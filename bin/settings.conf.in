@@ -116,6 +116,7 @@ ChanServDB         "chan.db"
 MemoServDB         "memo.db"
 StatServDB         "stat.db"
 OperServDB         "oper.db"
+OperServIgnoreDB   "ignore.db"
 SeenServDB         "seen.db"
 
 ################################################################

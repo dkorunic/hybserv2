@@ -66,6 +66,7 @@ extern  char      *ChanServDB;
 extern  char      *MemoServDB;
 extern  char      *StatServDB;
 extern  char      *OperServDB;
+extern  char      *OperServIgnoreDB;
 extern  char      *SeenServDB;
 
 extern  char      *n_OperServ;

@@ -52,7 +52,7 @@ AddJupe(char *name, char *reason, char *who)
 
   for (ii = 0; ii < strlen(name); ++ii)
   {
-    if (IsWildChar(name[ii]))
+    if (IsKWildChar(name[ii]))
     {
       nickjupe = 0;
       break;

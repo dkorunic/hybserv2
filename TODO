@@ -7,6 +7,8 @@ Drew's Law of Highway Biology:
 
 Pending bugs:
 -------------
+*) NEW bug in services, somehow connected with hashing code and servers -
+   FindServer does not find servers
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some

@@ -1233,7 +1233,8 @@ FindServer(const char *name)
   hashv = HashServer(name);
   temphash = &serverTable[hashv];
 
-  for (tempserv = (struct Server *) temphash->list; tempserv; tempserv = tempserv->hnext)
+  for (tempserv = (struct Server *) temphash->list; tempserv; tempserv =
+      tempserv->hnext)
   {
     /*
      * This has to be a match() instead of strcasecmp()

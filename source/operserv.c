@@ -1419,7 +1419,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
   for (ii = 0; ii < strlen(av[1]); ++ii)
   {
-    if (IsWildChar(av[1][ii]))
+    if (IsKWildChar(av[1][ii]))
       nickjupe = 0;
 
     if (!IsServChar(av[1][ii]))
@@ -1826,7 +1826,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
     charcnt = 0;
     for (ii = strlen(hostmask) - 1; ii > 0; ii--)
     {
-      if (IsWildChar(hostmask[ii]))
+      if (IsKWildChar(hostmask[ii]))
         continue;
 
       charcnt++;

@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <time.h>
+#include <assert.h>
 
 #include "alloc.h"
 #include "channel.h"
@@ -4706,6 +4707,7 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
     tempuser = DccGetUser(tempconn);
+    assert(tempuser != NULL);
 
     if (IsServicesAdmin(tempuser))
       prefix = '%';

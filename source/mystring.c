@@ -131,9 +131,20 @@ SplitBuf(char *buff, char ***array)
       ii;
   char *temp1, *tempbuf;
 
+  /* Be safe. If something down fails, it will point to NULL anyway -kre */
+  *array = NULL;
+
+  /* Perform this check -kre */
+  if (buff == NULL)
+    return 0;
+
   tempbuf = buff;
 
   ii = strlen(tempbuf);
+
+  /* No reason to parse this at all -kre */
+  if (!ii)
+    return 0;
 
   /* try to kill trailing \r or \n chars */
   if (IsEOL(tempbuf[ii - 1]))
@@ -150,6 +161,10 @@ SplitBuf(char *buff, char ***array)
    */
   while (IsSpace(*tempbuf))
     ++tempbuf;
+
+  /* Check if tempbuf contained only but spaces -kre */
+  if (!*tempbuf)
+    return 0;
 
   *array = (char **) MyMalloc(sizeof(char *) * argsize);
   acnt = 0;

@@ -1710,18 +1710,12 @@ s_sjoin(int ac, char **av)
     }
   }
 
-  /* 
-   * :irc.vchan SJOIN 978405679 #ircd-coders +sptna : @Diane @dia
-   * --> this happens with hybrid7beta2 -kre
-   *
-   * XXX - this is quickfix, we should rewrite this -kre
-   */
-    if (!strncmp(av[mcnt], ": ", 2))
-      /* Evade ": ". Note that parsing code lefts all after ':' as one
-       * whole line, so av[blah] + 2 is OK here -kre */
-      ncnt = SplitBuf(av[mcnt] + 2, &nicks);
-    else
-      ncnt = SplitBuf(av[mcnt] + 1, &nicks);
+  ncnt = SplitBuf(av[mcnt] + 1, &nicks);
+
+  /* Safety check - if we got no nicknames, that is non-valid blank SJOIN
+   * and we should silently ignore it kre */
+  if (!ncnt)
+    return;
 
   /*
    * when a user joins the channel "0", they get parted from all their

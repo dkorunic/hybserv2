@@ -32,6 +32,15 @@
 #include "sock.h"
 #include "Strn.h"
 
+#ifdef HAVE_SOLARIS_THREADS
+#include <thread.h>
+#include <synch.h>
+#else
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+#endif
+
 extern char *crypt();
 
 /*
@@ -255,6 +264,11 @@ DoShutdown(char *who, char *reason)
     ClearChans();
     ClearServs();
     ClearHashes(0);
+#endif
+
+  /* Ensure proper shutdown. -kre */
+#ifdef HAVE_PTHREADS
+  pthread_exit(1);
 #endif
 
   exit(1);

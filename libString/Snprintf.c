@@ -400,7 +400,7 @@ vSnprintf(register char *dest, register const size_t bytes,
 
       if (ch == 'c')
       {
-        *dest++ = va_arg(args, char);
+        *dest++ = va_arg(args, int);
 
         ++written;
 
@@ -724,7 +724,7 @@ vSprintf(register char *dest, register const char *format,
 
       if (ch == 'c')
       {
-        *dest++ = va_arg(args, char);
+        *dest++ = va_arg(args, int);
 
         ++written;
 

@@ -143,6 +143,12 @@ ProcessSignal(int sig)
          * a good chance they could get corrupted
          */
         /* DoShutdown((char *) NULL, "SIGSEGV Received"); */
+       
+        /* Ensure termination of threading system -kre */
+#ifdef HAVE_PTHREADS
+        pthread_exit(1);
+#endif
+
         exit(1);
       }
       else

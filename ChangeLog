@@ -1,3 +1,9 @@
+*** 20010503_9 by kreator
+- added fl_'s patch, follows his comment:
+  Hopfix is the +v instead of +h fix.. basically, the checks need to be in
+  order of importance (+o/+h/+v), not (+o/+v/+h) ;)
+
+
 *** 20010503_8 by kreator
 - patch by fl_: let +h people use unban by default (if hyb7 is defined) 
 

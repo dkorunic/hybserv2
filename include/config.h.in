@@ -387,4 +387,16 @@
 
 #endif
 
+#ifndef HYBRID7
+
+/*
+ * Turn this off to support gecos bans for Hybrid5/6.
+ * NOTE: This _has_ to be turned off for Hybrid7, since it does not
+ *       support +d style modes. -Janos
+ */
+
+#define GECOSBANS
+
+#endif
+
 #endif /* INCLUDED_config_h */

@@ -1248,10 +1248,14 @@ void
 signon()
 
 {
-  toserv("PASS %s :TS\nCAPAB :EX DE"
+  toserv("PASS %s :TS\nCAPAB :EX"
+#ifdef GECOSBANS
+      /* Send gecosbans capab -Janos */
+      " DE"
+#endif
 #ifdef HYBRID7
       /* Send most of Hybrid7 CAPABS -kre && Janos */
-      " UID KLN GLN HOPS IE HUB AOPS"
+      " KLN GLN HOPS IE HUB AOPS"
 #endif /* HYBRID7 */
       "\nSERVER %s 1 :%s\n", 
     currenthub->password, 

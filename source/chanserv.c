@@ -140,7 +140,9 @@ static void c_clear_hops(struct Luser *, struct NickInfo *, int, char **);
 #endif /* HYBRID7 */
 static void c_clear_voices(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_modes(struct Luser *, struct NickInfo *, int, char **);
+#ifdef GECOSBANS
 static void c_clear_gecos_bans(struct Luser *, struct NickInfo *, int, char **);
+#endif /* GECOSBANS */
 static void c_clear_bans(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_users(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
@@ -243,7 +245,9 @@ static struct Command clearcmds[] = {
   { "VOICES", c_clear_voices, LVL_NONE },
   { "MODES", c_clear_modes, LVL_NONE },
   { "BANS", c_clear_bans, LVL_NONE },
+#ifdef GECOSBANS
   { "GECOSBANS", c_clear_gecos_bans, LVL_NONE },
+#endif /* GECOSBANS */
   { "USERS", c_clear_users, LVL_NONE },
   { "ALL", c_clear_all, LVL_NONE },
 
@@ -6485,38 +6489,30 @@ c_clear(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 #ifdef HYBRID7
       /* Allow halfops for hybrid7 to be cleared, too -kre */
       "HALFOPS|"
-#endif
-      "VOICES|MODES|"
-      "BANS|GECOSBANS|ALL|USERS}\002");
-    notice(n_ChanServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_ChanServ,
-      "CLEAR");
+#endif /* HYBRID7 */
+      "VOICES|MODES|BANS|"
+#ifdef GECOSBANS
+      "GECOSBANS|"
+#endif /* GECOSBANS */
+      "ALL|USERS}\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
+        n_ChanServ, "CLEAR");
     return;
   }
 
   if (!(cptr = FindChan(av[1])))
   {
-    notice(n_ChanServ, lptr->nick,
-      ERR_CH_NOT_REGGED,
-      av[1]);
+    notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
     return;
   }
 
   if (!HasAccess(cptr, lptr, CA_CMDCLEAR))
   {
-    notice(n_ChanServ, lptr->nick,
-      ERR_NEED_ACCESS,
-      cptr->access_lvl[CA_CMDCLEAR],
-      "CLEAR",
-      cptr->name);
+    notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
+      cptr->access_lvl[CA_CMDCLEAR], "CLEAR", cptr->name);
     RecordCommand("%s: %s!%s@%s failed CLEAR [%s] %s",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name,
-      av[2]);
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+      cptr->name, av[2]);
     return;
   }
 
@@ -6525,12 +6521,8 @@ c_clear(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (cmdptr && (cmdptr != (struct Command *) -1))
   {
     RecordCommand("%s: %s!%s@%s CLEAR [%s] [%s]",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name,
-      cmdptr->cmd);
+      n_ChanServ, lptr->nick, lptr->username,
+      lptr->hostname, cptr->name, cmdptr->cmd);
 
     /* call cmdptr->func to execute command */
     (*cmdptr->func)(lptr, nptr, ac, av);
@@ -6810,12 +6802,14 @@ c_clear_all(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   c_clear_voices(lptr, nptr, ac, av);
   c_clear_modes(lptr, nptr, ac, av);
   c_clear_bans(lptr, nptr, ac, av);
+#ifdef GECOSBANS
   c_clear_gecos_bans( lptr, nptr, ac, av);
+#endif /* GECOSBANS */
 } /* c_clear_all() */
 
-static void
-c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
-
+#ifdef GECOSBANS
+static void c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr,
+    int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelGecosBan *bptr;
@@ -6829,12 +6823,13 @@ c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  bans = (char *) MyMalloc(sizeof(char));
+  bans = (char *)MyMalloc(sizeof(char));
   bans[0] = '\0';
 
   for (bptr = chptr->firstgecosban; bptr; bptr = bptr->next)
   {
-    bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) + (2 * sizeof(char)));
+    bans = (char *)MyRealloc(bans, strlen(bans) 
+        + strlen(bptr->mask) + (2 * sizeof(char)));
     strcat(bans, bptr->mask);
     strcat(bans, " ");
   }
@@ -6843,6 +6838,7 @@ c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   MyFree(bans);
 } /* c_clear_gecos_bans() */
+#endif /* GECOSBANS */
 
 #ifdef EMPOWERADMINS
 

@@ -46,7 +46,8 @@ struct Channel;
 /* We will happily FUBAR old databases by changing this. However, it had
  * to be done -kre && Janos
  * PS, I have added upgrade-chan target in Makefile for fixing this
- * properly - it relies on awk and DefaultAccess feature -kre */
+ * properly - it relies on awk and DefaultAccess as well as ALVL in
+ * chan.db -kre */
 #ifdef HYBRID7
 # define CA_AUTODEOP     0
 # define CA_AUTOVOICE    1

@@ -1,3 +1,4 @@
+dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(source/hybserv.c)
 
@@ -7,6 +8,25 @@ AC_CONFIG_HEADER(include/defs.h)
 dnl Set language and save it
 AC_LANG_C
 AC_LANG_SAVE
+
+dnl Get system type
+AC_CANONICAL_HOST
+MYHOST=$host_os
+case "$host_os" in
+*sunos*)
+  _SunOS=1
+  ;;
+*solaris*)
+  _SunOS=1
+  ;;
+esac
+
+dnl Package information
+PACKAGE=HybServ2
+VERSION=pre-1.8.0
+
+dnl Standard installation path
+AC_PREFIX_DEFAULT(/usr/local)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -30,18 +50,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ **))
 AC_HEADER_TIME
-
-dnl Check for solaris (got this from ircII-EPIC)
-dnl XXX - Fix this! Use config.guess
-AC_MSG_CHECKING(for Solaris/SunOS)
-
-if /bin/sun 2> /dev/null
-then
-  AC_MSG_RESULT(yes)
-  _SunOS=1
-else
-  AC_MSG_RESULT(no)
-fi
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL

@@ -1790,7 +1790,9 @@ s_sjoin(int ac, char **av)
       struct ChannelUser *tempuser;
       struct UserChannel *tempchan;
       struct ChannelBan *nextban;
+#ifdef GECOSBANS
       struct ChannelGecosBan *nextgecosban;
+#endif /* GECOSBANS */
 
       /*
        * if the TS given in the SJOIN is less than the recorded 
@@ -1815,7 +1817,8 @@ s_sjoin(int ac, char **av)
         cptr->firstban = nextban;
       }
 
-     /* clear all bans */
+#ifdef GECOSBANS
+     /* clear all gecos bans */
       while (cptr->firstgecosban)
       {
         nextgecosban = cptr->firstgecosban->next;
@@ -1825,6 +1828,7 @@ s_sjoin(int ac, char **av)
         MyFree(cptr->firstgecosban);
         cptr->firstgecosban = nextgecosban;
       }
+#endif /* GECOSBANS */
 
       for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
       {

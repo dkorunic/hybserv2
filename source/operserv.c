@@ -3505,7 +3505,9 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 
 {
   struct ChannelBan *tempban;
+#ifdef GECOSBANS
   struct ChannelGecosBan *tempgecosban;	
+#endif /* GECOSBANS */
   struct Exception *tempe;
   struct ChannelUser *tempuser;
   char *btime; /* time ban was set */
@@ -3643,21 +3645,23 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     }
   }
 
+#ifdef GECOSBANS
  if (cptr->firstgecosban)
   {
     os_notice(lptr, sockfd, "Gecos field Bans:");
-    for (tempgecosban = cptr->firstgecosban; tempgecosban; tempgecosban = tempgecosban->next)
+    for (tempgecosban = cptr->firstgecosban;
+        tempgecosban; tempgecosban = tempgecosban->next)
     {
       bcnt++;
       btime = (char *) ctime(&tempgecosban->when);
       btime[strlen(btime) - 1] = '\0';
       os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-        bcnt,
-        tempgecosban->mask,
+        bcnt, tempgecosban->mask,
         tempgecosban->who ? tempgecosban->who : "unknown",
         btime);
     }
   }
+#endif /* GECOSBANS */
 
   if (cptr->exceptlist)
   {
@@ -6321,7 +6325,9 @@ CalcMem(char *nick, int socket)
   struct Luser *tempuser;
   struct UserChannel *userc;
   struct ChannelUser *chanu;
+#ifdef GECOSBANS
   struct ChannelGecosBan *tempgecosban;
+#endif /* GECOSBANS */
 
   struct Channel *tempchan;
   struct ChannelBan *tempban;
@@ -6376,7 +6382,9 @@ CalcMem(char *nick, int socket)
   float servm;            /* memory used by servers */
   float chanm;            /* memory used by channels */
   float chanbanm;         /* memory used by channel bans */
+#ifdef GECOSBANS
   float changecosbanm;    /* memory used by gecos bans */
+#endif /* GECOSBANS */
   float chanexceptm;      /* memory used by channel exceptions */
   float confm;            /* total memory used by conf lines */
   float connm;            /* memory used by dcc connections */
@@ -6385,7 +6393,9 @@ CalcMem(char *nick, int socket)
   float hashcl;           /* clone hash */
   float hashs;            /* server hash */
   unsigned long chanbanc; /* number of channel bans */
+#ifdef GECOSBANS
   unsigned long changecosbanc; /* number of gecos bans */
+#endif /* GECOSBANS */
   unsigned long chanexceptc; /* number of channel exceptions */
   unsigned long confc;    /* total number of conf lines */
 
@@ -6441,10 +6451,14 @@ CalcMem(char *nick, int socket)
 
   chanm = 0;
   chanbanm = 0;
+#ifdef GECOSBANS
   changecosbanm = 0;
+#endif /* GECOSBANS */
   chanexceptm = 0;
   chanbanc = 0;
+#ifdef GECOSBANS
   changecosbanc = 0;
+#endif /* GECOSBANS */
   chanexceptc = 0;
   for (tempchan = ChannelList; tempchan; tempchan = tempchan->next)
   {
@@ -6468,13 +6482,17 @@ CalcMem(char *nick, int socket)
         chanbanm += strlen(tempban->who);
     }
 
-    for (tempgecosban = tempchan->firstgecosban; tempgecosban; tempgecosban = tempgecosban->next)
+#ifdef GECOSBANS
+    for (tempgecosban = tempchan->firstgecosban; tempgecosban;
+        tempgecosban = tempgecosban->next)
     {
       changecosbanc++;
-      changecosbanm += (strlen(tempgecosban->mask) + sizeof(struct ChannelGecosBan));
+      changecosbanm += (strlen(tempgecosban->mask) +
+          sizeof(struct ChannelGecosBan));
       if (tempgecosban->who)
         changecosbanm += strlen(tempgecosban->who);
     }
+#endif /* GECOSBANS */
 
     for (tempe = tempchan->exceptlist; tempe; tempe = tempe->next)
     {
@@ -6740,7 +6758,9 @@ CalcMem(char *nick, int socket)
   total = clientm +
           chanm +
           chanbanm +
+#ifdef GECOSBANS
           changecosbanm +
+#endif /* GECOSBANS */
           chanexceptm +
           servm +
           confm +
@@ -6819,12 +6839,14 @@ CalcMem(char *nick, int socket)
       chanbanc,
       chanbanm,
       chanbanm / 1024);
+#ifdef GECOSBANS
    /* Channel gecos ban mem usage */
     sprintf(sendstr,
       "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
       changecosbanc,
       changecosbanm,
       changecosbanm / 1024);
+#endif /* GECOSBANS */
     if (socket == NODCC)
       toserv(":%s NOTICE %s :%s",
         n_OperServ,

@@ -43,6 +43,7 @@ struct UserChannel;
 # define MODE_A          0x004000 /* channel is +a - Janos */
 #endif /* HYBRID7 */
 
+#ifdef GECOSBANS
 struct ChannelGecosBan
 {
   struct ChannelGecosBan *next, *prev;
@@ -50,6 +51,7 @@ struct ChannelGecosBan
   time_t when;   /* when the ban was made */
   char *mask;    /* hostmask of the ban */
 };
+#endif /* GECOSBANS */
 
 struct ChannelBan
 {
@@ -108,7 +110,9 @@ struct Channel
   struct ChannelUser *firstuser; /* pointer to first user in channel */
   time_t since;           /* when the channel was created (TS) */
   struct ChannelBan *firstban; /* pointer to first ban */
+#ifdef GECOSBANS
   struct ChannelGecosBan *firstgecosban; /* pointer to first gecos field ban*/
+#endif /* GECOSBANS */
   struct Exception *exceptlist; /* pointer to first ban exception */
   struct InviteException *inviteexceptlist; /* ptr to first invite
                                                exception - Janos */
@@ -125,8 +129,10 @@ struct Channel
  * Prototypes
  */
 
+#ifdef GECOSBANS
 void AddGecosBan(char *, struct Channel *, char *);
 void DeleteGecosBan(struct Channel *, char *);
+#endif /* GECOSBANS */
 
 void AddBan(char *, struct Channel *, char *);
 void DeleteBan(struct Channel *, char *);
@@ -172,8 +178,10 @@ struct InviteException *MatchInviteException(struct Channel *, char *);
 struct InviteException *FindInviteException(struct Channel *, char *);
 #endif /* HYBRID7 */
 
+#ifdef GECOSBANS
 struct ChannelGecosBan *MatchGecosBan(struct Channel *, char *);
 struct ChannelGecosBan *FindGecosBan(struct Channel *, char *);
+#endif /* GECOSBANS */
 
 /*
  * External declarations

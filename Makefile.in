@@ -22,7 +22,7 @@ WHOAMI = @WHOAMI@
 ############ Don't change anything below here ############
 
 # HybServ Version
-VERSION_MAJOR = pre-1.8.3
+VERSION_MAJOR = pre-1.8.0
 VERSION = @VERSION@
 
 CC = @CC@
@@ -92,6 +92,8 @@ distclean: clean
 	$(RM) `find . \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
 		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
 		-o -name '.*.rej' -o -name '.SUMS' -o -size 0 \) -print`
+
+mrproper: distclean
 
 depend:
 	@if [ ! -f source/.depend ]; then \

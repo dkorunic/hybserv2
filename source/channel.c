@@ -563,7 +563,9 @@ DeleteChannel(struct Channel *cptr)
   struct ChannelUser *cnext;
   struct ChannelBan *bnext;
   struct Exception *enext;
+#ifdef GECOSBANS
   struct ChannelGecosBan *gnext;
+#endif /* GECOSBANS */
 #ifdef HYBRID7
   struct InviteException *inext;
 #endif /* HYBRID7 */
@@ -605,6 +607,7 @@ DeleteChannel(struct Channel *cptr)
     cptr->firstban = bnext;
   }
 
+#ifdef GECOSBANS
   /*
    * clear channel denies
    */
@@ -617,6 +620,7 @@ DeleteChannel(struct Channel *cptr)
     MyFree(cptr->firstgecosban);
     cptr->firstgecosban = gnext;
   }
+#endif /* GECOSBANS */
 
   /*
    * clear channel exceptions
@@ -1199,6 +1203,7 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         break;
       } /* case 'b' */
 
+#ifdef GECOSBANS
       /*
        * Channel deny
        */
@@ -1215,6 +1220,7 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
         break;
       } /* case 'd' */
+#endif /* GECOSBANS */
 
       /*
        * Channel exception
@@ -1626,21 +1632,19 @@ KickBan(int ban, char *source, struct Channel *channel, char *nicks, char *reaso
   MyFree(av);
 } /* KickBan() */
 
+#ifdef GECOSBANS
 /*
 AddGecosBan()
   args: char *who, struct Channel *cptr, char *ban
   purpose: add gecos 'ban' set by 'who' to channel 'cptr'
   return: none
 */
-
-void
-AddGecosBan(char *who, struct Channel *cptr, char *ban)
-
+void AddGecosBan(char *who, struct Channel *cptr, char *ban)
 {
   time_t CurrTime = time(NULL);
   struct ChannelGecosBan *tempban;
 
-  tempban = (struct ChannelGecosBan *) MyMalloc(sizeof(struct ChannelGecosBan));
+  tempban = (struct ChannelGecosBan *)MyMalloc(sizeof(struct ChannelGecosBan));
   memset(tempban, 0, sizeof(struct ChannelGecosBan));
 
   if (who)
@@ -1662,10 +1666,7 @@ DeleteGecosBan()
   purpose: remove gecos 'ban' from channel 'cptr'
   return: none
 */
-
-void
-DeleteGecosBan(struct Channel *cptr, char *ban)
-
+void DeleteGecosBan(struct Channel *cptr, char *ban)
 {
   struct ChannelGecosBan *bptr;
 
@@ -1699,10 +1700,7 @@ FindGecosBan()
   purpose: determine if 'ban' is on 'cptr's ban list
   return: pointer to ban
 */
-
-struct ChannelGecosBan *
-FindGecosBan(struct Channel *cptr, char *ban)
-
+struct ChannelGecosBan * FindGecosBan(struct Channel *cptr, char *ban)
 {
   struct ChannelGecosBan *tempban;
 
@@ -1721,10 +1719,7 @@ MatchGecosBan()
  Same as FindBan() but use match() to compare bans to allow
 for wildcards
 */
-
-struct ChannelGecosBan *
-MatchGecosBan(struct Channel *cptr, char *ban)
-
+struct ChannelGecosBan * MatchGecosBan(struct Channel *cptr, char *ban)
 {
   struct ChannelGecosBan *tempban;
 
@@ -1734,3 +1729,4 @@ MatchGecosBan(struct Channel *cptr, char *ban)
 
   return (tempban);
 } /* MatchGecosBan() */
+#endif /* GECOSBANS */

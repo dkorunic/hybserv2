@@ -1,3 +1,7 @@
+*** 20030829_1 by kreator
+- tons of putlog() and toserv() fixes -> thanks Sarisa!
+
+
 *** 20030717_2 by kreator
 - include bane's unkline code as well as m_unline.c for Hybrid7
 

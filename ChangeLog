@@ -1,3 +1,7 @@
+*** 20010604_3 by kreator
+- fixed bug for DEBUGMODE in hybserv.c (thanks Janos)
+
+
 *** 20010604_2 by kreator
 - do some fixes all around
 - clean seenserv code a bit, do a reformat, remove joinpart() code

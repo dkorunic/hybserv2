@@ -1,3 +1,9 @@
+*** 20010502_3 by janos
+- I changed hybrid-7.leguin.org.uk to irc.efnow.net because on hybrid-7
+a hybnet server listening on port 6667, so I make sure users will come
+to hyb7 test net anyway :) 
+
+
 *** 20010502_2 by janos
 - a bug added to TODO
 

@@ -1,3 +1,18 @@
+
+On Tue, Jan 29, 2002 at 01:29:14AM -0500, marc@egotistical.net wrote:
+> bumped into this just now:
+> [dcc(operserv)] .ungline *@*.fbi.gov
+> [operserv(dcc)] Deleted gline HW@HW@P@*.fbi.go
+> [operserv(dcc)] Glines for *@*.fbi.gov removed [1 matches]
+> !services.null:S! OperServ: UNGLINE *@*.fbi.gov
+> those garble chars in the "Deleted gline" line are also reversed/etc..
+
+
+SERVER *.telnet.kabel.hub 1 :Test
+NICK Saris-T 1 1 +i sarisa sarisa.net test.telnet.kabel.hub :Test
+kaboom.
+
+
 telnet connections WON'T WORK. old code was buggy, new one just ignores
 telnet (immediately after identification) - yes, i plan to fix it sometime
 in the near future :)

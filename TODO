@@ -6,6 +6,9 @@ he has already achieved, but at what he aspires to do."
 
 Pending bugs:
 -------------
+*) clear modes doesn't clear limit
+*) fix lcnt issue in InsertLink() after reload command --> seems reload()
+   is very stupid
 *) check for OnAccessList() without master nick call - only when necessary
 *) remember to transfer access list in DeleteLink()
 *) seems it is possible that nickname stays ghosted more than necessary if

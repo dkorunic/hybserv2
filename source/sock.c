@@ -725,10 +725,8 @@ ReadSocketInfo(void)
       }
 
       /* this is for info coming from a dcc/telnet/tcm client */
-      for (dccptr = connections; dccptr; dccptr = dccnext)
+      for (dccptr = connections; dccptr != NULL; dccptr = dccptr->next)
       {
-        dccnext = dccptr->next;
-
         assert(dccptr->socket != NOSOCKET);
 
         if (IsDccConnect(dccptr) && FD_ISSET(dccptr->socket, &writefds))

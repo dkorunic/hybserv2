@@ -1,3 +1,10 @@
+*** 20020917_4 by kreator
+- start #ifdef DANCER work
+- update new channel activity (lastused) code
+- update access list info output
+- make proper o_restart and make it work with SIGUSR1, too
+
+
 *** 20020917_3 by kreator
 - misc
 

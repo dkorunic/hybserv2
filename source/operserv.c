@@ -788,7 +788,7 @@ int ignore_loaddata()
     {
       if (!irccmp(av[0], temp->hostmask))
       {
-        temp->expire = expire;
+        temp->expire = expire + current_ts;
         MyFree(av);
         found = 1;
         break;

@@ -1,3 +1,10 @@
+*** 20011124_2 by kreator
+- update TODO
+- confirm fixed possible DoS via DeleteLink()
+- fix master nick lookup for OnAccessList() which will result in normal
+  access lists lookups (as they should be in the first place!)
+
+
 *** 20011124_1 by kreator
 - this hopefully fixes that nasty DeleteLink() bug which could cause
   remote attacker to crash services in any time - this also could lead to

@@ -1,3 +1,8 @@
+*** 20010920_4 by wcampbel
+Removed the unused Strn.h header
+Added .cvsignore files
+
+
 *** 20010920_3 by wcampbel
 Document we now have a CVSWeb (Remove from TODO)
 Update the Hyb7 conf entries in README

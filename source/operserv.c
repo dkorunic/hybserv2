@@ -1564,8 +1564,9 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
     av[1],
     reason);
 
-  o_Wallops("JUPE %s [%s]",
+  o_Wallops("JUPE %s by %s [%s]",
     av[1],
+    onick,
     reason);
 
   if (!nickjupe)
@@ -1640,8 +1641,9 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
     "UNJUPE %s",
     av[1]);
 
-  o_Wallops("UNJUPE %s",
-    av[1]);
+  o_Wallops("UNJUPE %s by %s",
+    av[1],
+    onick);
 
   /* remove J: line from config file */
   if (JupeFile)

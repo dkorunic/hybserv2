@@ -590,7 +590,8 @@ ns_loaddata()
          * we've come to a new nick entry, so add the last nick
          * to the list before proceeding
          */
-        AddNick(nptr);
+        if (!FindNick(nptr->nick))
+          AddNick(nptr);
 
         if (islink)
           islink = 0;
@@ -609,7 +610,7 @@ ns_loaddata()
         nptr = NULL;
         continue;
       }
-#if 0
+#ifdef STRICT_DATA_CHECK
       /* Check if there already exists that nickname in list. This will
        * give some overhead, but this will make sure no nicknames are
        * twice or more times in db. */
@@ -629,7 +630,7 @@ ns_loaddata()
         nptr->created = atol(av[2]);
         nptr->lastseen = atol(av[3]);
         nptr->flags &= ~NS_IDENTIFIED;
-#if 0
+#ifdef STRICT_DATA_CHECK
       }
 #endif
     }

@@ -1,6 +1,10 @@
 #ifndef INCLUDED_config_h
 #define INCLUDED_config_h
 
+
+
+
+
 /* ------------------- Start of configurable section ------------ */
 
 /*
@@ -482,6 +486,23 @@
  */
 
 #define SERVICES_FIGHT_FIX
+
+/*
+ * This will give MUCH CPU overhead, and usually should not be enabled.
+ * This code makes double-checks for duplicate nicks in nick.db which
+ * shouldn't happen otherwise, but as a result of sloppy coding in
+ * previous hybserv releases. No, not my fault. I'm shipping it this way,
+ * so that all databases will be checked and fixed. If you know what are
+ * you doing, you can disable it. -kre
+ */
+
+#define STRICT_DATA_CHECK
+
+
+
+
+
+
 
 /* ------------------- End of configurable section -------------- */
 

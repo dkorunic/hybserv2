@@ -151,8 +151,6 @@ static void c_clear_bans(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_users(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 
-static void c_fixts(struct Luser *, struct NickInfo *, int, char **);
-
 #ifdef EMPOWERADMINS
 static void c_forbid(struct Luser *, struct NickInfo *, int, char **);
 static void c_unforbid(struct Luser *, struct NickInfo *, int, char **);
@@ -160,7 +158,11 @@ static void c_setpass(struct Luser *, struct NickInfo *, int, char **);
 static void c_status(struct Luser *, struct NickInfo *, int, char **);
 static void c_forget(struct Luser *, struct NickInfo *, int, char **);
 static void c_noexpire(struct Luser *, struct NickInfo *, int, char **);
-static void c_clearnoexpire(struct Luser *, struct NickInfo *, int, char **);   
+static void c_clearnoexpire(struct Luser *, struct NickInfo *, int, char
+    **);   
+static void c_fixts(struct Luser *, struct NickInfo *, int, char **);
+static void c_resetlevels(struct Luser *, struct NickInfo *, int, char
+    **);
 #endif /* EMPOWERADMINS */
 
 /* main ChanServ commands */
@@ -192,6 +194,7 @@ static struct Command chancmds[] = {
   { "FORGET", c_forget, LVL_ADMIN },
   { "NOEXPIRE", c_noexpire, LVL_ADMIN },
   { "CLEARNOEXP", c_clearnoexpire, LVL_ADMIN },
+  { "RESETLEVELS", c_resetlevels, LVL_ADMIN },
 #endif
 
   { 0, 0, 0 }
@@ -7172,13 +7175,11 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 } /* c_forget() */
 
 /*
-c_noexpire()
- Prevent channel av[1] from expiring
-*/
-
-static void
-c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
-
+ * c_noexpire()
+ * Prevent channel av[1] from expiring
+ */
+static void c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
 {
   struct ChanInfo *cptr;
 
@@ -7245,7 +7246,6 @@ c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     "NOEXPIRE");
 } /* c_noexpire() */
 
-
 /*
  * Clears noexpire modes setup on channels. Code taken from IrcBg and
  * slightly modified. -kre
@@ -7267,8 +7267,6 @@ void c_clearnoexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
       "All noexpire flags are cleared." );
 
 } /* c_clearnoexpire() */
-
-#endif /* EMPOWERADMINS */
 
 /* 
  * c_fixts()
@@ -7321,6 +7319,31 @@ static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
       MyFree(arv);
     }
   }
-}
+} /* c_fixts */
+
+/*
+ * c_resetlevels
+ *
+ * Resets levels of _all_ channels to DefaultAccess. -kre
+ */
+static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
+        char **av)
+{
+  int ii;
+  struct ChanInfo *cptr;
+
+  RecordCommand("%s: %s!%s@%s RESETLEVELS",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+
+  for (ii = 0; ii < CHANLIST_MAX; ii++)
+    for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
+        cptr->access_lvl = DefaultAccess;
+
+  notice(n_ChanServ, lptr->nick,
+      "All channels have been reset to default access levels." );
+
+} /* c_resetlevels */
+
+#endif /* EMPOWERADMINS */
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

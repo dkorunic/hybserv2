@@ -559,7 +559,7 @@ s_server(int ac, char **av)
     }
     return;
   }
-#endif
+#endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);
   if (tempserv == Me.hub)
@@ -595,22 +595,23 @@ s_server(int ac, char **av)
     /* initialize service nicks */
     InitServs(NULL);
 
-  #ifdef ALLOW_JUPES
+#ifdef ALLOW_JUPES
     /* Introduce juped nicks/servers to the network */
     InitJupes();
-  #endif
+#endif /* ALLOW_JUPES */
 
   }
   else
   {
-  #ifdef ALLOW_JUPES
+#ifdef ALLOW_JUPES
     /* a new server connected to network, check if its juped */
     CheckJuped(av[2]);
-  #endif
+#endif /* ALLOW_JUPES */
+
 #ifdef DEBUGMODE
     fprintf(stderr, "Introducing new server %s\n",
       av[2]);
-#endif
+#endif /* DEBUGMODE */
   }
 } /* s_server() */
 

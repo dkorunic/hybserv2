@@ -238,7 +238,7 @@ static struct OperCommand opercmds[] = {
 
 #ifdef ALLOW_DIE
   { "DIE", o_die, 0, 's' },
-#endif
+#endif /* ALLOW_DIE */
 
 #ifdef ALLOW_DUMP
   { "DUMP", o_dump, 0, 's' },

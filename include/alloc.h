@@ -23,7 +23,7 @@
 #define INCLUDED_config_h
 #endif
 
-#define MyFree(x)     free(x)
+#define MyFree(x)     if ((x)) free((x))
 
 #ifdef BLOCK_ALLOCATION
 

@@ -2519,7 +2519,6 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
   struct NickInfo *master_nptr = NULL;
   int ret = 0, cnt = 0, ulev;
   int found = 0;
-  int debugcnt = 0;
 
   if (!cptr || !lptr || (!mask && !nptr))
     return 0;

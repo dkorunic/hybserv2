@@ -9,7 +9,7 @@ echo
 echo "You need root to install HybServ in system wide directories"
 echo
 
-su root -c "make install ; make install-help"
+su root -c "make install"
 
 echo
 echo "HybServ has been successfully installed!"

@@ -1,3 +1,13 @@
+*** 20010430_1 by kreator
+- more syncing with Janos, especially for chan access levels for halfops
+  etc.
+- added GIMMECORE in config.h for proper corefile setup
+- more changes for CAPAB
+- changes to INSTALL
+- properly made update-chan in Makefile.in to detect and allow ALVL
+  deletion in chan.db for smooth upgrade to Hybrid7 capable Hybserv
+
+
 *** 20010429_9 by kreator
 - add upgrade script for new levels into Makefile.in
 

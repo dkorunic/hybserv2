@@ -41,6 +41,7 @@ New features:
 *) improve block allocator
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
+*) add mySQL/PostgreSQL support for databases
 *) mailing list
 *) cvsweb
 *) ziplinks

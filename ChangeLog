@@ -1,3 +1,8 @@
+*** 20010507_1 by kreator
+- add experimental MD5 support via hybcrypt()
+- fix problem with ChanServ ignoring valid operators
+
+
 *** 20010506_4 by janos
 - a line to hybserv.conf with an example user with 's' flag
   so a newbie can die ,and he does not need to kill hybserv

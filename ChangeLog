@@ -1,3 +1,9 @@
+*** 20010429_5 by kreator
+- add some more verbose messages in operserv: omode and gline wallops now
+  show who issued the command
+- fix index for chanserv and nickserv to show new commands
+
+
 *** 20010429_4 by kreator
 - oops, used uninitialised helpstr in helpserv security fix
 

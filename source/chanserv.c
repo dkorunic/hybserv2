@@ -3249,11 +3249,10 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   notice(n_ChanServ, lptr->nick,
          "The channel [\002%s\002] is now registered under your nickname",
          av[1]);
-  notice(n_ChanServ, lptr->nick, "You have been added as a SuperOp");
+  notice(n_ChanServ, lptr->nick, "You have been added as a Founder");
   notice(n_ChanServ, lptr->nick,
          "The password for %s is [\002%s\002] - Remember this for later use",
-         av[1],
-         av[2]);
+         av[1], av[2]);
 
   RecordCommand("%s: %s!%s@%s REGISTER [%s]",
                 n_ChanServ,
@@ -5318,39 +5317,39 @@ c_set_successor(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       notice(n_ChanServ, lptr->nick,
              "You must IDENTIFY as a founder before setting the successor nickname");
       RecordCommand("%s: %s!%s@%s failed SET [%s] SUCCESSOR %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
+                    n_ChanServ, lptr->nick, lptr->username,
+                    lptr->hostname, cptr->name,
                     (ac < 4) ? "" : av[3]);
       return;
     }
 
   RecordCommand("%s: %s!%s@%s SET [%s] SUCCESSOR %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
                 cptr->name,
                 (ac < 4) ? "" : av[3]);
 
   if (ac < 4)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002SET <channel> SUCCESSOR <nickname>\002");
+             "Syntax: \002SET <channel> SUCCESSOR <nickname|->\002");
       notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "SET SUCCESSOR");
+             ERR_MORE_INFO, n_ChanServ, "SET SUCCESSOR");
       return;
     }
 
+  if (!irccmp(av[3], "-"))
+  {
+    if (cptr->successor)
+      MyFree(cptr->successor);
+    cptr->successor = NULL;
+    notice(n_ChanServ, lptr->nick,
+      "The successor nickname for %s has been cleared", cptr->name);
+    return;
+  }
+
   if (!(fptr = FindNick(av[3])))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_NOT_REGGED,
-             av[3]);
+      notice(n_ChanServ, lptr->nick, ERR_NOT_REGGED, av[3]);
       return;
     }
 

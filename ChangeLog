@@ -1,3 +1,7 @@
+*** 20030112_2 by kreator
+- fixed smalles numerics issues with mo_forcenick()
+
+
 *** 20030112_1 by kreator
 - added m_forcenick.c as Hybrid7 FORCENICK module, to be incorporated with
   identifying and nickchanges..

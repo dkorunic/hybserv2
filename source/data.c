@@ -419,6 +419,10 @@ BackupDatabases(time_t unixtime)
 
   CopyFile(OperServDB, temp);
 
+  ircsprintf(temp, "%s/%s", bpath, OperServIgnoreDB);
+
+  CopyFile(OperServIgnoreDB, temp);
+
 #ifdef STATSERVICES
 
   ircsprintf(temp, "%s/%s", bpath, StatServDB);

@@ -5,6 +5,7 @@
 
 static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
+extern int rename(const char *oldpath, const char *newpath);
 extern char *crypt();
 
 /*

@@ -10,6 +10,7 @@ static char *rcsid = "$Id$";
 
 extern char *getpass();
 extern char *doencrypt(char *);
+extern int rename(const char *oldpath, const char *newpath);
 
 int
 main(int argc, char *argv[])

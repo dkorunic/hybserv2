@@ -1,3 +1,7 @@
+Some sort of TODO/planning program
+(not necessarily in `right' order)
+----------------------------------
+
 1) crashing on /reload
    -  done(?) - seems another Solaris goddamn bug.
 2) linked tree problems
@@ -36,3 +40,6 @@
     geek code
 21) anon cvs
     - done
+22) we don't save information on servers on shutdown (statserv). should
+    we?
+    - ?

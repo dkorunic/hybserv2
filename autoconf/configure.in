@@ -4,6 +4,10 @@ AC_INIT(source/hybserv.c)
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CONFIG_HEADER(include/defs.h)
 
+dnl Set language and save it
+AC_LANG_C
+AC_LANG_SAVE
+
 dnl Checks for programs.
 AC_PROG_CC
 AC_PATH_PROG(RM, rm)
@@ -23,15 +27,12 @@ AC_SUBST(WHOAMI)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-
 AC_CHECK_HEADERS(sys/time.h)
-
 AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ **))
-
 AC_HEADER_TIME
 
 dnl Check for solaris (got this from ircII-EPIC)
-
+dnl XXX - Fix this! Use config.guess
 AC_MSG_CHECKING(for Solaris/SunOS)
 
 if /bin/sun 2> /dev/null
@@ -44,39 +45,56 @@ fi
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strdup strerror)
-AC_CHECK_FUNCS(vprintf)
-
-AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),)
-
-AC_CHECK_LIB(nsl, gethostbyname, LIBS="$LIBS -lnsl",)
-AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket",)
-AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt",)
+AC_CHECK_FUNCS(strdup strerror vprintf)
+AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
+AC_CHECK_FUNCS(gethostbyname, , [AC_CHECK_LIB(nsl, gethostbyname), , LIBS="$LIBS -lnsl"])
+AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
+AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt")
 
 dnl Do not compile with pthread support if they give a
 dnl --disable-threads or --enable-threads=no to configure
-
 AC_ARG_ENABLE(threads, [  --enable-threads        Enable thread support [default=yes]])
-
-AC_SUBST(LIBP)
 
 dnl We will use Solaris native threads if Solaris is present
 if test ! "$enable_threads" = "no"; then
-
   AC_CHECK_LIB(thread, thr_create,
     AC_DEFINE(HAVE_SOLARIS_THREADS)
-    CFLAGS="$CFLAGS -D_REENTRANT"
+    CFLAGS="${CFLAGS} -D_REENTRANT"
     LIBP="-lthread",
     AC_MSG_WARN(No native Solaris threads - will try pthreads)
       AC_CHECK_LIB(pthread, pthread_create,
       AC_DEFINE(HAVE_PTHREADS)
       if test -n "$_SunOS"; then
-        CFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+        CFLAGS="${CFLAGS} -D_POSIX_PTHREAD_SEMANTICS"
       else
-        CFLAGS="$CFLAGS -D_REENTRANT"
+        CFLAGS="${CFLAGS} -D_REENTRANT"
       fi
       LIBP="-lpthread",
       AC_MSG_WARN(Compiling without pthread support)))
+fi
+AC_SUBST(LIBP)
+
+dnl Add support for sfio stdio library
+hold_libs=$LIBS
+hold_cflags=$CFLAGS
+AC_ARG_WITH(sfio-lib, [  --with-sfio-lib=DIR     Directory containing sfio library], LIBS="${LIBS} -L${withval}")
+hold_libs2=$LIBS
+AC_ARG_WITH(sfio-inc, [  --with-sfio-inc=DIR     Directory containing sfio include files], CFLAGS="${CFLAGS} -I${withval}")
+LIBS="${LIBS} -lsfio"
+AC_CHECK_LIB(stdio, fprintf, _sfio=yes, _sfio=no)
+if test "$_sfio" = "no";
+then
+  CFLAGS=$hold_cflags
+  LIBS=$hold_libs
+else
+  dnl Multithreaded environment
+  if test -n "${LIBP}";
+  then
+    LIBS="$hold_libs2 -lstdio-mt -lsfio-mt"
+  dnl Singlethreaded environment
+  else
+    LIBS="$hold_libs2 -lstdio -lsfio"
+  fi
 fi
 
 dnl Use sed to grab the version from Makefile.in
@@ -93,8 +111,8 @@ Makefile                \
 libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
-bin/settings.conf \
-include/config.h  \
+bin/settings.conf       \
+include/config.h        \
 )
 
 echo "

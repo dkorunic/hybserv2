@@ -6,7 +6,8 @@ CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDE = -I../include
 # DEFS =
-LIBS = @LIBS@
+# Link with pthread because of sfio. Yes, this is ugly cludge
+LIBS = @LIBS@ @LIBP@
 
 RM = @RM@ -f
 

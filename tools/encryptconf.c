@@ -25,6 +25,7 @@
 
 #define    MAXLINE    1024
 
+extern int rename(const char *oldpath, const char *newpath);
 extern char *doencrypt(char *);
 
 int

@@ -3513,7 +3513,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     /* it must be a nickname */
     if (!(nickptr = FindNick(av[3])))
     {
-      notice(n_ChanServ, lptr->nick, "Nickname [\002%s\002] is not registered. Please use either registered nickname or proper mask (nick!user@host, user@host or just host)");
+      notice(n_ChanServ, lptr->nick, "Nickname [\002%s\002] is not registered. Please use either registered nickname or proper mask (nick!user@host, user@host or just host)", av[3]);
       return;
     }
   }

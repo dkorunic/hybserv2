@@ -5164,7 +5164,6 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
       char uh[UHOSTLEN + 2];
       char chkstr[MAXLINE];
       char *user = NULL, *host = NULL;
-      int cnt = 1;
 
       os_notice(lptr, sockfd, "-- Listing Glines --");
        os_notice(lptr, sockfd,
@@ -5186,16 +5185,14 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
           }
        }
          
-      for (gptr = GlineList; gptr && cnt; gptr = gptr->next)
+      for (gptr = GlineList; gptr; gptr = gptr->next)
       {
-        /* Do username/hostname matching here! */
+        /* Do username/hostname matching here! -kre */
         if (ac > 2)
         {
           if (user && !match(user, gptr->username))
             continue;
-          if (match(host, gptr->hostname))
-            cnt = 0;
-          else
+          if (!match(host, gptr->hostname))
             continue;
         }
             

@@ -1851,7 +1851,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
   
   /* Is this the founder? (not somebody with founder _access_, but the
    * actual founder nick) */
-  if ((nptr = FindNick(lptr->nick)) && nptr->flags & NS_IDENTIFIED)
+  if ((nptr = FindNick(lptr->nick)) && (nptr->flags & NS_IDENTIFIED))
   {
     if (cptr->founder && irccmp(lptr->nick, cptr->founder) == 0)
     /* That's the founder joining. Update activity timer */
@@ -1892,9 +1892,8 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
   if (IsChannelMember(chptr, Me.csptr))
     {
       /*
-       * ChanServ is already on the channel so it is not
-       * a brand new channel - we don't have to worry about
-       * the new user(s) who joined
+       * ChanServ is already on the channel so it is not a brand new
+       * channel - we don't have to worry about the new user(s) who joined
        */
       return;
     }
@@ -2835,15 +2834,13 @@ IsFounder(struct Luser *lptr, struct ChanInfo *cptr)
 } /* IsFounder() */
 
 /*
-GetAccess()
-  Return highest access level 'lptr' has on 'cptr'
-*/
-
-static int
-GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
-
+ * GetAccess()
+ * Return highest access level 'lptr' has on 'cptr'
+ */
+static int GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 {
   struct ChanAccess *ca;
+  struct Channel *chptr;
   char chkstr[MAXLINE];
   int level = -9999;
   struct NickInfo *nptr;
@@ -2863,19 +2860,13 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 
   if ((nptr = FindNick(lptr->nick)))
     {
-      /*
-       * If nptr has not yet identified, don't give them access
-       */
+      /* If nptr has not yet identified, don't give them access */
       if (!(nptr->flags & NS_IDENTIFIED))
         {
           if (cptr->flags & CS_SECURE)
-            {
-              /*
-               * If the channel is secured, they MUST be
-               * identified to get access - return 0
-               */
-              return (0);
-            }
+              /* If the channel is secured, they MUST be identified to get
+               * access - return 0 */
+              return(0);
 
           if (!AllowAccessIfSOp)
             nptr = NULL;
@@ -2884,22 +2875,20 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
           else
             {
               /*
-               * They're opped on the channel, and AllowAccessIfSOp
-               * is enabled, so allow them access. This will only
-               * work during a netjoin, so ChanServ doesn't wrongfully
-               * deop whole channels. If a channel op tries to
-               * use this feature to get access without identifying,
-               * cs_process() will stop them cold.
+               * They're opped on the channel, and AllowAccessIfSOp is
+               * enabled, so allow them access. This will only work during
+               * a netjoin, so ChanServ doesn't wrongfully deop whole
+               * channels. If a channel op tries to use this feature to
+               * get access without identifying, cs_process() will stop
+               * them cold.
                */
             }
         }
     }
   else if (cptr->flags & CS_SECURE)
     {
-      /*
-       * The channel is secured, and they do not have a registered
-       * nickname - return 0
-       */
+      /* The channel is secured, and they do not have a registered
+       * nickname - return 0 */
       return (0);
     }
 
@@ -2920,7 +2909,6 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
               if (IsLinked(nptr, ca->nptr))
                 found = 1;
 #endif /* LINKED_NICKNAMES */
-
             }
         }
 
@@ -2930,10 +2918,10 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 
       if (found)
       {
-        struct Channel *chptr = FindChannel(cptr->name);
-        /* Only if the user is currently on the channel */
-        if (IsChannelMember(chptr, lptr))
-        /* Update usage time for this access level */
+        chptr = FindChannel(cptr->name);
+        /* Only if the user is currently on the channel update usage time
+         * for this access level */
+        if (chptr && IsChannelMember(chptr, lptr))
           cptr->lastused = ca->last_used = current_ts;
 
         if (ca->level >= level)
@@ -2947,7 +2935,7 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
       }
     }
 
-  if (level == (-9999))
+  if (level == -9999)
     return 0;
   else
     return (level);
@@ -3800,9 +3788,9 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
              "-- Access List for [\002%s\002] --",
              cptr->name);
       notice(n_ChanServ, lptr->nick,
-             "Num Level Hostmask                            Time since last use");
+             "Num Level Hostmask             Time since last use");
       notice(n_ChanServ, lptr->nick,
-             "--- ----- --------                            -------------------");
+             "--- ----- --------             -------------------");
       idx = 1;
       for (ca = cptr->access; ca; ca = ca->next, idx++)
         {
@@ -3812,7 +3800,7 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
           notice(n_ChanServ, lptr->nick,
             "%-3d %-5d %-35s %-10s", idx, ca->level,
             ca->hostmask ? ca->hostmask : (ca->nptr ? ca->nptr->nick : ""),
-            ca->last_used ? timeago(ca->last_used, 0) : "          ");
+            ca->last_used ? timeago(ca->last_used, 0) : "");
         }
       notice(n_ChanServ, lptr->nick,
              "-- End of list --");
@@ -6659,7 +6647,10 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   notice(n_ChanServ, lptr->nick, "  Registered: %s ago",
       timeago(cptr->created, 1));
 
+#if 0
+  /* XXX: testing -kre */
   if (!FindChannel(cptr->name))
+#endif
     notice(n_ChanServ, lptr->nick,
            "   Last Used: %s ago",
            timeago(cptr->lastused, 1));

@@ -1,3 +1,8 @@
+*** 20010410_3 by kreator
+Updated documentation for libhoard. Some updates for libhoard to use -lrt
+in configure for Solaris
+
+
 *** 20010410_2 by kreator
 Remove pthread_exit() from last commit. I still need to fix DoShutDown()
 and exit() for LinuxPosixTreads since it does not properly shut down

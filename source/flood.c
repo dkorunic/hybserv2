@@ -300,6 +300,11 @@ void updateConnectTable(char *user, char *host)
   struct Luser *ouser = NULL;
 #endif /* ADVFLOOD_NOTIFY_ALL */
 
+#if 0
+  if (!user || !host)
+    return;
+#endif
+
 #ifdef ADVFLOOD_NOIDENT_GLINEHOST
   if (user[0] == '~')
     banhost = 1;
@@ -366,10 +371,8 @@ void updateConnectTable(char *user, char *host)
               n_OperServ, luserptr->nick, Me.name, n_OperServ,
               ADVFLOOD_GLINE_REASON);
 
-              /* this barfs, will fix later -ike */
-              /*
-                if (Me.sptr) Me.sptr->numoperkills++;
-               */
+              if (Me.sptr)
+                Me.sptr->numoperkills++;
 
               Network->TotalOperKills++;
 #ifdef STATSERVICES

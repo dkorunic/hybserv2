@@ -1979,7 +1979,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   }
 
   /* Check if any users on the network match the new gline */
-  prev = (struct Luser *) NULL;
+  prev = NULL;
   for (user = ClientList; user; )
   {
     if (user->server == Me.sptr)
@@ -2022,7 +2022,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
       else
       {
         DeleteClient(user);
-        user = (struct Luser *) NULL;
+        user = NULL;
       }
     }
 

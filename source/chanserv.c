@@ -1871,9 +1871,9 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
   {
     if (cptr->founder && irccmp(lptr->nick, cptr->founder) == 0)
     /* That's the founder joining. Update activity timer */
-      cptr->last_founder_active = current_ts;
+      cptr->lastused = cptr->last_founder_active = current_ts;
     if (cptr->successor && irccmp(lptr->nick, cptr->successor) == 0)
-      cptr->last_successor_active = current_ts;
+      cptr->lastused = cptr->last_successor_active = current_ts;
   }
 } /* cs_CheckJoin() */
 

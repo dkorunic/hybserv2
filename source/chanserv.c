@@ -6288,7 +6288,7 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     cptr->name);
   notice(n_ChanServ, lptr->nick,
     "     Founder: %s %s",
-    cptr->founder ? cptr->founder : "OperServ",
+    cptr->founder ? cptr->founder : "",
     online ? "<< ONLINE >>" : "");
   notice(n_ChanServ, lptr->nick,
     "  Registered: %s ago",

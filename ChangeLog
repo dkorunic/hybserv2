@@ -1,3 +1,8 @@
+*** 20010921_1 by kreator
+- fix security issue when non-identified users with registered nickname
+  could see info on themselves including all channels and all levels
+
+
 *** 20010920_5 by wcampbel
 Cygwin fixes and document that Cygwin works
 

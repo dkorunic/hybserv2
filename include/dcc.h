@@ -53,6 +53,8 @@ struct DccUser
   char *username;   /* username */
   char *hostname;   /* hostname */
   int flags;        /* socket flags */
+  char spill[MAXLINE * 2];
+  int offset;
 
   /*
    * time of their last message - for telnet clients who haven't

@@ -99,9 +99,6 @@ char                      spill[MAXLINE * 2];
  */
 int                       offset = 0;
 
-char                      dccspill[MAXLINE * 2];
-int                       dccoffset = 0;
-
 #ifdef HIGHTRAFFIC_MODE
 
 int                       HTM = 0;         /* High Traffic Mode */
@@ -512,7 +509,6 @@ ReadSocketInfo(void)
 #endif
 
   spill[0] = '\0';
-  dccspill[0] = '\0';
 
   for (;;)
   {
@@ -1018,7 +1014,7 @@ ReadSock(struct DccUser *connptr)
     return 1;
 
   ch = buffer;
-  linech = dccspill + dccoffset;
+  linech = connptr->spill + connptr->offset;
 
   while (*ch)
   {
@@ -1029,7 +1025,7 @@ ReadSock(struct DccUser *connptr)
     {
       *linech = '\0';
 
-      if (*dccspill && IsEOL(*dccspill))
+      if (IsEOL(connptr->spill))
       {
         ch++;
         continue;
@@ -1037,12 +1033,12 @@ ReadSock(struct DccUser *connptr)
 
       /* process the line */
       if (connptr->flags & SOCK_TCMBOT)
-        BotProcess(connptr, dccspill); /* process line from bot */
+        BotProcess(connptr, connptr->spill); /* process line from bot */
       else
-        DccProcess(connptr, dccspill); /* process line from client */
+        DccProcess(connptr, connptr->spill); /* process line from client */
 
-      linech = dccspill;
-      dccoffset = 0;
+      linech = connptr->spill;
+      connptr->offset = 0;
 
       /*
        * If the line ends in \r\n, advance past the \n
@@ -1052,11 +1048,11 @@ ReadSock(struct DccUser *connptr)
     }
     else
     {
-      /* make sure we don't overflow dccspill */
-      if (linech < (dccspill + (sizeof(dccspill) - 1)))
+      /* make sure we don't overflow spill */
+      if (linech < (connptr->spill + (sizeof(connptr->spill) - 1)))
       {
         *linech++ = tmp;
-        dccoffset++;
+        connptr->offset++;
       }
     }
     ch++;

@@ -1274,26 +1274,37 @@ struct Server *
 FindServer(const char *name)
 
 {
-  register int hashv;
   register struct Server *tempserv;
-  register aHashEntry *temphash;
 
-  assert(name != 0);
+  assert(name != NULL);
 
-  hashv = HashServer(name);
-  temphash = &serverTable[hashv];
+  /* We can't just calculate the hash value for <name> and match
+   * all servers from that part of the hash table, because
+   * masked versions of <name> can have other hash values that
+   * the unmasked <name>.
+   * -adx
+   */
 
-  for (tempserv = (struct Server *) temphash->list; tempserv; tempserv =
-      tempserv->hnext)
+  for (tempserv = serverTable[HashServer(name)].list; tempserv;
+    tempserv = tempserv->hnext)
+    if (!irccmp(tempserv->name, name)) return (tempserv);
+
+  if ('*' == *name || '.' == *name) return NULL;
+
   {
-    /*
-     * This has to be a match() instead of irccmp()
-     * because the N: for HybServ on the hub server may have
-     * hostmask stripping, in which case the hub server would
-     * appear like *.hub.net
-     */
-    if (match(tempserv->name, name))
-      return (tempserv);
+    char buffer[HOSTLEN + 1];
+    char *s = buffer - 1;
+
+    buffer[HOSTLEN] = '\0';
+    strncpy(buffer, name, HOSTLEN);
+
+    while ((s = strchr(s + 2, '.')) != NULL)
+    {
+      *--s = '*';
+      for (tempserv = serverTable[HashServer(s)].list; tempserv;
+        tempserv = tempserv->hnext)
+	if (!irccmp(tempserv->name, s)) return (tempserv);
+    }
   }
 
   return (NULL);

@@ -6000,10 +6000,11 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   }
 
   /* NOTE: only CMDOP people can +h other people */
-  if (!HasAccess(cptr, lptr, CA_CMDOP))
+  /* So why do we have CMDHALFOP level?? -adx */
+  if (!HasAccess(cptr, lptr, CA_CMDHALFOP))   /* XXX */
   {
     notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
-      cptr->access_lvl[CA_CMDOP], "OP", cptr->name);
+      cptr->access_lvl[CA_CMDHALFOP], "HALFOP", cptr->name);
     RecordCommand("%s: %s!%s@%s failed HALFOP [%s]",
       n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
     return;
@@ -6029,7 +6030,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     char *tempnix, *tempptr, **arv;
     struct Luser *currlptr;
 
-    /* they want to voice other people */
+    /* they want to halfop other people */
     tempnix = GetString(ac - 2, av + 2);
 
     tempptr = tempnix;
@@ -6080,7 +6081,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   MyFree(dnicks);
 
   return;
-} /* c_halfop() */
+} /* c_hop() */
 #endif /* HYBRID7 */
 
 /*

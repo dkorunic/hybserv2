@@ -4479,10 +4479,7 @@ n_unlink(struct Luser *lptr, int ac, char **av)
      */
     notice(n_NickServ, lptr->nick,
       "Syntax: \002UNLINK [nickname [password]]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "UNLINK");
+    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "UNLINK");
     return;
   }
 
@@ -4506,21 +4503,14 @@ n_unlink(struct Luser *lptr, int ac, char **av)
       notice(n_NickServ, lptr->nick,
         ERR_BAD_PASS);
       RecordCommand("%s: %s!%s@%s failed UNLINK %s",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
+        n_NickServ, lptr->nick, lptr->username, lptr->hostname,
         nptr->nick);
       return;
     }
   }
 
   RecordCommand("%s: %s!%s@%s UNLINK %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    nptr->nick);
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, nptr->nick);
 
   unlink = DeleteLink(nptr, 1);
 
@@ -4537,11 +4527,9 @@ n_unlink(struct Luser *lptr, int ac, char **av)
     putlog(LOG1, "%s: UNLINK failed: DeleteLink() contained errors",
       n_NickServ);
   }
-  else if (unlink == (-1))
+  else if (unlink == -1)
   {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_LINKED,
-      nptr->nick);
+    notice(n_NickServ, lptr->nick, ERR_NOT_LINKED, nptr->nick);
   }
 } /* n_unlink() */
 

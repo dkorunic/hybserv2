@@ -4454,13 +4454,25 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  nptr->flags &= ~NS_FORBID;
-  
-  notice(n_NickServ, lptr->nick,
-    "Nickname [\002%s\002] is now unforbidden", av[1]);
+  if (!nptr->password)
+  {
+    /* It is made from AddNick() in forbid() code - it is empty, so it is
+     * safe to delete it -kre */
+    DeleteNick(nptr);
 
-  /* Check if av[1] is currently online and tell it to identify */
-  CheckNick(av[1]);
+    notice(n_NickServ, lptr->nick,
+      "The nickname [\002%s\002] has been dropped", av[1]);
+  }
+  else
+  {
+    nptr->flags &= ~NS_FORBID;
+  
+    notice(n_NickServ, lptr->nick,
+      "Nickname [\002%s\002] is now unforbidden", av[1]);
+
+    /* Check if av[1] is currently online and tell it to identify -kre */
+    CheckNick(av[1]);
+  }
 } /* n_unforbid() */
 
 /*

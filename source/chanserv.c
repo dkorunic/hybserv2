@@ -718,7 +718,7 @@ cs_loaddata()
     {
       if (cptr)
       {
-        if (!cptr->access_lvl && !(cptr->flags & CS_FORGET))
+        if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
         {
           cptr->access_lvl = DefaultAccess;
 
@@ -731,7 +731,7 @@ cs_loaddata()
             ret = -1;
         }
 
-        if (!cptr->password && !(cptr->flags & CS_FORGET))
+        if (!cptr->password && !(cptr->flags & (CS_FORBID | CS_FORGET)))
         {
           /* the previous channel didn't have a PASS line */
           fatal(1, "%s:%d No founder password entry for registered channel [%s] (FATAL)",
@@ -741,7 +741,7 @@ cs_loaddata()
           ret = -2;
         }
 
-        if (!cptr->founder && !(cptr->flags & CS_FORGET))
+        if (!cptr->founder && !(cptr->flags & (CS_FORBID | CS_FORGET)))
         {
           /* the previous channel didn't have a FNDR line */
           fatal(1, "%s:%d No founder nickname entry for registered channel [%s] (FATAL)",
@@ -798,7 +798,7 @@ cs_loaddata()
 
   if (cptr)
   {
-    if (!cptr->access_lvl && !(cptr->flags & CS_FORGET))
+    if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
     {
       cptr->access_lvl = DefaultAccess;
 
@@ -6674,10 +6674,31 @@ static void c_unforbid(struct Luser *lptr, struct NickInfo *nptr, int ac,
     return;
   }
 
-  cptr->flags &= ~CS_FORBID;
+  if (!cptr->password)
+  {
+    struct Channel *chptr;
 
-  notice(n_ChanServ, lptr->nick,
-    "The channel [\002%s\002] is now unforbidden", av[1]);
+    /* Well, it has empty fields - it was either from old forbid() code,
+     * or AddChan() made nickname from new forbid() - either way it is
+     * safe to delete it -kre */
+    chptr = FindChannel(cptr->name);
+
+    if (IsChannelMember(chptr, Me.csptr))
+      cs_part(chptr);
+
+    DeleteChan(cptr);
+
+    notice(n_ChanServ, lptr->nick,
+      "The channel [\002%s\002] has been dropped",
+      av[1]);
+  }
+  else
+  {
+    cptr->flags &= ~CS_FORBID;
+
+    notice(n_ChanServ, lptr->nick,
+      "The channel [\002%s\002] is now unforbidden", av[1]);
+  }
 } /* c_unforbid() */
 
 /*

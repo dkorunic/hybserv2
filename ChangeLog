@@ -1,3 +1,8 @@
+*** 20030616_1 by bane
+- added MD5 support to encryptconf, encryptdb and doencrypt
+- MD5 encryption now works on Solaris
+
+
 *** 20030607_3 by bane
 - changed files:
   help/chanserv/set/comment

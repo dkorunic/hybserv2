@@ -1,3 +1,9 @@
+*** 20010520_1 by janos
+- A smaller update to chanserv.c, and I set default CMDVOICE to 8
+  and CMDHALFOP to 10 (why? -> see my mail what was sent to hybserv-coders
+  on May 20th)
+
+
 *** 20010519_4 by kreator
 - misc change
 

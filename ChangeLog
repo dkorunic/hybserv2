@@ -1,3 +1,12 @@
+*** 20010820_2 by kreator
+- added KrisDuv's ideas into the code:
+  - fix memory leak in c_op()
+  - fix dumb usage of uninitialised str[] in n_set_hide()
+  - fix some stupid code in n_set_hide()
+  - display *all* info for channel and nickname to owner if he requests it
+    (ie: issues info command without arguments!)
+
+
 *** 20010820_1 by kreator
 - misc stuff mostly
 

@@ -754,8 +754,8 @@ WriteNicks()
         nptr->nick, nptr->flags, (long) nptr->created, (long)
         nptr->lastseen);
 
-      /* write out password */
-      fprintf(fp, "->PASS %s\n", nptr->password);
+      if (nptr->password)
+        fprintf(fp, "->PASS %s\n", nptr->password);
 
       if (nptr->email)
         fprintf(fp, "->EMAIL %s\n", nptr->email);

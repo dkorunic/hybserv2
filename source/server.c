@@ -1058,11 +1058,14 @@ s_privmsg(int ac, char **av)
      I moved this code from below for smoother source tweak -kre */
   command = av[3] + 1;
 
+  /* according to Sarisa, all format string bugs have been cleaned */
+#if 0
   /* Obviously, this code down strips '%'. But what if some valid string
      contains regular '%' and it should _not_ be stripped, ie. passwd
      string? So, I'll add search for IDENTIFY string. -kre */
   if (ircncmp(command, "IDENTIFY", 8))
     stripformatsymbols(av[3]);
+#endif
 
   if (RestrictedAccess)
 {

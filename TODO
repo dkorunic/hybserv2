@@ -1,11 +1,14 @@
 Today's MOTD
 ------------
-"To understand the heart and mind of a person, look not at what
-he has already achieved, but at what he aspires to do."
-
+"A bad marriage is like a horse with a broken leg, you can shoot
+ the horse, but it don't fix the leg."
 
 Pending bugs:
 -------------
+*) fix invalid gnote count
+*) fix damn malloc() coring..
+*) fix S lines
+*) fix V lines
 *) clear modes doesn't clear limit
 *) fix lcnt issue in InsertLink() after reload command --> seems reload()
    is very stupid
@@ -29,6 +32,7 @@ Pending bugs:
 
 Features to come:
 -----------------  
+*) force nick change - via plain old hacks
 *) choose NOTICES/MESSAGES to communicate with services
 *) rewrite documentation
    ----> work in progress (Hwy)

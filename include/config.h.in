@@ -498,7 +498,7 @@
  * you doing, you can disable it. -kre
  */
 
-#define STRICT_DATA_CHECK
+#undef STRICT_DATA_CHECK
 
 
 

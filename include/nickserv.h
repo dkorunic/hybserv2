@@ -33,7 +33,7 @@
 /* NickServ flags */
 #define NS_IDENTIFIED   0x00000001 /* nick has IDENTIFY'd */
 #define NS_PROTECTED    0x00000002 /* kill to regain nick */
-#define NS_OPERATOR     0x00000004 /* owned by oper - doesn't expire */
+#define NS_NOEXPIRE     0x00000004 /* nickname which doesn't expire */
 #define NS_AUTOMASK     0x00000008 /* auto-add new hostmasks */
 #define NS_PRIVATE      0x00000010 /* nick won't show up in a LIST */
 #define NS_COLLIDE      0x00000020 /* stole a nick - kill them */

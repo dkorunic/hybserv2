@@ -120,10 +120,8 @@ install-binary:
 	@echo '** Installing HybServ2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
 	@for file in $(BINPROGS); do \
-		if test ! -f "$(BINDIR)/$$file"; then \
-			echo "** Installing $$file in $(BINDIR) **"; \
-			$(INSTALL_BIN) "bin/$$file" "$(BINDIR)/$$file"; \
-		fi \
+		echo "** Installing $$file in $(BINDIR) **"; \
+		$(INSTALL_BIN) "bin/$$file" "$(BINDIR)/$$file"; \
 	done
 	@for file in $(SECUREFILES); do \
 		if test ! -f "$(CONFDIR)/$$file"; then \
@@ -142,17 +140,6 @@ install-binary:
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/shownicks
 	@echo '** Creating $(BINDIR)/showchans **'
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/showchans
-	@echo
-	-@$(LS) $(BINDIR)/hybserv\
-          $(CONFDIR)/hybserv.conf\
-          $(CONFDIR)/settings.conf\
-          $(CONFDIR)/motd.dcc\
-          $(CONFDIR)/motd.global\
-          $(BINDIR)/servchk\
-          $(BINDIR)/cleandb\
-          $(BINDIR)/encryptconf\
-          $(BINDIR)/encryptdb\
-          $(BINDIR)/mkpasswd
 	@echo
 	@echo '** Changing ownership of $(BINDIR) to $(WHOAMI) **'
 	@$(CHOWN) $(WHOAMI) $(BINDIR)

@@ -1211,13 +1211,22 @@ HashServer(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHSERVERS - 1));
+#endif
+
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % HASHSERVERS;
+
 } /* HashServer() */
 
 struct Server *

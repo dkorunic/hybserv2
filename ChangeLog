@@ -1,3 +1,9 @@
+*** 20010912_1 by kreator
+- added services fighting fix -> still experimental code
+- revisited DoShutdown() code - added putlog() with reason
+- did some misc changes around
+
+
 *** 20010911_1 by kreator
 - some TODO rewrites
 - sync with autoconf2.50 and autoheader2.50

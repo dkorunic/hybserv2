@@ -60,10 +60,12 @@ if test ! "$enable_threads" = "no"; then
   AC_CHECK_LIB(thread, thr_create,
     AC_DEFINE(HAVE_SOLARIS_THREADS)
     CFLAGS="${CFLAGS} -D_REENTRANT"
+    _have_thread=yes
     LIBP="-lthread",
     AC_MSG_WARN(No native Solaris threads - will try pthreads)
       AC_CHECK_LIB(pthread, pthread_create,
       AC_DEFINE(HAVE_PTHREADS)
+      _have_pthread=yes
       if test -n "$_SunOS"; then
         CFLAGS="${CFLAGS} -D_POSIX_PTHREAD_SEMANTICS"
       else
@@ -97,6 +99,28 @@ else
   fi
 fi
 
+dnl Add support for libhoard
+if test -n "{LIBP}"; then
+  dnl OK, multithreaded environment
+  hold_libs=$LIBS
+  AC_ARG_WITH(hoard-lib, [  --with-hoard-lib=DIR    Directory containing hoard library], LIBS="${LIBS} -L${withval}")
+  hold_libs2=$LIBS
+  LIBS="${LIBS} ${LIBP}"
+  AC_CHECK_LIB(hoard, malloc, _hoard=yes, _hoard=no)
+  if test "$_hoard" = "yes";
+  then
+    dnl Hoard found, proceed
+    LIBS="$hold_libs2 -lhoard"
+    if test "$_have_thread" = "yes"; then
+      dnl Needs librt, too
+      LIBS="${LIBS} -lrt"
+    fi
+  else
+    dnl restore LIBS since there is no libhoard
+    LIBS=$hold_libs
+  fi
+fi
+
 dnl Use sed to grab the version from Makefile.in
 VERSION_MAJOR=`sed -n -e 's/VERSION_MAJOR = *\(.*\)$/\1/p' Makefile.in`
 
@@ -118,16 +142,16 @@ include/config.h        \
 echo "
 Configuration:
 
-  HybServ Version:                ${VERSION}
-  Install path:                   ${prefix}/hybserv
-  Compiler:                       ${CC}
-  Compiler Flags:                 ${CFLAGS}"
+  HybServ Version:  ${VERSION}
+  Install path:     ${prefix}/hybserv
+  Compiler:         ${CC}
+  Compiler Flags:   ${CFLAGS}"
 
 if test -n "${LIBP}"; then
-  echo "  Thread support:                 enabled"
-  echo "  Thread library:                 ${LIBP}"
+  echo "  Thread support:   enabled"
+  echo "  Thread library:   ${LIBP}"
 else
-  echo "  Thread support:                 disabled"
+  echo "  Thread support:   disabled"
 fi
 
 echo

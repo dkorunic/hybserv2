@@ -44,3 +44,5 @@ Some sort of TODO/planning program
     we?
     - ?
 23) add collapse() and irccmp() (do we need this?)
+24) better multiprocessor support (libhoard!)
+    - done

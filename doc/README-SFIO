@@ -18,7 +18,8 @@ stream I/O processing:
 
 In HybServ we can use libstdio as wrapper for most of stdio functions
 (except for rename()). You can turn on this support with following
-options:
+options (not neccessary if library is already installed in standard
+include/library paths):
   --with-sfio-lib=DIR     Directory containing sfio library
   --with-sfio-inc=DIR     Directory containing sfio include files
 
@@ -29,3 +30,6 @@ Example:
 Configure script will automagically detect multithreaded environment and
 preferably use stdio-mt and sfio-mt for multithreaded hybserv, as well as
 stdio and sfio for unithreaded hybserv.
+
+You can download Sfio library from this URL:
+<URL:http://www.research.att.com/sw/tools/sfio/>

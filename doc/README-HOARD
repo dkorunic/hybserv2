@@ -1,0 +1,26 @@
+Starting from 1.7.4 release, HybServ can use hoard library.
+
+The Hoard memory allocator is a fast, scalable, and memory-efficient
+memory allocator for shared-memory multiprocessors.
+
+Multithreaded programs that perform dynamic memory allocation do not scale
+because the heap is a bottleneck. When multiple threads simultaneously
+allocate or deallocate memory from the heap, they will be serialized while
+waiting for the heap lock. Programs making intensive use of the heap
+actually slow down as the number of processors increases.
+
+Hoard is a fast allocator that solves this problem. In addition, it has
+very reasonable bounds on memory consumption.
+
+You can turn on this support with following options (not neccessary if
+library is already installed in standard include/library paths):
+  --with-hoard-lib=DIR    Directory containing hoard library
+
+Example:
+  ./configure --with-hoard-lib=/home/kreator/work/libhoard-2.0.5
+
+Configure script will automagically detect multithreaded environment and
+use librt with libthread.
+
+This library is available at:
+<URL:http://www.hoard.org>

@@ -1,3 +1,7 @@
+*** 20020902_2 by kreator
+- fixed WriteIgnores bug: ts should be delta, instead of fixed ts
+
+
 *** 20020902_1 by kreator
 - clear COLLIDE and NUMERIC flag in ns_loaddata()
 - fix other ERR_MUST_CHANGE into ERR_MUST_CHANGE2 when appropriate

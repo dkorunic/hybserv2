@@ -18,7 +18,20 @@
 #include "misc.h"
 #include "operserv.h"
 #include "settings.h"
+#include "sock.h"
+
+#ifdef ADVFLOOD
+#include "match.h"
+#include "conf.h"
+#include "dcc.h"
+#include "timestr.h"
+#ifdef ADVFLOOD_GLINE 
+#include "gline.h"
+#endif /* ADVFLOOD_GLINE */
+#endif /* ADVFLOOD */
+
 #include <time.h>
+#include <stdio.h>
 
 /*
  * Certain functions, like SendUmode() could possibly
@@ -251,3 +264,192 @@ IsFlood()
    */
   return (0);
 } /* IsFlood() */
+
+#ifdef ADVFLOOD
+
+/*
+ * updateConnectTable()
+ *
+ * If compiled with ADVFLOOD, called every time a luser connects
+ * or does a nick change
+ */
+
+void updateConnectTable(char *user, char *host)
+{
+  int tmp, banhost = 0, found = 0;
+  static int last = 0;
+  static struct connectInfo table[ADVFLOOD_TABLE];
+
+#ifdef ADVFLOOD_GLINE
+  char togline[UHOSTLEN];
+  struct rHost *rhostptr = NULL;
+  struct Gline *gptr;
+  struct Luser *luserptr = NULL, *prevptr = NULL;
+#endif /* ADVFLOOD_GLINE */
+
+#if defined ADVFLOOD_NOTIFY || defined ADVFLOOD_NOTIFY_ALL
+  char message[MAXLINE];
+#endif /* ADVFLOOD_NOTIFY || ADVFLOOD_NOTIFY_ALL */
+
+#ifdef ADVFLOOD_NOTIFY_ALL
+  struct Luser *ouser = NULL;
+#endif /* ADVFLOOD_NOTIFY_ALL */
+
+#ifdef ADVFLOOD_NOIDENT_GLINEHOST
+  if (user[0] == '~')
+    banhost = 1;
+#endif /* ADVFLOOD_NOIDENT_GLINEHOST */
+
+  rhostptr = IsRestrictedHost(user, host);
+  if (rhostptr && rhostptr->banhost == 1)
+    banhost = 1;
+
+  for (tmp=0; tmp < ADVFLOOD_TABLE; tmp++)
+  { 
+    if (!irccmp(table[tmp].host, host)
+        && (banhost == 1 || !irccmp(table[tmp].user,user)))
+    { 
+      found = 1;
+      if (current_ts - table[tmp].last <= ADVFLOOD_DELAY)
+      { 
+        table[tmp].frequency++;
+        if (table[tmp].frequency == ADVFLOOD_COUNT)
+        {
+
+        /* As far as we're concerned, offender shouldn't be in the table
+         * anymore */
+        strcpy(table[tmp].host, "@"); /* reset the host, remove from table */
+        last--;
+        if (last < 0)
+          last = 0;
+#if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
+        sprintf(togline, "%s@%s", (banhost == 1) ? "*" : user, host);
+
+        if (IsProtectedHost((banhost == 1) ? "*" : user, host)) 
+          banhost = -1; /* Can't do that. */
+
+        if ((gptr = IsGline((banhost == 1) ? "*" : user, host ))) 	
+          banhost = -1; /* Can't do that either. */
+
+        putlog(LOG1, "Advanced flood detected from [%s@%s], %s",
+            (banhost == 1) ? "*" : user, host, (banhost == -1) ?
+            "NOT glining, user protected or gline already in place" :
+            "offender GLINEd");
+        
+        if (banhost != -1)
+        {
+          AddGline(togline, ADVFLOOD_GLINE_REASON, Me.name,
+              timestr(ADVFLOOD_GLINE_TIME));
+
+          /* It's possible that the client nickchanged, and the GLINE
+           * won't take effect until he reconnects. So let's see if he's
+           * still online and KILL him if he is. */
+
+          prevptr = NULL;
+          for (luserptr = ClientList; luserptr; )
+          {
+            if (luserptr->server == Me.sptr)
+            {
+              luserptr = luserptr->next;
+              continue;
+            }
+
+            if (match(host, luserptr->hostname)
+                && (banhost == 1 || match(user, luserptr->username)))
+            {
+              toserv(":%s KILL %s :%s!%s (Glined: %s)\n", 
+              n_OperServ, luserptr->nick, Me.name, n_OperServ,
+              ADVFLOOD_GLINE_REASON);
+
+              /* this barfs, will fix later -ike */
+              /*
+                if (Me.sptr) Me.sptr->numoperkills++;
+               */
+
+              Network->TotalOperKills++;
+#ifdef STATSERVICES
+              if (Network->TotalOperKills > Network->OperKillsT)
+                Network->OperKillsT = Network->TotalOperKills;
+#endif /* STATSERVICES */
+              if (prevptr)
+              {
+                DeleteClient(luserptr);
+                luserptr = prevptr;
+              } 
+              else
+              {
+                DeleteClient(luserptr);
+                luserptr = NULL;
+              }	
+            } /* end KILL */
+
+            prevptr = luserptr;
+
+            if (luserptr)
+              luserptr = luserptr->next;
+            else
+              luserptr = ClientList;
+          } /* end find user */
+        } /* end place gline & kill matches */
+#endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
+
+#ifdef ADVFLOOD_NOTIFY
+        sprintf(message, "*** Advanced flood detected from [%s@%s], %s.",
+            (banhost == 1) ? "*" : user, host, 
+#if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
+          (banhost == -1) ? "not glining, user protected or gline in place" :
+          "offender GLINEd");
+#else
+          "operators notified");
+#endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
+				
+        SendUmode(OPERUMODE_Y, message);
+#endif /* ADVFLOOD_NOTIFY */
+
+#ifdef ADVFLOOD_NOTIFY_ALL
+        for (ouser = ClientList; ouser; ouser = ouser->next)
+        {
+          if (ouser->flags & L_OSREGISTERED)
+          {
+             sprintf(message,":OperServ NOTICE %s :Advanced flood"
+                 " detected from [%s@%s], %s.\n",
+                 ouser->nick, (banhost == 1) ? "*" : user, host,
+#if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
+            (banhost == -1) ?
+            "not glining, user protected or gline in place" :
+            "offender GLINEd");
+#else
+            "operators notified");
+#endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
+
+            toserv (message); 
+          }
+        }
+#endif
+        } /* handler */	
+      } /* matchtime */
+      else
+      {
+        table[tmp].frequency=1;
+        table[tmp].last=current_ts;
+      } /* else */
+    } /* match */
+  } /* for */
+
+  if (last == ADVFLOOD_TABLE)
+    last = 0;
+
+/*
+ * It isn't already in the table, add it.
+ */
+  if (found == 0)
+  {
+    strcpy(table[last].host, host);
+    strcpy(table[last].user, user);
+    table[last].frequency = 1;
+    table[last].last = current_ts;
+    last++;
+  } /* add to table */
+} /* updateConnectTable() */
+
+#endif /* ADVFLOOD */

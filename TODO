@@ -61,6 +61,7 @@ Features to come:
 
 Done so far:
 ------------
+*) ike did flood protection, more to come soon - stay tuned :-)
 *) channel verbose stuff
 *) fixed stupid stupid stupid bug with not --fcnt
 *) add collapse() and irccmp() (do we need this?)

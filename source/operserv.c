@@ -392,6 +392,10 @@ os_process(char *nick, char *command, int sockfd)
   struct OperCommand *cptr;
   struct Userlist *cmduser = NULL;
 
+#ifdef OPERNICKIDENT
+  struct NickInfo *nptr;
+#endif /* OPERNICKIDENT */
+
   if (!command)
     return;
 
@@ -471,13 +475,28 @@ os_process(char *nick, char *command, int sockfd)
     if (OpersHaveAccess)
     {
       /*
-       * GetUser() returned GenericOper, meaning this person
-       * is an operator, but does not have an O: line. Mark them
-       * as registered so they can perform Operator commands
-       * on OperServ
+       * GetUser() returned GenericOper, meaning this person is an
+       * operator, but does not have an O: line. Mark them as registered
+       * so they can perform Operator commands on OperServ
+       *
+       * If OPERNICKIDENT is defined, mark them as registered only if
+       * they idented to NickServ first. It's inexcusable to risk
+       * someone with just an oper's ircd password being able to badly
+       * mess things up via services. Force them to at least know one
+       * more password (NickServ). Ideally, an oper's ircd, nickserv and
+       * operserv passwords should be different. -ike
        */
+
+#ifdef OPERNICKIDENT
+      nptr = FindNick(lptr->nick);
+      if (lptr && (cmduser == GenericOper)
+          && ((Network->flags & NET_OFF)
+          || nptr->flags & NS_IDENTIFIED))
+#else
       if (lptr && (cmduser == GenericOper))
-        lptr->flags |= L_OSREGISTERED;
+#endif /* OPERNICKIDENT */
+
+      lptr->flags |= L_OSREGISTERED;
     } /* if (OpersHaveAccess) */
 
     acnt = SplitBuf(command, &arv);
@@ -969,11 +988,24 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 {
   struct Userlist *uptr;
 
+#ifdef OPERNICKIDENT
+  struct NickInfo *nptr;
+#endif /* OPERNICKIDENT */
+
   if (ac < 2)
   {
     os_notice(lptr, sockfd, "Syntax: \002IDENTIFY <password>\002");
     return;
   }
+
+#ifdef OPERNICKIDENT
+  nptr = FindNick (lptr->nick);
+  if (!(Network->flags & NET_OFF) && !(nptr->flags & NS_IDENTIFIED)) 
+  {
+    os_notice(lptr, sockfd, "You must first identify to \002NickServ\002");
+    return;
+  }
+#endif /* OPERNICKIDENT */
 
   if (IsRegistered(lptr, sockfd))
   {

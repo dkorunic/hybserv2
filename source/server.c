@@ -798,6 +798,11 @@ s_nick(int ac, char **av)
     es_add(oldnick, lptr->username, lptr->hostname, NULL, current_ts, 2);
   #endif /* SEENSERVICES */
 
+#ifdef ADVFLOOD
+    if (lptr->server != Me.sptr)
+    	updateConnectTable(lptr->username, lptr->hostname);
+#endif /* ADVFLOOD */
+
     return;
   } /* if (ac == 4) */
 
@@ -1300,6 +1305,11 @@ s_quit(int ac, char **av)
   es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1,
       current_ts, 1);
 #endif /* SEENSERVICES */
+
+#ifdef ADVFLOOD
+  if (lptr->server != Me.sptr)
+  	updateConnectTable(lptr->username, lptr->hostname);
+#endif /* ADVFLOOD */
 
   DeleteClient(lptr); /* delete user */
 } /* s_quit() */

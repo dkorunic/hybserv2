@@ -36,6 +36,7 @@ cosine      Patrick Alken        wnder@uwns.underworld.net
 decho       Nedelcho Stanev      decho@iname.com
 fl_         Lee Hardy            lee@leeh.co.uk
 Hwy101      Walter Campbell      wcampbel@botbay.net
+ike         Ivan Krstic          ike@gnjilux.srk.fer.hr 
 Janos       John Binder          jbinder@kgazd.bme.hu
 John-Work   F. John Rowan        john@tdkt.org
 kreator     Dinko Korunic        kreator@fly.srk.fer.hr
@@ -129,14 +130,14 @@ hybserv-request@alleged.com
 Available Lists 
 
   hybserv_public_list  Hybserv Public List
-  hybserv-bugs         Hybserv Bugs	
+  hybserv-bugs         Hybserv Bugs 
 
 
 
 Available List Manager Commands
 -------------------------------
 
-    subscribe	<list> [<address>]
+    subscribe <list> [<address>]
 
         Subscribe yourself (or <address> if specified) to the
         named <list>.
@@ -195,7 +196,7 @@ you *MUST* give services an H: line in ircd.conf.
 
 Configuration examples:
 
-NOTE:	Suppose the host name of services is "services.name" with
+NOTE: Suppose the host name of services is "services.name" with
       an ip of 1.2.3.4, and that server accepting the services
       has name "server.shomewhere" with ircd class "server" (or
       class 1).
@@ -206,10 +207,10 @@ Required statements in ircd.conf for Hybrid5/6:
   N:1.2.3.4:password:services.name::1
   H:*:*:services.name
 
-NOTE:	You can leave out H line if you don't want to use server
+NOTE: You can leave out H line if you don't want to use server
       jupes and G-Lines.
 
-NOTE:	We recommend using services on same server that is your
+NOTE: We recommend using services on same server that is your
       hub, and then you can use 127.0.0.1 as address in C/N lines
       (which will give you some performance, since traffic will
       go through loop back device).

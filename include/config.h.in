@@ -88,6 +88,16 @@
 
 #define   LINKED_NICKNAMES
 
+/*
+ * If OPERNICKIDENT is defined, opers IDENTIFYing to OperServ will
+ * be required to IDENTIFY to NickServ first. As the two passwords
+ * should *always* be different, this adds another layer of security.
+ * -ike
+ * << STRONGLY RECOMMENDED >>
+ */
+
+#define   OPERNICKIDENT
+
 #endif /* NICKSERVICES */
 
 /*
@@ -421,6 +431,49 @@
 
 #endif
 
+/*
+ * Defining ADVFLOOD enables advanced flood protection. Every client
+ * connect or nick change is stored in a table of size ADVFLOOD_TABLE.
+ * The table size should be whatever you expect the maximum number of
+ * different users (unique user || host) flooding simultaneously + ~10.
+ * If more than ADVFLOOD_COUNT reconnects and/or nick changes are
+ * detected from the same user@host in less than ADVFLOOD_DELAY seconds,
+ * advanced flood protection will fire off. If ADVFLOOD_NOTIFY is
+ * defined, +y opers on OperServ will be notified of the flood. If
+ * ADVFLOOD_NOTIFY_ALL is defined, notices regarding floods will be sent
+ * out to all opers that idented to OperServ. If ADVFLOOD_GLINE is
+ * defined, offenders will be auto-glined with reason
+ * ADVFLOOD_GLINE_REASON with a GLINE expiring after
+ * ADVFLOOD_GLINE_TIME. It is possible to define both ADVFLOOD_NOTIFY
+ * and ADVFLOOD_GLINE, but not both ADVFLOOD_NOTIFY and
+ * ADVFLOOD_NOTIFY_ALL. If ADVFLOOD_NOIDENT_GLINEHOST is defined, if a
+ * flood is detected from a non-idented user, the entire host will be
+ * glined, not just the user (since it's probably a script randomly
+ * choosing idents).
+ * -ike
+ */
+
+#define ADVFLOOD
+
+#ifdef ADVFLOOD
+ #define ADVFLOOD_TABLE  30 
+ #define ADVFLOOD_DELAY  60
+ #define ADVFLOOD_COUNT  4 
+
+ #undef ADVFLOOD_NOTIFY
+ #define ADVFLOOD_NOTIFY_ALL
+
+ #define ADVFLOOD_GLINE
+
+ #ifdef ADVFLOOD_GLINE
+  #define ADVFLOOD_GLINE_REASON "Reconnect / NICK flooding."
+  #define ADVFLOOD_GLINE_TIME   "1h"
+  #define ADVFLOOD_NOIDENT_GLINEHOST
+ #endif /* ADVFLOOD_GLINE */
+
+#endif /* ADVFLOOD */
+
+
 /* ------------------- End of configurable section -------------- */
 
 /*
@@ -429,6 +482,14 @@
 
 #if !defined HYBRID_ONLY && !defined IRCNET
 #error You have to define either HYBRID or IRCNET compatibility
+#endif
+
+/* 
+ * Petty don't-flood-opers-with-messages sanity check -ike
+ */
+
+#if defined ADVFLOOD && defined ADVFLOOD_NOTIFY && defined ADVFLOOD_NOTIFY_ALL
+#error You must not define both ADVFLOOD_NOTIFY and ADVFLOOD_NOTIFY_ALL
 #endif
 
 #endif /* INCLUDED_config_h */

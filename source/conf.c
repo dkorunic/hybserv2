@@ -45,7 +45,7 @@
 
 static char *getfield (char *newline);
 
-static void AddHostLimit(char *host, int hostnum);
+static void AddHostLimit(char *host, int hostnum, int banhost);
 static void AddUser(char *host, char *pass, char *nick, char *flags);
 static void AddServ(char *hostname, char *password, int port);
 static void AddBot(char *nick, char *host, char *pass, int port);
@@ -509,14 +509,17 @@ ParseConf(char *filename, int rehash)
       case 'i':
       case 'I':
       {
-        char *host, *num;
+        char *host, *num, *banhost;
 
         host = getfield(NULL);
         num = getfield(NULL);
+        banhost = getfield(NULL);
+        if (!banhost)
+          banhost = "0";
         if (!host || !num)
           continue;
 
-        AddHostLimit(host, atoi(num));
+        AddHostLimit(host, atoi(num), atoi(banhost));
 
         break;
       } /* case 'I' */
@@ -904,7 +907,7 @@ AddHostLimit()
 */
 
 static void
-AddHostLimit(char *host, int hostnum)
+AddHostLimit(char *host, int hostnum, int banhost)
 
 {
   struct rHost *ptr;
@@ -926,6 +929,9 @@ AddHostLimit(char *host, int hostnum)
   }
 
   ptr->hostnum = hostnum;
+#ifdef ADVFLOOD
+  ptr->banhost = banhost;
+#endif /* ADVFLOOD */
   ptr->next = rHostList;
   rHostList = ptr;
 } /* AddHostLimit() */

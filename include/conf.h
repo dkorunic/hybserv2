@@ -149,6 +149,9 @@ struct rHost
   char *username; /* username of restricted hostmask */
   char *hostname; /* hostname of restricted hostmask */
   int hostnum;    /* number of connections allowed from hostmask */
+#ifdef ADVFLOOD
+  int banhost;
+#endif /* ADVFLOOD */
 };
 
 /* Stores P: line info from hybserv.conf */

@@ -4841,7 +4841,7 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
 
   if (AreBots)
     {
-      os_notice(lptr, sockfd, "\r\nBot connections:");
+      os_notice(lptr, sockfd, "Bot connections:");
       for (tempconn = connections; tempconn; tempconn = tempconn->next)
         {
           if (!(tempconn->flags & SOCK_TCMBOT))

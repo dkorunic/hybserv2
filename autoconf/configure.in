@@ -47,8 +47,8 @@ AC_CHECK_HEADER(stdarg.h, , AC_MSG_ERROR(You must have stdarg.h))
 AC_HEADER_TIME
 
 dnl Add standard prefix to fix broken environments
-LIBS="${LIBS} -L/usr/local/lib"
-CFLAGS="${CFLAGS} -I/usr/local/include"
+LIBS="${LIBS} -L/usr/local/lib -L/usr/local/lib/pth"
+CFLAGS="${CFLAGS} -I/usr/local/include -I/usr/local/include/pth"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL

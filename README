@@ -40,7 +40,7 @@ Hwy101      Wendy Campbell       wcampbel@botbay.net
 ike         Ivan Krstic          ike@gnjilux.srk.fer.hr 
 Janos       John Binder          jbinder@kgazd.bme.hu
 John-Work   F. John Rowan        john@tdkt.org
-kreator     Dinko Korunic        kreator@fly.srk.fer.hr
+kreator     Dinko Korunic        kreator@srce.hr
 KrisDuv     Christophe Duverger  krisduv2000@yahoo.fr
 rhodie      Julian Petrov        rhodie@irchelp.unibg.org
 sofit       Stanislav Zahariev   sofit@mail.bg
@@ -70,7 +70,7 @@ DISTRIBUTION
   #2:  CVS Web snapshots:
        http://hybserv.dyndns.org/
        (obsolete: http://www.srce.hr/~kreator/projects/hybserv/)
-       http://fly.srk.fer.hr/~kreator/projects/tarballs/
+       http://www.srce.hr/~kreator/projects/tarballs/
 
 NOTE: CVS is usually more current than the release.
 
@@ -82,7 +82,7 @@ INSTALLATION
 #########################################################################
 # BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to                #
 #                                                                       #
-#          kreator@srk.fer.hr                                           #
+#          kreator@srce.hr                                              #
 #                                                                       #
 #########################################################################
  

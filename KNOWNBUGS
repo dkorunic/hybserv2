@@ -1,3 +1,20 @@
+(01:20:51) Highwy101:
+#0  irccmp (s1=0x8160b40 "SSNet", s2=0x81607c0 "SSNet") at match.c:218
+218       while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+  (gdb) bt
+#0  irccmp (s1=0x8160b40 "SSNet", s2=0x81607c0 "SSNet") at match.c:218
+#1  0x805dc6d in CloneMatch (user1=0x8160b20, user2=0x81607a0) at
+  hash.c:209
+#2  0x805deb1 in HashAddClient (lptr=0x8160b20, nickchange=0) at
+  hash.c:590
+#3  0x80570d1 in AddClient (line=0x809ce60) at client.c:413
+#4  0x807483a in s_nick (ac=10, av=0x809ce60) at server.c:963
+#5  0x807409d in ProcessInfo (arc=10, arv=0x809ce60) at server.c:168
+#6  0x807815c in ReadHub () at sock.c:911
+#7  0x8077e80 in ReadSocketInfo () at sock.c:681
+#8  0x805f54d in main (argc=1, argv=0xbfbffbfc) at hybserv.c:438
+#9  0x80496b9 in _start ()
+
 On Tue, Jan 29, 2002 at 01:29:14AM -0500, marc@egotistical.net wrote:
 > bumped into this just now:
 > [dcc(operserv)] .ungline *@*.fbi.gov

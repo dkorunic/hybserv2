@@ -100,8 +100,7 @@ static void s_pong(int ac, char **av);
  */
 static struct ServCommand servtab[] =
     {
-      { "PASS", s_pass
-      },
+      { "PASS", s_pass },
       { "PING", s_ping },
       { "SERVER", s_server },
       { "NICK", s_nick },
@@ -583,7 +582,7 @@ s_server(int ac, char **av)
 #endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);
-  if (tempserv == Me.hub)
+  if (tempserv && (tempserv == Me.hub))
     {
       /*
        * it's the SERVER line from the hub in the initial burst

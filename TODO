@@ -6,6 +6,7 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff
 *) set allowguardchannel 0 -> part all channels immediately
@@ -36,6 +37,9 @@ Pending bugs:
 
 Features (yet) to come:
 -----------------------
+*) (23:37:25) andrew: hello
+   (23:37:47) andrew: i'm just wondering if hybserv can be configured to
+   block nicks that contain explicit words?
 *)PuNkSterQFeTus: Heres an idea
   PuNkSterQFeTus: Instead of just /kill chan
   PuNkSterQFeTus: how about adding /kline chan

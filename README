@@ -67,9 +67,11 @@ DISTRIBUTION
        <press enter, no password>
        cvs checkout hybserv
 
-  #2:  CVS Web snapshots:
+  #2:  CVS Web:
        http://hybserv.dyndns.org/
-       (obsolete: http://www.srce.hr/~kreator/projects/hybserv/)
+
+  #3:  Mirrors:
+       http://www.2mbit.com/hybserv2/
        http://www.srce.hr/~kreator/projects/tarballs/
 
 NOTE: CVS is usually more current than the release.

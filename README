@@ -1,5 +1,6 @@
-Some short notes:
+$Id$
 
+NOTES:
 The former Hybserv development team has decided to spin off and
 focus its energies towards the HYBSERV2 project. Like the name
 implies this new version will be even better then that last. If
@@ -11,22 +12,16 @@ Per Sidewnder's (Cosine's) request - HYBSERV will no longer be
 supported. So if you have some questions or problems, please
 *upgrade* first to a version listed in the HYBSERV2 dir.
 
-The latest version is 1.8.0 <------
-
-John-Work
-
-
-HybServ2 TS services - This file last updated by JW @ 6 June 2001
-Copyright (C) 1998-2001 Patrick Alken (wnder@underworld.net)
-
 HybServ was first coded by Patrick Alken (wnder@underworld.net)
 and is now maintained by the Hybserv2 Coding Team, unless
 otherwise mentioned in the code or the credits.
 
+
+HYBSERV STAFF:
+
 Lead Developer of Hybserv2
 
 kreator     Dinko Korunic     kreator@fly.srk.fer.hr
-
 
 The following people have contributed to this release of HybServ2
 (in nick alphabetical order):
@@ -60,24 +55,23 @@ DISTRIBUTION
 
   You can get HybServ from:
 
-  #1:  ftp.magenet.net/pub/hybserv/
-       (Thanks to Bruns)
+  #1:  CVS Web snapshots:
+       http://fly.srk.fer.hr/~kreator/projects/hybserv/
+       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
 
   #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
        (Thanks to kreator)
 
-  #3:  Anonymous CVS to this CVSROOT:
-       :pserver:cvs@digi.alleged.com:/usr/cvsroot
+  #3:  ftp.magenet.net/pub/hybserv/
+       (Thanks to Bruns)
+
+  #4:  Anonymous CVS to this CVSROOT:
+       :pserver:cvs@vampirella.dyndns.org:/var/cvs
        cvs login
        <press enter, no password>
        cvs checkout hybserv
-
-  #4:  CVS Web snapshots:
-       http://fly.srk.fer.hr/~kreator/projects/hybserv/
-       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
-
-  #5:  Web Interface to the CVS Repository:
-       http://www.alleged.com/cvsweb
+       (This won't work most of the time, since that's my home machine
+        -kre)
 
 NOTE: CVS is usually more current than the release.
 
@@ -89,7 +83,7 @@ INSTALLATION
 #########################################################################
 # BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to                #
 #                                                                       #
-#          hybserv-bugs@alleged.com                                     #
+#          kreator@srk.fer.hr                                           #
 #                                                                       #
 #########################################################################
  
@@ -107,82 +101,6 @@ The criteria for reporting bugs is somewhat specific.
    occurs again, email to hybserv-bugs@alleged.com  the
    hybserv.hubinfo file, and it will give us a starting point.
 
-################################################################
-# If you are interested in helping out with the development of #
-# Hybserv feel free to join the Hybserv Development List       #
-################################################################
-
-
-Below are the official Hybserv2 mailing lists hosted by Alleged.com
-
-These are publicly postable lists.
-
-Here we can discuss anything we need and make sure problems get fixed.
-Please feel free to give out this address, and you may subscribe by
-sending email to:
-
-hybserv-request@alleged.com 
-
-(Please use a command from below in the body of the message and
- not in the subject)
-
-
-Available Lists 
-
-  hybserv_public_list  Hybserv Public List
-  hybserv-bugs         Hybserv Bugs 
-
-
-
-Available List Manager Commands
--------------------------------
-
-    subscribe <list> [<address>]
-
-        Subscribe yourself (or <address> if specified) to the
-        named <list>.
-
-    unsubscribe <list> [<address>]
-
-        Unsubscribe yourself (or <address> if specified) from the
-        named <list>.
-
-    which
-
-        Find out which lists you are on.
-
-    who <list>
-
-        Find out who is on the named <list>.
-
-    info <list>
-
-        Retrieve the general introductory information for the
-        named <list>.
-
-    lists
-
-        Show the lists served by this List Manager server.
-
-    help
-
-        Retrieve this message.
-
-    end
-
-        Stop processing commands (useful if your mailer adds a
-            signature).
-
-
-
-You may also find us online by using the EFNow Network
-
-  /server hybrid-7.leguin.org.uk
-  /server hybrid.best.net
-  /server irc.efnow.net
-
-  #ircd-coders
-  #twilight_zone
 
 #########################################################
 # Running Hybserv                                       #

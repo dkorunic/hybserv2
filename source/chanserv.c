@@ -2546,9 +2546,9 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
 
       if (found)
         {
-          /* don't let lptr->nick delete a hostmask that has a >= level than it
-           * does */
-          if (temp->level >= ulev)
+          /* don't let lptr->nick delete a hostmask that has a >= level
+           * than it does, except if it is founder */
+          if (temp->level >= ulev && !IsFounder(lptr, cptr))
             {
               ret = -1;
               continue;
@@ -2758,7 +2758,7 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 {
   struct ChanAccess *ca;
   char chkstr[MAXLINE];
-  int level = (-9999);
+  int level = -9999;
   struct NickInfo *nptr;
   int found;
 
@@ -3136,6 +3136,9 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if ((lptr->flags & L_OSREGISTERED) && IsOper(userptr))
     cptr->flags |= CS_NOEXPIRE;
 
+  /* Add Secure flag to channel by default (advice by harly) -kre */
+  cptr->flags |= CS_SECURE;
+
   /* 
    * A Founder of un chanel should have CA_FOUNDER access.
    * $you> /msg chanserv register #alabala blabla
@@ -3384,13 +3387,8 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
              "You cannot add an access level greater than [\002%d\002]",
              level - 1);
       RecordCommand("%s: %s!%s@%s failed ACCESS [%s] ADD %s %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
-                    av[3],
-                    av[4]);
+                    n_ChanServ, lptr->nick, lptr->username,
+                    lptr->hostname, cptr->name, av[3], av[4]);
       return;
     }
 

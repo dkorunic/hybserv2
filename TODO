@@ -6,6 +6,9 @@ QOTD:
 
 Pending bugs:
 -------------
+*) [Txitj(tx@a1171.cmu.carnet.hr)] -ChanServ(ChanServ@services.hr)-
+   Founder access is required for [LEVEL] (after set channel founder)
+*) founder should be able to remove level 50 person from access list
 *) problems with long nicknames: seems it doesn't see long->short nickname
    changes
 *) fix invalid gnote count

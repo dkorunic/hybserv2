@@ -803,8 +803,8 @@ s_nick(int ac, char **av)
      * check
      */
     if (irccmp(who, av[2]) != 0)
-      CheckNick(av[2]);
 #endif
+      CheckNick(av[2]);
   #endif /* NICKSERVICES */
 
   #ifdef ALLOW_JUPES

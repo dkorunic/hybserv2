@@ -1423,8 +1423,6 @@ CloseConnection(struct DccUser *dccptr)
   }
 
   DeleteDccClient(dccptr);
-
-  Network->TotalConns--;
 } /* CloseConnection() */
 
 /*
@@ -1481,6 +1479,8 @@ UnlinkDccClient(struct DccUser *dccptr)
 
 {
   assert(dccptr != 0);
+
+  Network->TotalConns--;
 
   if (dccptr->next)
     dccptr->next->prev = dccptr->prev;

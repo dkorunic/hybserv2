@@ -2100,13 +2100,13 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
     if (match(host, gptr->hostname))
     {
       ++gcnt;
+      os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
+          gptr->hostname);
 
       /*
        * remove gline from list
        */
       DeleteGline(gptr);
-      os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
-          gptr->hostname);
     }
   }
 

@@ -1,3 +1,8 @@
+*** 20010818_2 by kreator
+- added pre-API documentation that is Janos writing
+- removed old profiling report
+
+
 *** 20010818_1 by kreator
 - do smaller fixes in main Makefile
 - update new config.guess and config.sub and install-sh

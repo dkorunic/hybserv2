@@ -752,6 +752,9 @@ s_nick(int ac, char **av)
               if (newptr && IsLinked(nptr, newptr))
               {
                 newptr->flags |= NS_IDENTIFIED;
+                struct NickInfo *tmp;
+                tmp = GetMaster(newptr);
+                tmp->lastseen = current_ts;
 #ifdef DANCER
                 toserv(":%s MODE %s +e\r\n", Me.name, newptr->nick);
 #endif /* DANCER */
@@ -1365,10 +1368,12 @@ s_quit(int ac, char **av)
     {
       if (nptr->flags & NS_IDENTIFIED)
         {
+          struct NickInfo *tmp;
           if (nptr->lastqmsg)
             MyFree(nptr->lastqmsg);
           nptr->lastqmsg = MyStrdup(av[2] + 1);
-          nptr->lastseen = current_ts;
+          tmp = GetMaster(nptr);
+          tmp->lastseen = nptr->lastseen = current_ts;
         }
     }
 #endif /* NICKSERVICES */

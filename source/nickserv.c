@@ -4331,9 +4331,7 @@ n_link(struct Luser *lptr, int ac, char **av)
 
   if (!(target = FindNick(av[1])))
     {
-      notice(n_NickServ, lptr->nick,
-             ERR_NOT_REGGED,
-             av[1]);
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
       return;
     }
 
@@ -4370,11 +4368,8 @@ n_link(struct Luser *lptr, int ac, char **av)
   if (badlink)
     {
       RecordCommand("%s: %s!%s@%s failed LINK %s",
-                    n_NickServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    target->nick);
+                    n_NickServ, lptr->nick, lptr->username,
+                    lptr->hostname, target->nick);
       return;
     }
 
@@ -4400,6 +4395,8 @@ n_link(struct Luser *lptr, int ac, char **av)
 #ifdef MEMOSERVICES
       MoveMemos(nptr, target);
 #endif /* MEMOSERVICES */
+
+      target->lastseen = nptr->lastseen;
 
       notice(n_NickServ, lptr->nick,
              "Your nickname is now linked to [\002%s\002]",

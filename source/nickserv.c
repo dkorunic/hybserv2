@@ -4092,7 +4092,7 @@ static void
 n_info(struct Luser *lptr, int ac, char **av)
 
 {
-  struct NickInfo *nptr, *realptr;
+  struct NickInfo *nptr, *realptr, *tmpnick;
   struct Luser *userptr;
   int online, isadmin, isowner;
 
@@ -4119,7 +4119,8 @@ n_info(struct Luser *lptr, int ac, char **av)
     realptr->nick);
 
   isadmin = IsValidAdmin(lptr);
-  isowner = (nptr == GetMaster(lptr->nick));
+  tmpnick = FindNick(lptr->nick);
+  isowner = (nptr == GetMaster(tmpnick));
 
   if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
       !isowner

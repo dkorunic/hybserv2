@@ -25,6 +25,6 @@ if a channel is SecureOps and you:
 (badnick does not have autoop access)
 
 test fuckover!!! -- make it use threads -- i don't think fork() has
-access to the server fd ??
+access to the server fd ?? (No point, fuckover is gone)
 
 directive to do a /msg opers@server when clones are detected

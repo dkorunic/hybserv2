@@ -1,3 +1,8 @@
+*** 20021010_1 by kreator
+- some c_invite() fixes
+- update for c_cycle() from LHG team
+
+
 *** 20021007_1 by kreator
 - import identifoper code from ddb
 - document gdb_debug

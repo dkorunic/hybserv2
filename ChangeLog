@@ -1,3 +1,11 @@
+*** 20011125_2 by kreator
+- fixed n_info() issue which caused nicknames in linked list not to be
+  able to see -all- information on other nicks
+- fixed channel access inheritance for nicknames in link -> all access is
+  handled via master nicks (mental note: do missing transfer access in
+  DeleteLink())
+
+
 *** 20011125_1 by kreator
 - reverted OnAccessList() for ChanServ simply because I will resign
   chann access lists to handle all things via master nicks -> this will

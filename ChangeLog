@@ -1,3 +1,8 @@
+*** 20010430_2 by kreator
+- changes to INSTALL and README: mention services through loopback device
+  (127.0.0.1), put myself in bug reporting list, etc.
+
+
 *** 20010430_1 by kreator
 - more syncing with Janos, especially for chan access levels for halfops
   etc.

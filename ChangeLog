@@ -1,5 +1,21 @@
-*** 20010310_1 by wcampbel
+*** 20010310_4 by wcampbel
 Recover the lost ChangeLog entries
+
+
+*** 20010310_3 by wcampbel
+Testing
+
+*** 20010310_2 by wcampbel
+Document anonymous CVS
+
+
+*** 20010310_1 by kreator
+Fixed install.fast, since we don't need install-help as separate
+target, it is done in install target by default
+
+
+*** 20010305_1 by kreator
+Some typos of mine in statserv, and to log Walters nicknamelen change.
 
 
 *** 20010221_1 by kreator

@@ -1,3 +1,8 @@
+*** 20010528_5 by kreator
+- added preliminary support for pthread in libc_r; however, it seems to be
+  missing pthread_sigwait()
+
+
 *** 20010528_4 by kreator
 - misc changes in README
 - add gsm, phone and uin code to nickserv

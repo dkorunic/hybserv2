@@ -226,7 +226,7 @@ SetupVirtualHost()
 
   assert(LocalHostName != 0);
 
-  if ((hptr = gethostbyname(LocalHostName)) == (struct hostent *) NULL)
+  if ((hptr = gethostbyname(LocalHostName)) == NULL)
   {
     fprintf(stderr,
       "Unable to resolve virtual host [%s]: Unknown hostname\n",

@@ -291,9 +291,6 @@ void updateConnectTable(char *user, char *host)
   char togline[UHOSTLEN];
   struct rHost *rhostptr = NULL;
   struct Gline *gptr;
-#if 0
-  struct Luser *luserptr = NULL, *prevptr = NULL;
-#endif
 #endif /* ADVFLOOD_GLINE */
 
 #if defined ADVFLOOD_NOTIFY || defined ADVFLOOD_NOTIFY_ALL
@@ -355,56 +352,6 @@ void updateConnectTable(char *user, char *host)
           AddGline(togline, ADVFLOOD_GLINE_REASON, Me.name,
               timestr(ADVFLOOD_GLINE_TIME));
 
-          /* Bogus code -kre */
-#if 0
-          /* It's possible that the client nickchanged, and the GLINE
-           * won't take effect until he reconnects. So let's see if he's
-           * still online and KILL him if he is. -ike */
-
-          prevptr = NULL;
-          for (luserptr = ClientList; luserptr; )
-          {
-            if (luserptr->server == Me.sptr)
-            {
-              luserptr = luserptr->next;
-              continue;
-            }
-
-            if (match(host, luserptr->hostname)
-                && (banhost == 1 || match(user, luserptr->username)))
-            {
-              toserv(":%s KILL %s :%s!%s (Glined: %s)\n", 
-              n_OperServ, luserptr->nick, Me.name, n_OperServ,
-              ADVFLOOD_GLINE_REASON);
-
-              if (Me.sptr)
-                Me.sptr->numoperkills++;
-
-              Network->TotalOperKills++;
-#ifdef STATSERVICES
-              if (Network->TotalOperKills > Network->OperKillsT)
-                Network->OperKillsT = Network->TotalOperKills;
-#endif /* STATSERVICES */
-              if (prevptr)
-              {
-                DeleteClient(luserptr);
-                luserptr = prevptr;
-              } 
-              else
-              {
-                DeleteClient(luserptr);
-                luserptr = NULL;
-              }	
-            } /* end KILL */
-
-            prevptr = luserptr;
-
-            if (luserptr)
-              luserptr = luserptr->next;
-            else
-              luserptr = ClientList;
-          } /* end find user */
-#endif
         } /* end place gline & kill matches */
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
 

@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  putlog(LOG1, "HybServ2 TS services started");
+  putlog(LOG1, "HybServ2 TS services version %s started", hVersion);
 
   /*
    * Get the offset from GMT (London time)

@@ -895,13 +895,16 @@ s_nick(int ac, char **av)
   /* Add user to list */
   lptr = AddClient(av);
 
-  if (!lptr)
+  if (!lptr || !lptr->server)
   {
     /*
-     * Normally lptr will point to the newly created structure
-     * for av[1]. If it is NULL, one possibility is that
-     * HashAddClient() killed av[1] due to AutoKillClones, so
-     * go no furthur.
+     * Normally lptr will point to the newly created structure for av[1].
+     * If it is NULL, one possibility is that HashAddClient() killed av[1]
+     * due to AutoKillClones, so go no furthur.
+     *
+     * For now ignore situations when messages come from clients which are
+     * behind masked server, but their originate server in NICK isn't
+     * masked properly -kre
      */
     return;
   }

@@ -1,3 +1,8 @@
+*** 20010420_2 by kreator
+Fixes for nptr==nptr->master in NickServ, userdb ---> THIS has to be
+  reviewed. I was tired, and commented the wrong fix..
+
+
 *** 20010420_1 by kreator
 s/psuedo/pseudo/g **/*(.)
 Fixes for nptr==nptr->master in NickServ, userdb

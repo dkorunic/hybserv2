@@ -1,3 +1,8 @@
+*** 20020916_1 by kreator
+- add a bunch of features from dancer services; mental note: ifdef mode +e
+  and forward channels
+
+
 *** 20020906_2 by kreator
 - add expirebans docs
 

@@ -1,3 +1,9 @@
+*** 20010408_5 by kreator
+Fixed dcc.c with INADDR_NONE that was missing for Solaris.
+Fixed chanserv.c with ChanServ that would not part after INVITE on
+CS_GUARD channels with AllowGuardChannel == 0.
+
+
 *** 20010408_4 by kreator
 Fixed blank sjoins, I hope. Should have read ReadHub() better.
 

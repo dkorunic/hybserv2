@@ -2871,7 +2871,11 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
    * regardless of AutoOpAdmins being enabled.
    */
   if (!AutoOpAdmins && IsValidAdmin(lptr) && ((level == CA_AUTOOP) ||
-        (level == CA_AUTOHALFOP) || (level == CA_AUTOVOICE)))
+  /* check CA_AUTOHALFOP level only if hybrid7 -kre */
+#ifdef HYBRID7
+        (level == CA_AUTOHALFOP) ||
+#endif /* HYBRID7 */
+        (level == CA_AUTOVOICE)))
   {
     struct ChanAccess *ca;
     char nmask[MAXLINE];

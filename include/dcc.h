@@ -8,6 +8,11 @@
 #ifndef INCLUDED_dcc_h
 #define INCLUDED_dcc_h
 
+#ifndef INCLUDED_hybdefs_h
+#include "hybdefs.h"         /* MAXLINE needed -kre */
+#define INCLUDED_hybdefs_h
+#endif
+
 #ifndef INCLUDED_sys_time_h
 #include <sys/time.h>         /* time_t */
 #define INCLUDED_sys_time_h

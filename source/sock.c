@@ -1029,7 +1029,7 @@ ReadSock(struct DccUser *connptr)
     {
       *linech = '\0';
 
-      if (IsEOL(connptr->spill))
+      if (IsEOL(*connptr->spill))
       {
         ch++;
         continue;

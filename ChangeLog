@@ -1,3 +1,7 @@
+*** 20010619_1 by kreator
+- oopsies, i had one `,' too much in last commit
+
+
 *** 20010618_1 by kreator
 - rewrite some TODO entries
 - begin work on other ircds compatibility: got services to link with

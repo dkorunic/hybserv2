@@ -116,13 +116,15 @@ ReloadData()
               if (temp->flags & NS_DELETE)
                 {
                   /*
-                   * We should try to preserve the old identification data. Before
-                   * deleting this nickname, attempt to find the corresponding one
-                   * that was just read from the configuration file, and set it's
-                   * ident/collide/split_ts variables correctly. It is safe to use
-                   * FindNick() because it will return the most current entry. If
-                   * the entry was deleted, FindNick() will return 'temp' so we're
-                   * still not losing anything.
+                   * We should try to preserve the old identification
+                   * data. Before deleting this nickname, attempt to find
+                   * the corresponding one that was just read from the
+                   * configuration file, and set it's
+                   * ident/collide/split_ts variables correctly. It is
+                   * safe to use FindNick() because it will return the
+                   * most current entry. If the entry was deleted,
+                   * FindNick() will return 'temp' so we're still not
+                   * losing anything.
                    */
                   if ((newnick = FindNick(temp->nick)))
                     {

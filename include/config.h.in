@@ -414,19 +414,6 @@
 
 #define ADMININFO
 
-#ifndef DEBUG
-
-/*
- * Turn off assertions by default if not debugging. Undefine this if you
- * still want assertions, and DEBUG is not defined -kre
- */
-
-#define NDEBUG
-
-#endif /* DEBUG */
-
-#ifndef HYBRID7
-
 /*
  * Turn this off to support gecos bans for Hybrid5/6.
  * NOTE: This _has_ to be turned off for Hybrid7, since it does not
@@ -434,8 +421,6 @@
  */
 
 #define GECOSBANS
-
-#endif
 
 /*
  * Defining ADVFLOOD enables advanced flood protection. Every client
@@ -492,9 +477,18 @@
 /*
  * Forces nick change instead of disconnecting the user (when
  * kill protection is set). -harly
-  */
+ */
 
 #define FORCE_NICK_CHANGE
+
+/*
+ * Schedule nick kill instead of immediate killing for user-triggered
+ * ghost command. Turn this on on very large networks to have smoother
+ * operation. Beware that nick kills resolution is only every 30 seconds.
+ * -kre
+ */
+
+#define SCHEDULE_COLLIDE
 
 /*
  * This will give MUCH CPU overhead, and usually should not be enabled.
@@ -508,8 +502,6 @@
 #undef STRICT_DATA_CHECK
 
 
-
-
 /* ------------------- End of configurable section -------------- */
 
 /* 
@@ -519,5 +511,20 @@
 #if defined ADVFLOOD && defined ADVFLOOD_NOTIFY && defined ADVFLOOD_NOTIFY_ALL
 #error You must not define both ADVFLOOD_NOTIFY and ADVFLOOD_NOTIFY_ALL
 #endif
+
+#if defined HYBRID7
+#undef GECOSBANS
+#endif
+
+#ifndef DEBUG
+
+/*
+ * Turn off assertions by default if not debugging. Undefine this if you
+ * still want assertions, and DEBUG is not defined -kre
+ */
+
+#define NDEBUG
+
+#endif /* DEBUG */
 
 #endif /* INCLUDED_config_h */

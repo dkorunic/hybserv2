@@ -27,6 +27,7 @@ Pending bugs:
 
 Features (yet) to come:
 -----------------------
+*) save auth users before restart/die with a small ts..
 *) adx wishlist:
   1)
   <adx> for example, to create a new operserv's command

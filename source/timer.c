@@ -221,6 +221,19 @@ void DoTimer(time_t unixtime)
       ExpireIgnores(unixtime);
     } /* if ((unixtime % 5) == 0) */
 
+  if ((unixtime % 30) == 0)
+    {
+#ifdef NICKSERVICES
+
+      /*
+       * Check if there are any nick stealers to kill
+       */
+      CollisionCheck(unixtime);
+
+#endif /* NICKSERVICES */
+
+    } /* if ((unixtime % 30) == 0) */
+
   if ((unixtime % 60) == 0)
     {
 #ifdef ALLOW_GLINES
@@ -236,15 +249,6 @@ void DoTimer(time_t unixtime)
       /* expire server jupe votes */
       ExpireVotes(unixtime);
 #endif
-
-#ifdef NICKSERVICES
-
-      /*
-       * Check if there are any nick stealers to kill
-       */
-      CollisionCheck(unixtime);
-
-#endif /* NICKSERVICES */
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
       /* Check for splitted servers and optionally reconnect them -kre */

@@ -645,7 +645,7 @@ ns_loaddata()
               nptr->flags = atol(av[1]);
               nptr->created = atol(av[2]);
               nptr->lastseen = atol(av[3]);
-              nptr->flags &= ~NS_IDENTIFIED;
+              nptr->flags &= ~(NS_IDENTIFIED | NS_COLLIDE | NS_NUMERIC);
 #ifdef STRICT_DATA_CHECK
 
             }
@@ -1150,7 +1150,11 @@ CheckNick(char *nickname)
                    * they logon, whether they come from a known host or not.
                    * Give them one minute to identify.
                    */
+#ifdef FORCE_NICK_CHANGE
+                  notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE2);
+#else
                   notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
+#endif
                   realptr->flags |= NS_COLLIDE;
                   realptr->collide_ts = current_ts + 60;
                 }
@@ -1375,10 +1379,7 @@ collide(char *nick)
              "NICK %s 1 %ld +i %s %s %s :%s\n",
              lptr->nick,
              (long) (lptr->nick_ts - 1),
-             "enforced",
-             Me.name,
-             Me.name,
-             "Nickname Enforcement");
+             "enforced", Me.name, Me.name, "Nickname Enforcement");
 
   /*
    * Sending a server kill will be quieter than an oper
@@ -1402,7 +1403,7 @@ collide(char *nick)
        * remove the collide timer, but put a release timer so the
        * pseudo nick gets removed after NSReleaseTimeout
        */
-      nptr->flags &= ~NS_COLLIDE;
+      nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
       nptr->flags |= NS_RELEASE;
     }
 } /* collide() */
@@ -1481,10 +1482,11 @@ CollisionCheck(time_t unixtime)
                                 "%s: forcing nick change for %s!%s@%s",
                                 n_NickServ, lptr->nick, lptr->username,
                                 lptr->hostname);
-                        toserv(":%s 432 %s :Forcing nick change\n",
-                            Me.name, lptr->nick);
+                        toserv(":%s 432 %s %s :Erroneus Nickname\n",
+                            Me.name, lptr->server, lptr->nick);
                         nptr->flags |= NS_NUMERIC;
-                        nptr->collide_ts = current_ts + 10;
+                        nptr->collide_ts = current_ts + 30;
+                        continue;
                       }
 #endif
                       
@@ -4835,8 +4837,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
     }
 
   target = NULL;
-  list = halt = set
-                  = setnow = 0;
+  list = halt = set = setnow = 0;
 
   for (cnt = 1; cnt < ac; cnt++)
     {
@@ -4845,8 +4846,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
       else if (!ircncmp(av[cnt], "-halt", strlen(av[cnt])))
         halt = 1;
       else if (!ircncmp(av[cnt], "-set", strlen(av[cnt])))
-        set
-          = 1;
+        set = 1;
       else if (!ircncmp(av[cnt], "-setnow", strlen(av[cnt])))
         setnow = 1;
       else
@@ -4870,8 +4870,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
       /*
        * They didn't give any options - default to -set
        */
-      set
-        = 1;
+      set = 1;
     }
 
   ircsprintf(argbuf, "[%s] ", target);
@@ -4882,8 +4881,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
   if (halt)
     strcat(argbuf, "-halt ");
 
-  if (set
-     )
+  if (set)
     strcat(argbuf, "-set ");
 
   if (setnow)
@@ -4896,8 +4894,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
                 lptr->hostname,
                 argbuf);
 
-  if (set
-      || setnow)
+  if (set || setnow)
     {
       nptr = FindNick(target);
 
@@ -4909,8 +4906,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
           return;
         }
 
-      if (set
-         )
+      if (set)
         {
           nptr->flags |= NS_COLLIDE;
           nptr->collide_ts = current_ts + 60;

@@ -632,8 +632,8 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-threads        Enable thread support default=yes
-  --enable-dmalloc        Enable dmalloc support default=no
+  --enable-threads        Enable thread support [default=yes]
+  --enable-dmalloc        Enable dmalloc support [default=no]
 
 Some influential environment variables:
   CC          C compiler command
@@ -1030,7 +1030,7 @@ EOF
 esac
 
 PACKAGE=HybServ2
-VERSION=pre-1.8.0
+VERSION=1.8.0
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3026,7 +3026,7 @@ if test "${enable_dmalloc+set}" = set; then
   enableval="$enable_dmalloc"
 
 fi;
-if test ! "$enable_dmalloc" = "no"; then
+if test "x$enable_dmalloc" = "xyes"; then
 
 echo "$as_me:3031: checking for malloc in -ldmalloc" >&5
 echo $ECHO_N "checking for malloc in -ldmalloc... $ECHO_C" >&6

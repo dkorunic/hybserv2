@@ -4131,7 +4131,7 @@ static void
 n_info(struct Luser *lptr, int ac, char **av)
 
 {
-  struct NickInfo *nptr, *realptr, *tmpnick;
+  struct NickInfo *nptr, *realptr;
   struct Luser *userptr;
   int online = 0, isadmin = 0, isowner = 0;
 
@@ -4250,7 +4250,7 @@ n_info(struct Luser *lptr, int ac, char **av)
         strcat(buf, "AutoMask, ");
       if (nptr->flags & NS_PRIVATE)
         strcat(buf, "Private, ");
-      if (realptr->flags & NS_FORBID)
+      if (nptr->flags & NS_FORBID)
         strcat(buf, "Forbidden, ");
       if (nptr->flags & NS_SECURE)
         strcat(buf, "Secure, ");

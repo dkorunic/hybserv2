@@ -100,10 +100,14 @@ else
 fi
 
 dnl Add support for libhoard
-if test -n "{LIBP}"; then
+if test ! "$enable_threads" = "no"; then
   dnl OK, multithreaded environment
   hold_libs=$LIBS
   AC_ARG_WITH(hoard-lib, [  --with-hoard-lib=DIR    Directory containing hoard library], LIBS="${LIBS} -L${withval}")
+  dnl add -lrt for Solaris
+  if test -n "$_SunOS"; then
+    LIBS="${LIBS} -lrt"
+  fi
   hold_libs2=$LIBS
   LIBS="${LIBS} ${LIBP}"
   AC_CHECK_LIB(hoard, malloc, _hoard=yes, _hoard=no)
@@ -111,10 +115,6 @@ if test -n "{LIBP}"; then
   then
     dnl Hoard found, proceed
     LIBS="$hold_libs2 -lhoard"
-    if test "$_have_thread" = "yes"; then
-      dnl Needs librt, too
-      LIBS="${LIBS} -lrt"
-    fi
   else
     dnl restore LIBS since there is no libhoard
     LIBS=$hold_libs

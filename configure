@@ -1945,7 +1945,7 @@ else
   fi
 fi
 
-if test -n "{LIBP}"; then
+if test ! "$enable_threads" = "no"; then
     hold_libs=$LIBS
   # Check whether --with-hoard-lib or --without-hoard-lib was given.
 if test "${with_hoard_lib+set}" = set; then
@@ -1953,10 +1953,13 @@ if test "${with_hoard_lib+set}" = set; then
   LIBS="${LIBS} -L${withval}"
 fi
 
+    if test -n "$_SunOS"; then
+    LIBS="${LIBS} -lrt"
+  fi
   hold_libs2=$LIBS
   LIBS="${LIBS} ${LIBP}"
   echo $ac_n "checking for malloc in -lhoard""... $ac_c" 1>&6
-echo "configure:1960: checking for malloc in -lhoard" >&5
+echo "configure:1963: checking for malloc in -lhoard" >&5
 ac_lib_var=`echo hoard'_'malloc | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1964,7 +1967,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lhoard  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1968 "configure"
+#line 1971 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1975,7 +1978,7 @@ int main() {
 malloc()
 ; return 0; }
 EOF
-if { (eval echo configure:1979: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1982: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1999,9 +2002,6 @@ fi
   if test "$_hoard" = "yes";
   then
         LIBS="$hold_libs2 -lhoard"
-    if test "$_have_thread" = "yes"; then
-            LIBS="${LIBS} -lrt"
-    fi
   else
         LIBS=$hold_libs
   fi

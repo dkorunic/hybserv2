@@ -858,7 +858,7 @@ int SaveSettings()
   int ii;
   char buffer[MAXLINE],
        tmp[MAXLINE],
-       char tempname[MAXLINE];
+       tempname[MAXLINE];
 
   /* MMkay, this should write safe config files so that they won't get
    * b0rked if something happens when writing. -kre */

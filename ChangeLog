@@ -1,3 +1,7 @@
+*** 20010606_1 by john
+
+
+
 *** 20010605_4 by kreator
 - document that we still have problems with linked nicknames under some
   strange circumstances - we cannot release 1.8.0 untill this is fixed

@@ -1,3 +1,9 @@
+*** 20020427_9 by kreator
+- fix adx's patches :-)
+  a) MAXLINE missing
+  b) IsEOL(..) casting ptr to integer conversion
+
+
 *** 20020427_8 by kreator
 - another bunch of adx fixes:
   - DCC I/O loop error (fixed)

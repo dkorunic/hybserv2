@@ -523,12 +523,12 @@ WriteOpers()
   ircsprintf(tempname, "%s.tmp", OperServDB);
   fp = CreateDatabase(tempname, "OperServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing OperServ Database (%s): %s",
-      OperServDB,
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1, "Error writing OperServ Database (%s): %s",
+	     OperServDB,
+	     strerror(errno));
+      return 0;
+    }
 
   /*
    * The problem here is some O: lines may be for the same
@@ -545,17 +545,17 @@ WriteOpers()
   donestr = (char *) MyMalloc(sizeof(char));
   *donestr = '\0';
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-  {
-    ircsprintf(temp, "*%s*", tempuser->nick);
-    if (match(temp, donestr) == 0)
     {
-      fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
-      ircsprintf(temp, "%s ", tempuser->nick);
-      donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
-          + 1);
-      strcat(donestr, temp);
+      ircsprintf(temp, "*%s*", tempuser->nick);
+      if (match(temp, donestr) == 0)
+	{
+	  fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+	  ircsprintf(temp, "%s ", tempuser->nick);
+	  donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
+				       + 1);
+	  strcat(donestr, temp);
+	}
     }
-  }
 
   MyFree(donestr);
 
@@ -564,7 +564,7 @@ WriteOpers()
   rename(tempname, OperServDB);
 
   putlog(LOG3, "Wrote %s",
-    OperServDB);
+	 OperServDB);
 
   return 1;
 } /* WriteOpers() */

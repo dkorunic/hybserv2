@@ -15,9 +15,6 @@ Some sort of TODO/planning program:
 *) trace possible leaks
 *) use btree&mmap (additionally use adns and glib)
 *) improve block allocator
-*) check older KNOWNBUGS
-   - some, done. walter put back nickname len
-*) weird level redefine on all channels 
 *) cvsweb
 *) misc stuff:
    private notes on channel and user records, available only to staff
@@ -26,16 +23,12 @@ Some sort of TODO/planning program:
    multiple URL's, multiple email addresses (with limits)
    geek code
 *) add collapse() and irccmp() (do we need this?)
-*) hybrid7 features
-*) implement modes flood trigger
+*) implement modes flood trigger (and below)
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some
    special cases -- FIX FIX FIX THIS!
 *) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
-   AUTOHALFOP CMDHALFOP support
-   +h for hybserv7 (and AUTODEOP to remove +h)
-   support +I
    flood ctrl for services itself
    flood ctrl for channels: public flood, join-part flood, kick flood,
     deop flood, nick flood -> however, for some features it is obvious
@@ -44,13 +37,16 @@ Some sort of TODO/planning program:
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
-*) kline/unkline
 *) save services ignores
 
 
 Done so far:
 ------------
 
+*) hybrid7 features (Janos did it)
+*) weird level redefine on all channels 
+*) check older KNOWNBUGS
+*) kline/unkline
 *) .who not working?
 *) better multiprocessor support (libhoard!)
 *) Recover the lost ChangeLog entries

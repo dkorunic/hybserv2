@@ -56,10 +56,12 @@ New features:
 *) implement modes flood trigger (and below)
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
+*) umode +g ACCEPT list (BR's idea)
 
 
 Done so far:
 ------------
+*) added a lot of features from IrcBg
 *) NEW bug in services, somehow connected with hashing code and servers -
    FindServer does not find servers -- I wonder how come no one found out
    bug in hashing code that existed from first versions of HybServ1 for

@@ -1,3 +1,7 @@
+*** 20021012_1 by kreator
+- c_set_successor() fix: add successor clear (harly)
+
+
 *** 20021010_1 by kreator
 - some c_invite() fixes
 - update for c_cycle() from LHG team

@@ -51,13 +51,13 @@ DISTRIBUTION
   You can get HybServ from:
 
   #1:  ftp.magenet.net/pub/hybserv/
-       (Thanks to Bruns :-))
+       (thanks to Bruns)
 
   #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
-       (Thanks to kreator :-))
+       (thanks to kreator)
 
   #3:  ftp://mirrors.botbay.net/pub/hybserv/
-       (Thanks to Hwy101 :-))
+       (thanks to Hwy101)
 
   #4:  Anonymous CVS to this CVSROOT:
        :pserver:cvs@digi.alleged.com:/usr/cvsroot
@@ -66,6 +66,10 @@ DISTRIBUTION
        cvs checkout hybserv
 NOTE:
   CVS is usually more current than the release.
+
+  #5: CVS Web snapshots:
+      http://fly.srk.fer.hr/~kreator/project/hybserv/
+      http://fly.srk.fer.hr/~kreator/project/tarballs/hybserv-cvs.tar.gz
 
 
 INSTALLATION

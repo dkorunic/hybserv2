@@ -1,3 +1,7 @@
+*** 20021203_2 by kreator
+- fix old URLs
+
+
 *** 20021203_1 by kreator
 - seenserv smaller fix
 - fix wrong hostmask[MAXLINE] handling without boundary checking (bad,

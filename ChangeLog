@@ -1,3 +1,13 @@
+*** 20010614_1 by kreator
+- applied (some are slightly modified) patches from KrisDuv
+  <krisduv2000@yahoo.fr> in the following order:
+   * fix stupid DefaultAccess problem which ment that anyone could alter
+     global channel levels (how the heck didn't anyone notice that?)
+   * fix broken lastseen updating for nicknames
+   * fix broken "Last Seen" info in n_info()
+- did some misc changes
+
+
 *** 20010612_1 by wcampbel
 Side ported the Hyb6 fix for RESTART
 

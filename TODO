@@ -1,14 +1,12 @@
 Today's MOTD
 ------------
-"I was gratified to be able to answer promptly, and I did.  I said I
-didn't know."
-                -- Mark Twain
+"I know it all.  I just can't remember it all at once."
 
 
 Pending bugs:
 -------------
 *) trace possible leaks
-    I've prepared some parts of code for trace -kre
+   NOTE: I've prepared some parts of code for trace -kre
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
@@ -16,23 +14,27 @@ Pending bugs:
           weird
    NOTE3: still having problems.
 *) OperServ does not completely support hybrid7 modes yet, (for example
-  .channel command or SECURE)
+   .channel command or SECURE)
 *) fix "services" fighting by juping offending server/services
 *) sed helpfiles so that they have proper time values
+   NOTE: this should be done via %v or %t.. something like it
+*) save services ignores
+*) stuff from tools/* like encryptconf, encryptdb and doencrypt still do
+   not support MD5
 
 
 Features to come:
 -----------------  
 *) rewrite documentation
+   ----> work in progress (Hwy)
 *) add SVSNICK, SWHOIS, etc. for other IRCDs
 *) modularisation (_very_ unlikely to happen)
 *) completely document API
+   ----> work in progress (Janos)
 *) localisation
-*) operserv function to find improper TS channels and fix them
 *) misc stuff:
    private notes on channel and user records, available only to staff
    PGP/GPG keys per user
-   space for realname, address, phone numbers
    multiple URL's, multiple email addresses (with limits)
    geek code
 *) use btree&mmap (additionally use adns and glib)
@@ -40,25 +42,32 @@ Features to come:
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
 *) add mySQL/PostgreSQL support for databases
-*) mailing list
 *) cvsweb
-*) ziplinks
-*) save services ignores
+   ----> work in progress (Hwy and me)
+*) ziplinks (perhaps use servlink?)
 *) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
    flood ctrl for services itself
    flood ctrl for channels: public flood, join-part flood, kick flood,
     deop flood, nick flood -> however, for some features it is obvious
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
-*) add collapse() and irccmp() (do we need this?)
+   ----> work in progress (KrisDuv)
 *) implement modes flood trigger (and below)
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
+   ----> work in progress (me)
 *) umode +g ACCEPT list (BR's idea)
 
 
 Done so far:
 ------------
+*) channel verbose stuff
+*) fixed stupid stupid stupid bug with not --fcnt
+*) add collapse() and irccmp() (do we need this?)
+*) operserv function to find improper TS channels and fix them
+   ---> still needs to be further tested
+*) space for realname, address, phone numbers
+*) mailing list
 *) applied (some are slightly modified) patches from KrisDuv
    <krisduv2000@yahoo.fr> in the following order:
    - fix stupid DefaultAccess problem which ment that anyone could alter

@@ -1229,27 +1229,33 @@ DoListen(struct PortInfo *portptr)
 } /* DoListen() */
 
 /*
-signon()
-  args: none
-  purpose: send the PASS / CAPAB / SERVER handshake
-  return: none
-*/
-
-void
-signon()
-
+ * signon()
+ *
+ * args: none
+ * purpose: send the PASS / CAPAB / SERVER handshake
+ * return: none
+ */
+void signon(void)
 {
+  /* Hybrid6 and 7 handshake -kre */
+#ifdef HYBRID_ONLY
   toserv("PASS %s :TS\nCAPAB :EX"
 #ifdef GECOSBANS
       /* Send gecosbans capab -Janos */
       " DE"
-#endif
+#endif /* GECOSBANS */
 #ifdef HYBRID7
       /* Send most of Hybrid7 CAPABS -kre && Janos */
-      " KLN GLN HOPS IE HUB AOPS"
+      " KLN GLN HOPS IE HUB AOPS",
 #endif /* HYBRID7 */
-      "\nSERVER %s 1 :%s\n", 
-    currenthub->password, 
-    Me.name, 
-    Me.info); 
+      "\n", currenthub->password);
+#endif /* HYBRID_ONLY */
+      
+#ifdef IRCNET
+  /* Authenticate to IRCNet daemon -kre */
+  toserv("PASS %s %s IRC|%s %s\n", currenthub->password,
+    "0210030000", "HEiJKps", "P");
+#endif /* IRCNET */
+
+  toserv("SERVER %s 1 :%s\n", Me.name, Me.info); 
 } /* signon() */

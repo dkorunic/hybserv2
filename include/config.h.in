@@ -123,6 +123,13 @@
 #endif /* #ifdef HYBRID_ONLY */
 
 /*
+ * Defining this will turn on IRCNet daemon compatibility. Undergoing a
+ * lot of changes, so don't use it. -kre
+ */
+
+#undef    IRCNET
+
+/*
  * If this is defined, commands that involve HybServ setting modes, such
  * as .secure and .omode, will not break channel TS.  Instead, the program
  * will have OPERSERV_NICK join the channel to set the modes instead of
@@ -391,7 +398,7 @@
 
 #define NDEBUG
 
-#endif
+#endif /* DEBUG */
 
 #ifndef HYBRID7
 
@@ -403,6 +410,16 @@
 
 #define GECOSBANS
 
+#endif
+
+/* ------------------- End of configurable section -------------- */
+
+/*
+ * Sanity check -kre
+ */
+
+#if !defined HYBRID_ONLY && !defined IRCNET
+#error You have to define either HYBRID or IRCNET compatibility
 #endif
 
 #endif /* INCLUDED_config_h */

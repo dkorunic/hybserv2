@@ -27,7 +27,4 @@ if a channel is SecureOps and you:
 test fuckover!!! -- make it use threads -- i don't think fork() has
 access to the server fd ??
 
-<sexy> instead of level 40
-<sexy> you can rename level 40 to SuperOp
-
 directive to do a /msg opers@server when clones are detected

@@ -1,3 +1,9 @@
+*** 20010607_1 by kreator
+- misc changes in nickserv
+- modify irc servers that we are on since irc.uk.eu.org is not going to be
+  back on EFNow (hi, fl_ :)
+
+
 *** 20010606_2 by kreator
 - did some wordwrapping in README. oh that pesky wordwrap :-)
 

@@ -1,3 +1,8 @@
+*** 20011014_1 by kreator
+- add owallop for reload
+- add printing matches for ungline
+
+
 *** 20011011_3 by kreator
 - go back to 2.13 autoconf because of 2.52 brokeness for bsd
 

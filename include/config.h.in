@@ -331,19 +331,6 @@
 
 #undef    ALLOW_DUMP
 
-/*
- * Define this to allow administrators the use of the "fuckover" command.
- * NOTE: This command has previously been disabled entirely because of
- *       it's possible use as a DoS attack. I will accept absolutely no
- *       responsibility for damages, lag or hurt feelings as a result of
- *       this command. Please use this feature wisely.
- *
- * I'm thinking of disabling this function entirely. It is _lame_ and
- * unfair. NEVER use it! -kre
- */
-
-#undef    ALLOW_FUCKOVER
-
 /* 
  * Define this for debugging purposes. It will setup coresize
  * appropriately, and startup daemon in console mode for easier debugging.

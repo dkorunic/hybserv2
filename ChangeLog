@@ -1,3 +1,7 @@
+*** 20020922_3 by kreator
+- fixed a dozen of IsNum() < 0 issues in memoserv code
+
+
 *** 20020922_2 by kreator
 - more verbose m_list and m_read
 

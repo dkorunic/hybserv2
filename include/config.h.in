@@ -270,8 +270,17 @@
 /*
  * Define this if you want services to create a gline the Hybrid7 way by
  * sending a mass-kline to all servers. This will ONLY work on hyb7, and
- * for it to work, every server must have a shared block as follows if
- * your services were named services.eu
+ * for it to work, every server must have a shared block as previously
+ * described.
+ */
+#undef   HYBRID7_UNKLINE
+
+/*
+ * Define this if you want services to be able to remove glines after a
+ * specified period of time. This will ONLY work on hyb7, and for it to
+ * work, every server must have a shared block and loaded m_unkline.so
+ * which is provided in contrib/ directory as follows if your services
+ * were named services.eu
  * 
  * shared {
  *     name="services.eu";
@@ -466,6 +475,7 @@
 #  undef HYBRID_GLINES
 # else
 #  undef HYBRID7_GLINES
+#  undef HYBRID7_UNKLINE
 # endif
 #endif
 

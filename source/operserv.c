@@ -2209,6 +2209,23 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
           ++gcnt;
           os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
                     gptr->hostname);
+
+          /* This will work ONLY on Hybrid7. It removes K-Lines from other
+           * servers using remote UNKLINE command.
+           *
+           * You -need- appropriate shared{} block for Hybrid7 and
+           * m_unkline.so module that includes that feature (from CARNet
+           * IRC Network).  -bane
+           *
+           * Prototype: :%s UNKLINE * %s %s
+           *            :OperServ UNKLINE * user host
+           */
+
+#ifdef HYBRID7_UNKLINE
+           toserv(":%s UNKLINE %s %s %s\r\n", n_OperServ, "*",
+                  gptr->username, gptr->hostname);
+#endif
+          
           /* remove gline from list */
           DeleteGline(gptr);
         }

@@ -179,7 +179,7 @@ void SetDefaultALVL(struct ChanInfo *cptr);
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;
-extern int MaxTSDelta;
+extern long MaxTSDelta;
 
 #endif /* CHANNELSERVICES */
 

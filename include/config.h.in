@@ -475,6 +475,13 @@
 
 #endif /* ADVFLOOD */
 
+/*
+ * Defining this will make services capable of detecting so called
+ * "services fight", unpleasant situation when two or more services are
+ * fighting over their nicknames and causing HTM. -kre
+ */
+
+#define SERVICES_FIGHT_FIX
 
 /* ------------------- End of configurable section -------------- */
 

@@ -804,3 +804,16 @@ SeenMaxRecs        4000
 # default value of 8 weeks will be used.
 
 MaxTSDelta          "8w"
+
+# MaxServerCollides <integer> [OPTIONAL]
+#
+# Maximum server nicknames collides allowed before silent shutdown of
+# services (set this to a very high number, please).
+
+MaxServerCollides 10
+
+# MinServerCollidesDelta <integer> [OPTIONAL]
+#
+# Minimum delta between services' nicknames collides
+
+MinServerCollidesDelta "20s"

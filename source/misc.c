@@ -312,6 +312,8 @@ DoShutdown(char *who, char *reason)
     else
       sendstr[0] = '\0';
 
+  putlog(LOG1, sendstr);
+
 #if 0
   toserv(":%s QUIT :%s\nSQUIT %s :%s\n",
     n_OperServ,

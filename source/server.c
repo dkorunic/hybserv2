@@ -64,6 +64,8 @@ extern aHashEntry hostTable[HASHCLIENTS];
  * Global - list of network servers
  */
 struct Server *ServerList = NULL;
+static int ServerCollides = 0;
+static time_t ServerCollidesTS = 0;
 
 static void s_pass(int ac, char **av);
 static void s_ping(int ac, char **av);
@@ -81,6 +83,8 @@ static void s_whois(int ac, char **av);
 static void s_trace(int ac, char **av);
 static void s_version(int ac, char **av);
 static void s_motd(int ac, char **av);
+
+static void CheckServCollide(struct Server *bad_server);
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 static void s_topic(int ac, char **av);
@@ -823,20 +827,30 @@ s_nick(int ac, char **av)
   if ((serviceptr = GetService(av[1])))
   {
     /*
-     * Make sure it is a valid nick collide before
-     * we send a kill. If this is the initial
-     * hub burst, the hub would not have processed
-     * our NICK statement yet, so let TS clean everything
-     * up
+     * Make sure it is a valid nick collide before we send a kill. If this
+     * is the initial hub burst, the hub would not have processed our NICK
+     * statement yet, so let TS clean everything up
      */
     if (IsNickCollide(serviceptr, av))
     {
-      toserv(":%s KILL %s :%s\n",
-        Me.name,
-        av[1],
+      struct Luser *bad_lptr;
+
+      toserv(":%s KILL %s :%s\n", Me.name, av[1],
         "Attempt to Nick Collide Services");
 
-      DeleteClient(FindClient(av[1]));
+      bad_lptr = FindClient(av[1]);
+
+      if (!bad_lptr)
+        return;
+
+#ifdef SERVICES_FIGHT_FIX
+      
+      /* Check if services are fighting -kre */
+      CheckServCollide(bad_lptr->server);
+
+#endif /* SERVICES_FIGHT_FIX */
+
+      DeleteClient(bad_lptr);
 
       InitServs(serviceptr);
 
@@ -1418,23 +1432,22 @@ s_kill(int ac, char **av)
 
     if (lptr)
     {
-      putlog(LOG1,
-        "%s was killed by %s!%s@%s, re-initializing",
-        av[2],
-        lptr->nick,
-        lptr->username,
-        lptr->hostname);
+      putlog(LOG1, "%s was killed by %s!%s@%s, re-initializing", av[2],
+          lptr->nick, lptr->username, lptr->hostname);
+
+#ifdef SERVICES_FIGHT_FIX
+      CheckServCollide(lptr->server);
+#endif /* SERVICES_FIGHT_FIX */
+
     }
     else
     {
       putlog(LOG1,
         "%s was killed by %s (nick collide), re-initializing",
-        av[2],
-        who);
+        av[2], who);
 
       toserv(":%s KILL %s :%s\n",
-        Me.name,
-        av[2],
+        Me.name, av[2],
         "Attempt to Nick Collide Services");
 
       if (Me.sptr)
@@ -2416,3 +2429,47 @@ s_pong(int ac, char **av)
 } /* s_pong() */
 
 #endif /* STATSERVICES */
+
+#ifdef SERVICES_FIGHT_FIX
+/* This is preliminary version of the code, I will work on this later. It
+ * will probably have jupe/etc.. options -kre */
+static void CheckServCollide(struct Server *bad_server)
+{
+ 
+  /* Check if those two options are set at all */
+  if (MaxServerCollides && MinServerCollidesDelta)
+  {
+    /* If this is first collide TS */
+    if (!ServerCollidesTS)
+    {
+      ServerCollidesTS = current_ts;
+      return;
+    }
+    
+    /* Check if collides went over top */
+    if (ServerCollides >= MaxServerCollides)
+    {
+      /* When was last collide? */ 
+      if (ServerCollidesTS - current_ts < MinServerCollidesDelta)
+      {
+        char note1[] = "Detected services fight from %s";
+        char *reason = MyMalloc(sizeof(note1) + sizeof(bad_server->name));
+        ircsprintf(reason, note1, bad_server->name);
+        
+        SendUmode(OPERUMODE_Y, reason);
+        DoShutdown(NULL, reason);
+      }
+      else
+      {
+        /* We had some collides but they are slower than expected, so
+         * reset counter and timestamp */
+        ServerCollides = 0;
+        ServerCollidesTS = current_ts;
+        return;
+      }
+    }
+
+    ServerCollides++;
+  }
+}
+#endif /* SERVICES_FIGHT_FIX */

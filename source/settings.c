@@ -152,7 +152,7 @@ long      InhabitTimeout;
 int       AllowAccessIfSOp;
 int       RestrictRegister;
 int       GiveNotice;
-int       MaxTSDelta;
+long      MaxTSDelta;
 
 int       MaxMemos;
 long      MemoPurgeFreq;
@@ -164,6 +164,9 @@ int       GlobalNotices;
 int       SeenMaxRecs;
 
 int       UseMD5;
+
+int       MaxServerCollides;
+long      MinServerCollidesDelta;
 
 static void ClearDirectives();
 static int CheckDirectives();
@@ -324,6 +327,8 @@ struct Directive directives[] = {
   /* Global Configuration */
   { "GlobalNotices", D_OPTIONAL,    { { PARAM_SET, &GlobalNotices } } },
   { "UseMD5", D_OPTIONAL,           { { PARAM_SET, &UseMD5 } } },
+  { "MaxServerCollides", D_OPTIONAL,{ { PARAM_INT, &MaxServerCollides } } },
+  { "MinServerCollidesDelta", D_OPTIONAL,{ { PARAM_TIME, &MinServerCollidesDelta } } },
 
   { 0, 0,                           { { 0, 0 } } }
 };

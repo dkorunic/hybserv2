@@ -1,3 +1,7 @@
+*** 20030120_2 by kreator
+- smaller ^M fix
+
+
 *** 20030120_1 by kreator
 - fix Hybrid7 gline time
 - fix possible bad reference in cs_cycle()

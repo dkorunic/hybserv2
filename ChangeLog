@@ -1,3 +1,13 @@
+*** 20020625_2 by kreator
+- commited various stuff:
+  - args patches for ns_loaddata(), as well as bug with founder level
+    (CA_FOUNDER)
+  - add autosave services ignores into OperServIgnoreDB
+  - misc cleanups and fixes
+- tested against gcc-3.1
+- fixed cvs commit log f*up by cvs upgrade :-(
+
+
 *** 20020625_1 by kreator
 - test commit
 

@@ -1,3 +1,19 @@
+(gdb) bt
+#0  0xff1b6dec in strlen () from /usr/lib/libc.so.1
+#1  0xff1ffc98 in _doprnt () from /usr/lib/libc.so.1
+#2  0xff2019cc in sprintf () from /usr/lib/libc.so.1
+#3  0x43d2c in SaveSettings () at settings.c:886
+#4  0x3acb8 in o_save (lptr=0xf1b54, ac=0, av=0x113f50, sockfd=-1)
+    at operserv.c:3927
+#5  0x36b28 in os_process (nick=0xf1b54 "", command=0x0, sockfd=-1)
+        at operserv.c:545
+#6  0x41ee0 in s_privmsg (ac=4, av=0x7c7d4) at server.c:1146
+#7  0x410c8 in ProcessInfo (arc=4, arv=0x7c7d4) at server.c:147
+#8  0x45968 in ReadHub () at sock.c:902
+#9  0x455c0 in ReadSocketInfo () at sock.c:673
+Erased settings.conf because of MaxClonesWarning, and that because of
+PARAM_OPTIONAL - it actually did not check it and tried to snprintf()?!
+
 [10:53:31] #SideWnder# HUB 
 -- Listing current hubs --
 [Hub Name                      ] [# servers]

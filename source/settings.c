@@ -883,9 +883,13 @@ SaveSettings()
       {
         case PARAM_STRING:
         {
-          sprintf(tmp, "\"%s\" ",
-            *(char **) dptr->param[ii].ptr);
-          strcat(buffer, tmp);
+          /* Try to write out string only if non-null, ie is set -kre */
+          if (*(char *)dptr->param[ii].ptr)
+          {
+            sprintf(tmp, "\"%s\" ",
+              *(char **) dptr->param[ii].ptr);
+            strcat(buffer, tmp);
+          }
 
           break;
         } /* case PARAM_STRING */

@@ -46,7 +46,7 @@
 
 #ifdef NICKSERVICES
 
-/* 
+/*
  * hash containing registered nick info
  */
 struct NickInfo *nicklist[NICKLIST_MAX];
@@ -125,79 +125,85 @@ static void n_clearnoexp(struct Luser *, int, char **);
 #endif /* EMPOWERADMINS */
 
 /* main NickServ commands */
-static struct Command nickcmds[] = {
-  { "HELP", n_help, LVL_NONE },
-  { "REGISTER", n_register, LVL_NONE },
-  { "DROP", n_drop, LVL_NONE },
-  { "IDENTIFY", n_identify, LVL_NONE },
-  { "RECOVER", n_recover, LVL_NONE },
-  { "RELEASE", n_release, LVL_NONE },
-  { "GHOST", n_ghost, LVL_NONE },
-  { "ACCESS", n_access, LVL_IDENT },
-  { "SET", n_set, LVL_IDENT },
-  { "LIST", n_list, LVL_NONE },
-  { "INFO", n_info, LVL_NONE },
+static struct Command nickcmds[] =
+    {
+      { "HELP", n_help, LVL_NONE
+      },
+      { "REGISTER", n_register, LVL_NONE },
+      { "DROP", n_drop, LVL_NONE },
+      { "IDENTIFY", n_identify, LVL_NONE },
+      { "RECOVER", n_recover, LVL_NONE },
+      { "RELEASE", n_release, LVL_NONE },
+      { "GHOST", n_ghost, LVL_NONE },
+      { "ACCESS", n_access, LVL_IDENT },
+      { "SET", n_set, LVL_IDENT },
+      { "LIST", n_list, LVL_NONE },
+      { "INFO", n_info, LVL_NONE },
 
 #ifdef LINKED_NICKNAMES
-  { "LINK", n_link, LVL_IDENT },
-  { "UNLINK", n_unlink, LVL_IDENT },
+      { "LINK", n_link, LVL_IDENT },
+      { "UNLINK", n_unlink, LVL_IDENT },
 #endif /* LINKED_NICKNAMES */
 
 #ifdef EMPOWERADMINS
 
-  { "FORBID", n_forbid, LVL_ADMIN },
-  { "UNFORBID", n_unforbid, LVL_ADMIN },
-  { "SETPASS", n_setpass, LVL_ADMIN },
-  { "CHPASS", n_setpass, LVL_ADMIN },
-  { "NOEXPIRE", n_noexpire, LVL_ADMIN },
+      { "FORBID", n_forbid, LVL_ADMIN },
+      { "UNFORBID", n_unforbid, LVL_ADMIN },
+      { "SETPASS", n_setpass, LVL_ADMIN },
+      { "CHPASS", n_setpass, LVL_ADMIN },
+      { "NOEXPIRE", n_noexpire, LVL_ADMIN },
 #ifdef LINKED_NICKNAMES
-  { "SHOWLINK", n_showlink, LVL_ADMIN },
-  { "DROPLINK", n_droplink, LVL_ADMIN },
+      { "SHOWLINK", n_showlink, LVL_ADMIN },
+      { "DROPLINK", n_droplink, LVL_ADMIN },
 #endif /* LINKED_NICKNAMES */
-  { "COLLIDE", n_collide, LVL_ADMIN },
-  { "FLAG", n_flag, LVL_ADMIN },
-  { "CLEARNOEXP", n_clearnoexp, LVL_ADMIN },
-  { "FIXTS", n_fixts, LVL_ADMIN },
+      { "COLLIDE", n_collide, LVL_ADMIN },
+      { "FLAG", n_flag, LVL_ADMIN },
+      { "CLEARNOEXP", n_clearnoexp, LVL_ADMIN },
+      { "FIXTS", n_fixts, LVL_ADMIN },
 
 #endif /* EMPOWERADMINS */
 
-  { 0, 0, 0 }
-};
+      { 0, 0, 0 }
+    };
 
 /* sub commands of NickServ ACCESS */
-static struct Command accesscmds[] = {
-  { "ADD", n_access_add, LVL_NONE },
-  { "DEL", n_access_del, LVL_NONE },
-  { "LIST", n_access_list, LVL_NONE },
+static struct Command accesscmds[] =
+    {
+      { "ADD", n_access_add, LVL_NONE
+      },
+      { "DEL", n_access_del, LVL_NONE },
+      { "LIST", n_access_list, LVL_NONE },
 
-  { 0, 0, 0 }
-};
+      { 0, 0, 0 }
+    };
 
 /* sub commands of NickServ SET */
-static struct Command setcmds[] = {
-  { "KILL", n_set_kill, LVL_NONE },
-  { "AUTOMASK", n_set_automask, LVL_NONE },
-  { "PRIVATE", n_set_private, LVL_NONE },
-  { "NOEXPIRE", n_set_noexpire, LVL_NONE },
-  { "SECURE", n_set_secure, LVL_NONE },
-  { "UNSECURE", n_set_unsecure, LVL_NONE },
-  { "MEMOS", n_set_memos, LVL_NONE },
-  { "NOTIFY", n_set_notify, LVL_NONE },
-  { "SIGNON", n_set_signon, LVL_NONE },
-  { "HIDE", n_set_hide, LVL_NONE },
-  { "PASSWORD", n_set_password, LVL_NONE },
-  { "EMAIL", n_set_email, LVL_NONE },
-  { "URL", n_set_url, LVL_NONE },
-  { "UIN", n_set_uin, LVL_NONE },
-  { "GSM", n_set_gsm, LVL_NONE },
-  { "PHONE", n_set_phone, LVL_NONE },
+static struct Command setcmds[] =
+    {
+      { "KILL", n_set_kill, LVL_NONE
+      },
+      { "AUTOMASK", n_set_automask, LVL_NONE },
+      { "PRIVATE", n_set_private, LVL_NONE },
+      { "NOEXPIRE", n_set_noexpire, LVL_NONE },
+      { "SECURE", n_set_secure, LVL_NONE },
+      { "UNSECURE", n_set_unsecure, LVL_NONE },
+      { "MEMOS", n_set_memos, LVL_NONE },
+      { "NOTIFY", n_set_notify, LVL_NONE },
+      { "SIGNON", n_set_signon, LVL_NONE },
+      { "HIDE", n_set_hide, LVL_NONE },
+      { "PASSWORD", n_set_password, LVL_NONE },
+      { "EMAIL", n_set_email, LVL_NONE },
+      { "URL", n_set_url, LVL_NONE },
+      { "UIN", n_set_uin, LVL_NONE },
+      { "GSM", n_set_gsm, LVL_NONE },
+      { "PHONE", n_set_phone, LVL_NONE },
 
 #ifdef LINKED_NICKNAMES
-  { "MASTER", n_set_master, LVL_NONE },
+      { "MASTER", n_set_master, LVL_NONE },
 #endif
 
-  { 0, 0, 0 }
-};
+      { 0, 0, 0 }
+    };
 
 /*
 ns_process()
@@ -222,30 +228,30 @@ ns_process(char *nick, char *command)
     return;
 
   if (Network->flags & NET_OFF)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Services are currently \002disabled\002");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Services are currently \002disabled\002");
+      return;
+    }
 
   acnt = SplitBuf(command, &arv);
   if (acnt == 0)
-  {
-    MyFree(arv);
-    return;
-  }
+    {
+      MyFree(arv);
+      return;
+    }
 
   cptr = GetCommand(nickcmds, arv[0]);
 
   if (!cptr || (cptr == (struct Command *) -1))
-  {
-    notice(n_NickServ, lptr->nick,
-      "%s command [%s]",
-      (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
-      arv[0]);
-    MyFree(arv);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "%s command [%s]",
+             (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
+             arv[0]);
+      MyFree(arv);
+      return;
+    }
 
   /*
    * Check if the command is for admins only - if so,
@@ -253,12 +259,12 @@ ns_process(char *nick, char *command)
    * currently registered with OperServ.
    */
   if ((cptr->level == LVL_ADMIN) && !(IsValidAdmin(lptr)))
-  {
-    notice(n_NickServ, lptr->nick, "Unknown command [%s]",
-      arv[0]);
-    MyFree(arv);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, "Unknown command [%s]",
+             arv[0]);
+      MyFree(arv);
+      return;
+    }
 
   /*
    * Use FindNick() here instead of GetLink() because
@@ -268,39 +274,39 @@ ns_process(char *nick, char *command)
    */
   if ((nptr = FindNick(lptr->nick)))
     if (nptr->flags & NS_FORBID)
-    {
-      notice(n_NickServ, lptr->nick,
-        "Cannot execute commands for forbidden nicknames");
-      MyFree(arv);
-      return;
-    }
+      {
+        notice(n_NickServ, lptr->nick,
+               "Cannot execute commands for forbidden nicknames");
+        MyFree(arv);
+        return;
+      }
 
   if (cptr->level != LVL_NONE)
-  {
-    if (!nptr)
     {
-      notice(n_NickServ, lptr->nick,
-        "You must register your nick with \002%s\002 first",
-        n_NickServ);
-      notice(n_NickServ, lptr->nick,
-        "Type: \002/msg %s REGISTER <password>\002 to register your nickname", 
-        n_NickServ);
-      MyFree(arv);
-      return;
-    }
+      if (!nptr)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "You must register your nick with \002%s\002 first",
+                 n_NickServ);
+          notice(n_NickServ, lptr->nick,
+                 "Type: \002/msg %s REGISTER <password>\002 to register your nickname",
+                 n_NickServ);
+          MyFree(arv);
+          return;
+        }
 
-    if (!(nptr->flags & NS_IDENTIFIED))
-    {
-      notice(n_NickServ, lptr->nick,
-        "Password identification is required for [\002%s\002]",
-        cptr->cmd);
-      notice(n_NickServ, lptr->nick, 
-        "Type \002/msg %s IDENTIFY <password>\002 and retry",
-        n_NickServ);
-      MyFree(arv);
-      return;
+      if (!(nptr->flags & NS_IDENTIFIED))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Password identification is required for [\002%s\002]",
+                 cptr->cmd);
+          notice(n_NickServ, lptr->nick,
+                 "Type \002/msg %s IDENTIFY <password>\002 and retry",
+                 n_NickServ);
+          MyFree(arv);
+          return;
+        }
     }
-  }
 
   /* call cptr->func to execute command */
   (*cptr->func)(lptr, acnt, arv);
@@ -328,314 +334,316 @@ ns_loaddata()
   struct NickInfo *nptr = NULL;
 
   if (!(fp = fopen(NickServDB, "r")))
-  {
-    /* NickServ data file doesn't exist */
-    return -1;
-  }
+    {
+      /* NickServ data file doesn't exist */
+      return -1;
+    }
 
   cnt = 0;
   islink = 0;
 
   /* load data into list */
   while (fgets(line, MAXLINE - 1, fp))
-  {
-    cnt++;
-    ac = SplitBuf(line, &av);
-    if (!ac)
     {
-      /* probably a blank line */
-      MyFree(av);
-      continue;
-    }
-
-    if (av[0][0] == ';')
-    {
-      MyFree(av);
-      continue;
-    }
-
-    if (!ircncmp("->", av[0], 2))
-    {
-      /* 
-       * check if there are enough args
-       */
-      if (ac < 2)
-      {
-        fatal(1, "%s:%d Invalid database format (FATAL)",
-          NickServDB,
-          cnt);
-        ret = -2;
-        continue;
-      }
-
-      /* check if there is no nickname associated with the data */
-      if (!nptr)
-      {
-        fatal(1, "%s:%d No nickname associated with data",
-          NickServDB,
-          cnt);
-        if (ret > 0)
-          ret = -1;
-        continue;
-      }
-
-      keyword = av[0] + 2;
-      if (!ircncmp(keyword, "PASS", 4))
-      {
-        if (!nptr->password)
-          nptr->password = MyStrdup(av[1]);
-        else
+      cnt++;
+      ac = SplitBuf(line, &av);
+      if (!ac)
         {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple PASS lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
+          /* probably a blank line */
+          MyFree(av);
+          continue;
         }
-      }
-      else if (!ircncmp(keyword, "HOST", 4) && !islink)
-      {
-        AddHostToNick(av[1], nptr);
-      }
-      else if (!ircncmp(keyword, "EMAIL", 5))
-      {
-        if (!nptr->email)
-          nptr->email = MyStrdup(av[1]);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple EMAIL lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (!ircncmp(keyword, "URL", 3))
-      {
-        if (!nptr->url)
-          nptr->url = MyStrdup(av[1]);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple URL lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (!ircncmp(keyword, "GSM", 3))
-      {
-        if (!nptr->gsm)
-          nptr->gsm = MyStrdup(av[1]);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple GSM lines (using first)",
-            NickServDB, cnt, nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (!ircncmp(keyword, "PHONE", 5))
-      {
-        if (!nptr->phone)
-          nptr->phone = MyStrdup(av[1]);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple PHONE lines (using first)",
-            NickServDB, cnt, nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (!ircncmp(keyword, "UIN", 3))
-      {
-        if (!nptr->UIN)
-          nptr->UIN = MyStrdup(av[1]);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple UIN lines (using first)",
-            NickServDB, cnt, nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (LastSeenInfo && !ircncmp(keyword, "LASTUH", 6))
-      {
-        if (!nptr->lastu && !nptr->lasth)
-        {
-          nptr->lastu = MyStrdup(av[1]);
-          nptr->lasth = MyStrdup(av[2]);
-        }
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple LASTUH lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
-      else if (LastSeenInfo && !ircncmp(keyword, "LASTQMSG", 6))
-      {
-        if (!nptr->lastqmsg)
-          nptr->lastqmsg = MyStrdup(av[1] + 1);
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple LASTQMSG lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
 
-    #ifdef LINKED_NICKNAMES
-
-      else if (!ircncmp(keyword, "LINK", 4))
-      {
-        if (!nptr->master)
+      if (av[0][0] == ';')
         {
-          struct NickInfo *master;
+          MyFree(av);
+          continue;
+        }
 
-          if (!(master = GetLink(av[1])))
-          {
-            fatal(1, "%s:%d NickServ entry for [%s] has an unregistered master nickname: %s (FATAL)",
-              NickServDB,
-              cnt,
-              nptr->nick,
-              av[1]);
-            ret = -2;
-          }
-          else
-          {
-            int    goodlink;
-
-            /*
-             * The master nickname is ok - insert nptr into
-             * nptr->master's link list
-             */
-            islink = 1;
-
-            goodlink = InsertLink(master, nptr);
-            if (goodlink <= 0)
+      if (!ircncmp("->", av[0], 2))
+        {
+          /*
+           * check if there are enough args
+           */
+          if (ac < 2)
             {
-              fatal(1, "%s:%d InsertLink() failed for nickname [%s]: %s (FATAL)",
-                NickServDB,
-                cnt,
-                nptr->nick,
-                (goodlink == -1) ? "Circular Link" : "Exceeded MaxLinks links");
+              fatal(1, "%s:%d Invalid database format (FATAL)",
+                    NickServDB,
+                    cnt);
               ret = -2;
+              continue;
             }
-            else
+
+          /* check if there is no nickname associated with the data */
+          if (!nptr)
             {
-              struct NickHost *hptr;
-
-              /* Delete nptr's access list */
-              while (nptr->hosts)
-              {
-                hptr = nptr->hosts->next;
-                MyFree(nptr->hosts->hostmask);
-                MyFree(nptr->hosts);
-                nptr->hosts = hptr;
-              }
+              fatal(1, "%s:%d No nickname associated with data",
+                    NickServDB,
+                    cnt);
+              if (ret > 0)
+                ret = -1;
+              continue;
             }
-          }
-        }
-        else
-        {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple LINK lines (using first)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
-      }
 
-    #endif /* LINKED_NICKNAMES */
+          keyword = av[0] + 2;
+          if (!ircncmp(keyword, "PASS", 4))
+            {
+              if (!nptr->password)
+                nptr->password = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple PASS lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "HOST", 4) && !islink)
+            {
+              AddHostToNick(av[1], nptr);
+            }
+          else if (!ircncmp(keyword, "EMAIL", 5))
+            {
+              if (!nptr->email)
+                nptr->email = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple EMAIL lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "URL", 3))
+            {
+              if (!nptr->url)
+                nptr->url = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple URL lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "GSM", 3))
+            {
+              if (!nptr->gsm)
+                nptr->gsm = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple GSM lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "PHONE", 5))
+            {
+              if (!nptr->phone)
+                nptr->phone = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple PHONE lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "UIN", 3))
+            {
+              if (!nptr->UIN)
+                nptr->UIN = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple UIN lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (LastSeenInfo && !ircncmp(keyword, "LASTUH", 6))
+            {
+              if (!nptr->lastu && !nptr->lasth)
+                {
+                  nptr->lastu = MyStrdup(av[1]);
+                  nptr->lasth = MyStrdup(av[2]);
+                }
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple LASTUH lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (LastSeenInfo && !ircncmp(keyword, "LASTQMSG", 6))
+            {
+              if (!nptr->lastqmsg)
+                nptr->lastqmsg = MyStrdup(av[1] + 1);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple LASTQMSG lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
 
-    } /* if (!ircncmp("->", keyword, 2)) */
-    else
-    {
-      if (nptr)
-      {
-        if (!nptr->password && !(nptr->flags & NS_FORBID))
-        {
-          /* the previous nick didn't have a PASS line */
-          fatal(1,
-            "%s:%d No password entry for registered nick [%s] (FATAL)",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          ret = -2;
-        }
+#ifdef LINKED_NICKNAMES
 
-        if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
-        {
-          /* the previous nick didn't have a HOST line */
-          fatal(1, "%s:%d No hostname entry for registered nick [%s]",
-            NickServDB,
-            cnt,
-            nptr->nick);
-          if (ret > 0)
-            ret = -1;
-        }
+          else if (!ircncmp(keyword, "LINK", 4))
+            {
+              if (!nptr->master)
+                {
+                  struct NickInfo *master;
 
-        /*
-         * we've come to a new nick entry, so add the last nick
-         * to the list before proceeding
-         */
-        if (!FindNick(nptr->nick))
-          AddNick(nptr);
+                  if (!(master = GetLink(av[1])))
+                    {
+                      fatal(1, "%s:%d NickServ entry for [%s] has an unregistered master nickname: %s (FATAL)",
+                            NickServDB,
+                            cnt,
+                            nptr->nick,
+                            av[1]);
+                      ret = -2;
+                    }
+                  else
+                    {
+                      int    goodlink;
 
-        if (islink)
-          islink = 0;
-      }
+                      /*
+                       * The master nickname is ok - insert nptr into
+                       * nptr->master's link list
+                       */
+                      islink = 1;
 
-      /* 
-       * make sure there are enough args on the line
-       * <nick> <flags> <time created> <last seen>
-       */
-      if (ac < 4)
-      {
-        fatal(1, "%s:%d Invalid database format (FATAL)",
-          NickServDB,
-          cnt);
-        ret = -2;
-        nptr = NULL;
-        continue;
-      }
-#ifdef STRICT_DATA_CHECK
-      /* Check if there already exists that nickname in list. This will
-       * give some overhead, but this will make sure no nicknames are
-       * twice or more times in db. */
-      if (FindNick(av[0]))
-      {
-        fatal(1, "%s:%d NickServ entry [%s] is already in nick list",
-            NickServDB, cnt, av[0]);
-        nptr = NULL;
-        ret = -1;
-      }
+                      goodlink = InsertLink(master, nptr);
+                      if (goodlink <= 0)
+                        {
+                          fatal(1, "%s:%d InsertLink() failed for nickname [%s]: %s (FATAL)",
+                                NickServDB,
+                                cnt,
+                                nptr->nick,
+                                (goodlink == -1) ? "Circular Link" : "Exceeded MaxLinks links");
+                          ret = -2;
+                        }
+                      else
+                        {
+                          struct NickHost *hptr;
+
+                          /* Delete nptr's access list */
+                          while (nptr->hosts)
+                            {
+                              hptr = nptr->hosts->next;
+                              MyFree(nptr->hosts->hostmask);
+                              MyFree(nptr->hosts);
+                              nptr->hosts = hptr;
+                            }
+                        }
+                    }
+                }
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple LINK lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+
+#endif /* LINKED_NICKNAMES */
+
+        } /* if (!ircncmp("->", keyword, 2)) */
       else
-      {
-#endif
-        nptr = MakeNick();
-        nptr->nick = MyStrdup(av[0]);
-        nptr->flags = atol(av[1]);
-        nptr->created = atol(av[2]);
-        nptr->lastseen = atol(av[3]);
-        nptr->flags &= ~NS_IDENTIFIED;
+        {
+          if (nptr)
+            {
+              if (!nptr->password && !(nptr->flags & NS_FORBID))
+                {
+                  /* the previous nick didn't have a PASS line */
+                  fatal(1,
+                        "%s:%d No password entry for registered nick [%s] (FATAL)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  ret = -2;
+                }
+
+              if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
+                {
+                  /* the previous nick didn't have a HOST line */
+                  fatal(1, "%s:%d No hostname entry for registered nick [%s]",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+
+              /*
+               * we've come to a new nick entry, so add the last nick
+               * to the list before proceeding
+               */
+              if (!FindNick(nptr->nick))
+                AddNick(nptr);
+
+              if (islink)
+                islink = 0;
+            }
+
+          /*
+           * make sure there are enough args on the line
+           * <nick> <flags> <time created> <last seen>
+           */
+          if (ac < 4)
+            {
+              fatal(1, "%s:%d Invalid database format (FATAL)",
+                    NickServDB,
+                    cnt);
+              ret = -2;
+              nptr = NULL;
+              continue;
+            }
 #ifdef STRICT_DATA_CHECK
-      }
+          /* Check if there already exists that nickname in list. This will
+           * give some overhead, but this will make sure no nicknames are
+           * twice or more times in db. */
+          if (FindNick(av[0]))
+            {
+              fatal(1, "%s:%d NickServ entry [%s] is already in nick list",
+                    NickServDB, cnt, av[0]);
+              nptr = NULL;
+              ret = -1;
+            }
+          else
+            {
 #endif
-    }
-    MyFree(av);
-  } /* while */
+              nptr = MakeNick();
+              nptr->nick = MyStrdup(av[0]);
+              nptr->flags = atol(av[1]);
+              nptr->created = atol(av[2]);
+              nptr->lastseen = atol(av[3]);
+              nptr->flags &= ~NS_IDENTIFIED;
+#ifdef STRICT_DATA_CHECK
+
+            }
+#endif
+
+        }
+      MyFree(av);
+    } /* while */
 
   /*
    * This is needed because the above loop will only add the nicks
@@ -644,36 +652,36 @@ ns_loaddata()
    * it will get added now
    */
   if (nptr)
-  {
-    if ((nptr->password) || (nptr->flags & NS_FORBID))
     {
-      if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
-      {
-        fatal(1, "%s:%d No hostname entry for registered nick [%s]",
-          NickServDB,
-          cnt,
-          nptr->nick);
-        if (ret > 0)
-          ret = -1;
-      }
+      if ((nptr->password) || (nptr->flags & NS_FORBID))
+        {
+          if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
+            {
+              fatal(1, "%s:%d No hostname entry for registered nick [%s]",
+                    NickServDB,
+                    cnt,
+                    nptr->nick);
+              if (ret > 0)
+                ret = -1;
+            }
 
-      /* 
-       * nptr has a password, so it can be added to the table
-       */
-      AddNick(nptr);
-    }
-    else
-    {
-      if (!nptr->password && !(nptr->flags & NS_FORBID))
-      {
-        fatal(1, "%s:%d No password entry for registered nick [%s] (FATAL)",
-          NickServDB,
-          cnt,
-          nptr->nick);
-        ret = -2;
-      }
-    }
-  } /* if (nptr) */
+          /*
+           * nptr has a password, so it can be added to the table
+           */
+          AddNick(nptr);
+        }
+      else
+        {
+          if (!nptr->password && !(nptr->flags & NS_FORBID))
+            {
+              fatal(1, "%s:%d No password entry for registered nick [%s] (FATAL)",
+                    NickServDB,
+                    cnt,
+                    nptr->nick);
+              ret = -2;
+            }
+        }
+    } /* if (nptr) */
 
   fclose(fp);
 
@@ -732,7 +740,7 @@ AddFounderChannelToNick(struct NickInfo **nptr, struct ChanInfo *cptr)
 */
 
 void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
-    *cptr)
+                                  *cptr)
 {
   struct aChannelPtr *tmp, *prev;
 
@@ -740,39 +748,39 @@ void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
 
   /* Iterate list of nick's founder channels */
   for (tmp = (*nptr)->FounderChannels; tmp; )
-  {
-    /* We have a match! */
-    if (tmp->cptr == cptr)
     {
-      /* Last time we didn't have a match, so we have a ptr before this
-       * one in case of list relinking */
-      if (prev)
-      {
-        prev->next = tmp->next;
-        MyFree(tmp);
-        tmp = prev;
-      }
+      /* We have a match! */
+      if (tmp->cptr == cptr)
+        {
+          /* Last time we didn't have a match, so we have a ptr before this
+           * one in case of list relinking */
+          if (prev)
+            {
+              prev->next = tmp->next;
+              MyFree(tmp);
+              tmp = prev;
+            }
+          else
+            {
+              (*nptr)->FounderChannels = tmp->next;
+              MyFree(tmp);
+              tmp = NULL;
+            }
+
+          /* KrisDuv's fix for decreasing number of registered channels */
+          --(*nptr)->fccnt;
+
+          /* We can break since there should always be only 1 match */
+          break;
+        }
+
+      prev = tmp;
+
+      if (tmp)
+        tmp = tmp->next;
       else
-      {
-        (*nptr)->FounderChannels = tmp->next;
-        MyFree(tmp);
-        tmp = NULL;
-      }
-
-      /* KrisDuv's fix for decreasing number of registered channels */
-      --(*nptr)->fccnt;
-
-      /* We can break since there should always be only 1 match */
-      break;
+        tmp = (*nptr)->FounderChannels;
     }
-
-    prev = tmp;
-
-    if (tmp)
-      tmp = tmp->next;
-    else
-      tmp = (*nptr)->FounderChannels;
-  }
 } /* RemoveFounderChannelFromNick() */
 
 /*
@@ -781,24 +789,24 @@ AddAccessChannel()
 */
 
 struct AccessChannel *
-AddAccessChannel(struct NickInfo *nptr, struct ChanInfo *chanptr,
-                 struct ChanAccess *accessptr)
+      AddAccessChannel(struct NickInfo *nptr, struct ChanInfo *chanptr,
+                       struct ChanAccess *accessptr)
 
-{
-  struct AccessChannel *acptr;
+  {
+    struct AccessChannel *acptr;
 
-  acptr = (struct AccessChannel *) MyMalloc(sizeof(struct AccessChannel));
-  acptr->cptr = chanptr;
-  acptr->accessptr = accessptr;
+    acptr = (struct AccessChannel *) MyMalloc(sizeof(struct AccessChannel));
+    acptr->cptr = chanptr;
+    acptr->accessptr = accessptr;
 
-  acptr->prev = NULL;
-  acptr->next = nptr->AccessChannels;
-  if (acptr->next)
-    acptr->next->prev = acptr;
-  nptr->AccessChannels = acptr;
+    acptr->prev = NULL;
+    acptr->next = nptr->AccessChannels;
+    if (acptr->next)
+      acptr->next->prev = acptr;
+    nptr->AccessChannels = acptr;
 
-  return (acptr);
-} /* AddAccessChannel() */
+    return (acptr);
+  } /* AddAccessChannel() */
 
 /*
 DeleteAccessChannel()
@@ -830,17 +838,17 @@ its fields
 */
 
 static struct NickInfo *
-MakeNick()
+      MakeNick()
 
-{
-  struct NickInfo *nptr;
+  {
+    struct NickInfo *nptr;
 
-  nptr = (struct NickInfo *) MyMalloc(sizeof(struct NickInfo));
+    nptr = (struct NickInfo *) MyMalloc(sizeof(struct NickInfo));
 
-  memset(nptr, 0, sizeof(struct NickInfo));
+    memset(nptr, 0, sizeof(struct NickInfo));
 
-  return (nptr);
-} /* MakeNick() */
+    return (nptr);
+  } /* MakeNick() */
 
 /*
 AddNick()
@@ -853,7 +861,7 @@ AddNick(struct NickInfo *nickptr)
 {
   unsigned int hashv;
 
-  /* 
+  /*
    * all the fields of nickptr were filled in already, so just 
    * insert it in the list
    */
@@ -881,12 +889,14 @@ DeleteNick(struct NickInfo *nickptr)
   struct NickHost *htmp;
   unsigned int hashv;
 #ifdef CHANNELSERVICES
+
   struct ChanInfo *cptr;
   struct aChannelPtr *ftmp;
   struct aChannelPtr *ntmp;
   struct AccessChannel *atmp;
 #endif
 #ifdef MEMOSERVICES
+
   struct MemoInfo *mi;
 #endif
 
@@ -900,6 +910,7 @@ DeleteNick(struct NickInfo *nickptr)
 #endif
 
 #ifdef LINKED_NICKNAMES
+
   DeleteLink(nickptr, 0);
 #endif /* LINKED_NICKNAMES */
 
@@ -909,46 +920,46 @@ DeleteNick(struct NickInfo *nickptr)
   MyFree(nickptr->password);
 
   while (nickptr->hosts)
-  {
-    htmp = nickptr->hosts->next;
-    MyFree(nickptr->hosts->hostmask);
-    MyFree(nickptr->hosts);
-    nickptr->hosts = htmp;
-  }
+    {
+      htmp = nickptr->hosts->next;
+      MyFree(nickptr->hosts->hostmask);
+      MyFree(nickptr->hosts);
+      nickptr->hosts = htmp;
+    }
 
 #ifdef CHANNELSERVICES
 
   while ((ntmp = nickptr->FounderChannels))
-  {
-    cptr = ntmp->cptr;
-    ftmp = ntmp->next;
-
-    assert(ntmp);
-    
-    MyFree(ntmp);
-    nickptr->FounderChannels = ftmp;
-
-    /* All channels that this nick registered should be dropped, unless
-     * there is a successor. */
-
-    MyFree(cptr->founder);
-
-    /* If the channel has a successor, promote them to founder, otherwise
-     * delete the channel */
-    if (cptr->successor)
-      PromoteSuccessor(cptr);
-    else
     {
-      /* Fix by KrisDuv - make ChanServ part if on channel */
-      struct Channel *chptr;
-      chptr = FindChannel(cptr->name);
-      if (IsChannelMember(chptr, Me.csptr))
-        cs_part(chptr);
-       
-      /* And delete channel finally */   
-      DeleteChan(cptr);
+      cptr = ntmp->cptr;
+      ftmp = ntmp->next;
+
+      assert(ntmp);
+
+      MyFree(ntmp);
+      nickptr->FounderChannels = ftmp;
+
+      /* All channels that this nick registered should be dropped, unless
+       * there is a successor. */
+
+      MyFree(cptr->founder);
+
+      /* If the channel has a successor, promote them to founder, otherwise
+       * delete the channel */
+      if (cptr->successor)
+        PromoteSuccessor(cptr);
+      else
+        {
+          /* Fix by KrisDuv - make ChanServ part if on channel */
+          struct Channel *chptr;
+          chptr = FindChannel(cptr->name);
+          if (IsChannelMember(chptr, Me.csptr))
+            cs_part(chptr);
+
+          /* And delete channel finally */
+          DeleteChan(cptr);
+        }
     }
-  }
 
   /*
    * Before deleting nickptr->AccessChannels, we first want
@@ -961,11 +972,11 @@ DeleteNick(struct NickInfo *nickptr)
     DeleteAccess(atmp->cptr, atmp->accessptr);
 
   while (nickptr->AccessChannels)
-  {
-    atmp = nickptr->AccessChannels->next;
-    MyFree(nickptr->AccessChannels);
-    nickptr->AccessChannels = atmp;
-  }
+    {
+      atmp = nickptr->AccessChannels->next;
+      MyFree(nickptr->AccessChannels);
+      nickptr->AccessChannels = atmp;
+    }
 
 #endif /* CHANNELSERVICES */
 
@@ -1080,15 +1091,15 @@ CheckNick(char *nickname)
    * Check if the nick is forbidden
    */
   if (realptr->flags & NS_FORBID)
-  {
-    notice(n_NickServ, lptr->nick, 
-      "This nickname may not be used.  Please choose another.");
-    notice(n_NickServ, lptr->nick,
-      "If you do not change within one minute, you will be disconnected");
-    realptr->flags |= NS_COLLIDE;
-    realptr->collide_ts = current_ts + 60;
-    return 0;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "This nickname may not be used.  Please choose another.");
+      notice(n_NickServ, lptr->nick,
+             "If you do not change within one minute, you will be disconnected");
+      realptr->flags |= NS_COLLIDE;
+      realptr->collide_ts = current_ts + 60;
+      return 0;
+    }
 
   /*
    * We don't need to call OnAccessList() if the nickname
@@ -1105,74 +1116,74 @@ CheckNick(char *nickname)
    * in either case, give them a warning
    */
   if (!knownhost)
-  {
-    if (NicknameWarn || (nptr->flags & NS_PROTECTED))
     {
-      /*
-       * If NicknameWarn is enabled, or if their nickname
-       * is kill protected, give them a warning telling
-       * them to identify
-       */
-      notice(n_NickServ, lptr->nick, ERR_NOT_YOUR_NICK);
-      notice(n_NickServ, lptr->nick, ERR_NEED_IDENTIFY, n_NickServ);
-    }
+      if (NicknameWarn || (nptr->flags & NS_PROTECTED))
+        {
+          /*
+           * If NicknameWarn is enabled, or if their nickname
+           * is kill protected, give them a warning telling
+           * them to identify
+           */
+          notice(n_NickServ, lptr->nick, ERR_NOT_YOUR_NICK);
+          notice(n_NickServ, lptr->nick, ERR_NEED_IDENTIFY, n_NickServ);
+        }
 
-   if (AllowKillProtection)
-   {
-    if (nptr->flags & NS_KILLIMMED)
-    {
-      if (nptr->flags & NS_SECURE)
-      {
-        /*
-         * If the nickname is secure, we cannot kill them
-         * immediately, because they will be killed every time
-         * they logon, whether they come from a known host or not.
-         * Give them one minute to identify.
-         */
-        notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
-        realptr->flags |= NS_COLLIDE;
-        realptr->collide_ts = current_ts + 60;
-      }
-      else
-      {
-        /*
-          * The nickname has kill immediately set, so collide
-          * the nickname right now
-          */
-        putlog(LOG1, 
-          "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
-          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+      if (AllowKillProtection)
+        {
+          if (nptr->flags & NS_KILLIMMED)
+            {
+              if (nptr->flags & NS_SECURE)
+                {
+                  /*
+                   * If the nickname is secure, we cannot kill them
+                   * immediately, because they will be killed every time
+                   * they logon, whether they come from a known host or not.
+                   * Give them one minute to identify.
+                   */
+                  notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
+                  realptr->flags |= NS_COLLIDE;
+                  realptr->collide_ts = current_ts + 60;
+                }
+              else
+                {
+                  /*
+                    * The nickname has kill immediately set, so collide
+                    * the nickname right now
+                    */
+                  putlog(LOG1,
+                         "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
+                         n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-        SendUmode(OPERUMODE_S,
-          "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
-          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+                  SendUmode(OPERUMODE_S,
+                            "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
+                            n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-        collide(lptr->nick);
-        nptr->collide_ts = 0;
-      }
-    }
-    else if (nptr->flags & NS_PROTECTED)
-    {
-      /*
-       * If the nick is kill protected, give a 1 minute timeout
-       * for them to change
-       */
-      notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
-      realptr->flags |= NS_COLLIDE;
-      realptr->collide_ts = current_ts + 60;
-    }
-   }
-   return 0;
-  } /* if (!knownhost) */
+                  collide(lptr->nick);
+                  nptr->collide_ts = 0;
+                }
+            }
+          else if (nptr->flags & NS_PROTECTED)
+            {
+              /*
+               * If the nick is kill protected, give a 1 minute timeout
+               * for them to change
+               */
+              notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
+              realptr->flags |= NS_COLLIDE;
+              realptr->collide_ts = current_ts + 60;
+            }
+        }
+      return 0;
+    } /* if (!knownhost) */
 
   if ((knownhost) && (nptr->flags & NS_UNSECURE))
-  {
-    /*
-     * They're from a known host, and have UNSECURE set -
-     * mark them as identified
-     */
-    realptr->flags |= NS_IDENTIFIED;
-  }
+    {
+      /*
+       * They're from a known host, and have UNSECURE set -
+       * mark them as identified
+       */
+      realptr->flags |= NS_IDENTIFIED;
+    }
   return 1;
 } /* CheckNick() */
 
@@ -1196,13 +1207,13 @@ CheckOper(char *nickname)
 
   if (realptr && nptr)
     if ((realptr->flags & NS_IDENTIFIED) && !(nptr->flags & NS_NOEXPIRE))
-    {
-      notice(n_NickServ, nickname,
-        "You have not set the NoExpire nickname flag for your nickname");
-      notice(n_NickServ, nickname,
-        "Please type \002/msg %s SET NOEXPIRE ON\002 so your nickname does not expire",
-        n_NickServ);
-    }
+      {
+        notice(n_NickServ, nickname,
+               "You have not set the NoExpire nickname flag for your nickname");
+        notice(n_NickServ, nickname,
+               "Please type \002/msg %s SET NOEXPIRE ON\002 so your nickname does not expire",
+               n_NickServ);
+      }
 } /* CheckOper() */
 
 /*
@@ -1219,40 +1230,40 @@ ExpireNicknames(time_t unixtime)
   struct NickInfo *nptr, *next;
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    for (nptr = nicklist[ii]; nptr; nptr = next)
     {
-      next = nptr->next;
-
-    #ifdef RECORD_SPLIT_TS
-
-      if (nptr->split_ts)
-      {
-        /*
-         * Reset nptr->split_ts every half hour, if we have not
-         * seen them
-         */
-        if ((unixtime - nptr->whensplit) >= 1800)
-          nptr->split_ts = nptr->whensplit = 0;
-      }
-
-    #endif /* RECORD_SPLIT_TS */
-
-      if (NickNameExpire)
-      {
-        if ((!(nptr->flags & (NS_FORBID | NS_NOEXPIRE | NS_IDENTIFIED)))
-            && ((unixtime - nptr->lastseen) >= NickNameExpire))
+      for (nptr = nicklist[ii]; nptr; nptr = next)
         {
-          putlog(LOG2,
-            "%s: Expired nickname: [%s]",
-            n_NickServ,
-            nptr->nick);
+          next = nptr->next;
 
-          DeleteNick(nptr);
-        }
-      } /* if (NickNameExpire) */
-    } /* for (nptr = nicklist[ii]; nptr; nptr = next) */
-  } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+#ifdef RECORD_SPLIT_TS
+
+          if (nptr->split_ts)
+            {
+              /*
+               * Reset nptr->split_ts every half hour, if we have not
+               * seen them
+               */
+              if ((unixtime - nptr->whensplit) >= 1800)
+                nptr->split_ts = nptr->whensplit = 0;
+            }
+
+#endif /* RECORD_SPLIT_TS */
+
+          if (NickNameExpire)
+            {
+              if ((!(nptr->flags & (NS_FORBID | NS_NOEXPIRE | NS_IDENTIFIED)))
+                  && ((unixtime - nptr->lastseen) >= NickNameExpire))
+                {
+                  putlog(LOG2,
+                         "%s: Expired nickname: [%s]",
+                         n_NickServ,
+                         nptr->nick);
+
+                  DeleteNick(nptr);
+                }
+            } /* if (NickNameExpire) */
+        } /* for (nptr = nicklist[ii]; nptr; nptr = next) */
+    } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 } /* ExpireNicknames() */
 
 /*
@@ -1261,22 +1272,22 @@ FindNick()
 */
 
 struct NickInfo *
-FindNick(char *nickname)
+      FindNick(char *nickname)
 
-{
-  struct NickInfo *nptr;
-  unsigned int hashv;
+  {
+    struct NickInfo *nptr;
+    unsigned int hashv;
 
-  if (!nickname)
+    if (!nickname)
+      return (NULL);
+
+    hashv = NSHashNick(nickname);
+    for (nptr = nicklist[hashv]; nptr; nptr = nptr->next)
+      if (!irccmp(nptr->nick, nickname))
+        return (nptr);
+
     return (NULL);
-
-  hashv = NSHashNick(nickname);
-  for (nptr = nicklist[hashv]; nptr; nptr = nptr->next)
-    if (!irccmp(nptr->nick, nickname))
-      return (nptr);
-
-  return (NULL);
-} /* FindNick() */
+  } /* FindNick() */
 
 /*
 GetLink()
@@ -1285,21 +1296,22 @@ master if nickname is in a nick link
 */
 
 struct NickInfo *
-GetLink(char *nickname)
+      GetLink(char *nickname)
 
-{
-  struct NickInfo *nptr;
+  {
+    struct NickInfo *nptr;
 
-  if (!(nptr = FindNick(nickname)))
-    return (NULL);
+    if (!(nptr = FindNick(nickname)))
+      return (NULL);
 
 #ifdef LINKED_NICKNAMES
-  if (nptr->master)
-    return (nptr->master);
+
+    if (nptr->master)
+      return (nptr->master);
 #endif /* LINKED_NICKNAMES */
 
-  return (nptr);
-} /* GetLink() */
+    return (nptr);
+  } /* GetLink() */
 
 /*
 OnAccessList()
@@ -1340,26 +1352,26 @@ collide(char *nick)
   char **av, sendstr[MAXLINE];
 
   if(!SafeConnect)
-     return;
+    return;
 
   if (!(lptr = FindClient(nick)))
     return;
 
   ircsprintf(sendstr,
-    "NICK %s 1 %ld +i %s %s %s :%s\n",
-    lptr->nick,
-    (long) (lptr->nick_ts - 1),
-    "enforced",
-    Me.name,
-    Me.name,
-    "Nickname Enforcement");
+             "NICK %s 1 %ld +i %s %s %s :%s\n",
+             lptr->nick,
+             (long) (lptr->nick_ts - 1),
+             "enforced",
+             Me.name,
+             Me.name,
+             "Nickname Enforcement");
 
   /*
    * Sending a server kill will be quieter than an oper
    * kill since most clients are -k
    */
   toserv("KILL %s :%s!%s (Nickname Enforcement)\n%s",
-    lptr->nick, Me.name, n_NickServ, sendstr);
+         lptr->nick, Me.name, n_NickServ, sendstr);
 
   /* erase the old user */
   DeleteClient(lptr);
@@ -1371,14 +1383,14 @@ collide(char *nick)
   MyFree(av);
 
   if ((nptr = FindNick(nick)))
-  {
-    /*
-     * remove the collide timer, but put a release timer so the
-     * pseudo nick gets removed after NSReleaseTimeout
-     */
-    nptr->flags &= ~NS_COLLIDE;
-    nptr->flags |= NS_RELEASE;
-  }
+    {
+      /*
+       * remove the collide timer, but put a release timer so the
+       * pseudo nick gets removed after NSReleaseTimeout
+       */
+      nptr->flags &= ~NS_COLLIDE;
+      nptr->flags |= NS_RELEASE;
+    }
 } /* collide() */
 
 /*
@@ -1403,7 +1415,7 @@ release(char *nickname)
     return; /* lptr->nick isn't a pseudo-nick */
 
   toserv(":%s QUIT :Released\n",
-    lptr->nick);
+         lptr->nick);
   DeleteClient(lptr);
 
   nptr->flags &= ~NS_RELEASE;
@@ -1424,80 +1436,80 @@ CollisionCheck(time_t unixtime)
   struct NickInfo *nptr;
 
   for (ii = 0; ii < NICKLIST_MAX; ii++)
-  {
-    for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      if (nptr->flags & NS_COLLIDE)
-      {
-        struct Luser    *lptr;
-
-        if ((lptr = FindClient(nptr->nick)))
+      for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
         {
-          if (unixtime >= nptr->collide_ts)
-          {
-            /*
-             * The current time is 60+ seconds past the
-             * last time they changed their nickname or
-             * connected to the network, and they have not
-             * yet identified - kill them
-             */
-            putlog(LOG1, 
-              "%s: killing %s!%s@%s (Nickname Enforcement)",
-              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+          if (nptr->flags & NS_COLLIDE)
+            {
+              struct Luser    *lptr;
 
-            SendUmode(OPERUMODE_S,
-              "%s: killing %s!%s@%s (Nickname Enforcement)",
-              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+              if ((lptr = FindClient(nptr->nick)))
+                {
+                  if (unixtime >= nptr->collide_ts)
+                    {
+                      /*
+                       * The current time is 60+ seconds past the
+                       * last time they changed their nickname or
+                       * connected to the network, and they have not
+                       * yet identified - kill them
+                       */
+                      putlog(LOG1,
+                             "%s: killing %s!%s@%s (Nickname Enforcement)",
+                             n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-            /*
-             * kill the nick and replace with a pseudo nick
-             */
-            collide(lptr->nick);
-            nptr->collide_ts = 0;
-          }
-        }
-        else
-        {
-          /*
-           * User must have changed their nick or QUIT -
-           * remove the collide
-           */
-          nptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
-          nptr->collide_ts = 0;
-        }
-      } /* if (nptr->flags & NS_COLLIDE) */
-      else if (NSReleaseTimeout && (nptr->flags & NS_RELEASE))
-      {
-        struct Luser *lptr;
+                      SendUmode(OPERUMODE_S,
+                                "%s: killing %s!%s@%s (Nickname Enforcement)",
+                                n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-        if ((lptr = FindClient(nptr->nick)))
-        {
-          if ((unixtime - lptr->nick_ts) >= NSReleaseTimeout)
-          {
-            putlog(LOG1,
-              "%s: Releasing enforcement pseudo-nick [%s]",
-              n_NickServ,
-              lptr->nick);
+                      /*
+                       * kill the nick and replace with a pseudo nick
+                       */
+                      collide(lptr->nick);
+                      nptr->collide_ts = 0;
+                    }
+                }
+              else
+                {
+                  /*
+                   * User must have changed their nick or QUIT -
+                   * remove the collide
+                   */
+                  nptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
+                  nptr->collide_ts = 0;
+                }
+            } /* if (nptr->flags & NS_COLLIDE) */
+          else if (NSReleaseTimeout && (nptr->flags & NS_RELEASE))
+            {
+              struct Luser *lptr;
 
-            SendUmode(OPERUMODE_S,
-              "%s: Releasing enforcement pseudo-nick [%s]",
-              n_NickServ,
-              lptr->nick);
+              if ((lptr = FindClient(nptr->nick)))
+                {
+                  if ((unixtime - lptr->nick_ts) >= NSReleaseTimeout)
+                    {
+                      putlog(LOG1,
+                             "%s: Releasing enforcement pseudo-nick [%s]",
+                             n_NickServ,
+                             lptr->nick);
 
-            /* release the nickname */
-            release(lptr->nick);
-          }
-        }
-        else
-        {
-          /*
-           * Something got messed up, kill the release flag
-           */
-          nptr->flags &= ~NS_RELEASE;
-        }
-      }
-    } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
-  } /* for (ii = 0; ii < NICKLIST_MAX; ii++) */
+                      SendUmode(OPERUMODE_S,
+                                "%s: Releasing enforcement pseudo-nick [%s]",
+                                n_NickServ,
+                                lptr->nick);
+
+                      /* release the nickname */
+                      release(lptr->nick);
+                    }
+                }
+              else
+                {
+                  /*
+                   * Something got messed up, kill the release flag
+                   */
+                  nptr->flags &= ~NS_RELEASE;
+                }
+            }
+        } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
+    } /* for (ii = 0; ii < NICKLIST_MAX; ii++) */
 } /* CollisionCheck() */
 
 #ifdef LINKED_NICKNAMES
@@ -1515,8 +1527,8 @@ CollisionCheck(time_t unixtime)
 static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 {
   struct NickInfo *master = NULL, /* new master for link list */
-                  *leafmaster = NULL, /* previous master for leaf's list */
-                  *tmp = NULL;
+                                  *leafmaster = NULL, /* previous master for leaf's list */
+                                                *tmp = NULL;
   int lcnt = 0 ; /* link count */
 
 
@@ -1531,10 +1543,10 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
   /* check for circular link */
   for (tmp = master; tmp; tmp = tmp->nextlink)
-  {
-    if (tmp == leaf)
-      return(-1);
-  }
+{
+      if (tmp == leaf)
+        return(-1);
+    }
 
   /* find out number of linked nicknames in a list */
   if (master->numlinks)
@@ -1545,19 +1557,19 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
   /* XXX this code sucks anyway. */
   /* leaf is in linked list, add linked_count_leaf to linked_count_hub */
   if (leaf->master)
-  {
-    if (leaf->master->numlinks)
-      lcnt += leaf->master->numlinks;
-    else
-      lcnt++;
-  }
+    {
+      if (leaf->master->numlinks)
+        lcnt += leaf->master->numlinks;
+      else
+        lcnt++;
+    }
   else
-  {
-    if (leaf->numlinks)
-      lcnt += leaf->numlinks;
-    else
-      ++lcnt;
-  }
+    {
+      if (leaf->numlinks)
+        lcnt += leaf->numlinks;
+      else
+        ++lcnt;
+    }
 
   /* seems there are too many links, so die instantly */
   if (MaxLinks && (lcnt > MaxLinks))
@@ -1565,10 +1577,10 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
   /* setup leaf master */
   if (leaf->master)
-  {
-    leafmaster = leaf->master;
-    leaf->master->master = master;
-  }
+    {
+      leafmaster = leaf->master;
+      leaf->master->master = master;
+    }
   else
     leafmaster = leaf;
 
@@ -1593,10 +1605,10 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
   /* setup masters in whole list */
   for (tmp = leafmaster; tmp->nextlink; tmp = tmp->nextlink)
-  {
-    tmp->master = master;
-    ++master->numlinks;
-  }
+    {
+      tmp->master = master;
+      ++master->numlinks;
+    }
 
   /* do last master, insert hub's list at the end of leaf's list */
   tmp->master = master;
@@ -1634,68 +1646,68 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
 
   /* let us find structure -before- nptr */
   if (nptr->master)
-  {
-    for (tmp = nptr->master; tmp; tmp = tmp->nextlink)
-      if (tmp->nextlink == nptr)
-        break;
-    /* we've reached the end, and there was no nptr? now that's kinda
-     * strange */
-    if (!tmp)
-      return(0);
-  }
+    {
+      for (tmp = nptr->master; tmp; tmp = tmp->nextlink)
+        if (tmp->nextlink == nptr)
+          break;
+      /* we've reached the end, and there was no nptr? now that's kinda
+       * strange */
+      if (!tmp)
+        return(0);
+    }
 
   /* do relink: before nptr to after nptr */
   if (tmp)
-  {
-    master = nptr->master;
-    tmp->nextlink = nptr->nextlink;
+    {
+      master = nptr->master;
+      tmp->nextlink = nptr->nextlink;
 
-    /* and make a master from nptr */
-    nptr->master = nptr->nextlink = NULL;
-    nptr->numlinks = 0;
+      /* and make a master from nptr */
+      nptr->master = nptr->nextlink = NULL;
+      nptr->numlinks = 0;
 
-    if (copyhosts)
-      /* make hosts list for nptr since it is alone now */
-      for (hptr = master->hosts; hptr; hptr = hptr->next)
-        AddHostToNick(hptr->hostmask, nptr);
-  }
+      if (copyhosts)
+        /* make hosts list for nptr since it is alone now */
+        for (hptr = master->hosts; hptr; hptr = hptr->next)
+          AddHostToNick(hptr->hostmask, nptr);
+    }
   else /* nptr->master is NULL indicating this is master nick */
-  {
-    /* make nptr->nextlink the new master */
-    nptr->nextlink->master = NULL;
-    nptr->nextlink->numlinks = nptr->numlinks;
-    for (tmp = nptr->nextlink->nextlink; tmp; tmp = tmp->nextlink)
-      tmp->master = nptr->nextlink;
+    {
+      /* make nptr->nextlink the new master */
+      nptr->nextlink->master = NULL;
+      nptr->nextlink->numlinks = nptr->numlinks;
+      for (tmp = nptr->nextlink->nextlink; tmp; tmp = tmp->nextlink)
+        tmp->master = nptr->nextlink;
 
-    if (copyhosts)
-      for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-        AddHostToNick(hptr->hostmask, nptr->nextlink);
+      if (copyhosts)
+        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+          AddHostToNick(hptr->hostmask, nptr->nextlink);
 
-  #ifdef CHANNELSERVICES
+#ifdef CHANNELSERVICES
 
-    /*
-     * The new master should keep the list of founder channels from the
-     * old master
-     */
-    nptr->nextlink->FounderChannels = nptr->FounderChannels;
-    nptr->nextlink->fccnt = nptr->fccnt;
-    nptr->FounderChannels = NULL;
-    nptr->fccnt = 0;
+      /*
+       * The new master should keep the list of founder channels from the
+       * old master
+       */
+      nptr->nextlink->FounderChannels = nptr->FounderChannels;
+      nptr->nextlink->fccnt = nptr->fccnt;
+      nptr->FounderChannels = NULL;
+      nptr->fccnt = 0;
 
-  #endif /* CHANNELSERVICES */
+#endif /* CHANNELSERVICES */
 
-    master = nptr->nextlink;
+      master = nptr->nextlink;
 
-    /* and yes, declare nptr as nickname which is alone */
-    nptr->nextlink = NULL;
-  }
+      /* and yes, declare nptr as nickname which is alone */
+      nptr->nextlink = NULL;
+    }
 
   --master->numlinks;
   if (master->numlinks == 1)
-  {
-    master->numlinks = 0;
-    master->master = NULL;
-  }
+    {
+      master->numlinks = 0;
+      master->master = NULL;
+    }
 
   return (1);
 } /* DeleteLink() */
@@ -1732,56 +1744,57 @@ int IsLinked(struct NickInfo *nick1, struct NickInfo *nick2)
  * Return a pointer to nptr's nick link master
  */
 struct NickInfo *GetMaster(struct NickInfo *nptr)
-{
-  if (!nptr)
-    return (NULL);
+  {
+    if (!nptr)
+      return (NULL);
 
 #ifdef LINKED_NICKNAMES
-  if (nptr->master)
-    return (nptr->master);
+
+    if (nptr->master)
+      return (nptr->master);
 #endif
 
-  return (nptr);
-} /* GetMaster() */
+    return (nptr);
+  } /* GetMaster() */
 
 /* Helper for return-requested-help-item-from-file function */
 static void n_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
-  {
-    char  str[MAXLINE];
-
-    if (ac >= 3)
-      ircsprintf(str, "%s %s", av[1], av[2]);
-    else
     {
-      if ((!irccmp(av[1], "ACCESS")) ||
-          (!irccmp(av[1], "SET")))
-        ircsprintf(str, "%s index", av[1]);
+      char  str[MAXLINE];
+
+      if (ac >= 3)
+        ircsprintf(str, "%s %s", av[1], av[2]);
       else
-      {
-        struct Command *cptr;
+        {
+          if ((!irccmp(av[1], "ACCESS")) ||
+              (!irccmp(av[1], "SET")))
+            ircsprintf(str, "%s index", av[1]);
+          else
+            {
+              struct Command *cptr;
 
-        for (cptr = nickcmds; cptr->cmd; cptr++)
-          if (!irccmp(av[1], cptr->cmd))
-            break;
+              for (cptr = nickcmds; cptr->cmd; cptr++)
+                if (!irccmp(av[1], cptr->cmd))
+                  break;
 
-        if (cptr->cmd)
-          if ((cptr->level == LVL_ADMIN) &&
-              !(IsValidAdmin(lptr)))
-          {
-            notice(n_NickServ, lptr->nick,
-              "No help available on \002%s\002",
-              av[1]);
-            return;
-          }
+              if (cptr->cmd)
+                if ((cptr->level == LVL_ADMIN) &&
+                    !(IsValidAdmin(lptr)))
+                  {
+                    notice(n_NickServ, lptr->nick,
+                           "No help available on \002%s\002",
+                           av[1]);
+                    return;
+                  }
 
-        ircsprintf(str, "%s", av[1]);
-      }
+              ircsprintf(str, "%s", av[1]);
+            }
+        }
+
+      GiveHelp(n_NickServ, lptr->nick, str, NODCC);
     }
-
-    GiveHelp(n_NickServ, lptr->nick, str, NODCC);
-  }
   else
     GiveHelp(n_NickServ, lptr->nick, NULL, NODCC);
 } /* n_help() */
@@ -1800,57 +1813,57 @@ n_register(struct Luser *lptr, int ac, char **av)
   time_t currtime;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick, "Syntax: \002REGISTER\002 <password>");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "REGISTER");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, "Syntax: \002REGISTER\002 <password>");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "REGISTER");
+      return;
+    }
 
   if ((nptr = FindNick(lptr->nick)))
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] is already registered",
-      nptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] is already registered",
+             nptr->nick);
+      return;
+    }
 
   currtime = current_ts;
 
   if (currtime < (lptr->nickreg_ts + NickRegDelay))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Please wait %ld seconds before using REGISTER again",
-      NickRegDelay);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Please wait %ld seconds before using REGISTER again",
+             NickRegDelay);
+      return;
+    }
 
   nptr = MakeNick();
 
   if (!ChangePass(nptr, av[1]))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Register failed");
-    putlog(LOG1, "%s: failed to register %s!%s@%s",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
-    MyFree(nptr);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Register failed");
+      putlog(LOG1, "%s: failed to register %s!%s@%s",
+             n_NickServ,
+             lptr->nick,
+             lptr->username,
+             lptr->hostname);
+      MyFree(nptr);
+      return;
+    }
 
   nptr->nick = MyStrdup(lptr->nick);
   nptr->created = nptr->lastseen = currtime;
 
   if (LastSeenInfo)
-  {
-    nptr->lastu = MyStrdup(lptr->username);
-    nptr->lasth = MyStrdup(lptr->hostname);
-    nptr->lastqmsg = NULL;
-  }
+    {
+      nptr->lastu = MyStrdup(lptr->username);
+      nptr->lasth = MyStrdup(lptr->hostname);
+      nptr->lastqmsg = NULL;
+    }
 
   nptr->flags = NS_IDENTIFIED;
 
@@ -1892,19 +1905,19 @@ n_register(struct Luser *lptr, int ac, char **av)
   lptr->nickreg_ts = currtime;
 
   notice(n_NickServ, lptr->nick,
-    "Your nickname is now registered under the hostmask [\002%s\002]\n",
-    mask);
+         "Your nickname is now registered under the hostmask [\002%s\002]\n",
+         mask);
   notice(n_NickServ, lptr->nick,
-    "Your password is [\002%s\002] - Remember this for later use",
-    av[1]);
+         "Your password is [\002%s\002] - Remember this for later use",
+         av[1]);
 
   MyFree(mask);
 
   RecordCommand("%s: %s!%s@%s REGISTER",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname);
 } /* n_register() */
 
 /*
@@ -1921,12 +1934,12 @@ n_drop(struct Luser *lptr, int ac, char **av)
   struct Userlist *utmp;
 
   if (!(ni = FindNick(lptr->nick)))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      lptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             lptr->nick);
+      return;
+    }
 
   /*
    * Set dnick to lptr->nick instead of ni->nick because
@@ -1935,30 +1948,30 @@ n_drop(struct Luser *lptr, int ac, char **av)
   dnick = lptr->nick;
 
   if (!(ni->flags & NS_IDENTIFIED))
-  {
-    if (ac < 2)
     {
-      notice(n_NickServ, lptr->nick, "Syntax: \002DROP\002 [password]");
-      notice(n_NickServ, lptr->nick,
-        ERR_MORE_INFO,
-        n_NickServ,
-        "DROP");
-      return;
+      if (ac < 2)
+        {
+          notice(n_NickServ, lptr->nick, "Syntax: \002DROP\002 [password]");
+          notice(n_NickServ, lptr->nick,
+                 ERR_MORE_INFO,
+                 n_NickServ,
+                 "DROP");
+          return;
+        }
+      else
+        {
+          if (!pwmatch(ni->password, av[1]))
+            {
+              notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+              RecordCommand("%s: %s!%s@%s failed DROP",
+                            n_NickServ,
+                            lptr->nick,
+                            lptr->username,
+                            lptr->hostname);
+              return;
+            }
+        }
     }
-    else
-    {
-      if (!pwmatch(ni->password, av[1]))
-      {
-        notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
-        RecordCommand("%s: %s!%s@%s failed DROP",
-          n_NickServ,
-          lptr->nick,
-          lptr->username,
-          lptr->hostname);
-        return;
-      }
-    }
-  }
 
   if (lptr->flags & L_OSREGISTERED)
     utmp = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
@@ -1966,60 +1979,61 @@ n_drop(struct Luser *lptr, int ac, char **av)
     utmp = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
 
   if (IsAdmin(utmp) && (ni->flags & NS_IDENTIFIED) && ac >= 2)
-  {
+    {
 #ifdef EMPOWERADMINS
       if (!IsValidAdmin(lptr))
-      {
-        notice(n_NickServ, lptr->nick,
-          ERR_BAD_PASS);
-        RecordCommand("%s: (Unregistered) Administrator %s!%s@%s failed DROP [%s]",
-          n_NickServ,
-          lptr->nick,
-          lptr->username,
-          lptr->hostname,
-          av[1]);
-        return;
-      }
+        {
+          notice(n_NickServ, lptr->nick,
+                 ERR_BAD_PASS);
+          RecordCommand("%s: (Unregistered) Administrator %s!%s@%s failed DROP [%s]",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname,
+                        av[1]);
+          return;
+        }
 
       if (!(ni = FindNick(av[1])))
-      {
-        notice(n_NickServ, lptr->nick,
-          ERR_NOT_REGGED,
-          av[1]);
-        return;
-      }
+        {
+          notice(n_NickServ, lptr->nick,
+                 ERR_NOT_REGGED,
+                 av[1]);
+          return;
+        }
 
       dnick = av[1];
 
       RecordCommand("%s: Administrator %s!%s@%s DROP [%s]",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        dnick);
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    dnick);
 
-       o_Wallops("DROP from %s!%s@%s for nick [%s]",
-          lptr->nick, lptr->username, lptr->hostname,
-          av[1] );
+      o_Wallops("DROP from %s!%s@%s for nick [%s]",
+                lptr->nick, lptr->username, lptr->hostname,
+                av[1] );
 #endif
+
     }
   else
-  {
-    /* just a regular user dropping their nick */
-    RecordCommand("%s: %s!%s@%s DROP",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
-  }
+    {
+      /* just a regular user dropping their nick */
+      RecordCommand("%s: %s!%s@%s DROP",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname);
+    }
 
   /* remove the nick from the nicklist table */
 
   DeleteNick(ni);
 
   notice(n_NickServ, lptr->nick,
-    "The nickname [\002%s\002] has been dropped",
-    dnick);
+         "The nickname [\002%s\002] has been dropped",
+         dnick);
 } /* n_drop() */
 
 /*
@@ -2048,19 +2062,20 @@ n_identify(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr, *realptr;
 #ifdef MEMOSERVICES
+
   struct MemoInfo *mi;
 #endif
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002IDENTIFY\002 <password>");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "IDENTIFY");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002IDENTIFY\002 <password>");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "IDENTIFY");
+      return;
+    }
 
   realptr = FindNick(lptr->nick);
 
@@ -2070,90 +2085,90 @@ n_identify(struct Luser *lptr, int ac, char **av)
   nptr = GetMaster(realptr);
 
   if (!realptr || !nptr)
-  {
-    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED,
-      lptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED,
+             lptr->nick);
+      return;
+    }
 
   if (realptr->flags & NS_IDENTIFIED)
-  {
-    notice(n_NickServ, lptr->nick,
-      "You have already identified");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "You have already identified");
+      return;
+    }
 
   if (!pwmatch(realptr->password, av[1]))
-  {
-    notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+    {
+      notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
 
-    RecordCommand("%s: %s!%s@%s failed IDENTIFY",
-      n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+      RecordCommand("%s: %s!%s@%s failed IDENTIFY",
+                    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-    return;
-  }
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s IDENTIFY",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
   realptr->flags |= NS_IDENTIFIED;
   realptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
   notice(n_NickServ, lptr->nick,
-    "Password accepted - you are now recognized");
+         "Password accepted - you are now recognized");
 
   if ((nptr->flags & NS_AUTOMASK) &&
       (!OnAccessList(lptr->username, lptr->hostname, nptr)))
-  {
-    char *mask = HostToMask(lptr->username, lptr->hostname);
+    {
+      char *mask = HostToMask(lptr->username, lptr->hostname);
 
-    AddHostToNick(mask, nptr);
-    notice(n_NickServ, lptr->nick,
-      "Added hostmask [\002%s\002] to the list of your known hosts",
-      mask);
-    MyFree(mask);
-  }
+      AddHostToNick(mask, nptr);
+      notice(n_NickServ, lptr->nick,
+             "Added hostmask [\002%s\002] to the list of your known hosts",
+             mask);
+      MyFree(mask);
+    }
 
   if (IsOperator(lptr))
     CheckOper(lptr->nick);
 
   if (LastSeenInfo)
-  {
-    /*
-     * Update last seen user@host info
-     */
+    {
+      /*
+       * Update last seen user@host info
+       */
 
-    if (realptr->lastu)
-      MyFree(realptr->lastu);
-    if (realptr->lasth)
-      MyFree(realptr->lasth);
-    realptr->lastu = MyStrdup(lptr->username);
-    realptr->lasth = MyStrdup(lptr->hostname);
-  } /* if (LastSeenInfo) */
+      if (realptr->lastu)
+        MyFree(realptr->lastu);
+      if (realptr->lasth)
+        MyFree(realptr->lasth);
+      realptr->lastu = MyStrdup(lptr->username);
+      realptr->lasth = MyStrdup(lptr->hostname);
+    } /* if (LastSeenInfo) */
 
   /* I have decided to move here new memo checking code, because it
    * seems to me more reasonable to have it right after successful
    * identify, and not every time on signon -kre */
 #ifdef MEMOSERVICES
   if (nptr->flags & NS_MEMOSIGNON)
-  {
-    /* search by master -kre */
-    if ((mi = FindMemoList(nptr->nick)))
     {
-      if (mi->newmemos)
-      {
+      /* search by master -kre */
+      if ((mi = FindMemoList(nptr->nick)))
+        {
+          if (mi->newmemos)
+            {
+              notice(n_MemoServ, lptr->nick,
+                     "You have \002%d\002 new memo%s",
+                     mi->newmemos,
+                     (mi->newmemos == 1) ? "" : "s");
+              notice(n_MemoServ, lptr->nick,
+                     "Type \002/msg %s LIST\002 to view them",
+                     n_MemoServ);
+            }
+        }
+      else
         notice(n_MemoServ, lptr->nick,
-          "You have \002%d\002 new memo%s",
-          mi->newmemos,
-          (mi->newmemos == 1) ? "" : "s");
-        notice(n_MemoServ, lptr->nick,
-          "Type \002/msg %s LIST\002 to view them",
-          n_MemoServ);
-      }
+               "You have no new memos");
     }
-    else
-      notice(n_MemoServ, lptr->nick,
-          "You have no new memos");
-  }
 #endif /* MEMOSERVICES */
 } /* n_identify() */
 
@@ -2171,23 +2186,23 @@ n_recover(struct Luser *lptr, int ac, char **av)
   int goodcoll;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002RECOVER <nickname> [password]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "RECOVER");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002RECOVER <nickname> [password]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "RECOVER");
+      return;
+    }
 
   if (!(ni = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   /*
    * Check if lptr's userhost is on ni's access list - if so check
@@ -2199,66 +2214,66 @@ n_recover(struct Luser *lptr, int ac, char **av)
       && (!(ni->flags & NS_SECURE)))
     goodcoll = 1;
   else
-  {
-    if (ac >= 3)
-      if (pwmatch(ni->password, av[2]))
-        goodcoll = 1;
-  }
+    {
+      if (ac >= 3)
+        if (pwmatch(ni->password, av[2]))
+          goodcoll = 1;
+    }
 
   if (!goodcoll)
-  {
-    /* Admins may recover any nickname */
-    if (IsValidAdmin(lptr))
-      goodcoll = 2;
-  }
+    {
+      /* Admins may recover any nickname */
+      if (IsValidAdmin(lptr))
+        goodcoll = 2;
+    }
 
   if (goodcoll)
-  {
-    if (ni->flags & NS_RELEASE)
     {
+      if (ni->flags & NS_RELEASE)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] has already been recovered",
+                 av[1]);
+          return;
+        }
+
+      if (!FindClient(av[1]))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] is not currently online",
+                 av[1]);
+          return;
+        }
+
+      collide(av[1]);
       notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] has already been recovered",
-        av[1]);
-      return;
-    }
-
-    if (!FindClient(av[1]))
-    {
+             "The nickname [\002%s\002] has been recovered",
+             av[1]);
       notice(n_NickServ, lptr->nick,
-        "[\002%s\002] is not currently online",
-        av[1]);
-      return;
+             "Type: \002/msg %s RELEASE %s\002 to release the "
+             "nickname before the timeout",
+             n_NickServ,
+             av[1]);
+
+      RecordCommand("%s: %s%s!%s@%s RECOVER [%s]",
+                    n_NickServ,
+                    (goodcoll == 2) ? "Administrator " : "",
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
     }
-
-    collide(av[1]);
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] has been recovered",
-      av[1]);
-    notice(n_NickServ, lptr->nick,
-      "Type: \002/msg %s RELEASE %s\002 to release the "
-      "nickname before the timeout",
-        n_NickServ,
-        av[1]);
-
-    RecordCommand("%s: %s%s!%s@%s RECOVER [%s]",
-      n_NickServ,
-      (goodcoll == 2) ? "Administrator " : "",
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
   else
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_BAD_PASS);
-    RecordCommand("%s: %s!%s@%s failed RECOVER [%s]",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_BAD_PASS);
+      RecordCommand("%s: %s!%s@%s failed RECOVER [%s]",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
+    }
 } /* n_recover() */
 
 /*
@@ -2274,23 +2289,23 @@ n_release(struct Luser *lptr, int ac, char **av)
   int goodrel;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002RELEASE <nickname> [password]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "RELEASE");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002RELEASE <nickname> [password]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "RELEASE");
+      return;
+    }
 
   if (!(ni = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   /*
    * Check if lptr's userhost is on ni's access list - if so check
@@ -2302,62 +2317,62 @@ n_release(struct Luser *lptr, int ac, char **av)
       (!(ni->flags & NS_SECURE)))
     goodrel = 1;
   else
-  {
-    if (ac >= 3)
-      if (pwmatch(ni->password, av[2]))
-        goodrel = 1;
-  }
+    {
+      if (ac >= 3)
+        if (pwmatch(ni->password, av[2]))
+          goodrel = 1;
+    }
 
   if (!goodrel)
-  {
-    /* Admins who are IDENTIFY'd may release any nickname */
-    if (IsValidAdmin(lptr))
-      goodrel = 2;
-  }
+    {
+      /* Admins who are IDENTIFY'd may release any nickname */
+      if (IsValidAdmin(lptr))
+        goodrel = 2;
+    }
 
   if (goodrel)
-  {
-    if (!(ni->flags & NS_RELEASE))
     {
+      if (!(ni->flags & NS_RELEASE))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] is not being enforced",
+                 av[1]);
+          return;
+        }
+
+      if (!FindClient(av[1]))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] is not currently online",
+                 av[1]);
+          return;
+        }
+
+      release(av[1]);
       notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] is not being enforced",
-        av[1]);
-      return;
+             "The nickname [\002%s\002] has been released",
+             av[1]);
+
+      RecordCommand("%s: %s%s!%s@%s RELEASE [%s]",
+                    n_NickServ,
+                    (goodrel == 2) ? "Administrator " : "",
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
     }
-
-    if (!FindClient(av[1]))
-    {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] is not currently online",
-        av[1]);
-      return;
-    }
-
-    release(av[1]);
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] has been released",
-      av[1]);
-
-    RecordCommand("%s: %s%s!%s@%s RELEASE [%s]",
-      n_NickServ,
-      (goodrel == 2) ? "Administrator " : "",
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
   else
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_BAD_PASS);
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_BAD_PASS);
 
-    RecordCommand("%s: %s!%s@%s failed RELEASE [%s]",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
+      RecordCommand("%s: %s!%s@%s failed RELEASE [%s]",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
+    }
 } /* n_release() */
 
 /*
@@ -2374,23 +2389,23 @@ n_ghost(struct Luser *lptr, int ac, char **av)
   int goodcoll;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002GHOST <nickname> [password]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "GHOST");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002GHOST <nickname> [password]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "GHOST");
+      return;
+    }
 
   if (!(ni = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   /*
    * Check if lptr's userhost is on ni's access list - if so check
@@ -2402,68 +2417,68 @@ n_ghost(struct Luser *lptr, int ac, char **av)
       (!(ni->flags & NS_SECURE)))
     goodcoll = 1;
   else
-  {
-    if (ac >= 3)
-      if (pwmatch(ni->password, av[2]))
-        goodcoll = 1;
-  }
-
-  if (!goodcoll)
-  {
-    /* Admins may kill any nickname */
-    if (IsValidAdmin(lptr))
-      {
-        goodcoll = 1;
-        o_Wallops("Administrative ghost from %s for nick [%s]",
-                  lptr->nick, av[1]);
-      }
-  }
-
-  if (goodcoll)
-  {
-    struct Luser    *gptr;
-
-    if (!(gptr = FindClient(av[1])))
     {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] is not currently online",
-        av[1]);
-      return;
+      if (ac >= 3)
+        if (pwmatch(ni->password, av[2]))
+          goodcoll = 1;
     }
 
-    toserv(":%s KILL %s :%s!%s (Ghost: %s!%s@%s)\n",
-      n_NickServ,
-      av[1],
-      Me.name,
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+  if (!goodcoll)
+    {
+      /* Admins may kill any nickname */
+      if (IsValidAdmin(lptr))
+        {
+          goodcoll = 1;
+          o_Wallops("Administrative ghost from %s for nick [%s]",
+                    lptr->nick, av[1]);
+        }
+    }
 
-    DeleteClient(gptr);
+  if (goodcoll)
+    {
+      struct Luser    *gptr;
 
-    notice(n_NickServ, lptr->nick,
-      "[\002%s\002] has been killed",
-      av[1]);
+      if (!(gptr = FindClient(av[1])))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] is not currently online",
+                 av[1]);
+          return;
+        }
 
-    RecordCommand("%s: %s!%s@%s GHOST [%s]",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
+      toserv(":%s KILL %s :%s!%s (Ghost: %s!%s@%s)\n",
+             n_NickServ,
+             av[1],
+             Me.name,
+             n_NickServ,
+             lptr->nick,
+             lptr->username,
+             lptr->hostname);
+
+      DeleteClient(gptr);
+
+      notice(n_NickServ, lptr->nick,
+             "[\002%s\002] has been killed",
+             av[1]);
+
+      RecordCommand("%s: %s!%s@%s GHOST [%s]",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
+    }
   else
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_BAD_PASS);
-    RecordCommand("%s: %s!%s@%s failed GHOST [%s]",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_BAD_PASS);
+      RecordCommand("%s: %s!%s@%s failed GHOST [%s]",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    av[1]);
+    }
 } /* n_ghost() */
 
 /*
@@ -2479,15 +2494,15 @@ n_access(struct Luser *lptr, int ac, char **av)
   struct NickInfo *target;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002ACCESS {ADD|DEL|LIST} [mask]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "ACCESS");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002ACCESS {ADD|DEL|LIST} [mask]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "ACCESS");
+      return;
+    }
 
   target = NULL;
 
@@ -2497,34 +2512,34 @@ n_access(struct Luser *lptr, int ac, char **av)
    * Allow administrators to specify a nickname to modify
    */
   if (IsValidAdmin(lptr))
-  {
-    /*
-     * First, check if av[1] is a valid command. If not,
-     * check if it is a valid nickname. If av[1] is
-     * a valid command, process the command as though
-     * lptr is modifying their own access, which they
-     * most likely are. If av[1] is neither a valid
-     * command nor a valid nickname, give them
-     * a "Nick not registered" error.
-     */
-    cptr = GetCommand(accesscmds, av[1]);
-    if (!cptr || (cptr == (struct Command *) -1))
     {
-      target = GetLink(av[1]);
-      if (!target)
-      {
-        notice(n_NickServ, lptr->nick,
-          ERR_NOT_REGGED,
-          av[1]);
-        return;
-      }
+      /*
+       * First, check if av[1] is a valid command. If not,
+       * check if it is a valid nickname. If av[1] is
+       * a valid command, process the command as though
+       * lptr is modifying their own access, which they
+       * most likely are. If av[1] is neither a valid
+       * command nor a valid nickname, give them
+       * a "Nick not registered" error.
+       */
+      cptr = GetCommand(accesscmds, av[1]);
+      if (!cptr || (cptr == (struct Command *) -1))
+        {
+          target = GetLink(av[1]);
+          if (!target)
+            {
+              notice(n_NickServ, lptr->nick,
+                     ERR_NOT_REGGED,
+                     av[1]);
+              return;
+            }
 
-      if (ac >= 3)
-        cptr = GetCommand(accesscmds, av[2]);
-      else
-        cptr = NULL;
+          if (ac >= 3)
+            cptr = GetCommand(accesscmds, av[2]);
+          else
+            cptr = NULL;
+        }
     }
-  }
   else
     cptr = GetCommand(accesscmds, av[1]);
 
@@ -2535,22 +2550,22 @@ n_access(struct Luser *lptr, int ac, char **av)
 #endif /* EMPOWERADMINS_MORE */
 
   if (cptr && (cptr != (struct Command *) -1))
-  {
-    /* call the appropriate function */
-    (*cptr->func)(lptr, target, ac, av);
-  }
+    {
+      /* call the appropriate function */
+      (*cptr->func)(lptr, target, ac, av);
+    }
   else
-  {
-    /* the command doesn't exist */
-    notice(n_NickServ, lptr->nick,
-      "%s switch [\002%s\002]",
-      (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
-      av[1]);
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "ACCESS");
-  }
+    {
+      /* the command doesn't exist */
+      notice(n_NickServ, lptr->nick,
+             "%s switch [\002%s\002]",
+             (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
+             av[1]);
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "ACCESS");
+    }
 } /* n_access() */
 
 static void
@@ -2559,125 +2574,129 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 {
   struct NickInfo *nptr;
   char *mask,
-       *host,
-       *tmp;
+  *host,
+  *tmp;
 
   char user[USERLEN];
-  
+
   memset( (char*)user, 0x00, USERLEN );
 
   if (target)
-  {
-    if (ac < 4)
     {
-      notice(n_NickServ, lptr->nick,
-        "Syntax: \002ACCESS <nickname> ADD <mask>\002");
-      notice(n_NickServ, lptr->nick,
-        ERR_MORE_INFO, 
-        n_NickServ,
-        "ACCESS ADD");
-      return;
-    }
+      if (ac < 4)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Syntax: \002ACCESS <nickname> ADD <mask>\002");
+          notice(n_NickServ, lptr->nick,
+                 ERR_MORE_INFO,
+                 n_NickServ,
+                 "ACCESS ADD");
+          return;
+        }
 
-    nptr = target;
-    mask = av[3];
-  }
+      nptr = target;
+      mask = av[3];
+    }
   else
-  {
-    if (ac < 3)
     {
-      notice(n_NickServ, lptr->nick, "Syntax: \002ACCESS ADD <mask>\002");
-      notice(n_NickServ, lptr->nick,
-        ERR_MORE_INFO, 
-        n_NickServ,
-        "ACCESS ADD");
-      return;
+      if (ac < 3)
+        {
+          notice(n_NickServ, lptr->nick, "Syntax: \002ACCESS ADD <mask>\002");
+          notice(n_NickServ, lptr->nick,
+                 ERR_MORE_INFO,
+                 n_NickServ,
+                 "ACCESS ADD");
+          return;
+        }
+
+      nptr = GetLink(lptr->nick);
+      mask = av[2];
     }
 
-    nptr = GetLink(lptr->nick);
-    mask = av[2];
-  }
-
-  if(strlen(mask) > UHOSTLEN ) {
-	notice(n_NickServ, lptr->nick, "Hostmask too long!");
-        return;
-  }
+  if(strlen(mask) > UHOSTLEN )
+    {
+      notice(n_NickServ, lptr->nick, "Hostmask too long!");
+      return;
+    }
 
   if (!nptr)
     return;
 
   tmp = MyStrdup(mask);
-  
-  host = strchr(tmp, '@');
-  if( host == NULL ) {
-        notice(n_NickServ, lptr->nick, "Invalid hostmask!");
-        return;
-  }
-  if( strlen(mask)-strlen(host) > USERLEN - 1 ) {
-        notice(n_NickServ, lptr->nick, "Invalid hostmask!  Username too long!");
-        return;
-  }
 
-  if(strlen(host)) {
-    strncpy(user,mask,strlen(mask)-strlen(host));
-  }
+  host = strchr(tmp, '@');
+  if( host == NULL )
+    {
+      notice(n_NickServ, lptr->nick, "Invalid hostmask!");
+      return;
+    }
+  if( strlen(mask)-strlen(host) > USERLEN - 1 )
+    {
+      notice(n_NickServ, lptr->nick, "Invalid hostmask!  Username too long!");
+      return;
+    }
+
+  if(strlen(host))
+    {
+      strncpy(user,mask,strlen(mask)-strlen(host));
+    }
 
   if (!user || !host)
-  {
-    notice(n_NickServ, lptr->nick,
-      "The hostmask [\002%s\002] is invalid",
-      mask);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The hostmask [\002%s\002] is invalid",
+             mask);
+      return;
+    }
 
   ++host;
 
   if (OnAccessList(user, host+1, nptr))
-  {
-    if (target)
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] matches a hostmask already on the Access List for [%s]",
-          mask,
-          target->nick);
-    else
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] matches a hostmask already on your Access List",
-        mask);
-    return;
-  }
+    {
+      if (target)
+        notice(n_NickServ, lptr->nick,
+               "[\002%s\002] matches a hostmask already on the Access List for [%s]",
+               mask,
+               target->nick);
+      else
+        notice(n_NickServ, lptr->nick,
+               "[\002%s\002] matches a hostmask already on your Access List",
+               mask);
+      return;
+    }
   else
-  {
-    AddHostToNick(mask, nptr);
-
-    if (target)
     {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] has been added to the Access List for [%s]",
-        mask,
-        target->nick);
+      AddHostToNick(mask, nptr);
 
-      RecordCommand("%s: Administrator %s!%s@%s ACCESS %s ADD [%s]",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        target->nick,
-        mask);
-    }
-    else
-    {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] added to your Access List",
-        mask);
+      if (target)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] has been added to the Access List for [%s]",
+                 mask,
+                 target->nick);
 
-      RecordCommand("%s: %s!%s@%s ACCESS ADD [%s]",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        mask);
+          RecordCommand("%s: Administrator %s!%s@%s ACCESS %s ADD [%s]",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname,
+                        target->nick,
+                        mask);
+        }
+      else
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] added to your Access List",
+                 mask);
+
+          RecordCommand("%s: %s!%s@%s ACCESS ADD [%s]",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname,
+                        mask);
+        }
     }
-  }
 } /* n_access_add() */
 
 static void
@@ -2690,37 +2709,37 @@ n_access_del(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
   char *mask;
 
   if (target)
-  {
-    if (ac < 4)
     {
-      notice(n_NickServ, lptr->nick,
-        "Syntax: \002ACCESS <nickname> DEL <mask>\002");
-      notice(n_NickServ, lptr->nick,
-        ERR_MORE_INFO, 
-        n_NickServ,
-        "ACCESS DEL");
-      return;
-    }
+      if (ac < 4)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Syntax: \002ACCESS <nickname> DEL <mask>\002");
+          notice(n_NickServ, lptr->nick,
+                 ERR_MORE_INFO,
+                 n_NickServ,
+                 "ACCESS DEL");
+          return;
+        }
 
-    nptr = target;
-    mask = av[3];
-  }
+      nptr = target;
+      mask = av[3];
+    }
   else
-  {
-    if (ac < 3)
     {
-      notice(n_NickServ, lptr->nick,
-        "Syntax: \002ACCESS DEL <mask>\002");
-      notice(n_NickServ, lptr->nick,
-        ERR_MORE_INFO, 
-        n_NickServ,
-        "ACCESS DEL");
-      return;
-    }
+      if (ac < 3)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Syntax: \002ACCESS DEL <mask>\002");
+          notice(n_NickServ, lptr->nick,
+                 ERR_MORE_INFO,
+                 n_NickServ,
+                 "ACCESS DEL");
+          return;
+        }
 
-    nptr = GetLink(lptr->nick);
-    mask = av[2];
-  }
+      nptr = GetLink(lptr->nick);
+      mask = av[2];
+    }
 
   if (!nptr)
     return;
@@ -2729,79 +2748,79 @@ n_access_del(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 
   prev = NULL;
   for (hptr = nptr->hosts; hptr; )
-  {
-    if (match(mask, hptr->hostmask))
     {
-      found = 1;
-      MyFree(hptr->hostmask);
+      if (match(mask, hptr->hostmask))
+        {
+          found = 1;
+          MyFree(hptr->hostmask);
 
-      if (prev)
-      {
-        prev->next = hptr->next;
-        MyFree(hptr);
-        hptr = prev;
-      }
+          if (prev)
+            {
+              prev->next = hptr->next;
+              MyFree(hptr);
+              hptr = prev;
+            }
+          else
+            {
+              nptr->hosts = hptr->next;
+              MyFree(hptr);
+              hptr = NULL;
+            }
+
+          break;
+        }
+
+      prev = hptr;
+
+      if (hptr)
+        hptr = hptr->next;
       else
-      {
-        nptr->hosts = hptr->next;
-        MyFree(hptr);
-        hptr = NULL;
-      }
-
-      break;
+        hptr = nptr->hosts;
     }
-
-    prev = hptr;
-
-    if (hptr)
-      hptr = hptr->next;
-    else
-      hptr = nptr->hosts;
-  }
 
   if (found)
-  {
-    if (target)
     {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] removed from the Access List for [%s]",
-        mask,
-        target->nick);
+      if (target)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] removed from the Access List for [%s]",
+                 mask,
+                 target->nick);
 
-      RecordCommand("%s: Administrator %s!%s@%s ACCESS %s DEL [%s]",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        target->nick,
-        mask);
-    }
-    else
-    {
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] removed from your Access List",
-        mask);
+          RecordCommand("%s: Administrator %s!%s@%s ACCESS %s DEL [%s]",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname,
+                        target->nick,
+                        mask);
+        }
+      else
+        {
+          notice(n_NickServ, lptr->nick,
+                 "[\002%s\002] removed from your Access List",
+                 mask);
 
-      RecordCommand("%s: %s!%s@%s ACCESS DEL [%s]",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        mask);
+          RecordCommand("%s: %s!%s@%s ACCESS DEL [%s]",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname,
+                        mask);
+        }
     }
-  }
   else
-  {
-    if (target)
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] was not found on the Acces List for [%s]",
-        mask,
-        target->nick);
-    else
-      notice(n_NickServ, lptr->nick,
-        "[\002%s\002] was not found on your Access List",
-        mask);
-  }
+    {
+      if (target)
+        notice(n_NickServ, lptr->nick,
+               "[\002%s\002] was not found on the Acces List for [%s]",
+               mask,
+               target->nick);
+      else
+        notice(n_NickServ, lptr->nick,
+               "[\002%s\002] was not found on your Access List",
+               mask);
+    }
 } /* n_access_del() */
 
 static void
@@ -2824,46 +2843,46 @@ n_access_list(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
   mask = NULL;
 
   if (target)
-  {
-    if (ac >= 4)
-      mask = av[3];
-  }
+    {
+      if (ac >= 4)
+        mask = av[3];
+    }
   else
-  {
-    if (ac >= 3)
-      mask = av[2];
-  }
+    {
+      if (ac >= 3)
+        mask = av[2];
+    }
 
   if (target)
     RecordCommand("%s: Administrator %s!%s@%s ACCESS %s LIST %s",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      target->nick,
-      mask ? mask : "");
+                  n_NickServ,
+                  lptr->nick,
+                  lptr->username,
+                  lptr->hostname,
+                  target->nick,
+                  mask ? mask : "");
   else
     RecordCommand("%s: %s!%s@%s ACCESS LIST %s",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      mask ? mask : "");
+                  n_NickServ,
+                  lptr->nick,
+                  lptr->username,
+                  lptr->hostname,
+                  mask ? mask : "");
 
   notice(n_NickServ, lptr->nick,
-    "-- Access List for [\002%s\002] --",
-    nptr->nick);
+         "-- Access List for [\002%s\002] --",
+         nptr->nick);
 
   for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-  {
-    if (mask)
-      if (match(mask, hptr->hostmask) == 0)
-        continue;
+    {
+      if (mask)
+        if (match(mask, hptr->hostmask) == 0)
+          continue;
 
-    notice(n_NickServ, lptr->nick, "%d) %s",
-      cnt++,
-      hptr->hostmask);
-  }
+      notice(n_NickServ, lptr->nick, "%d) %s",
+             cnt++,
+             hptr->hostmask);
+    }
 
   notice(n_NickServ, lptr->nick, "-- End of list --");
 } /* n_access_list() */
@@ -2880,36 +2899,36 @@ n_set(struct Luser *lptr, int ac, char **av)
   struct Command *cptr;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET <option> [parameter]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "SET");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET <option> [parameter]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET");
+      return;
+    }
 
   cptr = GetCommand(setcmds, av[1]);
 
   if (cptr && (cptr != (struct Command *) -1))
-  {
-    /* call the appropriate function */
-    (*cptr->func)(lptr, ac, av);
-  }
+    {
+      /* call the appropriate function */
+      (*cptr->func)(lptr, ac, av);
+    }
   else
-  {
-    /* the command doesn't exist */
-    notice(n_NickServ, lptr->nick,
-      "%s switch [\002%s\002]",
-      (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
-      av[1]);
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "SET");
-    return;
-  }
+    {
+      /* the command doesn't exist */
+      notice(n_NickServ, lptr->nick,
+             "%s switch [\002%s\002]",
+             (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
+             av[1]);
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET");
+      return;
+    }
 } /* n_set() */
 
 static void
@@ -2922,68 +2941,68 @@ n_set_kill(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET KILL %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Kill Protection for your nickname is [\002%s\002]",
-      (nptr->flags & NS_PROTECTED) ? "ON" : ((nptr->flags & NS_KILLIMMED) ? "IMMED" : "OFF"));
-    return;
-  }
-
-  if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags &= ~NS_KILLIMMED;
-    if (AllowKillProtection)
     {
-      nptr->flags |= NS_PROTECTED;
       notice(n_NickServ, lptr->nick,
-        "Toggled Kill Protection [\002ON\002]");
+             "Kill Protection for your nickname is [\002%s\002]",
+             (nptr->flags & NS_PROTECTED) ? "ON" : ((nptr->flags & NS_KILLIMMED) ? "IMMED" : "OFF"));
       return;
     }
-    notice(n_NickServ, lptr->nick,
-      "Kill Protection is disabled on this network");
-    return;
-  }
+
+  if (!irccmp(av[2], "ON"))
+    {
+      nptr->flags &= ~NS_KILLIMMED;
+      if (AllowKillProtection)
+        {
+          nptr->flags |= NS_PROTECTED;
+          notice(n_NickServ, lptr->nick,
+                 "Toggled Kill Protection [\002ON\002]");
+          return;
+        }
+      notice(n_NickServ, lptr->nick,
+             "Kill Protection is disabled on this network");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~(NS_PROTECTED | NS_KILLIMMED);
-    notice(n_NickServ, lptr->nick,
-      "Toggled Kill Protection [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~(NS_PROTECTED | NS_KILLIMMED);
+      notice(n_NickServ, lptr->nick,
+             "Toggled Kill Protection [\002OFF\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "IMMED"))
-  {
-    if (AllowKillImmed)
     {
-      nptr->flags &= ~NS_PROTECTED;
-      nptr->flags |= NS_KILLIMMED;
-      notice(n_NickServ, lptr->nick,
-        "Toggled Immediate Kill Protection [\002ON\002]");
-    }
-    else
-    {
-      notice(n_NickServ, lptr->nick,
-        "The [\002IMMED\002] option is disabled");
-    }
+      if (AllowKillImmed)
+        {
+          nptr->flags &= ~NS_PROTECTED;
+          nptr->flags |= NS_KILLIMMED;
+          notice(n_NickServ, lptr->nick,
+                 "Toggled Immediate Kill Protection [\002ON\002]");
+        }
+      else
+        {
+          notice(n_NickServ, lptr->nick,
+                 "The [\002IMMED\002] option is disabled");
+        }
 
-    return;
-  }
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET KILL {ON|OFF|IMMED}\002");
+         "Syntax: \002SET KILL {ON|OFF|IMMED}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET KILL");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET KILL");
 } /* n_set_kill() */
 
 static void
@@ -2996,43 +3015,43 @@ n_set_automask(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET AUTOMASK %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "AutoMask for your nickname is [\002%s\002]",
-      (nptr->flags & NS_AUTOMASK) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "AutoMask for your nickname is [\002%s\002]",
+             (nptr->flags & NS_AUTOMASK) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_AUTOMASK;
-    notice(n_NickServ, lptr->nick,
-      "Toggled AutoMask [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_AUTOMASK;
+      notice(n_NickServ, lptr->nick,
+             "Toggled AutoMask [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_AUTOMASK;
-    notice(n_NickServ, lptr->nick,
-      "Toggled AutoMask [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_AUTOMASK;
+      notice(n_NickServ, lptr->nick,
+             "Toggled AutoMask [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET AUTOMASK {ON|OFF}\002");
+         "Syntax: \002SET AUTOMASK {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET AUTOMASK");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET AUTOMASK");
 } /* n_set_automask() */
 
 static void
@@ -3045,43 +3064,43 @@ n_set_private(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET PRIVATE %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Privacy for your nickname is [\002%s\002]",
-      (nptr->flags & NS_PRIVATE) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Privacy for your nickname is [\002%s\002]",
+             (nptr->flags & NS_PRIVATE) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_PRIVATE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Privacy [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_PRIVATE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Privacy [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_PRIVATE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Privacy [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_PRIVATE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Privacy [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET PRIVATE {ON|OFF}\002");
+         "Syntax: \002SET PRIVATE {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET PRIVATE");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET PRIVATE");
 } /* n_set_private() */
 
 static void
@@ -3094,68 +3113,68 @@ n_set_noexpire(struct Luser *lptr, int ac, char **av)
     return;
 
   if (ac < 3)
-  {
-    RecordCommand("%s: %s!%s@%s SET NOEXPIRE",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
-
-    notice(n_NickServ, lptr->nick,
-      "NoExpire status for your nickname is [\002%s\002]",
-      (nptr->flags & NS_NOEXPIRE) ? "ON" : "OFF");
-    return;
-  }
-
-  if (!irccmp(av[2], "ON"))
-  {
-    if (!IsOperator(lptr))
     {
+      RecordCommand("%s: %s!%s@%s SET NOEXPIRE",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname);
+
       notice(n_NickServ, lptr->nick,
-        "Permission Denied - You are not an IRC Operator");
-
-      RecordCommand("%s: %s!%s@%s failed attempt to use SET NOEXPIRE ON",
-        n_NickServ,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname);
-
+             "NoExpire status for your nickname is [\002%s\002]",
+             (nptr->flags & NS_NOEXPIRE) ? "ON" : "OFF");
       return;
     }
 
-    RecordCommand("%s: %s!%s@%s SET NOEXPIRE ON",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+  if (!irccmp(av[2], "ON"))
+    {
+      if (!IsOperator(lptr))
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Permission Denied - You are not an IRC Operator");
 
-    nptr->flags |= NS_NOEXPIRE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled NoExpire status [\002ON\002]");
-    return;
-  }
+          RecordCommand("%s: %s!%s@%s failed attempt to use SET NOEXPIRE ON",
+                        n_NickServ,
+                        lptr->nick,
+                        lptr->username,
+                        lptr->hostname);
+
+          return;
+        }
+
+      RecordCommand("%s: %s!%s@%s SET NOEXPIRE ON",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname);
+
+      nptr->flags |= NS_NOEXPIRE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled NoExpire status [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    RecordCommand("%s: %s!%s@%s SET NOEXPIRE OFF",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+    {
+      RecordCommand("%s: %s!%s@%s SET NOEXPIRE OFF",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname);
 
-    nptr->flags &= ~NS_NOEXPIRE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled NoExpire status [\002OFF\002]");
-    return;
-  }
+      nptr->flags &= ~NS_NOEXPIRE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled NoExpire status [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET NOEXPIRE {ON|OFF}\002");
+         "Syntax: \002SET NOEXPIRE {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET NOEXPIRE");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET NOEXPIRE");
 } /* n_set_noexpire() */
 
 static void
@@ -3168,43 +3187,43 @@ n_set_secure(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET SECURE %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Security for your nickname is [\002%s\002]",
-      (nptr->flags & NS_SECURE) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Security for your nickname is [\002%s\002]",
+             (nptr->flags & NS_SECURE) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_SECURE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Security [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_SECURE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Security [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_SECURE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Security [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_SECURE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Security [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET SECURE {ON|OFF}\002");
+         "Syntax: \002SET SECURE {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET SECURE");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET SECURE");
 } /* n_set_secure() */
 
 static void
@@ -3217,43 +3236,43 @@ n_set_unsecure(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET UNSECURE %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "UnSecure for your nickname is [\002%s\002]",
-      (nptr->flags & NS_UNSECURE) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "UnSecure for your nickname is [\002%s\002]",
+             (nptr->flags & NS_UNSECURE) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_UNSECURE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled UnSecure [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_UNSECURE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled UnSecure [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_UNSECURE;
-    notice(n_NickServ, lptr->nick,
-      "Toggled UnSecure [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_UNSECURE;
+      notice(n_NickServ, lptr->nick,
+             "Toggled UnSecure [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET UNSECURE {ON|OFF}\002");
+         "Syntax: \002SET UNSECURE {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET UNSECURE");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET UNSECURE");
 } /* n_set_unsecure() */
 
 static void
@@ -3266,43 +3285,43 @@ n_set_memos(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET MEMOS %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Allow Memos for your nickname is [\002%s\002]",
-      (nptr->flags & NS_MEMOS) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Allow Memos for your nickname is [\002%s\002]",
+             (nptr->flags & NS_MEMOS) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_MEMOS;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Allow Memos [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_MEMOS;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Allow Memos [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_MEMOS;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Allow Memos [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_MEMOS;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Allow Memos [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET MEMOS {ON|OFF}\002");
+         "Syntax: \002SET MEMOS {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET MEMOS");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET MEMOS");
 } /* n_set_memos() */
 
 static void
@@ -3315,43 +3334,43 @@ n_set_notify(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET NOTIFY %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Notification of New Memos for your nickname is [\002%s\002]",
-      (nptr->flags & NS_MEMONOTIFY) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Notification of New Memos for your nickname is [\002%s\002]",
+             (nptr->flags & NS_MEMONOTIFY) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_MEMONOTIFY;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Notification of New Memos [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_MEMONOTIFY;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Notification of New Memos [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_MEMONOTIFY;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Notification of New Memos [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_MEMONOTIFY;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Notification of New Memos [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET NOTIFY {ON|OFF}\002");
+         "Syntax: \002SET NOTIFY {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET NOTIFY");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET NOTIFY");
 } /* n_set_notify() */
 
 static void
@@ -3364,43 +3383,43 @@ n_set_signon(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET SIGNON %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    (ac < 3) ? "" : StrToupper(av[2]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                (ac < 3) ? "" : StrToupper(av[2]));
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Notification of Memos on Signon for your nickname is [\002%s\002]",
-      (nptr->flags & NS_MEMOSIGNON) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Notification of Memos on Signon for your nickname is [\002%s\002]",
+             (nptr->flags & NS_MEMOSIGNON) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[2], "ON"))
-  {
-    nptr->flags |= NS_MEMOSIGNON;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Notification of Memos on Signon [\002ON\002]");
-    return;
-  }
+    {
+      nptr->flags |= NS_MEMOSIGNON;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Notification of Memos on Signon [\002ON\002]");
+      return;
+    }
 
   if (!irccmp(av[2], "OFF"))
-  {
-    nptr->flags &= ~NS_MEMOSIGNON;
-    notice(n_NickServ, lptr->nick,
-      "Toggled Notification of Memos on Signon [\002OFF\002]");
-    return;
-  }
+    {
+      nptr->flags &= ~NS_MEMOSIGNON;
+      notice(n_NickServ, lptr->nick,
+             "Toggled Notification of Memos on Signon [\002OFF\002]");
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET SIGNON {ON|OFF}\002");
+         "Syntax: \002SET SIGNON {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET SIGNON");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET SIGNON");
 } /* n_set_signon() */
 
 static void
@@ -3416,96 +3435,96 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
 
   /* Check arguments first .. */
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET HIDE");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET HIDE");
+      return;
+    }
 
   if (ac >= 3)
     strcpy(str, StrToupper(av[2]));
 
   RecordCommand("%s: %s!%s@%s SET HIDE %s %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    str, /* can't have 2 StrToupper()'s in the same stmt (static) */
-    (ac < 4) ? "" : StrToupper(av[3]));
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                str, /* can't have 2 StrToupper()'s in the same stmt (static) */
+                (ac < 4) ? "" : StrToupper(av[3]));
 
   if (!ircncmp(av[2], "ALL", strlen(av[2])))
-  {
-    flag = NS_HIDEALL;
-    strcpy(str, "Hide Info");
-  }
+    {
+      flag = NS_HIDEALL;
+      strcpy(str, "Hide Info");
+    }
   else if (!ircncmp(av[2], "EMAIL", strlen(av[2])))
-  {
-    flag = NS_HIDEEMAIL;
-    strcpy(str, "Hide Email");
-  }
+    {
+      flag = NS_HIDEEMAIL;
+      strcpy(str, "Hide Email");
+    }
   else if (!ircncmp(av[2], "URL", strlen(av[2])))
-  {
-    flag = NS_HIDEURL;
-    strcpy(str, "Hide Url");
-  }
+    {
+      flag = NS_HIDEURL;
+      strcpy(str, "Hide Url");
+    }
   else if (!ircncmp(av[2], "QUIT", strlen(av[2])))
-  {
-    flag = NS_HIDEQUIT;
-    strcpy(str, "Hide Quit");
-  }
+    {
+      flag = NS_HIDEQUIT;
+      strcpy(str, "Hide Quit");
+    }
   else if (!ircncmp(av[2], "ADDR", strlen(av[2])))
-  {
-    flag = NS_HIDEADDR;
-    strcpy(str, "Hide Address");
-  }
+    {
+      flag = NS_HIDEADDR;
+      strcpy(str, "Hide Address");
+    }
 
   /* order this properly */
   if (!flag)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Unknown switch [%s]",
-      av[2]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Unknown switch [%s]",
+             av[2]);
+      return;
+    }
 
   if (ac < 4)
-  {
-    notice(n_NickServ, lptr->nick,
-      "%s for your nickname is [\002%s\002]",
-      str,
-      (nptr->flags & flag) ? "ON" : "OFF");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "%s for your nickname is [\002%s\002]",
+             str,
+             (nptr->flags & flag) ? "ON" : "OFF");
+      return;
+    }
 
   if (!irccmp(av[3], "ON"))
-  {
-    nptr->flags |= flag;
-    notice(n_NickServ, lptr->nick,
-      "Toggled %s [\002ON\002]",
-      str);
-    return;
-  }
+    {
+      nptr->flags |= flag;
+      notice(n_NickServ, lptr->nick,
+             "Toggled %s [\002ON\002]",
+             str);
+      return;
+    }
 
   if (!irccmp(av[3], "OFF"))
-  {
-    nptr->flags &= ~flag;
-    notice(n_NickServ, lptr->nick,
-      "Toggled %s [\002OFF\002]",
-      str);
-    return;
-  }
+    {
+      nptr->flags &= ~flag;
+      notice(n_NickServ, lptr->nick,
+             "Toggled %s [\002OFF\002]",
+             str);
+      return;
+    }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
+         "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
-    ERR_MORE_INFO,
-    n_NickServ,
-    "SET HIDE");
+         ERR_MORE_INFO,
+         n_NickServ,
+         "SET HIDE");
 } /* n_set_hide() */
 
 static void
@@ -3515,35 +3534,35 @@ n_set_password(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET PASSWORD <newpass>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET PASSWORD");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET PASSWORD <newpass>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET PASSWORD");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET PASSWORD ...",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname);
 
   if (!ChangePass(nptr, av[2]))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Password change failed");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Password change failed");
+      return;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "Your password has been changed to [\002%s\002]",
-    av[2]);
+         "Your password has been changed to [\002%s\002]",
+         av[2]);
 } /* n_set_password() */
 
 static void
@@ -3553,42 +3572,42 @@ n_set_email(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET EMAIL <email address|->\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET EMAIL");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET EMAIL <email address|->\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET EMAIL");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET EMAIL %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[2]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[2]);
 
   if (nptr->email)
     MyFree(nptr->email);
 
   if (!irccmp(av[2], "-"))
-  {
-    nptr->email = NULL;
-    notice(n_NickServ, lptr->nick,
-      "Your email address has been cleared");
-    return;
-  }
+    {
+      nptr->email = NULL;
+      notice(n_NickServ, lptr->nick,
+             "Your email address has been cleared");
+      return;
+    }
 
   nptr->email = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-    "Your email address has been set to [\002%s\002]",
-    nptr->email);
+         "Your email address has been set to [\002%s\002]",
+         nptr->email);
 } /* n_set_email() */
 
 static void
@@ -3598,42 +3617,42 @@ n_set_url(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET URL <url|->\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET URL");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET URL <url|->\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET URL");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET URL %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[2]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[2]);
 
   if (nptr->url)
     MyFree(nptr->url);
 
   if (!irccmp(av[2], "-"))
-  {
-    nptr->url = NULL;
-    notice(n_NickServ, lptr->nick,
-      "Your url has been cleared");
-    return;
-  }
+    {
+      nptr->url = NULL;
+      notice(n_NickServ, lptr->nick,
+             "Your url has been cleared");
+      return;
+    }
 
   nptr->url = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-    "Your url has been set to [\002%s\002]",
-    nptr->url);
+         "Your url has been set to [\002%s\002]",
+         nptr->url);
 } /* n_set_url() */
 
 /* Set UIN for nickname. Taken from IrcBg and modified -kre */
@@ -3642,42 +3661,42 @@ static void n_set_uin(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick, "Syntax: \002SET UIN <uin|->\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET UIN");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, "Syntax: \002SET UIN <uin|->\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET UIN");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET UIN %s",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
 
   if (nptr->UIN)
     MyFree(nptr->UIN);
 
   if (!irccmp(av[2], "-"))
-  {
-    nptr->UIN = NULL;
-    notice(n_NickServ, lptr->nick,
-      "Your UIN has been cleared");
-    return;
-  }
+    {
+      nptr->UIN = NULL;
+      notice(n_NickServ, lptr->nick,
+             "Your UIN has been cleared");
+      return;
+    }
 
   /* KrisDuv's check for validity of UIN */
   if (!IsNum(av[2]))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Invalid UIN [\002%s\002]", av[2]);
-    nptr->UIN = NULL;
-    return;
-  }
-  
+    {
+      notice(n_NickServ, lptr->nick,
+             "Invalid UIN [\002%s\002]", av[2]);
+      nptr->UIN = NULL;
+      return;
+    }
+
   nptr->UIN = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-    "Your UIN has been set to [\002%s\002]", nptr->UIN);
+         "Your UIN has been set to [\002%s\002]", nptr->UIN);
 
 } /* n_set_uin() */
 
@@ -3687,35 +3706,35 @@ static void n_set_gsm(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET GSM <GSM number|->\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
-      "SET GSM");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET GSM <GSM number|->\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+             "SET GSM");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET GSM %s", n_NickServ, lptr->nick,
-      lptr->username, lptr->hostname, av[2]);
+                lptr->username, lptr->hostname, av[2]);
 
   if (nptr->gsm)
     MyFree(nptr->gsm);
 
   if (!irccmp(av[2], "-"))
-  {
-    nptr->gsm = NULL;
-    notice(n_NickServ, lptr->nick, "Your GSM number has been cleared.");
-    return;
-  }
+    {
+      nptr->gsm = NULL;
+      notice(n_NickServ, lptr->nick, "Your GSM number has been cleared.");
+      return;
+    }
 
   nptr->gsm = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-    "Your GSM number has been set to [\002%s\002]",
-    nptr->gsm);
+         "Your GSM number has been set to [\002%s\002]",
+         nptr->gsm);
 } /* n_set_gsm() */
 
 /* Set phone number for nick. Code taken from IrcBg and modified -kre */
@@ -3724,35 +3743,35 @@ static void n_set_phone(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET PHONE <phone number|->\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
-      "SET PHONE");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET PHONE <phone number|->\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+             "SET PHONE");
+      return;
+    }
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   RecordCommand("%s: %s!%s@%s SET PHONE %s",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
 
   if (nptr->phone)
     MyFree(nptr->phone);
 
   if (!irccmp(av[2], "-"))
-  {
-    nptr->phone = NULL;
-    notice(n_NickServ, lptr->nick, "Your phone number has been cleared");
-    return;
-  }
+    {
+      nptr->phone = NULL;
+      notice(n_NickServ, lptr->nick, "Your phone number has been cleared");
+      return;
+    }
 
   nptr->phone = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-    "Your phone number has been set to [\002%s\002]",
-    nptr->phone);
+         "Your phone number has been set to [\002%s\002]",
+         nptr->phone);
 
 } /* n_set_phone() */
 
@@ -3764,22 +3783,22 @@ void n_clearnoexp(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick, "Syntax: CLEARNOEXP");
-    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
-        "CLEARNOEXP");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, "Syntax: CLEARNOEXP");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+             "CLEARNOEXP");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s CLEARNOEXP",
-    n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
-        nptr->flags &= ~NS_NOEXPIRE;
+      nptr->flags &= ~NS_NOEXPIRE;
 
   notice(n_ChanServ, lptr->nick,
-      "All noexpire flags for nicks have been cleared.");
+         "All noexpire flags for nicks have been cleared.");
 
 } /* n_clearnoexp() */
 
@@ -3795,55 +3814,55 @@ n_set_master(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr,
-                  *newmaster,
-                  *origmaster;
+        *newmaster,
+        *origmaster;
   struct NickHost *hptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET MASTER <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET MASTER");
-    return;
-  }
+{
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET MASTER <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SET MASTER");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s SET MASTER %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[2]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[2]);
 
   if (!(nptr = FindNick(lptr->nick)))
     return;
 
   if (!(newmaster = FindNick(av[2])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[2]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[2]);
+      return;
+    }
 
   if (!IsLinked(newmaster, nptr))
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] is not in your nickname link",
-      newmaster->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] is not in your nickname link",
+             newmaster->nick);
+      return;
+    }
 
   if ((nptr->master == newmaster) ||
       (!nptr->master && (nptr == newmaster)))
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] is already the master for your nickname link",
-      newmaster->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] is already the master for your nickname link",
+             newmaster->nick);
+      return;
+    }
 
   if (nptr->master)
     origmaster = nptr->master;
@@ -3858,16 +3877,16 @@ n_set_master(struct Luser *lptr, int ac, char **av)
    * has it now
    */
   while (origmaster->hosts)
-  {
-    hptr = origmaster->hosts->next;
-    MyFree(origmaster->hosts->hostmask);
-    MyFree(origmaster->hosts);
-    origmaster->hosts = hptr;
-  }
+    {
+      hptr = origmaster->hosts->next;
+      MyFree(origmaster->hosts->hostmask);
+      MyFree(origmaster->hosts);
+      origmaster->hosts = hptr;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "The master nickname for your link has been changed to [\002%s\002]",
-    newmaster->nick);
+         "The master nickname for your link has been changed to [\002%s\002]",
+         newmaster->nick);
 } /* n_set_master() */
 
 #endif /* LINKED_NICKNAMES */
@@ -3884,24 +3903,24 @@ n_list(struct Luser *lptr, int ac, char **av)
   struct NickInfo *temp;
   int IsAnAdmin;
   int ii,
-      mcnt, /* total matches found */
-      acnt; /* total matches - private nicks */
+  mcnt, /* total matches found */
+  acnt; /* total matches - private nicks */
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002LIST <pattern>\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, 
-      n_NickServ, "LIST");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002LIST <pattern>\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO,
+             n_NickServ, "LIST");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s LIST %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
 
   if (IsValidAdmin(lptr))
     IsAnAdmin = 1;
@@ -3910,44 +3929,44 @@ n_list(struct Luser *lptr, int ac, char **av)
 
   acnt = mcnt = 0;
   notice(n_NickServ, lptr->nick,
-    "-- Listing nicknames matching [\002%s\002] --",
-    av[1]);
+         "-- Listing nicknames matching [\002%s\002] --",
+         av[1]);
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    for (temp = nicklist[ii]; temp; temp = temp->next)
     {
-      if (match(av[1], temp->nick) && mcnt < 255 )
-      {
-        ++mcnt;
-
-        if ((IsAnAdmin) || !(temp->flags & NS_PRIVATE))
+      for (temp = nicklist[ii]; temp; temp = temp->next)
         {
-          char str[20];
+          if (match(av[1], temp->nick) && mcnt < 255 )
+            {
+              ++mcnt;
 
-          ++acnt;
-          if (temp->flags & NS_FORBID)
-            strcpy(str, "<< FORBIDDEN >>");
-          else if ((temp->flags & NS_IDENTIFIED) && FindClient(temp->nick))
-            strcpy(str, "<< ONLINE >>");
-          else if (temp->flags & NS_PRIVATE)
-            strcpy(str, "<< PRIVATE >>");
-          else
-            str[0] = '\0';
+              if ((IsAnAdmin) || !(temp->flags & NS_PRIVATE))
+                {
+                  char str[20];
 
-          notice(n_NickServ, lptr->nick, 
-            "%-10s %15s created %s ago",
-            temp->nick,
-            str,
-            timeago(temp->created, 1));
-        }
-      } /* if (match(av[1], temp->nick)) */
-    } /* for (temp = nicklist[ii]; temp; temp = temp->next) */
-  } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+                  ++acnt;
+                  if (temp->flags & NS_FORBID)
+                    strcpy(str, "<< FORBIDDEN >>");
+                  else if ((temp->flags & NS_IDENTIFIED) && FindClient(temp->nick))
+                    strcpy(str, "<< ONLINE >>");
+                  else if (temp->flags & NS_PRIVATE)
+                    strcpy(str, "<< PRIVATE >>");
+                  else
+                    str[0] = '\0';
 
-  notice(n_NickServ, lptr->nick, 
-    "-- End of list (%d/%d matches shown) --",
-    acnt,
-    mcnt);
+                  notice(n_NickServ, lptr->nick,
+                         "%-10s %15s created %s ago",
+                         temp->nick,
+                         str,
+                         timeago(temp->created, 1));
+                }
+            } /* if (match(av[1], temp->nick)) */
+        } /* for (temp = nicklist[ii]; temp; temp = temp->next) */
+    } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+
+  notice(n_NickServ, lptr->nick,
+         "-- End of list (%d/%d matches shown) --",
+         acnt,
+         mcnt);
 } /* n_list() */
 
 /*
@@ -3965,220 +3984,225 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   /* find about nick who issued the request */
   if (!(tmpnick = FindNick(lptr->nick)))
-  {
-    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
+      return;
+    }
 
   /* if there is less than 2 arguments, target is requester itself */
   if (ac < 2)
-  {
-    realptr = tmpnick;
-  }
+    {
+      realptr = tmpnick;
+    }
   else
     /* no, target is av[1] */
     if (!(realptr = FindNick(av[1])))
-    {
-      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
-      return;
-    }
+      {
+        notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+        return;
+      }
 
   if (!(nptr = GetMaster(realptr)))
     return;
 
   RecordCommand("%s: %s!%s@%s INFO %s",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname,
-    realptr->nick);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+                realptr->nick);
 
   isadmin = IsValidAdmin(lptr);
   isowner = ((nptr == GetMaster(tmpnick)) &&
-      (tmpnick->flags & NS_IDENTIFIED));
+             (tmpnick->flags & NS_IDENTIFIED));
 
   if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
       !isowner
-  #ifdef EMPOWERADMINS
-    && !isadmin)
-  #else
-    )
-  #endif
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] is private",
-      realptr->nick);
-    RecordCommand("%s: %s!%s@%s failed INFO %s",
-      n_NickServ, lptr->nick, lptr->username, lptr->hostname,
-      realptr->nick);
-    return;
-  }
+#ifdef EMPOWERADMINS
+      && !isadmin)
+#else
 
-  if ((userptr = FindClient(realptr->nick)))
+     )
+#endif
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] is private",
+             realptr->nick);
+      RecordCommand("%s: %s!%s@%s failed INFO %s",
+                    n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+                    realptr->nick);
+      return;
+    }
+
+  if ((userptr = FindClient(realptr->nick))
+     )
     if (realptr->flags & NS_IDENTIFIED)
       online = 1;
 
   notice(n_NickServ, lptr->nick,
-    "           Nickname: %s %s",
-    realptr->nick,
-    online ? "<< ONLINE >>" : "");
+         "           Nickname: %s %s",
+         realptr->nick,
+         online ? "<< ONLINE >>" : "");
 
   notice(n_NickServ, lptr->nick,
-    "         Registered: %s ago",
-    timeago(realptr->created, 1));
+         "         Registered: %s ago",
+         timeago(realptr->created, 1)
+        );
 
   if (realptr->lastseen && !online)
     notice(n_NickServ, lptr->nick,
-      "          Last Seen: %s ago",
-      timeago(realptr->lastseen, 1));
+           "          Last Seen: %s ago",
+           timeago(realptr->lastseen, 1)
+          );
 
-  if (!(nptr->flags & NS_HIDEALL) || isadmin || isowner)
-  {
-    char buf[MAXLINE];
-
-    if (LastSeenInfo)
+  if (!(nptr->flags & NS_HIDEALL)
+      || isadmin || isowner)
     {
-      if (!(nptr->flags & NS_HIDEADDR) || isadmin || isowner)
-        if (!online && realptr->lastu && realptr->lasth)
+      char buf[MAXLINE];
+
+      if (LastSeenInfo)
+        {
+          if (!(nptr->flags & NS_HIDEADDR) || isadmin || isowner)
+            if (!online && realptr->lastu && realptr->lasth)
+              notice(n_NickServ, lptr->nick,
+                     "  Last Seen Address: %s@%s",
+                     realptr->lastu,
+                     realptr->lasth);
+
+          if (!(nptr->flags & NS_HIDEQUIT) || isadmin || isowner)
+            if (realptr->lastqmsg)
+              notice(n_NickServ, lptr->nick,
+                     " Last Seen Quit Msg: %s",
+                     realptr->lastqmsg);
+        } /* if (LastSeenInfo) */
+
+      if (!(nptr->flags & NS_HIDEEMAIL) || isadmin || isowner)
+        if (realptr->email)
           notice(n_NickServ, lptr->nick,
-            "  Last Seen Address: %s@%s",
-            realptr->lastu,
-            realptr->lasth);
+                 "      Email Address: %s", realptr->email);
 
-      if (!(nptr->flags & NS_HIDEQUIT) || isadmin || isowner)
-        if (realptr->lastqmsg)
+      if (!(nptr->flags & NS_HIDEURL) || isadmin || isowner)
+        if (realptr->url)
           notice(n_NickServ, lptr->nick,
-            " Last Seen Quit Msg: %s",
-            realptr->lastqmsg);
-    } /* if (LastSeenInfo) */
+                 "                URL: %s", realptr->url);
 
-    if (!(nptr->flags & NS_HIDEEMAIL) || isadmin || isowner)
-      if (realptr->email)
+      if (nptr->UIN)
         notice(n_NickServ, lptr->nick,
-          "      Email Address: %s", realptr->email);
+               "                UIN: %s", nptr->UIN);
 
-    if (!(nptr->flags & NS_HIDEURL) || isadmin || isowner)
-      if (realptr->url)
+      if (nptr->gsm)
         notice(n_NickServ, lptr->nick,
-          "                URL: %s", realptr->url);
+               "                GSM: %s", nptr->gsm);
 
-    if (nptr->UIN)
-      notice(n_NickServ, lptr->nick,
-          "                UIN: %s", nptr->UIN);
+      if (nptr->phone)
+        notice(n_NickServ, lptr->nick,
+               "              Phone: %s", nptr->phone);
 
-    if (nptr->gsm)
-      notice(n_NickServ, lptr->nick,
-          "                GSM: %s", nptr->gsm);
+      buf[0] = '\0';
+      if (AllowKillProtection)
+        if (nptr->flags & NS_PROTECTED)
+          strcat(buf, "Kill Protection, ");
+      if (nptr->flags & NS_NOEXPIRE)
+        strcat(buf, "IRC Operator, ");
+      if (nptr->flags & NS_AUTOMASK)
+        strcat(buf, "AutoMask, ");
+      if (nptr->flags & NS_PRIVATE)
+        strcat(buf, "Private, ");
+      if (nptr->flags & NS_FORBID)
+        strcat(buf, "Forbidden, ");
+      if (nptr->flags & NS_SECURE)
+        strcat(buf, "Secure, ");
+      if (nptr->flags & NS_UNSECURE)
+        strcat(buf, "UnSecure, ");
+      if (nptr->flags & NS_HIDEALL)
+        strcat(buf, "Hidden, ");
+      if (nptr->flags & NS_MEMOS)
+        strcat(buf, "AllowMemos, ");
+      if (nptr->flags & NS_MEMONOTIFY)
+        strcat(buf, "MemoNotify, ");
+      if (nptr->flags & NS_MEMOSIGNON)
+        strcat(buf, "MemoSignon, ");
 
-    if (nptr->phone)
-      notice(n_NickServ, lptr->nick,
-          "              Phone: %s", nptr->phone);
-
-    buf[0] = '\0';
-    if (AllowKillProtection)
-      if (nptr->flags & NS_PROTECTED)
-        strcat(buf, "Kill Protection, ");
-    if (nptr->flags & NS_NOEXPIRE)
-      strcat(buf, "IRC Operator, ");
-    if (nptr->flags & NS_AUTOMASK)
-      strcat(buf, "AutoMask, ");
-    if (nptr->flags & NS_PRIVATE)
-      strcat(buf, "Private, ");
-    if (nptr->flags & NS_FORBID)
-      strcat(buf, "Forbidden, ");
-    if (nptr->flags & NS_SECURE)
-      strcat(buf, "Secure, ");
-    if (nptr->flags & NS_UNSECURE)
-      strcat(buf, "UnSecure, ");
-    if (nptr->flags & NS_HIDEALL)
-      strcat(buf, "Hidden, ");
-    if (nptr->flags & NS_MEMOS)
-      strcat(buf, "AllowMemos, ");
-    if (nptr->flags & NS_MEMONOTIFY)
-      strcat(buf, "MemoNotify, ");
-    if (nptr->flags & NS_MEMOSIGNON)
-      strcat(buf, "MemoSignon, ");
-
-    if (*buf)
-    {
-      buf[strlen(buf) - 2] = '\0';
-      notice(n_NickServ, lptr->nick,
-        "   Nickname Options: %s",
-        buf);
+      if (*buf)
+        {
+          buf[strlen(buf) - 2] = '\0';
+          notice(n_NickServ, lptr->nick,
+                 "   Nickname Options: %s",
+                 buf);
+        }
     }
-  }
 
   if (isadmin || isowner)
-  {
-    int cnt;
-
-    /*
-     * Show administrators all nicknames in this user's
-     * link, and also all channels this user has registered
-     */
-
-  #ifdef LINKED_NICKNAMES
-
-    if (nptr->master || nptr->nextlink)
     {
-      struct NickInfo *tmp;
+      int cnt;
 
-      cnt = 0;
+      /*
+       * Show administrators all nicknames in this user's
+       * link, and also all channels this user has registered
+       */
 
-      notice(n_NickServ, lptr->nick,
-        "   Linked Nicknames (first is master):");
+#ifdef LINKED_NICKNAMES
 
-      for (tmp = GetMaster(nptr); tmp; tmp = tmp->nextlink)
-      {
-        notice(n_NickServ, lptr->nick,
-          "                     %d) %s", ++cnt, tmp->nick);
-      }
-    }
+      if (nptr->master || nptr->nextlink)
+        {
+          struct NickInfo *tmp;
 
-  #endif /* LINKED_NICKNAMES */
+          cnt = 0;
 
-  #ifdef CHANNELSERVICES
+          notice(n_NickServ, lptr->nick,
+                 "   Linked Nicknames (first is master):");
 
-    /*
-     * ChanServDB makes all founder entries the nickname of
-     * the LINK master - so make sure we test the founder
-     * nickname against the link master's
-     */
-    if (nptr->FounderChannels)
-    {
-      struct aChannelPtr *tmpchan;
+          for (tmp = GetMaster(nptr); tmp; tmp = tmp->nextlink)
+            {
+              notice(n_NickServ, lptr->nick,
+                     "                     %d) %s", ++cnt, tmp->nick);
+            }
+        }
 
-      notice(n_NickServ, lptr->nick,
-        "Channels Registered:");
+#endif /* LINKED_NICKNAMES */
 
-      cnt = 0;
-      for (tmpchan = nptr->FounderChannels; tmpchan; tmpchan = tmpchan->next)
-      {
-        notice(n_NickServ, lptr->nick,
-          "                     %d) %s",
-          ++cnt,
-          tmpchan->cptr->name);
-      }
-    }
+#ifdef CHANNELSERVICES
 
-    if (nptr->AccessChannels)
-    {
-      struct AccessChannel *acptr;
+      /*
+       * ChanServDB makes all founder entries the nickname of
+       * the LINK master - so make sure we test the founder
+       * nickname against the link master's
+       */
+      if (nptr->FounderChannels)
+        {
+          struct aChannelPtr *tmpchan;
 
-      notice(n_NickServ, lptr->nick,
-        "Access Channels:");
+          notice(n_NickServ, lptr->nick,
+                 "Channels Registered:");
 
-      cnt = 0;
-      for (acptr = nptr->AccessChannels; acptr; acptr = acptr->next)
-      {
-        notice(n_NickServ, lptr->nick,
-          "                     %d) (%-3d) %s",
-          ++cnt,
-          acptr->accessptr->level,
-          acptr->cptr->name);
-      }
-    }
+          cnt = 0;
+          for (tmpchan = nptr->FounderChannels; tmpchan; tmpchan = tmpchan->next)
+            {
+              notice(n_NickServ, lptr->nick,
+                     "                     %d) %s",
+                     ++cnt,
+                     tmpchan->cptr->name);
+            }
+        }
 
-  #endif /* CHANNELSERVICES */
+      if (nptr->AccessChannels)
+        {
+          struct AccessChannel *acptr;
 
-  } /* if (isadmin || isowner) */
+          notice(n_NickServ, lptr->nick,
+                 "Access Channels:");
+
+          cnt = 0;
+          for (acptr = nptr->AccessChannels; acptr; acptr = acptr->next)
+            {
+              notice(n_NickServ, lptr->nick,
+                     "                     %d) (%-3d) %s",
+                     ++cnt,
+                     acptr->accessptr->level,
+                     acptr->cptr->name);
+            }
+        }
+
+#endif /* CHANNELSERVICES */
+
+    } /* if (isadmin || isowner) */
 } /* n_info() */
 
 #ifdef LINKED_NICKNAMES
@@ -4194,114 +4218,114 @@ n_link(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *target, /* target nickname */
-                  *nptr; /* lptr's nick structure */
+        *nptr; /* lptr's nick structure */
   int badlink,
-      ret;
+  ret;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002LINK <nickname> <password>\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "LINK");
-    return;
-  }
+{
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002LINK <nickname> <password>\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "LINK");
+      return;
+    }
 
   if (!(target = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   badlink = 0;
 
   if (!(nptr = FindNick(lptr->nick)))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      lptr->nick);
-    badlink = 1;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             lptr->nick);
+      badlink = 1;
+    }
   else if (target->flags & NS_FORBID)
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] is forbidden",
-      target->nick);
-    badlink = 1;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] is forbidden",
+             target->nick);
+      badlink = 1;
+    }
   else if (!irccmp(target->nick, lptr->nick))
-  {
-    notice(n_NickServ, lptr->nick,
-      "You cannot link to your current nickname");
-    badlink = 1;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "You cannot link to your current nickname");
+      badlink = 1;
+    }
   else if (!pwmatch(target->password, av[2]))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_BAD_PASS);
-    badlink = 1;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_BAD_PASS);
+      badlink = 1;
+    }
 
 
   if (badlink)
-  {
-    RecordCommand("%s: %s!%s@%s failed LINK %s",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      target->nick);
-    return;
-  }
-
-  RecordCommand("%s: %s!%s@%s LINK %s",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname, target->nick);
-
-  if ((ret = InsertLink(target, nptr)) > 0)
-  {
-    struct NickHost *htmp;
-
-    /*
-     * Successful link - delete lptr's (nptr's) access list,
-     * also copy nptr's memo list to target's list
-     */
-    while (nptr->hosts)
     {
-      htmp = nptr->hosts->next;
-      MyFree(nptr->hosts->hostmask);
-      MyFree(nptr->hosts);
-      nptr->hosts = htmp;
+      RecordCommand("%s: %s!%s@%s failed LINK %s",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    target->nick);
+      return;
     }
 
-  #ifdef MEMOSERVICES
-    MoveMemos(nptr, target);
-  #endif /* MEMOSERVICES */
+  RecordCommand("%s: %s!%s@%s LINK %s",
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, target->nick);
 
-    notice(n_NickServ, lptr->nick,
-      "Your nickname is now linked to [\002%s\002]",
-      target->nick);
-  }
+  if ((ret = InsertLink(target, nptr)) > 0)
+    {
+      struct NickHost *htmp;
+
+      /*
+       * Successful link - delete lptr's (nptr's) access list,
+       * also copy nptr's memo list to target's list
+       */
+      while (nptr->hosts)
+        {
+          htmp = nptr->hosts->next;
+          MyFree(nptr->hosts->hostmask);
+          MyFree(nptr->hosts);
+          nptr->hosts = htmp;
+        }
+
+#ifdef MEMOSERVICES
+      MoveMemos(nptr, target);
+#endif /* MEMOSERVICES */
+
+      notice(n_NickServ, lptr->nick,
+             "Your nickname is now linked to [\002%s\002]",
+             target->nick);
+    }
   else if (ret == 0)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Link failed");
-    putlog(LOG1, "%s: n_link: InsertLink() failed for %s (hub: %s)",
-      n_NickServ,
-      lptr->nick,
-      target->nick);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Link failed");
+      putlog(LOG1, "%s: n_link: InsertLink() failed for %s (hub: %s)",
+             n_NickServ,
+             lptr->nick,
+             target->nick);
+    }
   else if (ret == (-1))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Link failed: circular link detected");
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Link failed: circular link detected");
+    }
   else if (ret == (-2))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Number of links cannot exceed %d",
-      MaxLinks);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Number of links cannot exceed %d",
+             MaxLinks);
+    }
 } /* n_link() */
 
 /*
@@ -4320,15 +4344,15 @@ n_unlink(struct Luser *lptr, int ac, char **av)
   int unlink;
 
   if (ac == 2)
-  {
-    /*
-     * They specified a nickname to unlink, but no password
-     */
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002UNLINK [nickname [password]]\002");
-    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "UNLINK");
-    return;
-  }
+    {
+      /*
+       * They specified a nickname to unlink, but no password
+       */
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002UNLINK [nickname [password]]\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "UNLINK");
+      return;
+    }
 
   if (ac < 3)
     nptr = FindNick(lptr->nick);
@@ -4336,48 +4360,48 @@ n_unlink(struct Luser *lptr, int ac, char **av)
     nptr = FindNick(av[1]);
 
   if (!nptr)
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      (ac < 3) ? lptr->nick : av[1]);
-    return;
-  }
-
-  if (ac >= 3)
-  {
-    if (!pwmatch(nptr->password, av[2]))
     {
       notice(n_NickServ, lptr->nick,
-        ERR_BAD_PASS);
-      RecordCommand("%s: %s!%s@%s failed UNLINK %s",
-        n_NickServ, lptr->nick, lptr->username, lptr->hostname,
-        nptr->nick);
+             ERR_NOT_REGGED,
+             (ac < 3) ? lptr->nick : av[1]);
       return;
     }
-  }
+
+  if (ac >= 3)
+    {
+      if (!pwmatch(nptr->password, av[2]))
+        {
+          notice(n_NickServ, lptr->nick,
+                 ERR_BAD_PASS);
+          RecordCommand("%s: %s!%s@%s failed UNLINK %s",
+                        n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+                        nptr->nick);
+          return;
+        }
+    }
 
   RecordCommand("%s: %s!%s@%s UNLINK %s",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname, nptr->nick);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, nptr->nick);
 
   unlink = DeleteLink(nptr, 1);
 
   if (unlink > 0)
-  {
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] has been unlinked",
-      nptr->nick);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] has been unlinked",
+             nptr->nick);
+    }
   else if (unlink == 0)
-  {
-    notice(n_NickServ, lptr->nick,
-      "DeleteLink() reported errors, unlink failed");
-    putlog(LOG1, "%s: UNLINK failed: DeleteLink() contained errors",
-      n_NickServ);
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "DeleteLink() reported errors, unlink failed");
+      putlog(LOG1, "%s: UNLINK failed: DeleteLink() contained errors",
+             n_NickServ);
+    }
   else if (unlink == -1)
-  {
-    notice(n_NickServ, lptr->nick, ERR_NOT_LINKED, nptr->nick);
-  }
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_LINKED, nptr->nick);
+    }
 } /* n_unlink() */
 
 #endif /* LINKED_NICKNAMES */
@@ -4397,56 +4421,56 @@ n_forbid(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002FORBID <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "FORBID");
-    return;
-  }
-
-  RecordCommand("%s: %s!%s@%s FORBID [%s]",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
-
-  o_Wallops("FORBID from %s for nick [%s]",
-    lptr->nick,
-    av[1]);
-
-  if (!(nptr = FindNick(av[1])))
-  {
-    /* nick is not registered - do so now; add nick to nick table */
-
-    nptr = MakeNick();
-    nptr->nick = MyStrdup(av[1]);
-    nptr->created = current_ts;
-    nptr->flags |= NS_FORBID;
-    AddNick(nptr);
-  }
-  else
-  {
-    /* the nickname is already registered */
-
-    if (nptr->flags & NS_FORBID)
     {
       notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] is already forbidden",
-        av[1]);
+             "Syntax: \002FORBID <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "FORBID");
       return;
     }
 
-    nptr->flags |= NS_FORBID;
-    nptr->flags &= ~NS_IDENTIFIED;
-  }
+  RecordCommand("%s: %s!%s@%s FORBID [%s]",
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
+
+  o_Wallops("FORBID from %s for nick [%s]",
+            lptr->nick,
+            av[1]);
+
+  if (!(nptr = FindNick(av[1])))
+    {
+      /* nick is not registered - do so now; add nick to nick table */
+
+      nptr = MakeNick();
+      nptr->nick = MyStrdup(av[1]);
+      nptr->created = current_ts;
+      nptr->flags |= NS_FORBID;
+      AddNick(nptr);
+    }
+  else
+    {
+      /* the nickname is already registered */
+
+      if (nptr->flags & NS_FORBID)
+        {
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] is already forbidden",
+                 av[1]);
+          return;
+        }
+
+      nptr->flags |= NS_FORBID;
+      nptr->flags &= ~NS_IDENTIFIED;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "The nickname [\002%s\002] is now forbidden",
-    av[1]);
+         "The nickname [\002%s\002] is now forbidden",
+         av[1]);
 
   /*
    * Check if av[1] is currently online, if so, give warning
@@ -4466,44 +4490,44 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002UNFORBID <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, n_NickServ, "UNFORBID");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002UNFORBID <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO, n_NickServ, "UNFORBID");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
-    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
 
   o_Wallops("UNFORBID from %s for nick [%s]", lptr->nick, av[1]);
 
   if (!(nptr = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+      return;
+    }
 
   if (!nptr->password)
-  {
-    /* It is made from AddNick() in forbid() code - it is empty, so it is
-     * safe to delete it -kre */
-    DeleteNick(nptr);
+    {
+      /* It is made from AddNick() in forbid() code - it is empty, so it is
+       * safe to delete it -kre */
+      DeleteNick(nptr);
 
-    notice(n_NickServ, lptr->nick,
-      "The nickname [\002%s\002] has been dropped", av[1]);
-  }
+      notice(n_NickServ, lptr->nick,
+             "The nickname [\002%s\002] has been dropped", av[1]);
+    }
   else
-  {
-    nptr->flags &= ~NS_FORBID;
-  
-    notice(n_NickServ, lptr->nick,
-      "Nickname [\002%s\002] is now unforbidden", av[1]);
+    {
+      nptr->flags &= ~NS_FORBID;
 
-    /* Check if av[1] is currently online and tell it to identify -kre */
-    CheckNick(av[1]);
-  }
+      notice(n_NickServ, lptr->nick,
+             "Nickname [\002%s\002] is now unforbidden", av[1]);
+
+      /* Check if av[1] is currently online and tell it to identify -kre */
+      CheckNick(av[1]);
+    }
 } /* n_unforbid() */
 
 /*
@@ -4518,49 +4542,49 @@ n_setpass(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SETPASS <nickname> <password>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SETPASS");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SETPASS <nickname> <password>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SETPASS");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s SETPASS [%s] ...",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
 
   o_Wallops("SETPASS from %s!%s@%s for nick [%s]",
-    lptr->nick, lptr->username, lptr->hostname,
-    av[1] );
+            lptr->nick, lptr->username, lptr->hostname,
+            av[1] );
 
   if (!(nptr = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   if (!ChangePass(nptr, av[2]))
-  {
-    notice(n_NickServ, lptr->nick,
-      "Password change failed");
-    RecordCommand("%s: Failed to change password for [%s] to [%s] (SETPASS)",
-      n_NickServ,
-      av[1],
-      av[2]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Password change failed");
+      RecordCommand("%s: Failed to change password for [%s] to [%s] (SETPASS)",
+                    n_NickServ,
+                    av[1],
+                    av[2]);
+      return;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "Password for [\002%s\002] has been changed to [\002%s\002]",
-    av[1],
-    av[2]);
+         "Password for [\002%s\002] has been changed to [\002%s\002]",
+         av[1],
+         av[2]);
 } /* n_setpass() */
 
 /*
@@ -4575,36 +4599,36 @@ n_noexpire(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002NOEXPIRE <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "NOEXPIRE");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002NOEXPIRE <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "NOEXPIRE");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s NOEXPIRE [%s]",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
 
   if (!(nptr = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   nptr->flags |= NS_NOEXPIRE;
 
   notice(n_NickServ, lptr->nick,
-    "The nickname [\002%s\002] will never expire",
-    nptr->nick);
+         "The nickname [\002%s\002] will never expire",
+         nptr->nick);
 } /* n_noexpire() */
 
 #ifdef LINKED_NICKNAMES
@@ -4621,46 +4645,46 @@ n_showlink(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr, *tmp, *start;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SHOWLINK <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SHOWLINK");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SHOWLINK <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "SHOWLINK");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s SHOWLINK [%s]",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
 
   if (!(nptr = GetLink(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   if (!nptr->master && !nptr->nextlink)
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_LINKED,
-      nptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_LINKED,
+             nptr->nick);
+      return;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "-- Listing Nickname Link for [\002%s\002] --",
-    nptr->nick);
+         "-- Listing Nickname Link for [\002%s\002] --",
+         nptr->nick);
 
   notice(n_NickServ, lptr->nick,
-    "\002%s\002 << MASTER >>",
-    nptr->master ? nptr->master->nick : nptr->nick);
+         "\002%s\002 << MASTER >>",
+         nptr->master ? nptr->master->nick : nptr->nick);
 
   if (nptr->master)
     start = nptr->master->nextlink;
@@ -4668,16 +4692,16 @@ n_showlink(struct Luser *lptr, int ac, char **av)
     start = nptr->nextlink;
 
   for (tmp = start; tmp; tmp = tmp->nextlink)
-  {
-    notice(n_NickServ, lptr->nick,
-      "  %s",
-      tmp->nick);
+    {
+      notice(n_NickServ, lptr->nick,
+             "  %s",
+             tmp->nick);
 
-  }
+    }
 
   notice(n_NickServ, lptr->nick,
-    "-- End of list (%d nicknames in link) --",
-    nptr->master ? nptr->master->numlinks : nptr->numlinks);
+         "-- End of list (%d nicknames in link) --",
+         nptr->master ? nptr->master->numlinks : nptr->numlinks);
 } /* n_showlink() */
 
 /*
@@ -4692,49 +4716,49 @@ n_droplink(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr, *tmp;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002DROPLINK <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "DROPLINK");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002DROPLINK <nickname>\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "DROPLINK");
+      return;
+    }
 
   RecordCommand("%s: %s!%s@%s DROPLINK [%s]",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    av[1]);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                av[1]);
 
   if (!(nptr = GetLink(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   if (!nptr->master && !nptr->nextlink)
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_LINKED,
-      nptr->nick);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_LINKED,
+             nptr->nick);
+      return;
+    }
 
   while (nptr)
-  {
-    tmp = nptr->nextlink;
-    DeleteNick(nptr);
-    nptr = tmp;
-  }
+    {
+      tmp = nptr->nextlink;
+      DeleteNick(nptr);
+      nptr = tmp;
+    }
 
   notice(n_NickServ, lptr->nick,
-    "Link containing [\002%s\002] has been dropped",
-    av[1]);
+         "Link containing [\002%s\002] has been dropped",
+         av[1]);
 } /* n_droplink() */
 
 #endif /* LINKED_NICKNAMES */
@@ -4742,7 +4766,7 @@ n_droplink(struct Luser *lptr, int ac, char **av)
 /*
 n_collide()
  Perform various tasks on the current nick collide list
-
+ 
 Options:
  -list   - list nicknames to be collided
  -halt   - stop nick collision for targets
@@ -4757,59 +4781,63 @@ n_collide(struct Luser *lptr, int ac, char **av)
   struct NickInfo *nptr;
   int ii, cnt;
   int list, /* 1 if -list given */
-      halt, /* 1 if -halt given */
-      set, /* 1 if -set given */
-      setnow; /* 1 if -setnow given */
+  halt, /* 1 if -halt given */
+  set
+    , /* 1 if -set given */
+    setnow; /* 1 if -setnow given */
   char *target;
   char argbuf[MAXLINE];
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002COLLIDE <pattern> [options]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "COLLIDE");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002COLLIDE <pattern> [options]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "COLLIDE");
+      return;
+    }
 
   target = NULL;
-  list = halt = set = setnow = 0;
+  list = halt = set
+                  = setnow = 0;
 
   for (cnt = 1; cnt < ac; cnt++)
-  {
-    if (!ircncmp(av[cnt], "-list", strlen(av[cnt])))
-      list = 1;
-    else if (!ircncmp(av[cnt], "-halt", strlen(av[cnt])))
-      halt = 1;
-    else if (!ircncmp(av[cnt], "-set", strlen(av[cnt])))
-      set = 1;
-    else if (!ircncmp(av[cnt], "-setnow", strlen(av[cnt])))
-      setnow = 1;
-    else
     {
-      if (!target)
-        target = av[cnt];
+      if (!ircncmp(av[cnt], "-list", strlen(av[cnt])))
+        list = 1;
+      else if (!ircncmp(av[cnt], "-halt", strlen(av[cnt])))
+        halt = 1;
+      else if (!ircncmp(av[cnt], "-set", strlen(av[cnt])))
+        set
+          = 1;
+      else if (!ircncmp(av[cnt], "-setnow", strlen(av[cnt])))
+        setnow = 1;
+      else
+        {
+          if (!target)
+            target = av[cnt];
+        }
     }
-  }
 
   if (!target)
-  {
-    notice(n_NickServ, lptr->nick,
-      "No pattern specified");
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002COLLIDE <pattern> [options]\002");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "No pattern specified");
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002COLLIDE <pattern> [options]\002");
+      return;
+    }
 
   if (ac < 3)
-  {
-    /*
-     * They didn't give any options - default to -set
-     */
-    set = 1;
-  }
+    {
+      /*
+       * They didn't give any options - default to -set
+       */
+      set
+        = 1;
+    }
 
   ircsprintf(argbuf, "[%s] ", target);
 
@@ -4819,100 +4847,103 @@ n_collide(struct Luser *lptr, int ac, char **av)
   if (halt)
     strcat(argbuf, "-halt ");
 
-  if (set)
+  if (set
+     )
     strcat(argbuf, "-set ");
 
   if (setnow)
     strcat(argbuf, "-setnow ");
 
   RecordCommand("%s: %s!%s@%s COLLIDE %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    argbuf);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                argbuf);
 
-  if (set || setnow)
-  {
-    nptr = FindNick(target);
-
-    if (!nptr)
+  if (set
+      || setnow)
     {
-      notice(n_NickServ, lptr->nick,
-        ERR_NOT_REGGED,
-        target);
+      nptr = FindNick(target);
+
+      if (!nptr)
+        {
+          notice(n_NickServ, lptr->nick,
+                 ERR_NOT_REGGED,
+                 target);
+          return;
+        }
+
+      if (set
+         )
+        {
+          nptr->flags |= NS_COLLIDE;
+          nptr->collide_ts = current_ts + 60;
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] has been marked for collision",
+                 nptr->nick);
+        }
+      else /* setnow */
+        {
+          collide(nptr->nick);
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] has been collided",
+                 nptr->nick);
+        }
+
       return;
-    }
-
-    if (set)
-    {
-      nptr->flags |= NS_COLLIDE;
-      nptr->collide_ts = current_ts + 60;
-      notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] has been marked for collision",
-        nptr->nick);
-    }
-    else /* setnow */
-    {
-      collide(nptr->nick);
-      notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] has been collided",
-        nptr->nick);
-    }
-
-    return;
-  } /* if (set || setnow) */
+    } /* if (set || setnow) */
 
   if (list)
     notice(n_NickServ, lptr->nick,
-      "-- Listing collisions matching [\002%s\002] --",
-      target);
+           "-- Listing collisions matching [\002%s\002] --",
+           target);
 
   cnt = 0;
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      if (nptr->flags & NS_COLLIDE)
-      {
-        if (match(target, nptr->nick))
+      for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
         {
-          cnt++;
-          if (halt)
-            nptr->flags &= ~NS_COLLIDE;
+          if (nptr->flags & NS_COLLIDE)
+            {
+              if (match(target, nptr->nick))
+                {
+                  cnt++;
+                  if (halt)
+                    nptr->flags &= ~NS_COLLIDE;
 
-          if (list)
-          {
-            notice(n_NickServ, lptr->nick,
-              "%-15s",
-              nptr->nick);
-          }
+                  if (list)
+                    {
+                      notice(n_NickServ, lptr->nick,
+                             "%-15s",
+                             nptr->nick);
+                    }
+                }
+            } /* if (nptr->flags & NS_COLLIDE) */
         }
-      } /* if (nptr->flags & NS_COLLIDE) */
     }
-  }
 
   if (list)
-  {
-    notice(n_NickServ, lptr->nick,
-      "-- End of list (%d match%s found) --",
-      cnt,
-      (cnt == 1) ? "" : "es");
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "-- End of list (%d match%s found) --",
+             cnt,
+             (cnt == 1) ? "" : "es");
+    }
   else
-  {
-    notice(n_NickServ, lptr->nick,
-      "%d match%s found",
-      cnt,
-      (cnt == 1) ? "" : "es");
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "%d match%s found",
+             cnt,
+             (cnt == 1) ? "" : "es");
+    }
 } /* n_collide() */
 
 /*
 n_flag()
  Gives a registered nickname various flags which will limit
 their privileges
-
+ 
 Available flags:
 -noregister     Prevents them from registering a channel
 -nochanops      Will not op them on a channel if they're an AOP
@@ -4925,27 +4956,27 @@ n_flag(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr, *realptr;
   char buf[MAXLINE],
-       pstr[MAXLINE];
+  pstr[MAXLINE];
   int ii;
 
   if (ac < 2)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002FLAG <nickname> [options]\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "FLAG");
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002FLAG <nickname> [options]\002");
+      notice(n_NickServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_NickServ,
+             "FLAG");
+      return;
+    }
 
   if (!(realptr = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+    {
+      notice(n_NickServ, lptr->nick,
+             ERR_NOT_REGGED,
+             av[1]);
+      return;
+    }
 
   if (!(nptr = GetMaster(realptr)))
     return;
@@ -4954,93 +4985,93 @@ n_flag(struct Luser *lptr, int ac, char **av)
   pstr[0] = '\0';
 
   if (ac < 3)
-  {
-    RecordCommand("%s: %s!%s@%s FLAG [%s]",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      realptr->nick);
-
-    /*
-     * They gave no options, just display a list of
-     * nptr's current flags
-     */
-    if (nptr->flags & NS_NOREGISTER)
-      strcat(buf, "NoRegister, ");
-    if (nptr->flags & NS_NOCHANOPS)
-      strcat(buf, "NoChannelOps, ");
-
-    if (*buf)
     {
-      buf[strlen(buf) - 2] = '\0';
-      notice(n_NickServ, lptr->nick,
-        "The flags for [\002%s\002] are: %s",
-        realptr->nick,
-        buf);
-    }
-    else
-    {
-      notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] has no current flags",
-        realptr->nick);
-    }
+      RecordCommand("%s: %s!%s@%s FLAG [%s]",
+                    n_NickServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    realptr->nick);
 
-    return;
-  }
+      /*
+       * They gave no options, just display a list of
+       * nptr's current flags
+       */
+      if (nptr->flags & NS_NOREGISTER)
+        strcat(buf, "NoRegister, ");
+      if (nptr->flags & NS_NOCHANOPS)
+        strcat(buf, "NoChannelOps, ");
+
+      if (*buf)
+        {
+          buf[strlen(buf) - 2] = '\0';
+          notice(n_NickServ, lptr->nick,
+                 "The flags for [\002%s\002] are: %s",
+                 realptr->nick,
+                 buf);
+        }
+      else
+        {
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] has no current flags",
+                 realptr->nick);
+        }
+
+      return;
+    }
 
   /*
    * Parse the options they gave
    */
   for (ii = 2; ii < ac; ++ii)
-  {
-    if (!ircncmp(av[ii], "-noregister", strlen(av[ii])))
     {
-      nptr->flags |= NS_NOREGISTER;
-      strcat(buf, "NoRegister, ");
-      strcat(pstr, "-noregister ");
-    }
-    else if (!ircncmp(av[ii], "-nochanops", strlen(av[ii])))
-    {
-      nptr->flags |= NS_NOCHANOPS;
-      strcat(buf, "NoChannelOps, ");
-      strcat(pstr, "-nochanops ");
-    }
-    else if (!ircncmp(av[ii], "-clear", strlen(av[ii])))
-    {
-      nptr->flags &= ~(NS_NOREGISTER | NS_NOCHANOPS);
-      notice(n_NickServ, lptr->nick,
-        "The flags for [\002%s\002] have been cleared",
-        realptr->nick);
-      buf[0] = '\0';
-      strcat(pstr, "-clear ");
+      if (!ircncmp(av[ii], "-noregister", strlen(av[ii])))
+        {
+          nptr->flags |= NS_NOREGISTER;
+          strcat(buf, "NoRegister, ");
+          strcat(pstr, "-noregister ");
+        }
+      else if (!ircncmp(av[ii], "-nochanops", strlen(av[ii])))
+        {
+          nptr->flags |= NS_NOCHANOPS;
+          strcat(buf, "NoChannelOps, ");
+          strcat(pstr, "-nochanops ");
+        }
+      else if (!ircncmp(av[ii], "-clear", strlen(av[ii])))
+        {
+          nptr->flags &= ~(NS_NOREGISTER | NS_NOCHANOPS);
+          notice(n_NickServ, lptr->nick,
+                 "The flags for [\002%s\002] have been cleared",
+                 realptr->nick);
+          buf[0] = '\0';
+          strcat(pstr, "-clear ");
 
-      break;
+          break;
+        }
+      else
+        {
+          notice(n_NickServ, lptr->nick,
+                 "Invalid flag: %s",
+                 av[ii]);
+        }
     }
-    else
-    {
-      notice(n_NickServ, lptr->nick,
-        "Invalid flag: %s",
-        av[ii]);
-    }
-  }
 
   if (*buf)
-  {
-    buf[strlen(buf) - 2] = '\0';
-    notice(n_NickServ, lptr->nick,
-      "The flags (%s) have been added to [\002%s\002]",
-      buf,
-      realptr->nick);
-  }
+    {
+      buf[strlen(buf) - 2] = '\0';
+      notice(n_NickServ, lptr->nick,
+             "The flags (%s) have been added to [\002%s\002]",
+             buf,
+             realptr->nick);
+    }
 
   RecordCommand("%s: %s!%s@%s FLAG [%s] %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    realptr->nick,
-    pstr);
+                n_NickServ,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname,
+                realptr->nick,
+                pstr);
 } /* n_flag() */
 
 #endif /* EMPOWERADMINS */
@@ -5064,28 +5095,28 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
 
   /* Be paranoid */
   if (tsdelta <= 0)
-  {
-    notice(n_ChanServ, lptr->nick,
-        "Wrong TS_MAX_DELTA specified, using default of 8w");
-    tsdelta = 4838400; /* 8 weeks */
-  }
+    {
+      notice(n_ChanServ, lptr->nick,
+             "Wrong TS_MAX_DELTA specified, using default of 8w");
+      tsdelta = 4838400; /* 8 weeks */
+    }
 
   for (ouser = ClientList; ouser; ouser = ouser->next)
-  {
-    if ((now - ouser->since) >= tsdelta)
     {
-      SendUmode(OPERUMODE_Y, dMsg, ouser->nick, ouser->since, tsdelta);
-      notice(n_NickServ, lptr->nick, dMsg, ouser->nick, ouser->since,
-          tsdelta);
-      putlog(LOG1, "%s: Bogus TS nickname: [%s] (TS=%d)", 
-          n_ChanServ, ouser->nick, ouser->since);
+      if ((now - ouser->since) >= tsdelta)
+        {
+          SendUmode(OPERUMODE_Y, dMsg, ouser->nick, ouser->since, tsdelta);
+          notice(n_NickServ, lptr->nick, dMsg, ouser->nick, ouser->since,
+                 tsdelta);
+          putlog(LOG1, "%s: Bogus TS nickname: [%s] (TS=%d)",
+                 n_ChanServ, ouser->nick, ouser->since);
 
-      collide(ouser->nick);
-      notice(n_NickServ, lptr->nick,
-        "The nickname [\002%s\002] has been collided",
-        ouser->nick);
+          collide(ouser->nick);
+          notice(n_NickServ, lptr->nick,
+                 "The nickname [\002%s\002] has been collided",
+                 ouser->nick);
+        }
     }
-  }
 }
 
 #endif /* NICKSERVICES */

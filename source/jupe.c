@@ -39,7 +39,7 @@ struct Jupe       *JupeList = NULL;
 struct JupeVote   *VoteList = NULL;
 #endif
 
-/* 
+/*
 AddJupe() 
   Add jupe 'name' to list with 'reason'
 */
@@ -50,16 +50,16 @@ AddJupe(char *name, char *reason, char *who)
 {
   struct Jupe *tempjupe;
   int ii,
-      nickjupe = 1;
+  nickjupe = 1;
 
   for (ii = 0; ii < strlen(name); ++ii)
-  {
-    if (IsKWildChar(name[ii]))
     {
-      nickjupe = 0;
-      break;
+      if (IsKWildChar(name[ii]))
+        {
+          nickjupe = 0;
+          break;
+        }
     }
-  }
 
   tempjupe = (struct Jupe *) MyMalloc(sizeof(struct Jupe));
   memset(tempjupe, 0, sizeof(struct Jupe));
@@ -123,35 +123,35 @@ CheckJupes()
     return;
 
   for (tempserv = ServerList; tempserv; )
-  {
-    /*
-     * Make sure tempserv is using us as an uplink, which
-     * would qualify it as a pseudo-server. But also make
-     * sure it's not OUR current hub server - we never
-     * want to squit our hub.
-     */
-    if ((tempserv->uplink == Me.sptr) &&
-        (Me.hub != tempserv))
     {
       /*
-       * We found a server who has us as a hub - check if there
-       * is a J: line for it
+       * Make sure tempserv is using us as an uplink, which
+       * would qualify it as a pseudo-server. But also make
+       * sure it's not OUR current hub server - we never
+       * want to squit our hub.
        */
-      if (!IsJupe(tempserv->name))
-      {
-        toserv("SQUIT %s :Unjuped\n",
-          tempserv->name);
+      if ((tempserv->uplink == Me.sptr) &&
+          (Me.hub != tempserv))
+        {
+          /*
+           * We found a server who has us as a hub - check if there
+           * is a J: line for it
+           */
+          if (!IsJupe(tempserv->name))
+            {
+              toserv("SQUIT %s :Unjuped\n",
+                     tempserv->name);
 
-        next = tempserv->next;
-        DeleteServer(tempserv);
-        tempserv = next;
-      }
+              next = tempserv->next;
+              DeleteServer(tempserv);
+              tempserv = next;
+            }
+          else
+            tempserv = tempserv->next;
+        }
       else
         tempserv = tempserv->next;
     }
-    else
-      tempserv = tempserv->next;
-  }
 } /* CheckJupes() */
 
 /*
@@ -169,26 +169,26 @@ DoJupeSquit(char *serv, char *reason, char *who)
   int acnt;
 
   for (tempserv = ServerList; tempserv; )
-  {
-    if (match(serv, tempserv->name))
     {
-      /* squit the server */
-      toserv("SQUIT %s :Juped: %s (%s)\n",
-        tempserv->name, 
-        reason, 
-        who);
+      if (match(serv, tempserv->name))
+        {
+          /* squit the server */
+          toserv("SQUIT %s :Juped: %s (%s)\n",
+                 tempserv->name,
+                 reason,
+                 who);
 
-      prev = tempserv->next;
-      DeleteServer(tempserv); /* remove server from list */
-      tempserv = prev;
+          prev = tempserv->next;
+          DeleteServer(tempserv); /* remove server from list */
+          tempserv = prev;
+        }
+      else
+        tempserv = tempserv->next;
     }
-    else
-      tempserv = tempserv->next;
-  }
 
   /* add a fake server to replace it */
   ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, serv,
-      reason);
+             reason);
 
   toserv(sendstr);
 
@@ -215,64 +215,66 @@ CheckJuped(char *name)
   char sendstr[MAXLINE], **arv;
 
   for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
-  {
-    if (match(tempjupe->name, name))
     {
-      if (tempjupe->isnick)
-      {
-        struct Luser *lptr;
+      if (match(tempjupe->name, name))
+        {
+          if (tempjupe->isnick)
+            {
+              struct Luser *lptr;
 
-        if (!(lptr = FindClient(name)))
-          return 0;
+              if (!(lptr = FindClient(name)))
+                return 0;
 
-        /* its a nick jupe, not a server jupe */
+              /* its a nick jupe, not a server jupe */
 
-        /* collide the nickname */
-        ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
-            tempjupe->name,
-        #ifdef NICKSERVICES
-          (long) (lptr->nick_ts - 1),
-        #else
-          (long) (lptr->since - 1),
-        #endif
-          JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
-          tempjupe->reason ? tempjupe->reason : "Jupitered Nickname");
-        toserv(sendstr);
+              /* collide the nickname */
+              ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+                         tempjupe->name,
+#ifdef NICKSERVICES
+                         (long) (lptr->nick_ts - 1),
+#else
+                         (long) (lptr->since - 1),
+#endif
+                         JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+                         tempjupe->reason ? tempjupe->reason : "Jupitered Nickname");
+              toserv(sendstr);
 
-        DeleteClient(lptr);
+              DeleteClient(lptr);
 
-        SplitBuf(sendstr, &arv);
-        AddClient(arv);
+              SplitBuf(sendstr, &arv);
+              AddClient(arv);
 
-        if (Me.sptr)
-          Me.sptr->numoperkills++;
-        Network->TotalOperKills++;
-      #ifdef STATSERVICES
-        if (Network->TotalOperKills > Network->OperKillsT)
-          Network->OperKillsT = Network->TotalOperKills;
-      #endif
-      }
-      else
-      {
-        toserv("SQUIT %s :Juped: %s (%s)\n",
-          name,
-          tempjupe->reason,
-          tempjupe->who);
+              if (Me.sptr)
+                Me.sptr->numoperkills++;
+              Network->TotalOperKills++;
+#ifdef STATSERVICES
 
-        tempserv = FindServer(name);
-        DeleteServer(tempserv);
+              if (Network->TotalOperKills > Network->OperKillsT)
+                Network->OperKillsT = Network->TotalOperKills;
+#endif
 
-        /* replace it with fake server */
-        ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, name,
-            tempjupe->reason);
-        toserv(sendstr);
-        SplitBuf(sendstr, &arv);
+            }
+          else
+            {
+              toserv("SQUIT %s :Juped: %s (%s)\n",
+                     name,
+                     tempjupe->reason,
+                     tempjupe->who);
 
-        AddServer(5, arv);
-      }
-      return 1;
+              tempserv = FindServer(name);
+              DeleteServer(tempserv);
+
+              /* replace it with fake server */
+              ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, name,
+                         tempjupe->reason);
+              toserv(sendstr);
+              SplitBuf(sendstr, &arv);
+
+              AddServer(5, arv);
+            }
+          return 1;
+        }
     }
-  }
   return 0;
 } /* CheckJuped */
 
@@ -283,20 +285,20 @@ to the structure if so
 */
 
 struct Jupe *
-IsJupe(char *hostname)
+      IsJupe(char *hostname)
 
-{
-  struct Jupe *tempjupe;
+  {
+    struct Jupe *tempjupe;
 
-  if (!hostname)
+    if (!hostname)
+      return (NULL);
+
+    for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
+      if (match(tempjupe->name, hostname))
+        return (tempjupe);
+
     return (NULL);
-
-  for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
-    if (match(tempjupe->name, hostname))
-      return (tempjupe);
-
-  return (NULL);
-} /* IsJupe() */
+  } /* IsJupe() */
 
 /*
 InitJupes()
@@ -313,34 +315,34 @@ InitJupes()
   char **av;
 
   for (tmpjupe = JupeList; tmpjupe; tmpjupe = tmpjupe->next)
-  {
-    if (tmpjupe->isnick)
     {
-      /* collide the nickname */
-      ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
-          tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
-          tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
-      toserv(sendstr);
+      if (tmpjupe->isnick)
+        {
+          /* collide the nickname */
+          ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
+                     tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+                     tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
+          toserv(sendstr);
 
-      SplitBuf(sendstr, &av);
-      AddClient(av);
+          SplitBuf(sendstr, &av);
+          AddClient(av);
+        }
+      else
+        {
+          ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
+                     tmpjupe->name, tmpjupe->reason);
+
+          toserv(":%s SQUIT %s :%s (%s)\n%s\n",
+                 Me.name,
+                 tmpjupe->name,
+                 tmpjupe->reason,
+                 tmpjupe->who,
+                 sendstr);
+
+          SplitBuf(sendstr, &av);
+          AddServer(5, av);
+        }
     }
-    else
-    {
-      ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
-          tmpjupe->name, tmpjupe->reason);
-
-      toserv(":%s SQUIT %s :%s (%s)\n%s\n",
-        Me.name,
-        tmpjupe->name,
-        tmpjupe->reason,
-        tmpjupe->who,
-        sendstr);
-
-      SplitBuf(sendstr, &av);
-      AddServer(5, av);
-    }
-  }
 } /* InitJupes() */
 
 #ifdef JUPEVOTES
@@ -362,9 +364,9 @@ int AddVote(char *name, char *who)
       {
         exists = 1;
         for (i = 0; i < JUPEVOTES; i++)
-           /* see if they already voted for this server */
-           if (tempvote->who[i] && match(who, tempvote->who[i]))
-              return -1;
+          /* see if they already voted for this server */
+          if (tempvote->who[i] && match(who, tempvote->who[i]))
+            return -1;
         votematch = tempvote;
       }
 
@@ -390,7 +392,7 @@ int AddVote(char *name, char *who)
         tempvote->next->prev = tempvote;
       VoteList = tempvote;
     }
-    return 0;
+  return 0;
 }
 
 /*
@@ -404,7 +406,7 @@ int CountVotes(char *name)
 
   for (tempvote = VoteList; tempvote; tempvote = tempvote->next)
     if (match(name, tempvote->name))
-        return tempvote->count;
+      return tempvote->count;
 
   debug("CountVotes: ERROR!? NO votes found for %s",
         name);
@@ -421,26 +423,26 @@ void DeleteVote(char *name)
   int i;
 
   for (tempvote = VoteList; tempvote; tempvote = tempvote->next)
-   {
-     if (match(name, tempvote->name))
-      {
-        MyFree(tempvote->name);
-        for (i = 0; i < JUPEVOTES; i++)
-          if(tempvote->who[i])
-            MyFree(tempvote->who[i]);
+    {
+      if (match(name, tempvote->name))
+        {
+          MyFree(tempvote->name);
+          for (i = 0; i < JUPEVOTES; i++)
+            if(tempvote->who[i])
+              MyFree(tempvote->who[i]);
 
-        if (tempvote->prev)
-          tempvote->prev->next = tempvote->next;
-        else
-          VoteList = tempvote->next;
+          if (tempvote->prev)
+            tempvote->prev->next = tempvote->next;
+          else
+            VoteList = tempvote->next;
 
-        if (tempvote->next)
-          tempvote->next->prev = tempvote->prev;
+          if (tempvote->next)
+            tempvote->next->prev = tempvote->prev;
 
-        MyFree(tempvote);
-        return;
-      }
-   }
+          MyFree(tempvote);
+          return;
+        }
+    }
 }
 
 /* ExpireVotes()
@@ -454,29 +456,29 @@ void ExpireVotes(time_t unixtime)
   int i;
 
   for (tempvote = VoteList; tempvote; tempvote = tempvote->next)
-   {
-     if ((unixtime - tempvote->lasttime) > 600)
-      {
-        debug("ExpireVotes: expiring %s",
-              tempvote->name);
+    {
+      if ((unixtime - tempvote->lasttime) > 600)
+        {
+          debug("ExpireVotes: expiring %s",
+                tempvote->name);
 
-        MyFree(tempvote->name);
-        for (i = 0; i < JUPEVOTES; i++)
-          if(tempvote->who[i])
-            MyFree(tempvote->who[i]);
+          MyFree(tempvote->name);
+          for (i = 0; i < JUPEVOTES; i++)
+            if(tempvote->who[i])
+              MyFree(tempvote->who[i]);
 
-        if (tempvote->prev)
-          tempvote->prev->next = tempvote->next;
-        else
-          VoteList = tempvote->next;
+          if (tempvote->prev)
+            tempvote->prev->next = tempvote->next;
+          else
+            VoteList = tempvote->next;
 
-        if (tempvote->next)
-          tempvote->next->prev = tempvote->prev;
+          if (tempvote->next)
+            tempvote->next->prev = tempvote->prev;
 
-        MyFree(tempvote);
-        return;
-      }
-   }
+          MyFree(tempvote);
+          return;
+        }
+    }
 }
 #endif /* JUPEVOTES */
 

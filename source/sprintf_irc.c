@@ -25,7 +25,8 @@
 #include "sprintf_irc.h"
 #include <stdio.h>
 
-const char atoi_tab[4000] = {
+const char atoi_tab[4000] =
+  {
     '0','0','0',0, '0','0','1',0, '0','0','2',0, '0','0','3',0, '0','0','4',0,
     '0','0','5',0, '0','0','6',0, '0','0','7',0, '0','0','8',0, '0','0','9',0,
     '0','1','0',0, '0','1','1',0, '0','1','2',0, '0','1','3',0, '0','1','4',0,
@@ -225,7 +226,8 @@ const char atoi_tab[4000] = {
     '9','8','0',0, '9','8','1',0, '9','8','2',0, '9','8','3',0, '9','8','4',0,
     '9','8','5',0, '9','8','6',0, '9','8','7',0, '9','8','8',0, '9','8','9',0,
     '9','9','0',0, '9','9','1',0, '9','9','2',0, '9','9','3',0, '9','9','4',0,
-    '9','9','5',0, '9','9','6',0, '9','9','7',0, '9','9','8',0, '9','9','9',0 };
+    '9','9','5',0, '9','9','6',0, '9','9','7',0, '9','9','8',0, '9','9','9',0
+  };
 
 static char scratch_buffer[32];
 
@@ -271,173 +273,175 @@ vsprintf_irc(register char *str, register const char *format,
   while ((c = *format++))
     {
       if (c == '%')
-	{
-	  c = *format++; /* May never be '\0' ! */
+        {
+          c = *format++; /* May never be '\0' ! */
 
-	  if (c == 's')
-	    {
-	      register const char *p1 = va_arg(args, const char *);
-	      if ((*str = *p1))
-		{
-		  ++bytes;
-		  while ((*++str = *++p1))
-		    ++bytes;
-		}
-	      
-	      continue;
-	    }
+          if (c == 's')
+            {
+              register const char *p1 = va_arg(args, const char *);
+              if ((*str = *p1))
+                {
+                  ++bytes;
+                  while ((*++str = *++p1))
+                    ++bytes;
+                }
 
-	  if (c == 'c')
-	    {
-	      *str++ = (char) va_arg(args, int);
-	      ++bytes;
+              continue;
+            }
 
-	      continue;
-	    }
+          if (c == 'c')
+            {
+              *str++ = (char) va_arg(args, int);
+              ++bytes;
 
-	  /*
-	   * Prints time_t value in interval
-	   * [ 100000000 , 4294967295 ]
-	   * Actually prints like "%09lu"
-	   */
-	  if (c == 'l' && *format == 'u')
-	    {
-	      register unsigned long v1, v2;
-	      register const char *ap;
+              continue;
+            }
 
-	      ++format;
-	      v1 = va_arg(args, unsigned long);
-	      if (v1 > 999999999L)
-		{
-		  v2 = v1 / 1000000000;
-		  v1 -= v2 * 1000000000;
-		  *str++ = '0' + v2;
-		  ++bytes;
-		}
+          /*
+           * Prints time_t value in interval
+           * [ 100000000 , 4294967295 ]
+           * Actually prints like "%09lu"
+           */
+          if (c == 'l' && *format == 'u')
+            {
+              register unsigned long v1, v2;
+              register const char *ap;
 
-	      v2 = v1 / 1000000;
-	      v1 -= v2 * 1000000;
-	      ap = atoi_tab + (v2 << 2);
-	      *str++ = *ap++;
-	      *str++ = *ap++;
-	      *str++ = *ap;
-	      v2 = v1 / 1000;
-	      v1 -= v2 * 1000;
-	      ap = atoi_tab + (v2 << 2);
-	      *str++ = *ap++;
-	      *str++ = *ap++;
-	      *str++ = *ap;
-	      ap = atoi_tab + (v1 << 2);
-	      *str++ = *ap++;
-	      *str++ = *ap++;
-	      *str++ = *ap;
+              ++format;
+              v1 = va_arg(args, unsigned long);
+              if (v1 > 999999999L)
+                {
+                  v2 = v1 / 1000000000;
+                  v1 -= v2 * 1000000000;
+                  *str++ = '0' + v2;
+                  ++bytes;
+                }
 
-	      bytes += 9;
+              v2 = v1 / 1000000;
+              v1 -= v2 * 1000000;
+              ap = atoi_tab + (v2 << 2);
+              *str++ = *ap++;
+              *str++ = *ap++;
+              *str++ = *ap;
+              v2 = v1 / 1000;
+              v1 -= v2 * 1000;
+              ap = atoi_tab + (v2 << 2);
+              *str++ = *ap++;
+              *str++ = *ap++;
+              *str++ = *ap;
+              ap = atoi_tab + (v1 << 2);
+              *str++ = *ap++;
+              *str++ = *ap++;
+              *str++ = *ap;
 
-	      continue;
-	    }
-	  if (c == 't')
-	    {
-	      register unsigned int v1;
+              bytes += 9;
 
-	      v1 = va_arg(args,int);
-                            
-	      *str++ = (v1/10) + '0';
-	      *str++ = v1%10 + '0';
+              continue;
+            }
+          if (c == 't')
+            {
+              register unsigned int v1;
 
-	      bytes += 2;
+              v1 = va_arg(args,int);
 
-	      continue;
-	    }
+              *str++ = (v1/10) + '0';
+              *str++ = v1%10 + '0';
 
-	  if (c == 'd')
-	    {
-	      register unsigned int v1, v2;
-	      register const char *ap;
-	      register char *s = &scratch_buffer[sizeof(scratch_buffer) - 2];
-	      
-	      v1 = va_arg(args, int);
-	      if ((int)v1 <= 0)
-		{
-		  if (v1 == 0)
-		    {
-		      *str++ = '0';
-		      ++bytes;
-		      continue;
-		    }
-		  *str++ = '-';
-		  ++bytes;
-		  v1 = -v1;
-		}
+              bytes += 2;
 
-	      do
-		{
-		  v2 = v1 / 1000;
-		  ap = atoi_tab + 2 + ((v1 - 1000 * v2) << 2);
-		  *s-- = *ap--;
-		  *s-- = *ap--;
-		  *s-- = *ap;
-		}
-	      while ((v1 = v2) > 0);
+              continue;
+            }
 
-	      while ('0' == *++s);
+          if (c == 'd')
+            {
+              register unsigned int v1, v2;
+              register const char *ap;
+              register char *s = &scratch_buffer[sizeof(scratch_buffer) - 2];
 
-	      *str = *s;
-	      ++bytes;
+              v1 = va_arg(args, int);
+              if ((int)v1 <= 0)
+                {
+                  if (v1 == 0)
+                    {
+                      *str++ = '0';
+                      ++bytes;
+                      continue;
+                    }
+                  *str++ = '-';
+                  ++bytes;
+                  v1 = -v1;
+                }
 
-	      while ((*++str = *++s))
-		++bytes;
+              do
+                {
+                  v2 = v1 / 1000;
+                  ap = atoi_tab + 2 + ((v1 - 1000 * v2) << 2);
+                  *s-- = *ap--;
+                  *s-- = *ap--;
+                  *s-- = *ap;
+                }
+              while ((v1 = v2) > 0);
 
-	      continue;
-	    }
+              while ('0' == *++s)
+                ;
 
-	  if (c == 'u')
-	    {
-	      register unsigned int v1, v2;
-	      register const char *ap;
-	      register char *s = &scratch_buffer[sizeof(scratch_buffer) - 2];
-	      
-	      v1 = va_arg(args, unsigned int);
-	      if (v1 == 0)
-		{
-		  *str++ = '0';
-		  ++bytes;
-		  continue;
-		}
+              *str = *s;
+              ++bytes;
 
-	      do
-		{
-		  v2 = v1 / 1000;
-		  ap = atoi_tab + 2 + ((v1 - 1000 * v2) << 2);
-		  *s-- = *ap--;
-		  *s-- = *ap--;
-		  *s-- = *ap;
-		}
-	      while ((v1 = v2) > 0);
-	      
-	      while ('0' == *++s);
+              while ((*++str = *++s))
+                ++bytes;
 
-	      *str = *s;
-	      ++bytes;
+              continue;
+            }
 
-	      while ((*++str = *++s))
-		++bytes;
+          if (c == 'u')
+            {
+              register unsigned int v1, v2;
+              register const char *ap;
+              register char *s = &scratch_buffer[sizeof(scratch_buffer) - 2];
 
-	      continue;
-	    }
+              v1 = va_arg(args, unsigned int);
+              if (v1 == 0)
+                {
+                  *str++ = '0';
+                  ++bytes;
+                  continue;
+                }
 
-	  if (c != '%')
-	    {
-	      register int ret;
-	      
-	      format -= 2;
-	      ret = vsprintf(str, format, args);
-	      str += ret;
-	      bytes += ret;
+              do
+                {
+                  v2 = v1 / 1000;
+                  ap = atoi_tab + 2 + ((v1 - 1000 * v2) << 2);
+                  *s-- = *ap--;
+                  *s-- = *ap--;
+                  *s-- = *ap;
+                }
+              while ((v1 = v2) > 0);
 
-	      break;
-	    }
-	}
+              while ('0' == *++s)
+                ;
+
+              *str = *s;
+              ++bytes;
+
+              while ((*++str = *++s))
+                ++bytes;
+
+              continue;
+            }
+
+          if (c != '%')
+            {
+              register int ret;
+
+              format -= 2;
+              ret = vsprintf(str, format, args);
+              str += ret;
+              bytes += ret;
+
+              break;
+            }
+        }
 
       *str++ = c;
       ++bytes;

@@ -53,149 +53,156 @@ UpdateUserModes(struct Luser *user, char *modes)
 {
   int PLUS = 1;
   int umode,
-      ii;
+  ii;
 
   if (!modes || !user)
     return;
 
   for (ii = 0; ii < strlen(modes); ii++)
-  {
-    if (modes[ii] == '+')
     {
-      PLUS = 1;
-      continue;
-    }
-    if (modes[ii] == '-')
-    {
-      PLUS = 0;
-      continue;
-    }
-    umode = 0;
-    if (modes[ii] == 'i')
-      umode = UMODE_I;
-    if (modes[ii] == 's')
-      umode = UMODE_S;
-    if (modes[ii] == 'w')
-      umode = UMODE_W;
-    if (modes[ii] == 'o')
-      umode = UMODE_O;
-    if (!umode)
-      continue;
-
-    if (PLUS)
-    {
-      if ((umode == UMODE_O) && (!IsOperator(user)))
-      {
-      #ifdef STATSERVICES
-        char *hostname, *domain;
-        struct HostHash *hosth, *domainh;
-        time_t currtime = current_ts;
-      #endif
-
-      #ifdef NICKSERVICES
-        CheckOper(user->nick);
-      #endif
-
-        Network->TotalOperators++;
-
-        if (SafeConnect)
-          SendUmode(OPERUMODE_O,
-            "*** New Operator: %s (%s@%s) [%s]",
-            user->nick,
-            user->username,
-            user->hostname,
-            user->server ? user->server->name : "*unknown*");
-
-      #ifdef STATSERVICES
-        if (Network->TotalOperators > Network->MaxOperators)
+      if (modes[ii] == '+')
         {
-          Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = current_ts;
-
-          if ((Network->MaxOperators % 5) == 0)
-          {
-            /* inform +y people of new max oper count */
-            SendUmode(OPERUMODE_Y,
-              "*** New Max Operator Count: %ld",
-              Network->MaxOperators);
-          }
+          PLUS = 1;
+          continue;
         }
-        if (Network->TotalOperators > Network->MaxOperatorsT)
+      if (modes[ii] == '-')
         {
-          Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = current_ts;
+          PLUS = 0;
+          continue;
         }
-      #endif
+      umode = 0;
+      if (modes[ii] == 'i')
+        umode = UMODE_I;
+      if (modes[ii] == 's')
+        umode = UMODE_S;
+      if (modes[ii] == 'w')
+        umode = UMODE_W;
+      if (modes[ii] == 'o')
+        umode = UMODE_O;
+      if (!umode)
+        continue;
 
-        if (user->server)
+      if (PLUS)
         {
-          user->server->numopers++;
-
-        #ifdef STATSERVICES
-          if (user->server->numopers > user->server->maxopers)
-          {
-            user->server->maxopers = user->server->numopers;
-            user->server->maxopers_ts = current_ts;
-          }
-        #endif
-        }
-
-      #ifdef STATSERVICES
-        hostname = user->hostname;
-
-        if ((hosth = FindHost(hostname)))
-        {
-          hosth->curropers++;
-          if (hosth->curropers > hosth->maxopers)
-          {
-            hosth->maxopers = hosth->curropers;
-            hosth->maxopers_ts = currtime;
-          }
-        }
-
-        if ((domain = GetDomain(hostname)))
-        {
-          if ((domainh = FindDomain(domain)))
-          {
-            domainh->curropers++;
-            if (domainh->curropers > domainh->maxopers)
+          if ((umode == UMODE_O) && (!IsOperator(user)))
             {
-              domainh->maxopers = domainh->curropers;
-              domainh->maxopers_ts = currtime;
+#ifdef STATSERVICES
+              char *hostname, *domain;
+              struct HostHash *hosth, *domainh;
+              time_t currtime = current_ts;
+#endif
+
+#ifdef NICKSERVICES
+
+              CheckOper(user->nick);
+#endif
+
+              Network->TotalOperators++;
+
+              if (SafeConnect)
+                SendUmode(OPERUMODE_O,
+                          "*** New Operator: %s (%s@%s) [%s]",
+                          user->nick,
+                          user->username,
+                          user->hostname,
+                          user->server ? user->server->name : "*unknown*");
+
+#ifdef STATSERVICES
+
+              if (Network->TotalOperators > Network->MaxOperators)
+                {
+                  Network->MaxOperators = Network->TotalOperators;
+                  Network->MaxOperators_ts = current_ts;
+
+                  if ((Network->MaxOperators % 5) == 0)
+                    {
+                      /* inform +y people of new max oper count */
+                      SendUmode(OPERUMODE_Y,
+                                "*** New Max Operator Count: %ld",
+                                Network->MaxOperators);
+                    }
+                }
+              if (Network->TotalOperators > Network->MaxOperatorsT)
+                {
+                  Network->MaxOperatorsT = Network->TotalOperators;
+                  Network->MaxOperatorsT_ts = current_ts;
+                }
+#endif
+
+              if (user->server)
+                {
+                  user->server->numopers++;
+
+#ifdef STATSERVICES
+
+                  if (user->server->numopers > user->server->maxopers)
+                    {
+                      user->server->maxopers = user->server->numopers;
+                      user->server->maxopers_ts = current_ts;
+                    }
+#endif
+
+                }
+
+#ifdef STATSERVICES
+              hostname = user->hostname;
+
+              if ((hosth = FindHost(hostname)))
+                {
+                  hosth->curropers++;
+                  if (hosth->curropers > hosth->maxopers)
+                    {
+                      hosth->maxopers = hosth->curropers;
+                      hosth->maxopers_ts = currtime;
+                    }
+                }
+
+              if ((domain = GetDomain(hostname)))
+                {
+                  if ((domainh = FindDomain(domain)))
+                    {
+                      domainh->curropers++;
+                      if (domainh->curropers > domainh->maxopers)
+                        {
+                          domainh->maxopers = domainh->curropers;
+                          domainh->maxopers_ts = currtime;
+                        }
+                    }
+                }
+#endif /* STATSERVICES */
+
             }
-          }
+          user->umodes |= umode;
         }
-      #endif /* STATSERVICES */
-      }
-      user->umodes |= umode;
+      else
+        {
+          if ((umode == UMODE_O) && (IsOperator(user)))
+            {
+#ifdef STATSERVICES
+              char *hostname, *domain;
+              struct HostHash *hosth, *domainh;
+#endif
+
+              Network->TotalOperators--;
+              if (user->server)
+                user->server->numopers--;
+
+#ifdef STATSERVICES
+
+              hostname = user->hostname;
+
+              if ((hosth = FindHost(hostname)))
+                hosth->curropers--;
+
+              if ((domain = GetDomain(hostname)))
+                if ((domainh = FindDomain(domain)))
+                  domainh->curropers--;
+#endif
+
+            }
+          user->umodes &= ~umode;
+        }
     }
-    else
-    {
-      if ((umode == UMODE_O) && (IsOperator(user)))
-      {
-      #ifdef STATSERVICES
-        char *hostname, *domain;
-        struct HostHash *hosth, *domainh;
-      #endif
-
-        Network->TotalOperators--;
-        if (user->server)
-          user->server->numopers--;
-
-      #ifdef STATSERVICES
-        hostname = user->hostname;
-
-        if ((hosth = FindHost(hostname)))
-          hosth->curropers--;
-
-        if ((domain = GetDomain(hostname)))
-          if ((domainh = FindDomain(domain)))
-            domainh->curropers--;
-      #endif
-      }
-      user->umodes &= ~umode;
-    }
-  }
 } /* UpdateUserModes() */
 
 /*
@@ -207,170 +214,178 @@ AddClient()
 */
 
 struct Luser *
-AddClient(char **line)
+      AddClient(char **line)
 
-{
-  char *ch;
-  struct Luser *tempuser,
-               *newptr;
+  {
+    char *ch;
+    struct Luser *tempuser,
+          *newptr;
 
 #ifdef BLOCK_ALLOCATION
 
-  tempuser = (struct Luser *) BlockSubAllocate(ClientHeap);
-  if (!tempuser) /* shouldn't happen - but I'm paranoid :) */
-    return (NULL);
+    tempuser = (struct Luser *) BlockSubAllocate(ClientHeap);
+    if (!tempuser) /* shouldn't happen - but I'm paranoid :) */
+      return (NULL);
 
-  memset(tempuser, 0, sizeof(struct Luser));
+    memset(tempuser, 0, sizeof(struct Luser));
 
-  strncpy(tempuser->nick, line[1], NICKLEN);
-  strncpy(tempuser->username, line[5], USERLEN);
-  strncpy(tempuser->hostname, line[6], HOSTLEN);
-  strncpy(tempuser->realname, line[8] + 1, REALLEN);
+    strncpy(tempuser->nick, line[1], NICKLEN);
+    strncpy(tempuser->username, line[5], USERLEN);
+    strncpy(tempuser->hostname, line[6], HOSTLEN);
+    strncpy(tempuser->realname, line[8] + 1, REALLEN);
 
 #else
 
-  tempuser = (struct Luser *) MyMalloc(sizeof(struct Luser));
-  memset(tempuser, 0, sizeof(struct Luser));
+    tempuser = (struct Luser *) MyMalloc(sizeof(struct Luser));
+    memset(tempuser, 0, sizeof(struct Luser));
 
-  tempuser->nick = MyStrdup(line[1]);
-  tempuser->username = MyStrdup(line[5]);
-  tempuser->hostname = MyStrdup(line[6]);
-  tempuser->realname = MyStrdup(line[8] + 1);
+    tempuser->nick = MyStrdup(line[1]);
+    tempuser->username = MyStrdup(line[5]);
+    tempuser->hostname = MyStrdup(line[6]);
+    tempuser->realname = MyStrdup(line[8] + 1);
 
 #endif /* BLOCK_ALLOCATION */
 
-  tempuser->since = atol(line[3]);
+    tempuser->since = atol(line[3]);
 
 #ifdef NICKSERVICES
-  tempuser->nick_ts = tempuser->since;
+
+    tempuser->nick_ts = tempuser->since;
 #endif
 
-  if ((tempuser->server = FindServer(line[7])))
+    if ((tempuser->server = FindServer(line[7])))
   {
-    tempuser->server->numusers++;
+        tempuser->server->numusers++;
 
-  #ifdef STATSERVICES
-    if (tempuser->server->numusers > tempuser->server->maxusers)
-    {
-      tempuser->server->maxusers = tempuser->server->numusers;
-      tempuser->server->maxusers_ts = current_ts;
-    }
-  #endif
-  }
-
-  ch = &line[4][1];
-  while (*ch)
-  {
-    switch (*ch)
-    {
-      case 'i':
-      case 'I':
-      {
-        tempuser->umodes |= UMODE_I;
-        break;
-      }
-      case 's':
-      case 'S':
-      {
-        tempuser->umodes |= UMODE_S;
-        break;
-      }
-      case 'w':
-      case 'W':
-      {
-        tempuser->umodes |= UMODE_W;
-        break;
-      }
-      case 'o':
-      case 'O':
-      {
-        tempuser->umodes |= UMODE_O;
-
-        Network->TotalOperators++;
-
-      #ifdef STATSERVICES
-        if (Network->TotalOperators > Network->MaxOperators)
-        {
-          Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = current_ts;
-
-          if ((Network->MaxOperators % 5) == 0)
-          {
-            /* inform +y people of new max oper count */
-            SendUmode(OPERUMODE_Y,
-              "*** New Max Operator Count: %ld",
-              Network->MaxOperators);
-          }
-        }
-        if (Network->TotalOperators > Network->MaxOperatorsT)
-        {
-          Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = current_ts;
-        }
-      #endif
-
-        if (tempuser->server)
-        {
-          tempuser->server->numopers++;
-
-        #ifdef STATSERVICES
-          if (tempuser->server->numopers > tempuser->server->maxopers)
-          {
-            tempuser->server->maxopers = tempuser->server->numopers;
-            tempuser->server->maxopers_ts = current_ts;
-          }
-        #endif
-        }
-        break;
-      } /* case 'O' */
-      default: break;
-    } /* switch (*ch) */
-    ch++;
-  }
-
-  tempuser->next = ClientList;
-  tempuser->prev = NULL;
-  if (tempuser->next)
-    tempuser->next->prev = tempuser;
-  ClientList = tempuser;
-
-  /* add client to the hash table */
-  newptr = HashAddClient(ClientList, 0);
-
-  Network->TotalUsers++;
 #ifdef STATSERVICES
-  if (Network->TotalUsers > Network->MaxUsers)
-  {
-    Network->MaxUsers = Network->TotalUsers;
-    Network->MaxUsers_ts = current_ts;
 
-    if ((Network->MaxUsers % 10) == 0)
-    {
-      /* notify +y people of new max user count */
-      SendUmode(OPERUMODE_Y,
-        "*** New Max Client Count: %ld",
-        Network->MaxUsers);
-    }
-  }
-  if (Network->TotalUsers > Network->MaxUsersT)
-  {
-    Network->MaxUsersT = Network->TotalUsers;
-    Network->MaxUsersT_ts = current_ts;
-  }
+        if (tempuser->server->numusers > tempuser->server->maxusers)
+          {
+            tempuser->server->maxusers = tempuser->server->numusers;
+            tempuser->server->maxusers_ts = current_ts;
+          }
+#endif
+
+      }
+
+    ch = &line[4][1];
+    while (*ch)
+      {
+        switch (*ch)
+          {
+          case 'i':
+          case 'I':
+            {
+              tempuser->umodes |= UMODE_I;
+              break;
+            }
+          case 's':
+          case 'S':
+            {
+              tempuser->umodes |= UMODE_S;
+              break;
+            }
+          case 'w':
+          case 'W':
+            {
+              tempuser->umodes |= UMODE_W;
+              break;
+            }
+          case 'o':
+          case 'O':
+            {
+              tempuser->umodes |= UMODE_O;
+
+              Network->TotalOperators++;
+
+#ifdef STATSERVICES
+
+              if (Network->TotalOperators > Network->MaxOperators)
+                {
+                  Network->MaxOperators = Network->TotalOperators;
+                  Network->MaxOperators_ts = current_ts;
+
+                  if ((Network->MaxOperators % 5) == 0)
+                    {
+                      /* inform +y people of new max oper count */
+                      SendUmode(OPERUMODE_Y,
+                                "*** New Max Operator Count: %ld",
+                                Network->MaxOperators);
+                    }
+                }
+              if (Network->TotalOperators > Network->MaxOperatorsT)
+                {
+                  Network->MaxOperatorsT = Network->TotalOperators;
+                  Network->MaxOperatorsT_ts = current_ts;
+                }
+#endif
+
+              if (tempuser->server)
+                {
+                  tempuser->server->numopers++;
+
+#ifdef STATSERVICES
+
+                  if (tempuser->server->numopers > tempuser->server->maxopers)
+                    {
+                      tempuser->server->maxopers = tempuser->server->numopers;
+                      tempuser->server->maxopers_ts = current_ts;
+                    }
+#endif
+
+                }
+              break;
+            } /* case 'O' */
+          default:
+            break;
+          } /* switch (*ch) */
+        ch++;
+      }
+
+    tempuser->next = ClientList;
+    tempuser->prev = NULL;
+    if (tempuser->next)
+      tempuser->next->prev = tempuser;
+    ClientList = tempuser;
+
+    /* add client to the hash table */
+    newptr = HashAddClient(ClientList, 0);
+
+    Network->TotalUsers++;
+#ifdef STATSERVICES
+
+    if (Network->TotalUsers > Network->MaxUsers)
+      {
+        Network->MaxUsers = Network->TotalUsers;
+        Network->MaxUsers_ts = current_ts;
+
+        if ((Network->MaxUsers % 10) == 0)
+          {
+            /* notify +y people of new max user count */
+            SendUmode(OPERUMODE_Y,
+                      "*** New Max Client Count: %ld",
+                      Network->MaxUsers);
+          }
+      }
+    if (Network->TotalUsers > Network->MaxUsersT)
+      {
+        Network->MaxUsersT = Network->TotalUsers;
+        Network->MaxUsersT_ts = current_ts;
+      }
 #endif /* STATSERVICES */
 
 #ifdef ALLOW_GLINES
-  /*
-   * It's possible the client won't exist anymore, because if the user
-   * is a clone and AutoKillClones is enabled, HashAddClient() would
-   * have already killed the user, in which case newptr will be
-   * NULL - CheckGlined() checks for null pointers
-   */
-  CheckGlined(newptr); /* Check if new user is glined */
+    /*
+     * It's possible the client won't exist anymore, because if the user
+     * is a clone and AutoKillClones is enabled, HashAddClient() would
+     * have already killed the user, in which case newptr will be
+     * NULL - CheckGlined() checks for null pointers
+     */
+    CheckGlined(newptr); /* Check if new user is glined */
 #endif
 
-  return (tempuser);
-} /* AddClient() */
+    return (tempuser);
+  } /* AddClient() */
 
 /*
 DeleteClient()
@@ -387,9 +402,11 @@ DeleteClient(struct Luser *user)
   struct UserChannel *chnext;
 
 #ifdef NICKSERVICES
+
   struct NickInfo *nptr, *realptr;
 
 #ifdef CHANNELSERVICES
+
   struct aChannelPtr *fnext;
 #endif
 
@@ -399,61 +416,61 @@ DeleteClient(struct Luser *user)
     return;
 
   SendUmode(OPERUMODE_CAPE,
-    "*** Client exit: %s!%s@%s [%s]",
-    user->nick,
-    user->username,
-    user->hostname,
-    user->server ? user->server->name : "*unknown*");
+            "*** Client exit: %s!%s@%s [%s]",
+            user->nick,
+            user->username,
+            user->hostname,
+            user->server ? user->server->name : "*unknown*");
 
 #ifdef NICKSERVICES
 
   realptr = FindNick(user->nick);
   nptr = GetMaster(realptr);
   if (nptr && realptr)
-  {
-
-  #ifdef RECORD_SPLIT_TS
-
-    /*
-     * If they are identified with NickServ, record their TS, so we
-     * can tell if they are authorized later, if this is a netsplit
-     */
-    if (realptr->flags & NS_IDENTIFIED)
     {
-      realptr->split_ts = user->since;
-      realptr->whensplit = current_ts;
-    }
 
-  #endif /* RECORD_SPLIT_TS */
+#ifdef RECORD_SPLIT_TS
 
-    if (LastSeenInfo && (realptr->flags & NS_IDENTIFIED))
-    {
       /*
-       * Update last seen user@host info
+       * If they are identified with NickServ, record their TS, so we
+       * can tell if they are authorized later, if this is a netsplit
        */
+      if (realptr->flags & NS_IDENTIFIED)
+        {
+          realptr->split_ts = user->since;
+          realptr->whensplit = current_ts;
+        }
 
-      if (realptr->lastu)
-        MyFree(realptr->lastu);
-      if (realptr->lasth)
-        MyFree(realptr->lasth);
-      realptr->lastu = MyStrdup(user->username);
-      realptr->lasth = MyStrdup(user->hostname);
+#endif /* RECORD_SPLIT_TS */
+
+      if (LastSeenInfo && (realptr->flags & NS_IDENTIFIED))
+        {
+          /*
+           * Update last seen user@host info
+           */
+
+          if (realptr->lastu)
+            MyFree(realptr->lastu);
+          if (realptr->lasth)
+            MyFree(realptr->lasth);
+          realptr->lastu = MyStrdup(user->username);
+          realptr->lasth = MyStrdup(user->hostname);
+        }
+
+      /*
+       * they're quitting - unmark them as identified
+       */
+      realptr->flags &= ~NS_IDENTIFIED;
     }
 
-    /*
-     * they're quitting - unmark them as identified
-     */
-    realptr->flags &= ~NS_IDENTIFIED;
-  }
-
-  #ifdef CHANNELSERVICES
-    while (user->founder_channels)
+#ifdef CHANNELSERVICES
+  while (user->founder_channels)
     {
       fnext = user->founder_channels->next;
       RemFounder(user, user->founder_channels->cptr);
       user->founder_channels = fnext;
     }
-  #endif
+#endif
 
 #endif /* NICKSERVICES */
 
@@ -465,15 +482,15 @@ DeleteClient(struct Luser *user)
    */
 
   if (user->flags & L_OSREGISTERED)
-  {
-    struct Userlist *uptr;
-
-    if ((uptr = GetUser(0, user->nick, user->username, user->hostname)))
     {
-      uptr->split_ts = user->since;
-      uptr->whensplit = current_ts;
+      struct Userlist *uptr;
+
+      if ((uptr = GetUser(0, user->nick, user->username, user->hostname)))
+        {
+          uptr->split_ts = user->since;
+          uptr->whensplit = current_ts;
+        }
     }
-  }
 
 #endif /* RECORD_SPLIT_TS */
 
@@ -486,21 +503,21 @@ DeleteClient(struct Luser *user)
     user->server->numusers--;
 
   while (user->firstchan)
-  {
-    chnext = user->firstchan->next;
-    RemoveFromChannel(user->firstchan->chptr, user);
-    user->firstchan = chnext;
-  }
+    {
+      chnext = user->firstchan->next;
+      RemoveFromChannel(user->firstchan->chptr, user);
+      user->firstchan = chnext;
+    }
 
   HashDelClient(user, 0);
 
   /* keep oper count updated */
   if (user->umodes & UMODE_O)
-  {
-    Network->TotalOperators--;
-    if (user->server)
-      user->server->numopers--;
-  }
+    {
+      Network->TotalOperators--;
+      if (user->server)
+        user->server->numopers--;
+    }
 
 #ifndef BLOCK_ALLOCATION
   MyFree(user->nick);
@@ -548,18 +565,19 @@ IsRegistered(struct Luser *lptr, int sockfd)
       return (1);
 
   if (sockfd != NODCC)
-  {
-    if ((dccptr = IsDccSock(sockfd)))
-      if (!IsDccPending(dccptr))
-        return (1);
+    {
+      if ((dccptr = IsDccSock(sockfd)))
+        if (!IsDccPending(dccptr))
+          return (1);
 
-  #if 0
-    /* all we have left to work with is the nickname - *sigh* */
-    if ((dccptr = IsOnDcc(nick)))
-      if (!IsDccPending(dccptr))
-        return (1);
-  #endif
-  }
+#if 0
+      /* all we have left to work with is the nickname - *sigh* */
+      if ((dccptr = IsOnDcc(nick)))
+        if (!IsDccPending(dccptr))
+          return (1);
+#endif
+
+    }
 
   return (0);
 } /* IsRegistered() */
@@ -581,10 +599,10 @@ GetNick(char *nickname)
 
   final = nickname;
   if (IsNickPrefix(*final))
-  {
-    if (IsNickPrefix(*(++final)))
-      ++final;
-  }
+    {
+      if (IsNickPrefix(*(++final)))
+        ++final;
+    }
 
   return (final);
 } /* GetNick() */
@@ -638,13 +656,13 @@ IsNickCollide()
  Determine if 'servptr' is being nick collided
 A nickname collision is successful if the following conditions
 are met:
-
+ 
   1) Both user@host's match, and the connecting nick's TS is
      newer than our *Serv's TS
   2) The user@host's do NOT match, and the connecting nick's
      TS is older than our *Serv's TS
   3) The two TS's are equal, in which case both are killed
-
+ 
 Returns: 1 if successful collision
          0 if not
 */
@@ -663,30 +681,30 @@ IsNickCollide(struct Luser *servptr, char **av)
   newts = (time_t) atol(av[3]);
 
   if (newts == servptr->since)
-  {
-    return 1;
-  }
+    {
+      return 1;
+    }
   else
-  {
-    if (*av[5] == '~')
-      user = av[5] + 1;
-    else
-      user = av[5];
-
-    sameuh = (!irccmp(user, servptr->username) &&
-              !irccmp(av[6], servptr->hostname));
-
-    if (newts > servptr->since)
     {
-      if (sameuh)
-        return 1;
+      if (*av[5] == '~')
+        user = av[5] + 1;
+      else
+        user = av[5];
+
+      sameuh = (!irccmp(user, servptr->username) &&
+                !irccmp(av[6], servptr->hostname));
+
+      if (newts > servptr->since)
+        {
+          if (sameuh)
+            return 1;
+        }
+      else
+        {
+          if (!sameuh)
+            return 1;
+        }
     }
-    else
-    {
-      if (!sameuh)
-        return 1;
-    }
-  }
 
   return 0;
 } /* IsNickCollide() */

@@ -56,10 +56,12 @@ ReloadData()
   int ii;
 
 #ifdef CHANNELSERVICES
+
   struct ChanInfo *ctemp, *cnext;
 #endif
 
 #ifdef MEMOSERVICES
+
   struct MemoInfo *mtemp, *mnext;
 #endif
 
@@ -72,73 +74,75 @@ ReloadData()
       temp->flags |= NS_DELETE;
 
   if (ns_loaddata() == (-2))
-  {
-    /*
-     * Reload had fatal errors, so use the old database -
-     * go through and KEEP all structures marked for deletion
-     * and DELETE structures not marked, because they are the
-     * ones that were just added in the failed reload
-     */
-
-    for (ii = 0; ii < NICKLIST_MAX; ++ii)
     {
-      for (temp = nicklist[ii]; temp; temp = nnext)
-      {
-        nnext = temp->next;
+      /*
+       * Reload had fatal errors, so use the old database -
+       * go through and KEEP all structures marked for deletion
+       * and DELETE structures not marked, because they are the
+       * ones that were just added in the failed reload
+       */
 
-        if (!(temp->flags & NS_DELETE))
-          DeleteNick(temp);
-        else
+      for (ii = 0; ii < NICKLIST_MAX; ++ii)
         {
-          /* remove the deletion flag */
-          temp->flags &= ~NS_DELETE;
+          for (temp = nicklist[ii]; temp; temp = nnext)
+            {
+              nnext = temp->next;
+
+              if (!(temp->flags & NS_DELETE))
+                DeleteNick(temp);
+              else
+                {
+                  /* remove the deletion flag */
+                  temp->flags &= ~NS_DELETE;
+                }
+            }
         }
-      }
+
+      return 0;
     }
-
-    return 0;
-  }
   else
-  {
-    /*
-     * Reload was ok - now go through and remove the old nick
-     * structures marked for deletion
-     */
-
-    for (ii = 0; ii < NICKLIST_MAX; ++ii)
     {
-      for (temp = nicklist[ii]; temp; temp = nnext)
-      {
-        nnext = temp->next;
+      /*
+       * Reload was ok - now go through and remove the old nick
+       * structures marked for deletion
+       */
 
-        if (temp->flags & NS_DELETE)
+      for (ii = 0; ii < NICKLIST_MAX; ++ii)
         {
-          /*
-           * We should try to preserve the old identification data. Before
-           * deleting this nickname, attempt to find the corresponding one
-           * that was just read from the configuration file, and set it's
-           * ident/collide/split_ts variables correctly. It is safe to use
-           * FindNick() because it will return the most current entry. If
-           * the entry was deleted, FindNick() will return 'temp' so we're
-           * still not losing anything.
-           */
-          if ((newnick = FindNick(temp->nick)))
-          {
-            newnick->flags |= (temp->flags & NS_IDENTIFIED);
-            newnick->collide_ts = temp->collide_ts;
+          for (temp = nicklist[ii]; temp; temp = nnext)
+            {
+              nnext = temp->next;
 
-          #ifdef RECORD_SPLIT_TS
-            newnick->split_ts = temp->split_ts;
-            newnick->whensplit = temp->whensplit;
-          #endif /* RECORD_SPLIT_TS */
-          }
+              if (temp->flags & NS_DELETE)
+                {
+                  /*
+                   * We should try to preserve the old identification data. Before
+                   * deleting this nickname, attempt to find the corresponding one
+                   * that was just read from the configuration file, and set it's
+                   * ident/collide/split_ts variables correctly. It is safe to use
+                   * FindNick() because it will return the most current entry. If
+                   * the entry was deleted, FindNick() will return 'temp' so we're
+                   * still not losing anything.
+                   */
+                  if ((newnick = FindNick(temp->nick)))
+                    {
+                      newnick->flags |= (temp->flags & NS_IDENTIFIED);
+                      newnick->collide_ts = temp->collide_ts;
 
-          DeleteNick(temp);
+#ifdef RECORD_SPLIT_TS
 
-        } /* if (temp->flags & NS_DELETE) */
-      } /* for (temp = nicklist[ii]; temp; temp = nnext) */
-    } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
-  }
+                      newnick->split_ts = temp->split_ts;
+                      newnick->whensplit = temp->whensplit;
+#endif /* RECORD_SPLIT_TS */
+
+                    }
+
+                  DeleteNick(temp);
+
+                } /* if (temp->flags & NS_DELETE) */
+            } /* for (temp = nicklist[ii]; temp; temp = nnext) */
+        } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+    }
 
 #ifdef CHANNELSERVICES
 
@@ -147,100 +151,100 @@ ReloadData()
       ctemp->flags |= CS_DELETE;
 
   if (cs_loaddata() == (-2))
-  {
-    /*
-     * Reload had fatal errors, so use the old database -
-     * go through and KEEP all structures marked for deletion
-     * and DELETE structures not marked, because they are the
-     * ones that were just added in the failed reload
-     */
-
-    for (ii = 0; ii < CHANLIST_MAX; ++ii)
     {
-      for (ctemp = chanlist[ii]; ctemp; ctemp = cnext)
-      {
-        cnext = ctemp->next;
+      /*
+       * Reload had fatal errors, so use the old database -
+       * go through and KEEP all structures marked for deletion
+       * and DELETE structures not marked, because they are the
+       * ones that were just added in the failed reload
+       */
 
-        if (!(ctemp->flags & CS_DELETE))
-          DeleteChan(ctemp);
-        else
+      for (ii = 0; ii < CHANLIST_MAX; ++ii)
         {
-          /* remove the deletion flag */
-          ctemp->flags &= ~CS_DELETE;
-        }
-      }
-    }
+          for (ctemp = chanlist[ii]; ctemp; ctemp = cnext)
+            {
+              cnext = ctemp->next;
 
-    return 0;
-  }
+              if (!(ctemp->flags & CS_DELETE))
+                DeleteChan(ctemp);
+              else
+                {
+                  /* remove the deletion flag */
+                  ctemp->flags &= ~CS_DELETE;
+                }
+            }
+        }
+
+      return 0;
+    }
   else
-  {
-    struct Channel *cptr;
-
-    /*
-     * Reload was ok - now go through and remove the old chan
-     * structures marked for deletion
-     */
-
-    for (ii = 0; ii < CHANLIST_MAX; ++ii)
     {
-      for (ctemp = chanlist[ii]; ctemp; ctemp = cnext)
-      {
-        cnext = ctemp->next;
+      struct Channel *cptr;
 
-        if (ctemp->flags & CS_DELETE)
-          DeleteChan(ctemp);
-        else
-        {
-          /*
-           * It must be a new channel entry, have ChanServ
-           * join the channel
-           */
-          if (!(ctemp->flags & CS_FORGET))
-          {
-            cptr = FindChannel(ctemp->name);
-            if (cptr && !IsChannelMember(cptr, Me.csptr))
-              cs_join(ctemp);
-          }
-        }
-      }
-    }
-    
-    /*
-     * Now go through the list and have ChanServ part any old chans
-     */
-    if (Me.csptr)
-    {
-      struct UserChannel *uc, *ucprev;
+      /*
+       * Reload was ok - now go through and remove the old chan
+       * structures marked for deletion
+       */
 
-      ucprev = NULL;
-      for (uc = Me.csptr->firstchan; uc; )
-      {
-        if (!FindChan(uc->chptr->name))
+      for (ii = 0; ii < CHANLIST_MAX; ++ii)
         {
-          if (ucprev)
-          {
-            ucprev->next = uc->next;
-            cs_part(uc->chptr);
-            uc = ucprev;
-          }
-          else
-          {
-            Me.csptr->firstchan = uc->next;
-            cs_part(uc->chptr);
-            uc = NULL;
-          }
+          for (ctemp = chanlist[ii]; ctemp; ctemp = cnext)
+            {
+              cnext = ctemp->next;
+
+              if (ctemp->flags & CS_DELETE)
+                DeleteChan(ctemp);
+              else
+                {
+                  /*
+                   * It must be a new channel entry, have ChanServ
+                   * join the channel
+                   */
+                  if (!(ctemp->flags & CS_FORGET))
+                    {
+                      cptr = FindChannel(ctemp->name);
+                      if (cptr && !IsChannelMember(cptr, Me.csptr))
+                        cs_join(ctemp);
+                    }
+                }
+            }
         }
 
-        ucprev = uc;
+      /*
+       * Now go through the list and have ChanServ part any old chans
+       */
+      if (Me.csptr)
+        {
+          struct UserChannel *uc, *ucprev;
 
-        if (uc)
-          uc = uc->next;
-        else
-          uc = Me.csptr->firstchan;
-      }
-    }
-  } /* if (Me.csptr) */
+          ucprev = NULL;
+          for (uc = Me.csptr->firstchan; uc; )
+            {
+              if (!FindChan(uc->chptr->name))
+                {
+                  if (ucprev)
+                    {
+                      ucprev->next = uc->next;
+                      cs_part(uc->chptr);
+                      uc = ucprev;
+                    }
+                  else
+                    {
+                      Me.csptr->firstchan = uc->next;
+                      cs_part(uc->chptr);
+                      uc = NULL;
+                    }
+                }
+
+              ucprev = uc;
+
+              if (uc)
+                uc = uc->next;
+              else
+                uc = Me.csptr->firstchan;
+            }
+        }
+    } /* if (Me.csptr) */
 
 #endif /* CHANNELSERVICES */
 
@@ -251,50 +255,50 @@ ReloadData()
       mtemp->flags |= MS_RDELETE;
 
   if (ms_loaddata() == (-2))
-  {
-    /*
-     * Reload had fatal errors, so use the old database -
-     * go through and KEEP all structures marked for deletion
-     * and DELETE structures not marked, because they are the
-     * ones that were just added in the failed reload
-     */
-
-    for (ii = 0; ii < MEMOLIST_MAX; ++ii)
     {
-      for (mtemp = memolist[ii]; mtemp; mtemp = mnext)
-      {
-        mnext = mtemp->next;
+      /*
+       * Reload had fatal errors, so use the old database -
+       * go through and KEEP all structures marked for deletion
+       * and DELETE structures not marked, because they are the
+       * ones that were just added in the failed reload
+       */
 
-        if (!(mtemp->flags & MS_RDELETE))
-          DeleteMemoList(mtemp);
-        else
+      for (ii = 0; ii < MEMOLIST_MAX; ++ii)
         {
-          /* remove the deletion flag */
-          mtemp->flags &= ~MS_RDELETE;
+          for (mtemp = memolist[ii]; mtemp; mtemp = mnext)
+            {
+              mnext = mtemp->next;
+
+              if (!(mtemp->flags & MS_RDELETE))
+                DeleteMemoList(mtemp);
+              else
+                {
+                  /* remove the deletion flag */
+                  mtemp->flags &= ~MS_RDELETE;
+                }
+            }
         }
-      }
-    }
 
-    return 0;
-  }
+      return 0;
+    }
   else
-  {
-    /*
-     * Reload was ok - now go through and remove the old memo
-     * structures marked for deletion
-     */
-
-    for (ii = 0; ii < MEMOLIST_MAX; ++ii)
     {
-      for (mtemp = memolist[ii]; mtemp; mtemp = mnext)
-      {
-        mnext = mtemp->next;
+      /*
+       * Reload was ok - now go through and remove the old memo
+       * structures marked for deletion
+       */
 
-        if (mtemp->flags & MS_RDELETE)
-          DeleteMemoList(mtemp);
-      }
+      for (ii = 0; ii < MEMOLIST_MAX; ++ii)
+        {
+          for (mtemp = memolist[ii]; mtemp; mtemp = mnext)
+            {
+              mnext = mtemp->next;
+
+              if (mtemp->flags & MS_RDELETE)
+                DeleteMemoList(mtemp);
+            }
+        }
     }
-  }
 
 #endif /* MEMOSERVICES */
 
@@ -340,9 +344,9 @@ CreateDatabase(char *name, char *info)
 
   currtime = current_ts;
   fprintf(fptr, "; HybServ2 %s - %s - created %s",
-    hVersion,
-    info,
-    ctime(&currtime));
+          hVersion,
+          info,
+          ctime(&currtime));
 
   return (fptr);
 } /* CreateDatabase() */
@@ -361,7 +365,7 @@ BackupDatabases(time_t unixtime)
 {
   struct tm *backup_tm;
   char bpath[MAXLINE],
-       temp[MAXLINE];
+  temp[MAXLINE];
 
   /*
    * First make sure HPath/backup/ exists
@@ -370,41 +374,41 @@ BackupDatabases(time_t unixtime)
   ircsprintf(bpath, "%s/backup", HPath);
   /* Function mkdir() returns -1 on failure -kre */
   if (mkdir(bpath, 0700)==-1)
-  {
-    /* Proceed if errno is set. This usually should not be necessary, but
-     * this code should help me find why Solaris complains -kre */
-    if (errno && errno!=EEXIST)
     {
-      putlog(LOG1,
-        "Error creating backup directory [%s]: %s",
-        bpath,
-        strerror(errno));
-      return;
+      /* Proceed if errno is set. This usually should not be necessary, but
+       * this code should help me find why Solaris complains -kre */
+      if (errno && errno!=EEXIST)
+        {
+          putlog(LOG1,
+                 "Error creating backup directory [%s]: %s",
+                 bpath,
+                 strerror(errno));
+          return;
+        }
     }
-  }
 
   backup_tm = localtime(&unixtime);
 
   ircsprintf(bpath, "%s/backup/%d%02d%02d", HPath, 1900 +
-      backup_tm->tm_year, backup_tm->tm_mon + 1, backup_tm->tm_mday);
+             backup_tm->tm_year, backup_tm->tm_mon + 1, backup_tm->tm_mday);
 
   /*
    * Make the directory permissions: drwx------
    * Function mkdir() returns -1 on failure -kre
    */
   if (mkdir(bpath, 0700)==-1)
-  {
-    /* Proceed if errno is set. This usually should not be necessary, but
-     * this code should help me find why Solaris complains -kre */
-    if (errno && errno!=EEXIST)
     {
-      putlog(LOG1,
-        "Error creating backup directory [%s]: %s",
-        bpath,
-        strerror(errno));
-      return;
+      /* Proceed if errno is set. This usually should not be necessary, but
+       * this code should help me find why Solaris complains -kre */
+      if (errno && errno!=EEXIST)
+        {
+          putlog(LOG1,
+                 "Error creating backup directory [%s]: %s",
+                 bpath,
+                 strerror(errno));
+          return;
+        }
     }
-  }
 
   ircsprintf(temp, "%s/%s", bpath, OperServDB);
 
@@ -425,19 +429,22 @@ BackupDatabases(time_t unixtime)
   CopyFile(NickServDB, temp);
 
 #ifdef CHANNELSERVICES
+
   ircsprintf(temp, "%s/%s", bpath, ChanServDB);
 
   CopyFile(ChanServDB, temp);
 #endif /* CHANNELSERVICES */
 
 #ifdef MEMOSERVICES
+
   ircsprintf(temp, "%s/%s", bpath, MemoServDB);
 
   CopyFile(MemoServDB, temp);
 #endif /* MEMOSERVICES */
 
-/* SeenServDB should be backed up too. -kre */
+  /* SeenServDB should be backed up too. -kre */
 #ifdef SEENSERVICES
+
   ircsprintf(temp, "%s/%s", bpath, SeenServDB);
 
   CopyFile(SeenServDB, temp);
@@ -449,7 +456,7 @@ BackupDatabases(time_t unixtime)
 /*
 WriteDatabases()
  Rewrite all databases
-
+ 
 Return: 1 if successful
         0 if not
 */
@@ -504,9 +511,9 @@ WriteDatabases()
 WriteOpers()
   Write OperServDB to disk - just record opers' nicknames and
 what umodes they have
-
+ 
 Format:   Nickname <umodes>
-
+ 
  Return 1 if successful, 0 if not
 */
 
@@ -525,8 +532,8 @@ WriteOpers()
   if (!fp)
     {
       putlog(LOG1, "Error writing OperServ Database (%s): %s",
-	     OperServDB,
-	     strerror(errno));
+             OperServDB,
+             strerror(errno));
       return 0;
     }
 
@@ -548,13 +555,13 @@ WriteOpers()
     {
       ircsprintf(temp, "*%s*", tempuser->nick);
       if (match(temp, donestr) == 0)
-	{
-	  fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
-	  ircsprintf(temp, "%s ", tempuser->nick);
-	  donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
-				       + 1);
-	  strcat(donestr, temp);
-	}
+        {
+          fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+          ircsprintf(temp, "%s ", tempuser->nick);
+          donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
+                                       + 1);
+          strcat(donestr, temp);
+        }
     }
 
   MyFree(donestr);
@@ -564,7 +571,7 @@ WriteOpers()
   rename(tempname, OperServDB);
 
   putlog(LOG3, "Wrote %s",
-	 OperServDB);
+         OperServDB);
 
   return 1;
 } /* WriteOpers() */
@@ -587,35 +594,35 @@ WriteStats()
   ircsprintf(tempname, "%s.tmp", StatServDB);
   fp = CreateDatabase(tempname, "StatServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing StatServ Database (%s): %s",
-      StatServDB,
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1, "Error writing StatServ Database (%s): %s",
+             StatServDB,
+             strerror(errno));
+      return 0;
+    }
 
   fprintf(fp, "->USERS %ld %ld\n",
-    Network->MaxUsers,
-    (long) Network->MaxUsers_ts);
+          Network->MaxUsers,
+          (long) Network->MaxUsers_ts);
 
   fprintf(fp, "->OPERS %ld %ld\n",
-    Network->MaxOperators,
-    (long) Network->MaxOperators_ts);
+          Network->MaxOperators,
+          (long) Network->MaxOperators_ts);
 
   fprintf(fp, "->CHANS %ld %ld\n",
-    Network->MaxChannels,
-    (long) Network->MaxChannels_ts);
+          Network->MaxChannels,
+          (long) Network->MaxChannels_ts);
 
   fprintf(fp, "->SERVS %ld %ld\n",
-    Network->MaxServers,
-    (long) Network->MaxServers_ts);
+          Network->MaxServers,
+          (long) Network->MaxServers_ts);
 
   fclose(fp);
 
   rename(tempname, StatServDB);
 
   putlog(LOG3, "Wrote %s",
-    StatServDB);
+         StatServDB);
 
   return 1;
 } /* WriteStats() */
@@ -643,12 +650,12 @@ WriteNicks()
   ircsprintf(tempname, "%s.tmp", NickServDB);
   fp = CreateDatabase(tempname, "NickServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing NickServ Database (%s): %s",
-      NickServDB,
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1, "Error writing NickServ Database (%s): %s",
+             NickServDB,
+             strerror(errno));
+      return 0;
+    }
 
   ncnt = 0;
 
@@ -664,58 +671,58 @@ WriteNicks()
    */
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      if (nptr->master || !nptr->nextlink)
-      {
-        /* This is not a master nickname */
-        continue;
-      }
+      for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
+        {
+          if (nptr->master || !nptr->nextlink)
+            {
+              /* This is not a master nickname */
+              continue;
+            }
 
-      ++ncnt;
+          ++ncnt;
 
-      /* write out "nickname flags created last-seen" to file */
-      fprintf(fp, "%s %ld %ld %ld\n",
-        nptr->nick,
-        nptr->flags,
-        (long) nptr->created,
-        (long) nptr->lastseen);
+          /* write out "nickname flags created last-seen" to file */
+          fprintf(fp, "%s %ld %ld %ld\n",
+                  nptr->nick,
+                  nptr->flags,
+                  (long) nptr->created,
+                  (long) nptr->lastseen);
 
-      /* write out password only if not forbidden! -kre */
-      if (nptr->password)
-        fprintf(fp, "->PASS %s\n", nptr->password);
+          /* write out password only if not forbidden! -kre */
+          if (nptr->password)
+            fprintf(fp, "->PASS %s\n", nptr->password);
 
-      if (nptr->email)
-        fprintf(fp, "->EMAIL %s\n", nptr->email);
+          if (nptr->email)
+            fprintf(fp, "->EMAIL %s\n", nptr->email);
 
-      if (nptr->url)
-        fprintf(fp, "->URL %s\n", nptr->url);
+          if (nptr->url)
+            fprintf(fp, "->URL %s\n", nptr->url);
 
-      if (nptr->gsm)
-        fprintf(fp, "->GSM %s\n", nptr->gsm);
+          if (nptr->gsm)
+            fprintf(fp, "->GSM %s\n", nptr->gsm);
 
-      if (nptr->phone)
-        fprintf(fp, "->PHONE %s\n", nptr->phone);
+          if (nptr->phone)
+            fprintf(fp, "->PHONE %s\n", nptr->phone);
 
-      if (nptr->UIN)
-        fprintf(fp, "->UIN %s\n", nptr->UIN);
+          if (nptr->UIN)
+            fprintf(fp, "->UIN %s\n", nptr->UIN);
 
-      if (LastSeenInfo)
-      {
-        if (nptr->lastu && nptr->lasth)
-          fprintf(fp, "->LASTUH %s %s\n", nptr->lastu,
-            nptr->lasth);
+          if (LastSeenInfo)
+            {
+              if (nptr->lastu && nptr->lasth)
+                fprintf(fp, "->LASTUH %s %s\n", nptr->lastu,
+                        nptr->lasth);
 
-        if (nptr->lastqmsg)
-          fprintf(fp, "->LASTQMSG :%s\n", nptr->lastqmsg);
-      }
+              if (nptr->lastqmsg)
+                fprintf(fp, "->LASTQMSG :%s\n", nptr->lastqmsg);
+            }
 
-      for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-        fprintf(fp, "->HOST %s\n", hptr->hostmask);
+          for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+            fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
-    } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
-  } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+        } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
+    } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
 #endif /* LINKED_NICKNAMES */
 
@@ -725,98 +732,100 @@ WriteNicks()
    */
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      islinked = 0;
+      for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
+        {
+          islinked = 0;
 
-    #ifdef LINKED_NICKNAMES
-      if (nptr->master)
-        islinked = 1;
-      else
-      {
-        /*
-         * If nptr->master is NULL, but nptr->nextlink is not,
-         * this is a master nickname, which was already written,
-         * continue the loop
-         */
-        if (nptr->nextlink)
-          continue;
-      }
-    #endif /* LINKED_NICKNAMES */
+#ifdef LINKED_NICKNAMES
 
-      ++ncnt;
+          if (nptr->master)
+            islinked = 1;
+          else
+            {
+              /*
+               * If nptr->master is NULL, but nptr->nextlink is not,
+               * this is a master nickname, which was already written,
+               * continue the loop
+               */
+              if (nptr->nextlink)
+                continue;
+            }
+#endif /* LINKED_NICKNAMES */
 
-      /* write out "nickname flags created last-seen" to file */
-      fprintf(fp, "%s %ld %ld %ld\n",
-        nptr->nick, nptr->flags, (long) nptr->created, (long)
-        nptr->lastseen);
+          ++ncnt;
 
-      if (nptr->password)
-        fprintf(fp, "->PASS %s\n", nptr->password);
+          /* write out "nickname flags created last-seen" to file */
+          fprintf(fp, "%s %ld %ld %ld\n",
+                  nptr->nick, nptr->flags, (long) nptr->created, (long)
+                  nptr->lastseen);
 
-      if (nptr->email)
-        fprintf(fp, "->EMAIL %s\n", nptr->email);
+          if (nptr->password)
+            fprintf(fp, "->PASS %s\n", nptr->password);
 
-      if (nptr->url)
-        fprintf(fp, "->URL %s\n", nptr->url);
+          if (nptr->email)
+            fprintf(fp, "->EMAIL %s\n", nptr->email);
 
-      if (nptr->gsm)
-        fprintf(fp, "->GSM %s\n", nptr->gsm);
+          if (nptr->url)
+            fprintf(fp, "->URL %s\n", nptr->url);
 
-      if (nptr->phone)
-        fprintf(fp, "->PHONE %s\n", nptr->phone);
+          if (nptr->gsm)
+            fprintf(fp, "->GSM %s\n", nptr->gsm);
 
-      if (nptr->UIN)
-        fprintf(fp, "->UIN %s\n", nptr->UIN);
+          if (nptr->phone)
+            fprintf(fp, "->PHONE %s\n", nptr->phone);
 
-      if (LastSeenInfo)
-      {
-        if (nptr->lastu && nptr->lasth)
-          fprintf(fp, "->LASTUH %s %s\n",
-            nptr->lastu,
-            nptr->lasth);
+          if (nptr->UIN)
+            fprintf(fp, "->UIN %s\n", nptr->UIN);
 
-        if (nptr->lastqmsg)
-          fprintf(fp, "->LASTQMSG :%s\n",
-            nptr->lastqmsg);
-      }
+          if (LastSeenInfo)
+            {
+              if (nptr->lastu && nptr->lasth)
+                fprintf(fp, "->LASTUH %s %s\n",
+                        nptr->lastu,
+                        nptr->lasth);
 
-      if (!islinked)
-      {
-        /*
-         * write out hostmasks only if this nickname is
-         * not linked - if it is, the master nickname
-         * (previously written) has the access list
-         */
+              if (nptr->lastqmsg)
+                fprintf(fp, "->LASTQMSG :%s\n",
+                        nptr->lastqmsg);
+            }
 
-        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-          fprintf(fp, "->HOST %s\n",
-            hptr->hostmask);
-      }
+          if (!islinked)
+            {
+              /*
+               * write out hostmasks only if this nickname is
+               * not linked - if it is, the master nickname
+               * (previously written) has the access list
+               */
 
-    #ifdef LINKED_NICKNAMES
+              for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+                fprintf(fp, "->HOST %s\n",
+                        hptr->hostmask);
+            }
+
+#ifdef LINKED_NICKNAMES
 
 #if 0
-      assert(nptr != nptr->master);
+          assert(nptr != nptr->master);
 #endif
-      /* Quickfix. Seems unlink is broken atm. But, there is no need to
-       * die here since master was not written because of
-       * nptr->nextlink. Huh. Should fix link copying routines -kre */
-      if ((nptr != nptr->master) && nptr->master)
-        fprintf(fp, "->LINK %s\n",
-          nptr->master->nick);
+          /* Quickfix. Seems unlink is broken atm. But, there is no need to
+           * die here since master was not written because of
+           * nptr->nextlink. Huh. Should fix link copying routines -kre */
+          if ((nptr != nptr->master) && nptr->master)
+            fprintf(fp, "->LINK %s\n",
+                    nptr->master->nick);
 
-    #endif /* LINKED_NICKNAMES */
-    } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
-  } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
+#endif /* LINKED_NICKNAMES */
+
+        } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
+    } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
   fclose(fp);
 
   rename(tempname, NickServDB);
 
   putlog(LOG3, "Wrote %s (%d registered nicknames)",
-    NickServDB, ncnt);
+         NickServDB, ncnt);
 
   return (1);
 } /* WriteNicks() */
@@ -836,157 +845,157 @@ WriteChans()
   char tempname[MAXLINE];
   struct ChanInfo *cptr, *cnext;
   int ii,
-      ccnt;
+  ccnt;
 
   ircsprintf(tempname, "%s.tmp", ChanServDB);
   fp = CreateDatabase(tempname, "ChanServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing ChanServ Database (%s): %s",
-      ChanServDB,
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1, "Error writing ChanServ Database (%s): %s",
+             ChanServDB,
+             strerror(errno));
+      return 0;
+    }
 
   ccnt = 0;
 
   for (ii = 0; ii < CHANLIST_MAX; ++ii)
-  {
-    for (cptr = chanlist[ii]; cptr; cptr = cnext)
     {
-      cnext = cptr->next;
-
-      if (!GetLink(cptr->founder) &&
-          !(cptr->flags & CS_FORGET))
-      {
-        /*
-         * There is no founder - check if there is a successor.
-         * If so, promote them to founder, otherwise delete the
-         * channel.
-         */
-        if (cptr->successor && GetLink(cptr->successor))
+      for (cptr = chanlist[ii]; cptr; cptr = cnext)
         {
+          cnext = cptr->next;
+
+          if (!GetLink(cptr->founder) &&
+              !(cptr->flags & CS_FORGET))
+            {
+              /*
+               * There is no founder - check if there is a successor.
+               * If so, promote them to founder, otherwise delete the
+               * channel.
+               */
+              if (cptr->successor && GetLink(cptr->successor))
+                {
+                  /*
+                   * There is a valid successor - promote them to founder
+                   */
+                  PromoteSuccessor(cptr);
+                }
+              else
+                {
+                  putlog(LOG2,
+                         "%s: dropping channel [%s] (no founder)",
+                         n_ChanServ,
+                         cptr->name);
+
+                  DeleteChan(cptr);
+
+                  continue;
+                }
+            }
+
+          if (cptr->successor)
+            {
+              if (!GetLink(cptr->successor))
+                {
+                  /* successor's nickname has expired - erase it */
+                  putlog(LOG2,
+                         "%s: Successor [%s] for channel [%s] expired, removing",
+                         n_ChanServ,
+                         cptr->successor,
+                         cptr->name);
+
+                  MyFree(cptr->successor);
+                  cptr->successor = NULL;
+                }
+            }
+
+          ++ccnt;
+
           /*
-           * There is a valid successor - promote them to founder
+           * format: channel-name flags ts_created ts_lastused
            */
-          PromoteSuccessor(cptr);
-        }
-        else
-        {
-          putlog(LOG2,
-            "%s: dropping channel [%s] (no founder)",
-            n_ChanServ,
-            cptr->name);
+          fprintf(fp, "%s %ld %ld %ld\n",
+                  cptr->name,
+                  cptr->flags,
+                  (long) cptr->created,
+                  (long) cptr->lastused);
 
-          DeleteChan(cptr);
+          if (!(cptr->flags & CS_FORGET))
+            {
+              struct ChanAccess *ca;
+              struct AutoKick *ak;
+              int jj;
 
-          continue;
-        }
-      }
+              /* write founder */
+              fprintf(fp, "->FNDR %s\n",
+                      cptr->founder);
 
-      if (cptr->successor)
-      {
-        if (!GetLink(cptr->successor))
-        {
-          /* successor's nickname has expired - erase it */
-          putlog(LOG2,
-            "%s: Successor [%s] for channel [%s] expired, removing",
-            n_ChanServ,
-            cptr->successor,
-            cptr->name);
+              /* write password */
+              fprintf(fp, "->PASS %s\n",
+                      cptr->password);
 
-          MyFree(cptr->successor);
-          cptr->successor = NULL;
-        }
-      }
+              if (cptr->successor)
+                fprintf(fp, "->SUCCESSOR %s\n",
+                        cptr->successor);
 
-      ++ccnt;
+              if (cptr->topic)
+                fprintf(fp, "->TOPIC :%s\n",
+                        cptr->topic);
 
-      /*
-       * format: channel-name flags ts_created ts_lastused
-       */
-      fprintf(fp, "%s %ld %ld %ld\n",
-        cptr->name,
-        cptr->flags,
-        (long) cptr->created,
-        (long) cptr->lastused);
+              if (cptr->limit)
+                fprintf(fp, "->LIMIT %ld\n",
+                        cptr->limit);
 
-      if (!(cptr->flags & CS_FORGET))
-      {
-        struct ChanAccess *ca;
-        struct AutoKick *ak;
-        int jj;
+              if (cptr->key)
+                fprintf(fp, "->KEY %s\n",
+                        cptr->key);
 
-        /* write founder */
-        fprintf(fp, "->FNDR %s\n",
-          cptr->founder);
+              if (cptr->modes_on)
+                fprintf(fp, "->MON %d\n",
+                        cptr->modes_on);
 
-        /* write password */
-        fprintf(fp, "->PASS %s\n",
-          cptr->password);
+              if (cptr->modes_off)
+                fprintf(fp, "->MOFF %d\n",
+                        cptr->modes_off);
 
-        if (cptr->successor)
-          fprintf(fp, "->SUCCESSOR %s\n",
-            cptr->successor);
+              if (cptr->entrymsg)
+                fprintf(fp, "->ENTRYMSG :%s\n",
+                        cptr->entrymsg);
 
-        if (cptr->topic)
-          fprintf(fp, "->TOPIC :%s\n",
-            cptr->topic);
+              if (cptr->email)
+                fprintf(fp, "->EMAIL %s\n",
+                        cptr->email);
 
-        if (cptr->limit)
-          fprintf(fp, "->LIMIT %ld\n",
-            cptr->limit);
+              if (cptr->url)
+                fprintf(fp, "->URL %s\n",
+                        cptr->url);
 
-        if (cptr->key)
-          fprintf(fp, "->KEY %s\n",
-            cptr->key);
+              fprintf(fp, "->ALVL");
+              for (jj = 0; jj <= CA_FOUNDER; ++jj)
+                fprintf(fp, " %d",
+                        cptr->access_lvl[jj]);
+              fprintf(fp, "\n");
 
-        if (cptr->modes_on)
-          fprintf(fp, "->MON %d\n",
-            cptr->modes_on);
+              for (ca = cptr->access; ca; ca = ca->next)
+                fprintf(fp, "->ACCESS %s %d\n",
+                        ca->nptr ? ca->nptr->nick : stripctrlsymbols(ca->hostmask),
+                        ca->level);
 
-        if (cptr->modes_off)
-          fprintf(fp, "->MOFF %d\n",
-            cptr->modes_off);
-
-        if (cptr->entrymsg)
-          fprintf(fp, "->ENTRYMSG :%s\n",
-            cptr->entrymsg);
-
-        if (cptr->email)
-          fprintf(fp, "->EMAIL %s\n",
-            cptr->email);
-
-        if (cptr->url)
-          fprintf(fp, "->URL %s\n",
-            cptr->url);
-
-        fprintf(fp, "->ALVL");
-        for (jj = 0; jj <= CA_FOUNDER; ++jj)
-          fprintf(fp, " %d",
-            cptr->access_lvl[jj]);
-        fprintf(fp, "\n");
-
-        for (ca = cptr->access; ca; ca = ca->next)
-          fprintf(fp, "->ACCESS %s %d\n",
-            ca->nptr ? ca->nptr->nick : stripctrlsymbols(ca->hostmask),
-            ca->level);
-
-        for (ak = cptr->akick; ak; ak = ak->next)
-          fprintf(fp, "->AKICK %s :%s\n",
-            stripctrlsymbols(ak->hostmask),
-            ak->reason ? stripctrlsymbols(ak->reason) : "");
-      } /* if (!(cptr->flags & CS_FORGET)) */
-    } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
-  } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
+              for (ak = cptr->akick; ak; ak = ak->next)
+                fprintf(fp, "->AKICK %s :%s\n",
+                        stripctrlsymbols(ak->hostmask),
+                        ak->reason ? stripctrlsymbols(ak->reason) : "");
+            } /* if (!(cptr->flags & CS_FORGET)) */
+        } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
+    } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
 
   fclose(fp);
 
   rename(tempname, ChanServDB);
 
   putlog(LOG3, "Wrote %s (%d registered channels)",
-    ChanServDB,
-    ccnt);
+         ChanServDB,
+         ccnt);
 
   return (1);
 } /* WriteChans() */
@@ -1007,52 +1016,52 @@ WriteMemos()
   FILE *fp;
   char tempname[MAXLINE];
   int ii,
-      mcnt;
+  mcnt;
   struct MemoInfo *mi;
   struct Memo *memoptr;
 
   ircsprintf(tempname, "%s.tmp", MemoServDB);
   fp = CreateDatabase(tempname, "MemoServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing MemoServ Database (%s): %s",
-      MemoServDB,
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1, "Error writing MemoServ Database (%s): %s",
+             MemoServDB,
+             strerror(errno));
+      return 0;
+    }
 
   mcnt = 0;
 
   for (ii = 0; ii < MEMOLIST_MAX; ++ii)
-  {
-    for (mi = memolist[ii]; mi; mi = mi->next)
     {
-      ++mcnt;
+      for (mi = memolist[ii]; mi; mi = mi->next)
+        {
+          ++mcnt;
 
-      /* write out "target" to file */
-      fprintf(fp, "%s\n",
-        mi->name);
+          /* write out "target" to file */
+          fprintf(fp, "%s\n",
+                  mi->name);
 
-      for (memoptr = mi->memos; memoptr; memoptr = memoptr->next)
-      {
-        /* write out "sender ts-sent flags :text" to file */
-        if (!(memoptr->flags & MS_DELETE))
-          fprintf(fp, "->TEXT %s %ld %ld :%s\n",
-            memoptr->sender,
-            (long) memoptr->sent,
-            memoptr->flags,
-            memoptr->text);
-      }
-    } /* for (mi = memolist[ii]; mi; mi = mi->next) */
-  } /* for (ii = 0; ii < MEMOLIST_MAX; ++ii) */
+          for (memoptr = mi->memos; memoptr; memoptr = memoptr->next)
+            {
+              /* write out "sender ts-sent flags :text" to file */
+              if (!(memoptr->flags & MS_DELETE))
+                fprintf(fp, "->TEXT %s %ld %ld :%s\n",
+                        memoptr->sender,
+                        (long) memoptr->sent,
+                        memoptr->flags,
+                        memoptr->text);
+            }
+        } /* for (mi = memolist[ii]; mi; mi = mi->next) */
+    } /* for (ii = 0; ii < MEMOLIST_MAX; ++ii) */
 
   fclose(fp);
 
   rename(tempname, MemoServDB);
 
   putlog(LOG3, "Wrote %s (%d memo entries)",
-    MemoServDB,
-    mcnt);
+         MemoServDB,
+         mcnt);
 
   return (1);
 } /* WriteMemos() */
@@ -1072,100 +1081,100 @@ LoadData()
 {
   /* load OperServ database */
   if (os_loaddata() == (-2))
-  {
-    fprintf(stderr, "Fatal errors parsing database (%s)\n",
-      OperServDB);
-    putlog(LOG1, "Fatal errors parsing database (%s)",
-      OperServDB);
-    exit(1);
-  }
+    {
+      fprintf(stderr, "Fatal errors parsing database (%s)\n",
+              OperServDB);
+      putlog(LOG1, "Fatal errors parsing database (%s)",
+             OperServDB);
+      exit(1);
+    }
 
 #ifdef SEENSERVICES
   /* load SeenServ database */
   if (es_loaddata() == (-2))
-  {
-    fprintf(stderr, "Fatal errors parsing database (%s)\n",
-      SeenServDB);
-    putlog(LOG1, "Fatal errors parsing database (%s)",
-      SeenServDB);
-    exit(1);
-  }
+    {
+      fprintf(stderr, "Fatal errors parsing database (%s)\n",
+              SeenServDB);
+      putlog(LOG1, "Fatal errors parsing database (%s)",
+             SeenServDB);
+      exit(1);
+    }
 #endif /* SEENSERVICES */
 
 #ifdef NICKSERVICES
   /* load NickServ database */
   if (ns_loaddata() == (-2))
-  {
-    fprintf(stderr, "Fatal errors parsing database (%s)\n",
-      NickServDB);
-    putlog(LOG1, "Fatal errors parsing database (%s)",
-      NickServDB);
-    exit(1);
-  }
-
-  #ifdef CHANNELSERVICES
-    /* load ChanServ database */
-    if (cs_loaddata() == (-2))
     {
       fprintf(stderr, "Fatal errors parsing database (%s)\n",
-        ChanServDB);
+              NickServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
-        ChanServDB);
+             NickServDB);
       exit(1);
     }
-  #endif
 
-  #ifdef MEMOSERVICES
-    /* load MemoServ database */
-    if (ms_loaddata() == (-2))
+#ifdef CHANNELSERVICES
+  /* load ChanServ database */
+  if (cs_loaddata() == (-2))
     {
       fprintf(stderr, "Fatal errors parsing database (%s)\n",
-        MemoServDB);
+              ChanServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
-        MemoServDB);
+             ChanServDB);
       exit(1);
     }
-  #endif
+#endif
+
+#ifdef MEMOSERVICES
+  /* load MemoServ database */
+  if (ms_loaddata() == (-2))
+    {
+      fprintf(stderr, "Fatal errors parsing database (%s)\n",
+              MemoServDB);
+      putlog(LOG1, "Fatal errors parsing database (%s)",
+             MemoServDB);
+      exit(1);
+    }
+#endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
   /* load StatServ database */
   if (ss_loaddata() == (-2))
-  {
-    fprintf(stderr, "Fatal errors parsing database (%s)\n",
-      StatServDB);
-    putlog(LOG1, "Fatal errors parsing database (%s)",
-      StatServDB);
-    exit(1);
-  }
+    {
+      fprintf(stderr, "Fatal errors parsing database (%s)\n",
+              StatServDB);
+      putlog(LOG1, "Fatal errors parsing database (%s)",
+             StatServDB);
+      exit(1);
+    }
 #endif /* STATSERVICES */
 
 #ifdef NICKSERVICES
 
-  putlog(LOG1, 
-  "Databases loaded (%d registered nicknames, %d registered channels, %d memo entries)",
-    Network->TotalNicks,
+  putlog(LOG1,
+         "Databases loaded (%d registered nicknames, %d registered channels, %d memo entries)",
+         Network->TotalNicks,
 
-  #ifdef CHANNELSERVICES
+#ifdef CHANNELSERVICES
 
-    Network->TotalChans,
+         Network->TotalChans,
 
-  #else
+#else
 
-    0,
+         0,
 
-  #endif
+#endif
 
-  #ifdef MEMOSERVICES
+#ifdef MEMOSERVICES
 
-    Network->TotalMemos);
+         Network->TotalMemos);
 
-  #else
+#else
 
-    0);
+         0);
 
-  #endif
+#endif
 
 #endif /* NICKSERVICES */
 } /* LoadData() */
@@ -1186,7 +1195,7 @@ CopyFile(char *oldfile, char *newfile)
 
 {
   int oldfd,
-      newfd;
+  newfd;
   struct stat fst;
   char buffer[MAXLINE];
   int bytes;
@@ -1199,32 +1208,32 @@ CopyFile(char *oldfile, char *newfile)
     return (-3);
 
   if ((newfd = creat(newfile, (int) (fst.st_mode & 0700))) < 0)
-  {
-    close(oldfd);
-    return (-2);
-  }
+    {
+      close(oldfd);
+      return (-2);
+    }
 
   /*
    * Now start copying
    */
   for (bytes = 1; bytes > 0; )
-  {
-    bytes = read(oldfd, buffer, sizeof(buffer));
-    if (bytes > 0)
     {
-      if (write(newfd, buffer, bytes) < bytes)
-      {
-        /* disk space is full */
-        close(oldfd);
-        close(newfd);
-        unlink(newfile); /* delete the file we created */
-        return (-4);
-      }
+      bytes = read(oldfd, buffer, sizeof(buffer));
+      if (bytes > 0)
+        {
+          if (write(newfd, buffer, bytes) < bytes)
+            {
+              /* disk space is full */
+              close(oldfd);
+              close(newfd);
+              unlink(newfile); /* delete the file we created */
+              return (-4);
+            }
+        }
+      /*
+       * When bytes == 0 (EOF), we will drop out of the loop
+       */
     }
-    /*
-     * When bytes == 0 (EOF), we will drop out of the loop
-     */
-  }
 
   /* successful copy */
   close(oldfd);
@@ -1251,33 +1260,35 @@ WriteSeen()
   ircsprintf(tempname, "%s.tmp", SeenServDB);
   fp = CreateDatabase(tempname, "SeenServ Database");
   if (!fp)
-  {
-    putlog(LOG1, "Error writing SeenServ Database (%s): %s",
-      SeenServDB,
-      strerror(errno));
-    return 0;
-  }
-
-  for (seen = seenb; seen; seen = seen->next) {
-    if (seen) 
-    switch(seen->type) {
-      case 1:
-         fprintf(fp, "->QUIT %s %s %ld :%s\n", seen->nick, seen->userhost, (long) seen->time, seen->msg);
-         break;
-      case 2:
-         fprintf(fp, "->NICK %s %s %ld\n", seen->nick, seen->userhost, (long) seen->time);
-         break;
-      default:
-         break;
+    {
+      putlog(LOG1, "Error writing SeenServ Database (%s): %s",
+             SeenServDB,
+             strerror(errno));
+      return 0;
     }
-  }
+
+  for (seen = seenb; seen; seen = seen->next)
+    {
+      if (seen)
+        switch(seen->type)
+          {
+          case 1:
+            fprintf(fp, "->QUIT %s %s %ld :%s\n", seen->nick, seen->userhost, (long) seen->time, seen->msg);
+            break;
+          case 2:
+            fprintf(fp, "->NICK %s %s %ld\n", seen->nick, seen->userhost, (long) seen->time);
+            break;
+          default:
+            break;
+          }
+    }
 
   fclose(fp);
 
   rename(tempname, SeenServDB);
 
   putlog(LOG3, "Wrote %s",
-    SeenServDB);
+         SeenServDB);
 
   return 1;
 

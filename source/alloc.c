@@ -134,17 +134,17 @@ static void MakeBlock(Heap *heapptr)
    * where the next client/channel go in the sub block
    */
   sub->SlotHoles = (void **) MyMalloc(heapptr->ElementsPerBlock
-				      * sizeof(void *));
+                                      * sizeof(void *));
   memset((void *) sub->SlotHoles, 0, heapptr->ElementsPerBlock
-	 * sizeof(void *));
+         * sizeof(void *));
   sub->LastSlotHole = 0;
 
   /* Now actually allocate memory for the elements */
   sub->first = (void *) MyMalloc(heapptr->ElementsPerBlock
-				 * heapptr->ElementSize);
+                                 * heapptr->ElementSize);
 
   sub->last = (void *) ((unsigned long) sub->first + (unsigned long)
-			((heapptr->ElementsPerBlock - 1) * heapptr->ElementSize));
+                        ((heapptr->ElementsPerBlock - 1) * heapptr->ElementSize));
 
   /* Insert sub into the chain of blocks */
   sub->next = heapptr->base;
@@ -203,7 +203,7 @@ void *BlockSubAllocate(Heap *heapptr)
 
       /* New sub block is inserted in the beginning of the chain */
       if (!(subptr = heapptr->base))
-	return(NULL);
+        return(NULL);
 
       subptr->FreeElements--;
       heapptr->FreeElements--;
@@ -217,86 +217,91 @@ void *BlockSubAllocate(Heap *heapptr)
   for (subptr = heapptr->base; subptr; subptr = subptr->next)
     {
       if (subptr->FreeElements == 0)
-	{
-	  /* there are no unused slots in this sub block */
-	  continue;
-	}
+        {
+          /* there are no unused slots in this sub block */
+          continue;
+        }
 
       if (subptr->LastSlotHole == 0)
-	{
-	  /*
-	   * There are no "holes" in the block (ie: there are no empty slots
-	   * between elements in the block that need to be filled), so just
-	   * use the slot right after the last element in the block
-	   */
-	  offset = (unsigned long) ((heapptr->ElementsPerBlock
-				     - subptr->FreeElements) * heapptr->ElementSize);
+        {
+          /*
+           * There are no "holes" in the block (ie: there are no empty slots
+           * between elements in the block that need to be filled), so just
+           * use the slot right after the last element in the block
+           */
+          offset = (unsigned long) ((heapptr->ElementsPerBlock
+                                     - subptr->FreeElements) * heapptr->ElementSize);
 #if 0
-	  debug("ElsPerBlock-FreeEls=[%d], offset=[%d] addy=[%p]\n",
-		heapptr->ElementsPerBlock - subptr->FreeElements, offset,
-		(void *) ((unsigned long) subptr->first + offset));
+
+          debug("ElsPerBlock-FreeEls=[%d], offset=[%d] addy=[%p]\n",
+                heapptr->ElementsPerBlock - subptr->FreeElements, offset,
+                (void *) ((unsigned long) subptr->first + offset));
 #endif
 
-	  heapptr->FreeElements--;
-	  subptr->FreeElements--;
-	  subptr->LastUsedSlot = (void *) ((unsigned long) subptr->first + offset);
+          heapptr->FreeElements--;
+          subptr->FreeElements--;
+          subptr->LastUsedSlot = (void *) ((unsigned long) subptr->first + offset);
 
-	  /* Why duplicating code? -kre */
-	  /* return((void *) ((unsigned long) subptr->first + offset)); */
+          /* Why duplicating code? -kre */
+          /* return((void *) ((unsigned long) subptr->first + offset)); */
 
-	  return(subptr->LastUsedSlot);
-	}
+          return(subptr->LastUsedSlot);
+        }
       else
-	{
-	  int ii;
-	  void *ptr = NULL;
+        {
+          int ii;
+          void *ptr = NULL;
 
-	  /*
-	   * There is one or more "holes" in the block, where an element was
-	   * previously deleted, so fill a hole in with this element.
-	   * subptr->SlotHoles contains pointers to all of the holes, so use
-	   * the last index of subptr->SlotHoles as the new slot
-	   */
+          /*
+           * There is one or more "holes" in the block, where an element was
+           * previously deleted, so fill a hole in with this element.
+           * subptr->SlotHoles contains pointers to all of the holes, so use
+           * the last index of subptr->SlotHoles as the new slot
+           */
 #if 0
-	  debug("there are [%d] holes in the sub block\n",
-		subptr->LastSlotHole);
+
+          debug("there are [%d] holes in the sub block\n",
+                subptr->LastSlotHole);
 #endif
 
-	  ptr = subptr->SlotHoles[subptr->LastSlotHole - 1];
-	  subptr->SlotHoles[subptr->LastSlotHole - 1] = NULL;
+          ptr = subptr->SlotHoles[subptr->LastSlotHole - 1];
+          subptr->SlotHoles[subptr->LastSlotHole - 1] = NULL;
 
-	  if (!ptr)
-	    {
-	      for (ii = 0; ii < subptr->LastSlotHole; ii++)
-		{
-		  if (subptr->SlotHoles[ii] != NULL)
-		    {
-		      ptr = subptr->SlotHoles[ii];
-		      subptr->SlotHoles[ii] = NULL;
-		      break;
-		    }
-		}
-	    }
+          if (!ptr)
+            {
+              for (ii = 0; ii < subptr->LastSlotHole; ii++)
+                {
+                  if (subptr->SlotHoles[ii] != NULL)
+                    {
+                      ptr = subptr->SlotHoles[ii];
+                      subptr->SlotHoles[ii] = NULL;
+                      break;
+                    }
+                }
+            }
 
-	  /* Check if the pointer we're using is the only pointer in
-	   * subptr->SlotHoles[], if so, decrement subptr->LastSlotHole */
-	  while ((subptr->LastSlotHole >= 1) &&
-		 (subptr->SlotHoles[subptr->LastSlotHole - 1] == NULL))
-	    subptr->LastSlotHole--;
+          /* Check if the pointer we're using is the only pointer in
+           * subptr->SlotHoles[], if so, decrement subptr->LastSlotHole */
+          while ((subptr->LastSlotHole >= 1) &&
+                 (subptr->SlotHoles[subptr->LastSlotHole - 1] == NULL))
+            subptr->LastSlotHole--;
 #if 0
-	  debug("LastSlotHole is now equal to [%d]\n", subptr->LastSlotHole);
+
+          debug("LastSlotHole is now equal to [%d]\n", subptr->LastSlotHole);
 #endif
 
-	  subptr->FreeElements--;
-	  heapptr->FreeElements--;
+          subptr->FreeElements--;
+          heapptr->FreeElements--;
 
-	  /* ptr should NEVER be null, and if it is, subptr->LastSlotHole was
-	   * incorrectly calculated */
+          /* ptr should NEVER be null, and if it is, subptr->LastSlotHole was
+           * incorrectly calculated */
 #if 0
-	  debug("returning ptr [%p]\n", ptr);
+
+          debug("returning ptr [%p]\n", ptr);
 #endif
-	  return(ptr);
-	}
+
+          return(ptr);
+        }
     }
 
   /* we should never get here */
@@ -319,114 +324,122 @@ void BlockSubFree(Heap *heapptr, void *element)
   for (subptr = heapptr->base; subptr; subptr = subptr->next)
     {
       if ((element >= subptr->first) && (element <= subptr->last))
-	{
-	  /*
-	   * if: firstelement <= element <= lastelement, then element must be
-	   * in this sub block; add element's address to the SlotHoles array,
-	   * so we can fill the slot with another element later
-	   */
+        {
+          /*
+           * if: firstelement <= element <= lastelement, then element must be
+           * in this sub block; add element's address to the SlotHoles array,
+           * so we can fill the slot with another element later
+           */
 
 #if 0
-	  debug("LastUsedEl=[%p] element=[%p]\n",
-		subptr->LastUsedSlot, element);
+          debug("LastUsedEl=[%p] element=[%p]\n",
+                subptr->LastUsedSlot, element);
 #endif
 
-	  /*
-	   * Check if the last used element in the block is the same as the
-	   * element we are about to delete - if so, don't bother adding
-	   * 'element' to subptr->SlotHoles[] because 'element' is the last
-	   * element in the block and so the next element will automatically
-	   * be added in the same position
-	   */
-	  if (subptr->LastUsedSlot == element)
-	    {
-	      int index;
+          /*
+           * Check if the last used element in the block is the same as the
+           * element we are about to delete - if so, don't bother adding
+           * 'element' to subptr->SlotHoles[] because 'element' is the last
+           * element in the block and so the next element will automatically
+           * be added in the same position
+           */
+          if (subptr->LastUsedSlot == element)
+            {
+              int index;
 
-	      /*
-	       * element is the last used slot in the block so make
-	       * subptr->LastUsedSlot point the slot right before 'element',
-	       * unless element is the first slot in the block
-	       */
-	      if (subptr->LastUsedSlot == subptr->first)
-		{
-		  /* 'element' is the only entry in this block, so the block will
-		   * be empty after it is deleted */
+              /*
+               * element is the last used slot in the block so make
+               * subptr->LastUsedSlot point the slot right before 'element',
+               * unless element is the first slot in the block
+               */
+              if (subptr->LastUsedSlot == subptr->first)
+                {
+                  /* 'element' is the only entry in this block, so the block will
+                   * be empty after it is deleted */
 #if 0
-		  debug("LASTUSED SLOT IS FIRST LastSLotHole=[%p] first [%p]\n",
-			subptr->LastUsedSlot, subptr->first);
-#endif
-		  subptr->LastSlotHole = 0;
-		}
-	      else
-		{
-		  subptr->LastUsedSlot -= heapptr->ElementSize;
-
-		  /*
-		   * If the element right before 'element' was also
-		   * deleted, we must set subptr->LastUsedSlot to the
-		   * slot before THAT element, and keep going until
-		   * we find a valid element
-		   */
-		  while ((index = IsHole(subptr, subptr->LastUsedSlot)) != -1)
-		    {
-#if 0
-		      debug("LAST element [%p] is a NULL, decrementing LastUsedSlot\n",
-			    subptr->LastUsedSlot);
-#endif
-		      subptr->LastUsedSlot -= heapptr->ElementSize;
-		      subptr->SlotHoles[index] = NULL;
-		    }
-#if 0
-		  debug("Right after IsHole() loop, lastslothole=[%d]\n",
-			subptr->LastSlotHole);
+                  debug("LASTUSED SLOT IS FIRST LastSLotHole=[%p] first [%p]\n",
+                        subptr->LastUsedSlot, subptr->first);
 #endif
 
-		  /*
-		   * Several elements of subptr->SlotHoles[] could have been
-		   * deleted in the above loop, so we have to recalculate
-		   * subptr->LastSlotHole now
-		   */
+                  subptr->LastSlotHole = 0;
+                }
+              else
+                {
+                  subptr->LastUsedSlot -= heapptr->ElementSize;
+
+                  /*
+                   * If the element right before 'element' was also
+                   * deleted, we must set subptr->LastUsedSlot to the
+                   * slot before THAT element, and keep going until
+                   * we find a valid element
+                   */
+                  while ((index = IsHole(subptr, subptr->LastUsedSlot)) != -1)
+                    {
 #if 0
-		  debug("DECREMENTING LASTSLOTHOLE last=[%p] first=[%p]\n",
-			subptr->LastUsedSlot, subptr->first);
+                      debug("LAST element [%p] is a NULL, decrementing LastUsedSlot\n",
+                            subptr->LastUsedSlot);
 #endif
 
-		  while ((subptr->LastSlotHole >= 1) &&
-			 (subptr->SlotHoles[subptr->LastSlotHole - 1] == NULL))
-		    {
-		      subptr->LastSlotHole--;
+                      subptr->LastUsedSlot -= heapptr->ElementSize;
+                      subptr->SlotHoles[index] = NULL;
+                    }
 #if 0
-		      debug("slot: [%p] first [%p]\n",
-			    subptr->SlotHoles[subptr->LastSlotHole], subptr->first);
+                  debug("Right after IsHole() loop, lastslothole=[%d]\n",
+                        subptr->LastSlotHole);
 #endif
-		    }
-#if 0
-		  debug("LAST SLOT HOLE IS NOW: [%d]\n", subptr->LastSlotHole);
-		  debug("element was the last used slot, new LastUsedSlot=[%p]\n",
-			subptr->LastUsedSlot);
-#endif
-		}
-	    }
-	  else
-	    {
-	      /* element is in the middle of the block somewhere, add it to the
-	       * end of subptr->SlotHoles[] */
 
-	      subptr->SlotHoles[subptr->LastSlotHole] = (void *) element;
-	      /* subptr->LastSlotHole needs to be incremented since 'element'
-	       * was stuck at the very end */
-	      subptr->LastSlotHole++;
+                  /*
+                   * Several elements of subptr->SlotHoles[] could have been
+                   * deleted in the above loop, so we have to recalculate
+                   * subptr->LastSlotHole now
+                   */
 #if 0
-	      debug("free'd element was put on the END of SlotHoles, index=[%d]\n",
-		    subptr->LastSlotHole);
-	      for (ii = 0; ii < subptr->LastSlotHole; ii++)
-		debug("SlotHole[%d] = [%p]\n", ii, subptr->SlotHoles[ii]);
-#endif
-	    }
 
-	  heapptr->FreeElements++;
-	  subptr->FreeElements++;
-	}
+                  debug("DECREMENTING LASTSLOTHOLE last=[%p] first=[%p]\n",
+                        subptr->LastUsedSlot, subptr->first);
+#endif
+
+                  while ((subptr->LastSlotHole >= 1) &&
+                         (subptr->SlotHoles[subptr->LastSlotHole - 1] == NULL))
+                    {
+                      subptr->LastSlotHole--;
+#if 0
+
+                      debug("slot: [%p] first [%p]\n",
+                            subptr->SlotHoles[subptr->LastSlotHole], subptr->first);
+#endif
+
+                    }
+#if 0
+                  debug("LAST SLOT HOLE IS NOW: [%d]\n", subptr->LastSlotHole);
+                  debug("element was the last used slot, new LastUsedSlot=[%p]\n",
+                        subptr->LastUsedSlot);
+#endif
+
+                }
+            }
+          else
+            {
+              /* element is in the middle of the block somewhere, add it to the
+               * end of subptr->SlotHoles[] */
+
+              subptr->SlotHoles[subptr->LastSlotHole] = (void *) element;
+              /* subptr->LastSlotHole needs to be incremented since 'element'
+               * was stuck at the very end */
+              subptr->LastSlotHole++;
+#if 0
+
+              debug("free'd element was put on the END of SlotHoles, index=[%d]\n",
+                    subptr->LastSlotHole);
+              for (ii = 0; ii < subptr->LastSlotHole; ii++)
+                debug("SlotHole[%d] = [%p]\n", ii, subptr->SlotHoles[ii]);
+#endif
+
+            }
+
+          heapptr->FreeElements++;
+          subptr->FreeElements++;
+        }
     }
 } /* BlockSubFree() */
 
@@ -449,7 +462,7 @@ static int IsHole(SubBlock *sub, void *ptr)
   while (index < sub->LastSlotHole)
     {
       if (sub->SlotHoles[index] == ptr)
-	return(index);
+        return(index);
       index++;
     }
 

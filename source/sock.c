@@ -133,8 +133,9 @@ writesocket(int sockfd, char *writestr)
   /*send(sockfd, writestr, strlen(writestr), 0);*/
 
 #ifdef DEBUGMODE
+
   fprintf(stderr, "Writing: %s",
-    writestr);
+          writestr);
 #endif /* DEBUGMODE */
 
   ii = write(sockfd, writestr, strlen(writestr));
@@ -142,16 +143,16 @@ writesocket(int sockfd, char *writestr)
   Network->SendB += (writestr ? strlen(writestr) : 0);
 
   if ((ii < 0) && (errno != EAGAIN))
-  {
-    struct DccUser *conn;
-    /* 
-     * EOF writing to the socket - check if we were writing to a 
-     * partyline socket, if so, mark the user with SOCK_EOF to
-     * kill the connection later
-     */
-    if ((conn = IsDccSock(sockfd)))
-      conn->flags |= SOCK_EOF;
-  }
+    {
+      struct DccUser *conn;
+      /*
+       * EOF writing to the socket - check if we were writing to a 
+       * partyline socket, if so, mark the user with SOCK_EOF to
+       * kill the connection later
+       */
+      if ((conn = IsDccSock(sockfd)))
+        conn->flags |= SOCK_EOF;
+    }
 
   return (ii);
 } /* writesocket() */
@@ -229,8 +230,8 @@ SetupVirtualHost()
       ((hptr = gethostbyaddr(LocalHostName, 4, AF_INET)) == NULL))
     {
       fprintf(stderr,
-	      "Unable to resolve virtual host [%s]: Unknown hostname\n",
-	      LocalHostName);
+              "Unable to resolve virtual host [%s]: Unknown hostname\n",
+              LocalHostName);
 
       MyFree(LocalHostName);
       LocalHostName = NULL;
@@ -243,11 +244,11 @@ SetupVirtualHost()
       LocalAddr.sin_port = 0;
 
       memcpy((void *) &LocalAddr.sin_addr, (void *) hptr->h_addr,
-	     hptr->h_length);
+             hptr->h_length);
 
       fprintf(stderr, "Using virtual host %s[%s]\n",
-	      LocalHostName,
-	      inet_ntoa(LocalAddr.sin_addr));
+              LocalHostName,
+              inet_ntoa(LocalAddr.sin_addr));
     }
 } /* SetupVirtualHost() */
 
@@ -255,43 +256,43 @@ SetupVirtualHost()
 LookupHostname()
  Attempt to resolve 'host' into an ip address. 'ip_address' is
 modified to contain the resolved ip address in unsigned int form.
-
+ 
 Return: a hostent pointer to the hostname information
 */
 
 struct hostent *
-LookupHostname(char *host, struct in_addr *ip_address)
+      LookupHostname(char *host, struct in_addr *ip_address)
 
-{
-  struct hostent *hp;
-  struct in_addr ip;
-
-  /*
-   * If 'host' was given in dotted notation (1.2.3.4),
-   * inet_addr() will convert it to unsigned int form,
-   * otherwise return -1L.
-   */
-  ip.s_addr = inet_addr(host);
-
-  if (ip.s_addr != INADDR_NONE)
   {
+    struct hostent *hp;
+    struct in_addr ip;
+
     /*
-     * No point in resolving it now
+     * If 'host' was given in dotted notation (1.2.3.4),
+     * inet_addr() will convert it to unsigned int form,
+     * otherwise return -1L.
      */
-    hp = NULL;
-  }
-  else
-  {
-    hp = gethostbyname(host);
-    if (hp)
-      memcpy(&ip.s_addr, hp->h_addr_list[0], (size_t) hp->h_length);
-  }
+    ip.s_addr = inet_addr(host);
 
-  if (ip_address)
-    *ip_address = ip;
+    if (ip.s_addr != INADDR_NONE)
+      {
+        /*
+         * No point in resolving it now
+         */
+        hp = NULL;
+      }
+    else
+      {
+        hp = gethostbyname(host);
+        if (hp)
+          memcpy(&ip.s_addr, hp->h_addr_list[0], (size_t) hp->h_length);
+      }
 
-  return (hp);
-} /* LookupHostname() */
+    if (ip_address)
+      *ip_address = ip;
+
+    return (hp);
+  } /* LookupHostname() */
 
 /*
 ConnectHost()
@@ -315,104 +316,107 @@ ConnectHost(char *hostname, unsigned int port)
   hostptr = LookupHostname(hostname, &ip);
 
   if (hostptr)
-  {
-    assert(ip.s_addr != INADDR_NONE);
-
-    ServAddr.sin_family = hostptr->h_addrtype;
-    ServAddr.sin_addr.s_addr = ip.s_addr;
-  }
-  else
-  {
-    /*
-     * There is no host entry, but there might be an ip address
-     */
-    if (ip.s_addr == INADDR_NONE)
     {
-    #ifdef DEBUGMODE
-      fprintf(stderr,
-        "Cannot connect to port %d of %s: Unknown host\n",
-        port,
-        hostname);
-    #endif
-      putlog(LOG1,
-        "Unable to connect to %s:%d: Unknown hostname",
-        hostname,
-        port);
-      return (-1);
-    }
+      assert(ip.s_addr != INADDR_NONE);
 
-    ServAddr.sin_family = AF_INET;
-    ServAddr.sin_addr.s_addr = ip.s_addr;
-  }
+      ServAddr.sin_family = hostptr->h_addrtype;
+      ServAddr.sin_addr.s_addr = ip.s_addr;
+    }
+  else
+    {
+      /*
+       * There is no host entry, but there might be an ip address
+       */
+      if (ip.s_addr == INADDR_NONE)
+        {
+#ifdef DEBUGMODE
+          fprintf(stderr,
+                  "Cannot connect to port %d of %s: Unknown host\n",
+                  port,
+                  hostname);
+#endif
+
+          putlog(LOG1,
+                 "Unable to connect to %s:%d: Unknown hostname",
+                 hostname,
+                 port);
+          return (-1);
+        }
+
+      ServAddr.sin_family = AF_INET;
+      ServAddr.sin_addr.s_addr = ip.s_addr;
+    }
 
 #ifdef DEBUGMODE
   fprintf(stderr,
-    "Connecting to %s[%s].%d\n",
-    hostname,
-    inet_ntoa(ServAddr.sin_addr),
-    port);
+          "Connecting to %s[%s].%d\n",
+          hostname,
+          inet_ntoa(ServAddr.sin_addr),
+          port);
 #endif
 
   if ((socketfd = socket(ServAddr.sin_family, SOCK_STREAM, 0)) < 0)
-  {
-  #ifdef DEBUGMODE
-    fprintf(stderr, "Unable to open stream socket\n");
-  #endif
-    putlog(LOG1,
-      "Unable to open stream socket: %s",
-      strerror(errno));
+    {
+#ifdef DEBUGMODE
+      fprintf(stderr, "Unable to open stream socket\n");
+#endif
 
-    return(-1);
-  }
+      putlog(LOG1,
+             "Unable to open stream socket: %s",
+             strerror(errno));
+
+      return(-1);
+    }
 
   if (LocalHostName)
-  {
-    /* bind to virtual host */
-    if ((bind(socketfd, (struct sockaddr *) &LocalAddr, sizeof(LocalAddr))) < 0)
     {
-      putlog(LOG1, "Unable to bind virtual host %s[%s]: %s",
-        LocalHostName,
-        inet_ntoa(LocalAddr.sin_addr),
-        strerror(errno));
-      close (socketfd);
-      return (-1);
+      /* bind to virtual host */
+      if ((bind(socketfd, (struct sockaddr *) &LocalAddr, sizeof(LocalAddr))) < 0)
+        {
+          putlog(LOG1, "Unable to bind virtual host %s[%s]: %s",
+                 LocalHostName,
+                 inet_ntoa(LocalAddr.sin_addr),
+                 strerror(errno));
+          close (socketfd);
+          return (-1);
+        }
     }
-  }
 
   if (!SetNonBlocking(socketfd))
-  {
-    putlog(LOG1,
-      "Unable to set socket [%d] non-blocking",
-      socketfd);
-    close(socketfd);
-    return (-1);
-  }
+    {
+      putlog(LOG1,
+             "Unable to set socket [%d] non-blocking",
+             socketfd);
+      close(socketfd);
+      return (-1);
+    }
 
   ServAddr.sin_port = (unsigned short) htons((unsigned short) port);
 
   /* Check for both if return value is -1 and errno is set. This is
    * paranoid, I know, but it was obviously necessary on Solaris -kre */
   if (connect(socketfd, (struct sockaddr *) &ServAddr, sizeof(ServAddr))==-1)
-  {
-    if (errno && errno!=EINPROGRESS)
     {
-    #ifdef DEBUGMODE
-      fprintf(stderr,
-        "Cannot connect to port %d of %s: %s\n",
-        port,
-        hostname,
-        strerror(errno));
-    #endif
-      putlog(LOG1,
-        "Error connecting to %s[%s].%d: %s",
-        hostname,
-        hostname,
-        port,
-        strerror(errno));
-      close(socketfd);
-      return(-1);
+      if (errno && errno!=EINPROGRESS)
+        {
+#ifdef DEBUGMODE
+          fprintf(stderr,
+                  "Cannot connect to port %d of %s: %s\n",
+                  port,
+                  hostname,
+                  strerror(errno));
+#endif
+
+          putlog(LOG1,
+                 "Error connecting to %s[%s].%d: %s",
+                 hostname,
+                 hostname,
+                 port,
+                 strerror(errno));
+          close(socketfd);
+          return(-1);
+        }
     }
-  }
 
   return (socketfd);
 } /* ConnectHost() */
@@ -420,7 +424,7 @@ ConnectHost(char *hostname, unsigned int port)
 /*
 CompleteHubConnection()
  Complete second half of non-blocking connect sequence
-
+ 
 Return: 1 if successful
         0 if unsuccessful
 */
@@ -430,7 +434,7 @@ CompleteHubConnection(struct Servlist *hubptr)
 
 {
   int errval,
-      errlen;
+  errlen;
 
   assert(hubptr != 0);
 
@@ -439,34 +443,34 @@ CompleteHubConnection(struct Servlist *hubptr)
   errval = 0;
   errlen = sizeof(errval);
   if (getsockopt(HubSock, SOL_SOCKET, SO_ERROR, &errval, &errlen) < 0)
-  {
-    putlog(LOG1,
-      "getsockopt(SO_ERROR) failed: %s",
-      strerror(errno));
-    return 0;
-  }
+    {
+      putlog(LOG1,
+             "getsockopt(SO_ERROR) failed: %s",
+             strerror(errno));
+      return 0;
+    }
 
   if (errval > 0)
-  {
-  #ifdef DEBUGMODE
-    fprintf(stderr,
-      "Cannot connect to port %d of %s: %s\n",
-      hubptr->port, hubptr->hostname, strerror(errval));
-  #endif
+    {
+#ifdef DEBUGMODE
+      fprintf(stderr,
+              "Cannot connect to port %d of %s: %s\n",
+              hubptr->port, hubptr->hostname, strerror(errval));
+#endif
 
-    putlog(LOG1,
-      "Error connecting to port %d of %s: %s",
-      hubptr->port, hubptr->hostname, strerror(errval));
+      putlog(LOG1,
+             "Error connecting to port %d of %s: %s",
+             hubptr->port, hubptr->hostname, strerror(errval));
 
-    return 0;
-  }
+      return 0;
+    }
 
   signon();
 
   hubptr->connect_ts = current_ts;
 
   SendUmode(OPERUMODE_Y, "*** Connected to %s:%d",
-      hubptr->hostname, hubptr->port); 
+            hubptr->hostname, hubptr->port);
   putlog(LOG1, "Connected to %s:%d", hubptr->hostname, hubptr->port);
 
   return 1;
@@ -490,289 +494,293 @@ ReadSocketInfo(void)
   struct DccUser *dccptr;
   struct PortInfo *tempport;
   fd_set readfds,
-         writefds;
+  writefds;
 
 #if defined(HIGHTRAFFIC_MODE) || (!defined(HAVE_PTHREADS) \
 		&& !defined(HAVE_SOLARIS_THREADS))
+
   time_t curr_ts;
 #endif
 
 #if !defined HAVE_PTHREADS && !defined(HAVE_SOLARIS_THREADS)
+
   time_t last_ts = current_ts;
 #endif
 
   spill[0] = '\0';
 
   for (;;)
-  {
+    {
 
 #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
-    /*
-     * If pthreads are not enabled, DoTimer() will be called from this
-     * code, and so we need curr_ts here
-     *
-     * And we also need time setup here -kre
-     */
-    curr_ts = current_ts = time(NULL);
+      /*
+       * If pthreads are not enabled, DoTimer() will be called from this
+       * code, and so we need curr_ts here
+       *
+       * And we also need time setup here -kre
+       */
+      curr_ts = current_ts = time(NULL);
 #endif /* !(HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #ifdef HIGHTRAFFIC_MODE
 
 #if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
-    /*
-     * Since pthreads are enabled, HTM mode is the only thing that needs
-     * curr_ts, since DoTimer() is called from a separate thread
-     */
-    curr_ts = current_ts;
+      /*
+       * Since pthreads are enabled, HTM mode is the only thing that needs
+       * curr_ts, since DoTimer() is called from a separate thread
+       */
+      curr_ts = current_ts;
 #endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
-    if (HTM)
-    {
-      int htm_count;
+      if (HTM)
+        {
+          int htm_count;
 
 #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
-      if (last_ts != curr_ts)
-      {
-        /*
-         * So DoTimer() doesn't get called a billion times when HTM is
-         * turned off
-         */
-        last_ts = curr_ts;
+          if (last_ts != curr_ts)
+            {
+              /*
+               * So DoTimer() doesn't get called a billion times when HTM is
+               * turned off
+               */
+              last_ts = curr_ts;
 
-        /*
-         * DoTimer() won't do anything other than update
-         * Network->CheckRecvB since we are in HTM
-         */
-        DoTimer(curr_ts);
-      } /* if (last_ts != curr_ts) */
+              /*
+               * DoTimer() won't do anything other than update
+               * Network->CheckRecvB since we are in HTM
+               */
+              DoTimer(curr_ts);
+            } /* if (last_ts != curr_ts) */
 
 #endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
-      /* Check if HTM should be turned off */
-      if ((curr_ts - HTM_ts) >= HTM_TIMEOUT)
-      {
-        float    currload;
+          /* Check if HTM should be turned off */
+          if ((curr_ts - HTM_ts) >= HTM_TIMEOUT)
+            {
+              float    currload;
 
-        currload = ((float) (Network->RecvB - Network->CheckRecvB) / 
-                    (float) 1024) / (float) HTM_INTERVAL;
+              currload = ((float) (Network->RecvB - Network->CheckRecvB) /
+                          (float) 1024) / (float) HTM_INTERVAL;
 
-        if (currload >= (float) ReceiveLoad)
-        {
-          HTM_ts = curr_ts;
-          putlog(LOG1, "Continuing high-traffic mode (%0.2f K/s)",
-            currload);
-          SendUmode(OPERUMODE_Y,
-            "*** Continuing high-traffic mode (%0.2f K/s)",
-            currload);
-        }
-        else
-        {
-          HTM = HTM_ts = 0;
-          putlog(LOG1, "Resuming standard traffic operations (%0.2f K/s)",
-            currload);
-          SendUmode(OPERUMODE_Y,
-            "*** Resuming standard traffic operations (%0.2f K/s)",
-            currload);
-        }
-      }
+              if (currload >= (float) ReceiveLoad)
+                {
+                  HTM_ts = curr_ts;
+                  putlog(LOG1, "Continuing high-traffic mode (%0.2f K/s)",
+                         currload);
+                  SendUmode(OPERUMODE_Y,
+                            "*** Continuing high-traffic mode (%0.2f K/s)",
+                            currload);
+                }
+              else
+                {
+                  HTM = HTM_ts = 0;
+                  putlog(LOG1, "Resuming standard traffic operations (%0.2f K/s)",
+                         currload);
+                  SendUmode(OPERUMODE_Y,
+                            "*** Resuming standard traffic operations (%0.2f K/s)",
+                            currload);
+                }
+            }
 
-      for (htm_count = 0; htm_count < HTM_RATIO; htm_count++)
-        if (!ReadHub())
-          return;
+          for (htm_count = 0; htm_count < HTM_RATIO; htm_count++)
+            if (!ReadHub())
+              return;
 
-    } /* if (HTM) */
+        } /* if (HTM) */
 #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
-    else
+      else
 #endif /* ! (HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #endif /* HIGHTRAFFIC_MODE */
 
-    #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
-      if (last_ts != curr_ts)
-      {
-        if (curr_ts > (last_ts + 1))
-        {
-          time_t  delta;
-          /*
-           * we skipped at least 1 time interval - make up for it
-           * by calling DoTimer() how ever many intervals we missed
-           * (ie: if the TS went from 5 to 8, call DoTimer() twice
-           * since we missed 6 and 7)
-           */
-          for (delta = (last_ts + 1); delta < curr_ts; delta++)
-            DoTimer(delta);
-        }
-        last_ts = curr_ts;
-        DoTimer(curr_ts);
-      }
+        if (last_ts != curr_ts)
+          {
+            if (curr_ts > (last_ts + 1))
+              {
+                time_t  delta;
+                /*
+                 * we skipped at least 1 time interval - make up for it
+                 * by calling DoTimer() how ever many intervals we missed
+                 * (ie: if the TS went from 5 to 8, call DoTimer() twice
+                 * since we missed 6 and 7)
+                 */
+                for (delta = (last_ts + 1); delta < curr_ts; delta++)
+                  DoTimer(delta);
+              }
+            last_ts = curr_ts;
+            DoTimer(curr_ts);
+          }
 
-    #endif /* HAVE_PTHREADS */
+#endif /* HAVE_PTHREADS */
 
-    FD_ZERO(&readfds);
-    FD_ZERO(&writefds);
+      FD_ZERO(&readfds);
+      FD_ZERO(&writefds);
 
-    TimeOut.tv_sec = 1;
-    TimeOut.tv_usec = 0L;
-
-    if (currenthub && (HubSock != NOSOCKET))
-    {
-      if (IsHubConnect(currenthub))
-        FD_SET(HubSock, &writefds);
-      else
-        FD_SET(HubSock, &readfds);
-    }
-
-    for (dccptr = connections; dccptr; dccptr = dccptr->next)
-    {
-      if (IsDccConnect(dccptr))
-        FD_SET(dccptr->socket, &writefds);
-      else
-      {
-        FD_SET(dccptr->socket, &readfds);
-        if (dccptr->authfd != NOSOCKET)
-        {
-          FD_SET(dccptr->authfd, &readfds);
-          if (dccptr->flags & SOCK_WRID)
-            FD_SET(dccptr->authfd, &writefds);
-        }
-      }
-    }
-
-    for (tempport = PortList; tempport; tempport = tempport->next)
-      if (tempport->socket != NOSOCKET)
-        FD_SET(tempport->socket, &readfds);
-
-    SelectResult = select(FD_SETSIZE, &readfds, &writefds, NULL, &TimeOut);
-    if (SelectResult > 0)
-    {
-      /* something happened */
+      TimeOut.tv_sec = 1;
+      TimeOut.tv_usec = 0L;
 
       if (currenthub && (HubSock != NOSOCKET))
-      {
-        /* This is for info coming from the hub server */
+        {
+          if (IsHubConnect(currenthub))
+            FD_SET(HubSock, &writefds);
+          else
+            FD_SET(HubSock, &readfds);
+        }
 
-        if (IsHubConnect(currenthub) && FD_ISSET(HubSock, &writefds))
+      for (dccptr = connections; dccptr; dccptr = dccptr->next)
         {
-          if (!CompleteHubConnection(currenthub))
-          {
-            close(HubSock);
-            currenthub->sockfd = HubSock = NOSOCKET;
-          }
+          if (IsDccConnect(dccptr))
+            FD_SET(dccptr->socket, &writefds);
+          else
+            {
+              FD_SET(dccptr->socket, &readfds);
+              if (dccptr->authfd != NOSOCKET)
+                {
+                  FD_SET(dccptr->authfd, &readfds);
+                  if (dccptr->flags & SOCK_WRID)
+                    FD_SET(dccptr->authfd, &writefds);
+                }
+            }
         }
-        else if (FD_ISSET(HubSock, &readfds))
-        {
-          if (!ReadHub())
-            return; /* something bad happened */
-        }
-      } /* if (currenthub && (HubSock != NOSOCKET)) */
 
       for (tempport = PortList; tempport; tempport = tempport->next)
-      {
-        if (tempport->socket == NOSOCKET)
-          continue;
+        if (tempport->socket != NOSOCKET)
+          FD_SET(tempport->socket, &readfds);
 
-        if (FD_ISSET(tempport->socket, &readfds))
+      SelectResult = select(FD_SETSIZE, &readfds, &writefds, NULL, &TimeOut);
+      if (SelectResult > 0)
         {
-        #ifdef HAVE_SOLARIS_THREADS
-	  thread_t clientid;
-        #else
+          /* something happened */
+
+          if (currenthub && (HubSock != NOSOCKET))
+            {
+              /* This is for info coming from the hub server */
+
+              if (IsHubConnect(currenthub) && FD_ISSET(HubSock, &writefds))
+                {
+                  if (!CompleteHubConnection(currenthub))
+                    {
+                      close(HubSock);
+                      currenthub->sockfd = HubSock = NOSOCKET;
+                    }
+                }
+              else if (FD_ISSET(HubSock, &readfds))
+                {
+                  if (!ReadHub())
+                    return; /* something bad happened */
+                }
+            } /* if (currenthub && (HubSock != NOSOCKET)) */
+
+          for (tempport = PortList; tempport; tempport = tempport->next)
+            {
+              if (tempport->socket == NOSOCKET)
+                continue;
+
+              if (FD_ISSET(tempport->socket, &readfds))
+                {
+#ifdef HAVE_SOLARIS_THREADS
+                  thread_t clientid;
+#else
         #ifdef HAVE_PTHREADS
-          pthread_t clientid;
-          pthread_attr_t attr;
+
+                  pthread_t clientid;
+                  pthread_attr_t attr;
+#endif
         #endif
+
+                  /*
+                   * a client has connected on one of our listening ports
+                   * (P: lines) - accept their connection, and perform
+                   * ident etc
+                   */
+
+#ifdef HAVE_SOLARIS_THREADS
+
+                  thr_create(NULL, 0, (void *) &ConnectClient, (void *) tempport,
+                             THR_DETACHED, &clientid);
+
+#else
+
+#ifdef HAVE_PTHREADS
+
+                  /* this way gethostbyaddr() will be non-blocking */
+                  pthread_attr_init(&attr);
+                  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+                  pthread_create(&clientid, &attr, (void *) &ConnectClient, (void *) tempport);
+
+#else
+
+                  ConnectClient(tempport);
+
+#endif /* HAVE_PTHREADS */
         #endif
 
-          /*
-           * a client has connected on one of our listening ports
-           * (P: lines) - accept their connection, and perform
-           * ident etc
-           */
+                }
+            }
 
-	#ifdef HAVE_SOLARIS_THREADS
+          /* this is for info coming from a dcc/telnet/tcm client */
+          for (dccptr = connections; dccptr != NULL; dccptr = dccnext)
+            {
+              assert(dccptr->socket != NOSOCKET);
+              dccnext = dccptr->next;
 
-	  thr_create(NULL, 0, (void *) &ConnectClient, (void *) tempport,
-			  THR_DETACHED, &clientid);
+              if (IsDccConnect(dccptr) && FD_ISSET(dccptr->socket, &writefds))
+                {
+                  if (!GreetDccUser(dccptr))
+                    DeleteDccClient(dccptr);
 
-	#else
+                  continue;
+                }
 
-        #ifdef HAVE_PTHREADS
+              if (dccptr->authfd != NOSOCKET)
+                {
+                  if (FD_ISSET(dccptr->authfd, &writefds) &&
+                      (dccptr->flags & SOCK_WRID))
+                    writeauth(dccptr); /* send ident request */
 
-          /* this way gethostbyaddr() will be non-blocking */
-          pthread_attr_init(&attr);
-          pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-          pthread_create(&clientid, &attr, (void *) &ConnectClient, (void *) tempport);
+                  if (FD_ISSET(dccptr->authfd, &readfds))
+                    readauth(dccptr); /* read ident reply */
+                }
 
-        #else
+              if (dccptr->flags & SOCK_NEEDID)
+                continue;
 
-          ConnectClient(tempport);
+              if (FD_ISSET(dccptr->socket, &readfds))
+                {
+                  /* read and parse any data from the socket */
+                  if (!ReadSock(dccptr))
+                    {
+                      CloseConnection(dccptr);
+                      continue;
+                    }
+                } /* if (FD_ISSET(dccptr->socket, &readfds)) */
+            } /* for (dccptr = connections; dccptr; dccptr = dccptr->next) */
 
-        #endif /* HAVE_PTHREADS */
-        #endif
-        }
-      }
-
-      /* this is for info coming from a dcc/telnet/tcm client */
-      for (dccptr = connections; dccptr != NULL; dccptr = dccnext)
-      {
-        assert(dccptr->socket != NOSOCKET);
-	dccnext = dccptr->next;
-
-        if (IsDccConnect(dccptr) && FD_ISSET(dccptr->socket, &writefds))
+          dccnext = NULL;   /* XXX */
+        } /* if (SelectResult > 0) */
+      else
         {
-          if (!GreetDccUser(dccptr))
-            DeleteDccClient(dccptr);
+          /* Also check whether is errno set at all.. -kre */
+          if ((SelectResult == (-1)) && errno && errno!=EINTR)
+            {
+#ifdef DEBUGMODE
+              fprintf(stderr,
+                      "Connection closed: %s\n",
+                      strerror(errno));
+#endif
 
-          continue;
+              putlog(LOG1, "Lost connection to %s:%d (%s)",
+                     currenthub->hostname,
+                     currenthub->port,
+                     strerror(errno));
+
+              return;
+            }
         }
-
-        if (dccptr->authfd != NOSOCKET)
-        {
-          if (FD_ISSET(dccptr->authfd, &writefds) &&
-              (dccptr->flags & SOCK_WRID))
-            writeauth(dccptr); /* send ident request */
-
-          if (FD_ISSET(dccptr->authfd, &readfds))
-            readauth(dccptr); /* read ident reply */
-        }
-
-        if (dccptr->flags & SOCK_NEEDID)
-          continue;
-
-        if (FD_ISSET(dccptr->socket, &readfds))
-        {
-          /* read and parse any data from the socket */
-          if (!ReadSock(dccptr))
-          {
-            CloseConnection(dccptr);
-            continue;
-          }
-        } /* if (FD_ISSET(dccptr->socket, &readfds)) */
-      } /* for (dccptr = connections; dccptr; dccptr = dccptr->next) */
-
-      dccnext = NULL;   /* XXX */
-    } /* if (SelectResult > 0) */
-    else
-    {
-      /* Also check whether is errno set at all.. -kre */
-      if ((SelectResult == (-1)) && errno && errno!=EINTR)
-      {
-      #ifdef DEBUGMODE      
-        fprintf(stderr,
-          "Connection closed: %s\n",
-          strerror(errno));
-      #endif
-
-        putlog(LOG1, "Lost connection to %s:%d (%s)",
-          currenthub->hostname,
-          currenthub->port,
-          strerror(errno));
-
-        return;
-      }
-    }
-  } /* for (;;) */
+    } /* for (;;) */
 } /* ReadSocketInfo() */
 
 /*
@@ -789,6 +797,7 @@ ReadHub()
   register char *ch;
   register char *linech;
 #ifdef EXTREMEDEBUG
+
   FILE *fp;
 #endif
 
@@ -802,11 +811,11 @@ ReadHub()
     return 2; /* no error - there's just nothing to read */
 
   if (length <= 0)
-  {
-    putlog(LOG1, "Read error from server: %s",
-      strerror(errno));
-    return 0; /* the connection was closed */
-  }
+    {
+      putlog(LOG1, "Read error from server: %s",
+             strerror(errno));
+      return 0; /* the connection was closed */
+    }
 
   Network->RecvB += length;
 
@@ -817,11 +826,12 @@ ReadHub()
   buffer[length] = '\0';
 
 #ifdef EXTREMEDEBUG
+
   if ((fp = fopen("hybserv.hubinfo", "a+")))
-  {
-    fprintf(fp, "%s", buffer);
-    fclose(fp);
-  }
+    {
+      fprintf(fp, "%s", buffer);
+      fclose(fp);
+    }
 #endif
 
   /*
@@ -848,123 +858,124 @@ ReadHub()
    */
 
   while (*ch)
-  {
-    register char tmp;
-  #ifdef DEBUGMODE
-    int    ii;
-  #endif
-
-    tmp = *ch;
-    if (IsEOL(tmp))
     {
-      *linech = '\0';
+      register char tmp;
+#ifdef DEBUGMODE
 
-      if (nextparam)
-      {
-        /*
-         * It is possible nextparam will not be NULL here if there is a
-         * line like:
-         * PASS password :TS
-         * where the text after the colon does not have any spaces, so we
-         * reach the \n and do not execute the code below which sets the
-         * next index of param[] to nextparam. Do it here.
-         */
-        param[paramc++] = nextparam;
-      }
+      int    ii;
+#endif
 
-    #ifdef DEBUGMODE
-      for (ii = 0; ii < paramc; ii++)
-        fprintf(stderr, "%s ", param[ii]);
-      fprintf(stderr, "\n");
-    #endif
-
-      /*
-       * Make sure paramc is non-zero, because if the line starts with a
-       * \n, we will immediately come here, without initializing param[0]
-       */
-      if (paramc)
-      {
-        /* process the line */
-        ProcessInfo(paramc, param);
-      }
-
-      linech = spill;
-      offset = 0;
-      paramc = 0;
-      nextparam = NULL;
-
-      /*
-       * If the line ends in \r\n, then this algorithm would have only
-       * picked up the \r. We don't want an entire other loop to do the
-       * \n, so advance ch here.
-       */
-      if (IsEOL(*(ch + 1)))
-        ch++;
-    }
-    else
-    {
-      /* make sure we don't overflow spill[] */
-      if (linech >= (spill + (sizeof(spill) - 1)))
-      {
-        ch++;
-        continue;
-      }
-
-      *linech++ = tmp;
-      if (tmp == ' ')
-      {
-        /*
-         * Only set the space character to \0 if this is the very first
-         * parameter, or if nextparam is not NULL. If nextparam is NULL,
-         * then we've hit a parameter that starts with a colon (:), so
-         * leave it as a whole parameter.
-         */
-        if (nextparam || (paramc == 0))
-          *(linech - 1) = '\0';
-
-        if (paramc == 0)
+      tmp = *ch;
+      if (IsEOL(tmp))
         {
-          /*
-           * Its the first parameter - set it to the beginning of spill
-           */
-          param[paramc++] = spill;
-          nextparam = linech;
-        }
-        else
-        {
+          *linech = '\0';
+
           if (nextparam)
-          {
-            param[paramc++] = nextparam;
-            if (*nextparam == ':')
             {
               /*
-               * We've hit a colon, set nextparam to NULL, so we know not
-               * to set any more spaces to \0
+               * It is possible nextparam will not be NULL here if there is a
+               * line like:
+               * PASS password :TS
+               * where the text after the colon does not have any spaces, so we
+               * reach the \n and do not execute the code below which sets the
+               * next index of param[] to nextparam. Do it here.
                */
-              nextparam = NULL;
-
-              /*
-               * Unfortunately, the first space has already been set to \0
-               * above, so reset to to a space character
-               */
-              *(linech - 1) = ' ';
+              param[paramc++] = nextparam;
             }
-            else
-              nextparam = linech;
 
-            if (paramc >= MAXPARAM)
-              nextparam = NULL;
-          }
+#ifdef DEBUGMODE
+          for (ii = 0; ii < paramc; ii++)
+            fprintf(stderr, "%s ", param[ii]);
+          fprintf(stderr, "\n");
+#endif
+
+          /*
+           * Make sure paramc is non-zero, because if the line starts with a
+           * \n, we will immediately come here, without initializing param[0]
+           */
+          if (paramc)
+            {
+              /* process the line */
+              ProcessInfo(paramc, param);
+            }
+
+          linech = spill;
+          offset = 0;
+          paramc = 0;
+          nextparam = NULL;
+
+          /*
+           * If the line ends in \r\n, then this algorithm would have only
+           * picked up the \r. We don't want an entire other loop to do the
+           * \n, so advance ch here.
+           */
+          if (IsEOL(*(ch + 1)))
+            ch++;
         }
-      }
-      offset++;
-    }
+      else
+        {
+          /* make sure we don't overflow spill[] */
+          if (linech >= (spill + (sizeof(spill) - 1)))
+            {
+              ch++;
+              continue;
+            }
 
-    /*
-     * Advance ch to go to the next letter in the buffer
-     */
-    ch++;
-  }
+          *linech++ = tmp;
+          if (tmp == ' ')
+            {
+              /*
+               * Only set the space character to \0 if this is the very first
+               * parameter, or if nextparam is not NULL. If nextparam is NULL,
+               * then we've hit a parameter that starts with a colon (:), so
+               * leave it as a whole parameter.
+               */
+              if (nextparam || (paramc == 0))
+                *(linech - 1) = '\0';
+
+              if (paramc == 0)
+                {
+                  /*
+                   * Its the first parameter - set it to the beginning of spill
+                   */
+                  param[paramc++] = spill;
+                  nextparam = linech;
+                }
+              else
+                {
+                  if (nextparam)
+                    {
+                      param[paramc++] = nextparam;
+                      if (*nextparam == ':')
+                        {
+                          /*
+                           * We've hit a colon, set nextparam to NULL, so we know not
+                           * to set any more spaces to \0
+                           */
+                          nextparam = NULL;
+
+                          /*
+                           * Unfortunately, the first space has already been set to \0
+                           * above, so reset to to a space character
+                           */
+                          *(linech - 1) = ' ';
+                        }
+                      else
+                        nextparam = linech;
+
+                      if (paramc >= MAXPARAM)
+                        nextparam = NULL;
+                    }
+                }
+            }
+          offset++;
+        }
+
+      /*
+       * Advance ch to go to the next letter in the buffer
+       */
+      ch++;
+    }
 
   return 1;
 } /* ReadHub() */
@@ -994,10 +1005,10 @@ ReadSock(struct DccUser *connptr)
     return 2; /* no error - there's just nothing to read */
 
   if (length <= 0)
-  {
-    /* dcc client closed connection */
-    return 0;
-  }
+    {
+      /* dcc client closed connection */
+      return 0;
+    }
 
   /*
    * recv() may have cut off the line in the middle
@@ -1012,46 +1023,46 @@ ReadSock(struct DccUser *connptr)
   linech = connptr->spill + connptr->offset;
 
   while (*ch)
-  {
-    register char tmp;
-
-    tmp = *ch;
-    if (IsEOL(tmp))
     {
-      *linech = '\0';
+      register char tmp;
 
-      if (IsEOL(*connptr->spill))
-      {
-        ch++;
-        continue;
-      }
+      tmp = *ch;
+      if (IsEOL(tmp))
+        {
+          *linech = '\0';
 
-      /* process the line */
-      if (connptr->flags & SOCK_TCMBOT)
-        BotProcess(connptr, connptr->spill); /* process line from bot */
+          if (IsEOL(*connptr->spill))
+            {
+              ch++;
+              continue;
+            }
+
+          /* process the line */
+          if (connptr->flags & SOCK_TCMBOT)
+            BotProcess(connptr, connptr->spill); /* process line from bot */
+          else
+            DccProcess(connptr, connptr->spill); /* process line from client */
+
+          linech = connptr->spill;
+          connptr->offset = 0;
+
+          /*
+           * If the line ends in \r\n, advance past the \n
+           */
+          if (IsEOL(*(ch + 1)))
+            ch++;
+        }
       else
-        DccProcess(connptr, connptr->spill); /* process line from client */
-
-      linech = connptr->spill;
-      connptr->offset = 0;
-
-      /*
-       * If the line ends in \r\n, advance past the \n
-       */
-      if (IsEOL(*(ch + 1)))
-        ch++;
+        {
+          /* make sure we don't overflow spill */
+          if (linech < (connptr->spill + (sizeof(connptr->spill) - 1)))
+            {
+              *linech++ = tmp;
+              connptr->offset++;
+            }
+        }
+      ch++;
     }
-    else
-    {
-      /* make sure we don't overflow spill */
-      if (linech < (connptr->spill + (sizeof(connptr->spill) - 1)))
-      {
-        *linech++ = tmp;
-        connptr->offset++;
-      }
-    }
-    ch++;
-  }
 
   return 1;
 } /* ReadSock() */
@@ -1067,50 +1078,50 @@ CycleServers()
 
 {
   if (HubSock == NOSOCKET)
-  {
-    if (currenthub)
     {
-      if (!currenthub->next)
+      if (currenthub)
+        {
+          if (!currenthub->next)
+            currenthub = ServList;
+          else
+            currenthub = currenthub->next;
+        }
+      else
         currenthub = ServList;
-      else
-        currenthub = currenthub->next;
-    }
-    else
-      currenthub = ServList;
 
-    SendUmode(OPERUMODE_Y,
-      "*** Cycling server list");
+      SendUmode(OPERUMODE_Y,
+                "*** Cycling server list");
 
-    while (currenthub)
-    {
-      /* Begin connection to server */
-      if ((HubSock = ConnectHost(currenthub->hostname, currenthub->port)) >= 0) 
-      {
-        currenthub->sockfd = HubSock;
+      while (currenthub)
+        {
+          /* Begin connection to server */
+          if ((HubSock = ConnectHost(currenthub->hostname, currenthub->port)) >= 0)
+            {
+              currenthub->sockfd = HubSock;
 
-        SetHubConnect(currenthub);
+              SetHubConnect(currenthub);
 
-        break;
-      }
-      else
-      {
-        SendUmode(OPERUMODE_Y,
-          "*** Unable to connect to %s:%d (%s)",
-          currenthub->hostname,
-          currenthub->port,
-          strerror(errno));
+              break;
+            }
+          else
+            {
+              SendUmode(OPERUMODE_Y,
+                        "*** Unable to connect to %s:%d (%s)",
+                        currenthub->hostname,
+                        currenthub->port,
+                        strerror(errno));
 
-        HubSock = NOSOCKET;
-        currenthub = currenthub->next;
-      }
-    } /* while (currenthub) */
-  } /* if (HubSock == NOSOCKET) */
+              HubSock = NOSOCKET;
+              currenthub = currenthub->next;
+            }
+        } /* while (currenthub) */
+    } /* if (HubSock == NOSOCKET) */
 } /* CycleServers() */
 
 /*
 SetNonBlocking()
  Mark a socket file descriptor as non-blocking
-
+ 
 Return: 1 if successful
         0 if unsuccessful
 */
@@ -1122,25 +1133,25 @@ SetNonBlocking(int socket)
   int flags = 0;
 
   if ((flags = fcntl(socket, F_GETFL, 0)) == -1)
-  {
-    putlog(LOG1,
-      "SetNonBlocking: fcntl(%d, F_GETFL, 0) failed: %s",
-      socket,
-      strerror(errno));
-    return 0;
-  }
-  else
-  {
-    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1)
     {
       putlog(LOG1,
-        "SetNonBlocking: fcntl(%d, F_SETFL, %d) failed: %s",
-        socket,
-        flags | O_NONBLOCK,
-        strerror(errno));
+             "SetNonBlocking: fcntl(%d, F_GETFL, 0) failed: %s",
+             socket,
+             strerror(errno));
       return 0;
     }
-  }
+  else
+    {
+      if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1)
+        {
+          putlog(LOG1,
+                 "SetNonBlocking: fcntl(%d, F_SETFL, %d) failed: %s",
+                 socket,
+                 flags | O_NONBLOCK,
+                 strerror(errno));
+          return 0;
+        }
+    }
 
   return 1;
 } /* SetNonBlocking() */
@@ -1163,11 +1174,11 @@ SetSocketOptions(int socket)
    * the port this socket is bound to
    */
   if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (char *) &option, sizeof(option)) < 0)
-  {
-    putlog(LOG1, "SetSocketOptions: setsockopt(SO_REUSEADDR) failed: %s",
-      strerror(errno));
-    return;
-  }
+    {
+      putlog(LOG1, "SetSocketOptions: setsockopt(SO_REUSEADDR) failed: %s",
+             strerror(errno));
+      return;
+    }
 } /* SetSocketOptions() */
 
 /*
@@ -1184,40 +1195,40 @@ DoListen(struct PortInfo *portptr)
   socketname.sin_family = AF_INET;
   socketname.sin_addr.s_addr = INADDR_ANY;
   socketname.sin_port = htons(portptr->port);
-  
+
   portptr->tries++;
 
   if ((portptr->socket = socket(PF_INET, SOCK_STREAM, 6)) < 0)
-  {
-    putlog(LOG1, "Unable to create stream socket: %s",
-      strerror(errno));
-    close(portptr->socket);
-    portptr->socket = NOSOCKET;
-    return;
-  }
+    {
+      putlog(LOG1, "Unable to create stream socket: %s",
+             strerror(errno));
+      close(portptr->socket);
+      portptr->socket = NOSOCKET;
+      return;
+    }
 
   /* set various socket options */
   SetSocketOptions(portptr->socket);
 
   if (bind(portptr->socket, (struct sockaddr *)&socketname, sizeof(socketname)) < 0)
-  {
-    putlog(LOG1, "Unable to bind port %d: %s",
-      portptr->port,
-      strerror(errno));
-    close(portptr->socket);
-    portptr->socket = NOSOCKET;
-    return;
-  }
+    {
+      putlog(LOG1, "Unable to bind port %d: %s",
+             portptr->port,
+             strerror(errno));
+      close(portptr->socket);
+      portptr->socket = NOSOCKET;
+      return;
+    }
 
   if (listen(portptr->socket, 4) < 0)
-  {
-    putlog(LOG1, "Unable to listen on port %d: %s",
-      portptr->port,
-      strerror(errno));
-    close(portptr->socket);
-    portptr->socket = NOSOCKET;
-    return;
-  }
+    {
+      putlog(LOG1, "Unable to listen on port %d: %s",
+             portptr->port,
+             strerror(errno));
+      close(portptr->socket);
+      portptr->socket = NOSOCKET;
+      return;
+    }
 } /* DoListen() */
 
 /*
@@ -1233,21 +1244,21 @@ void signon(void)
 #ifdef HYBRID_ONLY
   toserv("PASS %s :TS\nCAPAB :EX"
 #ifdef GECOSBANS
-      /* Send gecosbans capab -Janos */
-      " DE"
+         /* Send gecosbans capab -Janos */
+         " DE"
 #endif /* GECOSBANS */
 #ifdef HYBRID7
-      /* Send most of Hybrid7 CAPABS -kre && Janos */
-      " KLN GLN HOPS IE HUB AOPS"
+         /* Send most of Hybrid7 CAPABS -kre && Janos */
+         " KLN GLN HOPS IE HUB AOPS"
 #endif /* HYBRID7 */
-      "\n", currenthub->password);
+         "\n", currenthub->password);
 #endif /* HYBRID_ONLY */
-      
+
 #ifdef IRCNET
   /* Authenticate to IRCNet daemon -kre */
   toserv("PASS %s %s IRC|%s %s\n", currenthub->password,
-    "0210030000", "HEiJKps", "P");
+         "0210030000", "HEiJKps", "P");
 #endif /* IRCNET */
 
-  toserv("SERVER %s 1 :%s\n", Me.name, Me.info); 
+  toserv("SERVER %s 1 :%s\n", Me.name, Me.info);
 } /* signon() */

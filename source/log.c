@@ -63,12 +63,13 @@ putlog(int level, char *format, ...)
     return;
 
   if ((fp = fopen(LogFile, "a+")) == NULL)
-  {
-  #ifdef DEBUGMODE
-    printf("Unable to open log file: %s\n", LogFile);
-  #endif
-    return;
-  }
+    {
+#ifdef DEBUGMODE
+      printf("Unable to open log file: %s\n", LogFile);
+#endif
+
+      return;
+    }
 
   CurrTime = current_ts;
   strcpy(buf, ctime(&CurrTime));
@@ -87,11 +88,12 @@ putlog(int level, char *format, ...)
   vfprintf(fp, format, args);
   fprintf(fp, "\n");
 
-  #ifdef DEBUGMODE
-    fprintf(stderr, "Logged> ");
-    vfprintf(stderr, format, args);
-    fprintf(stderr, "\n");
-  #endif
+#ifdef DEBUGMODE
+
+  fprintf(stderr, "Logged> ");
+  vfprintf(stderr, format, args);
+  fprintf(stderr, "\n");
+#endif
 
   fclose(fp);
 
@@ -111,74 +113,74 @@ CheckLogs(time_t unixtime)
 
 {
   char tmplog[MAXLINE],
-       olddate[MAXLINE];
+  olddate[MAXLINE];
   char *currdate;
   struct tm *log_tm;
   time_t oldts;
   DIR *dp;
   struct dirent *dirp;
   int lmatches,
-      len;
+  len;
 
   if (MaxLogs)
-  {
-    /*
-     * We must now check if there are MaxLogs log files
-     * in HPath/. If so, delete the oldest one to make
-     * room for the current one.
-     */
-
-    if (!(dp = opendir(HPath)))
-    {
-      putlog(LOG1, "Error reading log directory: %s",
-        strerror(errno));
-      return;
-    }
-
-    ircsprintf(tmplog, "%s.", LogFile);
-    len = strlen(tmplog);
-
-    lmatches = 0;
-    olddate[0] = '\0';
-    currdate = NULL;
-
-    /*
-     * Go through all the files in the directory and
-     * pick out the ones that match "LogFile."
-     */
-    while ((dirp = readdir(dp)))
-    {
-      if (!ircncmp(dirp->d_name, tmplog, len))
-      {
-        ++lmatches;
-
-        /*
-         * Now check the date on the log file to see
-         * if its the oldest.
-         */
-        if (!*olddate)
-          strcpy(olddate, dirp->d_name + len);
-        else
-        {
-          currdate = dirp->d_name + len;
-          if (atol(olddate) > atol(currdate))
-            strcpy(olddate, currdate);
-        }
-      }
-    }
-
-    if ((lmatches >= MaxLogs) && *olddate)
     {
       /*
-       * There are too many log files in the directory,
-       * delete the oldest one - it will be: LogFile.olddate
+       * We must now check if there are MaxLogs log files
+       * in HPath/. If so, delete the oldest one to make
+       * room for the current one.
        */
-      ircsprintf(tmplog, "%s/%s.%s", HPath, LogFile, olddate);
-      unlink(tmplog);
-    }
 
-    closedir(dp);
-  } /* if (MaxLogs) */
+      if (!(dp = opendir(HPath)))
+        {
+          putlog(LOG1, "Error reading log directory: %s",
+                 strerror(errno));
+          return;
+        }
+
+      ircsprintf(tmplog, "%s.", LogFile);
+      len = strlen(tmplog);
+
+      lmatches = 0;
+      olddate[0] = '\0';
+      currdate = NULL;
+
+      /*
+       * Go through all the files in the directory and
+       * pick out the ones that match "LogFile."
+       */
+      while ((dirp = readdir(dp)))
+        {
+          if (!ircncmp(dirp->d_name, tmplog, len))
+            {
+              ++lmatches;
+
+              /*
+               * Now check the date on the log file to see
+               * if its the oldest.
+               */
+              if (!*olddate)
+                strcpy(olddate, dirp->d_name + len);
+              else
+                {
+                  currdate = dirp->d_name + len;
+                  if (atol(olddate) > atol(currdate))
+                    strcpy(olddate, currdate);
+                }
+            }
+        }
+
+      if ((lmatches >= MaxLogs) && *olddate)
+        {
+          /*
+           * There are too many log files in the directory,
+           * delete the oldest one - it will be: LogFile.olddate
+           */
+          ircsprintf(tmplog, "%s/%s.%s", HPath, LogFile, olddate);
+          unlink(tmplog);
+        }
+
+      closedir(dp);
+    } /* if (MaxLogs) */
 
   /*
    * Now rename the current log file. Use the TS of one
@@ -189,7 +191,7 @@ CheckLogs(time_t unixtime)
   oldts = unixtime - 1;
   log_tm = localtime(&oldts);
   ircsprintf(tmplog, "%s.%d%02d%02d",
-    LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
+             LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
 
   rename(LogFile, tmplog);
 } /* CheckLogs() */

@@ -70,72 +70,74 @@ ProcessSignal(int sig)
 
 {
   switch (sig)
-  {
-    /* rehash configuration file */
-    case SIGHUP:
     {
-      SendUmode(OPERUMODE_Y,
-        "*** Received SIGHUP, rehashing configuration file and databases");
-      putlog(LOG1,
-        "Received signal SIGHUP, rehashing configuration file and databases");
+      /* rehash configuration file */
+    case SIGHUP:
+      {
+        SendUmode(OPERUMODE_Y,
+                  "*** Received SIGHUP, rehashing configuration file and databases");
+        putlog(LOG1,
+               "Received signal SIGHUP, rehashing configuration file and databases");
 
-      Rehash();
+        Rehash();
 
-      if (ReloadDbsOnHup)
-        ReloadData();
+        if (ReloadDbsOnHup)
+          ReloadData();
 
-      signal(SIGHUP, ProcessSignal); /* reset the signal */
-      break;
-    }
+        signal(SIGHUP, ProcessSignal); /* reset the signal */
+        break;
+      }
 
 #if 0
-    /* restart services */
+      /* restart services */
     case SIGINT:
-    {
-    #ifdef DEBUGMODE
-      DoShutdown("console", "Recieved SIGINT");
-      exit(1);
-    #else
-      SendUmode(OPERUMODE_Y,
-        "*** Received SIGINT, restarting services");
-      putlog(LOG1, "Received signal SIGINT, restarting");
-      ServReboot();
-      signal(SIGINT, ProcessSignal);
-    #endif
-      break;
-    }
+      {
+#ifdef DEBUGMODE
+        DoShutdown("console", "Recieved SIGINT");
+        exit(1);
+#else
+
+        SendUmode(OPERUMODE_Y,
+                  "*** Received SIGINT, restarting services");
+        putlog(LOG1, "Received signal SIGINT, restarting");
+        ServReboot();
+        signal(SIGINT, ProcessSignal);
+#endif
+
+        break;
+      }
 #endif
 
     case SIGPIPE:
-    {
-      putlog(LOG1, "Received signal SIGPIPE, ignoring");
-      /*abort();*/
-      break;
-    }
+      {
+        putlog(LOG1, "Received signal SIGPIPE, ignoring");
+        /*abort();*/
+        break;
+      }
 
-    /* 
-     * this is required to prevent a child process from becoming a
-     * zombie which just sits out there taking up fds
-     */
+      /*
+       * this is required to prevent a child process from becoming a
+       * zombie which just sits out there taking up fds
+       */
     case SIGCHLD:
-    {
-      wait(NULL);
-      signal(SIGCHLD, ProcessSignal);
-      break;
-    }
+      {
+        wait(NULL);
+        signal(SIGCHLD, ProcessSignal);
+        break;
+      }
 
-    /* something really died */
+      /* something really died */
     case SIGTERM:
-    {
+      {
         putlog(LOG1, "Received SIGTERM, shutting down");
         SendUmode(OPERUMODE_Y,
-          "*** Received SIGTERM, shutting down");
+                  "*** Received SIGTERM, shutting down");
         DoShutdown(NULL, "SIGTERM Received");
+      }
     }
-  }
 } /* ProcessSignal() */
 
-/* 
+/*
 InitListenPorts()
   args: none
   purpose: initialize ports for listening
@@ -169,13 +171,15 @@ InitLists()
 
   memset((void *) &nicklist, 0, sizeof(nicklist));
 
-  #ifdef CHANNELSERVICES
-    memset((void *) &chanlist, 0, sizeof(chanlist));
-  #endif
+#ifdef CHANNELSERVICES
 
-  #ifdef MEMOSERVICES
-    memset((void *) &memolist, 0, sizeof(memolist));
-  #endif
+  memset((void *) &chanlist, 0, sizeof(chanlist));
+#endif
+
+#ifdef MEMOSERVICES
+
+  memset((void *) &memolist, 0, sizeof(memolist));
+#endif
 
 #endif /* NICKSERVICES */
 
@@ -196,6 +200,7 @@ InitLists()
   GenericOper->flags = (PRIV_OPER | PRIV_JUPE | PRIV_GLINE);
 
 #ifdef RECORD_SPLIT_TS
+
   GenericOper->split_ts = GenericOper->whensplit = 0;
 #endif
 
@@ -217,6 +222,7 @@ InitSignals()
 
 #else
 #ifdef HAVE_PTHREADS
+
   pthread_attr_t attr;
   pthread_t signalid;
 
@@ -230,7 +236,7 @@ InitSignals()
   /* setup signal hooks */
   signal(SIGHUP, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
-/*  signal(SIGINT, ProcessSignal); */
+  /*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);
   signal(SIGPIPE, SIG_IGN);
 
@@ -258,25 +264,30 @@ PostCleanup()
 
   Me.nsptr = NULL;
 
-  #ifdef CHANNELSERVICES
-    Me.csptr = NULL;
-  #endif
+#ifdef CHANNELSERVICES
 
-  #ifdef MEMOSERVICES
-    Me.msptr = NULL;
-  #endif
+  Me.csptr = NULL;
+#endif
+
+#ifdef MEMOSERVICES
+
+  Me.msptr = NULL;
+#endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   Me.ssptr = NULL;
 #endif
 
 #ifdef HELPSERVICES
+
   Me.hsptr = NULL;
 #endif
 
 #ifdef SEENSERVICES
+
   Me.esptr = NULL;
 #endif
 
@@ -288,24 +299,24 @@ introduce()
 */
 
 static struct Luser *
-introduce(char *nick, char *ident, char *info)
+      introduce(char *nick, char *ident, char *info)
 
-{
-  char sendstr[MAXLINE];
-  time_t CurrTime = current_ts;
-  char **av;
-  struct Luser *lptr;
-  
-  ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", nick, (long)
-      CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
-  toserv(sendstr);
+  {
+    char sendstr[MAXLINE];
+    time_t CurrTime = current_ts;
+    char **av;
+    struct Luser *lptr;
 
-  SplitBuf(sendstr, &av);
-  lptr = AddClient(av); /* Add 'nick' to user list */
-  MyFree(av);
+    ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", nick, (long)
+               CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
+    toserv(sendstr);
 
-  return (lptr);
-} /* introduce() */
+    SplitBuf(sendstr, &av);
+    lptr = AddClient(av); /* Add 'nick' to user list */
+    MyFree(av);
+
+    return (lptr);
+  } /* introduce() */
 
 /*
 InitServs()
@@ -321,29 +332,29 @@ void InitServs(struct Luser *servptr)
   struct aService *sptr;
 
   if (servptr)
-  {
-    /*
-     * A service nick was killed, determine which one it was and
-     * re-introduce them. Now, the service will have been removed from the
-     * luser linked list already if it was a kill. However, s_kill() will
-     * have called GetService(), which returns a pointer to Me.*sptr,
-     * depending on which *Serv was killed. Therefore, 'servptr' will
-     * still correctly point to a Me.*sptr, even though it really points
-     * to garbage. So it is still safe to compare servptr to Me.*sptr's.
-     */
-
-    for (sptr = ServiceBots; sptr->name; ++sptr)
     {
-      if (servptr == *(sptr->lptr))
-      {
-        *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
-            *(sptr->desc));
-        return; /* no need to keep searching */
-      }
-    }
+      /*
+       * A service nick was killed, determine which one it was and
+       * re-introduce them. Now, the service will have been removed from the
+       * luser linked list already if it was a kill. However, s_kill() will
+       * have called GetService(), which returns a pointer to Me.*sptr,
+       * depending on which *Serv was killed. Therefore, 'servptr' will
+       * still correctly point to a Me.*sptr, even though it really points
+       * to garbage. So it is still safe to compare servptr to Me.*sptr's.
+       */
 
-    return;
-  }
+      for (sptr = ServiceBots; sptr->name; ++sptr)
+        {
+          if (servptr == *(sptr->lptr))
+            {
+              *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+                                        *(sptr->desc));
+              return; /* no need to keep searching */
+            }
+        }
+
+      return;
+    }
 
   /*
    * Services probably just connected to the network,
@@ -351,8 +362,8 @@ void InitServs(struct Luser *servptr)
    */
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
-  {
-    *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
-        *(sptr->desc));
-  }
+    {
+      *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+                                *(sptr->desc));
+    }
 } /* InitServs() */

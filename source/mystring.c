@@ -87,15 +87,15 @@ char *GetString(int ac, char **av)
 
   ii = 0;
   while (ii < ac)
-  {
-    ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
+    {
+      ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
 
-    final = (char *) MyRealloc(final,
-      strlen(final) + strlen(temp) + sizeof(char));
-    strcat(final, temp);
+      final = (char *) MyRealloc(final,
+                                 strlen(final) + strlen(temp) + sizeof(char));
+      strcat(final, temp);
 
-    ++ii;
-  }
+      ++ii;
+    }
 
   /* Routine to get rid of spaces at the end of new string. However, we
    * don't need it atm -kre */
@@ -104,7 +104,7 @@ char *GetString(int ac, char **av)
   while (final[ii] == ' ' && ii)
     final[ii--] = 0;
 #endif
-  
+
   return (final);
 } /* GetString() */
 
@@ -121,7 +121,7 @@ int SplitBuf(char *buff, char ***array)
   int acnt, ii;
   char *temp1, *tempbuf;
 
-  /* Be safe. If something down fails, it will point 
+  /* Be safe. If something down fails, it will point
    * to NULL anyway -kre */
   *array = NULL;
 
@@ -160,38 +160,38 @@ int SplitBuf(char *buff, char ***array)
   *array = (char **) MyMalloc(sizeof(char *) * argsize);
   acnt = 0;
   while (*tempbuf)
-  {
-    if (acnt == argsize)
     {
-      argsize += 8;
-      *array = (char **) MyRealloc(*array, sizeof(char *) * argsize);
-    }
+      if (acnt == argsize)
+        {
+          argsize += 8;
+          *array = (char **) MyRealloc(*array, sizeof(char *) * argsize);
+        }
 
-    if ((*tempbuf == ':') && (acnt != 0))
-    {
-      (*array)[acnt++] = tempbuf;
-      /* (*array)[acnt++] = tempbuf + 1; */
-      tempbuf = "";
-    }
-    else
-    {
-      /* Why use strpbrk() on only 1 character? We have faster strchr for
-       * that. -kre */
-      /* temp1 = strpbrk(tempbuf, " "); */
-      temp1 = strchr(tempbuf, ' ');
-      if (temp1)
-      {
-        *temp1++ = 0;
-        while (IsSpace(*temp1))
-          ++temp1;
-      }
+      if ((*tempbuf == ':') && (acnt != 0))
+        {
+          (*array)[acnt++] = tempbuf;
+          /* (*array)[acnt++] = tempbuf + 1; */
+          tempbuf = "";
+        }
       else
-        temp1 = tempbuf + strlen(tempbuf);
+        {
+          /* Why use strpbrk() on only 1 character? We have faster strchr for
+           * that. -kre */
+          /* temp1 = strpbrk(tempbuf, " "); */
+          temp1 = strchr(tempbuf, ' ');
+          if (temp1)
+            {
+              *temp1++ = 0;
+              while (IsSpace(*temp1))
+                ++temp1;
+            }
+          else
+            temp1 = tempbuf + strlen(tempbuf);
 
-      (*array)[acnt++] = tempbuf;
-      tempbuf = temp1;
+          (*array)[acnt++] = tempbuf;
+          tempbuf = temp1;
+        }
     }
-  }
 
   return (acnt);
 } /* SplitBuf() */

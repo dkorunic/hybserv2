@@ -82,25 +82,29 @@ int main(int argc, char *argv[])
 #endif /* DEBUGMODE */
 
 #ifdef GDB_DEBUG
-  int GDBAttached = 0; 
+
+  int GDBAttached = 0;
 #endif /* GDB_DEBUG */
 
 #if defined GIMMECORE || defined DEBUGMODE
+
   struct rlimit rlim; /* resource limits -kre */
 #endif /* GIMMECORE || DEBUGMODE */
 
   FILE *pidfile; /* to write our pid */
   uid_t uid, /* real user id */
-        euid; /* effective user id */
+  euid; /* effective user id */
   struct utsname un;
 
 #ifdef HAVE_SOLARIS_THREADS
+
   thread_t selectid;
   thread_t timerid;
 
 #else
 
 #ifdef HAVE_PTHREADS
+
   pthread_attr_t attr;
   pthread_t selectid;
   pthread_t timerid;
@@ -112,29 +116,30 @@ int main(int argc, char *argv[])
   TimeStarted = current_ts = time(NULL);
 
   fprintf(stderr,
-    "HybServ2 TS services version %s by HybServ2 team\n"
+          "HybServ2 TS services version %s by HybServ2 team\n"
 #if defined __DATE__ && defined __TIME__
-    "Compiled at %s, %s\n",
+          "Compiled at %s, %s\n",
 #endif
-    hVersion
+          hVersion
 #if defined __DATE__ && defined __TIME__
-    , __DATE__, __TIME__
+          , __DATE__, __TIME__
 #endif
-    );
+         );
 
   if (uname(&un) != -1)
-  {
-    fprintf(stderr, "Running on: %s %s\n", un.sysname,
-      un.release);
-  }
+    {
+      fprintf(stderr, "Running on: %s %s\n", un.sysname,
+              un.release);
+    }
   else
     /* Blah. It ignored uname(), then pretend to be funny :-) -kre */
     fprintf(stderr, "Running on: computer, probably :-)\n");
 
 #ifdef GDB_DEBUG
-  while (!GDBAttached) 
+
+  while (!GDBAttached)
     sleep(1);
-#endif /* GDB_DEBUG */  
+#endif /* GDB_DEBUG */
 
   /*
    * Load SETPATH (settings.conf) - this must be done
@@ -143,45 +148,47 @@ int main(int argc, char *argv[])
    * in settings.conf
    */
   if (LoadSettings(0) == 0)
-  {
-    fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
-      "Check logfile %s\n", SETPATH, LogFile ? LogFile : "*unknown*");
-    return (0);
-  }
+    {
+      fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
+              "Check logfile %s\n", SETPATH, LogFile ? LogFile : "*unknown*");
+      return (0);
+    }
 
   /*
    * If they run ./shownicks or ./showchans rather than ./hybserv
    * display nicknames/channels
    */
   if (strstr(argv[0], "shownicks"))
-  {
-  #ifdef NICKSERVICES
-    ShowNicknames(argc, argv);
-  #endif /* NICKSERVICES */
-    return (0);
-  }
+    {
+#ifdef NICKSERVICES
+      ShowNicknames(argc, argv);
+#endif /* NICKSERVICES */
+
+      return (0);
+    }
   else if (strstr(argv[0], "showchans"))
-  {
-  #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-    ShowChannels(argc, argv);
-  #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
-    return (0);
-  }
+    {
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+      ShowChannels(argc, argv);
+#endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
+
+      return (0);
+    }
 
   /* Check for running services -kre */
   if ((pidfile = fopen(PidFile, "r")) == NULL)
     putlog(LOG1, "Unable to read %s", PidFile);
   else
-  {
-    pid_t mypid;
-    fscanf(pidfile, "%u", &mypid);
-    fclose(pidfile);
-    if (!kill(mypid, 0))
     {
-      fprintf(stderr, "Services are already running!\n");
-      exit(1);
+      pid_t mypid;
+      fscanf(pidfile, "%u", &mypid);
+      fclose(pidfile);
+      if (!kill(mypid, 0))
+        {
+          fprintf(stderr, "Services are already running!\n");
+          exit(1);
+        }
     }
-  }
 
   putlog(LOG1, "HybServ2 TS services version %s started", hVersion);
 
@@ -191,6 +198,7 @@ int main(int argc, char *argv[])
   gmt_offset = GetGMTOffset(TimeStarted);
 
 #if 0
+
   tm_gmt = gmtime(&TimeStarted);
   gmt_offset = TimeStarted - mktime(tm_gmt);
 #endif /* 0 */
@@ -199,29 +207,29 @@ int main(int argc, char *argv[])
   euid = geteuid(); /* the effective id (different if setuid) */
 
   if (chdir(HPath) != 0)
-  {
-    fprintf(stderr,
-      "HPath is an invalid directory, please check %s\n",
-      SETPATH);
-    putlog(LOG1, "Invalid HPath (%s), shutting down", HPath);
-    exit(0);
-  }
+    {
+      fprintf(stderr,
+              "HPath is an invalid directory, please check %s\n",
+              SETPATH);
+      putlog(LOG1, "Invalid HPath (%s), shutting down", HPath);
+      exit(0);
+    }
 
   if (!uid || !euid)
-  {
-    /*
-     * It is setuid root or running as root
-     * Let us chroot() hybserv then. -kre
-     */
-    putlog(LOG1, "Detected running with root uid, chrooting");
-
-    if (chroot(HPath))
     {
-      fprintf(stderr, "Cannot chroot, exiting.\n");
-      putlog(LOG1,"Cannot chroot, shutting down");
-      exit(1);
+      /*
+       * It is setuid root or running as root
+       * Let us chroot() hybserv then. -kre
+       */
+      putlog(LOG1, "Detected running with root uid, chrooting");
+
+      if (chroot(HPath))
+        {
+          fprintf(stderr, "Cannot chroot, exiting.\n");
+          putlog(LOG1,"Cannot chroot, shutting down");
+          exit(1);
+        }
     }
-  }
 
   /* Be sure, be paranoid, be safe. -kre */
   umask(077);
@@ -241,10 +249,10 @@ int main(int argc, char *argv[])
 #ifdef GLOBALSERVICES
 
   if (LogonNews)
-  {
-    Network->LogonNewsFile.filename = LogonNews;
-    ReadMessageFile(&Network->LogonNewsFile);
-  }
+    {
+      Network->LogonNewsFile.filename = LogonNews;
+      ReadMessageFile(&Network->LogonNewsFile);
+    }
 
 #endif /* GLOBALSERVICES */
 
@@ -252,25 +260,28 @@ int main(int argc, char *argv[])
     SetupVirtualHost();
 
 #if !defined DEBUGMODE && !defined GDB_DEBUG
+
   pid = fork();
   if (pid == (-1))
-  {
-    printf("Unable to fork(), exiting.\n");
-    exit(1);
-  }
+    {
+      printf("Unable to fork(), exiting.\n");
+      exit(1);
+    }
   if (pid != 0)
-  {
-    printf("Running in background (pid: %d)\n", pid);
-    exit(0);
-  }
+    {
+      printf("Running in background (pid: %d)\n", pid);
+      exit(0);
+    }
 
   /* Make current process session leader -kre */
-  setsid(); 
+  setsid();
 #else
+
   printf("Entering foreground debug mode\n");
 #endif /* DEBUGMODE */
 
 #if defined GIMMECORE || defined DEBUGMODE
+
   printf("Setting corefile limit... ");
   /* Set corefilesize to maximum - therefore we ensure that core will be
    * generated, no matter of shell limits -kre */
@@ -290,10 +301,10 @@ int main(int argc, char *argv[])
   if ((pidfile = fopen(PidFile, "w")) == NULL)
     putlog(LOG1, "Unable to open %s", PidFile);
   else
-  {
-    fprintf(pidfile, "%u\n", getpid());
-    fclose(pidfile);
-  }
+    {
+      fprintf(pidfile, "%u\n", getpid());
+      fclose(pidfile);
+    }
 
   /* initialize tcm/user listening ports */
   InitListenPorts();
@@ -302,6 +313,7 @@ int main(int argc, char *argv[])
   ClearHashes(1);
 
 #ifdef BLOCK_ALLOCATION
+
   InitHeaps();
 #endif
 
@@ -314,7 +326,7 @@ int main(int argc, char *argv[])
   thr_create(NULL, 0, p_CheckTime, NULL, THR_DETACHED, &timerid);
 
 #else
-  
+
 #ifdef HAVE_PTHREADS
 
   /* This thread will call DoTimer() every second */
@@ -327,62 +339,62 @@ int main(int argc, char *argv[])
 #endif /* HAVE_SOLARIS_THREADS */
 
   while (1)
-  {
-    /* enter loop waiting for server info */
+    {
+      /* enter loop waiting for server info */
 #ifdef HAVE_SOLARIS_THREADS
-    
-    thr_create(NULL, 0, (void *) &ReadSocketInfo, NULL,
-                    THR_BOUND, &selectid);
-    thr_join(selectid, NULL, NULL);
+
+      thr_create(NULL, 0, (void *) &ReadSocketInfo, NULL,
+                 THR_BOUND, &selectid);
+      thr_join(selectid, NULL, NULL);
 
 #else
 
 #ifdef HAVE_PTHREADS
 
-    pthread_create(&selectid, NULL, (void *) &ReadSocketInfo, NULL);
-    pthread_join(selectid, NULL);
+      pthread_create(&selectid, NULL, (void *) &ReadSocketInfo, NULL);
+      pthread_join(selectid, NULL);
 
 #else
 
-    ReadSocketInfo();
+      ReadSocketInfo();
 
 #endif /* HAVE_PTHREADS */
 
 #endif /* HAVE_SOLARIS_THREADS */
 
-    if (Me.hub)
-      SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
-    else
-      SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
+      if (Me.hub)
+        SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
+      else
+        SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
 
-    if (currenthub)
-      if (currenthub->realname)
-      {
-        MyFree(currenthub->realname);
-        currenthub->realname = NULL;
-      }
+      if (currenthub)
+        if (currenthub->realname)
+          {
+            MyFree(currenthub->realname);
+            currenthub->realname = NULL;
+          }
 
-    close(HubSock); /* There was an error */
-    HubSock = NOSOCKET;
-    currenthub->connect_ts = 0;
+      close(HubSock); /* There was an error */
+      HubSock = NOSOCKET;
+      currenthub->connect_ts = 0;
 
-    /* 
-     * whenever HybServ connects/reconnects to a server, clear
-     * users, servers, and chans
-     */
-    ClearUsers();
-    ClearChans();
-    ClearServs();
-    /*
-     * ClearHashes() must be called AFTER ClearUsers(),
-     * or StatServ's unique client counts will be off since
-     * cloneTable[] would be NULL while it was trying to find
-     * clones
-     */
-    ClearHashes(0);
+      /*
+       * whenever HybServ connects/reconnects to a server, clear
+       * users, servers, and chans
+       */
+      ClearUsers();
+      ClearChans();
+      ClearServs();
+      /*
+       * ClearHashes() must be called AFTER ClearUsers(),
+       * or StatServ's unique client counts will be off since
+       * cloneTable[] would be NULL while it was trying to find
+       * clones
+       */
+      ClearHashes(0);
 
-    PostCleanup();
-  } /* while (1) */
+      PostCleanup();
+    } /* while (1) */
 
   return (0);
 } /* main() */

@@ -2244,6 +2244,9 @@ n_identify(struct Luser *lptr, int ac, char **av)
                "You have no new memos");
     }
 #endif /* MEMOSERVICES */
+
+  nptr->lastseen = realptr->lastseen = current_ts;
+  
 } /* n_identify() */
 
 /*

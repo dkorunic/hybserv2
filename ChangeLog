@@ -1,3 +1,13 @@
+*** 20010617_2 by kreator
+- fixed problem with killchan not cleaning channels because of lame O:*@*
+  lines (reported by KrisDuv)
+- did what Kris suggested --> >= check for c_level(): however, this is a
+  cosmetic change since it was syntactically and logically OK (founder can
+  redefine levels and make autoop match only one person - founder)
+- added verbose reports (if channel is set verbose) for access_add
+  (KrisDuv) and access_del (modification of Kris' code)
+
+
 *** 20010617_1 by kreator
 - applied KrisDuv's patch for RemoveFounderChannelFromNick() function
   which _didn't_ decrease fccnt after channel drop: so in fact we had

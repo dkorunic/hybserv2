@@ -167,13 +167,9 @@ CheckGlined(struct Luser *lptr)
 
   if ((tempgline = IsGline(lptr->username, lptr->hostname)))
     {
-      toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\n",
-             n_OperServ,
-             lptr->nick,
-             Me.name,
-             n_OperServ,
-             tempgline->reason,
-             tempgline->who);
+      toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
+             n_OperServ, lptr->nick, Me.name, n_OperServ,
+             tempgline->reason, tempgline->who);
 
       DeleteClient(lptr);
 
@@ -221,23 +217,14 @@ void
 ExecuteGline(char *username, char *hostname, char *reason)
 
 {
-  toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\n",
-         Me.name,
-         username ? username : "*",
-         hostname,
-         reason);
+  toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\n",
-         Me.name,
-         username ? username : "*",
-         hostname,
-         reason);
+  toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\n",
-         Me.name,
-         username ? username : "*",
-         hostname,
-         reason);
+  toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 } /* ExecuteGline() */
 
 #endif /* HYBRID_GLINES */
@@ -252,10 +239,9 @@ ExecuteGline(char *username, char *hostname, char *reason)
 void Execute7Gline(char *username, char *hostname, char *reason, time_t
     time)
 {
-  toserv(":%s KLINE %s %lu %s %s :%s\n",
-         n_OperServ, "*", time,
-         username ? username : "*",
-         hostname, reason);
+  toserv(":%s KLINE %s %lu %s %s :%s\r\n",
+         n_OperServ, "*", time, username ? username : "*", hostname,
+         reason);
 } /* Execute7Gline() */
 
 #endif /* HYBRID7_GLINES */

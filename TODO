@@ -11,12 +11,6 @@ Pending bugs:
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff
 *) set allowguardchannel 0 -> part all channels immediately
-*) segv:
-[19:54:37] <q> 1) register a channel
-[19:54:47] <q> 2) set guard on (dunno if this is necessary but probably so)
-[19:54:49] <q> 3) set verbose on
-[19:54:57] <q> 4) access #chan AAAAAAAA.....
-[19:55:04] <q> put about 500 A's
 *) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count

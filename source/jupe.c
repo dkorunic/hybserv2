@@ -139,8 +139,7 @@ CheckJupes()
            */
           if (!IsJupe(tempserv->name))
             {
-              toserv("SQUIT %s :Unjuped\n",
-                     tempserv->name);
+              toserv("SQUIT %s :Unjuped\r\n", tempserv->name);
 
               next = tempserv->next;
               DeleteServer(tempserv);
@@ -173,10 +172,8 @@ DoJupeSquit(char *serv, char *reason, char *who)
       if (match(serv, tempserv->name))
         {
           /* squit the server */
-          toserv("SQUIT %s :Juped: %s (%s)\n",
-                 tempserv->name,
-                 reason,
-                 who);
+          toserv("SQUIT %s :Juped: %s (%s)\r\n", tempserv->name, reason,
+              who);
 
           prev = tempserv->next;
           DeleteServer(tempserv); /* remove server from list */
@@ -187,7 +184,7 @@ DoJupeSquit(char *serv, char *reason, char *who)
     }
 
   /* add a fake server to replace it */
-  ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, serv,
+  ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n", Me.name, serv,
              reason);
 
   toserv(sendstr);
@@ -229,7 +226,7 @@ CheckJuped(char *name)
 
 #ifdef DANCER
               ircsprintf(sendstr,
-                  "NICK %s 1 %ld +i juped juped.com %s %lu :%s\n",
+                  "NICK %s 1 %ld +i juped juped.com %s %lu :%s\r\n",
                   tempjupe->name,
 #ifdef NICKSERVICES
                   (long) (lptr->nick_ts - 1),
@@ -240,7 +237,7 @@ CheckJuped(char *name)
                   tempjupe->reason : "Jupitered Nickname");
 #else
               /* collide the nickname */
-              ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+              ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
                          tempjupe->name,
 #ifdef NICKSERVICES
                          (long) (lptr->nick_ts - 1),
@@ -270,17 +267,15 @@ CheckJuped(char *name)
             }
           else
             {
-              toserv("SQUIT %s :Juped: %s (%s)\n",
-                     name,
-                     tempjupe->reason,
-                     tempjupe->who);
+              toserv("SQUIT %s :Juped: %s (%s)\r\n", name,
+                  tempjupe->reason, tempjupe->who);
 
               tempserv = FindServer(name);
               DeleteServer(tempserv);
 
               /* replace it with fake server */
-              ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, name,
-                         tempjupe->reason);
+              ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n",
+                  Me.name, name, tempjupe->reason);
               toserv(sendstr);
               SplitBuf(sendstr, &arv);
 
@@ -333,12 +328,12 @@ InitJupes()
       if (tmpjupe->isnick)
         {
 #ifdef DANCER
-          ircsprintf(sendstr, "NICK %s 1 1 +i juped juped.com %s :%s\n",
+          ircsprintf(sendstr, "NICK %s 1 1 +i juped juped.com %s :%s\r\n",
               tmpjupe->name, Me.name, tmpjupe->reason ? tmpjupe->reason :
               "Jupitered Nickname");
 #else
           /* collide the nickname */
-          ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
+          ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\r\n",
                      tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
                      tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
 #endif /* DANCER */
@@ -352,7 +347,7 @@ InitJupes()
           ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
                      tmpjupe->name, tmpjupe->reason);
 
-          toserv(":%s SQUIT %s :%s (%s)\n%s\n",
+          toserv(":%s SQUIT %s :%s (%s)\r\n%s\r\n",
                  Me.name,
                  tmpjupe->name,
                  tmpjupe->reason,

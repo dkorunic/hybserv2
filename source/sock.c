@@ -162,13 +162,9 @@ writesocket(int sockfd, char *writestr)
 } /* writesocket() */
 
 /*
-toserv()
-  sends 'str' to hub server
+  toserv() sends 'str' to hub server
 */
-
-void
-toserv(char *format, ...)
-
+void toserv(char *format, ...)
 {
   char buf[MAXLINE * 2];
   int ii;
@@ -190,7 +186,7 @@ toserv(char *format, ...)
    */
   if ((format[strlen(format) - 1] == '\n') &&
       (buf[ii - 1] != '\n'))
-    writesocket(HubSock, "\n");
+    writesocket(HubSock, "\r\n");
 } /* toserv() */
 
 /*
@@ -206,9 +202,7 @@ tosock(int sockfd, char *format, ...)
   va_list args;
 
   va_start(args, format);
-
   vsprintf_irc(buf, format, args);
-
   va_end(args);
 
   /* send the string to the socket */
@@ -777,7 +771,7 @@ ReadSocketInfo(void)
       else
         {
           /* Also check whether is errno set at all.. -kre */
-          if ((SelectResult == (-1)) && errno && errno!=EINTR)
+          if ((SelectResult == (-1)) && errno && (errno != EINTR))
             {
 #ifdef DEBUGMODE
               fprintf(stderr,
@@ -1258,7 +1252,7 @@ void signon(void)
 {
   /* Hybrid6 and 7 handshake -kre */
 #ifdef HYBRID_ONLY
-  toserv("PASS %s :TS\nCAPAB :EX"
+  toserv("PASS %s :TS\r\nCAPAB :EX"
 #ifdef DANCER
       " DNCR SRV"
 #endif /* DANCER */
@@ -1270,14 +1264,14 @@ void signon(void)
          /* Send most of Hybrid7 CAPABS -kre && Janos */
          " KLN GLN HOPS IE HUB AOPS"
 #endif /* HYBRID7 */
-         "\n", currenthub->password);
+         "\r\n", currenthub->password);
 #endif /* HYBRID_ONLY */
 
 #ifdef IRCNET
   /* Authenticate to IRCNet daemon -kre */
-  toserv("PASS %s %s IRC|%s %s\n", currenthub->password,
+  toserv("PASS %s %s IRC|%s %s\r\n", currenthub->password,
          "0210030000", "HEiJKps", "P");
 #endif /* IRCNET */
 
-  toserv("SERVER %s 1 :%s\n", Me.name, Me.info);
+  toserv("SERVER %s 1 :%s\r\n", Me.name, Me.info);
 } /* signon() */

@@ -970,7 +970,7 @@ cs_join(struct ChanInfo *chanptr)
       else
         chants = current_ts;
 
-      ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\n", Me.name,
+      ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n", Me.name,
                  (long) chants, chanptr->name, n_ChanServ);
       toserv(sendstr);
 
@@ -1007,7 +1007,7 @@ cs_joinchan(struct ChanInfo *chanptr)
 
   chptr = FindChannel(chanptr->name);
 
-  ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\n",
+  ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n",
              Me.name, chptr ? (long) chptr->since : (long) current_ts,
              chanptr->name, n_ChanServ);
   toserv(sendstr);
@@ -1031,7 +1031,7 @@ cs_join_ts_minus_1(struct ChanInfo *chanptr)
   int ac;
 
   ircsprintf(sendstr,
-             ":%s SJOIN %ld %s + :@%s\n",
+             ":%s SJOIN %ld %s + :@%s\r\n",
              Me.name, cptr ? (long) (cptr->since - 1) : (long) current_ts,
              cptr->name, n_ChanServ);
   toserv(sendstr);
@@ -1057,9 +1057,7 @@ cs_part(struct Channel *chptr)
   if (!chptr)
     return;
 
-  toserv(":%s PART %s\n",
-         n_ChanServ,
-         chptr->name);
+  toserv(":%s PART %s\r\n", n_ChanServ, chptr->name);
   RemoveFromChannel(chptr, Me.csptr);
 } /* cs_part() */
 
@@ -1103,7 +1101,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if (!IsChannelMember(chptr, Me.csptr))
         cs_joinchan(cptr);
 
-      toserv(":%s MODE %s +i\n", n_ChanServ, cptr->name);
+      toserv(":%s MODE %s +i\r\n", n_ChanServ, cptr->name);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, "+i");
       KickBan(0, n_ChanServ, chptr, knicks, "Forbidden Channel");
       MyFree(knicks);
@@ -1224,7 +1222,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           if (chptr->key)
             {
               ircsprintf(temp, "-k %s", chptr->key);
-              toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, temp);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, temp);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, temp);
             }
           ircsprintf(temp, "%s %s", modes, cptr->key);
@@ -1242,7 +1240,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     }
   if (modes[1])
     {
-      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 
@@ -1299,8 +1297,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     }
   if (modes[1])
     {
-      toserv(":%s MODE %s %s\n",
-             n_ChanServ, cptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 
@@ -1325,10 +1322,7 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
        * ChanServ should already be on the channel - just set
        * topic normally
        */
-      toserv(":%s TOPIC %s :%s\n",
-             n_ChanServ,
-             chanptr->name,
-             topic);
+      toserv(":%s TOPIC %s :%s\r\n", n_ChanServ, chanptr->name, topic);
     }
   else
     {
@@ -1341,10 +1335,10 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
        * It won't help if topiclen > ircdbuflen, that was original bug.
        * Anyway, it is dealt with c_topic() code, too. :-) -kre
        */
-      toserv(":%s SJOIN %ld %s + :@%s\n", Me.name, chanptr->since,
+      toserv(":%s SJOIN %ld %s + :@%s\r\n", Me.name, chanptr->since,
           chanptr->name, n_ChanServ);
-      toserv(":%s TOPIC %s :%s\n", n_ChanServ, chanptr->name, topic);
-      toserv(":%s PART %s\n", n_ChanServ, chanptr->name);
+      toserv(":%s TOPIC %s :%s\r\n", n_ChanServ, chanptr->name, topic);
+      toserv(":%s PART %s\r\n", n_ChanServ, chanptr->name);
     }
 } /* cs_SetTopic() */
 
@@ -1406,7 +1400,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
                 return;
 
               ircsprintf(modes, "+o %s", lptr->nick);
-              toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
             }
         }
@@ -1417,13 +1411,13 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
               (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP]))
             {
               ircsprintf(modes, "-o %s", lptr->nick);
-              toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
             }
           else if (HasFlag(lptr->nick, NS_NOCHANOPS))
             {
               ircsprintf(modes, "-o %s", lptr->nick);
-              toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 
               notice(n_ChanServ, lptr->nick,
@@ -1448,7 +1442,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
           if (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP])
             {
               ircsprintf(modes, "-v %s", lptr->nick);
-              toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
             }
         }
@@ -1467,7 +1461,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
           if (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP])
             {
               ircsprintf(modes, "-h %s", lptr->nick);
-              toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+              toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
             }
         }
@@ -1528,10 +1522,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
 
       if (modes[0])
         {
-          toserv(":%s MODE %s %s\n",
-                 n_ChanServ,
-                 cptr->name,
-                 modes);
+          toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
           UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
         }
     }
@@ -1539,7 +1530,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       (cptr->limit))
     {
       ircsprintf(modes, "+l %ld", cptr->limit);
-      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
   if ((mode == MODE_K) &&
@@ -1548,11 +1539,11 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if (!isminus)
         {
           ircsprintf(modes, "-k %s", chptr->key);
-          toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+          toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
           UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
         }
       ircsprintf(modes, "+k %s", cptr->key);
-      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 #ifdef DANCER
@@ -1561,11 +1552,11 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     if (!isminus)
     {
       ircsprintf(modes, "-f %s", chptr->forward);
-      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
     ircsprintf(modes, "+f %s", cptr->forward);
-    toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+    toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
   }
 #endif /* DANCER */
@@ -1623,10 +1614,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
 
       if (modes[0])
         {
-          toserv(":%s MODE %s %s\n",
-                 n_ChanServ,
-                 cptr->name,
-                 modes);
+          toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
           UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
         }
     }
@@ -1703,7 +1691,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
     {
       ircsprintf(modes, "+o %s", tempuser->lptr->nick);
-      toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, chanptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
     }
 #ifdef HYBRID7
@@ -1712,7 +1700,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
            HasAccess(cptr, tempuser->lptr, CA_AUTOHALFOP))
     {
       ircsprintf(modes, "+h %s", tempuser->lptr->nick);
-      toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, chanptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
     }
 #endif /* HYBRID7 */
@@ -1720,7 +1708,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
            HasAccess(cptr, tempuser->lptr, CA_AUTOVOICE))
     {
       ircsprintf(modes, "+v %s", tempuser->lptr->nick);
-      toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, chanptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
     }
 } /* cs_CheckOp() */
@@ -1792,7 +1780,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       if (!IsChannelMember(chanptr, Me.csptr))
         cs_joinchan(cptr);
 
-      toserv(":%s MODE %s +is\n", n_ChanServ, cptr->name);
+      toserv(":%s MODE %s +is\r\n", n_ChanServ, cptr->name);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, "+is");
       KickBan(0, n_ChanServ, chanptr, lptr->nick, "Forbidden Channel");
       return;
@@ -1821,10 +1809,10 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
         }
 
       ircsprintf(modes, "+b %s", ak->hostmask);
-      toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, chanptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
 
-      toserv(":%s KICK %s %s :%s\n", n_ChanServ, chanptr->name,
+      toserv(":%s KICK %s %s :%s\r\n", n_ChanServ, chanptr->name,
              lptr->nick, ak->reason ? ak->reason : "");
       RemoveFromChannel(chanptr, lptr);
     }
@@ -1838,13 +1826,13 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
 
       ircsprintf(modes, "+b *!%s", mask);
 
-      toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+      toserv(":%s MODE %s %s\r\n", n_ChanServ, chanptr->name, modes);
 
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
 
       MyFree(mask);
 
-      toserv(":%s KICK %s %s :%s\n",
+      toserv(":%s KICK %s %s :%s\r\n",
              n_ChanServ, chanptr->name, lptr->nick, "Restricted Channel");
 
       RemoveFromChannel(chanptr, lptr);
@@ -3544,7 +3532,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                 {
                   char modes[MAXLINE];
                   ircsprintf(modes, "+o %s", nickptr->nick);
-                  toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+                  toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
                   UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
                 }
             }
@@ -4013,12 +4001,12 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		  if (sidx == 1)
 		  {
 		    ircsprintf(modes, "+b %s", hostmask);
-	      toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
+	      toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, modes);
 		    UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 		    sidx = 0;
 		  }
 
-      toserv(":%s KICK %s %s :%s\n", n_ChanServ, cptr->name,
+      toserv(":%s KICK %s %s :%s\r\n", n_ChanServ, cptr->name,
           tempuser->lptr->nick, reason ? reason : "");
 	  }
   }
@@ -5772,7 +5760,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if ((chptr = FindChannel(cptr->name)))
     {
-      toserv(":%s MODE %s %s %s\n",
+      toserv(":%s MODE %s %s %s\r\n",
              n_ChanServ, cptr->name, modes,
              ((cptr->modes_off & MODE_K) && (chptr->key)) ? chptr->key : "");
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
@@ -6175,7 +6163,7 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
       strcat(modes, "k ");
       strcat(modes, chptr->key);
     }
-    toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
+    toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, modes);
 
     UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     if (cs_ShouldBeOnChan(cptr))
@@ -6262,11 +6250,11 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       /* it only needs to join if it's not guarding - toot */
       if (!(cptr->flags & CS_GUARD))
         {
-          toserv(":%s SJOIN %ld %s + :@%s\n",
+          toserv(":%s SJOIN %ld %s + :@%s\r\n",
                  Me.name, chptr->since, cptr->name, n_ChanServ);
         }
 
-      toserv(":%s INVITE %s %s\n",
+      toserv(":%s INVITE %s %s\r\n",
              n_ChanServ, lptr->nick, cptr->name);
 
       if ((cptr->flags & CS_VERBOSE))
@@ -6281,7 +6269,7 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       /* It will PART also if AllowGuardChannel is not set -kre */
       if (!(cptr->flags & CS_GUARD) || !AllowGuardChannel)
         {
-          toserv(":%s PART %s\n",
+          toserv(":%s PART %s\r\n",
                  n_ChanServ,
                  cptr->name);
         }
@@ -6337,7 +6325,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             {
               if (!(uchan->flags & CH_OPPED))
                 {
-                  toserv(":%s MODE %s +o %s\n", n_ChanServ,
+                  toserv(":%s MODE %s +o %s\r\n", n_ChanServ,
                          uchan->chptr->name, lptr->nick);
                   uchan->flags |= CH_OPPED;
 
@@ -7260,7 +7248,7 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 #endif /* DANCER */
 
-  toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
+  toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, modes);
 
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 } /* c_clear_modes() */
@@ -7340,18 +7328,14 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   SetModes(n_ChanServ, 0, 'o', chptr, ops);
   MyFree(ops);
 
-  toserv(":%s MODE %s +i\n",
-         n_ChanServ,
-         chptr->name);
+  toserv(":%s MODE %s +i\r\n", n_ChanServ, chptr->name);
 
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, "+i");
 
   KickBan(0, n_ChanServ, chptr, knicks, "Clearing Users");
   MyFree(knicks);
 
-  toserv(":%s MODE %s -i\n",
-         n_ChanServ,
-         chptr->name);
+  toserv(":%s MODE %s -i\r\n", n_ChanServ, chptr->name);
 
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, "-i");
 } /* c_clear_users() */
@@ -7996,7 +7980,7 @@ ExpireAkicks(time_t unixtime)
           modes[sizeof(modes) - 1] = '\0'; /* Paranoic - there is no
                                               ircnsprintf() :) */
           /* Send UNBAN */
-          toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+          toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
           chptr = FindChannel(cptr->name); 
           if (chptr)
             UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);

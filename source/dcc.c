@@ -90,7 +90,7 @@ SendMotd(int sockfd)
 
   if ((fp = fopen(DccMotdFile, "r")) == NULL)
     {
-      writesocket(sockfd, "MOTD file missing\n");
+      writesocket(sockfd, "MOTD file missing\r\n");
       return;
     }
 
@@ -265,7 +265,7 @@ SendDccMessage(struct DccUser *from, char *message)
     return;
 
   ircsprintf(final, "<%s@%s> %s", from->nick, n_OperServ, message);
-  strcat(final, "\n");
+  strcat(final, "\r\n");
 
   /* now send the string to all clients */
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
@@ -344,17 +344,14 @@ SendUmode(int umode, char *format, ...)
                   if (tempuser->umodes & OPERUMODE_Y)
                   {
                     tosock(dccptr->socket,
-                      "%s *** Broadcast Flood detected, halting broadcasts for %d seconds\n",
+                      "%s *** Broadcast Flood detected, halting broadcasts for %d seconds\r\n",
                       timestr, BCFLoodTime);
                   }
                 }
           */
           if (!ActiveFlood && tempuser->umodes & umode)
             {
-              tosock(dccptr->socket,
-                     "%s %s\n",
-                     timestr,
-                     buffer);
+              tosock(dccptr->socket, "%s %s\r\n", timestr, buffer);
             }
         }
     }
@@ -395,8 +392,7 @@ DccConnectHost(char *hostname, unsigned int port)
         {
 #ifdef DEBUGMODE
           fprintf(stderr,
-                  "Cannot connect to port %d of %s: Unknown host\n",
-                  port,
+                  "Cannot connect to port %d of %s: Unknown host\n", port,
                   hostname);
 #endif
 
@@ -2159,14 +2155,9 @@ ServReboot()
     }
   connections = NULL;
 
-#if 0
-
-  toserv("SQUIT %s :restarting\n",
-         currenthub->realname ? currenthub->realname : "*");
-#endif
   /* Instead of SQUIT -kre */
-  toserv(":%s ERROR :Restarting\n", Me.name);
-  toserv(":%s QUIT\n", Me.name);
+  toserv(":%s ERROR :Restarting\r\n", Me.name);
+  toserv(":%s QUIT\r\n", Me.name);
 
   /* kill old connection and clear out user/chan lists etc */
   close(HubSock);

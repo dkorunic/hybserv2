@@ -345,10 +345,8 @@ DoPings()
       tempserv->lastping_sec = timer.tv_sec;
       tempserv->lastping_usec = timer.tv_usec;
 
-      toserv(":%s PING %s :%s\n",
-             Me.name,
-             Me.name,
-             tempserv->name);
+      toserv(":%s PING %s :%s\r\n",
+             Me.name, Me.name, tempserv->name);
     }
 } /* DoPings() */
 

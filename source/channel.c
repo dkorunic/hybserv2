@@ -1023,10 +1023,8 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
                         os_join(cptr);
 #else
 
-                        toserv(":%s MODE %s +o %s\n",
-                               Me.name,
-                               cptr->name,
-                               n_OperServ);
+                        toserv(":%s MODE %s +o %s\r\n", Me.name,
+                            cptr->name, n_OperServ);
 #endif
 
                       }
@@ -1393,23 +1391,15 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
       cs_join(FindChan(cptr->name));
 #else
 
-      toserv(":%s MODE %s +o %s\n",
-             Me.name,
-             cptr->name,
-             n_ChanServ);
+      toserv(":%s MODE %s +o %s\r\n", Me.name, cptr->name, n_ChanServ);
 #endif
 
       if (!lptr)
-        putlog(LOG1, "%s: %s attempted to deop %s",
-               cptr->name,
-               who,
-               n_ChanServ);
+        putlog(LOG1, "%s: %s attempted to deop %s", cptr->name, who,
+            n_ChanServ);
       else
-        putlog(LOG1, "%s: %s!%s@%s attempted to deop %s",
-               cptr->name,
-               lptr->nick,
-               lptr->username,
-               lptr->hostname,
+        putlog(LOG1, "%s: %s!%s@%s attempted to deop %s", cptr->name,
+            lptr->nick, lptr->username, lptr->hostname,
                n_ChanServ);
     }
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
@@ -1555,10 +1545,7 @@ DoMode(struct Channel *chptr, char *modes, int joinpart)
     /* make sure its not already a monitored channel */
     os_join(chptr);
 
-  toserv(":%s MODE %s %s\n",
-         n_OperServ,
-         chptr->name,
-         modes);
+  toserv(":%s MODE %s %s\r\n", n_OperServ, chptr->name, modes);
   UpdateChanModes(Me.osptr, n_OperServ, chptr, modes);
 
   if (joinpart && !chanptr)
@@ -1566,10 +1553,7 @@ DoMode(struct Channel *chptr, char *modes, int joinpart)
 
 #else
 
-  toserv(":%s MODE %s %s\n",
-         Me.name,
-         chptr->name,
-         modes);
+  toserv(":%s MODE %s %s\r\n", Me.name, chptr->name, modes);
   UpdateChanModes(0, Me.name, chptr, modes);
 
 #endif /* SAVE_TS */
@@ -1632,10 +1616,7 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
           mtmp = modestr(MaxModes, mode);
           ircsprintf(sendstr, "%s%s %s",
                      plus ? "+" : "-", mtmp, done);
-          toserv(":%s MODE %s %s\n",
-                 source,
-                 chptr->name,
-                 sendstr);
+          toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
           UpdateChanModes(0, source, chptr, sendstr);
           MyFree(mtmp);
           memset(&done, 0, MAXLINE);
@@ -1646,14 +1627,8 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
   if (done[0] != '\0')
     {
       mtmp = modestr(mcnt - 1, mode);
-      ircsprintf(sendstr, "%s%s %s",
-                 plus ? "+" : "-",
-                 mtmp,
-                 done);
-      toserv(":%s MODE %s %s\n",
-             source,
-             chptr->name,
-             sendstr);
+      ircsprintf(sendstr, "%s%s %s", plus ? "+" : "-", mtmp, done);
+      toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
       UpdateChanModes(0, source, chptr, sendstr);
       MyFree(mtmp);
     }
@@ -1704,11 +1679,8 @@ KickBan(int ban, char *source, struct Channel *channel, char *nicks, char *reaso
 
   for (ii = 0; ii < ac; ii++)
     {
-      toserv(":%s KICK %s %s :%s\n",
-             source,
-             channel->name,
-             av[ii],
-             reason ? reason : "");
+      toserv(":%s KICK %s %s :%s\r\n", source, channel->name, av[ii],
+          reason ? reason : "");
       RemoveFromChannel(channel, FindClient(av[ii]));
     }
 

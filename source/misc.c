@@ -268,9 +268,9 @@ void notice(char *from, char *nick, char *format, ...)
 
   nptr = GetLink(nick);
   if (nptr && (nptr->flags & NS_PRIVMSG))
-    toserv(":%s PRIVMSG %s :%s\n", who, nick, finalstr);
+    toserv(":%s PRIVMSG %s :%s\r\n", who, nick, finalstr);
   else
-    toserv(":%s NOTICE %s :%s\n", who, nick, finalstr);
+    toserv(":%s NOTICE %s :%s\r\n", who, nick, finalstr);
 
 } /* notice() */
 
@@ -293,7 +293,7 @@ DoShutdown(char *who, char *reason)
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
-  toserv(":%s QUIT :%s\n", n_ChanServ, "Shutting Down");
+  toserv(":%s QUIT :%s\r\n", n_ChanServ, "Shutting Down");
 #endif
 
   /* close listening sockets */
@@ -317,8 +317,8 @@ DoShutdown(char *who, char *reason)
   putlog(LOG1, sendstr);
 
   /* Instead of SQUIT -kre */
-  toserv(":%s ERROR :Shutting down\n", Me.name);
-  toserv(":%s QUIT\n", Me.name);
+  toserv(":%s ERROR :Shutting down\r\n", Me.name);
+  toserv(":%s QUIT\r\n", Me.name);
 
 #ifdef DEBUGMODE
   /* This can be useful in debug mode -kre */

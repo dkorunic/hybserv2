@@ -1389,10 +1389,10 @@ collide(char *nick)
     return;
 
 #ifdef DANCER
-  ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\n", lptr->nick,
+  ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
       "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
 #else
-  ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+  ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
       lptr->nick, (long) (lptr->nick_ts - 1), "enforced", Me.name,
       Me.name, "Nickname Enforcement");
 #endif /* DANCER */
@@ -1401,7 +1401,7 @@ collide(char *nick)
    * Sending a server kill will be quieter than an oper
    * kill since most clients are -k
    */
-  toserv("KILL %s :%s!%s (Nickname Enforcement)\n%s",
+  toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
          lptr->nick, Me.name, n_NickServ, sendstr);
 
   /* erase the old user */
@@ -1445,8 +1445,7 @@ release(char *nickname)
   if (lptr->server != Me.sptr)
     return; /* lptr->nick isn't a pseudo-nick */
 
-  toserv(":%s QUIT :Released\n",
-         lptr->nick);
+  toserv(":%s QUIT :Released\r\n", lptr->nick);
   DeleteClient(lptr);
 
   nptr->flags &= ~NS_RELEASE;
@@ -1498,7 +1497,7 @@ CollisionCheck(time_t unixtime)
                                 "%s: forcing nick change for %s!%s@%s",
                                 n_NickServ, lptr->nick, lptr->username,
                                 lptr->hostname);
-                        toserv(":%s 432 %s %s :Erroneus Nickname\n",
+                        toserv(":%s 432 %s %s :Erroneus Nickname\r\n",
                             Me.name, lptr->server, lptr->nick);
                         nptr->flags |= NS_NUMERIC;
                         nptr->collide_ts = current_ts + 30;
@@ -1961,23 +1960,20 @@ n_register(struct Luser *lptr, int ac, char **av)
   lptr->nickreg_ts = currtime;
 
   notice(n_NickServ, lptr->nick,
-         "Your nickname is now registered under the hostmask [\002%s\002]\n",
+         "Your nickname is now registered under the hostmask [\002%s\002]",
          mask);
   notice(n_NickServ, lptr->nick,
          "Your password is [\002%s\002] - Remember this for later use",
          av[1]);
 #ifdef DANCER
   /* for ircds that have +e mode -kre */
-  toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
+  toserv(":%s MODE %s +e\r\n", Me.name, lptr->nick);
 #endif /* DANCER */
 
   MyFree(mask);
 
-  RecordCommand("%s: %s!%s@%s REGISTER",
-                n_NickServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname);
+  RecordCommand("%s: %s!%s@%s REGISTER", n_NickServ, lptr->nick,
+      lptr->username, lptr->hostname);
 } /* n_register() */
 
 /*
@@ -2092,10 +2088,11 @@ n_drop(struct Luser *lptr, int ac, char **av)
   DeleteNick(ni);
 #ifdef DANCER
   /* De-identify the user, for ircds that have such mode -kre */
-  toserv(":%s MODE %s -e\n", Me.name, dnick);
+  toserv(":%s MODE %s -e\r\n", Me.name, dnick);
 #endif /* DANCER */
 
-  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been dropped", dnick);
+  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been
+      dropped", dnick);
 } /* n_drop() */
 
 /*
@@ -2178,7 +2175,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
   notice(n_NickServ, lptr->nick,
          "Password accepted - you are now recognized");
 #ifdef DANCER
-  toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
+  toserv(":%s MODE %s +e\r\n", Me.name, lptr->nick);
 #endif /* DANCER */
 
   if ((nptr->flags & NS_AUTOMASK) &&
@@ -2511,14 +2508,9 @@ n_ghost(struct Luser *lptr, int ac, char **av)
           return;
         }
 
-      toserv(":%s KILL %s :%s!%s (Ghost: %s!%s@%s)\n",
-             n_NickServ,
-             av[1],
-             Me.name,
-             n_NickServ,
-             lptr->nick,
-             lptr->username,
-             lptr->hostname);
+      toserv(":%s KILL %s :%s!%s (Ghost: %s!%s@%s)\r\n",
+             n_NickServ, av[1], Me.name, n_NickServ, lptr->nick,
+             lptr->username, lptr->hostname);
 
       DeleteClient(gptr);
 

@@ -312,7 +312,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
               ircsprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
               if ((fp = fopen(sendstr, "r")) == NULL)
                 {
-                  writesocket(sockfd, "Unable to open help file\n");
+                  writesocket(sockfd, "Unable to open help file\r\n");
                   return;
                 }
             }
@@ -362,7 +362,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           else
             {
               writesocket(sockfd, sendstr);
-              writesocket(sockfd, "\n");
+              writesocket(sockfd, "\r\n");
             }
           return;
         }
@@ -479,7 +479,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           else
             {
               writesocket(sockfd, sendstr);
-              writesocket(sockfd, "\n");
+              writesocket(sockfd, "\r\n");
             }
           return;
         }
@@ -494,7 +494,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           else
             {
               writesocket(sockfd, final ? final : "");
-              /*writesocket(sockfd, "\n");*/
+              writesocket(sockfd, "\r\n");
             }
           if (final && (final != (char *) -1))
             MyFree(final);

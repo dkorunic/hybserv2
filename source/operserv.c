@@ -898,11 +898,11 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
       {
         nptr = GetLink(lptr->nick);
         if (nptr && (nptr->flags & NS_PRIVMSG))
-          toserv(":%s PRIVMSG %s :%s\n",
+          toserv(":%s PRIVMSG %s :%s\r\n",
               (ServerNotices) ? Me.name : n_OperServ,
               lptr->nick, finstr);
         else
-          toserv(":%s NOTICE %s :%s\n",
+          toserv(":%s NOTICE %s :%s\r\n",
               (ServerNotices) ? Me.name : n_OperServ,
               lptr->nick, finstr);
       }
@@ -910,7 +910,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
   else
     {
       writesocket(sockfd, finstr);
-      writesocket(sockfd, "\n");
+      writesocket(sockfd, "\r\n");
     }
 } /* os_notice() */
 
@@ -930,11 +930,8 @@ os_join(struct Channel *cptr)
     return;
 
   ircsprintf(sendstr,
-             ":%s SJOIN %ld %s + :@%s\n",
-             Me.name,
-             (long) cptr->since,
-             cptr->name,
-             n_OperServ);
+             ":%s SJOIN %ld %s + :@%s\r\n",
+             Me.name, (long) cptr->since, cptr->name, n_OperServ);
 
   toserv(sendstr);
 
@@ -963,12 +960,9 @@ os_join_ts_minus_1(struct Channel *cptr)
   if (!cptr)
     return;
 
-  ircsprintf(sendstr,
-             ":%s SJOIN %ld %s + :@%s\n",
-             Me.name,
-             (cptr->since != 0) ? (long) cptr->since - 1 : 0,
-             cptr->name,
-             n_OperServ);
+  ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n",
+     Me.name, (cptr->since != 0) ? (long) cptr->since - 1 : 0, cptr->name,
+     n_OperServ);
 
   toserv(sendstr);
   ac = SplitBuf(sendstr, &av);
@@ -988,7 +982,7 @@ os_part(struct Channel *chptr)
   if (!chptr)
     return;
 
-  toserv(":%s PART %s\n", n_OperServ, chptr->name);
+  toserv(":%s PART %s\r\n", n_OperServ, chptr->name);
 
   RemoveFromChannel(chptr, Me.osptr);
 } /* os_part() */
@@ -1058,7 +1052,7 @@ o_Wallops(char *format, ...)
   vsprintf_irc(buffer, format, args);
   va_end(args);
 
-  toserv(":%s OPERWALL :%s: %s\n", Me.name, n_OperServ, buffer);
+  toserv(":%s OPERWALL :%s: %s\r\n", Me.name, n_OperServ, buffer);
 
 } /* o_Wallops() */
 
@@ -1489,11 +1483,9 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
                   kptr->nick,
                   reason);
 
-  o_Wallops("KILL %s [%s]",
-            kptr->nick,
-            reason);
+  o_Wallops("KILL %s [%s]", kptr->nick, reason);
 
-  toserv(":%s KILL %s :%s!%s (%s (Requested by %s))\n",
+  toserv(":%s KILL %s :%s!%s (%s (Requested by %s))\r\n",
          n_OperServ, av[1], Me.name, n_OperServ, reason, onick);
 
   /* remove the killed nick from list */
@@ -1692,7 +1684,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
       if ((jptr = FindClient(av[1])))
         {
           /* kill the juped nick */
-          toserv(":%s KILL %s :%s!%s (%s)\n",
+          toserv(":%s KILL %s :%s!%s (%s)\r\n",
                  n_OperServ, av[1], Me.name, n_OperServ, reason);
           DeleteClient(jptr);
 
@@ -1711,11 +1703,11 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
       /* replace nick with a fake user */
 #ifdef DANCER
-      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s %lu :%s\n", av[1],
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s %lu :%s\r\n", av[1],
           (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
           0xffffffffUL, reason);
 #else
-      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
          av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
          reason);
 #endif /* DANCER */
@@ -1818,7 +1810,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
               /* if theres a pseudo client holding the nick, kill it */
               if ((tempuser = FindClient(tempjupe->name)))
                 {
-                  toserv(":%s QUIT :UnJuped\n", tempuser->nick);
+                  toserv(":%s QUIT :UnJuped\r\n", tempuser->nick);
                   DeleteClient(tempuser);
                 }
             }
@@ -2112,7 +2104,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 
       if (match(hostname, user->hostname))
         {
-          toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\n",
+          toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
                  n_OperServ, user->nick, Me.name, n_OperServ, reason,
                  whostr);
 
@@ -2717,7 +2709,7 @@ InitFuckoverProcess(char *from, char *ftarget)
                   }
 
                 /* send null string to target */
-                toserv(":%s %d %s :\n", Me.name, ii, ftarget);
+                toserv(":%s %d %s :\r\n", Me.name, ii, ftarget);
               }
           }
 
@@ -3126,10 +3118,6 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
               /* send 'msgbuf' to matches through a NOTICE */
               os_notice(tempuser, sockfd, msgbuf);
-              /*
-              toserv(":%s NOTICE %s :%s\n", n_OperServ, tempuser->nick,
-                msgbuf);
-               */
             }
           else if (kill) /* -kill */
             {
@@ -3158,7 +3146,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
                         "** Killing %s",
                         tempuser->nick);
 
-              toserv(":%s KILL %s :%s!%s (#%d (%s@%s))\n",
+              toserv(":%s KILL %s :%s!%s (#%d (%s@%s))\r\n",
                      n_OperServ, tempuser->nick, Me.name, n_OperServ, cnt,
                      onick, n_OperServ);
 
@@ -3330,7 +3318,7 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
         } /* for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next) */
 
       if (sockfd == NODCC)
-        toserv("\n");
+        toserv("\r\n");
       else
         writesocket(sockfd, "\n");
     }
@@ -3744,7 +3732,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
         }
     }
   if (sockfd == NODCC)
-    toserv("\n");
+    toserv("\r\n");
   else
     writesocket(sockfd, "\n");
 
@@ -3915,13 +3903,9 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
       /*GoodTimer = 0;*/
 #endif
 
-#if 0
-      toserv("SQUIT %s :ReRouting\n",
-             currenthub->realname ? currenthub->realname : "*");
-#endif
       /* Do ERROR string instead of lame SQUIT -kre */
-      toserv(":%s ERROR :Rerouting\n", Me.name);
-      toserv(":%s QUIT\n", Me.name);
+      toserv(":%s ERROR :Rerouting\r\n", Me.name);
+      toserv(":%s QUIT\r\n", Me.name);
 
       /* kill old connection and clear out user/chan lists etc */
       close(HubSock);
@@ -4901,7 +4885,7 @@ o_boot(struct Luser *lptr, int ac, char **av, int sockfd)
 
   if (!(dccptr = IsOnDcc(av[1])))
     {
-      os_notice(lptr, sockfd, "%s is not on the partyline\n",
+      os_notice(lptr, sockfd, "%s is not on the partyline",
                 av[1]);
       return;
     }
@@ -5621,14 +5605,9 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
       if (bad)
         continue;
 
-      toserv(":%s KILL %s :%s!%s (%s (%s@%s))\n",
-             n_OperServ,
-             tempuser->lptr->nick,
-             Me.name,
-             n_OperServ,
-             reason,
-             onick,
-             n_OperServ);
+      toserv(":%s KILL %s :%s!%s (%s (%s@%s))\r\n",
+             n_OperServ, tempuser->lptr->nick, Me.name, n_OperServ,
+             reason, onick, n_OperServ);
 
       DeleteClient(tempuser->lptr);
     }
@@ -5720,9 +5699,9 @@ o_killhost(struct Luser *lptr, int ac, char **av, int sockfd)
               break;
             }
 
-          toserv(":%s KILL %s :%s!%s (%s (%s@%s))\n",
-                 n_OperServ, tempuser->nick, Me.name, n_OperServ, reason, onick,
-                 n_OperServ);
+          toserv(":%s KILL %s :%s!%s (%s (%s@%s))\r\n",
+                 n_OperServ, tempuser->nick, Me.name, n_OperServ, reason,
+                 onick, n_OperServ);
 
           DeleteClient(tempuser);
         }
@@ -5822,11 +5801,8 @@ o_htm_on(struct Luser *lptr, int ac, char **av, int sockfd)
          ohost);
 
   SendUmode(OPERUMODE_Y,
-            "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s\n",
-            currload,
-            onick,
-            ouser,
-            ohost);
+    "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s\r\n",
+    currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now ON");
 } /* o_htm_on() */
@@ -5850,17 +5826,11 @@ o_htm_off(struct Luser *lptr, int ac, char **av, int sockfd)
 
   putlog(LOG1,
          "Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s",
-         currload,
-         onick,
-         ouser,
-         ohost);
+         currload, onick, ouser, ohost);
 
   SendUmode(OPERUMODE_Y,
-            "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s\n",
-            currload,
-            onick,
-            ouser,
-            ohost);
+ "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s\r\n",
+            currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now OFF");
 } /* o_htm_off() */
@@ -5895,11 +5865,8 @@ o_htm_max(struct Luser *lptr, int ac, char **av, int sockfd)
          ohost);
 
   SendUmode(OPERUMODE_Y,
-            "*** New HTM Rate: %d K/s (forced by %s!%s@%s)\n",
-            newmax,
-            onick,
-            ouser,
-            ohost);
+            "*** New HTM Rate: %d K/s (forced by %s!%s@%s)\r\n",
+            newmax, onick, ouser, ohost);
 
   os_notice(lptr, sockfd,
             "The HTM Rate has been set to: %d K/s",
@@ -6160,7 +6127,7 @@ o_dump(struct Luser *lptr, int ac, char **av, int sockfd)
                   "DUMP [%s]",
                   dstr);
 
-  toserv("%s\n", dstr);
+  toserv("%s\r\n", dstr);
 
   /*
    * Technically, this av almost the same as the arv[] passed to
@@ -6349,10 +6316,8 @@ TakeOver(struct Channel *cptr)
           acnt = SplitBuf(dopnicks, &av);
           for (ii = 0; ii < acnt; ii++)
             {
-              toserv(":%s KICK %s %s :\n",
-                     n_OperServ,
-                     cptr->name,
-                     av[ii]);
+              toserv(":%s KICK %s %s :\r\n",
+                     n_OperServ, cptr->name, av[ii]);
               RemoveFromChannel(cptr, FindClient(av[ii]));
             }
           MyFree(av);
@@ -6992,118 +6957,80 @@ CalcMem(char *nick, int socket)
     {
       /* User structures usage */
       ircsprintf(sendstr,
-                 "Clients:    %5.0f (%10.0fb) (%10.2fkb)\n",
-                 Network->TotalUsers,
-                 clientm,
-                 clientm / 1024);
+                 "Clients:    %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalUsers, clientm, clientm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Server structures usage */
       ircsprintf(sendstr,
-                 "Servers:    %5.0f (%10.0fb) (%10.2fkb)\n",
-                 Network->TotalServers,
-                 servm,
-                 servm / 1024);
+                 "Servers:    %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalServers, servm, servm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-         */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Channel structures usage */
       ircsprintf(sendstr,
-                 "Channels:   %5.0f (%10.0fb) (%10.2fkb)\n",
-                 Network->TotalChannels,
-                 chanm,
-                 chanm / 1024);
+                 "Channels:   %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalChannels, chanm, chanm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-         */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Channel ban mem usage */
       ircsprintf(sendstr,
-                 "Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
-                 chanbanc,
-                 chanbanm,
-                 chanbanm / 1024);
+                 "Bans:       %5ld (%10.0fb) (%10.2fkb)",
+                 chanbanc, chanbanm, chanbanm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+
 #ifdef GECOSBANS
       /* Channel gecos ban mem usage */
       ircsprintf(sendstr,
-                 "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
-                 changecosbanc,
-                 changecosbanm,
-                 changecosbanm / 1024);
-#endif /* GECOSBANS */
-
+                 "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)",
+                 changecosbanc, changecosbanm, changecosbanm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
+#endif /* GECOSBANS */
 
       /* Channel exception memory usage */
       ircsprintf(sendstr,
-                 "Exceptions: %5ld (%10.0fb) (%10.2fkb)\n",
-                 chanexceptc,
-                 chanexceptm,
-                 chanexceptm / 1024);
+                 "Exceptions: %5ld (%10.0fb) (%10.2fkb)",
+                 chanexceptc, chanexceptm, chanexceptm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       ircsprintf(sendstr,
-                 "Conf lines: %5ld (%10.0fb) (%10.2fkb)\n",
-                 confc,
-                 confm,
-                 confm / 1024);
+                 "Conf lines: %5ld (%10.0fb) (%10.2fkb)",
+                 confc, confm, confm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       ircsprintf(sendstr,
-                 "Ignores: %8ld (%10.0fb) (%10.2fkb)\n",
-                 igc,
-                 igm,
-                 igm / 1024);
+                 "Ignores: %8ld (%10.0fb) (%10.2fkb)",
+                 igc, igm, igm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       ircsprintf(sendstr,
-                 "Partyline: %6d (%10.0fb) (%10.2fkb)\n",
-                 Network->TotalConns,
-                 connm,
-                 connm / 1024);
+                 "Partyline: %6d (%10.0fb) (%10.2fkb)",
+                 Network->TotalConns, connm, connm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */ 
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7111,13 +7038,9 @@ CalcMem(char *nick, int socket)
 #ifdef NICKSERVICES
 
       ircsprintf(sendstr,
-                 "NickServ:         (%10.0fb) (%10.2fkb)\n",
-                 nsm,
-                 nsm / 1024);
+                 "NickServ:         (%10.0fb) (%10.2fkb)",
+                 nsm, nsm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7125,13 +7048,9 @@ CalcMem(char *nick, int socket)
 #ifdef CHANNELSERVICES
 
       ircsprintf(sendstr,
-                 "ChanServ:         (%10.0fb) (%10.2fkb)\n",
-                 csm,
-                 csm / 1024);
+                 "ChanServ:         (%10.0fb) (%10.2fkb)",
+                 csm, csm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7140,13 +7059,9 @@ CalcMem(char *nick, int socket)
 #ifdef MEMOSERVICES
 
       ircsprintf(sendstr,
-                 "MemoServ:         (%10.0fb) (%10.2fkb)\n",
-                 msm,
-                 msm / 1024);
+                 "MemoServ:         (%10.0fb) (%10.2fkb)",
+                 msm, msm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7157,13 +7072,9 @@ CalcMem(char *nick, int socket)
 #ifdef STATSERVICES
 
       ircsprintf(sendstr,
-                 "StatServ:         (%10.0fb) (%10.2fkb)\n",
-                 ssm,
-                 ssm / 1024);
+                 "StatServ:         (%10.0fb) (%10.2fkb)",
+                 ssm, ssm / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7171,53 +7082,36 @@ CalcMem(char *nick, int socket)
 
       /* Client Hash */
       ircsprintf(sendstr,
-                 "Client Hash:      (%10.0fb) (%10.2fkb)\n",
-                 hashc,
-                 hashc / 1024);
+                 "Client Hash:      (%10.0fb) (%10.2fkb)",
+                 hashc, hashc / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Channel Hash */
       ircsprintf(sendstr,
-                 "Channel Hash:     (%10.0fb) (%10.2fkb)\n",
-                 hashch,
-                 hashch / 1024);
+                 "Channel Hash:     (%10.0fb) (%10.2fkb)",
+                 hashch, hashch / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Clone Hash */
       ircsprintf(sendstr,
-                 "Clone Hash:       (%10.0fb) (%10.2fkb)\n",
-                 hashcl,
-                 hashcl / 1024);
+                 "Clone Hash:       (%10.0fb) (%10.2fkb)",
+                 hashcl, hashcl / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
 
       /* Total memory used */
       ircsprintf(sendstr,
-                 "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)\n",
-                 total,
-                 total / 1024,
-                 (total / 1024) / 1024);
+                 "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)",
+                 total, total / 1024, (total / 1024) / 1024);
       if (socket == NODCC)
-        /*
-        toserv(":%s NOTICE %s :%s", n_OperServ, nick, sendstr);
-        */
         os_notice(lptr, socket, sendstr);
       else
         writesocket(socket, sendstr);
@@ -7247,7 +7141,7 @@ void ReconnectCheck(time_t expire)
       if (temphub->uplink && !templeaf->uplink &&
           expire-templeaf->split_ts>temphost->re_time)
         {
-          toserv(":%s CONNECT %s %d :%s\n", Me.name, temphost->leaf,
+          toserv(":%s CONNECT %s %d :%s\r\n", Me.name, temphost->leaf,
                  temphost->port, temphost->hub);
 #ifdef DEBUG
 
@@ -7320,12 +7214,12 @@ static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
   /* Prototype: :%s KLINE %s %lu %s %s :%s */
   /* :OperServ KLINE * 0 prvi drugi :treci */
   /* sourcenick, targetserver, tkline_time, user, host, reason */
-  toserv(":%s KLINE %s %s %s %s %s\n", n_OperServ, "*",
+  toserv(":%s KLINE %s %s %s %s %s\r\n", n_OperServ, "*",
       tkline ? tkline : "0", user, host,
       reason ? reason : ":HybServ remote kline");
 #else
   klinestr = GetString(ac - 1, av + 1);
-  toserv(":%s KLINE %s %s\n", Me.name, n_OperServ, klinestr);
+  toserv(":%s KLINE %s %s\r\n", Me.name, n_OperServ, klinestr);
   MyFree(klinestr);
 #endif
 }

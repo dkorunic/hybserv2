@@ -397,9 +397,8 @@ do_squit(char *serv, char *reason)
       /* squit the server */
       if (match(serv, tempserv->name))
         {
-          toserv("SQUIT %s :%s\n",
-                 tempserv->name,
-                 reason);
+          toserv("SQUIT %s :%s\r\n",
+                 tempserv->name, reason);
 
           prev = tempserv->next;
 
@@ -517,8 +516,7 @@ static void s_ping(int ac, char **av)
   if (*who == ':')
     who++;
 
-  toserv(":%s PONG %s :%s\n",
-         Me.name, Me.name, who);
+  toserv(":%s PONG %s :%s\r\n", Me.name, Me.name, who);
   burst_complete = 1;
 } /* s_ping() */
 
@@ -755,7 +753,7 @@ s_nick(int ac, char **av)
               {
                 newptr->flags |= NS_IDENTIFIED;
 #ifdef DANCER
-                toserv(":%s MODE %s +e\n", Me.name, newptr->nick);
+                toserv(":%s MODE %s +e\r\n", Me.name, newptr->nick);
 #endif /* DANCER */
               }
             }
@@ -874,7 +872,7 @@ s_nick(int ac, char **av)
         {
           struct Luser *bad_lptr;
 
-          toserv(":%s KILL %s :%s\n", Me.name, av[1],
+          toserv(":%s KILL %s :%s\r\n", Me.name, av[1],
                  "Attempt to Nick Collide Services");
 
           bad_lptr = FindClient(av[1]);
@@ -1509,8 +1507,7 @@ s_kill(int ac, char **av)
                  "%s was killed by %s (nick collide), re-initializing",
                  av[2], who);
 
-          toserv(":%s KILL %s :%s\n",
-                 Me.name, av[2],
+          toserv(":%s KILL %s :%s\r\n", Me.name, av[2],
                  "Attempt to Nick Collide Services");
 
           if (Me.sptr)
@@ -1980,13 +1977,12 @@ s_sjoin(int ac, char **av)
               os_join(cptr);
 #else
 
-              toserv(":%s MODE %s +o %s\n",
-                     Me.name,
-                     cptr->name,
-                     n_OperServ);
+              toserv(":%s MODE %s +o %s\r\n",
+                     Me.name, cptr->name, n_OperServ);
 #endif
 
-              putlog(LOG2, "%s: %s attempted to deop %s", cptr->name, av[0] + 1, n_OperServ);
+              putlog(LOG2, "%s: %s attempted to deop %s", cptr->name,
+                  av[0] + 1, n_OperServ);
             }
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -1998,10 +1994,8 @@ s_sjoin(int ac, char **av)
               cs_join(FindChan(cptr->name));
 #else
 
-              toserv(":%s MODE %s +o %s\n",
-                     Me.name,
-                     cptr->name,
-                     n_ChanServ);
+              toserv(":%s MODE %s +o %s\r\n",
+                     Me.name, cptr->name, n_ChanServ);
 #endif
 
               putlog(LOG2, "%s: %s attempted to deop %s",
@@ -2148,39 +2142,24 @@ s_whois(int ac, char **av)
 
   isoper = strchr(ServiceUmodes, 'o');
 
-  toserv(":%s 311 %s %s %s %s * :%s\n",
-         Me.name,
-         who,
-         serviceptr->nick,
-         serviceptr->username,
-         Me.name,
+  toserv(":%s 311 %s %s %s %s * :%s\r\n",
+         Me.name, who, serviceptr->nick, serviceptr->username, Me.name,
          serviceptr->realname);
 
-  toserv(":%s 312 %s %s %s :%s\n",
-         Me.name,
-         who,
-         serviceptr->nick,
-         Me.name,
-         Me.info);
+  toserv(":%s 312 %s %s %s :%s\r\n",
+         Me.name, who, serviceptr->nick, Me.name, Me.info);
 
   if (isoper)
     {
-      toserv(":%s 313 %s %s :is Network Service daemon\n",
-             Me.name,
-             who,
-             serviceptr->nick);
+      toserv(":%s 313 %s %s :is Network Service daemon\r\n",
+             Me.name, who, serviceptr->nick);
     }
 
-  toserv(":%s 317 %s %s 0 %ld :seconds idle, signon time\n",
-         Me.name,
-         who,
-         serviceptr->nick,
-         TimeStarted);
+  toserv(":%s 317 %s %s 0 %ld :seconds idle, signon time\r\n",
+         Me.name, who, serviceptr->nick, TimeStarted);
 
-  toserv(":%s 318 %s %s :End of /WHOIS list.\n",
-         Me.name,
-         who,
-         serviceptr->nick);
+  toserv(":%s 318 %s %s :End of /WHOIS list.\r\n",
+         Me.name, who, serviceptr->nick);
 } /* s_whois() */
 
 /*
@@ -2218,7 +2197,7 @@ s_trace(int ac, char **av)
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
     {
-      toserv(":%s %d %s %s %d :%s[%s@%s]\n",
+      toserv(":%s %d %s %s %d :%s[%s@%s]\r\n",
              Me.name,
              isoper ? 204 : 205,
              who,
@@ -2229,7 +2208,7 @@ s_trace(int ac, char **av)
              Me.name);
     }
 
-  toserv(":%s 206 %s Serv 10 %1.0fS %1.0fC %s :AutoConn.!*@%s\n",
+  toserv(":%s 206 %s Serv 10 %1.0fS %1.0fC %s :AutoConn.!*@%s\r\n",
          Me.name,
          who,
          Network->TotalServers,
@@ -2237,7 +2216,7 @@ s_trace(int ac, char **av)
          currenthub->realname ? currenthub->realname : currenthub->hostname,
          Me.name);
 
-  toserv(":%s 262 %s %s :End of TRACE\n",
+  toserv(":%s 262 %s %s :End of TRACE\r\n",
          Me.name,
          who,
          Me.name);
@@ -2273,7 +2252,7 @@ s_version(int ac, char **av)
             "*** Remote version query requested by %s",
             who);
 
-  toserv(":%s 351 %s HybServ2-%s. %s :TS3\n",
+  toserv(":%s 351 %s HybServ2-%s. %s :TS3\r\n",
          Me.name, who, hVersion, Me.name);
 } /* s_version() */
 
@@ -2311,13 +2290,13 @@ s_motd(int ac, char **av)
 
   if (!(fp = fopen(MotdFile, "r")))
     {
-      toserv(":%s 422 %s :MOTD File is missing\n",
+      toserv(":%s 422 %s :MOTD File is missing\r\n",
              Me.name,
              who);
       return;
     }
 
-  toserv(":%s 375 %s :- %s Message of the Day -\n",
+  toserv(":%s 375 %s :- %s Message of the Day -\r\n",
          Me.name,
          who,
          Me.name);
@@ -2326,7 +2305,7 @@ s_motd(int ac, char **av)
     {
       if (IsEOL(*line))
         {
-          toserv(":%s 372 %s :- \n",
+          toserv(":%s 372 %s :- \r\n",
                  Me.name,
                  who);
           continue;
@@ -2335,15 +2314,13 @@ s_motd(int ac, char **av)
       final = Substitute(NULL, line, NODCC);
       if (final && (final != (char *) -1))
         {
-          toserv(":%s 372 %s :- %s\n",
-                 Me.name,
-                 who,
-                 final);
+          toserv(":%s 372 %s :- %s\r\n",
+                 Me.name, who, final);
           MyFree(final);
         }
     }
 
-  toserv(":%s 376 %s :End of /MOTD command\n",
+  toserv(":%s 376 %s :End of /MOTD command\r\n",
          Me.name,
          who);
 
@@ -2481,16 +2458,9 @@ s_pong(int ac, char **av)
                         servptr->name,
                         timeago(MaxPing, 3));
 
-#if 0
-
-              toserv("SQUIT %s :ReRouting (current lag: %5.4f seconds)\n",
-                     servptr->name,
-                     servptr->ping);
-#endif
-
-              toserv(":%s ERROR :Rerouting (lag: %5.4f seconds)\n",
+              toserv(":%s ERROR :Rerouting (lag: %5.4f seconds)\r\n",
                      Me.name, servptr->ping);
-              toserv(":%s QUIT\n", Me.name);
+              toserv(":%s QUIT\r\n", Me.name);
 
               close(HubSock);
               ClearUsers();

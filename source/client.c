@@ -97,7 +97,7 @@ UpdateUserModes(struct Luser *user, char *modes)
           else
           {
              /* Blech, who is screwing with us? */
-             toserv(":%s MODE %s -e\n", Me.name, user->nick);
+             toserv(":%s MODE %s -e\r\n", Me.name, user->nick);
              RecordCommand("User %s has +e umode but is not known to me, setting -e",
                  user->nick);
              umode = 0;
@@ -389,7 +389,7 @@ struct Luser *
             if (!mine)
             {
               /* Blech, who is screwing with us? */
-              toserv(":%s MODE %s -e\n", Me.name, tempuser->nick);
+              toserv(":%s MODE %s -e\r\n", Me.name, tempuser->nick);
               RecordCommand("User %s has +e umode but is not known to me, setting -e",
                   tempuser->nick);
             }

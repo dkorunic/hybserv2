@@ -591,11 +591,8 @@ struct Luser *
             if ((rhostptr = IsRestrictedHost(lptr->username, lptr->hostname)))
               {
                 debug("restricted host = [%s@%s], real host = [%s@%s] max conns = [%d]\n",
-                      rhostptr->username,
-                      rhostptr->hostname,
-                      lptr->username,
-                      lptr->hostname,
-                      rhostptr->hostnum);
+                      rhostptr->username, rhostptr->hostname,
+                      lptr->username, lptr->hostname, rhostptr->hostnum);
               }
             else
               {
@@ -720,7 +717,7 @@ struct Luser *
                       {
                         if (AutoKillClones && (clcnt > MaxClones ))
                           {
-                            toserv(":%s KILL %s :%s!%s (Clones)\n",
+                            toserv(":%s KILL %s :%s!%s (Clones)\r\n",
                                    n_OperServ, temp2->nick, Me.name, n_OperServ);
                             DeleteClient(temp2);
                             temp2 = prev;
@@ -745,18 +742,12 @@ struct Luser *
           {
             killclones = 1;
 
-            toserv(":%s KILL %s :%s!%s (Clones)\n",
-                   n_OperServ,
-                   lptr->nick,
-                   Me.name,
-                   n_OperServ);
+            toserv(":%s KILL %s :%s!%s (Clones)\r\n",
+                   n_OperServ, lptr->nick, Me.name, n_OperServ);
             DeleteClient(lptr);
 
-            toserv(":%s KILL %s :%s!%s (Clones)\n",
-                   n_OperServ,
-                   tempuser->nick,
-                   Me.name,
-                   n_OperServ);
+            toserv(":%s KILL %s :%s!%s (Clones)\r\n",
+                   n_OperServ, tempuser->nick, Me.name, n_OperServ);
             DeleteClient(tempuser);
           }
         else
@@ -793,7 +784,7 @@ struct Luser *
                      */
                     debug("clcnt[%d] is over the allowed value [%d]\n",
                           clcnt, rhostptr->hostnum);
-                    toserv(":%s KILL %s :%s!%s (Restricted hostmask (%d maximum connections allowed))\n",
+                    toserv(":%s KILL %s :%s!%s (Restricted hostmask (%d maximum connections allowed))\r\n",
                            n_OperServ, lptr->nick, Me.name, n_OperServ,
                            rhostptr->hostnum);
                     DeleteClient(lptr);

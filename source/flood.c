@@ -383,16 +383,12 @@ void updateConnectTable(char *user, char *host)
                     {
                       if (ouser->flags & L_OSREGISTERED)
                         {
-                          ircsprintf(message,":OperServ NOTICE %s :Advanced flood"
-                                  " detected from [%s@%s], %s.\n",
-                                  ouser->nick, (banhost == 1) ? "*" : user, host,
+                          notice(n_OperServ, "Advanced flood detected from [%s@%s], %s.", ouser->nick, (banhost == 1) ? "*" : user, host,
 #if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
-                                  (banhost == -1) ?
-                                  "not glining, user protected or gline in place" :
-                                  "offender GLINEd");
+                                  (banhost == -1) ? "not GLINE-ing" :
+                                  "offender GLINE-d");
 #else
-                                  "operators notified"
-                                 );
+                                  "operators notified");
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
 
                           toserv (message);

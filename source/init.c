@@ -302,7 +302,7 @@ static struct Luser *introduce(char *nick, char *ident, char *info)
     char **av;
     struct Luser *lptr;
 
-    ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", nick, (long)
+    ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\r\n", nick, (long)
                CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
     toserv(sendstr);
 

@@ -417,7 +417,8 @@ int main(int argc, char *argv[])
           buf[len] = '\0';
           next = strchr(buf, '\n');
 
-          /* Terminate at the first \n, throw the lot away if we don't get one */
+          /* Terminate at the first \n, throw the lot away if we don't get
+           * one */
           while (next)
           {
             *next = '\0';

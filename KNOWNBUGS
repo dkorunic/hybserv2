@@ -1,3 +1,20 @@
+.gline
+(gdb) bt
+#0  vSnprintf (
+    dest=0xfec06f53 "line [5m] for *test@from.services [] activated",
+    bytes=511, format=0x5ac75 " for %s@%s [%s] (%s)", args=0xfec071a8)
+    at Snprintf.c:309
+#1  0x3bdec in o_RecordCommand (sockfd=4,
+    format=0x5ac68 "GLINE from %s for %s@%s [%s] (%s)") at operserv.c:881
+#2  0x3d194 in o_gline (lptr=0x10, ac=804312, av=0xc0528, sockfd=4)
+    at operserv.c:1961
+#3  0x3bad8 in os_process (nick=0x10 <Address 0x10 out of bounds>,
+    command=0x0, sockfd=4) at operserv.c:540
+#4  0x2a718 in DccProcess (dccptr=0xc5c98, command=0x972e9 "gline")
+    at dcc.c:2004
+#5  0x4b1fc in ReadSock (connptr=0xc5c98) at sock.c:1050
+#6  0x4adac in ReadSocketInfo () at sock.c:754
+
 And again by me:
 #4  0xff139470 in abort () from /usr/lib/libc.so.1
 #5  0x690d4 in __lshrdi3 (u=-64393791833450880, b=589032)

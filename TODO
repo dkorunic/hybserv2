@@ -38,6 +38,7 @@ Some sort of TODO/planning program:
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
 *) save services ignores
+*) nasty .gline bug
 
 
 Done so far:

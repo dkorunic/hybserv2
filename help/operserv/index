@@ -9,6 +9,7 @@ For more information on the commands, type
 %+o%bOperator commands:%b
 %+o    CLONES     Display list of clones on the network
 %+g    GLINE      Prevent a user from joining the network 
+%+g    KLINE      Kline a user, if your ircd supports it
 %+o    HTM        Toggle HTM on/off
 %+o    HUB        Display a hub's leaf servers
 %+j    JUPE       Prevent a server from connecting

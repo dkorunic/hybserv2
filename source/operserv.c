@@ -380,7 +380,7 @@ os_process(char *nick, char *command, int sockfd)
 
 {
   struct DccUser *dccptr;
-  struct Luser *lptr;
+  struct Luser *lptr = NULL;
   int acnt;
   int bad;
   char **arv;
@@ -390,8 +390,13 @@ os_process(char *nick, char *command, int sockfd)
   if (!command)
     return;
 
-  lptr = NULL;
-  if ((sockfd == NODCC) && !(lptr = FindClient(nick)))
+  if (!(lptr = FindClient(nick)))
+#if 0
+    /* Quickfix. All further code relies on lptr, however the old code did
+     * not check case when lptr was not filled and sockfd == NODCC. In
+     * that case every lptr->blah lookup will cause segfault. -kre */
+    && (sockfd == NODCC))
+#endif
     return;
 
   if ((Network->flags & NET_OFF) &&

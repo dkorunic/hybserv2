@@ -878,10 +878,6 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
   int argcnt; /* number of arguements */
   int argidx; /* current index in modeargs[] */
 
-#ifndef SAVE_TS
-  char sendstr[MAXLINE];
-#endif
-
   if (!cptr)
     return;
 
@@ -978,7 +974,9 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         if (!(userptr = FindClient(modeargs[argidx])))
           break;
 
-        SetChannelMode(cptr, add, MODE_O, userptr, 0);
+        /* never mark ChanServ/OperServ as deopped -adx */
+        if (!add && userptr != Me.csptr && userptr != Me.osptr)
+          SetChannelMode(cptr, add, MODE_O, userptr, 0);
 
         if (add)
         {

@@ -1436,6 +1436,8 @@ void
 DeleteDccClient(struct DccUser *dccptr)
 
 {
+  if (dccptr == dccnext) dccnext = dccptr->next;
+
   UnlinkDccClient(dccptr);
 
   close(dccptr->socket);

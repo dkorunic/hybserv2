@@ -1662,6 +1662,7 @@ s_sjoin(int ac, char **av)
   struct Channel *cptr, *oldptr;
   int ncnt, /* number of SJOINing nicks */
       mcnt;
+  int chanserv_deopped = 0, operserv_deopped = 0;
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
   struct ChanInfo *ci;
@@ -1875,10 +1876,15 @@ s_sjoin(int ac, char **av)
 
         if (tempuser->flags & CH_OPPED)
         {
-          tempuser->flags &= ~CH_OPPED;
-          tempchan = FindChannelByUser(tempuser->lptr, cptr);
-          if (tempchan)
-            tempchan->flags &= ~CH_OPPED;
+	  /* never set ChanServ/OperServ as deopped.. -adx */
+	  if (tempuser->lptr == Me.csptr) chanserv_deopped = 1;
+	  else if (tempuser->lptr == Me.osptr) operserv_deopped = 1;
+	  else {
+            tempuser->flags &= ~CH_OPPED;
+            tempchan = FindChannelByUser(tempuser->lptr, cptr);
+            if (tempchan)
+              tempchan->flags &= ~CH_OPPED;
+	  }
         }
 #ifdef HYBRID7
         /* Yeps, do same for halfops -Janus */
@@ -1899,8 +1905,7 @@ s_sjoin(int ac, char **av)
         }
       } /* for (tempuser .. ) */
 
-      if (IsChannelMember(cptr, Me.osptr) &&
-          !IsChannelOp(cptr, Me.osptr))
+      if (operserv_deopped)
       {
         /* n_OperServ was deoped in the sjoin, must reop it */
         #ifdef SAVE_TS
@@ -1916,8 +1921,7 @@ s_sjoin(int ac, char **av)
       }
 
     #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-      if (IsChannelMember(cptr, Me.csptr) &&
-          !IsChannelOp(cptr, Me.csptr))
+      if (chanserv_deopped)
       {
         /* n_ChanServ was deoped in the sjoin, must reop it */
         #ifdef SAVE_TS

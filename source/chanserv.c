@@ -286,8 +286,8 @@ static AccessInfo accessinfo[] = {
   { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
 #ifdef HYBRID7
   /* Halfop help indices -Janos */
-  { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
   { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
+  { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
 #endif /* HYBRID7 */
   { CA_AUTOOP, "AUTOOP", "Automatic op" },
   { CA_CMDOP, "CMDOP", "Use of comand OP" },
@@ -2871,7 +2871,7 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
    * regardless of AutoOpAdmins being enabled.
    */
   if (!AutoOpAdmins && IsValidAdmin(lptr) && ((level == CA_AUTOOP) ||
-        (level == CA_AUTOVOICE)))
+        (level == CA_AUTOHALFOP) || (level == CA_AUTOVOICE)))
   {
     struct ChanAccess *ca;
     char nmask[MAXLINE];

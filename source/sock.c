@@ -110,6 +110,8 @@ time_t                    HTM_ts = 0;      /* when HTM was activated */
  */
 int                       ReceiveLoad = RECVLOAD;
 
+struct DccUser            *dccnext;
+
 #endif /* HIGHTRAFFIC_MODE */
 
 /*
@@ -494,7 +496,7 @@ ReadSocketInfo(void)
   int SelectResult;
   struct timeval TimeOut;
 
-  struct DccUser *dccptr, *dccnext;
+  struct DccUser *dccptr;
   struct PortInfo *tempport;
   fd_set readfds,
          writefds;
@@ -721,9 +723,10 @@ ReadSocketInfo(void)
       }
 
       /* this is for info coming from a dcc/telnet/tcm client */
-      for (dccptr = connections; dccptr != NULL; dccptr = dccptr->next)
+      for (dccptr = connections; dccptr != NULL; dccptr = dccnext)
       {
         assert(dccptr->socket != NOSOCKET);
+	dccnext = dccptr->next;
 
         if (IsDccConnect(dccptr) && FD_ISSET(dccptr->socket, &writefds))
         {
@@ -757,6 +760,7 @@ ReadSocketInfo(void)
         } /* if (FD_ISSET(dccptr->socket, &readfds)) */
       } /* for (dccptr = connections; dccptr; dccptr = dccptr->next) */
 
+      dccnext = NULL;   /* XXX */
     } /* if (SelectResult > 0) */
     else
     {

@@ -195,7 +195,8 @@ CheckGlined(struct Luser *lptr)
   #ifdef HYBRID7_GLINES
     Execute7Gline(tempgline->username,
                  tempgline->hostname,
-                 tempgline->reason);
+                 tempgline->reason,
+		 tempgline->expires);
   #endif /* HYBRID7_GLINES */
 
   }
@@ -249,12 +250,12 @@ ExecuteGline(char *username, char *hostname, char *reason)
  */
 
 void
-Execute7Gline(char *username, char *hostname, char *reason)
+Execute7Gline(char *username, char *hostname, char *reason, time_t time)
 
 {
-  toserv(":%s KLINE %s %s %lu %s %s :%s\n",
-         Me.name, n_OperServ, "*", 0,
-         username ? username : "*",
+  toserv(":%s KLINE %s %lu %s %s :%s\n",
+         n_OperServ, "*", time,
+	 username ? username : "*",
          hostname, reason);
 } /* Execute7Gline() */
 

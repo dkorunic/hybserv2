@@ -2032,7 +2032,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 #endif /* HYBRID_GLINES */
 
 #ifdef HYBRID7_GLINES
-  Execute7Gline(username, hostname, reason);
+  Execute7Gline(username, hostname, reason, expires);
 #endif /* HYBRID7_GLINES */
 
   MyFree(reason);

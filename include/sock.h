@@ -66,6 +66,7 @@ extern struct sockaddr_in       LocalAddr;
 extern int                      HTM;
 extern time_t                   HTM_ts;
 extern int                      ReceiveLoad;
+extern struct DccUser           *dccnext;
 
 #endif /* HIGHTRAFFIC_MODE */
 

@@ -47,7 +47,7 @@ void ExecuteGline(char *user, char *host, char *reason);
 #endif
 
 #ifdef HYBRID7_GLINES
-void Execute7Gline(char *user, char *host, char *reason);
+void Execute7Gline(char *user, char *host, char *reason, time_t);
 #endif
 
 void ExpireGlines(time_t unixtime);

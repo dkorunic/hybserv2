@@ -59,6 +59,7 @@ INSTALLATION
     OpenBSD 2.7 (and older)
     Solaris 2.7 (and older)
     Digital Unix 4.0
+    Cygwin 1.1.3 (and newer)
 
  If you are unable to compile HybServ, please let me know at
  kreator@fly.srk.fer.hr.  Bug reports/suggestions may be sent to the 

@@ -23,6 +23,7 @@
 #include <signal.h>
 #else
 #include <sys/signal.h>
+#include <signal.h>
 #endif /* HAVE_CYGWIN */
 
 #include "alloc.h"

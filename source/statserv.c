@@ -978,7 +978,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 #ifdef SPLIT_INFO
   else
     notice(n_StatServ, lptr->nick,
-      "Currenty in \002netsplit\002 for %s",
+      "Currently in \002netsplit\002 for %s",
       servptr->name,
       timeago(servptr->connect_ts, 0));
 #endif
@@ -1607,7 +1607,7 @@ ss_splitinfo(struct Luser *lptr, int ac, char **av)
 void ss_printsplit(struct Server *tmpserv, struct Luser *lptr)
 {
   notice(n_StatServ, lptr->nick,
-    "%-30s currenty in \002netsplit\002 for %s",
+    "%-30s currently in \002netsplit\002 for %s",
     tmpserv->name,
     timeago(tmpserv->split_ts, 0));
 }

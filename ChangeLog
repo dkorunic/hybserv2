@@ -1,3 +1,26 @@
+*** 20020427_6 by kreator
+- add adx in credits
+- a whole bunch of adx fixes:
+  1. dccspill MUST NOT be a global variable, otherwise any operator with
+     low privileges could use all OperServ commands:
+     - an +o oper connects to hybserv and sends, for example, .DIE
+       without CR/LF and with single space at the end,
+     - when services admin (+s) uses any command, it is appended to the end
+       of DCC spill; for example, if they use .status, we've got
+           .DIE .status
+       in the DCC spill. This is then processed and, finally, the +o oper
+       is able to use the privileged command.
+  2. FindServer(): We CANNOT just compute the hash value for server name
+     and match() the chain, because *.server.org may have another hash
+     value than some.server.org. If we are looking for "some.server.org"
+     and have a server named "*.server.org", we won't find it -
+     FindServer() returns NULL, which is *wrong*.
+  3. Why do we need CMDOP access to use /msg ChanServ HALFOP? We have
+     CMDHALFOP instead (let founders decide what level they want for
+     HALFOP command...).
+
+
+
 *** 20020427_5 by kreator
 - add adx in credits
 - a whole bunch of adx fixes:

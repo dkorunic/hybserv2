@@ -1,3 +1,8 @@
+*** 20031227_1 by kreator
+- dcc help command fix (rabble)
+- clear todo (rabble)
+
+
 *** 20031226_1 by kreator
 - wrong user info for svsnick (jared)
 - services are not introduced if ALLOW_JUPES is off (mark)

@@ -749,16 +749,16 @@ s_nick(int ac, char **av)
            */
           if (nptr->flags & NS_IDENTIFIED)
             {
+              struct NickInfo *tmp;
               if (newptr && IsLinked(nptr, newptr))
               {
-                struct NickInfo *tmp;
                 newptr->flags |= NS_IDENTIFIED;
-                tmp = GetMaster(newptr);
-                tmp->lastseen = current_ts;
 #ifdef DANCER
                 toserv(":%s MODE %s +e\r\n", Me.name, newptr->nick);
 #endif /* DANCER */
               }
+              tmp = GetMaster(nptr);
+              tmp->lastseen = current_ts;
             }
 #endif /* LINKED_NICKNAMES */
 

@@ -8,8 +8,6 @@ A pessimist is a man who has been compelled to live with an optimist.
 
 Pending bugs:
 -------------
-*) last seen does not update for master nicknames when using slaves..
-   (should be fixed)
 *) forcenick
 *) 20 nicknames problem
 *) pth_cancel() on SIGTERM

@@ -72,12 +72,10 @@ DISTRIBUTION
        (Thanks to Bruns)
 
   #4:  Anonymous CVS to this CVSROOT:
-       :pserver:cvs@vampirella.dyndns.org:/var/cvs
+       :pserver:cvs@hybserv.esa.fer.hr:/home/cvs
        cvs login
        <press enter, no password>
        cvs checkout hybserv
-       (This won't work most of the time, since that's my home machine
-        -kre)
 
 NOTE: CVS is usually more current than the release.
 

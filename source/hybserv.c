@@ -94,8 +94,7 @@ main(int argc, char *argv[])
   TimeStarted = time(NULL);
 
   fprintf(stderr,
-    "\nHybServ TS services version %s by Patrick Alken "
-    "(wnder@underworld.net)\n"
+    "HybServ2 TS services version %s by HybServ2 team\n"
 #if defined __DATE__ && defined __TIME__
     "Compiled at %s, %s\n",
 #endif
@@ -121,7 +120,7 @@ main(int argc, char *argv[])
    */
   if (LoadSettings(0) == 0)
   {
-    fprintf(stderr, "Fatal errors encountered and logged parsing %s, exiting\n",
+    fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n",
       SETPATH);
     return (0);
   }
@@ -160,7 +159,7 @@ main(int argc, char *argv[])
     }
   }
 
-  putlog(LOG1, "HybServ TS services started");
+  putlog(LOG1, "HybServ2 TS services started");
 
   /*
    * Get the offset from GMT (London time)

@@ -599,7 +599,7 @@ case "$host_os" in
 esac
 
 PACKAGE=HybServ2
-VERSION=pre-1.8.0
+VERSION=pre-8.0
 
 
 
@@ -1429,7 +1429,7 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   :
 else
   echo "$ac_t""no" 1>&6
-{ echo "configure: error: ** You must have stdarg.h in order to compile HybServ **" 1>&2; exit 1; }
+{ echo "configure: error: ** You must have stdarg.h in order to compile HybServ2 **" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking whether time.h and sys/time.h may both be included""... $ac_c" 1>&6
@@ -2438,7 +2438,8 @@ test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
 echo "
 Configuration:
 
-  HybServ Version:  ${VERSION}
+  Detected OS:      ${host_os}
+  HybServ2 Version: ${VERSION}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
   Compiler Flags:   ${CFLAGS}"

@@ -23,7 +23,7 @@ esac
 
 dnl Package information
 PACKAGE=HybServ2
-VERSION=pre-1.8.0
+VERSION=pre-8.0
 
 dnl Standard installation path
 AC_PREFIX_DEFAULT(/usr/local)
@@ -48,7 +48,7 @@ AC_SUBST(WHOAMI)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(sys/time.h)
-AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ **))
+AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ2 **))
 AC_HEADER_TIME
 
 dnl Checks for library functions.
@@ -151,7 +151,8 @@ include/config.h        \
 echo "
 Configuration:
 
-  HybServ Version:  ${VERSION}
+  Detected OS:      ${host_os}
+  HybServ2 Version: ${VERSION}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
   Compiler Flags:   ${CFLAGS}"

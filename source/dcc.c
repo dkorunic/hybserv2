@@ -990,7 +990,7 @@ GreetDccUser(struct DccUser *dccptr)
   }
 
   motd_tm = localtime(&CurrTime);
-  sprintf(sendstr, "HybServ %s (%d/%d/%d %d:%02d)\n", 
+  sprintf(sendstr, "HybServ2 %s (%d/%d/%d %d:%02d)\n", 
     hVersion,
     1900 + motd_tm->tm_year,
     motd_tm->tm_mon + 1,
@@ -1078,12 +1078,28 @@ onctcp(char *nick, char *target, char *msg)
 
   if (strncasecmp(msg, "VERSION", 7) == 0)
   {
+#ifdef ADMININFO
+    struct Userlist *tempuser = NULL;    
+    struct Luser *olptr = NULL;
+#endif /* ADMININFO */
+
     notice(target, nick,
-      "\001VERSION HybServ TS Services version %s\001",
+      "\001VERSION HybServ2 TS Services version %s\001",
       hVersion); 
     notice(target, nick,
       "\001VERSION Administrators: %s\001",
       Me.admin);
+
+#ifdef ADMININFO
+    /* Print active operators that have identified to OperServ -kre */
+    for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+    {
+      if ((olptr = FindClient(tempuser->nick)) &&
+          (olptr->flags & L_OSREGISTERED))
+      notice(target, nick, "\001VERSION Active operators: %s (%s@%s)\001",
+          tempuser->nick, tempuser->username, tempuser->hostname);
+    }
+#endif /* ADMININFO */
 
     SendUmode(OPERUMODE_Y,
       "%s: CTCP VERSION received from %s!%s@%s",

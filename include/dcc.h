@@ -99,4 +99,8 @@ void ServReboot();
 
 extern struct DccUser *connections;
 
+#ifdef ADMININFO
+extern struct Userlist *UserList;
+#endif /* ADMININFO */
+
 #endif /* INCLUDED_dcc_h */

@@ -257,7 +257,7 @@
  *         server to take the place of the juped one
  */
 
-#undef    ALLOW_GLINES
+#define   ALLOW_GLINES
 #define   ALLOW_JUPES
 
 #ifdef ALLOW_GLINES
@@ -375,6 +375,12 @@
 
 #define   GIMMECORE
 
+/*
+ * Defining this will produce "Active operators .." output in VERSION
+ * reply of any of the services. -kre
+ */
+
+#define ADMININFO
 
 #ifndef DEBUG
 

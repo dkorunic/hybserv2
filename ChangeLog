@@ -1,3 +1,8 @@
+*** 20021212_1 by kreator
+- fix #undef gecosbans warning
+- smaller set of changes
+
+
 *** 20021210_1 by kreator
 - fix very very nasty problem: original stupid spilled chars
   implementation caused multiple passes through BotProcess() with already

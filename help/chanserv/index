@@ -25,7 +25,9 @@ For more information on a specific command, type
 %+aAdministrator commands:
 %+a%b%b
 %+a    FORBID     Prevent anyone from using a channel
+%+a    UNFORBID   Reverses FORBID effects
 %+a    SETPASS    Reset a channel's founder password
 %+a    STATUS     View a user's access level on a channel
 %+a    FORGET     Prevent a channel from being registered
 %+a    NOEXPIRE   Prevent a channel from expiring
+%+a    KLINE      Tries to send other servers KLINE command

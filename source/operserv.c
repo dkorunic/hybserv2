@@ -1729,19 +1729,15 @@ o_omode(struct Luser *lptr, int ac, char **av, int sockfd)
   omodes = GetString(ac - 2, av + 2);
 
   o_RecordCommand(sockfd,
-    "OMODE %s %s",
-    av[1],
-    omodes);
+    "OMODE from %s - %s %s",
+    lptr->nick, av[1], omodes);
 
-  o_Wallops("OMODE %s %s",
-    av[1],
-    omodes);
+  o_Wallops("OMODE from %s - %s %s",
+    lptr->nick, av[1], omodes);
 
   if (!(chptr = FindChannel(av[1])))
   {
-    os_notice(lptr, sockfd,
-      "No such channel: %s",
-      av[1]);
+    os_notice(lptr, sockfd, "No such channel: %s", av[1]);
     return;
   }
 
@@ -1825,8 +1821,8 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
    * from av[2] if _any_ digit is present in av[1] since timestr will then
    * return non-zero value. Also, it is necessary to check if `@' is
    * contained in av[2] -kre */
-  expires=timestr(av[1]);
-  if ((strchr(av[1], '@')==NULL) && (ac>2) && expires)
+  expires = timestr(av[1]);
+  if ((strchr(av[1], '@') == NULL) && (ac > 2) && expires)
   {
     sidx = 3;
     hostmask = av[2];
@@ -1852,9 +1848,9 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
     if (NonStarChars > charcnt)
     {
       os_notice(lptr, sockfd,
-        "[%s] is too general, please include at least %d non (*,?,@,.) characters",
-        hostmask,
-        NonStarChars);
+        "[%s] is too general, please include "
+        "at least %d non (*,?,@,.) characters",
+        hostmask, NonStarChars);
       return;
     }
   } /* if (NonStarChars) */
@@ -1952,30 +1948,20 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   if (!expires)
   {
     o_RecordCommand(sockfd,
-      "GLINE %s@%s [%s]",
-      username ? username : "*",
-      hostname,
-      reason);
+      "GLINE from %s for %s@%s [%s]",
+      lptr->nick, username ? username : "*", hostname, reason);
 
-    o_Wallops("GLINE %s@%s [%s]",
-      username ? username : "*",
-      hostname,
-      reason);
+    o_Wallops("GLINE from %s for %s@%s [%s]",
+      lptr->nick, username ? username : "*", hostname, reason);
   }
   else
   {
     o_RecordCommand(sockfd,
-      "GLINE %s@%s [%s] (%s)",
-      username ? username : "*",
-      hostname,
-      reason,
-      av[1]);
+      "GLINE from %s for %s@%s [%s] (%s)",
+      lptr->nick, username ? username : "*", hostname, reason, av[1]);
 
-    o_Wallops("GLINE %s@%s [%s] (%s)",
-      username ? username : "*",
-      hostname,
-      reason,
-      av[1]);
+    o_Wallops("GLINE from %s for %s@%s [%s] (%s)",
+      lptr->nick, username ? username : "*", hostname, reason, av[1]);
   }
 
   /* Check if any users on the network match the new gline */

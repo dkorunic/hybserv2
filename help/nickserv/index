@@ -22,6 +22,7 @@ For more information on a specific command, type
 %+aAdministrator commands:
 %+a%b%b
 %+a    FORBID     Prevent anyone from using a nickname
+%+a    UNFORBID   Reverses effects of FORBID command
 %+a    SETPASS    Change a nickname's password
 %+a    NOEXPIRE   Prevent a nickname from expiring
 %+a    SHOWLINK   Display a certain nickname link list

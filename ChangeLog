@@ -1,3 +1,12 @@
+*** 20011011_1 by kreator
+- update install
+- update knownbugs: mention telnet conns don't work
+- update to autoconf/automake 2.52
+- update some dcc code
+- update operserv
+- do support for dmalloc
+
+
 *** 20011009_1 by kreator
 - fix small bug in SERVICES_FIGHT_FIX
 - do releasenotes, update known bugs, etc.

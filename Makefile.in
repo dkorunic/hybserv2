@@ -21,14 +21,12 @@ WHOAMI = @WHOAMI@
 
 ############ Don't change anything below here ############
 
-# HybServ Version
-VERSION_MAJOR = 1.7.3
+# HybServ2 Version
+VERSION_MAJOR = 1.8.0
 VERSION = @VERSION@
 
 CC = @CC@
 CFLAGS = @CFLAGS@ -Wall -pipe
-# Enable on multi-CPU server
-#MAKEFLAGS = -j 6
 
 # Debugging CFLAGS
 #CFLAGS = @CFLAGS@ -Wall -g -D_REENTRANT -pipe
@@ -45,60 +43,62 @@ CHMOD = @CHMOD@
 CHOWN = @CHOWN@ -R
 LS = @LS@ -l
 
-INSTALL=@INSTALL@
-INSTALL_DATA=@INSTALL_DATA@
-INSTALL_BIN=${INSTALL} -m 755
-INSTALL_SECURE=${INSTALL} -m 600
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_BIN = ${INSTALL} -m 755
+INSTALL_SECURE = ${INSTALL} -m 600
 
 # Executable programs
-BINPROGS = \
- cleandb\
- encryptconf\
- encryptdb\
- mkpasswd\
- servchk
+BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk fixlevel
 
 # Secure configuration files (mode 600)
-SECUREFILES = hybserv.conf\
-              settings.conf
+SECUREFILES = hybserv.conf settings.conf
 
 # General configuration files
-CONFFILES = motd.dcc\
-            motd.global
+CONFFILES = motd.dcc motd.global
 
 # File containing HPath variable
 HPATHFIX = settings.conf
 
+# Subdirs for make
+SUBDIRS = source tools
 
-all: libString source tools
-	@echo '** Building libString library **'
-	@cd libString ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
+all: source tools
+	@echo "*** Begin building HybServ2 version $(VERSION) ***"
 	@echo
-	@echo '** Building Hybserv binary **'
-	@cd source ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"
-	@echo
-	@echo '** Building Hybserv tools **'
-	@cd tools ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
-	@echo
-	@echo "*** Done building HybServ version $(VERSION) ***"
-	@echo
+	@for i in $(SUBDIRS); do \
+		echo "*** Building $$i ***"; \
+		cd $$i; \
+		${MAKE} "VERSION=$(VERSION)"; \
+		cd ..; \
+		echo; \
+	done
+	@echo "*** Done building HybServ2 version $(VERSION) ***"
 
 build: all
 
 clean:
-	@echo '** Removing objects **'
-	@cd libString ; $(MAKE) clean
-	@cd source ; $(MAKE) clean
-	@cd tools ; $(MAKE) clean
+	@echo '** Begin cleaning and removing objects **'
+	@echo
+	@for i in $(SUBDIRS); do \
+		echo "*** Cleaning $$i ***"; \
+		cd $$i; \
+		${MAKE} clean; \
+		cd ..; \
+		echo; \
+	done
 
 distclean: clean
-	$(RM) `find . -name Makefile -print` include/defs.h \
-		include/config.h bin/settings.conf \
+	@echo '*** Removing objects and misc files ***'
+	$(RM) `find . -type f -name Makefile -print` include/defs.h \
+		include/config.h bin/settings.conf bin/cleandb \
 		config.status config.cache config.log ~* core \
 		hybserv.core `find . -type f -size 0 -print`
-	$(RM) `find . \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
-		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
+	$(RM) `find . -type f \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
+		-o -name '*.bak' -o -name '.#*' -o -name '#*#' -o -name '.*.orig' \
 		-o -name '.*.rej' -o -name '.SUMS' -o -size 0 \) -print`
+
+mrproper: distclean
 
 depend:
 	@if [ ! -f source/.depend ]; then \
@@ -107,8 +107,7 @@ depend:
 	@cd source ; $(MAKE) depend
 
 install: all install-binary install-help
-	@echo "*** Done installing HybServ $(VERSION) ***"
-	@echo
+	@echo "*** Done installing HybServ2 $(VERSION) ***"
 
 install-binary:
 	@if test ! -d $(BINDIR); then \
@@ -119,13 +118,11 @@ install-binary:
 		echo Creating $(CONFDIR); \
 		mkdir $(CONFDIR) 2>/dev/null; \
 	fi
-	@echo '** Installing HybServ in $(BINDIR) **'
+	@echo '** Installing HybServ2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
 	@for file in $(BINPROGS); do \
-		if test ! -f "$(BINDIR)/$$file"; then \
-			echo "** Installing $$file in $(BINDIR) **"; \
-			$(INSTALL_BIN) "bin/$$file" "$(BINDIR)/$$file"; \
-		fi \
+		echo "** Installing $$file in $(BINDIR) **"; \
+		$(INSTALL_BIN) "bin/$$file" "$(BINDIR)/$$file"; \
 	done
 	@for file in $(SECUREFILES); do \
 		if test ! -f "$(CONFDIR)/$$file"; then \
@@ -144,17 +141,6 @@ install-binary:
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/shownicks
 	@echo '** Creating $(BINDIR)/showchans **'
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/showchans
-	@echo
-	-@$(LS) $(BINDIR)/hybserv\
-          $(CONFDIR)/hybserv.conf\
-          $(CONFDIR)/settings.conf\
-          $(CONFDIR)/motd.dcc\
-          $(CONFDIR)/motd.global\
-          $(BINDIR)/servchk\
-          $(BINDIR)/cleandb\
-          $(BINDIR)/encryptconf\
-          $(BINDIR)/encryptdb\
-          $(BINDIR)/mkpasswd
 	@echo
 	@echo '** Changing ownership of $(BINDIR) to $(WHOAMI) **'
 	@$(CHOWN) $(WHOAMI) $(BINDIR)
@@ -178,6 +164,9 @@ install-help:
 	@echo Changing ownership of $(HELPDIR) to $(WHOAMI)
 	@$(CHOWN) $(WHOAMI) $(HELPDIR)
 	@echo
+
+coffe:
+	@echo "*** Gimme coffe to work properly ***"
 
 autoconf:
 	autoconf autoconf/configure.in > configure

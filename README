@@ -1,59 +1,88 @@
 Some short notes:
 
-The former Hybserv development team has decided to spin off and 
-focus its energies towards the HYBSERV2 project. Like the name 
-implys this new version will be even better then that last. 
-If their is something you would like to see added to HYBSERV2 
-please let use know as we are always looking for new ideas.
+The former Hybserv development team has decided to spin off and
+focus its energies towards the HYBSERV2 project. Like the name
+implies this new version will be even better then that last. If
+their is something you would like to see added to HYBSERV2 please
+let us know as we are always looking for new ideas.
 
-With that said - Per Sidewnder's (Cosine's) request - HYBSERV
-will no longer be supported. So if u have a question please 
-upgrade to a version listed in the HYBSERV2 dir. 
+IMPORTANT NOTE:
+Per Sidewnder's (Cosine's) request - HYBSERV will no longer be
+supported. So if you have some questions or problems, please
+*upgrade* first to a version listed in the HYBSERV2 dir.
 
+The latest version is 1.8.0 <------
 
 John-Work
 
 
-HybServ(2) TS services - This file last updated by JW @ Nov 20 2000
-Copyright (C) 1998-2000 Patrick Alken (wnder@underworld.net)
+HybServ2 TS services - This file last updated by JW @ 6 June 2001
+Copyright (C) 1998-2001 Patrick Alken (wnder@underworld.net)
 
-HybServ was first coded by Patrick Alken (wnder@underworld.net) 
-and is now maintained by the Hybserv2 Coding Team, unless otherwise 
-mentioned in the code or the credits.
+HybServ was first coded by Patrick Alken (wnder@underworld.net)
+and is now maintained by the Hybserv2 Coding Team, unless
+otherwise mentioned in the code or the credits.
 
-The following people have contributed to this release of HybServ
-In nick alphabetical order:
+Lead Developer of Hybserv2
 
-Bruns       Brian Bruns     bruns@magenet.com
-Cosine      Patrick Alken   wnder@uwns.underworld.net
-Decho       Nedelcho Stanev decho@csoft.bg
-Hwy101      Walter Campbell wcampbel@botbay.net
-John-Work   F. John Rowan   john@tdkt.org
-kreator     Dinko Korunic   kreator@fly.srk.fer.hr
-Toot        Toby Verrall    to7@antipope.fsnet.co.uk
-		
-HybServ was specifically designed to run with hybrid ircd, although 
-it *should* work with CSr as well.  You may recieve the hybrid irc 
-daemon from ftp.blackened.com in /pub/irc/hybrid.  In our opinion, 
-it is the best irc daemon available and is currently used by EFNET / 
-Dalnet / ICQ / WFNET / HYBNET and Openprojects.
+kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 
-I'm releasing this software under the terms of the GNU General
-Public License (see COPYING).  Should you choose to use and/or modify
-any of my code, please do so under the terms of the GNU General Public
-License, published by the Free Software Foundation.
+
+The following people have contributed to this release of HybServ2
+(in nick alphabetical order):
+
+Bruns       Brian Bruns          bruns@magenet.net
+Hwy101      Walter Campbell      wcampbel@botbay.net
+Janos       John Binder          jbinder@kgazd.bme.hu
+John-Work   F. John Rowan        john@tdkt.org
+KrisDuv     Christophe Duverger  krisduv2000@yahoo.fr
+c0manche    Olivier Molinete     omg@digitallyunited.com
+cosine      Patrick Alken        wnder@uwns.underworld.net
+decho       Nedelcho Stanev      decho@iname.com
+fl_         Lee Hardy            lee@leeh.co.uk
+ike         Ivan Krstic          ike@gnjilux.srk.fer.hr 
+kreator     Dinko Korunic        kreator@fly.srk.fer.hr
+toot        Toby Verrall         to7@antipope.fsnet.co.uk
+
+    
+HybServ was specifically designed to run with hybrid ircd, although it
+*should* work with CSr as well.  You may receive the hybrid irc daemon
+from ftp.blackened.com in /pub/irc/hybrid. These services (more or less
+same code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet /
+EFNow / Openprojects Network.
+
+This software is released under the terms of the GNU General Public
+License (see COPYING).  Should you choose to use and/or modify any of
+code, please do so under the terms of the GNU General Public License,
+published by the Free Software Foundation.
 
 DISTRIBUTION
 
   You can get HybServ from:
 
-       #1:  ftp.magenet.com/pub/hybserv/
-            (Thanks to Bruns :-))
+  #1:  ftp.magenet.net/pub/hybserv/
+       (Thanks to Bruns)
 
-       #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
-            (Thanks to kreator :-))
+  #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
+       (Thanks to kreator)
 
+  #3:  ftp://mirrors.botbay.net/pub/hybserv/
+       (Thanks to Hwy101)
 
+  #4:  Anonymous CVS to this CVSROOT:
+       :pserver:cvs@digi.alleged.com:/usr/cvsroot
+       cvs login
+       <press enter, no password>
+       cvs checkout hybserv
+
+  #5:  CVS Web snapshots:
+       http://fly.srk.fer.hr/~kreator/projects/hybserv/
+       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
+
+  #6:  Web Interface to the CVS Repository:
+       http://www.alleged.com/cvsweb
+
+NOTE: CVS is usually more current than the release.
 
 
 INSTALLATION
@@ -61,7 +90,10 @@ INSTALLATION
   Read the INSTALL file :-).
 
 #########################################################################
-# BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to john@tdkt.org  #
+# BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to                #
+#                                                                       #
+#          hybserv-bugs@alleged.com                                     #
+#                                                                       #
 #########################################################################
  
 We can't fix bugs if no one reports them!
@@ -73,10 +105,10 @@ The criteria for reporting bugs is somewhat specific.
    will produce corefile.
 
 2. If you do not know how to reproduce the bug at will, please
-   do the following: #define EXTREMEDEBUG in config.h, which 
-   will cause the file "hybserv.hubinfo" to be created. If the 
-   bug occurs again, email me the hybserv.hubinfo file, and it 
-   will give us a starting point.
+   do the following: #define EXTREMEDEBUG in config.h, which will
+   cause the file "hybserv.hubinfo" to be created. If the bug
+   occurs again, email to hybserv-bugs@alleged.com  the
+   hybserv.hubinfo file, and it will give us a starting point.
 
 ################################################################
 # If you are interested in helping out with the development of #
@@ -84,86 +116,186 @@ The criteria for reporting bugs is somewhat specific.
 ################################################################
 
 
-This is the offical Hybserv mailing list hosted on MageNet.
+Below are the official Hybserv2 mailing lists hosted by Alleged.com
 
-This is a publically postable list.
+These are publicly postable lists.
 
-Here we can discuss anything we need and make sure problems get fixed. 
+Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
-sending e-mailing to majordomo@magenet.com:
+sending email to:
 
-subscribe hybserv <your mail>
+hybserv-request@alleged.com 
 
-You may also find us online by using the Openprojects Network
+(Please use a command from below in the body of the message and
+ not in the subject)
 
- /server vinge.openprojects.net
- /server irc.linux.com
 
-#twilight_zone
+Available Lists 
+
+  hybserv_public_list  Hybserv Public List
+  hybserv-bugs         Hybserv Bugs 
+
+
+
+Available List Manager Commands
+-------------------------------
+
+    subscribe <list> [<address>]
+
+        Subscribe yourself (or <address> if specified) to the
+        named <list>.
+
+    unsubscribe <list> [<address>]
+
+        Unsubscribe yourself (or <address> if specified) from the
+        named <list>.
+
+    which
+
+        Find out which lists you are on.
+
+    who <list>
+
+        Find out who is on the named <list>.
+
+    info <list>
+
+        Retrieve the general introductory information for the
+        named <list>.
+
+    lists
+
+        Show the lists served by this List Manager server.
+
+    help
+
+        Retrieve this message.
+
+    end
+
+        Stop processing commands (useful if your mailer adds a
+            signature).
+
+
+
+You may also find us online by using the EFNow Network
+
+  /server hybrid-7.leguin.org.uk
+  /server hybrid.best.net
+  /server irc.efnow.net
+
+  #ircd-coders
+  #twilight_zone
 
 #########################################################
 # Running Hybserv                                       #
 #########################################################
 
-Make sure that each hub server you have specified in your config file
-has C/N lines for HybServ matching the password in the first field of
-the S: line and the server name specified in the N: line.  Also, if you
-wish to enable jupes (#define ALLOW_JUPES), you *MUST* give services
-an H: line in ircd.conf.
+Make sure that each hub server you have specified in your config
+file has C/N lines for HybServ matching the password in the first
+field of the S: line and the server name specified in the N:
+line.  Also, if you wish to enable jupes (#define ALLOW_JUPES),
+you *MUST* give services an H: line in ircd.conf.
 
-  C/N line examples: Suppose the hostname of services is
-"services.us" with an ip of 1.2.3.4.
+Configuration examples:
 
-  In ircd.conf:    C:1.2.3.4:MyPassword:services.us::1
-                   N:1.2.3.4:MyPassword:services.us::1
+NOTE: Suppose the host name of services is "services.name" with
+      an ip of 1.2.3.4, and that server accepting the services
+      has name "server.shomewhere" with ircd class "server" (or
+      class 1).
 
-  In hybserv.conf: S:MyPassword:hub.server.com:6667
-                   N:services.us:Hybrid services
+Required statements in ircd.conf for Hybrid5/6:
 
-When you have compiled HybServ and edited the necessary files, simply
-type ./hybserv. 
+  C:1.2.3.4:password:services.name::1
+  N:1.2.3.4:password:services.name::1
+  H:*:*:services.name
 
-Then, go on IRC and type:            /msg OperServ identify <password>
+NOTE: You can leave out H line if you don't want to use server
+      jupes and G-Lines.
 
-Assuming OperServ is the OperServNick defined in settings.conf and you
-have given yourself a O: line in hybserv.conf. You should beallowed to 
-give OperServ commands through /msg or DCC CHAT.  
+NOTE: We recommend using services on same server that is your
+      hub, and then you can use 127.0.0.1 as address in C/N lines
+      (which will give you some performance, since traffic will
+      go through loop back device).
 
-For a list of commands, /msg OperServ help.
+However in Hybrid 7 to accomplish the same you have to put in
+ircd.conf following code:
+
+  connect {
+    name = "services.name";
+    host = "1.2.3.4";
+    send_password = "password";
+    accept_password = "password";
+    compressed = no;
+    hub_mask = "*";
+    class = "server";
+  };
+
+
+In hybserv.conf configuration should be as follows:
+
+  S:password:hub.server.somewhere:6667
+  N:services.name:Hybrid services
+
+When you have compiled HybServ and edited the necessary files,
+simply type ./hybserv which should start daemon properly. If it
+is not in process list, check hybserv.log which should state
+reasons of failure. 
+
+Then, go on IRC and type:
+  /msg OperServ identify <password>
+
+Assuming OperServ is the OperServNick defined in settings.conf
+and you have given yourself a O: line in hybserv.conf. You should
+be allowed to give OperServ commands through /msg or DCC CHAT.  
+
+For a list of commands do:
+  /msg OperServ help
 
 Most commands may also be done through DCC CHAT, and in fact more
-commands are available through DCC CHAT. Simply /dcc chat OperServ 
-to connect, and .help
+commands are available through DCC CHAT. Simply /dcc chat
+OperServ to connect, and .help
 
-I have tried to make HybServ fully compatible with TCM (linking wise).
-If you wish HybServ to be part of your TCM botnet, read TCM-LINKING
-for instructions.  If you have no idea what a TCM bot is, don't worry
-about it :-).
+I have tried to make HybServ fully compatible with TCM (linking
+wise). If you wish HybServ to be part of your TCM botnet,
+read TCM-LINKING for instructions.  If you have no idea what a
+TCM bot is, don't worry about it :-).
 
 If you enabled NickServ, ChanServ, MemoServ etc. in config.h, you
 can get lists of their commands through /msg *Serv help. NickServ
 and ChanServ have several commands that can only be executed by
 administrators.  This means you must match an O: line (with an
-"a" flag) in hybserv.conf AND be registered with OperServ to use
-them. This can be done by typing /msg OperServ password, these 
-commands CANNOT be accessed by DCC Chat. 
+"a" flag) in hybserv.conf and be registered with OperServ to
+use them. This can be done by typing /msg OperServ password,
+these commands CANNOT be accessed by DCC Chat. 
 
-IMPORTANT NOTE! If you use Hybrid or Hybrid-compatibile IRC daemon, you
-should enable Q-lines (quarantined nickname) for services-reserved
-nicknames because of obvious security reasons:
+IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC
+  daemon, you should enable Q-lines (quarantined nickname) for
+  services-reserved nicknames because of obvious security
+  reasons:
 
-	Q:NickServ:This nickname is reserved.
-	Q:ChanServ:This nickname is reserved.
-	Q:OperServ:This nickname is reserved.
+  Q:NickServ:This nickname is reserved.
+  Q:ChanServ:This nickname is reserved.
+  Q:OperServ:This nickname is reserved.
 
+However Q lines changed in Hybrid-7 Feel free to copy and paste
+these lines:
+
+  resv {
+    # The reason must go first
+    reason = "This nickname is reserved";
+    nick = "NickServ";
+    nick = "ChanServ";
+    nick = "OperServ";
+  };
 
 ##########################################################################
 # Legal Stuff:                                                           #
 ##########################################################################
 
 This package has absolutely no warranty.  Use at your own risk.
-The author will accept no responsibility for any damage, whatsoever,
-caused by this program.
+The author will accept no responsibility for any damage,
+whatsoever, caused by this program.
 
 ##########################################################################
 # Credits:                                                               #
@@ -174,15 +306,15 @@ Functions used from other GPL'd sources:
      HashNick()     -- from ircd-hybrid source
      HashChannel()  -- from ircd-hybrid source
 
-tools/mkpasswd.c is copyright (C) 1991 Nelson Minar <minar@reed.edu>
+tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
+<minar@reed.edu>, Walter Campbell, and Hybserv7 team.
 
 Some help files were used from EsperNet's service package:
 
 ftp.dragonfire.net/software/unix/irc
 
-The ideas for a settings.conf and the shownicks/showchans programs
-were inspired from this package as well. 
+The ideas for a settings.conf and the shownicks/showchans
+programs were inspired from this package as well. 
 
-See also the begining of this file.
-
+See also the beginning of this file.
 

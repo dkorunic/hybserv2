@@ -9,10 +9,15 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -28,6 +33,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
+#include "sprintf_irc.h"
 
 static aHashEntry clientTable[HASHCLIENTS];
 static aHashEntry channelTable[HASHCHANNELS];
@@ -55,13 +61,23 @@ HashNick(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHCLIENTS - 1));
+#endif
+
+  /* fix broken hash code -kre */
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % HASHCLIENTS;
+
 } /* HashNick() */
 
 #ifdef NICKSERVICES
@@ -76,13 +92,24 @@ NSHashNick(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (NICKLIST_MAX - 1));
+#endif
+
+  /* fix broken hash code -kre */
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+
+  return h % NICKLIST_MAX;
+
 } /* NSHashNick() */
 
 #endif /* NICKSERVICES */
@@ -111,7 +138,7 @@ FindClient(const char *name)
    * Got the bucket, now search the chain.
    */
   for (tempuser = (struct Luser *)temphash->list; tempuser; tempuser = tempuser->hnext)
-    if (!strcasecmp(name, tempuser->nick))
+    if (!irccmp(name, tempuser->nick))
       return(tempuser);
 
   return ((struct Luser *) NULL);
@@ -159,7 +186,7 @@ CloneMatch(struct Luser *user1, struct Luser *user2)
     return 0;
 
   /*
-   * Make sure service psuedo nicks are not flagged as
+   * Make sure service pseudo nicks are not flagged as
    * clones.
    */
   if ((user1->server == Me.sptr) ||
@@ -176,10 +203,10 @@ CloneMatch(struct Luser *user1, struct Luser *user2)
   else
     username2 = user2->username;
 
-  if (strcasecmp(username1, username2) != 0)
+  if (irccmp(username1, username2) != 0)
     return 0;
 
-  if (strcasecmp(user1->hostname, user2->hostname) != 0)
+  if (irccmp(user1->hostname, user2->hostname) != 0)
     return 0;
 
   /* both the usernames and hostnames match - must be a clone */
@@ -211,7 +238,7 @@ IsClone(struct Luser *lptr)
   if (lptr->server == Me.sptr)
     return (0);
 
-  sprintf(uhost, "%s@%s",
+  ircsprintf(uhost, "%s@%s",
     (lptr->username[0] == '~') ? lptr->username + 1 : lptr->username,
     lptr->hostname);
 
@@ -297,9 +324,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
    */
   if (lptr->username[0] == '~')
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username + 1,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username + 1, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->NonIdentd++;
@@ -307,9 +332,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
   }
   else
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->Identd++;
@@ -321,7 +344,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
 #ifdef STATSERVICES
 
   hostname = lptr->hostname;
-  currtime = time(NULL);
+  currtime = current_ts;
 
   for (domain = hostname; *domain; domain++);
   while (domain != hostname)
@@ -596,9 +619,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
       if (SafeConnect)
         SendUmode(OPERUMODE_C,
           "*** Clone detected: %s (%s@%s) [%s]",
-          lptr->nick,
-          lptr->username,
-          lptr->hostname,
+          lptr->nick, lptr->username, lptr->hostname,
           lptr->server ? lptr->server->name : "*unknown*");
 
       break;
@@ -627,7 +648,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
       temp2 = cloneTable[hashv].list;
   }
 
-  if (cloneTable[hashv].list == (void *) NULL)
+  if (cloneTable[hashv].list == NULL)
   {
     lptr->cnext = (struct Luser *)cloneTable[hashv].list;
     cloneTable[hashv].list = (void *)lptr;
@@ -636,64 +657,47 @@ HashAddClient(struct Luser *lptr, int nickchange)
   if (MaxClones && foundclone)
   {
     int    clcnt = 2; /* number of clones */
-    char  *killmsg = (char *) NULL;
     struct Luser  *prev = (struct Luser *) NULL;
 
-    killmsg = (char *) MyMalloc(strlen(tempuser->nick) + strlen(lptr->nick) + 32);
-    sprintf(killmsg, "%s -> %s",
-      tempuser->nick,
-      lptr->nick);
-
-    for (tempuser = cloneTable[hashv].list; tempuser; tempuser = tempuser->cnext)
+    for (tempuser = cloneTable[hashv].list; tempuser; tempuser =
+        tempuser->cnext)
     {
       if (tempuser->cnext == lptr)
       {
-        /* 
-         * go through the table and get a list of all the clones
-         * matching lptr's userhost
-         */
+        /* go through the table and get a list of all the clones matching
+         * lptr's userhost */
         for (temp2 = lptr->cnext; temp2; temp2 = temp2->cnext)
         {
           if (CloneMatch(lptr, temp2))
-          {
             ++clcnt;
-            killmsg = (char *) MyRealloc(killmsg, strlen(killmsg) + strlen(temp2->nick) + (5 * sizeof(char)));
-            strcat(killmsg, " -> ");
-            strcat(killmsg, temp2->nick);
-          }
         }
 
         if (clcnt < MaxClones)
         {
-          MyFree(killmsg);
           return (lptr);
         }
 
-        if (AutoKillClones && (clcnt >= (MaxClones + 1)))
+        if (AutoKillClones && (clcnt > MaxClones ))
         {
           killclones = 1;
 
-          putlog(LOG2, "Clones [%s] (%s@%s) killed",
-            killmsg,
+          putlog(LOG2, "Clones from (%s@%s) killed",
             lptr->username,
             lptr->hostname);
 
           SendUmode(OPERUMODE_C,
-            "*** Killing clones [%s] (%s@%s)",
-            killmsg,
+            "*** Killing clones from (%s@%s)",
             lptr->username,
             lptr->hostname);
         }
         else
         {
-          putlog(LOG2, "Sent clone warning to [%s] (%s@%s)",
-            killmsg,
+          putlog(LOG2, "Sent clone warning to (%s@%s)",
             lptr->username,
             lptr->hostname);
 
           SendUmode(OPERUMODE_C,
-            "*** Warning clones [%s] (%s@%s)",
-            killmsg,
+            "*** Warning clones from (%s@%s)",
             lptr->username,
             lptr->hostname);
         }
@@ -708,14 +712,10 @@ HashAddClient(struct Luser *lptr, int nickchange)
         {
           if (CloneMatch(lptr, temp2))
           {
-            if (AutoKillClones && (clcnt >= (MaxClones + 1)))
+            if (AutoKillClones && (clcnt > MaxClones ))
             {
-              toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
-                n_OperServ,
-                temp2->nick,
-                Me.name,
-                n_OperServ,
-                killmsg);
+              toserv(":%s KILL %s :%s!%s (Clones)\n",
+                n_OperServ, temp2->nick, Me.name, n_OperServ);
               DeleteClient(temp2);
               temp2 = prev;
             }
@@ -728,7 +728,8 @@ HashAddClient(struct Luser *lptr, int nickchange)
 
         break;
       } /* if (tempuser->cnext == lptr) */
-    } /* for (tempuser = cloneTable[hashv].list; tempuser; tempuser = tempuser->cnext) */
+    } /* for (tempuser = cloneTable[hashv].list; tempuser; tempuser =
+         tempuser->cnext) */
 
     /*
      * lptr and tempuser were not killed in the above loop -
@@ -738,20 +739,18 @@ HashAddClient(struct Luser *lptr, int nickchange)
     {
       killclones = 1;
 
-      toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
+      toserv(":%s KILL %s :%s!%s (Clones)\n",
         n_OperServ,
         lptr->nick,
         Me.name,
-        n_OperServ,
-        killmsg);
+        n_OperServ);
       DeleteClient(lptr);
 
-      toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
+      toserv(":%s KILL %s :%s!%s (Clones)\n",
         n_OperServ,
         tempuser->nick,
         Me.name,
-        n_OperServ,
-        killmsg);
+        n_OperServ);
       DeleteClient(tempuser);
     }
     else
@@ -759,8 +758,6 @@ HashAddClient(struct Luser *lptr, int nickchange)
       WarnClone(lptr->nick);
       WarnClone(tempuser->nick);
     }
-
-    MyFree(killmsg);
   } /* if (MaxClones && foundclone) */
 
   if (rhostptr)
@@ -791,10 +788,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
           debug("clcnt[%d] is over the allowed value [%d]\n",
             clcnt, rhostptr->hostnum);
           toserv(":%s KILL %s :%s!%s (Restricted hostmask (%d maximum connections allowed))\n",
-            n_OperServ,
-            lptr->nick,
-            Me.name,
-            n_OperServ,
+            n_OperServ, lptr->nick, Me.name, n_OperServ,
             rhostptr->hostnum);
           DeleteClient(lptr);
         }
@@ -861,9 +855,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
 
   if (lptr->username[0] == '~')
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username + 1,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username + 1, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->NonIdentd--;
@@ -871,9 +863,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
   }
   else
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->Identd--;
@@ -973,7 +963,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
 
           if (clonematches == 1)
           {
-            time_t  currtime = time(NULL);
+            time_t  currtime = current_ts;
 
             /*
              * there was only 1 other client who matched lptr, so that
@@ -1037,12 +1027,23 @@ HashUhost(char *userhost)
   register unsigned int h = 0;
   register int i = 30; /* only use first 30 chars of uhost */
 
+#if 0
   while(*hname && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*hname++));
   }
 
   return (h & (HASHCLIENTS - 1));
+#endif
+  
+  while (*hname && --i)
+  {
+    h += ToLower(*hname);
+    hname++;
+  }
+
+  return h % HASHCLIENTS;
+
 } /* HashUhost() */
 
 /*
@@ -1061,12 +1062,23 @@ HashChannel(const char *name)
   register int i = 30;
   unsigned int h = 0;
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHCHANNELS - 1));
+#endif
+
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+
+  return h % HASHCHANNELS;
+  
 } /* HashChannel() */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -1083,12 +1095,23 @@ CSHashChan(const char *name)
   register int i = 30;
   unsigned int h = 0;
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (CHANLIST_MAX - 1));
+#endif
+  
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  
+  return h % CHANLIST_MAX;
+
 } /* CSHashChan() */
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
@@ -1112,12 +1135,22 @@ MSHashMemo(const char *name)
    * to thirty characters
    */
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (MEMOLIST_MAX - 1));
+#endif
+
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % MEMOLIST_MAX;
+
 } /* MSHashMemo() */
 
 #endif /* defined(NICKSERVICES) && defined(MEMOSERVICES) */
@@ -1202,7 +1235,7 @@ FindChannel(const char *name)
   temphash = &channelTable[hashv];
 
   for (tempchan = (struct Channel *)temphash->list; tempchan; tempchan = tempchan->hnext)
-    if (!strcasecmp(name, tempchan->name))
+    if (!irccmp(name, tempchan->name))
       return (tempchan);
 
   return ((struct Channel *) NULL);
@@ -1218,13 +1251,23 @@ HashServer(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHSERVERS - 1));
+#endif
+
+  /* fix broken hash code -kre */
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % HASHSERVERS;
+
 } /* HashServer() */
 
 struct Server *
@@ -1240,10 +1283,11 @@ FindServer(const char *name)
   hashv = HashServer(name);
   temphash = &serverTable[hashv];
 
-  for (tempserv = (struct Server *) temphash->list; tempserv; tempserv = tempserv->hnext)
+  for (tempserv = (struct Server *) temphash->list; tempserv; tempserv =
+      tempserv->hnext)
   {
     /*
-     * This has to be a match() instead of strcasecmp()
+     * This has to be a match() instead of irccmp()
      * because the N: for HybServ on the hub server may have
      * hostmask stripping, in which case the hub server would
      * appear like *.hub.net

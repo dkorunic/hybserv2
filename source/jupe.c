@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -25,6 +27,7 @@
 #include "sock.h"
 #include "timestr.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 #ifdef ALLOW_JUPES
 
@@ -51,7 +54,7 @@ AddJupe(char *name, char *reason, char *who)
 
   for (ii = 0; ii < strlen(name); ++ii)
   {
-    if (IsWildChar(name[ii]))
+    if (IsKWildChar(name[ii]))
     {
       nickjupe = 0;
       break;
@@ -106,7 +109,7 @@ DeleteJupe(struct Jupe *jptr)
 
 /*
 CheckJupes()
- Called after rehash to check if there are any psuedo-servers
+ Called after rehash to check if there are any pseudo-servers
 which no longer have a J: line. SQUIT any we find
 */
 
@@ -123,7 +126,7 @@ CheckJupes()
   {
     /*
      * Make sure tempserv is using us as an uplink, which
-     * would qualify it as a psuedo-server. But also make
+     * would qualify it as a pseudo-server. But also make
      * sure it's not OUR current hub server - we never
      * want to squit our hub.
      */
@@ -184,10 +187,8 @@ DoJupeSquit(char *serv, char *reason, char *who)
   }
 
   /* add a fake server to replace it */
-  sprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n",
-    Me.name,
-    serv,
-    reason);
+  ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, serv,
+      reason);
 
   toserv(sendstr);
 
@@ -227,15 +228,14 @@ CheckJuped(char *name)
         /* its a nick jupe, not a server jupe */
 
         /* collide the nickname */
-        sprintf(sendstr,
-          "NICK %s 1 %ld +i juped juped.com %s :%s\n",
-          tempjupe->name,
+        ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+            tempjupe->name,
         #ifdef NICKSERVICES
           (long) (lptr->nick_ts - 1),
         #else
           (long) (lptr->since - 1),
         #endif
-          Me.name,
+          JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
           tempjupe->reason ? tempjupe->reason : "Jupitered Nickname");
         toserv(sendstr);
 
@@ -263,10 +263,8 @@ CheckJuped(char *name)
         DeleteServer(tempserv);
 
         /* replace it with fake server */
-        sprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n",
-          Me.name,
-          name,
-          tempjupe->reason);
+        ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, name,
+            tempjupe->reason);
         toserv(sendstr);
         SplitBuf(sendstr, &arv);
 
@@ -319,11 +317,9 @@ InitJupes()
     if (tmpjupe->isnick)
     {
       /* collide the nickname */
-      sprintf(sendstr,
-        "NICK %s 1 1 +i juped juped.com %s :%s\n",
-        tmpjupe->name,
-        Me.name,
-        tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
+      ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
+          tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+          tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
       toserv(sendstr);
 
       SplitBuf(sendstr, &av);
@@ -331,11 +327,8 @@ InitJupes()
     }
     else
     {
-      sprintf(sendstr,
-        ":%s SERVER %s 2 :Juped: %s",
-        Me.name,
-        tmpjupe->name,
-        tmpjupe->reason);
+      ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
+          tmpjupe->name, tmpjupe->reason);
 
       toserv(":%s SQUIT %s :%s (%s)\n%s\n",
         Me.name,
@@ -361,7 +354,7 @@ int AddVote(char *name, char *who)
   struct JupeVote *tempvote, *votematch = NULL;
   int exists = 0;
   int i;
-  time_t unixtime = time(NULL);
+  time_t unixtime = current_ts;
 
   /* check if someone voted for this server already */
   for (tempvote = VoteList; tempvote; tempvote = tempvote->next)

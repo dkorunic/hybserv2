@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,8 +35,8 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 /* Solaris does not provide this by default. Anyway this is wrong approach,
    since -1 is 255.255.255.255 addres which is _valid_! Obviously
@@ -45,7 +47,7 @@
 
 static char *getfield (char *newline);
 
-static void AddHostLimit(char *host, int hostnum);
+static void AddHostLimit(char *host, int hostnum, int banhost);
 static void AddUser(char *host, char *pass, char *nick, char *flags);
 static void AddServ(char *hostname, char *password, int port);
 static void AddBot(char *nick, char *host, char *pass, int port);
@@ -79,7 +81,7 @@ struct PortInfo *PortList = NULL;    /* list of ports to listen on */
 struct Userlist *GenericOper = NULL;
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
-struct cHost *cHostList=NULL;        /* list of autoconnecting hosts */
+struct cHost *cHostList = NULL;      /* list of autoconnecting hosts */
 #endif
 
 int HubCount = 0;                    /* number of S: lines in hybserv.conf */
@@ -192,7 +194,7 @@ Rehash()
 
 #ifdef ALLOW_JUPES
   /*
-   * SQUIT any psuedo-servers who no longer have a J: line
+   * SQUIT any pseudo-servers who no longer have a J: line
    */
   CheckJupes();
 #endif
@@ -299,7 +301,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.admin = (char *) MyMalloc(REALLEN);
           memset(Me.admin, 0, REALLEN);
-          Strncpy(Me.admin, temp, REALLEN - 1);
+          strncpy(Me.admin, temp, REALLEN - 1);
         }
         else
           Me.admin = MyStrdup(temp);
@@ -451,7 +453,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.name = (char *) MyMalloc(REALLEN);
           memset(Me.name, 0, REALLEN);
-          Strncpy(Me.name, name, REALLEN - 1);
+          strncpy(Me.name, name, REALLEN - 1);
         }
         else
           Me.name = MyStrdup(name);
@@ -460,7 +462,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.info = (char *) MyMalloc(REALLEN);
           memset(Me.info, 0, REALLEN);
-          Strncpy(Me.info, info, REALLEN - 1);
+          strncpy(Me.info, info, REALLEN - 1);
         }
         else
           Me.info = MyStrdup(info);
@@ -509,14 +511,17 @@ ParseConf(char *filename, int rehash)
       case 'i':
       case 'I':
       {
-        char *host, *num;
+        char *host, *num, *banhost;
 
         host = getfield(NULL);
         num = getfield(NULL);
+        banhost = getfield(NULL);
+        if (!banhost)
+          banhost = "0";
         if (!host || !num)
           continue;
 
-        AddHostLimit(host, atoi(num));
+        AddHostLimit(host, atoi(num), atoi(banhost));
 
         break;
       } /* case 'I' */
@@ -593,7 +598,7 @@ ParseConf(char *filename, int rehash)
         char *start, *end;
         char *filename;
 
-        if (!strncasecmp(line, ".include", 8))
+        if (!ircncmp(line, ".include", 8))
         {
           /*
            * It is a .include statement - meaning they
@@ -634,7 +639,7 @@ ParseConf(char *filename, int rehash)
            * configuration file
            */
           ParseConf(filename, 0);
-        } /* if (!strncasecmp(line, ".include", 8)) */
+        } /* if (!ircncmp(line, ".include", 8)) */
 
         break;
       } /* case '.' */
@@ -742,7 +747,7 @@ getfield (char *newline)
   field = line;
   if ((end = strchr(line, ':')) == NULL)
   {
-    line = (char *) NULL;
+    line = NULL;
     if ((end = strchr(field, '\n')) == NULL)
       end = field + strlen(field);
   }
@@ -770,7 +775,7 @@ IsChannel(char *chan)
   struct Chanlist *tempchan;
 
   for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
-    if (!strcasecmp(tempchan->name, chan))
+    if (!irccmp(tempchan->name, chan))
       return(tempchan);
 
   return (NULL);
@@ -800,7 +805,7 @@ IsServLine(char *name, char *port)
 
   for (tempserv = ServList; tempserv; tempserv = tempserv->next)
     if ((tempserv->port == portnum) &&
-        (!strcasecmp(tempserv->hostname, name)))
+        (!irccmp(tempserv->hostname, name)))
       return (tempserv);
 
   return (NULL);
@@ -892,7 +897,7 @@ IsBot(char *bname)
     return (NULL);
 
   tempbot = BotList;
-  while (tempbot && (strcasecmp(tempbot->name, bname) != 0))
+  while (tempbot && (irccmp(tempbot->name, bname) != 0))
     tempbot = tempbot->next;
 
   return (tempbot);
@@ -904,7 +909,7 @@ AddHostLimit()
 */
 
 static void
-AddHostLimit(char *host, int hostnum)
+AddHostLimit(char *host, int hostnum, int banhost)
 
 {
   struct rHost *ptr;
@@ -926,6 +931,9 @@ AddHostLimit(char *host, int hostnum)
   }
 
   ptr->hostnum = hostnum;
+#ifdef ADVFLOOD
+  ptr->banhost = banhost;
+#endif /* ADVFLOOD */
   ptr->next = rHostList;
   rHostList = ptr;
 } /* AddHostLimit() */
@@ -948,7 +956,7 @@ IsRestrictedHost(char *user, char *host)
       return (temphost);
   }
 
-  return (NULL);
+  return NULL;
 } /* IsRestrictedHost() */
 
 /*
@@ -1276,10 +1284,10 @@ AddPort(int port, char *host, char *type)
     if (strlen(host))
       ptr->host = MyStrdup(host);
     else
-      ptr->host = (char *) NULL;
+      ptr->host = NULL;
   }
   else
-    ptr->host = (char *) NULL;
+    ptr->host = NULL;
 
   if (!type)
     ptr->type = PRT_USERS;
@@ -1287,9 +1295,9 @@ AddPort(int port, char *host, char *type)
   {
     ptr->type = 0;
 
-    if (!strcasecmp(type, "TCM"))
+    if (!irccmp(type, "TCM"))
       ptr->type = PRT_TCM;
-    if (!strcasecmp(type, "USERS"))
+    if (!irccmp(type, "USERS"))
       ptr->type = PRT_USERS;
 
     if (!ptr->type)
@@ -1690,9 +1698,8 @@ MatchesAdmin(char *mask)
   {
     if (IsAdmin(tempuser))
     {
-      sprintf(tempstr, "*!%s@%s",
-        tempuser->username,
-        tempuser->hostname);
+      ircsprintf(tempstr, "*!%s@%s", tempuser->username,
+          tempuser->hostname);
 
       if (match(mask, tempstr))
         return (1);
@@ -1733,7 +1740,7 @@ GetUser(int nickonly, char *nickname, char *user, char *host)
 
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
   {
-    if (!strcasecmp(tempuser->nick, nickname))
+    if (!irccmp(tempuser->nick, nickname))
     {
       if (nickonly && (!user && !host))
       {

@@ -9,61 +9,65 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "config.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "match.h"
 #include "misc.h"
+#include "timestr.h"
+#include "sprintf_irc.h"
 
 /*
-timeago()
-  Uses the TS "timestamp" to make a corresponding time string
-to the long format:
-  X years X weeks X days (Xh Xm Xs)
-or the short format:
-  Xy Xw Xd Xh Xm Xs
-depending on the flag parameter.
-
-Values for "flag":
- 0 - display (presenttime - timestamp) in short format
- 1 - display (presenttime - timestamp) in long format
- 2 - display (timestamp) in short format
- 3 - display (timestamp) in long format
- 4 - display (timestamp) in short format but with no spaces
-*/
-
-char *
-timeago(time_t timestamp, int flag)
-
+ * timeago()
+ *
+ * Uses the TS "timestamp" to make a corresponding time string to the long
+ * format:
+ * X years X weeks X days (Xh Xm Xs)
+ * or the short format:
+ * Xy Xw Xd Xh Xm Xs
+ * depending on the flag parameter.
+ *
+ * Values for "flag":
+ * 0 - display (presenttime - timestamp) in short format
+ * 1 - display (presenttime - timestamp) in long format
+ * 2 - display (timestamp) in short format
+ * 3 - display (timestamp) in long format
+ * 4 - display (timestamp) in short format but with no spaces
+ */
+char *timeago(time_t timestamp, int flag)
 {
   static char final[50];
   char temp[50];
   time_t delta;
   long years, weeks, days, hours, minutes, seconds;
   int longfmt;
-  int spaces; /* put spaces in the string? */
+  int spaces; 
 
+  /* put spaces in the string? */
   spaces = 1;
 
   switch (flag)
   {
     case 0:
     {
-      delta = time(NULL) - timestamp;
+      delta = current_ts - timestamp;
       longfmt = 0;
       break;
     }
 
     case 1:
     {
-      delta = time(NULL) - timestamp;
+      delta = current_ts - timestamp;
       longfmt = 1;
       break;
     }
@@ -93,7 +97,7 @@ timeago(time_t timestamp, int flag)
     default:
     {
       /* shouldn't happen */
-      return ("");
+      return NULL;
     }
   } /* switch (flag) */
 
@@ -109,15 +113,10 @@ timeago(time_t timestamp, int flag)
   if (years)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld year%s ",
-        years,
-        (years == 1) ? "" : "s");
+      ircsprintf(temp, "%ld year%s ", years, (years == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldy",
-        years);
+      ircsprintf(temp, "%ldy", years);
       if (spaces)
         strcat(temp, " ");
     }
@@ -127,15 +126,10 @@ timeago(time_t timestamp, int flag)
   if (weeks)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld week%s ",
-        weeks,
-        (weeks == 1) ? "" : "s");
+      ircsprintf(temp, "%ld week%s ", weeks, (weeks == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldw",
-        weeks);
+      ircsprintf(temp, "%ldw", weeks);
       if (spaces)
         strcat(temp, " ");
     }
@@ -145,15 +139,10 @@ timeago(time_t timestamp, int flag)
   if (days)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld day%s ",
-        days,
-        (days == 1) ? "" : "s");
+      ircsprintf(temp, "%ld day%s ", days, (days == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldd",
-        days);
+      ircsprintf(temp, "%ldd", days);
       if (spaces)
         strcat(temp, " ");
     }
@@ -165,18 +154,12 @@ timeago(time_t timestamp, int flag)
     if (longfmt)
     {
       /*
-       * We don't want to have a string like:
-       * 1 week (0h 0m 0s)
-       * so make sure at least one of these values
-       * is non-zero
+       * We don't want to have a string like: 1 week (0h 0m 0s) so make
+       * sure at least one of these values is non-zero
        */
       if (hours || minutes || seconds)
       {
-        sprintf(temp,
-          "(%ldh %ldm %lds)",
-          hours,
-          minutes,
-          seconds);
+        ircsprintf(temp, "(%ldh %ldm %lds)", hours, minutes, seconds);
         strcat(final, temp);
       }
     }
@@ -185,9 +168,7 @@ timeago(time_t timestamp, int flag)
       temp[0] = '\0';
       if (hours)
       {
-        sprintf(temp,
-          "%ldh",
-          hours);
+        ircsprintf(temp, "%ldh", hours);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -195,9 +176,7 @@ timeago(time_t timestamp, int flag)
 
       if (minutes)
       {
-        sprintf(temp,
-          "%ldm",
-          minutes);
+        ircsprintf(temp, "%ldm", minutes);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -205,9 +184,7 @@ timeago(time_t timestamp, int flag)
 
       if (seconds)
       {
-        sprintf(temp,
-          "%lds",
-          seconds);
+        ircsprintf(temp, "%lds", seconds);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -226,15 +203,13 @@ timeago(time_t timestamp, int flag)
     if (hours)
     {
       if (longfmt)
-        sprintf(temp,
+        ircsprintf(temp,
           "%ld hour%s ",
           hours,
           (hours == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%ldh",
-          hours);
+        ircsprintf(temp, "%ldh", hours);
         if (spaces)
           strcat(temp, " ");
       }
@@ -244,15 +219,11 @@ timeago(time_t timestamp, int flag)
     if (minutes)
     {
       if (longfmt)
-        sprintf(temp,
-          "%ld minute%s ",
-          minutes,
-          (minutes == 1) ? "" : "s");
+        ircsprintf(temp, "%ld minute%s ",
+          minutes, (minutes == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%ldm",
-           minutes);
+        ircsprintf(temp, "%ldm", minutes);
         if (spaces)
           strcat(temp, " ");
       }
@@ -262,15 +233,11 @@ timeago(time_t timestamp, int flag)
     if (seconds)
     {
       if (longfmt)
-        sprintf(temp,
-          "%ld second%s ",
-          seconds,
-          (seconds == 1) ? "" : "s");
+        ircsprintf(temp, "%ld second%s ",
+          seconds, (seconds == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%lds",
-          seconds);
+        ircsprintf(temp, "%lds", seconds);
         if (spaces)
           strcat(temp, " ");
       }
@@ -295,14 +262,12 @@ timeago(time_t timestamp, int flag)
 } /* timeago() */
 
 /*
-timestr()
- This function is similar to timeago(), but it takes an arguement
-string of the format "Xw Xd Xh Xm Xs", and converts it to seconds.
-*/
-
-long
-timestr(char *format)
-
+ * timestr()
+ *
+ * This function is similar to timeago(), but it takes an arguement
+ * string of the format "Xw Xd Xh Xm Xs", and converts it to seconds.
+ */
+long timestr(char *format)
 {
   long seconds;
   char digitbuf[MAXLINE];
@@ -323,8 +288,7 @@ timestr(char *format)
      * 'm', or 's' in it - assume it is in seconds so we don't
      * break the below loop
      */
-    sprintf(fmtbuf, "%ss",
-      format);
+    ircsprintf(fmtbuf, "%ss", format);
   }
   else
     strcpy(fmtbuf, format);
@@ -340,9 +304,8 @@ timestr(char *format)
     else
     {
       /*
-       * We reached a non-digit character - increment seconds
-       * variable accordingly:
-       *
+       * We reached a non-digit character - increment seconds variable
+       * accordingly:
        *  w - week   (604800 seconds)
        *  d - day    (86400 seconds)
        *  h - hour   (3600 seconds)
@@ -397,14 +360,12 @@ timestr(char *format)
 } /* timestr() */
 
 /*
-GetTime()
- Attempt to get the current time in seconds/useconds using
-gettimeofday(). If that fails, get it in seconds/0.
-*/
-
-struct timeval *
-GetTime(struct timeval *timer)
-
+ * GetTime()
+ *
+ * Attempt to get the current time in seconds/useconds using
+ * gettimeofday(). If that fails, get it in seconds/0.
+ */
+struct timeval *GetTime(struct timeval *timer)
 {
   if (!timer)
     return (NULL);
@@ -416,7 +377,7 @@ GetTime(struct timeval *timer)
 
 #else
 
-  timer->tv_sec = time(NULL);
+  timer->tv_sec = current_ts;
   timer->tv_usec = 0;
   return (timer);
 
@@ -424,13 +385,10 @@ GetTime(struct timeval *timer)
 } /* GetTime() */
 
 /*
-GetGMTOffset()
- Return the GMT offset from localtime (in seconds)
-*/
-
-long
-GetGMTOffset(time_t unixtime)
-
+ * GetGMTOffset()
+ * Return the GMT offset from localtime (in seconds)
+ */
+long GetGMTOffset(time_t unixtime)
 {
 #if 0
   struct tm *gmt,

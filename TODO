@@ -1,28 +1,136 @@
-kreator
--------
-1) crashing on /reload
-   -  done(?) - seems another Solaris goddamn bug.
-2) linked tree problems
-   - people report it has gone after 1.7.3
-3) bcflood issue
-   - done.
-4) add cidr & ranged ip's (if listening on port add tcpwrap capatibilities)
-5) trace possible leaks
-6) use btree&mmap (additionally use adns and glib)
-7) improve block allocator
-8) check older KNOWNBUGS
-   - some.
-9) get rid of proxy ch. code (or make it better :) )
-   - done. ripped out -> use tcm-hybrid for that
-10) add support for solaris threads
-    - done.
-11) trace weird SIGPIPE-s
-    - done (probably)
-12) weird level redefine on all channels 
-13) umode command (in msg)
-    - done.
-14) insert support for solaris threads
-    - done.
-16) split and autorouting
-    - done -> testing in progress.
+Today's MOTD
+------------
+"Computers will not be perfected until they can compute how much more
+ than the estimate the job will cost."
 
+
+Pending bugs:
+-------------
+*) send all mlock modes on channel creation
+*) trace possible leaks
+   NOTE: I've prepared some parts of code for trace -kre
+*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
+   with unlink link copying routine.
+   NOTE: Quickfixed this. However, I need to look at this more closely!
+   NOTE2: traced problem to DeleteLink(), done some more fixes, till
+          weird
+   NOTE3: still having problems.
+*) OperServ does not completely support hybrid7 modes yet, (for example
+   .channel command or SECURE)
+*) sed helpfiles so that they have proper time values
+   NOTE: this should be done via %v or %t.. something like it
+*) save services ignores
+*) stuff from tools/* like encryptconf, encryptdb and doencrypt still do
+   not support MD5
+
+
+Features to come:
+-----------------  
+*) choose NOTICES/MESSAGES to communicate with services
+*) rewrite documentation
+   ----> work in progress (Hwy)
+*) add SVSNICK, SWHOIS, etc. for other IRCDs
+*) modularisation (_very_ unlikely to happen)
+*) completely document API
+   ----> work in progress (Janos)
+*) localisation
+*) misc stuff:
+   private notes on channel and user records, available only to staff
+   PGP/GPG keys per user
+   multiple URL's, multiple email addresses (with limits)
+   geek code
+*) use btree&mmap (additionally use adns and glib)
+*) improve block allocator
+*) add cidr & ranged ip's
+*) add tcpwrap capatibilities
+*) ziplinks (perhaps use servlink?)
+*) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
+   flood ctrl for services itself
+   flood ctrl for channels: public flood, join-part flood, kick flood,
+    deop flood, nick flood -> however, for some features it is obvious
+    that chanserv/operserv will have to reside on channels, which I
+    dislike (-kre)
+   ----> work in progress (KrisDuv)
+*) implement modes flood trigger (and below)
+*) add some features from http://www.appwatch.com/Linux/App/879/data.html
+*) be compatibile with other ircds (!!)
+   ----> work in progress (me)
+*) umode +g ACCEPT list (BR's idea)
+
+
+Done so far:
+------------
+*) CVSWeb installed and documented
+*) add mySQL/PostgreSQL support for databases
+   -> i'm working on this, too; currently i'm involved in libpq to be
+   specific (kre)
+*) fix "services" fighting by juping offending server/services
+   detect online services and silently drop out
+   detect services fighting
+   -> i'm working on this right now (kre)
+*) ike did flood protection, more to come soon - stay tuned :-)
+*) channel verbose stuff
+*) fixed stupid stupid stupid bug with not --fcnt
+*) add collapse() and irccmp() (do we need this?)
+*) operserv function to find improper TS channels and fix them
+   ---> still needs to be further tested
+*) space for realname, address, phone numbers
+*) mailing list
+*) applied (some are slightly modified) patches from KrisDuv
+   <krisduv2000@yahoo.fr> in the following order:
+   - fix stupid DefaultAccess problem which ment that anyone could alter
+     global channel levels (how the heck didn't anyone notice that?)
+   - fix broken lastseen updating for nicknames
+   - fix broken "Last Seen" info in n_info()
+*) Walter has fixed restart() problem that was affected with check_pid()
+*) fix stupid bug that services +o people who match() O line, but have not
+   registered with OperServ
+*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
+   special cases -- FIX FIX FIX THIS!
+*) added a lot of features from IrcBg
+*) NEW bug in services, somehow connected with hashing code and servers -
+   FindServer does not find servers -- I wonder how come no one found out
+   bug in hashing code that existed from first versions of HybServ1 for
+   masked servers! Ugh. -kre
+*) ultra-buggy DeleteLink() for nicknames! - some fixes, yet to test
+   throughly
+*) use snprintf instead of sprintf or possibly use irc_sprintf from
+   Hybrid
+*) lower usage of time() via global variable synched in dotimer()
+*) added fixts for channels and nicknames
+*) added deletion of cleartext password from memory if crypt is on
+*) services ignoring people sometimes
+*) MD5 support (UseMD5 param_set)
+*) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
+*) let +h people use unban by default (if hyb7 is defined) (fl_)
+*) safe write for settings.conf -> it can be truncated in some cases
+*) if there is AutoKillClones in settings.conf with value 0, it is setup
+   to 1; if there isn't, it is setup to 0 as it should be
+*) weird chat problem reported by fl_ -> services do not respond
+*) nasty .gline bug (dcc)
+*) hybrid7 features (Janos did it)
+*) weird level redefine on all channels 
+*) check older KNOWNBUGS
+*) kline/unkline
+*) .who not working?
+*) better multiprocessor support (libhoard!)
+*) Recover the lost ChangeLog entries
+*) sfio support
+*) crashing on /reload
+*) linked tree problems
+*) bcflood issue
+*) anon cvs
+*) we don't save information on servers on shutdown (statserv)
+*) get rid of proxy ch. code (or make it better :) )
+*) add support for solaris threads
+*) trace weird SIGPIPE-s
+*) umode command (in msg)
+*) insert support for solaris threads
+*) split and autorouting
+*) SplitBuff() fixes
+*) various older fixes, look in ChangeLog
+*) fix NSSetMemoSignon issue, reported by monolith
+   <monolith@mail.orblivion.com>
+*) unforbid (chan/nick)
+*) <...> and various not mentioned, since there were a lot of changes,
+   look in ChangeLog for more info

@@ -34,6 +34,8 @@ struct MyInfo;
 #define   CHANNELLEN  200 /* channel length */
 #define   KEYLEN      23  /* channel key length */
 #define   SERVERLEN   63  /* server hostname length */
+#define   TOPICLEN    90  /* maximum topic length, can be 120 for hybrid6
+                             and 90 for others -kre */
 
 #define   UHOSTLEN    (USERLEN + HOSTLEN)
 
@@ -138,5 +140,6 @@ extern int                       SafeConnect;
 extern char                      hVersion[];
 extern time_t                    TimeStarted;
 extern long                      gmt_offset;
+extern time_t                    current_ts;
 
 #endif /* INCLUDED_hybdefs_h */

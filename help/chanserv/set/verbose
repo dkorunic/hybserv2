@@ -1,0 +1,5 @@
+Syntax: %bSET <channel> VERBOSE {ON|OFF}%b
+
+When the VERBOSE setting is ON, any change in 
+access list for <channel> will notify all
+chanops on <channel>.

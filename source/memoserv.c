@@ -9,11 +9,16 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "channel.h"
@@ -23,11 +28,13 @@
 #include "err.h"
 #include "hash.h"
 #include "helpserv.h"
+#include "match.h"
 #include "memoserv.h"
 #include "misc.h"
 #include "mystring.h"
 #include "nickserv.h"
 #include "settings.h"
+#include "sprintf_irc.h"
 #include "timestr.h"
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
@@ -217,7 +224,7 @@ ms_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -245,7 +252,7 @@ ms_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp(keyword, "TEXT", 4))
+      if (!ircncmp(keyword, "TEXT", 4))
       {
         struct Memo *memoptr;
 
@@ -260,7 +267,7 @@ ms_loaddata()
         AddMemo(mi, memoptr);
       }
 
-    } /* if (!strncasecmp("->", keyword, 2)) */
+    } /* if (!ircncmp("->", keyword, 2)) */
     else
     {
       if (mi)
@@ -650,7 +657,7 @@ FindMemoList(char *name)
   hashv = MSHashMemo(name);
   for (mi = memolist[hashv]; mi; mi = mi->next)
   {
-    if (!strcasecmp(mi->name, name))
+    if (!irccmp(mi->name, name))
       return (mi);
   }
 
@@ -695,7 +702,7 @@ StoreMemo(char *target, char *text, struct Luser *lptr)
 
   memoptr = MakeMemo();
   memoptr->sender = MyStrdup(lptr->nick);
-  memoptr->sent = time(NULL);
+  memoptr->sent = current_ts;
   memoptr->index = mi->memocnt;
   memoptr->text = MyStrdup(text);
   AddMemo(mi, memoptr);
@@ -870,9 +877,11 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       /*
        * It was sent to a nickname - check if they are online
-       * and notify them
+       * and identified and optionally notify them
        */
-      if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+      if ((master->flags & NS_MEMONOTIFY) &&
+          (realptr->flags & NS_IDENTIFIED) &&
+          FindClient(realptr->nick))
       {
         notice(n_MemoServ, realptr->nick,
           "You have a new memo from \002%s\002 (#%d)",
@@ -930,10 +939,7 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       }
 
       newtext = (char *) MyMalloc(strlen(memotext) + strlen(ci->name) + 4);
-      sprintf(newtext,
-        "(%s) %s",
-        ci->name,
-        memotext);
+      ircsprintf(newtext, "(%s) %s", ci->name, memotext);
       for (ca = ci->access; ca; ca = ca->next)
       {
         if (ca->nptr)
@@ -1125,7 +1131,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1155,7 +1161,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "%d", index);
+    ircsprintf(istr, "%d", index);
   else
     strcpy(istr, "ALL");
 
@@ -1188,7 +1194,7 @@ m_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     struct Command *cptr;
 
     for (cptr = memocmds; cptr->cmd; cptr++)
-      if (!strcasecmp(av[1], cptr->cmd))
+      if (!irccmp(av[1], cptr->cmd))
         break;
 
     if (cptr->cmd)
@@ -1201,7 +1207,7 @@ m_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_MemoServ, lptr->nick, str, NODCC);
   }
@@ -1289,7 +1295,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1304,7 +1310,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "Memo #%d has", index);
+    ircsprintf(istr, "Memo #%d has", index);
   else
     strcpy(istr, "All memos have");
 
@@ -1397,7 +1403,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1412,7 +1418,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "Memo #%d has", index);
+    ircsprintf(istr, "Memo #%d has", index);
   else
     strcpy(istr, "All memos have");
 
@@ -1471,7 +1477,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   index = IsNum(av[1]);
   if ((index < 0) || (index > from->memocnt) || 
-      (!index && (strcasecmp(av[1], "ALL") != 0)))
+      (!index && (irccmp(av[1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1573,7 +1579,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       memoptr = MakeMemo();
       memoptr->sender = MyStrdup(lptr->nick);
-      memoptr->sent = time(NULL);
+      memoptr->sent = current_ts;
       memoptr->index = target->memocnt;
 
       strcpy(buf, "[Fwd]: ");
@@ -1588,9 +1594,9 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (!index)
-    sprintf(buf, "All memos have");
+    ircsprintf(buf, "All memos have");
   else
-    sprintf(buf, "Memo #%d has", index);
+    ircsprintf(buf, "Memo #%d has", index);
 
   notice(n_MemoServ, lptr->nick,
     "%s been forwarded to [\002%s\002]",
@@ -1603,7 +1609,9 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
      * It was sent to a nickname - check if they are online
      * and notify them
      */
-    if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+    if ((master->flags & NS_MEMONOTIFY) && 
+        (realptr->flags & NS_IDENTIFIED) &&
+        FindClient(realptr->nick))
     {
       notice(n_MemoServ, realptr->nick,
         "You have %d new forwarded memo%s from \002%s\002",
@@ -1743,11 +1751,12 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac >= 3)
   {
     memotext = (char *) MyMalloc(strlen("[Re]: ") + strlen(av[2]) + 1);
-    sprintf(memotext, "[Re]: %s", av[2]);
+    ircsprintf(memotext, "[Re]: %s", av[2]);
     ii = 3;
     while (ii < ac)
     {
-      memotext = (char *) MyRealloc(memotext, strlen(memotext) + strlen(av[ii]) + (2 * sizeof(char)));
+      memotext = (char *) MyRealloc(memotext, strlen(memotext) +
+          strlen(av[ii]) + (2 * sizeof(char)));
       strcat(memotext, " ");
       strcat(memotext, av[ii]);
       ii++;
@@ -1768,7 +1777,9 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
      * It was sent to a nickname - check if they are online
      * and notify them
      */
-    if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+    if ((master->flags & NS_MEMONOTIFY) && 
+        (realptr->flags & NS_IDENTIFIED) &&
+        FindClient(realptr->nick))
     {
       notice(n_MemoServ, realptr->nick,
         "You have a new memo from \002%s\002 (#%d)",

@@ -10,3 +10,6 @@
 
 /* Define if you have native Solaris threads. */
 #undef HAVE_SOLARIS_THREADS
+
+/* Define if you have CygWin compiler environment */
+#undef HAVE_CYGWIN

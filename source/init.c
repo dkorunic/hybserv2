@@ -9,12 +9,22 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#ifndef HAVE_CYGWIN
+#include <signal.h>
+#else
+#include <sys/signal.h>
+#include <signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "alloc.h"
 #include "chanserv.h"
@@ -23,7 +33,6 @@
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "hash.h"
 #include "hybdefs.h"
@@ -36,6 +45,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "timer.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -78,6 +88,7 @@ ProcessSignal(int sig)
       break;
     }
 
+#if 0
     /* restart services */
     case SIGINT:
     {
@@ -93,6 +104,7 @@ ProcessSignal(int sig)
     #endif
       break;
     }
+#endif
 
     case SIGPIPE:
     {
@@ -142,14 +154,14 @@ ProcessSignal(int sig)
          * Don't write databases on SIGSEGV, because there's
          * a good chance they could get corrupted
          */
-        /* DoShutdown((char *) NULL, "SIGSEGV Received"); */
+        /* DoShutdown(NULL, "SIGSEGV Received"); */
         exit(1);
       }
       else
       {
         SendUmode(OPERUMODE_Y,
           "*** Received SIGTERM, shutting down");
-        DoShutdown((char *) NULL, "SIGTERM Received");
+        DoShutdown(NULL, "SIGTERM Received");
       }
     }
   }
@@ -252,7 +264,7 @@ InitSignals()
   signal(SIGSEGV, ProcessSignal);
   signal(SIGBUS, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
-  signal(SIGINT, ProcessSignal);
+/*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);
   signal(SIGPIPE, SIG_IGN);
 
@@ -314,18 +326,12 @@ introduce(char *nick, char *ident, char *info)
 
 {
   char sendstr[MAXLINE];
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   char **av;
   struct Luser *lptr;
   
-  sprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", 
-       nick,
-       (long) CurrTime,
-       ServiceUmodes,
-       ident,
-       Me.name,
-       Me.name,
-       info);
+  ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", nick, (long)
+      CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
   toserv(sendstr);
 
   SplitBuf(sendstr, &av);
@@ -344,33 +350,28 @@ InitServs()
   return: none
 */
 
-void
-InitServs(struct Luser *servptr)
-
+void InitServs(struct Luser *servptr)
 {
   struct aService *sptr;
 
   if (servptr)
   {
     /*
-     * A service nick was killed, determine which one it was
-     * and re-introduce them. Now, the service will have
-     * been removed from the luser linked list already if
-     * it was a kill. However, s_kill() will have called
-     * GetService(), which returns a pointer to Me.*sptr,
-     * depending on which *Serv was killed. Therefore,
-     * 'servptr' will still correctly point to a Me.*sptr,
-     * even though it really points to garbage. So it is
-     * still safe to compare servptr to Me.*sptr's.
+     * A service nick was killed, determine which one it was and
+     * re-introduce them. Now, the service will have been removed from the
+     * luser linked list already if it was a kill. However, s_kill() will
+     * have called GetService(), which returns a pointer to Me.*sptr,
+     * depending on which *Serv was killed. Therefore, 'servptr' will
+     * still correctly point to a Me.*sptr, even though it really points
+     * to garbage. So it is still safe to compare servptr to Me.*sptr's.
      */
 
     for (sptr = ServiceBots; sptr->name; ++sptr)
     {
       if (servptr == *(sptr->lptr))
       {
-        *(sptr->lptr) = introduce(*(sptr->name),
-                                  *(sptr->ident),
-                                  *(sptr->desc));
+        *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+            *(sptr->desc));
         return; /* no need to keep searching */
       }
     }
@@ -385,8 +386,7 @@ InitServs(struct Luser *servptr)
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
   {
-    *(sptr->lptr) = introduce(*(sptr->name),
-                              *(sptr->ident),
-                              *(sptr->desc));
+    *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+        *(sptr->desc));
   }
 } /* InitServs() */

@@ -9,16 +9,20 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -30,7 +34,6 @@
 #include "conf.h"
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"
@@ -38,7 +41,7 @@
 #include "operserv.h"
 #include "server.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 #include "timer.h"
 
 #ifdef HAVE_SOLARIS_THREADS
@@ -89,14 +92,14 @@ char                      *nextparam = NULL;    /* address of next parameter */
  * the "spilled over" characters - the partial line that
  * buffer wasn't big enough to hold
  */
-char                      spill[MAXLINE];
+char                      spill[MAXLINE * 2];
 
 /*
  * Index of spill[] where we left off
  */
 int                       offset = 0;
 
-char                      dccspill[MAXLINE];
+char                      dccspill[MAXLINE * 2];
 int                       dccoffset = 0;
 
 #ifdef HIGHTRAFFIC_MODE
@@ -163,7 +166,7 @@ void
 toserv(char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   int ii;
   va_list args;
 
@@ -172,7 +175,7 @@ toserv(char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -197,12 +200,12 @@ void
 tosock(int sockfd, char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   va_list args;
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -464,7 +467,7 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   signon();
 
-  hubptr->connect_ts = time(NULL);
+  hubptr->connect_ts = current_ts;
 
   SendUmode(OPERUMODE_Y,
     "*** Connected to %s:%d",
@@ -505,7 +508,7 @@ ReadSocketInfo(void)
 #endif
 
 #if !defined HAVE_PTHREADS && !defined(HAVE_SOLARIS_THREADS)
-  time_t last_ts = time(NULL);
+  time_t last_ts = current_ts;
 #endif
 
   spill[0] = '\0';
@@ -514,36 +517,37 @@ ReadSocketInfo(void)
   for (;;)
   {
 
-  #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
     /*
-     * If pthreads are not enabled, DoTimer() will be called
-     * from this code, and so we need curr_ts here
+     * If pthreads are not enabled, DoTimer() will be called from this
+     * code, and so we need curr_ts here
+     *
+     * And we also need time setup here -kre
      */
-    curr_ts = time(NULL);
-  #endif
+    curr_ts = current_ts = time(NULL);
+#endif /* !(HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #ifdef HIGHTRAFFIC_MODE
 
-  #if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
+#if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
     /*
-     * Since pthreads are enabled, HTM mode is the only thing
-     * that needs curr_ts, since DoTimer() is called from
-     * a separate thread
+     * Since pthreads are enabled, HTM mode is the only thing that needs
+     * curr_ts, since DoTimer() is called from a separate thread
      */
-    curr_ts = time(NULL);
-  #endif
+    curr_ts = current_ts;
+#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
     if (HTM)
     {
       int htm_count;
 
-    #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
       if (last_ts != curr_ts)
       {
         /*
-         * So DoTimer() doesn't get called a billion times when
-         * HTM is turned off
+         * So DoTimer() doesn't get called a billion times when HTM is
+         * turned off
          */
         last_ts = curr_ts;
 
@@ -554,7 +558,7 @@ ReadSocketInfo(void)
         DoTimer(curr_ts);
       } /* if (last_ts != curr_ts) */
 
-    #endif /* HAVE_PTHREADS */
+#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
       /* Check if HTM should be turned off */
       if ((curr_ts - HTM_ts) >= HTM_TIMEOUT)
@@ -589,9 +593,9 @@ ReadSocketInfo(void)
           return;
 
     } /* if (HTM) */
-  #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
     else
-  #endif
+#endif /* ! (HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #endif /* HIGHTRAFFIC_MODE */
 
@@ -699,7 +703,7 @@ ReadSocketInfo(void)
 
 	#ifdef HAVE_SOLARIS_THREADS
 
-	  thr_create(NULL, 0, (void *)&ConnectClient, (void *)tempport,
+	  thr_create(NULL, 0, (void *) &ConnectClient, (void *) tempport,
 			  THR_DETACHED, &clientid);
 
 	#else
@@ -832,31 +836,26 @@ ReadHub()
 #endif
 
   /*
-   * buffer could possibly contain several lines of info,
-   * especially if this is the inital connect burst, so go
-   * through, and record each line (until we hit a \n) and
-   * process it separately
+   * buffer could possibly contain several lines of info, especially if
+   * this is the inital connect burst, so go through, and record each line
+   * (until we hit a \n) and process it separately
    */
 
   ch = buffer;
   linech = spill + offset;
 
   /*
-   * The following routine works something like this:
-   * buffer may contain several full lines, and then
-   * a partial line. If this is the case, loop through
-   * buffer, storing each character in 'spill' until
-   * we hit a \n or \r.  When we do, process the line.
-   * When we hit the end of buffer, spill will contain
-   * the partial line that buffer had, and offset will
-   * contain the index of spill where we left off, so the
-   * next time we recv() from the hub, the beginning
-   * characters of buffer will be appended to the end of
-   * spill, thus forming a complete line.
-   * If buffer does not contain a partial line, then
-   * linech will simply point to the first index of 'spill'
-   * (offset will be zero) after we process all of buffer's
-   * lines, and we can continue normally from there.
+   * The following routine works something like this: buffer may contain
+   * several full lines, and then a partial line. If this is the case,
+   * loop through buffer, storing each character in 'spill' until we hit a
+   * \n or \r.  When we do, process the line. When we hit the end of
+   * buffer, spill will contain the partial line that buffer had, and
+   * offset will contain the index of spill where we left off, so the next
+   * time we recv() from the hub, the beginning characters of buffer will
+   * be appended to the end of spill, thus forming a complete line. If
+   * buffer does not contain a partial line, then linech will simply point
+   * to the first index of 'spill' (offset will be zero) after we process
+   * all of buffer's lines, and we can continue normally from there.
    */
 
   while (*ch)
@@ -874,13 +873,12 @@ ReadHub()
       if (nextparam)
       {
         /*
-         * It is possible nextparam will not be NULL here
-         * if there is a line like:
+         * It is possible nextparam will not be NULL here if there is a
+         * line like:
          * PASS password :TS
-         * where the text after the colon does not have
-         * any spaces, so we reach the \n and do not
-         * execute the code below which sets the next
-         * index of param[] to nextparam. Do it here.
+         * where the text after the colon does not have any spaces, so we
+         * reach the \n and do not execute the code below which sets the
+         * next index of param[] to nextparam. Do it here.
          */
         param[paramc++] = nextparam;
       }
@@ -892,9 +890,8 @@ ReadHub()
     #endif
 
       /*
-       * Make sure paramc is non-zero, because if the line
-       * starts with a \n, we will immediately come here,
-       * without initializing param[0]
+       * Make sure paramc is non-zero, because if the line starts with a
+       * \n, we will immediately come here, without initializing param[0]
        */
       if (paramc)
       {
@@ -905,12 +902,12 @@ ReadHub()
       linech = spill;
       offset = 0;
       paramc = 0;
-      nextparam = (char *) NULL;
+      nextparam = NULL;
 
       /*
-       * If the line ends in \r\n, then this algorithm would
-       * have only picked up the \r. We don't want an entire
-       * other loop to do the \n, so advance ch here.
+       * If the line ends in \r\n, then this algorithm would have only
+       * picked up the \r. We don't want an entire other loop to do the
+       * \n, so advance ch here.
        */
       if (IsEOL(*(ch + 1)))
         ch++;
@@ -928,10 +925,9 @@ ReadHub()
       if (tmp == ' ')
       {
         /*
-         * Only set the space character to \0 if this is
-         * the very first parameter, or if nextparam is
-         * not NULL. If nextparam is NULL, then we've hit
-         * a parameter that starts with a colon (:), so
+         * Only set the space character to \0 if this is the very first
+         * parameter, or if nextparam is not NULL. If nextparam is NULL,
+         * then we've hit a parameter that starts with a colon (:), so
          * leave it as a whole parameter.
          */
         if (nextparam || (paramc == 0))
@@ -940,8 +936,7 @@ ReadHub()
         if (paramc == 0)
         {
           /*
-           * Its the first parameter - set it to the beginning
-           * of spill
+           * Its the first parameter - set it to the beginning of spill
            */
           param[paramc++] = spill;
           nextparam = linech;
@@ -954,15 +949,14 @@ ReadHub()
             if (*nextparam == ':')
             {
               /*
-               * We've hit a colon, set nextparam to NULL,
-               * so we know not to set any more spaces to \0
+               * We've hit a colon, set nextparam to NULL, so we know not
+               * to set any more spaces to \0
                */
-              nextparam = (char *) NULL;
+              nextparam = NULL;
 
               /*
-               * Unfortunately, the first space has already
-               * been set to \0 above, so reset to to a
-               * space character
+               * Unfortunately, the first space has already been set to \0
+               * above, so reset to to a space character
                */
               *(linech - 1) = ' ';
             }
@@ -970,7 +964,7 @@ ReadHub()
               nextparam = linech;
 
             if (paramc >= MAXPARAM)
-              nextparam = (char *) NULL;
+              nextparam = NULL;
           }
         }
       }
@@ -1238,18 +1232,33 @@ DoListen(struct PortInfo *portptr)
 } /* DoListen() */
 
 /*
-signon()
-  args: none
-  purpose: send the PASS / CAPAB / SERVER handshake
-  return: none
-*/
-
-void
-signon()
-
+ * signon()
+ *
+ * args: none
+ * purpose: send the PASS / CAPAB / SERVER handshake
+ * return: none
+ */
+void signon(void)
 {
-  toserv("PASS %s :TS\nCAPAB :EX DE\nSERVER %s 1 :%s\n", 
-    currenthub->password, 
-    Me.name, 
-    Me.info); 
+  /* Hybrid6 and 7 handshake -kre */
+#ifdef HYBRID_ONLY
+  toserv("PASS %s :TS\nCAPAB :EX"
+#ifdef GECOSBANS
+      /* Send gecosbans capab -Janos */
+      " DE"
+#endif /* GECOSBANS */
+#ifdef HYBRID7
+      /* Send most of Hybrid7 CAPABS -kre && Janos */
+      " KLN GLN HOPS IE HUB AOPS"
+#endif /* HYBRID7 */
+      "\n", currenthub->password);
+#endif /* HYBRID_ONLY */
+      
+#ifdef IRCNET
+  /* Authenticate to IRCNet daemon -kre */
+  toserv("PASS %s %s IRC|%s %s\n", currenthub->password,
+    "0210030000", "HEiJKps", "P");
+#endif /* IRCNET */
+
+  toserv("SERVER %s 1 :%s\n", Me.name, Me.info); 
 } /* signon() */

@@ -9,24 +9,33 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+
+#ifndef HAVE_CYGWIN
 #include <signal.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
+
 #include <sys/utsname.h>
 
 #include "alloc.h"
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hash.h"
 #include "hybdefs.h"
 #include "init.h"
@@ -66,35 +75,44 @@ struct MyInfo                Me;
  */
 int                          SafeConnect = 0;
 
-int
-main(int argc, char *argv[])
-
+int main(int argc, char *argv[])
 {
 #ifndef DEBUGMODE
-  int pid; /* pid of this process */
-#else
+  pid_t pid; /* pid of this process */
+#endif /* DEBUGMODE */
+
+#ifdef GDB_DEBUG
+  int GDBAttached = 0; 
+#endif /* GDB_DEBUG */
+
+#if defined GIMMECORE || defined DEBUGMODE
   struct rlimit rlim; /* resource limits -kre */
-#endif
+#endif /* GIMMECORE || DEBUGMODE */
+
   FILE *pidfile; /* to write our pid */
   uid_t uid, /* real user id */
         euid; /* effective user id */
   struct utsname un;
+
 #ifdef HAVE_SOLARIS_THREADS
   thread_t selectid;
   thread_t timerid;
+
 #else
+
 #ifdef HAVE_PTHREADS
   pthread_attr_t attr;
   pthread_t selectid;
   pthread_t timerid;
-#endif
-#endif
+#endif /* HAVE_PTHREADS */
 
-  TimeStarted = time(NULL);
+#endif /* HAVE_SOLARIS_THREADS */
+
+  /* Initialise current TS for services -kre */
+  TimeStarted = current_ts = time(NULL);
 
   fprintf(stderr,
-    "\nHybServ TS services version %s by Patrick Alken "
-    "(wnder@underworld.net)\n"
+    "HybServ2 TS services version %s by HybServ2 team\n"
 #if defined __DATE__ && defined __TIME__
     "Compiled at %s, %s\n",
 #endif
@@ -103,13 +121,20 @@ main(int argc, char *argv[])
     , __DATE__, __TIME__
 #endif
     );
-  if (uname(&un)!=-1)
+
+  if (uname(&un) != -1)
   {
     fprintf(stderr, "Running on: %s %s\n", un.sysname,
       un.release);
   }
   else
-    fprintf(stderr, "Running on: *unknown*\n");
+    /* Blah. It ignored uname(), then pretend to be funny :-) -kre */
+    fprintf(stderr, "Running on: computer, probably :-)\n");
+
+#ifdef GDB_DEBUG
+  while (!GDBAttached) 
+    sleep(1);
+#endif /* GDB_DEBUG */  
 
   /*
    * Load SETPATH (settings.conf) - this must be done
@@ -119,8 +144,8 @@ main(int argc, char *argv[])
    */
   if (LoadSettings(0) == 0)
   {
-    fprintf(stderr, "Fatal errors encountered and logged parsing %s, exiting\n",
-      SETPATH);
+    fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
+      "Check logfile %s\n", SETPATH, LogFile ? LogFile : "*unknown*");
     return (0);
   }
 
@@ -144,12 +169,12 @@ main(int argc, char *argv[])
   }
 
   /* Check for running services -kre */
-  if ((pidfile=fopen(PidFile, "r"))==NULL)
+  if ((pidfile = fopen(PidFile, "r")) == NULL)
     putlog(LOG1, "Unable to read %s", PidFile);
   else
   {
     pid_t mypid;
-    fscanf(pidfile, "%i\n", &mypid);
+    fscanf(pidfile, "%u", &mypid);
     fclose(pidfile);
     if (!kill(mypid, 0))
     {
@@ -158,7 +183,7 @@ main(int argc, char *argv[])
     }
   }
 
-  putlog(LOG1, "HybServ TS services started");
+  putlog(LOG1, "HybServ2 TS services started");
 
   /*
    * Get the offset from GMT (London time)
@@ -226,50 +251,47 @@ main(int argc, char *argv[])
   if (LocalHostName)
     SetupVirtualHost();
 
-#ifndef DEBUGMODE
-
+#if !defined DEBUGMODE && !defined GDB_DEBUG
   pid = fork();
   if (pid == (-1))
   {
     printf("Unable to fork(), exiting.\n");
-    exit(0);
+    exit(1);
   }
   if (pid != 0)
   {
-    printf("Running in background (pid: %d)\n\n", pid);
+    printf("Running in background (pid: %d)\n", pid);
     exit(0);
   }
 
   /* Make current process session leader -kre */
   setsid(); 
-
 #else
+  printf("Entering foreground debug mode\n");
+#endif /* DEBUGMODE */
 
-  printf("Entering debug mode\nSetting corefile limit... ");
+#if defined GIMMECORE || defined DEBUGMODE
+  printf("Setting corefile limit... ");
   /* Set corefilesize to maximum - therefore we ensure that core will be
    * generated, no matter of shell limits -kre */
   getrlimit(RLIMIT_CORE, &rlim);
-  rlim.rlim_cur=rlim.rlim_max;
+  rlim.rlim_cur = rlim.rlim_max;
   setrlimit(RLIMIT_CORE, &rlim);
   printf("done.\n");
+#endif /* GIMMECORE || DEBUGMODE */
 
-#endif /* !DEBUGMODE */
-
-
-  /*
-   * Signals must be set up after fork(), since the parent
-   * exits
-   */
+  /* Signals must be set up after fork(), since the parent exits */
   InitSignals();
 
-  srandom(time(NULL)+getpid());
+  /* Initialise random number generator -kre */
+  srandom(current_ts + getpid());
 
-  /* write our pid to a file */
+  /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)
     putlog(LOG1, "Unable to open %s", PidFile);
   else
   {
-    fprintf(pidfile, "%i\n", (int) getpid());
+    fprintf(pidfile, "%u\n", getpid());
     fclose(pidfile);
   }
 
@@ -288,58 +310,56 @@ main(int argc, char *argv[])
 
 #ifdef HAVE_SOLARIS_THREADS
 
+  /* This thread will call DoTimer() every second -kre */
   thr_create(NULL, 0, p_CheckTime, NULL, THR_DETACHED, &timerid);
 
 #else
   
 #ifdef HAVE_PTHREADS
 
-  /*
-   * This thread will call DoTimer() every second
-   */
+  /* This thread will call DoTimer() every second */
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
   pthread_create(&timerid, &attr, p_CheckTime, NULL);
 
-#endif
-#endif
+#endif /* HAVE_PTHREADS */
+
+#endif /* HAVE_SOLARIS_THREADS */
 
   while (1)
   {
     /* enter loop waiting for server info */
-  #ifdef HAVE_SOLARIS_THREADS
+#ifdef HAVE_SOLARIS_THREADS
     
-    thr_create(NULL, 0, (void *)&ReadSocketInfo, NULL,
+    thr_create(NULL, 0, (void *) &ReadSocketInfo, NULL,
                     THR_BOUND, &selectid);
     thr_join(selectid, NULL, NULL);
 
-  #else
+#else
 
-  #ifdef HAVE_PTHREADS
+#ifdef HAVE_PTHREADS
 
     pthread_create(&selectid, NULL, (void *) &ReadSocketInfo, NULL);
     pthread_join(selectid, NULL);
 
-  #else
+#else
 
     ReadSocketInfo();
 
-  #endif
-  #endif /* HAVE_PTHREADS */
+#endif /* HAVE_PTHREADS */
+
+#endif /* HAVE_SOLARIS_THREADS */
 
     if (Me.hub)
-      SendUmode(OPERUMODE_Y,
-        "*** Disconnected from %s",
-        Me.hub->name);
+      SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
     else
-      SendUmode(OPERUMODE_Y,
-        "*** Disconnected from hub server");
+      SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
 
     if (currenthub)
       if (currenthub->realname)
       {
         MyFree(currenthub->realname);
-        currenthub->realname = (char *) NULL;
+        currenthub->realname = NULL;
       }
 
     close(HubSock); /* There was an error */

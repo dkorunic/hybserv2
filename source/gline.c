@@ -9,9 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -70,7 +75,7 @@ AddGline(char *host, char *reason, char *who, long when)
   if (!when)
     tempgline->expires = 0;
   else
-    tempgline->expires = time(NULL) + when;
+    tempgline->expires = current_ts + when;
 
   tempgline->next = GlineList;
   tempgline->prev = NULL;
@@ -186,6 +191,13 @@ CheckGlined(struct Luser *lptr)
                  tempgline->hostname,
                  tempgline->reason);
   #endif /* HYBRID_GLINES */
+
+  #ifdef HYBRID7_GLINES
+    Execute7Gline(tempgline->username,
+                 tempgline->hostname,
+                 tempgline->reason);
+  #endif /* HYBRID7_GLINES */
+
   }
 } /* CheckGlined */
 
@@ -227,6 +239,26 @@ ExecuteGline(char *username, char *hostname, char *reason)
 } /* ExecuteGline() */
 
 #endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+/*
+ * Execute7Gline()
+ * Send a KLINE user host on * :reason (effectively a gline)
+ * 
+ * :SERVER kline OPERNICK TARGET_SERVER DURATION USER HOST REASON
+ */
+
+void
+Execute7Gline(char *username, char *hostname, char *reason)
+
+{
+  toserv(":%s KLINE %s %s %lu %s %s :%s\n",
+         Me.name, n_OperServ, "*", 0,
+         username ? username : "*",
+         hostname, reason);
+} /* Execute7Gline() */
+
+#endif /* HYBRID7_GLINES */
 
 /*
 ExpireGlines()

@@ -1,0 +1,4 @@
+Syntax: %bUNFORBID <nickname>%b
+
+Reverses forbid command effect on %b<nickname>%b. All
+levels, registrations, etc. will properly be returned.

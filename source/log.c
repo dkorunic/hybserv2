@@ -9,26 +9,31 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
+#include "match.h"
+#include "misc.h"
 #include "operserv.h"
 #include "settings.h"
-#include "Strn.h"
-#include "misc.h"
+#include "sprintf_irc.h"
+#include "sprintf_irc.h"
 
 /*
 putlog()
@@ -57,7 +62,7 @@ putlog(int level, char *format, ...)
   if (!LogFile)
     return;
 
-  if ((fp = fopen(LogFile, "a+")) == (FILE *) NULL)
+  if ((fp = fopen(LogFile, "a+")) == NULL)
   {
   #ifdef DEBUGMODE
     printf("Unable to open log file: %s\n", LogFile);
@@ -65,7 +70,7 @@ putlog(int level, char *format, ...)
     return;
   }
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   strcpy(buf, ctime(&CurrTime));
 
   /*
@@ -130,13 +135,12 @@ CheckLogs(time_t unixtime)
       return;
     }
 
-    sprintf(tmplog, "%s.",
-      LogFile);
+    ircsprintf(tmplog, "%s.", LogFile);
     len = strlen(tmplog);
 
     lmatches = 0;
     olddate[0] = '\0';
-    currdate = (char *) NULL;
+    currdate = NULL;
 
     /*
      * Go through all the files in the directory and
@@ -144,7 +148,7 @@ CheckLogs(time_t unixtime)
      */
     while ((dirp = readdir(dp)))
     {
-      if (!strncasecmp(dirp->d_name, tmplog, len))
+      if (!ircncmp(dirp->d_name, tmplog, len))
       {
         ++lmatches;
 
@@ -169,10 +173,7 @@ CheckLogs(time_t unixtime)
        * There are too many log files in the directory,
        * delete the oldest one - it will be: LogFile.olddate
        */
-      sprintf(tmplog, "%s/%s.%s",
-        HPath,
-        LogFile,
-        olddate);
+      ircsprintf(tmplog, "%s/%s.%s", HPath, LogFile, olddate);
       unlink(tmplog);
     }
 
@@ -187,11 +188,8 @@ CheckLogs(time_t unixtime)
 
   oldts = unixtime - 1;
   log_tm = localtime(&oldts);
-  sprintf(tmplog, "%s.%d%02d%02d",
-    LogFile,
-    1900 + log_tm->tm_year,
-    log_tm->tm_mon + 1,
-    log_tm->tm_mday);
+  ircsprintf(tmplog, "%s.%d%02d%02d",
+    LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
 
   rename(LogFile, tmplog);
 } /* CheckLogs() */
@@ -207,11 +205,11 @@ RecordCommand(char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   va_start(args, format);
 
-  vSnprintf(buffer, sizeof(buffer), format, args);
+  vsprintf_irc(buffer, format, args);
 
   va_end(args);
 

@@ -789,3 +789,31 @@ MaxModes           2
 # This is how many Seen records seenserv will store
 
 SeenMaxRecs        4000
+
+# UseMD5 [OPTIONAL]
+#
+# This turns on support for MD5 capable crypt using MCF
+
+#UseMD5
+
+# MaxTSDelta <integer> [OPTIONAL]
+#
+#  Set this to maximal allowed TS delta value for nicknames and channels.
+# Functions like FIXTS in both ChanServ and NickServ will loop through
+# channels and nicknames searching for bogus TS'. If this is not defined,
+# default value of 8 weeks will be used.
+
+MaxTSDelta          "8w"
+
+# MaxServerCollides <integer> [OPTIONAL]
+#
+# Maximum server nicknames collides allowed before silent shutdown of
+# services (set this to a very high number, please).
+
+MaxServerCollides 10
+
+# MinServerCollidesDelta <integer> [OPTIONAL]
+#
+# Minimum delta between services' nicknames collides
+
+MinServerCollidesDelta "20s"

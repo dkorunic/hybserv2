@@ -61,10 +61,21 @@ char* stripctrlsymbols( char * source );
 char* stripformatsymbols( char * source );
 int checkforproc( char* source );
 
+#ifdef CRYPT_PASSWORDS
+char *hybcrypt(char *, char *);
+char *make_des_salt(void);
+char *make_md5_salt(void);
+char *make_md5_salt_oldpasswd(char *);
+#endif /* CRYPT_PASSWORDS */
+
 /*
  * External declarations
  */
 
 extern  struct aService ServiceBots[];
+
+#ifdef CRYPT_PASSWORDS
+extern int UseMD5;
+#endif /* CRYPT_PASSWORDS */
 
 #endif /* INCLUDED_misc_h */

@@ -9,13 +9,17 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -23,7 +27,7 @@
 #include "motd.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 
 /*
 InitMessageFile()
@@ -71,13 +75,9 @@ ReadMessageFile(struct MessageFile *fileptr)
   localtm = localtime(&sb.st_mtime);
 
   if (localtm)
-    sprintf(fileptr->DateLastChanged,
-      "%d/%d/%d %02d:%02d",
-      localtm->tm_mday,
-      localtm->tm_mon + 1,
-      1900 + localtm->tm_year,
-      localtm->tm_hour,
-      localtm->tm_min);
+    ircsprintf(fileptr->DateLastChanged, "%d/%d/%d %02d:%02d",
+        localtm->tm_mday, localtm->tm_mon + 1, 1900 + localtm->tm_year,
+        localtm->tm_hour, localtm->tm_min);
 
   /*
    * Clear out old data
@@ -99,8 +99,9 @@ ReadMessageFile(struct MessageFile *fileptr)
     if ((ch = strchr(buffer, '\n')))
       *ch = '\0';
 
-    NewLine = (struct MessageFileLine *) MyMalloc(sizeof(struct MessageFileLine));
-    Strncpy(NewLine->line, buffer, MESSAGELINELEN);
+    NewLine = (struct MessageFileLine *)
+      MyMalloc(sizeof(struct MessageFileLine));
+    strncpy(NewLine->line, buffer, MESSAGELINELEN);
     NewLine->line[MESSAGELINELEN] = '\0';
 
     /*

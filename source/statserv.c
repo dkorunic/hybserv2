@@ -9,11 +9,16 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -30,8 +35,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #ifdef  STATSERVICES
 
@@ -47,6 +52,8 @@ static void ss_refresh(struct Luser *, int, char **);
 static void ss_clearstats(struct Luser *, int, char **);
 static void ss_showstats(struct Luser *, int, char **);
 static void ss_greplog(struct Luser *, int, char **);
+static void ss_showadmins(struct Luser *, int, char **);
+static void ss_showopers(struct Luser *, int, char **);
 
 #ifdef SPLIT_INFO
 static void ss_splitinfo(struct Luser *, int, char **);  
@@ -61,6 +68,8 @@ static struct Command statcmds[] = {
   { "SERVER", ss_server, LVL_NONE },
   { "STATS", ss_stats, LVL_NONE },
   { "HELP", ss_help, LVL_NONE },
+  { "SHOWADMINS", ss_showadmins, LVL_NONE },
+  { "SHOWOPERS", ss_showopers, LVL_NONE },
 
   { "REFRESH", ss_refresh, LVL_ADMIN },
   { "CLEARSTATS", ss_clearstats, LVL_ADMIN },
@@ -75,8 +84,8 @@ static struct Command statcmds[] = {
 
 long korectdat( long dat1, int dni);
 int* get_tg( int year, int *days );
-int gnw[]={31,28,31,30,31,30,31,31,30,31,30,31,31};
-int gw[] = { 31,29,31,30,31,30,31,31,30,31,30,31,31 };
+int gnw[] = {31,28,31,30,31,30,31,31,30,31,30,31,31};
+int gw[] = {31,29,31,30,31,30,31,31,30,31,30,31,31};
 
 /* This is _wrong_! We do have LogFile, so I've corrected mistakes in code
  * that is down, too -kre */
@@ -162,7 +171,7 @@ ss_loaddata()
   char *keyword;
   int ac, ret = 1, cnt;
 
-  if ((fp = fopen(StatServDB, "r")) == (FILE *) NULL)
+  if ((fp = fopen(StatServDB, "r")) == NULL)
   {
     /* StatServ data file doesn't exist */
     return (-1);
@@ -187,7 +196,7 @@ ss_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -203,7 +212,7 @@ ss_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp(keyword, "USERS", 5))
+      if (!ircncmp(keyword, "USERS", 5))
       {
         if (Network->TotalUsers <= atol(av[1]))
         {
@@ -211,7 +220,7 @@ ss_loaddata()
           Network->MaxUsers_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "OPERS", 5))
+      else if (!ircncmp(keyword, "OPERS", 5))
       {
         if (Network->TotalOperators <= atol(av[1]))
         {
@@ -219,7 +228,7 @@ ss_loaddata()
           Network->MaxOperators_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "CHANS", 5))
+      else if (!ircncmp(keyword, "CHANS", 5))
       {
         if (Network->TotalChannels <= atol(av[1]))
         {
@@ -227,7 +236,7 @@ ss_loaddata()
           Network->MaxChannels_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "SERVS", 5))
+      else if (!ircncmp(keyword, "SERVS", 5))
       {
         if (Network->TotalServers <= atol(av[1]))
         {
@@ -361,7 +370,7 @@ FindHost(char *hostname)
   hashv = HashUhost(hostname);
 
   for (tmp = hostTable[hashv].list; tmp; tmp = tmp->hnext)
-    if (!(tmp->flags & SS_DOMAIN) && (!strcasecmp(tmp->hostname, hostname)))
+    if (!(tmp->flags & SS_DOMAIN) && (!irccmp(tmp->hostname, hostname)))
       return (tmp);
 
   return (NULL);
@@ -385,7 +394,7 @@ FindDomain(char *domain)
   hashv = HashUhost(domain);
 
   for (tmp = hostTable[hashv].list; tmp; tmp = tmp->hnext)
-    if ((tmp->flags & SS_DOMAIN) && (!strcasecmp(tmp->hostname, domain)))
+    if ((tmp->flags & SS_DOMAIN) && (!irccmp(tmp->hostname, domain)))
       return (tmp);
 
   return (NULL);
@@ -442,7 +451,7 @@ GetDomain(char *hostname)
       }
     }
     if (!dotcnt)
-      return ((char *) NULL);
+      return (NULL);
     if (dotcnt == 1)
       done[cnt] = '\0';
     else
@@ -470,7 +479,7 @@ GetDomain(char *hostname)
   else if ((dotcnt != 1) || (*domain == '.'))
     return (NULL); /* invalid domain */
 
-  Strncpy(done, domain, sizeof(done) - 1);
+  strncpy(done, domain, sizeof(done) - 1);
   done[sizeof(done) - 1] = '\0';
 
   return (done);
@@ -701,7 +710,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
   {
     alen = strlen(av[ii]);
 
-    if (!strncasecmp(av[ii], "-maxusers", alen))
+    if (!ircncmp(av[ii], "-maxusers", alen))
     {
       if (++ii >= ac)
       {
@@ -712,7 +721,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
       maxusers = atoi(av[ii]);
     }
-    else if (!strncasecmp(av[ii], "-minusers", alen))
+    else if (!ircncmp(av[ii], "-minusers", alen))
     {
       if (++ii >= ac)
       {
@@ -723,9 +732,9 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
       minusers = atoi(av[ii]);
     }
-    else if (!strncasecmp(av[ii], "-info", alen))
+    else if (!ircncmp(av[ii], "-info", alen))
       info = 1;
-    else if (!strncasecmp(av[ii], "-hub", alen))
+    else if (!ircncmp(av[ii], "-hub", alen))
     {
       if (++ii >= ac)
       {
@@ -760,15 +769,13 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
   if (maxusers >= 0)
   {
-    sprintf(str, "-maxusers %d ",
-      maxusers);
+    ircsprintf(str, "-maxusers %d ", maxusers);
     strcat(argbuf, str);
   }
 
   if (minusers >= 0)
   {
-    sprintf(str, "-minusers %d ",
-      minusers);
+    ircsprintf(str, "-minusers %d ", minusers);
     strcat(argbuf, str);
   }
 
@@ -777,8 +784,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
   if (hub)
   {
-    sprintf(str, "-hub %s ",
-      hub->name);
+    ircsprintf(str, "-hub %s ", hub->name);
     strcat(argbuf, str);
   }
 
@@ -949,8 +955,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
     if ((servptr->maxping > 0.0) && servptr->maxping_ts)
     {
-      sprintf(str, "on %s",
-        ctime(&servptr->maxping_ts));
+      ircsprintf(str, "on %s", ctime(&servptr->maxping_ts));
       str[strlen(str) - 1] = '\0';
       notice(n_StatServ, lptr->nick,
         "Highest Ping:          %5.4f seconds %s",
@@ -960,8 +965,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
     if ((servptr->minping > 0.0) && servptr->minping_ts)
     {
-      sprintf(str, "on %s",
-        ctime(&servptr->minping_ts));
+      ircsprintf(str, "on %s", ctime(&servptr->minping_ts));
       str[strlen(str) - 1] = '\0';
       notice(n_StatServ, lptr->nick,
         "Lowest Ping:           %5.4f seconds %s",
@@ -978,7 +982,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 #ifdef SPLIT_INFO
   else
     notice(n_StatServ, lptr->nick,
-      "Currenty in \002netsplit\002 for %s",
+      "Currently in \002netsplit\002 for %s",
       servptr->name,
       timeago(servptr->connect_ts, 0));
 #endif
@@ -1081,14 +1085,10 @@ ss_stats(struct Luser *lptr, int ac, char **av)
     "Non-Resolving Host Users:   %ld",
     (long) Network->TotalUsers - Network->ResHosts);
 
-  currtime = time(NULL);
+  currtime = current_ts;
   strcpy(tmp, ctime(&currtime));
   SplitBuf(tmp, &tav);
-  sprintf(str, "%s %s %s, %s",
-    tav[0],
-    tav[1],
-    tav[2],
-    tav[4]);
+  ircsprintf(str, "%s %s %s, %s", tav[0], tav[1], tav[2], tav[4]);
   notice(n_StatServ, lptr->nick,
     "-- \002So far today:\002 (%s) --",
     str);
@@ -1097,10 +1097,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxUsersT_ts)
   {
     tmp_tm = localtime(&Network->MaxUsersT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1112,10 +1110,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxOperatorsT_ts)
   {
     tmp_tm = localtime(&Network->MaxOperatorsT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1127,10 +1123,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxChannelsT_ts)
   {
     tmp_tm = localtime(&Network->MaxChannelsT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1142,10 +1136,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxServersT_ts)
   {
     tmp_tm = localtime(&Network->MaxServersT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1177,7 +1169,7 @@ ss_help(struct Luser *lptr, int ac, char **av)
     struct Command *sptr;
 
     for (sptr = statcmds; sptr->cmd; sptr++)
-      if (!strcasecmp(av[1], sptr->cmd))
+      if (!irccmp(av[1], sptr->cmd))
         break;
 
     if (sptr->cmd)
@@ -1190,12 +1182,12 @@ ss_help(struct Luser *lptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_StatServ, lptr->nick, str, NODCC);
   }
   else
-    GiveHelp(n_StatServ, lptr->nick, (char *) NULL, NODCC);
+    GiveHelp(n_StatServ, lptr->nick, NULL, NODCC);
 } /* ss_help() */
 
 /*
@@ -1254,11 +1246,11 @@ ss_clearstats(struct Luser *lptr, int ac, char **av)
   {
     for (ii = 1; ii < ac; ii++)
     {
-      if (!strncasecmp(av[ii], "-domain", strlen(av[ii])))
+      if (!ircncmp(av[ii], "-domain", strlen(av[ii])))
         domain = 1;
-      else if (!strncasecmp(av[ii], "-host", strlen(av[ii])))
+      else if (!ircncmp(av[ii], "-host", strlen(av[ii])))
         host = 1;
-      else if (!strncasecmp(av[ii], "-all", strlen(av[ii])))
+      else if (!ircncmp(av[ii], "-all", strlen(av[ii])))
         host = domain = 1;
     }
   }
@@ -1422,15 +1414,16 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
         }
 
 
-        if( strlen(av[1]) > 15 || strlen(av[2]) > 31 || strlen(lptr->nick) > 15 ) {
+        if( strlen(av[1]) > 15 || strlen(av[2]) > 31 || strlen(lptr->nick)
+            > 15 ) {
 			notice(n_StatServ,lptr->nick,
                        "Invalid params!" );
                 return;
         }
 
-        sprintf( who,  "%s", StrToupper(av[1]));
-        sprintf( what, "%s", StrToupper(av[2]));
-        sprintf( nick, "%s", lptr->nick );
+        ircsprintf( who,  "%s", StrToupper(av[1]));
+        ircsprintf( what, "%s", StrToupper(av[2]));
+        ircsprintf( nick, "%s", lptr->nick );
 
 //        if( av[3] != NULL )
 	if (ac > 3 && av[3] != NULL)
@@ -1458,18 +1451,19 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
         tm = *localtime(&t);
         putlog( LOG1, "Thread for log browsing started.");
  
-        sprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday );
+        ircsprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1,
+            tm.tm_mday );
 
         for( i=0; i<=day; i++ ) {
            if( i == 0 )
-              sprintf(grep_log_filename, "%s", LogFile );
+              ircsprintf(grep_log_filename, "%s", LogFile );
            else
-              sprintf(grep_log_filename, "%s.%8.8ld", 
+              ircsprintf(grep_log_filename, "%s.%8.8ld", 
                    LogFile, 
                    korectdat(atol(date), i*-1)
               );
 
-           if ((lf = fopen(grep_log_filename, "r")) == (FILE *) NULL)
+           if ((lf = fopen(grep_log_filename, "r")) == NULL)
            {
 		notice(n_StatServ,lptr->nick,
                         "No Log file detected :%s",
@@ -1566,52 +1560,98 @@ int* get_tg( int year, int *days )
 }
 
 #ifdef SPLIT_INFO
-/* This accepts these parameters:
+/* Accepts these parameters:
  * a) no parameters - to display split data for all servers currently in
- * netsplit
- * b) av[1] - to display split data for current server -kre */
-static void
-ss_splitinfo(struct Luser *lptr, int ac, char **av)
+ *    netsplit
+ * b) av[1] - to display split data for current server
+ * -kre
+ */
+static void ss_splitinfo(struct Luser *lptr, int ac, char **av)
 {
   struct Server *tmpserv;
-  int issplit=0;
+  char sMsg[] = "%-30s currently in \002netsplit\002 for %s";
+  int issplit = 0;
+
   if (ac < 2)
   {
-    for (tmpserv=ServerList; tmpserv; tmpserv=tmpserv->next)
+    for (tmpserv = ServerList; tmpserv; tmpserv = tmpserv->next)
       if (tmpserv->split_ts)
       {
-        ss_printsplit(tmpserv, lptr);
-        issplit=1;
+        notice(n_StatServ, lptr->nick, sMsg, tmpserv->name,
+            timeago(tmpserv->split_ts, 0));
+        issplit = 1;
       }
   }
   else
   {
-    if ((tmpserv=FindServer(av[1])))
+    if ((tmpserv = FindServer(av[1])))
     {
-      ss_printsplit(tmpserv, lptr);
-      issplit=1;
-
+      if (tmpserv->split_ts)
+      {
+        notice(n_StatServ, lptr->nick, sMsg, tmpserv->name,
+            timeago(tmpserv->split_ts, 0));
+        issplit = 1;
+      }
     }
     else
       notice(n_StatServ, lptr->nick,
         "Invalid server %s!", av[1]);
   }
+
   if (!issplit)
     notice(n_StatServ, lptr->nick,
-      "No active splits at this moment");
-
+      "No split for specified server or no active splits");
 }
 
-/* Routine for printing split info. Should never get NULL as input
- * parameter. -kre */
-void ss_printsplit(struct Server *tmpserv, struct Luser *lptr)
+#endif /* SPLIT_INFO */
+
+
+/*
+ * Show services adminstrators. Code from IrcBg, slightly modified. -kre
+ */
+static void ss_showadmins(struct Luser *lptr, int ac, char **av)
 {
-  notice(n_StatServ, lptr->nick,
-    "%-30s currenty in \002netsplit\002 for %s",
-    tmpserv->name,
-    timeago(tmpserv->split_ts, 0));
+  int iCnt = 0;
+  struct Luser *tempuser;
+
+  RecordCommand("%s: %s!%s@%s SHOWADMINS",
+    n_StatServ, lptr->nick, lptr->username, lptr->hostname);
+
+  notice(n_StatServ, lptr->nick, "Currently online services admins");
+  notice(n_StatServ, lptr->nick, "--------------------------------");
+
+  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+  {
+    if (IsValidAdmin(tempuser))
+      notice(n_StatServ, lptr->nick , "[%d] %s", ++iCnt,tempuser->nick );
+  }
+
+  notice(n_StatServ, lptr->nick, "--------------------------------");
+  notice(n_StatServ, lptr->nick, " %d admins online.", iCnt);
 }
 
-#endif
+/*
+ * Show operators. Code from IrcBg, slightly modified. -kre
+ */
+static void ss_showopers(struct Luser *lptr, int ac, char **av)
+{
+  int iCnt = 0;
+  struct Luser *tempuser;
+
+  RecordCommand("%s: %s!%s@%s SHOWOPERS",
+    n_StatServ, lptr->nick, lptr->username, lptr->hostname);
+
+  notice(n_StatServ, lptr->nick, "Currently online irc operators");
+  notice(n_StatServ, lptr->nick, "-------------------------------");
+
+  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+  {
+    if (IsOperator(tempuser))
+      notice(n_StatServ, lptr->nick , "[%d] %s", ++iCnt,tempuser->nick );
+  }
+
+  notice(n_StatServ, lptr->nick, "-------------------------------");
+  notice(n_StatServ, lptr->nick, " %d operators online.", iCnt);
+}
 
 #endif /* STATSERVICES */

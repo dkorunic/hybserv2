@@ -1,3 +1,1014 @@
+*** 20011011_3 by kreator
+- go back to 2.13 autoconf because of 2.52 brokeness for bsd
+
+
+*** 20011011_2 by kreator
+- a bunch of new fixes and updates to 1.8.0
+
+
+*** 20011011_1 by kreator
+- update install
+- update knownbugs: mention telnet conns don't work
+- update to autoconf/automake 2.52
+- update some dcc code
+- update operserv
+- do support for dmalloc
+
+
+*** 20011009_1 by kreator
+- fix small bug in SERVICES_FIGHT_FIX
+- do releasenotes, update known bugs, etc.
+
+
+*** 20011006_2 by wcampbel
+Fix for the fix from ike
+
+
+*** 20011006_1 by wcampbel
+Fix for NICKOPERIDENT from ike, hopefully this will prevent the odd coring
+
+
+*** 20010923_2 by wcampbel
+.jump is administrator only (spotted by erick@erick.org)
+
+
+*** 20010923_1 by wcampbel
+.fuckover no longer exists, remove from the DCC help
+
+
+*** 20010921_1 by kreator
+- fix security issue when non-identified users with registered nickname
+  could see info on themselves including all channels and all levels
+
+
+*** 20010920_5 by wcampbel
+Cygwin fixes and document that Cygwin works
+
+
+*** 20010920_4 by wcampbel
+Removed the unused Strn.h header
+Added .cvsignore files
+
+
+*** 20010920_3 by wcampbel
+Document we now have a CVSWeb (Remove from TODO)
+Update the Hyb7 conf entries in README
+
+
+*** 20010920_2 by kreator
+- add sql-design to be..
+
+
+*** 20010920_1 by kreator
+- misc fixes
+- rewrite MyFree macro into inline func
+- misc stuff, sql stuff, etc..
+- remove c_r support since it is broken for our use
+- new core :-/
+
+
+*** 20010915_2 by kreator
+- added sql stuff to be done later
+
+
+*** 20010915_1 by kreator
+Directory /usr/cvsroot/hybserv/sql added to the repository
+
+
+*** 20010912_1 by kreator
+- added services fighting fix -> still experimental code
+- revisited DoShutdown() code - added putlog() with reason
+- did some misc changes around
+
+
+*** 20010911_1 by kreator
+- some TODO rewrites
+- sync with autoconf2.50 and autoheader2.50
+- update configure and defs.h properly
+- fix misc warnings
+
+
+*** 20010907_1 by kreator
+- remove darn x=NULL in MyFree() which borked some of wild code we still
+  have around :-(
+
+
+*** 20010828_1 by wcampbel
+Synced up mkpasswd
+
+
+*** 20010827_1 by wcampbel
+Add the nick to the JUPE/UNJUPE WALLOPS notice.  This is useful for
+responsibility purposes
+
+
+*** 20010820_3 by kreator
+- misc stuff for n_info()
+
+
+*** 20010820_2 by kreator
+- added KrisDuv's ideas into the code:
+  - fix memory leak in c_op()
+  - fix dumb usage of uninitialised str[] in n_set_hide()
+  - fix some stupid code in n_set_hide()
+  - display *all* info for channel and nickname to owner if he requests it
+    (ie: issues info command without arguments!)
+
+
+*** 20010820_1 by kreator
+- misc stuff mostly
+
+
+*** 20010818_6 by kreator
+- fixed some c_r stuff (should have trown out that c_r support ages ago)
+- fix some n_NickServ stuff in OPERNICKIDENT code
+- misc
+
+
+*** 20010818_5 by wcampbel
+#if 0'ed two variables that were unused
+
+
+*** 20010818_4 by kreator
+- add c0manche as contributor -> he tested O-line security and reported
+  that bug i've fixed last
+- mention once again that this is STILL a prerelease
+
+
+*** 20010818_3 by kreator
+- fixed most inconvenient bug in OPERNICKIDENT code
+
+
+*** 20010818_2 by kreator
+- added pre-API documentation that is Janos writing
+- removed old profiling report
+
+
+*** 20010818_1 by kreator
+- do smaller fixes in main Makefile
+- update new config.guess and config.sub and install-sh
+- fix some bogus code in ADVFLOOD
+- fix some stupid NULL casts (i was fixing this in last commit, but i'm
+  mentioning just in case)
+
+
+*** 20010816_3 by kreator
+- fixed some more code in ADVFLOOD
+
+
+*** 20010816_2 by kreator
+- disable ADVFLOOD_NOTIFY_ALL at the moment
+- do some misc changes for flood detections, seems new advflood code is
+  reason of latest cpu-kill deadloops :(
+
+
+*** 20010816_1 by kreator
+- disable unused portion of match.c
+
+
+*** 20010811_1 by kreator
+- added TIME_WITH_SYS_TIME check, did proper change of *.c which use
+  time.h
+- modified MyFree() to NULLify argument after free()-ing
+- added new bug -> we've got a new core
+
+
+*** 20010810_2 by kreator
+- put *newer* config.guess and config.sub
+- fixed n_set_uin() issue with non-dissapearing "UIN: " in n_info() output
+
+
+*** 20010810_1 by kreator
+- fixed smaller typo, eg:
+  [fer]  Foreign OperKill: OperServ killed |DeVa| (Clones))
+                                                          ^ note `)'
+
+
+*** 20010807_2 by kreator
+- took out #error !defined HYBRID_ONLY || !defined IRCNET since it is
+  more-less meaningless and b0rks Comstud
+
+
+*** 20010807_1 by kreator
+- added ADVFLOOD patch from ike with smaller modifications (here follows
+  his comment):
+  * added advanced flood protection against nickchange/reconnect flooders,
+    this is completely tweakable in include/config.h - ADVFLOOD
+  * added option to require opers to identify to nickserv before being
+    able to identify to operserv in include/config.h - OPERNICKIDENT
+  * some code is repetitive, cleanups will be done soon
+- got back from vacations :-)
+
+
+*** 20010731_1 by wcampbel
+Updated config.guess and config.sub for asuffield
+
+
+*** 20010730_1 by wcampbel
+Commit a change to allow the user@host to be specified in config.h for
+juped nicks.  We may want to replace this later with a way to .jupe a
+nick with a specific user@host.  Comments?
+
+
+*** 20010717_1 by wcampbel
+Corrected a URL for CVS checkouts
+
+
+*** 20010623_1 by wcampbel
+Committed a minor thing to test the e-mail sending upon commits
+
+
+*** 20010622_1 by kreator
+- fscanf had \n for pid
+- fixed issue when services would core on large number of clones
+
+
+*** 20010619_2 by kreator
+- bwah. solaris has unsigned long pid_t and bsd has unsigned int
+
+
+*** 20010619_1 by kreator
+- oopsies, i had one `,' too much in last commit
+
+
+*** 20010618_1 by kreator
+- rewrite some TODO entries
+- begin work on other ircds compatibility: got services to link with
+  ircnet ircd, next will fix NICK syntax
+
+
+*** 20010617_2 by kreator
+- fixed problem with killchan not cleaning channels because of lame O:*@*
+  lines (reported by KrisDuv)
+- did what Kris suggested --> >= check for c_level(): however, this is a
+  cosmetic change since it was syntactically and logically OK (founder can
+  redefine levels and make autoop match only one person - founder)
+- added verbose reports (if channel is set verbose) for access_add
+  (KrisDuv) and access_del (modification of Kris' code)
+
+
+*** 20010617_1 by kreator
+- applied KrisDuv's patch for RemoveFounderChannelFromNick() function
+  which _didn't_ decrease fccnt after channel drop: so in fact we had
+  ++fccnt but never --fcnt!
+
+
+*** 20010616_1 by kreator
+- smaller sprintf_irc cleanup
+
+
+*** 20010615_2 by wcampbel
+Added KrisDuv to the credits
+
+
+*** 20010615_1 by kreator
+- last commit was referencing to ChanServ leaving of channel, not OperServ
+  (was tired and didn't notice the difference)
+- applied another KrisDuv's patch
+- fixed all similar problems that upper patch was referencing to
+
+
+*** 20010614_3 by kreator
+- added patch from KrisDuv: OperServ would not part channels which were
+  dropped on founder nick drop
+- add some CygWin support
+
+
+*** 20010614_2 by kreator
+- oops, was mislead by one of Kris' patches so i forgot to add an extra
+  nptr check in s_quit()
+
+
+*** 20010614_1 by kreator
+- applied (some are slightly modified) patches from KrisDuv
+  <krisduv2000@yahoo.fr> in the following order:
+   * fix stupid DefaultAccess problem which ment that anyone could alter
+     global channel levels (how the heck didn't anyone notice that?)
+   * fix broken lastseen updating for nicknames
+   * fix broken "Last Seen" info in n_info()
+- did some misc changes
+
+
+*** 20010612_1 by wcampbel
+Side ported the Hyb6 fix for RESTART
+
+
+*** 20010607_1 by kreator
+- misc changes in nickserv
+- modify irc servers that we are on since irc.uk.eu.org is not going to be
+  back on EFNow (hi, fl_ :)
+
+
+*** 20010606_2 by kreator
+- did some wordwrapping in README. oh that pesky wordwrap :-)
+
+
+*** 20010606_1 by john
+- I cleaned up the README file a bit and added more specific information 
+  regarding the mailing lists. As of now ALL of the lists are fully 
+  functioning. 
+
+
+*** 20010605_4 by kreator
+- document that we still have problems with linked nicknames under some
+  strange circumstances - we cannot release 1.8.0 untill this is fixed
+
+
+*** 20010605_3 by kreator
+- oops, last commit f***ed up things :-(
+
+
+*** 20010605_2 by kreator
+- add routine that will check on load if there are more than 1 nick
+  entry per 1 nick: this will slow down reading routines a bit so we can
+  eradicate it when we are sure no problems with linked nicknames exist
+  any more.
+
+
+*** 20010605_1 by kreator
+- undo some fixes for nicklink problem. seems some people are having
+  repeated nicknames in nick.db, and funny thing is that i _don't_ have
+  them with same version of software!
+
+
+*** 20010604_3 by kreator
+- fixed bug for DEBUGMODE in hybserv.c (thanks Janos)
+
+
+*** 20010604_2 by kreator
+- do some fixes all around
+- clean seenserv code a bit, do a reformat, remove joinpart() code
+- do misc fixes with operserv code
+
+
+*** 20010604_1 by kreator
+- wrote various missing helpfiles
+- modify MyFree()
+- do misc fixes around
+
+
+*** 20010603_4 by kreator
+- some TODO changes
+
+
+*** 20010603_3 by kreator
+- oops, forgot to remove fuckover helpfiles :)
+
+
+*** 20010603_2 by kreator
+- do some changes to cmdhalfop that Janos proposed
+
+
+*** 20010603_1 by kreator
+- a lot of fixes and cleanups all around
+
+
+*** 20010602_2 by wcampbel
+In my opinion, forbidden channels should be created with chanmode +s
+in addition to chanmode +i
+
+
+*** 20010602_1 by janos
+- In line 5999 in chanserv it was HALFOF not HALFOP -> fixed
+
+
+*** 20010601_3 by kreator
+- fixed CH_OPPED stuff
+- more fixes for that pesky problem with master nicks and unlink
+- remake .depend
+
+
+*** 20010601_2 by kreator
+- fix Makefile
+- do some fixes for CH_OPPED stuff, so i re-enabled it: this needs more
+  tracing, so current CVS will probably have problems
+
+
+*** 20010601_1 by kreator
+- added fixlevel script for fixing broken ALVL entries which will appear
+  for all people using older chan.db-s with newer sources
+- remove that code from Makefile
+
+
+*** 20010530_1 by kreator
+- fix small bug in data.c for saving forbidded nickname's passwords
+
+
+*** 20010529_1 by kreator
+- fix nickserv set documentation
+
+
+*** 20010528_7 by kreator
+- original IrcBg code had 8 char limit for UIN and dumped it into long:
+  since they are larger now, move it into string
+
+
+*** 20010528_6 by kreator
+- added some todo directives
+
+
+*** 20010528_5 by kreator
+- added preliminary support for pthread in libc_r; however, it seems to be
+  missing pthread_sigwait()
+
+
+*** 20010528_4 by kreator
+- misc changes in README
+- add gsm, phone and uin code to nickserv
+- add clearnoexpire for nickserv and chanserv
+- fix statserv index which was missing showstats
+- add set verbose for chanserv
+- fix set url help
+- fix configure
+- added showadmins and showopers
+
+
+*** 20010528_3 by kreator
+- fix autoconf for snprintf
+- remove bogus snprintf from chanserv
+
+
+*** 20010528_2 by kreator
+- completely remove support for LibSfio and LibHoard since they give us no
+  better performance & updated docs accordingly
+- remove old profile
+- move strncasecmp into ircncmp
+- move strcasecmp into irccmp
+- misc fixes around
+- fix tools Makefile (remove libp - hoard)
+
+
+*** 20010528_1 by kreator
+- get rid of that pesky SIGINT signal handler; i wanted to remove it
+  several times but always forgot
+
+
+*** 20010527_7 by kreator
+- did a _lot_ of fixes in hashing code that was obviously broken for any
+  masked server in hash: this should fix all bad hits for such cases
+
+
+*** 20010527_6 by kreator
+- try to fix hashing code for masked servers
+
+
+*** 20010527_5 by kreator
+- misc makefile fix
+
+
+*** 20010527_4 by kreator
+- tweak hook a bit
+
+
+*** 20010527_3 by kreator
+- added GDB hook in hybserv.c
+
+
+*** 20010527_2 by kreator
+- fix mkpasswd
+
+
+*** 20010527_1 by kreator
+- document new bug with FindServer
+- import match.c from Hybrid7 and delete old one
+- fix jupe.c
+- fix operserv.c
+- misc fix for sock.c
+- fix for tools Makefile
+- import mkpasswd.c from Hybrid7 with MD5
+
+
+*** 20010522_2 by kreator
+- added complete profile in doc/20010519_2-profile.gz
+
+
+*** 20010522_1 by kreator
+- add mySQL/PostgreSQL support in TODO; hopefully someone will join us who
+  will independently work on this one
+
+
+*** 20010521_1 by kreator
+- misc statserv fix
+
+
+*** 20010520_1 by janos
+- A smaller update to chanserv.c, and I set default CMDVOICE to 8
+  and CMDHALFOP to 10 (why? -> see my mail what was sent to hybserv-coders
+  on May 20th)
+
+
+*** 20010519_4 by kreator
+- misc change
+
+
+*** 20010519_3 by kreator
+- fix bug in c_info
+
+
+*** 20010519_2 by kreator
+- do some optimisations in SplitBuf based on profile report, should give us
+  some more performance
+
+
+*** 20010519_1 by kreator
+- added preliminary/first_day profiling results in
+  doc/20010518_1-profile.gz
+
+
+*** 20010518_1 by kreator
+- more configure and Makefile fixes
+
+
+*** 20010517_3 by kreator
+- rip out FuckOver
+
+
+*** 20010517_2 by kreator
+- misc Makefile changes
+
+
+*** 20010517_1 by janos
+- YESSS, Hybserv2 mailing lists are working again. John-Work moved it to
+  Alleged, so README was updated
+  Mailing list infos:
+  hybserv@alleged.com - Hybserv Public List
+  hybserv-bugs@alleged.com - Hybserv Bugs
+  hybserv-coders@alleged.com - Hybserv Coders
+  hybserv-cvs@alleged.com - Hybserv CVS
+
+
+
+*** 20010516_4 by kreator
+- misc fixes all around
+- Makefile changes
+- increase bufs for ircvsprintf
+
+
+*** 20010516_3 by kreator
+- juped libString completely
+- misc changes around
+
+
+*** 20010516_2 by kreator
+- very large update - juped libString and added irc_sprintf (and co.) from
+  Hybrid7; that gave us additional performance gain; we lost some boundary
+  checking there
+- moved Snprintf to snprintf, etc..
+- fixed misc stuff all around 
+
+
+*** 20010516_1 by kreator
+- quite large update, I rewrote lots of code to make current_ts global,
+  which has lowered usage of time() considerably; now we do have services
+  consuming less CPU time
+- preliminary support for snprintf fix
+
+
+*** 20010511_2 by kreator
+- part of DeleteLink fixes.
+
+
+*** 20010511_1 by kreator
+- fix nasty bug in WriteNicks() that existed even before
+- found some more bugs in DeleteLink()
+
+
+*** 20010510_1 by kreator
+- misc changes to INSTALL
+- added myself as leader developer :-) as result of discussion with John,
+  that doesn't mean I will pretend to be boss -> I will try to continue
+  improving HybServ2 and putting lot of efforts in that wonderful project:
+  just to mention that more people are joining us and hopefully this
+  project will grow even more
+
+
+*** 20010508_2 by kreator
+- DisplaySettings() in OperServ had same bug as did SaveSettings() in
+  settings.c: it didn't check if PARAM_STRING is empty
+
+
+*** 20010508_1 by kreator
+- misc TODO modifications
+- misc install.fast modifications
+- add FIXTS command for ChanServ and NickServ for fixing bogus TS
+  nicknames; default value is 8 weeks, however this is too much paranoid
+  and has to be further tested
+
+
+*** 20010507_2 by kreator
+- small hybserv.conf modifications
+- reviewed TODO
+
+
+*** 20010507_1 by kreator
+- add experimental MD5 support via hybcrypt()
+- fix problem with ChanServ ignoring valid operators
+
+
+*** 20010506_4 by janos
+- a line to hybserv.conf with an example user with 's' flag
+  so a newbie can die ,and he does not need to kill hybserv
+
+
+*** 20010506_3 by kreator
+- fix problems with cmds on forgotten channels
+
+
+*** 20010506_2 by kreator
+- fix configure script to detect stdio and stdio-mt more precisely
+- correct some typos in README
+- fix Makefile.in for sources to have correct include hierarchy, to have
+  local includes before system ones (why o why didn't we have this
+  before?)
+
+
+*** 20010506_1 by kreator
+- misc stuff
+
+
+*** 20010505_1 by janos
+- TODO refreshing, a bug what flame fixed, and I added to TODO before,
+but kreator has not noticed it so, I removed from TODO(it was about
+auto +v/+h+o), and notice about
+operserv does not support hybrid7 modes
+ 
+
+
+*** 20010503_9 by kreator
+- added fl_'s patch, follows his comment:
+  Hopfix is the +v instead of +h fix.. basically, the checks need to be in
+  order of importance (+o/+h/+v), not (+o/+v/+h) ;)
+
+
+*** 20010503_8 by kreator
+- patch by fl_: let +h people use unban by default (if hyb7 is defined) 
+
+
+*** 20010503_7 by kreator
+- add web for cvs snapshots that I provide (manually)
+
+
+*** 20010503_6 by kreator
+- add some more files to be cleaned in distclean, especially those left
+  from CVS conflicts
+- force type f for make distclean, we don't want any directories to be
+  erased
+
+
+*** 20010503_5 by kreator
+- add some more bugs in TODO, remove old ones
+
+
+*** 20010503_4 by kreator
+- fix small typo in settings.c
+
+
+*** 20010503_3 by kreator
+- remade .depend
+- rewrote SaveSettings() so that conf is saved safe, it won't get
+  truncated if something bad happens when writing conf
+
+
+*** 20010503_2 by kreator
+- fix for quite nasty problem with dcc connections: dccptr->nick was
+  changed in onick (tempuser from GetUser -> O lines) instead of real
+  lptr->nick, prolly for telnet connections. i don't care if they got
+  b0rked, previous solution was simply stupid and wrong
+- sync TODO and KNOWNBUGS
+
+
+*** 20010503_1 by kreator
+- more fixes for PARAM_STRING in settings.c
+
+
+*** 20010502_6 by kreator
+- fix another ugly conf bug with PARAM_STRING
+
+
+*** 20010502_5 by kreator
+- fix for lame SQUIT
+- reported new bug with services ignoring DCC commands (does this have
+  anything to do with previous DCC chat problems?)
+
+
+*** 20010502_4 by kreator
+- fix problem with PARAM_SET directives in conf files: old routines would
+  save PARAM_SET with value of 1, but if one would put it into 0, conf
+  would treat it as it is SET-ed (1). i've fixed it not to write any
+  numerics on PARAM_SET values -> however, this code has to be rewritten
+  and redefined again, since it means we don't have to look a whole
+  param[] structure, just param[0] since whole directive should be one
+  PARAM_SET
+- resynced README and TODO between me and janos :-)
+
+
+*** 20010502_3 by janos
+- I changed hybrid-7.leguin.org.uk to irc.efnow.net because on hybrid-7
+a hybnet server listening on port 6667, so I make sure users will come
+to hyb7 test net anyway :) 
+
+
+*** 20010502_2 by janos
+- a bug added to TODO
+
+
+*** 20010502_1 by kreator
+- after extensive testing I confirm that previous patch completely fixed
+  all DCC cores on .command that would end in return message to
+  non-existing lptr
+- reformated and changed style of documentation in README
+
+
+*** 20010501_9 by kreator
+- removed fixed bug from TODO and KNOWNBUGS; this was fast :-)
+
+
+*** 20010501_8 by kreator
+- fix nasty .gline bug
+- fix kline documentation for OperServ
+- TODO changes
+
+
+*** 20010501_7 by kreator
+- fix that totally weird variable scope bug in ADMININFO, *ugh*
+
+
+*** 20010501_6 by janos
+- some information added about Hybrid7 and HybServ linking in README 
+
+
+*** 20010501_5 by kreator
+- oops, ADMININFO had splitted string that should not be like it
+
+
+*** 20010501_4 by kreator
+- fix small typo reported by Janos - Administrators should be
+  Administrator in VERSION reply
+- changes to ADMININFO code
+
+
+*** 20010501_3 by kreator
+- more changes for ADMININFO
+
+
+*** 20010501_2 by kreator
+- move RELEASENOTES-1.8.0 into RELEASENOTES-8.0, according to John
+- smaller modifications INSTALL, README and TODO and misc code lying
+  around to move HybServ string into HybServ2
+- more verbose configure
+- add ADMININFO for ctcp VERSION, code under define in config.h.in
+
+
+*** 20010501_1 by kreator
+- updates for Makefile.in to support mrproper that some users are used to,
+  it does distclean by default
+- changes to configure.in and configure to have proper system detection,
+  especially solaris: previously we tested for "/bin/sun", and that sucks;
+  now we have config.guess and config.sub for that
+- more syncing with Janos: properly added gecosbans on all sources and
+  includes, rechecked all, modified CAPABS, etc.
+
+
+*** 20010430_4 by john
+
+
+
+*** 20010430_3 by kreator
+- rewrote some TODO entries since we've fixed them
+
+
+*** 20010430_2 by kreator
+- changes to INSTALL and README: mention services through loopback device
+  (127.0.0.1), put myself in bug reporting list, etc.
+
+
+*** 20010430_1 by kreator
+- more syncing with Janos, especially for chan access levels for halfops
+  etc.
+- added GIMMECORE in config.h for proper corefile setup
+- more changes for CAPAB
+- changes to INSTALL
+- properly made update-chan in Makefile.in to detect and allow ALVL
+  deletion in chan.db for smooth upgrade to Hybrid7 capable Hybserv
+
+
+*** 20010429_9 by kreator
+- add upgrade script for new levels into Makefile.in
+
+
+*** 20010429_8 by kreator
+- and another fix, probably last
+
+
+*** 20010429_7 by kreator
+- fix ugly core that happens for printing level commands
+
+
+*** 20010429_6 by kreator
+- synched with Janos for Hybrid7 +a, +I and +h - reviewed all patches and
+  incorporated them into latest cvs. Note: this is quite large update!
+- updated README and RELEASENOTES
+- updated documentation: clear, index, halfop, etc.
+- updated config.h appropriately with new dependancies
+
+
+*** 20010429_5 by kreator
+- add some more verbose messages in operserv: omode and gline wallops now
+  show who issued the command
+- fix index for chanserv and nickserv to show new commands
+
+
+*** 20010429_4 by kreator
+- oops, used uninitialised helpstr in helpserv security fix
+
+
+*** 20010429_3 by kreator
+- more fixes for both unforbid()s - make it work as drop on fake
+  nicknames/channels
+- some more fixes for smooth upgrade on unforbid()
+- move to pre-1.8.0 that will appear on syncing with Binder
+
+
+*** 20010429_2 by kreator
+- removed cleandb that did not go in last cvs
+
+
+*** 20010429_1 by kreator
+- added unforbid for channels and nicknames
+- added kline for operserv
+- added gline7 from fl (Lee Hardy <lee@leeh.co.uk>)
+- fix for serious security problem with helpserv, reported by larne
+  (Edward Brocklesby <ejb@leguin.org.uk>) and binder (John Binder
+  <jbinder@kgazd.bme.hu>)
+- fix cleandb with both [ and -d override for older systems
+- fix cleandb into cleandb.in that will configure fix with proper path
+- add releasenotes for 1.8
+- add documentation for kline, unforbid
+- fix forbid documentation
+- fix drop documentation
+- modifications to TODO
+- added fl_ and binder/janos to README, contributors
+- fixed configure script for cleandb
+- fix lame register variables in libstring (%s%register%%g)
+- fix Makefile.in
+- additionally test hybserv against gcc-3.0
+
+
+*** 20010422_1 by kreator
+Fixed minor bug in s_server() to correctly detect reconnecting hosts if
+SPLIT_INFO on
+
+
+*** 20010420_2 by kreator
+Fixes for nptr==nptr->master in NickServ, userdb ---> THIS has to be
+  reviewed. I was tired, and commented the wrong fix..
+
+
+*** 20010420_1 by kreator
+s/psuedo/pseudo/g **/*(.)
+Fixes for nptr==nptr->master in NickServ, userdb
+Quickfixes for memonotify on signon -> decided to notify user right after
+  its identification ---> THIS HAS TO BE REVIEWED! Probably problems with
+  DeleteLink() with copylink turned on.
+Several smaller bugfixes around, too small to mention..
+
+
+*** 20010414_1 by kreator
+More TODO directives, mostly ideas from John Binder <jbinder@kgazd.bme.hu>
+
+
+*** 20010413_1 by wcampbel
+Removed serno.h in the root
+serno.h is only in include/
+
+
+*** 20010411_4 by kreator
+Quickfixed CH_OPPED stuff. However, this is _not_ real solution, since it
+seems CH_OPPED flags are not functional ATM.
+Reversed back " " stuff, since it is handled in SplitBuf() anyway, and it
+would do performance hit.
+
+
+*** 20010411_3 by kreator
+Fixed that nasty " " at the end of modes. Seems there were at least two
+bugs causing server not to update channel/user flags, and that was reason
+of OP ALL not to be working, together with other similar functions.
+
+
+*** 20010411_2 by kreator
+Fix address magenet.com -> magenet.net
+
+
+*** 20010411_1 by kreator
+Fixed ChanServ that would stay on channel if it was CS_RESTRICT and then
+~CS_RESTRICT.
+
+
+*** 20010410_3 by kreator
+Updated documentation for libhoard. Some updates for libhoard to use -lrt
+in configure for Solaris
+
+
+*** 20010410_2 by kreator
+Remove pthread_exit() from last commit. I still need to fix DoShutDown()
+and exit() for LinuxPosixTreads since it does not properly shut down
+threading system :|
+
+
+*** 20010410_1 by kreator
+Fix for SplitBuf() and s_sjoin() for blank sjoins. More fixes for
+SplitBuf() to handle some bad situations.
+Fix for pthread_exit() in DoShutDown() and SIGSEGV in ProcessSignals()
+Some fixes for Snprintf where char is propagated to int in `...'.
+
+
+*** 20010408_6 by kreator
+Fix for ChanServ not parting channels with too long topics. There was no
+topiclen check. Also, it would join, set topic and part, which could be
+too long for ircd linebuf, and could therefore be truncated.
+
+
+*** 20010408_5 by kreator
+Fixed dcc.c with INADDR_NONE that was missing for Solaris.
+Fixed chanserv.c with ChanServ that would not part after INVITE on
+CS_GUARD channels with AllowGuardChannel == 0.
+
+
+*** 20010408_4 by kreator
+Fixed blank sjoins, I hope. Should have read ReadHub() better.
+
+
+*** 20010408_3 by kreator
+Ugh! I'm dumb. Forgot av[mcnt][0]==':', and put av[mcnt]==':'.
+
+
+*** 20010408_2 by kreator
+I believe this should fix problem with ':' alone as av[5] which makes
+nicks[0] empty.
+
+
+*** 20010408_1 by kreator
+Seems that we have weird behaviour with Hybrid7 and sjoin (reported by
+larne) - I'm including assertion for GetNick(nicks[0]) I believe since
+nicks[] gets NULL for some reason. 
+
+
+*** 20010401_1 by kreator
+Fixed nasty bug in DccConnectHost(): in FreeBSD gethostbyname() does not
+resolve IP-s, especially IPv4 addresses that are not in dot notation.
+Some TODO stuff.
+
+
+*** 20010327_1 by kreator
+Document more TODO entries.
+
+
+*** 20010315_1 by kreator
+Add better support for multiprocessing machines running HybServ - through
+libhoard. Add configure testing for it. Document it. Update TODO.
+
+
+*** 20010313_2 by wcampbel
+Test commit, make sure the fixed serno.h works
+
+
+*** 20010313_1 by wcampbel
+Added the 3rd mirror
+
+
+*** 20010312_1 by kreator
+Document some more TODO stuff..
+
+
+*** 20010311_1 by kreator
+Sfio support - configure && documentation, appropriate source
+modifications, etc.
+
+
+*** 20010310_5 by wcampbel
+Recovered the lost ChangeLog entries
+
+
+*** 20010310_4 by wcampbel
+Recover the lost ChangeLog entries
+
+
+*** 20010310_3 by wcampbel
+Testing
+
+*** 20010310_2 by wcampbel
+Document anonymous CVS
+
+
+*** 20010310_1 by kreator
+Fixed install.fast, since we don't need install-help as separate
+target, it is done in install target by default
+
+
+*** 20010305_1 by kreator
+Some typos of mine in statserv, and to log Walters nicknamelen change.
+
+
 *** 20010221_1 by kreator
 More fixes for autoroute stuff.
 

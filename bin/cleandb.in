@@ -15,7 +15,7 @@
 # confirmation for each directory being deleted.
 
 # Set this to the default backup directory
-BackupDir="/usr/local/hybserv/backup/"
+BackupDir="@prefix@/hybserv/backup/"
 
 # Don't touch anything below here
 
@@ -25,11 +25,11 @@ datecheck="$(date '+%Y%m')"
 default="y"
 count=0
 
-if test -n "$1"; then
+if [ ! "x$1" = "x" ]; then
   case "$1" in
     -c | --confirm | --confir | --confi | --conf | --con | --co | --c)
       confirm="yes"
-      if test -n "$2"; then
+      if [ ! "x$2" = "x" ]; then
         BackupDir="$2"
       fi
     ;;
@@ -45,7 +45,7 @@ if test -n "$1"; then
   esac
 fi
 
-if test ! -d "$BackupDir"; then
+if [ ! -d "$BackupDir" ]; then
   echo "Invalid directory: $BackupDir"
   exit 0
 fi
@@ -55,14 +55,14 @@ cd "$BackupDir"
 # Use echo here to take the \n characters out of the ls output
 # and replace them with spaces. This probably isn't the best
 # way to do it :-/
-directories="`echo $(ls)`"
+directories="`echo *`"
 
 for backdir in $directories; do
 
   # If the length of $backdir is not 8, it does not satisfy
   # the YYYYMMDD form, assume we are in the wrong directory and
   # exit because we don't want to delete something important, etc
-  if test ! "${#backdir}" = "8"; then
+  if [ ! "${#backdir}" = "8" ]; then
     echo "$BackupDir: $backdir is an invalid backup directory, exiting"
     exit 1
   fi
@@ -71,7 +71,7 @@ for backdir in $directories; do
   # actually a directory. The backup directory should contain
   # ONLY sub-directories, so if we come across a regular file etc,
   # we are probably in the wrong place.
-  if test ! -d "${backdir}"; then
+  if [ ! -d "${backdir}" ]; then
     echo "$BackupDir: $backdir is an invalid backup directory, exiting"
     exit 1
   fi
@@ -82,13 +82,13 @@ for backdir in $directories; do
 
   # If the YYYYMM of the current directory does not match
   # the current year/month ($datecheck) delete the directory
-  if test ! "$tmp" = "$datecheck"; then
-    if test "$confirm" = "yes"; then
+  if [ ! "$tmp" = "$datecheck" ]; then
+    if [ "$confirm" = "yes" ]; then
       gotyn=0
       while [ $gotyn -eq 0 ]; do
         echo -n "Remove $backdir? [$default] "
         read Input
-        if test ! -n "$Input"; then
+        if [ ! "x$Input" = "x" ]; then
           Input="$default"
         fi
 

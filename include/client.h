@@ -109,6 +109,8 @@ struct Luser
   long  numnicks;    /* how many times they've changed their nickname */
   long  numkicks;    /* how many times they've kicked someone */
   long  numkills;    /* how many times they've killed someone */
+  long  numhops;     /* how many times they +h'd someone */
+  long  numdhops;    /* how many times they -h'd someone */
 
 #endif /* STATSERVICES */
 

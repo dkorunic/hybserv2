@@ -1,16 +1,37 @@
-/*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
- * This program comes with absolutely NO WARRANTY
+/************************************************************************
+ *   IRC - Internet Relay Chat, src/match.c
+ *   Copyright (C) 1990 Jarkko Oikarinen
  *
- * Should you choose to use and/or modify this source code, please
- * do so under the terms of the GNU General Public License under which
- * this program is distributed.
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * Changes:
+ * Thomas Helvey <tomh@inxpress.net> June 23, 1999
+ * Const correctness changes
+ * Cleanup of collapse and match
+ * Moved static calls variable to match
+ * Added asserts for null pointers
+ *
+ * Imported from Hybrid7 since original match.c was taken from Hybrid6
+ * -kre
  *
  * $Id$
  */
-
 #include <assert.h>
-
+#include <string.h> /* strrchr */
+#include <ctype.h>
+#include <stdlib.h>
 #include "config.h"
 #include "match.h"
 
@@ -31,6 +52,10 @@
  * removed escape handling, none of the masks used with this
  * function should contain an escape '\\' unless you are searching
  * for one, it is no longer possible to escape * and ?. 
+ *
+ * - This is no longer the case. We can use match on gecos which we could
+ * legitimately want to use an escape. So I re-enabled escaping - A1kmm.
+ *
  * Moved calls rollup to function body, since match isn't recursive
  * there isn't any reason to have it exposed to the file, this change
  * also has the added benefit of making match reentrant. :)
@@ -43,29 +68,45 @@
  */
 #define MATCH_MAX_CALLS 512  /* ACK! This dies when it's less that this
                                 and we have long lines to parse */
-int
-match(const char *mask, const char *name)
-
+int match(const char *mask, const char *name)
 {
-  const unsigned char* m = (const unsigned char*) mask;
-  const unsigned char* n = (const unsigned char*) name;
+  const unsigned char* m = (const unsigned char*)  mask;
+  const unsigned char* n = (const unsigned char*)  name;
   const unsigned char* ma = (const unsigned char*) mask;
   const unsigned char* na = (const unsigned char*) name;
-  int wild  = 0;
-  int calls = 0;
+  int   wild  = 0;
+  int   calls = 0;
+  int   quote = 0;
   assert(0 != mask);
   assert(0 != name);
   if (!mask || !name)
     return 0;
-
   while (calls++ < MATCH_MAX_CALLS) {
-    if (*m == '*') {
+    if (quote)
+      quote++;
+    if (quote == 3)
+      quote = 0;
+    if (*m == '\\' && !quote)
+      {
+       m++;
+       quote = 1;
+       continue;
+      }
+    if (!quote && *m == '*') {
       /*
        * XXX - shouldn't need to spin here, the mask should have been
        * collapsed before match is called
        */
       while (*m == '*')
         m++;
+      if (*m == '\\')
+        {
+          m++;
+          /* This means it is an invalid mask -A1kmm. */
+          if (!*m)
+            return 0;
+          quote = 2;
+        }
       wild = 1;
       ma = m;
       na = n;
@@ -74,9 +115,11 @@ match(const char *mask, const char *name)
     if (!*m) {
       if (!*n)
         return 1;
+      if (quote)
+        return 0;
       for (m--; (m > (const unsigned char*) mask) && (*m == '?'); m--)
         ;
-      if ((*m == '*') && (m > (const unsigned char*) mask))
+      if (*m == '*' && (m > (const unsigned char*) mask))
         return 1;
       if (!wild)
         return 0;
@@ -88,11 +131,13 @@ match(const char *mask, const char *name)
        * XXX - shouldn't need to spin here, the mask should have been
        * collapsed before match is called
        */
+      if (quote)
+        return 0;
       while (*m == '*')
         m++;
       return (*m == 0);
     }
-    if (ToLower(*m) != ToLower(*n) && *m != '?') {
+    if (ToLower(*m) != ToLower(*n) && !(!quote && *m == '?')) {
       if (!wild)
         return 0;
       m = ma;
@@ -107,6 +152,151 @@ match(const char *mask, const char *name)
   }
   return 0;
 }
+
+/*
+ * Rewritten to work properly with escaping, and hopefully to run faster
+ * in most cases... -A1kmm.
+ */
+char *
+collapse(char *pattern)
+{
+ char *p = pattern, *po = pattern;
+ char c;
+ int f = 0;
+
+ if (!p)
+   return NULL;
+ 
+ while ((c = *p++))
+   {
+    if (!(f & 2) && c == '*')
+      {
+       if (!(f & 1))
+         *po++ = '*';
+       f |= 1;
+      }
+    else if (!(f & 2) && c == '\\')
+      {
+       *po++ = '\\';
+       f |= 2;
+      }
+    else
+      {
+       *po++ = c;
+       f &= ~3;
+      }
+   }
+ *po++ = 0;
+ return pattern;
+}
+
+#if 0
+/*
+** collapse a pattern string into minimal components.
+** This particular version is "in place", so that it changes the pattern
+** which is to be reduced to a "minimal" size.
+*/
+/* collapse - behavior modification (Thomas Helvey <tomh@inxpress.net>)
+ * Removed mask escapes, we don't escape wildcards or call match
+ * on a mask. This change is somewhat subtle, the old version converted
+ * \\*** to \\**, the new version blindly converts it to \\*.
+ * Removed code that did a lot of work but achieved nothing, testing
+ * showed that the code in test for '?' produced exactly the same results
+ * as code that ignored '?'. The only thing you can do with a mask is to
+ * remove adjacent '*' characters, attempting anything else breaks the re.
+ *
+ * collapse - convert adjacent *'s to a single *
+ */
+char* collapse(char *pattern)
+{
+  char* s = pattern;
+  char* s1;
+  char* t;
+
+  /*
+   * XXX - null pointers ok?
+   */
+  if (s) {
+    for (; *s; s++) {
+      if ('*' == *s) {
+        t = s1 = s + 1;
+        while ('*' == *t)
+          ++t;
+        if (s1 != t) {
+          while ((*s1++ = *t++))
+            ;
+        }
+      }
+    }
+  }
+  return pattern;
+}
+#endif
+
+
+/*
+ * irccmp - case insensitive comparison of two 0 terminated strings.
+ *
+ *      returns  0, if s1 equal to s2
+ *              <0, if s1 lexicographically less than s2
+ *              >0, if s1 lexicographically greater than s2
+ */
+int irccmp(const char *s1, const char *s2)
+{
+  const unsigned char* str1 = (const unsigned char*) s1;
+  const unsigned char* str2 = (const unsigned char*) s2;
+  int   res;
+  assert(0 != s1);
+  assert(0 != s2);
+
+  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0) {
+    if (*str1 == '\0')
+      return 0;
+    str1++;
+    str2++;
+  }
+  return (res);
+}
+
+int ircncmp(const char* s1, const char *s2, int n)
+{
+  const unsigned char* str1 = (const unsigned char*) s1;
+  const unsigned char* str2 = (const unsigned char*) s2;
+  int res;
+  assert(0 != s1);
+  assert(0 != s2);
+
+  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0) {
+    str1++; str2++; n--;
+    if (n == 0 || (*str1 == '\0' && *str2 == '\0'))
+      return 0;
+  }
+  return (res);
+}
+
+#if 0
+unsigned long textip_to_ul(const char *ip)
+{
+  unsigned long ipr=0;
+  unsigned int octet=0;
+
+  char c;
+  while((c=*ip)) {
+    if(isdigit((int)c)) {
+      octet *= 10;
+      octet += (*ip & 0xF);
+    } else if(c == '.') {
+      ipr <<= 8;
+      ipr += octet;
+      octet = 0;
+    } else if(c=='/')break;
+    ip++;
+  }
+  ipr <<= 8;
+  ipr += octet;
+  return ipr;
+}
+#endif
 
 const unsigned char ToLowerTab[] = { 
   0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa,
@@ -181,272 +371,266 @@ const unsigned char ToUpperTab[] = {
 /*
  * CharAttrs table
  *
- * NOTE: RFC 1459 says: anything but a ^G, comma, or space is
- * allowed for channel names
+ * NOTE: RFC 1459 sez: anything but a ^G, comma, or space is allowed
+ * for channel names
  */
 const unsigned int CharAttrs[] = {
 /* 0  */     CNTRL_C,
-/* 1  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 2  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 3  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 4  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 5  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 6  */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 7 BEL */  CNTRL_C | NONEOS_C,
-/* 8  \b */  CNTRL_C | CHAN_C | NONEOS_C,
-/* 9  \t */  CNTRL_C | SPACE_C | CHAN_C | NONEOS_C,
-/* 10 \n */  CNTRL_C | SPACE_C | CHAN_C | NONEOS_C | EOL_C,
-/* 11 \v */  CNTRL_C | SPACE_C | CHAN_C | NONEOS_C,
-/* 12 \f */  CNTRL_C | SPACE_C | CHAN_C | NONEOS_C,
-/* 13 \r */  CNTRL_C | SPACE_C | CHAN_C | NONEOS_C | EOL_C,
-/* 14 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 15 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 16 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 17 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 18 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 19 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 20 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 21 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 22 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 23 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 24 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 25 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 26 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 27 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 28 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 29 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 30 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* 31 */     CNTRL_C | CHAN_C | NONEOS_C,
-/* SP */     PRINT_C | SPACE_C,
-/* ! */      PRINT_C | HWILD_C | CHAN_C | NONEOS_C,
-/* " */      PRINT_C | CHAN_C | NONEOS_C,
-/* # */      PRINT_C | CHANPFX_C | CHAN_C | NONEOS_C,
-/* $ */      PRINT_C | CHAN_C | NONEOS_C | USER_C,
-/* % */      PRINT_C | CHAN_C | NONEOS_C,
-/* & */      PRINT_C | CHANPFX_C | CHAN_C | NONEOS_C,
-/* ' */      PRINT_C | CHAN_C | NONEOS_C,
-/* ( */      PRINT_C | CHAN_C | NONEOS_C,
-/* ) */      PRINT_C | CHAN_C | NONEOS_C,
-/* * */      PRINT_C | HWILD_C | CHAN_C | NONEOS_C | SERV_C,
-/* + */      PRINT_C | CHAN_C | NONEOS_C | NICKPFX_C,
-/* , */      PRINT_C | NONEOS_C,
-/* - */      PRINT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* . */      PRINT_C | HWILD_C | CHAN_C | NONEOS_C | HOST_C | SERV_C,
-#ifdef RFC1035_ANAL
-/* / */      PRINT_C | CHAN_C | NONEOS_C,
-#else
-/* / */      PRINT_C | CHAN_C | NONEOS_C | HOST_C,
-#endif
-/* 0 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 1 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 2 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 3 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 4 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 5 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 6 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 7 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 8 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* 9 */      PRINT_C | DIGIT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* : */      PRINT_C | CHAN_C | NONEOS_C,
-/* ; */      PRINT_C | CHAN_C | NONEOS_C,
-/* < */      PRINT_C | CHAN_C | NONEOS_C,
-/* = */      PRINT_C | CHAN_C | NONEOS_C,
-/* > */      PRINT_C | CHAN_C | NONEOS_C,
-/* ? */      PRINT_C | HWILD_C | CHAN_C | NONEOS_C,
-/* @ */      PRINT_C | HWILD_C | CHAN_C | NONEOS_C | NICKPFX_C,
-/* A */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* B */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* C */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* D */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* E */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* F */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* G */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* H */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* I */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* J */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* K */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* L */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* M */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* N */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* O */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* P */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* Q */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* R */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* S */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* T */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* U */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* V */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* W */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* X */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* Y */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* Z */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* [ */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* \ */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* ] */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* ^ */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-#ifdef RFC1035_ANAL
-/* _ */      PRINT_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-#else
-/* _ */      PRINT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-#endif
-/* ` */      PRINT_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* a */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* b */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* c */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* d */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* e */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* f */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* g */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* h */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* i */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* j */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* k */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* l */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* m */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* n */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* o */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* p */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* q */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* r */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* s */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* t */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* u */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* v */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* w */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* x */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* y */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* z */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
-/* { */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* | */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* } */      PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
-/* ~ */      PRINT_C | ALPHA_C | CHAN_C | NONEOS_C | USER_C,
-/* del  */   CHAN_C | NONEOS_C,
-/* 0x80 */   CHAN_C | NONEOS_C,
-/* 0x81 */   CHAN_C | NONEOS_C,
-/* 0x82 */   CHAN_C | NONEOS_C,
-/* 0x83 */   CHAN_C | NONEOS_C,
-/* 0x84 */   CHAN_C | NONEOS_C,
-/* 0x85 */   CHAN_C | NONEOS_C,
-/* 0x86 */   CHAN_C | NONEOS_C,
-/* 0x87 */   CHAN_C | NONEOS_C,
-/* 0x88 */   CHAN_C | NONEOS_C,
-/* 0x89 */   CHAN_C | NONEOS_C,
-/* 0x8A */   CHAN_C | NONEOS_C,
-/* 0x8B */   CHAN_C | NONEOS_C,
-/* 0x8C */   CHAN_C | NONEOS_C,
-/* 0x8D */   CHAN_C | NONEOS_C,
-/* 0x8E */   CHAN_C | NONEOS_C,
-/* 0x8F */   CHAN_C | NONEOS_C,
-/* 0x90 */   CHAN_C | NONEOS_C,
-/* 0x91 */   CHAN_C | NONEOS_C,
-/* 0x92 */   CHAN_C | NONEOS_C,
-/* 0x93 */   CHAN_C | NONEOS_C,
-/* 0x94 */   CHAN_C | NONEOS_C,
-/* 0x95 */   CHAN_C | NONEOS_C,
-/* 0x96 */   CHAN_C | NONEOS_C,
-/* 0x97 */   CHAN_C | NONEOS_C,
-/* 0x98 */   CHAN_C | NONEOS_C,
-/* 0x99 */   CHAN_C | NONEOS_C,
-/* 0x9A */   CHAN_C | NONEOS_C,
-/* 0x9B */   CHAN_C | NONEOS_C,
-/* 0x9C */   CHAN_C | NONEOS_C,
-/* 0x9D */   CHAN_C | NONEOS_C,
-/* 0x9E */   CHAN_C | NONEOS_C,
-/* 0x9F */   CHAN_C | NONEOS_C,
-/* 0xA0 */   CHAN_C | NONEOS_C,
-/* 0xA1 */   CHAN_C | NONEOS_C,
-/* 0xA2 */   CHAN_C | NONEOS_C,
-/* 0xA3 */   CHAN_C | NONEOS_C,
-/* 0xA4 */   CHAN_C | NONEOS_C,
-/* 0xA5 */   CHAN_C | NONEOS_C,
-/* 0xA6 */   CHAN_C | NONEOS_C,
-/* 0xA7 */   CHAN_C | NONEOS_C,
-/* 0xA8 */   CHAN_C | NONEOS_C,
-/* 0xA9 */   CHAN_C | NONEOS_C,
-/* 0xAA */   CHAN_C | NONEOS_C,
-/* 0xAB */   CHAN_C | NONEOS_C,
-/* 0xAC */   CHAN_C | NONEOS_C,
-/* 0xAD */   CHAN_C | NONEOS_C,
-/* 0xAE */   CHAN_C | NONEOS_C,
-/* 0xAF */   CHAN_C | NONEOS_C,
-/* 0xB0 */   CHAN_C | NONEOS_C,
-/* 0xB1 */   CHAN_C | NONEOS_C,
-/* 0xB2 */   CHAN_C | NONEOS_C,
-/* 0xB3 */   CHAN_C | NONEOS_C,
-/* 0xB4 */   CHAN_C | NONEOS_C,
-/* 0xB5 */   CHAN_C | NONEOS_C,
-/* 0xB6 */   CHAN_C | NONEOS_C,
-/* 0xB7 */   CHAN_C | NONEOS_C,
-/* 0xB8 */   CHAN_C | NONEOS_C,
-/* 0xB9 */   CHAN_C | NONEOS_C,
-/* 0xBA */   CHAN_C | NONEOS_C,
-/* 0xBB */   CHAN_C | NONEOS_C,
-/* 0xBC */   CHAN_C | NONEOS_C,
-/* 0xBD */   CHAN_C | NONEOS_C,
-/* 0xBE */   CHAN_C | NONEOS_C,
-/* 0xBF */   CHAN_C | NONEOS_C,
-/* 0xC0 */   CHAN_C | NONEOS_C,
-/* 0xC1 */   CHAN_C | NONEOS_C,
-/* 0xC2 */   CHAN_C | NONEOS_C,
-/* 0xC3 */   CHAN_C | NONEOS_C,
-/* 0xC4 */   CHAN_C | NONEOS_C,
-/* 0xC5 */   CHAN_C | NONEOS_C,
-/* 0xC6 */   CHAN_C | NONEOS_C,
-/* 0xC7 */   CHAN_C | NONEOS_C,
-/* 0xC8 */   CHAN_C | NONEOS_C,
-/* 0xC9 */   CHAN_C | NONEOS_C,
-/* 0xCA */   CHAN_C | NONEOS_C,
-/* 0xCB */   CHAN_C | NONEOS_C,
-/* 0xCC */   CHAN_C | NONEOS_C,
-/* 0xCD */   CHAN_C | NONEOS_C,
-/* 0xCE */   CHAN_C | NONEOS_C,
-/* 0xCF */   CHAN_C | NONEOS_C,
-/* 0xD0 */   CHAN_C | NONEOS_C,
-/* 0xD1 */   CHAN_C | NONEOS_C,
-/* 0xD2 */   CHAN_C | NONEOS_C,
-/* 0xD3 */   CHAN_C | NONEOS_C,
-/* 0xD4 */   CHAN_C | NONEOS_C,
-/* 0xD5 */   CHAN_C | NONEOS_C,
-/* 0xD6 */   CHAN_C | NONEOS_C,
-/* 0xD7 */   CHAN_C | NONEOS_C,
-/* 0xD8 */   CHAN_C | NONEOS_C,
-/* 0xD9 */   CHAN_C | NONEOS_C,
-/* 0xDA */   CHAN_C | NONEOS_C,
-/* 0xDB */   CHAN_C | NONEOS_C,
-/* 0xDC */   CHAN_C | NONEOS_C,
-/* 0xDD */   CHAN_C | NONEOS_C,
-/* 0xDE */   CHAN_C | NONEOS_C,
-/* 0xDF */   CHAN_C | NONEOS_C,
-/* 0xE0 */   CHAN_C | NONEOS_C,
-/* 0xE1 */   CHAN_C | NONEOS_C,
-/* 0xE2 */   CHAN_C | NONEOS_C,
-/* 0xE3 */   CHAN_C | NONEOS_C,
-/* 0xE4 */   CHAN_C | NONEOS_C,
-/* 0xE5 */   CHAN_C | NONEOS_C,
-/* 0xE6 */   CHAN_C | NONEOS_C,
-/* 0xE7 */   CHAN_C | NONEOS_C,
-/* 0xE8 */   CHAN_C | NONEOS_C,
-/* 0xE9 */   CHAN_C | NONEOS_C,
-/* 0xEA */   CHAN_C | NONEOS_C,
-/* 0xEB */   CHAN_C | NONEOS_C,
-/* 0xEC */   CHAN_C | NONEOS_C,
-/* 0xED */   CHAN_C | NONEOS_C,
-/* 0xEE */   CHAN_C | NONEOS_C,
-/* 0xEF */   CHAN_C | NONEOS_C,
-/* 0xF0 */   CHAN_C | NONEOS_C,
-/* 0xF1 */   CHAN_C | NONEOS_C,
-/* 0xF2 */   CHAN_C | NONEOS_C,
-/* 0xF3 */   CHAN_C | NONEOS_C,
-/* 0xF4 */   CHAN_C | NONEOS_C,
-/* 0xF5 */   CHAN_C | NONEOS_C,
-/* 0xF6 */   CHAN_C | NONEOS_C,
-/* 0xF7 */   CHAN_C | NONEOS_C,
-/* 0xF8 */   CHAN_C | NONEOS_C,
-/* 0xF9 */   CHAN_C | NONEOS_C,
-/* 0xFA */   CHAN_C | NONEOS_C,
-/* 0xFB */   CHAN_C | NONEOS_C,
-/* 0xFC */   CHAN_C | NONEOS_C,
-/* 0xFD */   CHAN_C | NONEOS_C,
-/* 0xFE */   CHAN_C | NONEOS_C,
-/* 0xFF */   CHAN_C | NONEOS_C
+/* 1  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 2  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 3  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 4  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 5  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 6  */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 7 BEL */  CNTRL_C|NONEOS_C,
+/* 8  \b */  CNTRL_C|CHAN_C|NONEOS_C,
+/* 9  \t */  CNTRL_C|SPACE_C|CHAN_C|NONEOS_C,
+/* 10 \n */  CNTRL_C|SPACE_C|CHAN_C|NONEOS_C|EOL_C,
+/* 11 \v */  CNTRL_C|SPACE_C|CHAN_C|NONEOS_C,
+/* 12 \f */  CNTRL_C|SPACE_C|CHAN_C|NONEOS_C,
+/* 13 \r */  CNTRL_C|SPACE_C|CHAN_C|NONEOS_C|EOL_C,
+/* 14 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 15 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 16 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 17 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 18 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 19 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 20 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 21 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 22 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 23 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 24 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 25 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 26 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 27 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 28 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 29 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 30 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* 31 */     CNTRL_C|CHAN_C|NONEOS_C,
+/* SP */     PRINT_C|SPACE_C,
+/* ! */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C,
+/* " */      PRINT_C|CHAN_C|NONEOS_C,
+/* # */      PRINT_C|CHANPFX_C|CHAN_C|NONEOS_C,
+/* $ */      PRINT_C|CHAN_C|NONEOS_C|USER_C,
+/* % */      PRINT_C|CHAN_C|NONEOS_C|NICKPFX_C,
+/* & */      PRINT_C|CHANPFX_C|CHAN_C|NONEOS_C,
+/* ' */      PRINT_C|CHAN_C|NONEOS_C,
+/* ( */      PRINT_C|CHAN_C|NONEOS_C,
+/* ) */      PRINT_C|CHAN_C|NONEOS_C,
+/* * */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C|SERV_C,
+/* + */      PRINT_C|CHAN_C|NONEOS_C|NICKPFX_C,
+/* , */      PRINT_C|NONEOS_C,
+/* - */      PRINT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* . */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C|HOST_C|SERV_C,
+/* / */      PRINT_C|CHAN_C|NONEOS_C,
+/* 0 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 1 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 2 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 3 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 4 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 5 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 6 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 7 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 8 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* 9 */      PRINT_C|DIGIT_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* : */      PRINT_C|CHAN_C|NONEOS_C|HOST_C,
+/* ; */      PRINT_C|CHAN_C|NONEOS_C,
+/* < */      PRINT_C|CHAN_C|NONEOS_C,
+/* = */      PRINT_C|CHAN_C|NONEOS_C,
+/* > */      PRINT_C|CHAN_C|NONEOS_C,
+/* ? */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C,
+/* @ */      PRINT_C|KWILD_C|CHAN_C|NONEOS_C|NICKPFX_C,
+/* A */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* B */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* C */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* D */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* E */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* F */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* G */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* H */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* I */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* J */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* K */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* L */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* M */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* N */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* O */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* P */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* Q */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* R */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* S */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* T */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* U */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* V */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* W */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* X */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* Y */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* Z */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* [ */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* \ */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* ] */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* ^ */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* _ */      PRINT_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* ` */      PRINT_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* a */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* b */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* c */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* d */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* e */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* f */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* g */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* h */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* i */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* j */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* k */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* l */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* m */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* n */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* o */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* p */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* q */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* r */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* s */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* t */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* u */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* v */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* w */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* x */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* y */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* z */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C|HOST_C,
+/* { */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* | */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* } */      PRINT_C|ALPHA_C|NICK_C|CHAN_C|NONEOS_C|USER_C,
+/* ~ */      PRINT_C|ALPHA_C|CHAN_C|NONEOS_C|USER_C,
+/* del  */   CHAN_C|NONEOS_C,
+/* 0x80 */   CHAN_C|NONEOS_C,
+/* 0x81 */   CHAN_C|NONEOS_C,
+/* 0x82 */   CHAN_C|NONEOS_C,
+/* 0x83 */   CHAN_C|NONEOS_C,
+/* 0x84 */   CHAN_C|NONEOS_C,
+/* 0x85 */   CHAN_C|NONEOS_C,
+/* 0x86 */   CHAN_C|NONEOS_C,
+/* 0x87 */   CHAN_C|NONEOS_C,
+/* 0x88 */   CHAN_C|NONEOS_C,
+/* 0x89 */   CHAN_C|NONEOS_C,
+/* 0x8A */   CHAN_C|NONEOS_C,
+/* 0x8B */   CHAN_C|NONEOS_C,
+/* 0x8C */   CHAN_C|NONEOS_C,
+/* 0x8D */   CHAN_C|NONEOS_C,
+/* 0x8E */   CHAN_C|NONEOS_C,
+/* 0x8F */   CHAN_C|NONEOS_C,
+/* 0x90 */   CHAN_C|NONEOS_C,
+/* 0x91 */   CHAN_C|NONEOS_C,
+/* 0x92 */   CHAN_C|NONEOS_C,
+/* 0x93 */   CHAN_C|NONEOS_C,
+/* 0x94 */   CHAN_C|NONEOS_C,
+/* 0x95 */   CHAN_C|NONEOS_C,
+/* 0x96 */   CHAN_C|NONEOS_C,
+/* 0x97 */   CHAN_C|NONEOS_C,
+/* 0x98 */   CHAN_C|NONEOS_C,
+/* 0x99 */   CHAN_C|NONEOS_C,
+/* 0x9A */   CHAN_C|NONEOS_C,
+/* 0x9B */   CHAN_C|NONEOS_C,
+/* 0x9C */   CHAN_C|NONEOS_C,
+/* 0x9D */   CHAN_C|NONEOS_C,
+/* 0x9E */   CHAN_C|NONEOS_C,
+/* 0x9F */   CHAN_C|NONEOS_C,
+/* 0xA0 */   CHAN_C|NONEOS_C,
+/* 0xA1 */   CHAN_C|NONEOS_C,
+/* 0xA2 */   CHAN_C|NONEOS_C,
+/* 0xA3 */   CHAN_C|NONEOS_C,
+/* 0xA4 */   CHAN_C|NONEOS_C,
+/* 0xA5 */   CHAN_C|NONEOS_C,
+/* 0xA6 */   CHAN_C|NONEOS_C,
+/* 0xA7 */   CHAN_C|NONEOS_C,
+/* 0xA8 */   CHAN_C|NONEOS_C,
+/* 0xA9 */   CHAN_C|NONEOS_C,
+/* 0xAA */   CHAN_C|NONEOS_C,
+/* 0xAB */   CHAN_C|NONEOS_C,
+/* 0xAC */   CHAN_C|NONEOS_C,
+/* 0xAD */   CHAN_C|NONEOS_C,
+/* 0xAE */   CHAN_C|NONEOS_C,
+/* 0xAF */   CHAN_C|NONEOS_C,
+/* 0xB0 */   CHAN_C|NONEOS_C,
+/* 0xB1 */   CHAN_C|NONEOS_C,
+/* 0xB2 */   CHAN_C|NONEOS_C,
+/* 0xB3 */   CHAN_C|NONEOS_C,
+/* 0xB4 */   CHAN_C|NONEOS_C,
+/* 0xB5 */   CHAN_C|NONEOS_C,
+/* 0xB6 */   CHAN_C|NONEOS_C,
+/* 0xB7 */   CHAN_C|NONEOS_C,
+/* 0xB8 */   CHAN_C|NONEOS_C,
+/* 0xB9 */   CHAN_C|NONEOS_C,
+/* 0xBA */   CHAN_C|NONEOS_C,
+/* 0xBB */   CHAN_C|NONEOS_C,
+/* 0xBC */   CHAN_C|NONEOS_C,
+/* 0xBD */   CHAN_C|NONEOS_C,
+/* 0xBE */   CHAN_C|NONEOS_C,
+/* 0xBF */   CHAN_C|NONEOS_C,
+/* 0xC0 */   CHAN_C|NONEOS_C,
+/* 0xC1 */   CHAN_C|NONEOS_C,
+/* 0xC2 */   CHAN_C|NONEOS_C,
+/* 0xC3 */   CHAN_C|NONEOS_C,
+/* 0xC4 */   CHAN_C|NONEOS_C,
+/* 0xC5 */   CHAN_C|NONEOS_C,
+/* 0xC6 */   CHAN_C|NONEOS_C,
+/* 0xC7 */   CHAN_C|NONEOS_C,
+/* 0xC8 */   CHAN_C|NONEOS_C,
+/* 0xC9 */   CHAN_C|NONEOS_C,
+/* 0xCA */   CHAN_C|NONEOS_C,
+/* 0xCB */   CHAN_C|NONEOS_C,
+/* 0xCC */   CHAN_C|NONEOS_C,
+/* 0xCD */   CHAN_C|NONEOS_C,
+/* 0xCE */   CHAN_C|NONEOS_C,
+/* 0xCF */   CHAN_C|NONEOS_C,
+/* 0xD0 */   CHAN_C|NONEOS_C,
+/* 0xD1 */   CHAN_C|NONEOS_C,
+/* 0xD2 */   CHAN_C|NONEOS_C,
+/* 0xD3 */   CHAN_C|NONEOS_C,
+/* 0xD4 */   CHAN_C|NONEOS_C,
+/* 0xD5 */   CHAN_C|NONEOS_C,
+/* 0xD6 */   CHAN_C|NONEOS_C,
+/* 0xD7 */   CHAN_C|NONEOS_C,
+/* 0xD8 */   CHAN_C|NONEOS_C,
+/* 0xD9 */   CHAN_C|NONEOS_C,
+/* 0xDA */   CHAN_C|NONEOS_C,
+/* 0xDB */   CHAN_C|NONEOS_C,
+/* 0xDC */   CHAN_C|NONEOS_C,
+/* 0xDD */   CHAN_C|NONEOS_C,
+/* 0xDE */   CHAN_C|NONEOS_C,
+/* 0xDF */   CHAN_C|NONEOS_C,
+/* 0xE0 */   CHAN_C|NONEOS_C,
+/* 0xE1 */   CHAN_C|NONEOS_C,
+/* 0xE2 */   CHAN_C|NONEOS_C,
+/* 0xE3 */   CHAN_C|NONEOS_C,
+/* 0xE4 */   CHAN_C|NONEOS_C,
+/* 0xE5 */   CHAN_C|NONEOS_C,
+/* 0xE6 */   CHAN_C|NONEOS_C,
+/* 0xE7 */   CHAN_C|NONEOS_C,
+/* 0xE8 */   CHAN_C|NONEOS_C,
+/* 0xE9 */   CHAN_C|NONEOS_C,
+/* 0xEA */   CHAN_C|NONEOS_C,
+/* 0xEB */   CHAN_C|NONEOS_C,
+/* 0xEC */   CHAN_C|NONEOS_C,
+/* 0xED */   CHAN_C|NONEOS_C,
+/* 0xEE */   CHAN_C|NONEOS_C,
+/* 0xEF */   CHAN_C|NONEOS_C,
+/* 0xF0 */   CHAN_C|NONEOS_C,
+/* 0xF1 */   CHAN_C|NONEOS_C,
+/* 0xF2 */   CHAN_C|NONEOS_C,
+/* 0xF3 */   CHAN_C|NONEOS_C,
+/* 0xF4 */   CHAN_C|NONEOS_C,
+/* 0xF5 */   CHAN_C|NONEOS_C,
+/* 0xF6 */   CHAN_C|NONEOS_C,
+/* 0xF7 */   CHAN_C|NONEOS_C,
+/* 0xF8 */   CHAN_C|NONEOS_C,
+/* 0xF9 */   CHAN_C|NONEOS_C,
+/* 0xFA */   CHAN_C|NONEOS_C,
+/* 0xFB */   CHAN_C|NONEOS_C,
+/* 0xFC */   CHAN_C|NONEOS_C,
+/* 0xFD */   CHAN_C|NONEOS_C,
+/* 0xFE */   CHAN_C|NONEOS_C,
+/* 0xFF */   CHAN_C|NONEOS_C
 };
+
+

@@ -12,5 +12,5 @@
 #ifdef VERSION
 char  hVersion[] = VERSION;
 #else
-char  hVersion[] = "";
+char  hVersion[] = "*unknown*";
 #endif

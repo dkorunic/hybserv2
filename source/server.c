@@ -9,11 +9,17 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#include <assert.h>
 
 #include "alloc.h"
 #include "channel.h"
@@ -22,7 +28,6 @@
 #include "conf.h"
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "global.h"
 #include "hash.h"
@@ -42,8 +47,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
@@ -59,6 +64,8 @@ extern aHashEntry hostTable[HASHCLIENTS];
  * Global - list of network servers
  */
 struct Server *ServerList = NULL;
+static int ServerCollides = 0;
+static time_t ServerCollidesTS = 0;
 
 static void s_pass(int ac, char **av);
 static void s_ping(int ac, char **av);
@@ -76,6 +83,8 @@ static void s_whois(int ac, char **av);
 static void s_trace(int ac, char **av);
 static void s_version(int ac, char **av);
 static void s_motd(int ac, char **av);
+
+static void CheckServCollide(struct Server *bad_server);
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 static void s_topic(int ac, char **av);
@@ -141,7 +150,7 @@ ProcessInfo(int arc, char **arv)
 
   for (stptr = servtab; stptr->cmd; stptr++)
   {
-    if (!strcasecmp(arv[index], stptr->cmd))
+    if (!irccmp(arv[index], stptr->cmd))
     {
       (*stptr->func)(arc, arv);
       break;
@@ -177,7 +186,7 @@ AddServer(int argcnt, char **line)
   if (argcnt == 4)
   {
   #ifdef BLOCK_ALLOCATION
-    Strncpy(tempserv->name, line[1], SERVERLEN);
+    strncpy(tempserv->name, line[1], SERVERLEN);
   #else
     tempserv->name = MyStrdup(line[1]);
   #endif
@@ -198,7 +207,7 @@ AddServer(int argcnt, char **line)
       return (NULL);
 
   #ifdef BLOCK_ALLOCATION
-    Strncpy(tempserv->name, line[2], SERVERLEN);
+    strncpy(tempserv->name, line[2], SERVERLEN);
   #else
     tempserv->name = MyStrdup(line[2]);
   #endif
@@ -208,7 +217,7 @@ AddServer(int argcnt, char **line)
      * have "Me.sptr" point to it
      */
     if (!Me.sptr)
-      if (!strcasecmp(tempserv->name, Me.name))
+      if (!irccmp(tempserv->name, Me.name))
         Me.sptr = tempserv;
 
     /*
@@ -230,7 +239,7 @@ AddServer(int argcnt, char **line)
         if (tempserv->uplink->numservs > tempserv->uplink->maxservs)
         {
           tempserv->uplink->maxservs = tempserv->uplink->numservs;
-          tempserv->uplink->maxservs_ts = time(NULL);
+          tempserv->uplink->maxservs_ts = current_ts;
         }
       #endif
       }
@@ -243,7 +252,7 @@ AddServer(int argcnt, char **line)
         tempserv->uplink ? tempserv->uplink->name : "*unknown*");
   }
 
-  tempserv->connect_ts = time(NULL);
+  tempserv->connect_ts = current_ts;
   tempserv->numservs = 1;
 
 #ifdef STATSERVICES
@@ -272,7 +281,7 @@ AddServer(int argcnt, char **line)
   if (Network->TotalServers > Network->MaxServers)
   {
     Network->MaxServers = Network->TotalServers;
-    Network->MaxServers_ts = time(NULL);
+    Network->MaxServers_ts = current_ts;
 
     if ((Network->MaxServers % 5) == 0)
     {
@@ -285,7 +294,7 @@ AddServer(int argcnt, char **line)
   if (Network->TotalServers > Network->MaxServersT)
   {
     Network->MaxServersT = Network->TotalServers;
-    Network->MaxServersT_ts = time(NULL);
+    Network->MaxServersT_ts = current_ts;
   }
 #endif
 
@@ -308,14 +317,6 @@ DeleteServer(struct Server *sptr)
   if (!sptr)
     return;
 
-  /*
-   * Delete server from hash table
-   */
-  (void) HashDelServer(sptr);
-
-  if (sptr->uplink)
-    sptr->uplink->numservs--;
-
 #ifdef EXTRA_SPLIT_INFO
   /* This could spawn too much messages, even flood on connects/reconnects
    * because of severe DoS -kre */
@@ -324,6 +325,14 @@ DeleteServer(struct Server *sptr)
     sptr->name,
     sptr->uplink ? sptr->uplink->name : "*unknown*");
 #endif
+
+  /*
+   * Delete server from hash table
+   */
+  (void) HashDelServer(sptr);
+
+  if (sptr->uplink)
+    sptr->uplink->numservs--;
 
   /*
    * go through server list, and check if any leafs had sptr
@@ -490,7 +499,7 @@ s_ping(int ac, char **av)
   if (ac < 2)
     return;
 
-  if (!strcasecmp(av[0], "PING"))
+  if (!irccmp(av[0], "PING"))
     who = av[1];
   else
     who = av[0];
@@ -547,18 +556,18 @@ s_server(int ac, char **av)
    * have 2 cases - either this is juped server or is not. If it is,
    * ignore whole split stuff -kre */
   {
-    if ((ac==5) && !IsJupe(tempserv->name))
+    if ((ac == 5) && !IsJupe(tempserv->name))
     {
-      time_t current_ts=time(NULL);
-      tempserv->uplink=FindServer(av[0]);
-      SendUmode(OPERUMODE_Y, "Server %s has connected after %s split time",
-        av[2], timeago(tempserv->split_ts, 0));
-      tempserv->split_ts=0;
-      tempserv->connect_ts=current_ts;
+      tempserv->uplink = FindServer(av[0] + 1);
+      SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
+          "after %s split time",
+        av[2], av[0] + 1, timeago(tempserv->split_ts, 0));
+      tempserv->split_ts = 0;
+      tempserv->connect_ts = current_ts;
     }
     return;
   }
-#endif
+#endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);
   if (tempserv == Me.hub)
@@ -576,10 +585,8 @@ s_server(int ac, char **av)
     /*
      * add the services (our) server as well
      */
-    sprintf(sendstr, ":%s SERVER %s 1 :%s",
-      av[1],
-      Me.name,
-      Me.info);
+    ircsprintf(sendstr, ":%s SERVER %s 1 :%s",
+      av[1], Me.name, Me.info);
 
     SplitBuf(sendstr, &line);
 
@@ -596,22 +603,23 @@ s_server(int ac, char **av)
     /* initialize service nicks */
     InitServs(NULL);
 
-  #ifdef ALLOW_JUPES
+#ifdef ALLOW_JUPES
     /* Introduce juped nicks/servers to the network */
     InitJupes();
-  #endif
+#endif /* ALLOW_JUPES */
 
   }
   else
   {
-  #ifdef ALLOW_JUPES
+#ifdef ALLOW_JUPES
     /* a new server connected to network, check if its juped */
     CheckJuped(av[2]);
-  #endif
+#endif /* ALLOW_JUPES */
+
 #ifdef DEBUGMODE
     fprintf(stderr, "Introducing new server %s\n",
       av[2]);
-#endif
+#endif /* DEBUGMODE */
   }
 } /* s_server() */
 
@@ -674,7 +682,7 @@ s_nick(int ac, char **av)
 
   #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
     /*memset(&newnick, 0, NICKLEN + 1);*/
-    Strncpy(newnick, av[2], NICKLEN);
+    strncpy(newnick, av[2], NICKLEN);
     newnick[NICKLEN] = '\0';
   #endif
 
@@ -686,14 +694,17 @@ s_nick(int ac, char **av)
   #ifdef NICKSERVICES
     nptr = FindNick(lptr->nick);
 
+    /* Update lastseen info for old nickname */
+    if (nptr && (nptr->flags & NS_IDENTIFIED))
+      nptr->lastseen = current_ts;
+
     newptr = FindNick(newnick);
     if (newptr)
     {
       /*
-       * Un-Identify the new nickname in case it is registered -
-       * it could possibly be identified from the flags read
-       * from the userfile, if no-one has used this nickname
-       * yet.
+       * Un-Identify the new nickname in case it is registered - it could
+       * possibly be identified from the flags read from the userfile, if
+       * no-one has used this nickname yet.
        */
       newptr->flags &= ~NS_IDENTIFIED;
     }
@@ -703,12 +714,11 @@ s_nick(int ac, char **av)
 
     #ifdef LINKED_NICKNAMES
       /*
-       * One of the features of linked nicknames is if you
-       * identify for one nick in the link, you are identified
-       * for every nick. If lptr->nick is changing his/her nick
-       * to another nickname in the link (and is currently
-       * identified), make sure they get correctly identified
-       * for the new nickname.
+       * One of the features of linked nicknames is if you identify for
+       * one nick in the link, you are identified for every nick. If
+       * lptr->nick is changing his/her nick to another nickname in the
+       * link (and is currently identified), make sure they get correctly
+       * identified for the new nickname.
        */
       if (nptr->flags & NS_IDENTIFIED)
       {
@@ -784,7 +794,7 @@ s_nick(int ac, char **av)
      * their nick to "aBa", in which case we don't need to
      * check
      */
-    if (strcasecmp(who, av[2]) != 0)
+    if (irccmp(who, av[2]) != 0)
       CheckNick(av[2]);
   #endif /* NICKSERVICES */
 
@@ -793,8 +803,15 @@ s_nick(int ac, char **av)
   #endif
 
   #ifdef SEENSERVICES
-    es_add(oldnick, lptr->username, lptr->hostname, NULL, time(NULL), 2);
+    es_add(oldnick, lptr->username, lptr->hostname, NULL, current_ts, 2);
   #endif /* SEENSERVICES */
+
+#ifdef ADVFLOOD
+#if 0
+    if (lptr->server != Me.sptr)
+#endif
+    	updateConnectTable(lptr->username, lptr->hostname);
+#endif /* ADVFLOOD */
 
     return;
   } /* if (ac == 4) */
@@ -810,20 +827,30 @@ s_nick(int ac, char **av)
   if ((serviceptr = GetService(av[1])))
   {
     /*
-     * Make sure it is a valid nick collide before
-     * we send a kill. If this is the initial
-     * hub burst, the hub would not have processed
-     * our NICK statement yet, so let TS clean everything
-     * up
+     * Make sure it is a valid nick collide before we send a kill. If this
+     * is the initial hub burst, the hub would not have processed our NICK
+     * statement yet, so let TS clean everything up
      */
     if (IsNickCollide(serviceptr, av))
     {
-      toserv(":%s KILL %s :%s\n",
-        Me.name,
-        av[1],
+      struct Luser *bad_lptr;
+
+      toserv(":%s KILL %s :%s\n", Me.name, av[1],
         "Attempt to Nick Collide Services");
 
-      DeleteClient(FindClient(av[1]));
+      bad_lptr = FindClient(av[1]);
+
+      if (!bad_lptr)
+        return;
+
+#ifdef SERVICES_FIGHT_FIX
+      
+      /* Check if services are fighting -kre */
+      CheckServCollide(bad_lptr->server);
+
+#endif /* SERVICES_FIGHT_FIX */
+
+      DeleteClient(bad_lptr);
 
       InitServs(serviceptr);
 
@@ -875,7 +902,7 @@ s_nick(int ac, char **av)
 
 #ifdef GLOBALSERVICES
 
-  if (strncasecmp(Me.name, lptr->server->name, strlen(lptr->server->name))) {
+  if (ircncmp(Me.name, lptr->server->name, strlen(lptr->server->name))) {
     /*
      * Send the motd to the new user
      */
@@ -988,7 +1015,7 @@ s_privmsg(int ac, char **av)
   /* Obviously, this code down strips '%'. But what if some valid string
      contains regular '%' and it should _not_ be stripped, ie. passwd
      string? So, I'll add search for IDENTIFY string. -kre */
-  if (strncasecmp(command, "IDENTIFY", 8))
+  if (ircncmp(command, "IDENTIFY", 8))
     stripformatsymbols(av[3]);
 
   if (RestrictedAccess)
@@ -1008,9 +1035,7 @@ s_privmsg(int ac, char **av)
 
     if (lptr)
     {
-      sprintf(chkstr, "*!%s@%s",
-        lptr->username,
-        lptr->hostname);
+      ircsprintf(chkstr, "*!%s@%s", lptr->username, lptr->hostname);
       if (OnIgnoreList(chkstr))
         return;
     }
@@ -1019,7 +1044,7 @@ s_privmsg(int ac, char **av)
 
   if ((tmp = strchr(av[2], '@')))
   {
-    if (!strcasecmp(tmp + 1, Me.name))
+    if (!irccmp(tmp + 1, Me.name))
       *tmp = '\0';
   }
 
@@ -1031,10 +1056,10 @@ s_privmsg(int ac, char **av)
     {
       lptr->messages++;
       if (!lptr->msgs_ts[0])
-        lptr->msgs_ts[0] = time(NULL);
+        lptr->msgs_ts[0] = current_ts;
       else
       {
-        lptr->msgs_ts[1] = time(NULL);
+        lptr->msgs_ts[1] = current_ts;
         if (lptr->messages == FloodCount)
         {
           lptr->messages = 0;
@@ -1092,7 +1117,7 @@ s_privmsg(int ac, char **av)
           else
           {
             lptr->messages = 1;
-            lptr->msgs_ts[0] = time(NULL);
+            lptr->msgs_ts[0] = current_ts;
           }
         }
         else
@@ -1104,7 +1129,7 @@ s_privmsg(int ac, char **av)
              * reset everything
              */
             lptr->messages = 1;
-            lptr->msgs_ts[0] = time(NULL);
+            lptr->msgs_ts[0] = current_ts;
           }
         }
       }
@@ -1223,24 +1248,28 @@ s_squit(int ac, char **av)
 
   /* If we defined more info on split, we will not delete
    * non-intentionally splitted servers from hash -kre */
+
 #ifndef SPLIT_INFO
   DeleteServer(sptr); /* delete server from list */
 #else
+
   /* Iterate all server list. Enter split_ts for both splitted hub and his
    * leaves. NULLify uplinks for splitted leaves if there are any -kre */
   for (tmpserv=ServerList; tmpserv; tmpserv=tmpserv->next)
   {
     if (tmpserv->uplink==sptr || tmpserv==sptr)
     {
-      tmpserv->uplink=NULL;
-      tmpserv->split_ts=time(NULL);
-      tmpserv->connect_ts=0;
+
 #ifdef EXTRA_SPLIT_INFO
       /* This could spawn too much messages -kre */
       SendUmode(OPERUMODE_L,
         "*** Netsplit: %s (hub: %s)", tmpserv->name,
         tmpserv->uplink ? tmpserv->uplink->name : "*unknown*");
 #endif
+
+      tmpserv->uplink = NULL;
+      tmpserv->split_ts = current_ts;
+      tmpserv->connect_ts = 0;
     }
   }
 #endif
@@ -1287,13 +1316,22 @@ s_quit(int ac, char **av)
       if (nptr->lastqmsg)
         MyFree(nptr->lastqmsg);
       nptr->lastqmsg = MyStrdup(av[2] + 1);
+      nptr->lastseen = current_ts;
     }
   }
 #endif /* NICKSERVICES */
 
 #ifdef SEENSERVICES
-  es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1, time(NULL), 1);
+  es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1,
+      current_ts, 1);
 #endif /* SEENSERVICES */
+
+#ifdef ADVFLOOD
+#if 0
+  if (lptr->server != Me.sptr)
+#endif
+  	updateConnectTable(lptr->username, lptr->hostname);
+#endif /* ADVFLOOD */
 
   DeleteClient(lptr); /* delete user */
 } /* s_quit() */
@@ -1394,23 +1432,22 @@ s_kill(int ac, char **av)
 
     if (lptr)
     {
-      putlog(LOG1,
-        "%s was killed by %s!%s@%s, re-initializing",
-        av[2],
-        lptr->nick,
-        lptr->username,
-        lptr->hostname);
+      putlog(LOG1, "%s was killed by %s!%s@%s, re-initializing", av[2],
+          lptr->nick, lptr->username, lptr->hostname);
+
+#ifdef SERVICES_FIGHT_FIX
+      CheckServCollide(lptr->server);
+#endif /* SERVICES_FIGHT_FIX */
+
     }
     else
     {
       putlog(LOG1,
         "%s was killed by %s (nick collide), re-initializing",
-        av[2],
-        who);
+        av[2], who);
 
       toserv(":%s KILL %s :%s\n",
-        Me.name,
-        av[2],
+        Me.name, av[2],
         "Attempt to Nick Collide Services");
 
       if (Me.sptr)
@@ -1431,7 +1468,7 @@ s_kill(int ac, char **av)
      * Me.osptr a new value, where serviceptr would be
      * the old value
      */
-    if (!strcasecmp(av[2], n_OperServ))
+    if (!irccmp(av[2], n_OperServ))
     {
       struct Chanlist *tempchan;
       struct Channel *chptr;
@@ -1450,7 +1487,7 @@ s_kill(int ac, char **av)
     /*
      * If ChanServ was killed, rejoin all it's channels
      */
-    else if (!strcasecmp(av[2], n_ChanServ))
+    else if (!irccmp(av[2], n_ChanServ))
       cs_RejoinChannels();
 
   #endif
@@ -1610,7 +1647,8 @@ s_sjoin(int ac, char **av)
         */
        modes[MAXLINE];
   char **line,
-       **nicks; /* array of SJOINing nicknames */
+       **nicks, /* array of SJOINing nicknames */
+       *oldnick;
   time_t CurrTime; /* current TS if its a new channel */
   struct Channel *cptr, *oldptr;
   int ncnt, /* number of SJOINing nicks */
@@ -1622,7 +1660,7 @@ s_sjoin(int ac, char **av)
   int ii;
 #endif
 
-  if (!strcasecmp(av[1], "JOIN"))
+  if (!irccmp(av[1], "JOIN"))
   {
     char *chan;
 
@@ -1631,14 +1669,11 @@ s_sjoin(int ac, char **av)
 
     chan = (*av[2] == ':') ? av[2] + 1 : av[2];
 
-    CurrTime = time(NULL);
+    CurrTime = current_ts;
 
     /* kludge for older ircds that don't use SJOIN */
-    sprintf(sendstr, ":%s SJOIN %ld %s + :%s",
-      currenthub->realname,
-      (long) CurrTime,
-      chan,
-      av[0]);
+    ircsprintf(sendstr, ":%s SJOIN %ld %s + :%s",
+      currenthub->realname, (long) CurrTime, chan, av[0]);
 
     SplitBuf(sendstr, &line);
     SplitBuf(av[0], &nicks);
@@ -1695,20 +1730,25 @@ s_sjoin(int ac, char **av)
    * names list *should* start with a :, if it doesn't, there's a
    * limit and/or key 
    */
-  if (av[5][0] != ':')
+  if (av[mcnt][0] != ':')
   {
     strcat(modes, " ");
-    strcat(modes, av[5]);
+    strcat(modes, av[mcnt]);
     mcnt++;
-    if (av[6][0] != ':')
+    if (av[mcnt][0] != ':') /* XXX - same code, rewrite it! -kre */
     {
       strcat(modes, " ");
-      strcat(modes, av[6]);
+      strcat(modes, av[mcnt]);
       mcnt++;
     }
   }
 
   ncnt = SplitBuf(av[mcnt] + 1, &nicks);
+
+  /* Safety check - if we got no nicknames, that is non-valid blank SJOIN
+   * and we should silently ignore it kre */
+  if (!ncnt)
+    return;
 
   /*
    * when a user joins the channel "0", they get parted from all their
@@ -1735,6 +1775,10 @@ s_sjoin(int ac, char **av)
   } /* if (*av[3] == '0') */
 
   oldptr = FindChannel(av[3]);
+  oldnick = GetNick(nicks[0]);
+  assert(oldnick != NULL); /* We should always know at least _first_
+                              nickname from list, since there would be no
+                              sjoin otherwise -kre */
 
   if (SafeConnect)
   {
@@ -1746,12 +1790,12 @@ s_sjoin(int ac, char **av)
       SendUmode(OPERUMODE_J,
         "*** New channel: %s (created by %s)",
         av[3],
-        GetNick(nicks[0]));
+        oldnick);
     } /* if (!oldptr) */
     else
       SendUmode(OPERUMODE_J,
         "*** Channel join: %s (%s)",
-        GetNick(nicks[0]),
+        oldnick,
         oldptr->name);
   }
 
@@ -1774,7 +1818,9 @@ s_sjoin(int ac, char **av)
       struct ChannelUser *tempuser;
       struct UserChannel *tempchan;
       struct ChannelBan *nextban;
+#ifdef GECOSBANS
       struct ChannelGecosBan *nextgecosban;
+#endif /* GECOSBANS */
 
       /*
        * if the TS given in the SJOIN is less than the recorded 
@@ -1799,7 +1845,8 @@ s_sjoin(int ac, char **av)
         cptr->firstban = nextban;
       }
 
-     /* clear all bans */
+#ifdef GECOSBANS
+     /* clear all gecos bans */
       while (cptr->firstgecosban)
       {
         nextgecosban = cptr->firstgecosban->next;
@@ -1809,6 +1856,7 @@ s_sjoin(int ac, char **av)
         MyFree(cptr->firstgecosban);
         cptr->firstgecosban = nextgecosban;
       }
+#endif /* GECOSBANS */
 
       for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
       {
@@ -1823,6 +1871,16 @@ s_sjoin(int ac, char **av)
           if (tempchan)
             tempchan->flags &= ~CH_OPPED;
         }
+#ifdef HYBRID7
+        /* Yeps, do same for halfops -Janus */
+        if (tempuser->flags & CH_HOPPED)
+        {
+          tempuser->flags &= ~CH_HOPPED;
+          tempchan = FindChannelByUser(tempuser->lptr, cptr);
+          if (tempchan)
+            tempchan->flags &= ~CH_HOPPED;
+        }        
+#endif /* HYBRID7 */
         if (tempuser->flags & CH_VOICED)
         {
           tempuser->flags &= ~CH_VOICED;
@@ -2024,7 +2082,7 @@ s_whois(int ac, char **av)
 
   if (isoper)
   {
-    toserv(":%s 313 %s %s :is madly feared (is an IRC Operator)\n",
+    toserv(":%s 313 %s %s :is Network Service daemon\n",
       Me.name,
       who,
       serviceptr->nick);
@@ -2061,7 +2119,7 @@ s_trace(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(av[2] + 1, Me.name) != 0)
+  if (irccmp(av[2] + 1, Me.name) != 0)
     return;
 
   isoper = strchr(ServiceUmodes, 'o');
@@ -2120,7 +2178,7 @@ s_version(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
+  if (irccmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
     return;
 
   if (av[0][0] == ':')
@@ -2132,7 +2190,7 @@ s_version(int ac, char **av)
     "*** Remote version query requested by %s",
     who);
 
-  toserv(":%s 351 %s HybServ-%s. %s :TS3\n",
+  toserv(":%s 351 %s HybServ2-%s. %s :TS3\n",
     Me.name,
     who,
     hVersion,
@@ -2159,7 +2217,7 @@ s_motd(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
+  if (irccmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
     return;
 
   if (av[0][0] == ':')
@@ -2194,7 +2252,7 @@ s_motd(int ac, char **av)
       continue;
     }
 
-    final = Substitute((char *) NULL, line, NODCC);
+    final = Substitute(NULL, line, NODCC);
     if (final && (final != (char *) -1))
     {
       toserv(":%s 372 %s :- %s\n",
@@ -2280,7 +2338,7 @@ s_pong(int ac, char **av)
     return;
 
   GetTime(&pong_t);
-  currts = time(NULL);
+  currts = current_ts;
 
   /*
    * Now set delta variables to the delta given by
@@ -2343,9 +2401,14 @@ s_pong(int ac, char **av)
           servptr->name,
           timeago(MaxPing, 3));
 
+#if 0
         toserv("SQUIT %s :ReRouting (current lag: %5.4f seconds)\n",
           servptr->name,
           servptr->ping);
+#endif
+        toserv(":%s ERROR :Rerouting (lag: %5.4f seconds)\n",
+            Me.name, servptr->ping);
+        toserv(":%s QUIT\n", Me.name);
 
         close(HubSock);
         ClearUsers();
@@ -2366,3 +2429,47 @@ s_pong(int ac, char **av)
 } /* s_pong() */
 
 #endif /* STATSERVICES */
+
+#ifdef SERVICES_FIGHT_FIX
+/* This is preliminary version of the code, I will work on this later. It
+ * will probably have jupe/etc.. options -kre */
+static void CheckServCollide(struct Server *bad_server)
+{
+ 
+  /* Check if those two options are set at all */
+  if (MaxServerCollides && MinServerCollidesDelta)
+  {
+    /* If this is first collide TS */
+    if (!ServerCollidesTS)
+    {
+      ServerCollidesTS = current_ts;
+      return;
+    }
+    
+    /* Check if collides went over top */
+    if (ServerCollides >= MaxServerCollides)
+    {
+      /* When was first collide? */ 
+      if (current_ts - ServerCollidesTS < MinServerCollidesDelta)
+      {
+        char note1[] = "Detected services fight from %s";
+        char *reason = MyMalloc(sizeof(note1) + sizeof(bad_server->name));
+        ircsprintf(reason, note1, bad_server->name);
+        
+        SendUmode(OPERUMODE_Y, reason);
+        DoShutdown(NULL, reason);
+      }
+      else
+      {
+        /* We had some collides but they are slower than expected, so
+         * reset counter and timestamp */
+        ServerCollides = 0;
+        ServerCollidesTS = current_ts;
+        return;
+      }
+    }
+
+    ServerCollides++;
+  }
+}
+#endif /* SERVICES_FIGHT_FIX */

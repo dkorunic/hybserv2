@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -21,7 +23,6 @@
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hash.h"
 #include "hybdefs.h"
 #include "log.h"
@@ -30,7 +31,16 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
+
+#ifdef HAVE_SOLARIS_THREADS
+#include <thread.h>
+#include <synch.h>
+#else
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+#endif
 
 extern char *crypt();
 
@@ -91,6 +101,67 @@ struct aService ServiceBots[] = {
   { 0, 0, 0, 0 }
 };
 
+#ifdef CRYPT_PASSWORDS
+static char saltChars[] = "abcdefghijklmnopqrstuvwxyz"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "0123456789./";
+#endif /* CRYPT_PASSWORDS */
+
+#ifdef CRYPT_PASSWORDS
+/* This specific parts of code are from Hybrid7 mkpasswd tool. Nelson
+ * Minar (minar@reed.edu) wrote the original tool, and Hybrid7 team did
+ * MD5. -kre */
+char *hybcrypt(char *source, char *oldpass)
+{
+  char *salt;
+
+  if (UseMD5)
+    salt = make_md5_salt();
+  else
+    salt = make_des_salt();
+
+  /* We don't do anything with oldpass, we could randomize a bit and feed
+   * it as salt, but hey, we have wonderful random() -kre */
+
+  return crypt(source, salt);
+}
+
+char *make_des_salt()
+{
+  static char salt[3];
+  char *saltptr = salt;
+
+  /* Saltify */
+  salt[0] = saltChars[random() % 64];
+  salt[1] = saltChars[random() % 64];
+  salt[2] = '\0';
+
+  return saltptr;
+}
+
+char *make_md5_salt()
+{
+  static char salt[13];
+  int i;
+  char *saltptr = salt;
+
+  /* This is for setup of modular crypt -kre */
+  salt[0] = '$';
+  salt[1] = '1';
+  salt[2] = '$';
+
+  /* Saltify */
+  for (i = 3; i <= 10; i++)
+    salt[i] = saltChars[random() % 64];
+
+  /* And properly finish modular crypt salt string -kre */
+  salt[11] = '$';
+  salt[12] = '\0';
+
+  return saltptr;
+}
+#endif /* CRYPT_PASSWORDS */
+
 /*
 debug()
   Output a debug message to stderr
@@ -116,17 +187,16 @@ debug(char *format, ...)
 
 {
   va_list args;
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
   /* send the string to +d users */
-  SendUmode(OPERUMODE_D, "DEBUG: %s",
-    buf);
+  SendUmode(OPERUMODE_D, "DEBUG: %s", buf);
 } /* debug() */
 
 #endif /* DEBUGMODE */
@@ -140,13 +210,13 @@ void
 fatal(int keepgoing, char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   va_list args;
   int oldlev;
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -180,13 +250,13 @@ void
 notice(char *from, char *nick, char *format, ...)
 
 {
-  char finalstr[MAXLINE];
+  char finalstr[MAXLINE * 2];
   char who[MAXLINE];
   va_list args;
 
   va_start(args, format);
 
-  vSnprintf(finalstr, sizeof(finalstr), format, args);
+  vsprintf_irc(finalstr, format, args);
 
   if (ServerNotices)
     strcpy(who, Me.name);
@@ -232,21 +302,28 @@ DoShutdown(char *who, char *reason)
   if (reason)
   {
     if (who)
-      sprintf(sendstr, "%s (authorized by %s)", reason, who);
+      ircsprintf(sendstr, "%s (authorized by %s)", reason, who);
     else
       strcpy(sendstr, reason);
   }
   else
     if (who)
-      sprintf(sendstr, "Authorized by %s", who);
+      ircsprintf(sendstr, "Authorized by %s", who);
     else
       sendstr[0] = '\0';
 
+  putlog(LOG1, sendstr);
+
+#if 0
   toserv(":%s QUIT :%s\nSQUIT %s :%s\n",
     n_OperServ,
     "Shutting Down",
     currenthub->realname ? currenthub->realname : currenthub->hostname,
     sendstr);
+#endif
+  /* Instead of SQUIT -kre */
+  toserv(":%s ERROR :Shutting down\n", Me.name);
+  toserv(":%s QUIT\n", Me.name);
   
 #ifdef DEBUG
     /* This can be useful in debug mode -kre */
@@ -257,6 +334,8 @@ DoShutdown(char *who, char *reason)
     ClearHashes(0);
 #endif
 
+  /* HMmh! exit(1) should be called from main() to ensure proper threading
+   * system termination. Fix this. -kre */
   exit(1);
 } /* DoShutdown() */
 
@@ -286,11 +365,9 @@ HostToMask (char *username, char *hostname)
       len;
 
   if (!username || !hostname)
-    return ((char *) NULL);
+    return (NULL);
 
-  sprintf(userhost, "%s@%s",
-    username,
-    hostname);
+  ircsprintf(userhost, "%s@%s", username, hostname);
 
   len = strlen(userhost) + 32;
 
@@ -367,7 +444,7 @@ HostToMask (char *username, char *hostname)
        * copy the ip address (except the last .XXX) into the 
        * right spot in 'final'
        */
-      Strncpy(final + ii, host, temp - host);
+      strncpy(final + ii, host, temp - host);
 
       /* stick a .* on the end :-) */
       ii += (temp - host);
@@ -416,7 +493,7 @@ HostToMask (char *username, char *hostname)
        * Check if there is another period in topsegment,
        * and if so use it. Otherwise use realhost
        */
-      sprintf(final + ii, "*%s", 
+      ircsprintf(final + ii, "*%s", 
         strchr(topsegment + 1, '.') ? topsegment : realhost);
     }
   }
@@ -570,7 +647,7 @@ Substitute(char *nick, char *str, int sockfd)
           else if (lptr)
             tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
           else
-            tempuser = GetUser(1, nick, (char *) NULL, (char *) NULL);
+            tempuser = GetUser(1, nick, NULL, NULL);
 
           if ((CheckAccess(tempuser, flag)))
           {
@@ -617,7 +694,7 @@ Substitute(char *nick, char *str, int sockfd)
   else
   {
     MyFree(finalstr);
-    return ((char *) NULL);
+    return (NULL);
   }
 } /* Substitute() */
 
@@ -638,7 +715,7 @@ GetService(char *name)
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
   {
-    if (!strcasecmp(name, *(sptr->name)))
+    if (!irccmp(name, *(sptr->name)))
       return (*(sptr->lptr));
   }
 
@@ -682,6 +759,7 @@ pwmatch(char *password, char *chkpass)
 {
 #ifdef CRYPT_PASSWORDS
   char *encr;
+  int cmpresult;
 #endif
 
   if (!password || !chkpass)
@@ -689,10 +767,16 @@ pwmatch(char *password, char *chkpass)
 
 #ifdef CRYPT_PASSWORDS
 
-  encr = (char *) crypt(chkpass, password);
+  encr = crypt(chkpass, password);
   assert(encr != 0);
 
-  if (!strcmp(encr, password))
+  cmpresult = strcmp(encr, password);
+
+#ifdef BORKPASSWD
+  memset(chkpass, 0, strlen(chkpass));
+#endif /* BORKPASSWD */
+
+  if (!cmpresult)
     return 1;
   else
     return 0;
@@ -719,6 +803,7 @@ operpwmatch(char *password, char *chkpass)
 {
 #ifdef CRYPT_OPER_PASSWORDS
   char *encr;
+  int cmpresult;
 #endif
 
   if (!password || !chkpass)
@@ -726,10 +811,16 @@ operpwmatch(char *password, char *chkpass)
 
 #ifdef CRYPT_OPER_PASSWORDS
 
-  encr = (char *) crypt(chkpass, password);
+  encr = crypt(chkpass, password);
   assert(encr != 0);
 
-  if (!strcmp(encr, password))
+  cmpresult = strcmp(encr, password);
+
+#ifdef BORKPASSWD
+  memset(chkpass, 0, strlen(chkpass));
+#endif /* BORKPASSWD */
+
+  if (!cmpresult)
     return 1;
   else
     return 0;
@@ -763,7 +854,7 @@ IsInNickArray(int nickcnt, char **nicks, char *nickname)
     if (!ntmp)
       continue;
 
-    if (!strcasecmp(ntmp, nickname))
+    if (!irccmp(ntmp, nickname))
       return (1);
   }
 
@@ -831,7 +922,7 @@ GetCommand(struct Command *cmdlist, char *name)
   clength = strlen(name);
   for (cmdptr = cmdlist; cmdptr->cmd; cmdptr++)
   {
-    if (!strncasecmp(name, cmdptr->cmd, clength))
+    if (!ircncmp(name, cmdptr->cmd, clength))
     {
       if (clength == strlen(cmdptr->cmd))
       {
@@ -911,3 +1002,4 @@ int checkforproc( char* source )
         return 0;
   
 }
+

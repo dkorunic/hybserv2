@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -22,6 +24,7 @@
 #include "misc.h"
 #include "settings.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 /*
  * These variables, or directives, are set by parsing
@@ -141,7 +144,7 @@ long      NickRegDelay;
 int       MaxLinks;
 int       AllowKillProtection;
 int       AllowKillImmed;
-int	  AllowGuardChannel;
+int	      AllowGuardChannel;
 
 int       MaxChansPerUser;
 int       MaxAkicks;
@@ -149,6 +152,7 @@ long      InhabitTimeout;
 int       AllowAccessIfSOp;
 int       RestrictRegister;
 int       GiveNotice;
+long      MaxTSDelta;
 
 int       MaxMemos;
 long      MemoPurgeFreq;
@@ -158,6 +162,11 @@ long      MaxPing;
 
 int       GlobalNotices;
 int       SeenMaxRecs;
+
+int       UseMD5;
+
+int       MaxServerCollides;
+long      MinServerCollidesDelta;
 
 static void ClearDirectives();
 static int CheckDirectives();
@@ -189,9 +198,9 @@ struct Directive directives[] = {
   { "MemoServDB", D_NORUNTIME,      { { PARAM_STRING, &MemoServDB } } },
   { "StatServDB", D_NORUNTIME,      { { PARAM_STRING, &StatServDB } } },
   { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
- { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
+  { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
 
-  /* Psuedo-Client Nicknames/Idents/Descriptions and Options */
+  /* Pseudo-Client Nicknames/Idents/Descriptions and Options */
   { "OperServNick", D_NORUNTIME,    { { PARAM_STRING, &n_OperServ },
                                       { PARAM_STRING, &id_OperServ },
                                       { PARAM_STRING, &desc_OperServ } } },
@@ -263,6 +272,7 @@ struct Directive directives[] = {
   { "LogLevel", D_REQUIRED,         { { PARAM_INT, &LogLevel } } },
   { "MaxLogs", D_OPTIONAL,          { { PARAM_INT, &MaxLogs } } },
   { "MaxModes", D_NORUNTIME,        { { PARAM_INT, &MaxModes } } },
+  { "MaxTSDelta", D_OPTIONAL,       { { PARAM_TIME, &MaxTSDelta } } },
 
   /* SeenServ Configuration */
   { "SeenMaxRecs", D_REQUIRED,      { { PARAM_INT, &SeenMaxRecs } } },
@@ -316,6 +326,9 @@ struct Directive directives[] = {
 
   /* Global Configuration */
   { "GlobalNotices", D_OPTIONAL,    { { PARAM_SET, &GlobalNotices } } },
+  { "UseMD5", D_OPTIONAL,           { { PARAM_SET, &UseMD5 } } },
+  { "MaxServerCollides", D_OPTIONAL,{ { PARAM_INT, &MaxServerCollides } } },
+  { "MinServerCollidesDelta", D_OPTIONAL,{ { PARAM_TIME, &MinServerCollidesDelta } } },
 
   { 0, 0,                           { { 0, 0 } } }
 };
@@ -355,13 +368,13 @@ ClearDirectives(int rehash)
       {
         case PARAM_STRING:
         {
-          *(char **) tmp->param[ii].ptr = (char *) NULL;
+          *(char **) tmp->param[ii].ptr = NULL;
           break;
         }
 
         case PARAM_TIME:
         {
-          *(long **) tmp->param[ii].ptr = (long *) NULL;
+          *(long **) tmp->param[ii].ptr = NULL;
           break;
         }
 
@@ -369,7 +382,7 @@ ClearDirectives(int rehash)
         case PARAM_SET:
         case PARAM_PORT:
         {
-          *(int *) tmp->param[ii].ptr = (int) NULL;
+          *(int *) tmp->param[ii].ptr = 0;
           break;
         }
 
@@ -491,7 +504,7 @@ FindDirective(char *directive)
     return (NULL);
 
   for (tmp = directives; tmp->name; tmp++)
-    if (!strcasecmp(directive, tmp->name))
+    if (!irccmp(directive, tmp->name))
       return (tmp);
 
   return (NULL);
@@ -636,17 +649,30 @@ dparse(char *line, int linenum, int rehash)
     if ((dptr->param[ii].type != PARAM_SET) && (pcnt >= larc))
     {
       fatal(1, "%s:%d Not enough arguements to [%s] directive",
-        SETPATH,
-        linenum,
-        dptr->name);
+        SETPATH, linenum, dptr->name);
       return (0);
     }
+
+#if 0
+    /*
+     * There should be code which check for too many arguments for
+     * PARAM_SET - because of bugs in previous HybServ1 code I am leaving
+     * this code under undef, but it _should_ go into distribution once.
+     * However, I don't wont to break old `save -conf' files. -kre
+     */
+     if ((dptr->param[ii].type == PARAM_SET) && (pcnt > 1))
+     {
+        fatal(1, "%s:%d Too many arguments for [%s] directive",
+          SETPATH, linenum, dptr->name);
+        return 0;
+     }
+#endif
 
     switch (dptr->param[ii].type)
     {
       case PARAM_STRING:
       {
-        if ((*(char **) dptr->param[ii].ptr) != (char *) NULL)
+        if ((*(char **) dptr->param[ii].ptr) != NULL)
         {
           /*
            * If this is a rehash, make sure we free the old
@@ -781,7 +807,7 @@ LoadSettings(int rehash)
   int goodread;
   int cnt;
 
-  if ((fp = fopen(SETPATH, "r")) == (FILE *) NULL)
+  if ((fp = fopen(SETPATH, "r")) == NULL)
   {
     fprintf(stderr, "Unable to open SETPATH (%s)\n",
       SETPATH);
@@ -838,18 +864,20 @@ SaveSettings()
 Return: 1 if successful
         0 if not
 */
-
-int
-SaveSettings()
-
+int SaveSettings()
 {
   FILE *fp;
   struct Directive *dptr;
   int ii;
   char buffer[MAXLINE],
-       tmp[MAXLINE];
+       tmp[MAXLINE],
+       tempname[MAXLINE];
 
-  if (!(fp = fopen(SETPATH, "w")))
+  /* MMkay, this should write safe config files so that they won't get
+   * b0rked if something happens when writing. -kre */
+  ircsprintf(tempname, "%s.tmp", SETPATH);
+  
+  if (!(fp = fopen(tempname, "w")))
   {
     putlog(LOG1,
       "SaveSettings(): Unable to open %s: %s",
@@ -860,7 +888,7 @@ SaveSettings()
 
   for (dptr = directives; dptr->name; dptr++)
   {
-    buffer[0] = '\0';
+    buffer[0] = 0;
     for (ii = 0; ii < PARAM_MAX; ii++)
     {
       if (!dptr->param[ii].type)
@@ -870,16 +898,20 @@ SaveSettings()
       {
         case PARAM_STRING:
         {
-          sprintf(tmp, "\"%s\" ",
-            *(char **) dptr->param[ii].ptr);
-          strcat(buffer, tmp);
+          /* Try to write out string only if non-null, ie is set -kre */
+          if (*(char **)dptr->param[ii].ptr)
+          {
+            ircsprintf(tmp, "\"%s\" ",
+              *(char **) dptr->param[ii].ptr);
+            strcat(buffer, tmp);
+          }
 
           break;
         } /* case PARAM_STRING */
 
         case PARAM_TIME:
         {
-          sprintf(tmp, "%s ",
+          ircsprintf(tmp, "%s ",
             timeago(*(long *) dptr->param[ii].ptr, 4));
           strcat(buffer, tmp);
 
@@ -889,8 +921,7 @@ SaveSettings()
         case PARAM_INT:
         case PARAM_PORT:
         {
-          sprintf(tmp, "%d ",
-            *(int *) dptr->param[ii].ptr);
+          ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
           strcat(buffer, tmp);
 
           break;
@@ -900,13 +931,27 @@ SaveSettings()
         {
           /*
            * Only write out SETs if they are non null
+           *
+           * IMHO if dptr->param[ii].type == PARAM_SET there is no reason
+           * to write numeric value because it is ignored in the first
+           * way.
+           * -kre
            */
           if (*(int *) dptr->param[ii].ptr)
           {
-            sprintf(tmp, "%d ",
+#if 0
+            ircsprintf(tmp, "%d ",
               *(int *) dptr->param[ii].ptr);
             strcat(buffer, tmp);
+#endif
+            /* Fill in buffer.. */
+            strcat(buffer, " ");
+            /* and then do continue -kre */
           }
+          else
+            /* Any of SETs in param[] was empty, so there is no need to
+             * write directive -kre */
+            buffer[0] = 0;
 
           break;
         } /* case PARAM_SET */
@@ -920,6 +965,8 @@ SaveSettings()
   }
 
   fclose(fp);
+
+  rename(tempname, SETPATH);
 
   return 1;
 } /* SaveSettings() */

@@ -9,10 +9,15 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "channel.h"
@@ -28,7 +33,6 @@
 #include "server.h"
 #include "settings.h"
 #include "statserv.h"
-#include "Strn.h"
 
 /*
  * Global - linked list of clients
@@ -85,7 +89,7 @@ UpdateUserModes(struct Luser *user, char *modes)
       #ifdef STATSERVICES
         char *hostname, *domain;
         struct HostHash *hosth, *domainh;
-        time_t currtime = time(NULL);
+        time_t currtime = current_ts;
       #endif
 
       #ifdef NICKSERVICES
@@ -106,7 +110,7 @@ UpdateUserModes(struct Luser *user, char *modes)
         if (Network->TotalOperators > Network->MaxOperators)
         {
           Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = time(NULL);
+          Network->MaxOperators_ts = current_ts;
 
           if ((Network->MaxOperators % 5) == 0)
           {
@@ -119,7 +123,7 @@ UpdateUserModes(struct Luser *user, char *modes)
         if (Network->TotalOperators > Network->MaxOperatorsT)
         {
           Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = time(NULL);
+          Network->MaxOperatorsT_ts = current_ts;
         }
       #endif
 
@@ -131,7 +135,7 @@ UpdateUserModes(struct Luser *user, char *modes)
           if (user->server->numopers > user->server->maxopers)
           {
             user->server->maxopers = user->server->numopers;
-            user->server->maxopers_ts = time(NULL);
+            user->server->maxopers_ts = current_ts;
           }
         #endif
         }
@@ -218,10 +222,10 @@ AddClient(char **line)
 
   memset(tempuser, 0, sizeof(struct Luser));
 
-  Strncpy(tempuser->nick, line[1], NICKLEN);
-  Strncpy(tempuser->username, line[5], USERLEN);
-  Strncpy(tempuser->hostname, line[6], HOSTLEN);
-  Strncpy(tempuser->realname, line[8] + 1, REALLEN);
+  strncpy(tempuser->nick, line[1], NICKLEN);
+  strncpy(tempuser->username, line[5], USERLEN);
+  strncpy(tempuser->hostname, line[6], HOSTLEN);
+  strncpy(tempuser->realname, line[8] + 1, REALLEN);
 
 #else
 
@@ -249,7 +253,7 @@ AddClient(char **line)
     if (tempuser->server->numusers > tempuser->server->maxusers)
     {
       tempuser->server->maxusers = tempuser->server->numusers;
-      tempuser->server->maxusers_ts = time(NULL);
+      tempuser->server->maxusers_ts = current_ts;
     }
   #endif
   }
@@ -288,7 +292,7 @@ AddClient(char **line)
         if (Network->TotalOperators > Network->MaxOperators)
         {
           Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = time(NULL);
+          Network->MaxOperators_ts = current_ts;
 
           if ((Network->MaxOperators % 5) == 0)
           {
@@ -301,7 +305,7 @@ AddClient(char **line)
         if (Network->TotalOperators > Network->MaxOperatorsT)
         {
           Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = time(NULL);
+          Network->MaxOperatorsT_ts = current_ts;
         }
       #endif
 
@@ -313,7 +317,7 @@ AddClient(char **line)
           if (tempuser->server->numopers > tempuser->server->maxopers)
           {
             tempuser->server->maxopers = tempuser->server->numopers;
-            tempuser->server->maxopers_ts = time(NULL);
+            tempuser->server->maxopers_ts = current_ts;
           }
         #endif
         }
@@ -338,7 +342,7 @@ AddClient(char **line)
   if (Network->TotalUsers > Network->MaxUsers)
   {
     Network->MaxUsers = Network->TotalUsers;
-    Network->MaxUsers_ts = time(NULL);
+    Network->MaxUsers_ts = current_ts;
 
     if ((Network->MaxUsers % 10) == 0)
     {
@@ -351,7 +355,7 @@ AddClient(char **line)
   if (Network->TotalUsers > Network->MaxUsersT)
   {
     Network->MaxUsersT = Network->TotalUsers;
-    Network->MaxUsersT_ts = time(NULL);
+    Network->MaxUsersT_ts = current_ts;
   }
 #endif /* STATSERVICES */
 
@@ -417,7 +421,7 @@ DeleteClient(struct Luser *user)
     if (realptr->flags & NS_IDENTIFIED)
     {
       realptr->split_ts = user->since;
-      realptr->whensplit = time(NULL);
+      realptr->whensplit = current_ts;
     }
 
   #endif /* RECORD_SPLIT_TS */
@@ -467,7 +471,7 @@ DeleteClient(struct Luser *user)
     if ((uptr = GetUser(0, user->nick, user->username, user->hostname)))
     {
       uptr->split_ts = user->since;
-      uptr->whensplit = time(NULL);
+      uptr->whensplit = current_ts;
     }
   }
 
@@ -475,7 +479,7 @@ DeleteClient(struct Luser *user)
 
 #ifdef ALLOW_FUCKOVER
   /* check if user was a target of o_fuckover() */
-  CheckFuckoverTarget(user, (char *) NULL);
+  CheckFuckoverTarget(user, NULL);
 #endif
 
   if (user->server)
@@ -573,7 +577,7 @@ GetNick(char *nickname)
   char *final;
 
   if (!nickname)
-    return ((char *) NULL);
+    return (NULL);
 
   final = nickname;
   if (IsNickPrefix(*final))
@@ -669,8 +673,8 @@ IsNickCollide(struct Luser *servptr, char **av)
     else
       user = av[5];
 
-    sameuh = (!strcasecmp(user, servptr->username) &&
-              !strcasecmp(av[6], servptr->hostname));
+    sameuh = (!irccmp(user, servptr->username) &&
+              !irccmp(av[6], servptr->hostname));
 
     if (newts > servptr->since)
     {

@@ -41,23 +41,48 @@ struct Channel;
 #define CS_NOEXPIRE     0x00000200 /* never expires */
 #define CS_GUARD        0x00000400 /* have ChanServ join the channel */
 #define CS_SPLITOPS     0x00000800 /* let people keep ops from splits */
+#define CS_VERBOSE      0x00001000 /* notify chanops for access changes */
+
 
 /* access_lvl[] indices */
-#define CA_AUTODEOP     0
-#define CA_AUTOVOICE    1
-#define CA_CMDVOICE     2
-#define CA_ACCESS       3
-#define CA_CMDINVITE    4
-#define CA_AUTOOP       5
-#define CA_CMDOP        6
-#define CA_CMDUNBAN     7
-#define CA_AKICK        8
-#define CA_CMDCLEAR     9
-#define CA_SET          10
-#define CA_SUPEROP      11
-#define CA_FOUNDER      12
-
-#define CA_SIZE         13 /* number of indices */
+/* We will happily FUBAR old databases by changing this. However, it had
+ * to be done -kre && Janos
+ * PS, I have added upgrade-chan target in Makefile for fixing this
+ * properly - it relies on awk and DefaultAccess as well as ALVL in
+ * chan.db -kre */
+#ifdef HYBRID7
+# define CA_AUTODEOP     0
+# define CA_AUTOVOICE    1
+# define CA_CMDVOICE     2
+# define CA_ACCESS       3
+# define CA_CMDINVITE    4
+# define CA_AUTOHALFOP   5
+# define CA_CMDHALFOP    6
+# define CA_AUTOOP       7
+# define CA_CMDOP        8
+# define CA_CMDUNBAN     9
+# define CA_AKICK        10
+# define CA_CMDCLEAR     11
+# define CA_SET          12
+# define CA_SUPEROP      13
+# define CA_FOUNDER      14
+# define CA_SIZE         15 /* number of indices */
+#else
+# define CA_AUTODEOP     0
+# define CA_AUTOVOICE    1
+# define CA_CMDVOICE     2
+# define CA_ACCESS       3
+# define CA_CMDINVITE    4
+# define CA_AUTOOP       5
+# define CA_CMDOP        6
+# define CA_CMDUNBAN     7
+# define CA_AKICK        8
+# define CA_CMDCLEAR     9
+# define CA_SET          10
+# define CA_SUPEROP      11
+# define CA_FOUNDER      12
+# define CA_SIZE         13 /* number of indices */
+#endif /* HYBRID7 */
 
 struct ChanAccess
 {
@@ -146,12 +171,15 @@ void DeleteChan(struct ChanInfo *cptr);
 void RemFounder(struct Luser *lptr, struct ChanInfo *cptr);
 void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr);
 int HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level);
+void SetDefaultALVL(struct ChanInfo *cptr);
 
 /*
  * Extern declarations
  */
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
+extern struct Channel *ChannelList;
+extern long MaxTSDelta;
 
 #endif /* CHANNELSERVICES */
 

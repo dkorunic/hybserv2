@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -17,6 +19,9 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "channel.h"
@@ -33,6 +38,7 @@
 #include "settings.h"
 #include "seenserv.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 static int CopyFile(char *oldfile, char *newfile);
 
@@ -328,14 +334,14 @@ CreateDatabase(char *name, char *info)
   FILE *fptr;
   time_t currtime;
 
-  if ((fptr = fopen(name, "w")) == (FILE *) NULL)
-    return ((FILE *) NULL);
+  if ((fptr = fopen(name, "w")) == NULL)
+    return (NULL);
 
   /* change the mode to -rw------- */
   chmod(name, 0600);
 
-  currtime = time(NULL);
-  fprintf(fptr, "; HybServ %s - %s - created %s",
+  currtime = current_ts;
+  fprintf(fptr, "; HybServ2 %s - %s - created %s",
     hVersion,
     info,
     ctime(&currtime));
@@ -363,9 +369,7 @@ BackupDatabases(time_t unixtime)
    * First make sure HPath/backup/ exists
    * Notice that %s/backup/something has to be under 512 characters. -kre
    */
-  sprintf(bpath,
-    "%s/backup",
-    HPath);
+  ircsprintf(bpath, "%s/backup", HPath);
   /* Function mkdir() returns -1 on failure -kre */
   if (mkdir(bpath, 0700)==-1)
   {
@@ -383,12 +387,8 @@ BackupDatabases(time_t unixtime)
 
   backup_tm = localtime(&unixtime);
 
-  sprintf(bpath,
-    "%s/backup/%d%02d%02d",
-    HPath,
-    1900 + backup_tm->tm_year,
-    backup_tm->tm_mon + 1,
-    backup_tm->tm_mday);
+  ircsprintf(bpath, "%s/backup/%d%02d%02d", HPath, 1900 +
+      backup_tm->tm_year, backup_tm->tm_mon + 1, backup_tm->tm_mday);
 
   /*
    * Make the directory permissions: drwx------
@@ -408,17 +408,13 @@ BackupDatabases(time_t unixtime)
     }
   }
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    OperServDB);
+  ircsprintf(temp, "%s/%s", bpath, OperServDB);
 
   CopyFile(OperServDB, temp);
 
 #ifdef STATSERVICES
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    StatServDB);
+  ircsprintf(temp, "%s/%s", bpath, StatServDB);
 
   CopyFile(StatServDB, temp);
 
@@ -426,33 +422,25 @@ BackupDatabases(time_t unixtime)
 
 #ifdef NICKSERVICES
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    NickServDB);
+  ircsprintf(temp, "%s/%s", bpath, NickServDB);
 
   CopyFile(NickServDB, temp);
 
 #ifdef CHANNELSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    ChanServDB);
+  ircsprintf(temp, "%s/%s", bpath, ChanServDB);
 
   CopyFile(ChanServDB, temp);
 #endif /* CHANNELSERVICES */
 
 #ifdef MEMOSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    MemoServDB);
+  ircsprintf(temp, "%s/%s", bpath, MemoServDB);
 
   CopyFile(MemoServDB, temp);
 #endif /* MEMOSERVICES */
 
 /* SeenServDB should be backed up too. -kre */
 #ifdef SEENSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    SeenServDB);
+  ircsprintf(temp, "%s/%s", bpath, SeenServDB);
 
   CopyFile(SeenServDB, temp);
 #endif
@@ -534,7 +522,7 @@ WriteOpers()
   char *donestr; /* list of nicks we wrote */
   char temp[MAXLINE];
 
-  sprintf(tempname, "%s.tmp", OperServDB);
+  ircsprintf(tempname, "%s.tmp", OperServDB);
   fp = CreateDatabase(tempname, "OperServ Database");
   if (!fp)
   {
@@ -560,16 +548,13 @@ WriteOpers()
   *donestr = '\0';
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
   {
-    sprintf(temp, "*%s*",
-      tempuser->nick);
+    ircsprintf(temp, "*%s*", tempuser->nick);
     if (match(temp, donestr) == 0)
     {
-      fprintf(fp, "%s %ld\n",
-        tempuser->nick,
-        tempuser->umodes);
-      sprintf(temp, "%s ",
-        tempuser->nick);
-      donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp) + 1);
+      fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+      ircsprintf(temp, "%s ", tempuser->nick);
+      donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
+          + 1);
       strcat(donestr, temp);
     }
   }
@@ -601,7 +586,7 @@ WriteStats()
   FILE *fp;
   char tempname[MAXLINE];
 
-  sprintf(tempname, "%s.tmp", StatServDB);
+  ircsprintf(tempname, "%s.tmp", StatServDB);
   fp = CreateDatabase(tempname, "StatServ Database");
   if (!fp)
   {
@@ -658,7 +643,7 @@ WriteNicks()
   struct NickHost *hptr;
   int islinked;
 
-  sprintf(tempname, "%s.tmp", NickServDB);
+  ircsprintf(tempname, "%s.tmp", NickServDB);
   fp = CreateDatabase(tempname, "NickServ Database");
   if (!fp)
   {
@@ -673,14 +658,12 @@ WriteNicks()
 #ifdef LINKED_NICKNAMES
 
   /*
-   * We have to go through the nicklist to write out all
-   * master entries first, because the leaf entries will
-   * have a ->LINK <master nick>, so the next time the
-   * database is read, we have to make sure we can find
-   * the master nickname entry or we've got problems :-).
-   * Basically, make sure the leaf entries don't get written
-   * out before master entries. Unfortunately, we have
-   * to repeat some code here.
+   * We have to go through the nicklist to write out all master entries
+   * first, because the leaf entries will have a ->LINK <master nick>, so
+   * the next time the database is read, we have to make sure we can find
+   * the master nickname entry or we've got problems :-). Basically, make
+   * sure the leaf entries don't get written out before master entries.
+   * Unfortunately, we have to repeat some code here.
    */
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
@@ -689,9 +672,7 @@ WriteNicks()
     {
       if (nptr->master || !nptr->nextlink)
       {
-        /*
-         * This is not a master nickname
-         */
+        /* This is not a master nickname */
         continue;
       }
 
@@ -704,39 +685,38 @@ WriteNicks()
         (long) nptr->created,
         (long) nptr->lastseen);
 
-      if (!(nptr->flags & NS_FORBID))
+      /* write out password only if not forbidden! -kre */
+      if (nptr->password)
+        fprintf(fp, "->PASS %s\n", nptr->password);
+
+      if (nptr->email)
+        fprintf(fp, "->EMAIL %s\n", nptr->email);
+
+      if (nptr->url)
+        fprintf(fp, "->URL %s\n", nptr->url);
+
+      if (nptr->gsm)
+        fprintf(fp, "->GSM %s\n", nptr->gsm);
+
+      if (nptr->phone)
+        fprintf(fp, "->PHONE %s\n", nptr->phone);
+
+      if (nptr->UIN)
+        fprintf(fp, "->UIN %s\n", nptr->UIN);
+
+      if (LastSeenInfo)
       {
-        /* write out password */
+        if (nptr->lastu && nptr->lasth)
+          fprintf(fp, "->LASTUH %s %s\n", nptr->lastu,
+            nptr->lasth);
 
-        fprintf(fp, "->PASS %s\n",
-          nptr->password);
+        if (nptr->lastqmsg)
+          fprintf(fp, "->LASTQMSG :%s\n", nptr->lastqmsg);
+      }
 
-        if (nptr->email)
-          fprintf(fp, "->EMAIL %s\n",
-          nptr->email);
+      for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+        fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
-        if (nptr->url)
-          fprintf(fp, "->URL %s\n",
-          nptr->url);
-
-        if (LastSeenInfo)
-        {
-          if (nptr->lastu && nptr->lasth)
-            fprintf(fp, "->LASTUH %s %s\n",
-              nptr->lastu,
-              nptr->lasth);
-
-          if (nptr->lastqmsg)
-            fprintf(fp, "->LASTQMSG :%s\n",
-              nptr->lastqmsg);
-        }
-
-        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-
-          fprintf(fp, "->HOST %s\n",
-            hptr->hostmask);
-
-      } /* if (!(nptr->flags & NS_FORBID)) */
     } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
   } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
@@ -772,62 +752,65 @@ WriteNicks()
 
       /* write out "nickname flags created last-seen" to file */
       fprintf(fp, "%s %ld %ld %ld\n",
-        nptr->nick,
-        nptr->flags,
-        (long) nptr->created,
-        (long) nptr->lastseen);
+        nptr->nick, nptr->flags, (long) nptr->created, (long)
+        nptr->lastseen);
 
-      if (!(nptr->flags & NS_FORBID))
+      if (nptr->password)
+        fprintf(fp, "->PASS %s\n", nptr->password);
+
+      if (nptr->email)
+        fprintf(fp, "->EMAIL %s\n", nptr->email);
+
+      if (nptr->url)
+        fprintf(fp, "->URL %s\n", nptr->url);
+
+      if (nptr->gsm)
+        fprintf(fp, "->GSM %s\n", nptr->gsm);
+
+      if (nptr->phone)
+        fprintf(fp, "->PHONE %s\n", nptr->phone);
+
+      if (nptr->UIN)
+        fprintf(fp, "->UIN %s\n", nptr->UIN);
+
+      if (LastSeenInfo)
       {
-        /* write out password */
+        if (nptr->lastu && nptr->lasth)
+          fprintf(fp, "->LASTUH %s %s\n",
+            nptr->lastu,
+            nptr->lasth);
 
-        fprintf(fp, "->PASS %s\n",
-          nptr->password);
+        if (nptr->lastqmsg)
+          fprintf(fp, "->LASTQMSG :%s\n",
+            nptr->lastqmsg);
+      }
 
-        if (nptr->email)
-          fprintf(fp, "->EMAIL %s\n",
-          nptr->email);
+      if (!islinked)
+      {
+        /*
+         * write out hostmasks only if this nickname is
+         * not linked - if it is, the master nickname
+         * (previously written) has the access list
+         */
 
-        if (nptr->url)
-          fprintf(fp, "->URL %s\n",
-          nptr->url);
+        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+          fprintf(fp, "->HOST %s\n",
+            hptr->hostmask);
+      }
 
-        if (LastSeenInfo)
-        {
-          if (nptr->lastu && nptr->lasth)
-            fprintf(fp, "->LASTUH %s %s\n",
-              nptr->lastu,
-              nptr->lasth);
+    #ifdef LINKED_NICKNAMES
 
-          if (nptr->lastqmsg)
-            fprintf(fp, "->LASTQMSG :%s\n",
-              nptr->lastqmsg);
-        }
+#if 0
+      assert(nptr != nptr->master);
+#endif
+      /* Quickfix. Seems unlink is broken atm. But, there is no need to
+       * die here since master was not written because of
+       * nptr->nextlink. Huh. Should fix link copying routines -kre */
+      if ((nptr != nptr->master) && nptr->master)
+        fprintf(fp, "->LINK %s\n",
+          nptr->master->nick);
 
-        if (!islinked)
-        {
-          /*
-           * write out hostmasks only if this nickname is
-           * not linked - if it is, the master nickname
-           * (previously written) has the access list
-           */
-
-          for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-            fprintf(fp, "->HOST %s\n",
-              hptr->hostmask);
-        }
-
-      #ifdef LINKED_NICKNAMES
-
-        assert(nptr != nptr->master);
-
-	if (nptr->master)
-          fprintf(fp, "->LINK %s\n",
-            nptr->master->nick);
-
-      #endif /* LINKED_NICKNAMES */
-
-      } /* if (!(nptr->flags & NS_FORBID)) */
+    #endif /* LINKED_NICKNAMES */
     } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
   } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
@@ -836,8 +819,7 @@ WriteNicks()
   rename(tempname, NickServDB);
 
   putlog(LOG3, "Wrote %s (%d registered nicknames)",
-    NickServDB,
-    ncnt);
+    NickServDB, ncnt);
 
   return (1);
 } /* WriteNicks() */
@@ -859,7 +841,7 @@ WriteChans()
   int ii,
       ccnt;
 
-  sprintf(tempname, "%s.tmp", ChanServDB);
+  ircsprintf(tempname, "%s.tmp", ChanServDB);
   fp = CreateDatabase(tempname, "ChanServ Database");
   if (!fp)
   {
@@ -878,7 +860,7 @@ WriteChans()
       cnext = cptr->next;
 
       if (!GetLink(cptr->founder) &&
-          !(cptr->flags & (CS_FORBID | CS_FORGET)))
+          !(cptr->flags & CS_FORGET))
       {
         /*
          * There is no founder - check if there is a successor.
@@ -932,7 +914,7 @@ WriteChans()
         (long) cptr->created,
         (long) cptr->lastused);
 
-      if (!(cptr->flags & (CS_FORBID | CS_FORGET)))
+      if (!(cptr->flags & CS_FORGET))
       {
         struct ChanAccess *ca;
         struct AutoKick *ak;
@@ -997,7 +979,7 @@ WriteChans()
           fprintf(fp, "->AKICK %s :%s\n",
             stripctrlsymbols(ak->hostmask),
             ak->reason ? stripctrlsymbols(ak->reason) : "");
-      } /* if (!(cptr->flags & (CS_FORBID | CS_FORGET))) */
+      } /* if (!(cptr->flags & CS_FORGET)) */
     } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
   } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
 
@@ -1032,7 +1014,7 @@ WriteMemos()
   struct MemoInfo *mi;
   struct Memo *memoptr;
 
-  sprintf(tempname, "%s.tmp", MemoServDB);
+  ircsprintf(tempname, "%s.tmp", MemoServDB);
   fp = CreateDatabase(tempname, "MemoServ Database");
   if (!fp)
   {
@@ -1269,7 +1251,7 @@ WriteSeen()
   char tempname[MAXLINE];
   aSeen *seen;
 
-  sprintf(tempname, "%s.tmp", SeenServDB);
+  ircsprintf(tempname, "%s.tmp", SeenServDB);
   fp = CreateDatabase(tempname, "SeenServ Database");
   if (!fp)
   {

@@ -9,6 +9,7 @@ For more information on the commands, type
 %+o%bOperator commands:%b
 %+o    CLONES     Display list of clones on the network
 %+g    GLINE      Prevent a user from joining the network 
+%+g    KLINE      Kline a user, if your ircd supports it
 %+o    HTM        Toggle HTM on/off
 %+o    HUB        Display a hub's leaf servers
 %+j    JUPE       Prevent a server from connecting
@@ -34,7 +35,6 @@ For more information on the commands, type
 %+s%bServices Administrator commands:%b
 %+s    DIE        Shutdown services
 %+s    DUMP       Send raw data to hub server
-%+s    FUCKOVER   Activate server flood for a user
 %+s    OFF/ON     (De)activate services
 %+s    REHASH     Reload configuration file
 %+s    RELOAD     Reload nickname/channel/memo/stat databases

@@ -165,7 +165,7 @@ extern  long      NickRegDelay;
 extern  int       MaxLinks;
 extern  int       AllowKillProtection;
 extern  int       AllowKillImmed;
-extern	int	  AllowGuardChannel;
+extern	int	      AllowGuardChannel;
 
 extern  int       MaxChansPerUser;
 extern  int       MaxAkicks;
@@ -182,5 +182,8 @@ extern  long      MaxPing;
 
 extern  int       GlobalNotices;
 extern  int       SeenMaxRecs;
+
+extern  int       MaxServerCollides;
+extern  long      MinServerCollidesDelta;
 
 #endif /* INCLUDED_settings_h */

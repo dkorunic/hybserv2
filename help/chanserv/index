@@ -18,14 +18,18 @@ For more information on a specific command, type
     INFO       Display information for a channel
     INVITE     Invite yourself to a channel
     OP         Op yourself on a channel
+    HALFOP     HalfOp yourself on a channel
     VOICE      Voice yourself on a channel
     UNBAN      Unban yourself on a channel
     CLEAR      Clear various channel modes
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b
-%+a    FORBID     Prevent anyone from using a channel
-%+a    SETPASS    Reset a channel's founder password
-%+a    STATUS     View a user's access level on a channel
-%+a    FORGET     Prevent a channel from being registered
-%+a    NOEXPIRE   Prevent a channel from expiring
+%+a    FORBID      Prevent anyone from using a channel
+%+a    UNFORBID    Reverses FORBID effects
+%+a    SETPASS     Reset a channel's founder password
+%+a    STATUS      View a user's access level on a channel
+%+a    FORGET      Prevent a channel from being registered
+%+a    NOEXPIRE    Prevent a channel from expiring
+%+a    CLEARNOEXP  Clear all noexpire flags for channels
+%+a    RESETLEVELS Reset all channels to default access levels

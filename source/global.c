@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -27,7 +29,7 @@
 #include "nickserv.h"
 #include "operserv.h"
 #include "settings.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 #include "server.h"
 
 #ifdef GLOBALSERVICES
@@ -148,7 +150,7 @@ g_help(struct Luser *lptr, int ac, char **av)
     struct Command *cptr;
 
     for (cptr = globalcmds; cptr->cmd; ++cptr)
-      if (!strcasecmp(av[1], cptr->cmd))
+      if (!irccmp(av[1], cptr->cmd))
         break;
 
     if (cptr->cmd)
@@ -161,7 +163,7 @@ g_help(struct Luser *lptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_Global, lptr->nick, str, NODCC);
   }
@@ -219,7 +221,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
       admins;
   char *message;
   char argbuf[MAXLINE + 1];
-  char temp[MAXLINE + 1];
+  char temp[MAXLINE * 2];
   struct Luser *tempuser;
   struct Userlist *userptr;
 
@@ -241,19 +243,19 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   ops = 0;
   opers = 0;
   admins = 0;
-  message = 0;
+  message = NULL;
 
   for (cnt = 1; cnt < ac; ++cnt)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-all", alen))
+    if (!ircncmp(av[cnt], "-all", alen))
       all = 1;
-    else if (!strncasecmp(av[cnt], "-ops", alen))
+    else if (!ircncmp(av[cnt], "-ops", alen))
       ops = 1;
-    else if (!strncasecmp(av[cnt], "-opers", alen))
+    else if (!ircncmp(av[cnt], "-opers", alen))
       opers = 1;
-    else if (!strncasecmp(av[cnt], "-admins", alen))
+    else if (!ircncmp(av[cnt], "-admins", alen))
       admins = 1;
     else
     {
@@ -286,8 +288,8 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   if (admins)
     strcat(argbuf, "-admins ");
 
-  Snprintf(temp, sizeof(temp) - 1, "%s%s", argbuf, message);
-  Strncpy(argbuf, temp, MAXLINE);
+  ircsprintf(temp, "%s%s", argbuf, message);
+  strncpy(argbuf, temp, MAXLINE);
   argbuf[MAXLINE] = '\0';
 
   RecordCommand("%s: %s!%s@%s GNOTE %s",
@@ -304,7 +306,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     if (FindService(tempuser))
       continue;
 
-    if (!strncasecmp(Me.name, tempuser->server->name, 
+    if (!ircncmp(Me.name, tempuser->server->name, 
         strlen(tempuser->server->name)))
       continue;
 
@@ -345,6 +347,8 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     "Message sent (%d match%s)",
     cnt,
     (cnt == 1) ? "" : "es");
+
+  MyFree(message);
 } /* g_gnote() */
 
 /*
@@ -381,14 +385,14 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  mask = 0;
-  message = 0;
+  mask = NULL;
+  message = NULL;
 
   for (cnt = 1; cnt < ac; ++cnt)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-mask", alen))
+    if (!ircncmp(av[cnt], "-mask", alen))
     {
       if (++cnt >= ac)
       {
@@ -416,15 +420,11 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
   *argbuf = '\0';
 
   if (mask)
-    Snprintf(argbuf, sizeof(argbuf) - 1,
-      "-mask %s ",
-      mask);
+    ircsprintf(argbuf, "-mask %s ", mask);
 
-  Snprintf(temp, sizeof(temp) - 1, "%s%s",
-    argbuf,
-    message);
+  ircsprintf(temp, "%s%s", argbuf, message);
 
-  Strncpy(argbuf, temp, sizeof(argbuf) - 1);
+  strncpy(argbuf, temp, sizeof(argbuf) - 1);
   argbuf[sizeof(argbuf) - 1] = '\0';
 
   RecordCommand("%s: %s!%s@%s GCHANNOTE %s",
@@ -464,6 +464,8 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
     "Channel message sent (%d match%s)",
     cnt,
     (cnt == 1) ? "" : "es");
+
+  MyFree(message);
 } /* g_gchannote() */
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
@@ -501,11 +503,11 @@ g_gmemo(struct Luser *lptr, int ac, char **av)
 		}
 	}
 
-	MyFree(text);
-
 	notice(n_Global, lptr->nick,
 		"Memo sent to %d nicknames",
 		cnt);
+
+	MyFree(text);
 } /* g_gmemo() */
 
 #ifdef CHANNELSERVICES
@@ -543,11 +545,11 @@ g_gcmemo(struct Luser *lptr, int ac, char **av)
 		}
 	}
 
-	MyFree(text);
-
 	notice(n_Global, lptr->nick,
 		"Memo sent to %d channels",
 		cnt);
+
+	MyFree(text);
 } /* g_gcmemo() */
 
 #endif /* CHANNELSERVICES */

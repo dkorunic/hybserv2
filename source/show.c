@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -74,7 +76,7 @@ parseargs(int ac, char *av[])
   int ii;
   long flags;
 
-  Filename = (char *) NULL;
+  Filename = NULL;
   ncidx = 0;
 
   flags = 0;

@@ -9,16 +9,24 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <unistd.h>
 #include <sys/types.h>
-#include <signal.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#ifndef HAVE_CYGWIN
+#include <signal.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "chanserv.h"
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "gline.h"
 #include "hybdefs.h"
@@ -42,6 +50,9 @@
 #endif
 #endif
 
+/* Global timer that will reduce local usage of time() -kre */
+time_t current_ts;
+
 #if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
 
 /*
@@ -50,20 +61,19 @@
 int               GoodTimer = 1;
 
 /*
-p_CheckSignals()
- This thread will continually wait for various signals, and call
-ProcessSignal() appropriately
+ * p_CheckSignals()
+ *
+ * This thread will continually wait for various signals, and call
+ * ProcessSignal() appropriately
 */
 
-void *
-p_CheckSignals()
-
+void *p_CheckSignals()
 {
   sigset_t set;
   int caught;
 
   sigemptyset(&set);
-  sigaddset(&set, SIGINT);
+/*  sigaddset(&set, SIGINT); */
   sigaddset(&set, SIGHUP);
   sigaddset(&set, SIGSEGV);
   sigaddset(&set, SIGBUS);
@@ -91,16 +101,14 @@ p_CheckSignals()
 } /* p_CheckSignals() */
 
 /*
-p_CheckTime()
- This function will be called from a new thread to enter
-an infinite loop and call DoTimer() once every second
+ * p_CheckTime()
+ *
+ * This function will be called from a new thread to enter an infinite
+ * loop and call DoTimer() once every second
 */
-
-void *
-p_CheckTime()
-
+void *p_CheckTime()
 {
-  time_t current_ts = time(NULL);
+  current_ts = time(NULL);
 
   while (1)
   {
@@ -109,9 +117,9 @@ p_CheckTime()
       DoTimer(current_ts);
 
     /*
-     * Every five minutes, reset current_ts to time() in case a
-     * DoTimer() call took over a second, in which case current_ts
-     * will be a little off
+     * Every five minutes, reset current_ts to time() in case a DoTimer()
+     * call took over a second, in which case current_ts will be a little
+     * off
      */
     if ((current_ts % 300) == 0)
       current_ts = time(NULL);
@@ -125,14 +133,12 @@ p_CheckTime()
 #endif /* HAVE_PTHREADS */
 
 /*
-DoTimer()
-  Execute various commands every second - such as checking for 
-expired temp glines etc.
-*/
-
-void
-DoTimer(time_t unixtime)
-
+ * DoTimer()
+ *
+ * Execute various commands every second - such as checking for expired
+ * temp glines etc.
+ */
+void DoTimer(time_t unixtime)
 {
 #ifdef HIGHTRAFFIC_MODE
 
@@ -150,7 +156,7 @@ DoTimer(time_t unixtime)
     if (currload >= (float) ReceiveLoad)
     {
       HTM = 1;
-      HTM_ts = time(NULL);
+      HTM_ts = unixtime;
       putlog(LOG1, "Entering high-traffic mode (%0.2f K/s)",
         currload);
       SendUmode(OPERUMODE_Y,

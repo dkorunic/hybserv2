@@ -1,3 +1,10 @@
+*** 20010811_1 by kreator
+- added TIME_WITH_SYS_TIME check, did proper change of *.c which use
+  time.h
+- modified MyFree() to NULLify argument after free()-ing
+- added new bug -> we've got a new core
+
+
 *** 20010810_2 by kreator
 - put *newer* config.guess and config.sub
 - fixed n_set_uin() issue with non-dissapearing "UIN: " in n_info() output

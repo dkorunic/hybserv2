@@ -1,3 +1,11 @@
+*** 20010516_2 by kreator
+- very large update - juped libString and added irc_sprintf (and co.) from
+  Hybrid7; that gave us additional performance gain; we lost some boundary
+  checking there
+- moved Snprintf to snprintf, etc..
+- fixed misc stuff all around 
+
+
 *** 20010516_1 by kreator
 - quite large update, I rewrote lots of code to make current_ts global,
   which has lowered usage of time() considerably; now we do have services

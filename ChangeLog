@@ -1,3 +1,14 @@
+*** 20010528_4 by kreator
+- misc changes in README
+- add gsm, phone and uin code to nickserv
+- add clearnoexpire for nickserv and chanserv
+- fix statserv index which was missing showstats
+- add set verbose for chanserv
+- fix set url help
+- fix configure
+- added showadmins and showopers
+
+
 *** 20010528_3 by kreator
 - fix autoconf for snprintf
 - remove bogus snprintf from chanserv

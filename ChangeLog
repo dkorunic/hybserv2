@@ -1,3 +1,7 @@
+*** 20010529_1 by kreator
+- fix nickserv set documentation
+
+
 *** 20010528_7 by kreator
 - original IrcBg code had 8 char limit for UIN and dumped it into long:
   since they are larger now, move it into string

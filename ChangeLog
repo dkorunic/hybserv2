@@ -1,3 +1,8 @@
+*** 20010528_1 by kreator
+- get rid of that pesky SIGINT signal handler; i wanted to remove it
+  several times but always forgot
+
+
 *** 20010527_7 by kreator
 - did a _lot_ of fixes in hashing code that was obviously broken for any
   masked server in hash: this should fix all bad hits for such cases

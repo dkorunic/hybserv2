@@ -1,3 +1,7 @@
+*** 20010522_2 by kreator
+- added complete profile in doc/20010519_2-profile.gz
+
+
 *** 20010522_1 by kreator
 - add mySQL/PostgreSQL support in TODO; hopefully someone will join us who
   will independently work on this one

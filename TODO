@@ -5,6 +5,9 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) send all mlock modes on channel creation
+*) detect online services and silently drop out
+*) detect services fighting
 *) trace possible leaks
    NOTE: I've prepared some parts of code for trace -kre
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems

@@ -27,7 +27,6 @@
 {                       \
   if ((x))              \
     free((x));          \
-  x = NULL;             \
 }
 
 #ifdef BLOCK_ALLOCATION

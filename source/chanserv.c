@@ -2494,31 +2494,33 @@ static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
 static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
     *mask, struct NickInfo *nptr)
 {
-  struct ChanAccess *temp;
-  struct NickInfo *master_nptr;
+  struct ChanAccess *temp = NULL;
+  struct NickInfo *master_nptr = NULL;
   int ret = 0, cnt = 0, ulev;
-  int found;
+  int found = 0;
+  int debugcnt = 0;
 
   if (!cptr || !lptr || (!mask && !nptr))
     return 0;
 
-  if (!cptr->access)
+  if (!(cptr->access))
     return 0;
 
   master_nptr = GetMaster(nptr);
 
   ulev = GetAccess(cptr, lptr);
 
-  for (temp = cptr->access; temp; temp = temp->next)
+  for (temp = cptr->access; temp; temp = temp->next, ++debugcnt)
   {
+
     found = 0;
 
     if (master_nptr && temp->nptr && (master_nptr == temp->nptr))
       found = 1;
-
-    if (mask && temp->hostmask)
-      if (match(mask, temp->hostmask))
-        found = 1;
+    else
+      if (mask && temp->hostmask)
+        if (match(mask, temp->hostmask))
+          found = 1;
 
     if (found)
     {
@@ -2537,7 +2539,13 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
       if (master_nptr && temp->acptr)
         DeleteAccessChannel(master_nptr, temp->acptr);
 
+      /* Absolutely swell! Down here temp gets free()d and then referenced
+       * again with temp->next!! Gaah! I've quickfixed it referencing it
+       * back to the original start, ie. cptr->access. -kre */
       DeleteAccess(cptr, temp);
+
+      temp = cptr->access;
+
     } /* if (found) */
   }
   

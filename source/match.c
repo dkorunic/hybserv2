@@ -77,22 +77,27 @@ int match(const char *mask, const char *name)
   int   wild  = 0;
   int   calls = 0;
   int   quote = 0;
-  assert(0 != mask);
-  assert(0 != name);
+
+  assert(mask != NULL);
+  assert(name != NULL);
+
   if (!mask || !name)
     return 0;
-  while (calls++ < MATCH_MAX_CALLS) {
+
+  while (calls++ < MATCH_MAX_CALLS)
+  {
     if (quote)
       quote++;
     if (quote == 3)
       quote = 0;
     if (*m == '\\' && !quote)
-      {
-       m++;
-       quote = 1;
-       continue;
-      }
-    if (!quote && *m == '*') {
+    {
+      m++;
+      quote = 1;
+      continue;
+    }
+    if (!quote && *m == '*')
+    {
       /*
        * XXX - shouldn't need to spin here, the mask should have been
        * collapsed before match is called
@@ -100,19 +105,20 @@ int match(const char *mask, const char *name)
       while (*m == '*')
         m++;
       if (*m == '\\')
-        {
-          m++;
-          /* This means it is an invalid mask -A1kmm. */
-          if (!*m)
-            return 0;
-          quote = 2;
-        }
+      {
+	m++;
+	/* This means it is an invalid mask -A1kmm. */
+	if (!*m)
+	  return 0;
+	quote = 2;
+      }
       wild = 1;
       ma = m;
       na = n;
     }
 
-    if (!*m) {
+    if (!*m)
+    {
       if (!*n)
         return 1;
       if (quote)
@@ -126,7 +132,8 @@ int match(const char *mask, const char *name)
       m = ma;
       n = ++na;
     }
-    else if (!*n) {
+    else if (!*n)
+    {
       /*
        * XXX - shouldn't need to spin here, the mask should have been
        * collapsed before match is called
@@ -143,7 +150,8 @@ int match(const char *mask, const char *name)
       m = ma;
       n = ++na;
     }
-    else {
+    else
+    {
       if (*m)
         m++;
       if (*n)
@@ -164,75 +172,31 @@ collapse(char *pattern)
  char c;
  int f = 0;
 
- if (!p)
+ if (p == NULL)
    return NULL;
  
  while ((c = *p++))
+ {
+   if (!(f & 2) && c == '*')
    {
-    if (!(f & 2) && c == '*')
-      {
-       if (!(f & 1))
-         *po++ = '*';
-       f |= 1;
-      }
-    else if (!(f & 2) && c == '\\')
-      {
-       *po++ = '\\';
-       f |= 2;
-      }
-    else
-      {
-       *po++ = c;
-       f &= ~3;
-      }
+     if (!(f & 1))
+       *po++ = '*';
+     f |= 1;
    }
+   else if (!(f & 2) && c == '\\')
+   {
+     *po++ = '\\';
+     f |= 2;
+   }
+   else
+   {
+     *po++ = c;
+     f &= ~3;
+   }
+ }
  *po++ = 0;
  return pattern;
 }
-
-#if 0
-/*
-** collapse a pattern string into minimal components.
-** This particular version is "in place", so that it changes the pattern
-** which is to be reduced to a "minimal" size.
-*/
-/* collapse - behavior modification (Thomas Helvey <tomh@inxpress.net>)
- * Removed mask escapes, we don't escape wildcards or call match
- * on a mask. This change is somewhat subtle, the old version converted
- * \\*** to \\**, the new version blindly converts it to \\*.
- * Removed code that did a lot of work but achieved nothing, testing
- * showed that the code in test for '?' produced exactly the same results
- * as code that ignored '?'. The only thing you can do with a mask is to
- * remove adjacent '*' characters, attempting anything else breaks the re.
- *
- * collapse - convert adjacent *'s to a single *
- */
-char* collapse(char *pattern)
-{
-  char* s = pattern;
-  char* s1;
-  char* t;
-
-  /*
-   * XXX - null pointers ok?
-   */
-  if (s) {
-    for (; *s; s++) {
-      if ('*' == *s) {
-        t = s1 = s + 1;
-        while ('*' == *t)
-          ++t;
-        if (s1 != t) {
-          while ((*s1++ = *t++))
-            ;
-        }
-      }
-    }
-  }
-  return pattern;
-}
-#endif
-
 
 /*
  * irccmp - case insensitive comparison of two 0 terminated strings.
@@ -246,10 +210,12 @@ int irccmp(const char *s1, const char *s2)
   const unsigned char* str1 = (const unsigned char*) s1;
   const unsigned char* str2 = (const unsigned char*) s2;
   int   res;
-  assert(0 != s1);
-  assert(0 != s2);
 
-  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0) {
+  assert(s1 != NULL);
+  assert(s2 != NULL);
+
+  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+  {
     if (*str1 == '\0')
       return 0;
     str1++;
@@ -263,40 +229,17 @@ int ircncmp(const char* s1, const char *s2, int n)
   const unsigned char* str1 = (const unsigned char*) s1;
   const unsigned char* str2 = (const unsigned char*) s2;
   int res;
-  assert(0 != s1);
-  assert(0 != s2);
+  assert(s1 != NULL);
+  assert(s2 != NULL);
 
-  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0) {
+  while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+  {
     str1++; str2++; n--;
     if (n == 0 || (*str1 == '\0' && *str2 == '\0'))
       return 0;
   }
   return (res);
 }
-
-#if 0
-unsigned long textip_to_ul(const char *ip)
-{
-  unsigned long ipr=0;
-  unsigned int octet=0;
-
-  char c;
-  while((c=*ip)) {
-    if(isdigit((int)c)) {
-      octet *= 10;
-      octet += (*ip & 0xF);
-    } else if(c == '.') {
-      ipr <<= 8;
-      ipr += octet;
-      octet = 0;
-    } else if(c=='/')break;
-    ip++;
-  }
-  ipr <<= 8;
-  ipr += octet;
-  return ipr;
-}
-#endif
 
 const unsigned char ToLowerTab[] = { 
   0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa,
@@ -632,5 +575,3 @@ const unsigned int CharAttrs[] = {
 /* 0xFE */   CHAN_C|NONEOS_C,
 /* 0xFF */   CHAN_C|NONEOS_C
 };
-
-

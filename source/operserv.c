@@ -929,13 +929,8 @@ o_RecordCommand(int sockfd, char *format, ...)
      * If they're using the command via privmsg,
      * use the format: OperServ: nick!user@host COMMAND ...
      */
-    SendUmode(OPERUMODE_S,
-      "%s: %s!%s@%s %s",
-      n_OperServ,
-      onick,
-      ouser,
-      ohost,
-      buffer);
+    SendUmode(OPERUMODE_S, "%s: %s!%s@%s %s", n_OperServ, onick, ouser,
+        ohost, buffer);
   }
   else
   {
@@ -943,10 +938,7 @@ o_RecordCommand(int sockfd, char *format, ...)
      * If they're using the command via dcc chat,
      * use the format: #nick# COMMAND ...
      */
-    SendUmode(OPERUMODE_S,
-      "#%s# %s",
-      onick,
-      buffer);
+    SendUmode(OPERUMODE_S, "#%s# %s", onick, buffer);
   }
 } /* o_RecordCommand() */
 
@@ -972,9 +964,7 @@ o_Wallops(char *format, ...)
   va_end(args);
 
   toserv(":%s WALLOPS :%s: %s\n",
-     Me.name,
-     n_OperServ,
-     buffer);
+     Me.name, n_OperServ, buffer);
 
 } /* o_Wallops() */
 

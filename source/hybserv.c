@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
 #ifndef DEBUGMODE
   int pid; /* pid of this process */
 #endif /* DEBUGMODE */
+
 #ifdef GDB_DEBUG
   int GDBAttached = 0; 
 #endif /* GDB_DEBUG */
@@ -241,7 +242,7 @@ int main(int argc, char *argv[])
   if (LocalHostName)
     SetupVirtualHost();
 
-#if !defined DEBUGMODE || !defined GDB_DEBUG
+#if !defined DEBUGMODE && !defined GDB_DEBUG
   pid = fork();
   if (pid == (-1))
   {

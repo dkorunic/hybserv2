@@ -3196,9 +3196,9 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 #ifdef EMPOWERADMINS
   /* We want empowered (not empoweredmore) admins to be able to drop
    * forbidden and forgotten channels, too. -kre */
-	  || (IsValidAdmin(lptr) && cptr->flags & (CS_FORBID | CS_FORGET))
+    || (IsValidAdmin(lptr) && cptr->flags & (CS_FORBID | CS_FORGET))
 #endif /* EMPOWERADMINS */
-	  ))
+    ))
   {
     notice(n_ChanServ, lptr->nick,
       "Syntax: \002DROP <channel> <password>\002");
@@ -3396,20 +3396,43 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel ) )
   {
     notice(n_ChanServ, lptr->nick,
-      "[\002%s\002] has been added to the access list for %s with level [\002%d\002]",
+      "[\002%s\002] has been added to the access list "
+      "for %s with level [\002%d\002]",
       nickptr ? nickptr->nick : hostmask,
       cptr->name,
-      newlevel );
+      newlevel);
 
     RecordCommand("%s: %s!%s@%s ACCESS [%s] ADD %s %d",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name,
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
       nickptr ? nickptr->nick : hostmask ? hostmask : "unknown!",
-      newlevel );
+      newlevel);
 
+     /* Notify user -KrisDuv 
+        I've added identification check -kre */
+     if ((cptr->flags & CS_VERBOSE) && nickptr &&
+        (nickptr->flags & NS_IDENTIFIED))
+     {
+       struct Channel *chptr = FindChannel(cptr->name);
+ 
+       notice(n_ChanServ, nickptr->nick,
+        "You have been added to the access list for %s "
+        "with level [\002%d\002]", cptr->name, newlevel);
+
+       /* autoop him if newlevel >= CA_AUTOOP */
+       if (chptr)
+       {
+         struct Luser *luptr = FindClient(nickptr->nick);
+
+         if (!IsChannelOp(chptr, luptr) && 
+            (newlevel >= cptr->access_lvl[CA_AUTOOP]))
+         {
+           char modes[MAXLINE];
+           ircsprintf(modes, "+o %s", nickptr->nick);
+           toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+           UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+         }
+       }
+     }
   }
   else
   {
@@ -3503,6 +3526,15 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
       lptr->hostname,
       cptr->name,
       nickptr ? nickptr->nick : host);
+  
+     /* Notify user if channel is verbose and user is identified -kre */
+     if ((cptr->flags & CS_VERBOSE) && nickptr &&
+        (nickptr->flags & NS_IDENTIFIED))
+     {
+       notice(n_ChanServ, nickptr->nick,
+        "You have been deleted from the access list for [\002%s\002]",
+        cptr->name);
+     }
   }
   else
   {
@@ -4133,7 +4165,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
 
     newlevel = atoi(av[4]);
-    if (newlevel > cptr->access_lvl[CA_FOUNDER])
+    if (newlevel >= cptr->access_lvl[CA_FOUNDER])
     {
       notice(n_ChanServ, lptr->nick,
         "You cannot create a level greater than [\002%d\002]",

@@ -5300,8 +5300,10 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   char *reason;
   struct Channel *chptr;
   struct ChannelUser *tempuser, *next;
-  int ii,
-      bad,
+#if 0
+  int ii;
+#endif
+  int bad,
       cnt;
   int alen;
   int nonops, /* -nonops */
@@ -5418,11 +5420,18 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
     else
     {
       if (tempuser->lptr->flags & L_OSREGISTERED)
+     /* 
+      * IMHO, this code is questionable. I think it would be better to
+      * skip L_OSREGISTERED (ie: services oper registered) nicknames, and
+      * not to check O: lines configuration. -kre
+      */
+#if 0
         ii = 1;
       else
         ii = 0;
       if (IsProtected(GetUser(ii, tempuser->lptr->nick,
               tempuser->lptr->username, tempuser->lptr->hostname)))
+#endif
         bad = 1;
     }
 

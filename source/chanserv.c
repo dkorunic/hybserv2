@@ -2182,7 +2182,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
       {
         lptr->founder_channels = fcptr->next;
         MyFree(fcptr);
-        fcptr = NULL;
+        /* fcptr = NULL; */
       }
 
       /*
@@ -2215,7 +2215,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
       {
         cptr->founders = fuptr->next;
         MyFree(fuptr);
-        fuptr = NULL;
+        /* fuptr = NULL; */
       }
 
       break;
@@ -2510,7 +2510,7 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
 
   ulev = GetAccess(cptr, lptr);
 
-  for (temp = cptr->access; temp; temp = temp->next, ++debugcnt)
+  for (temp = cptr->access; temp; )
   {
 
     found = 0;
@@ -2539,15 +2539,15 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
       if (master_nptr && temp->acptr)
         DeleteAccessChannel(master_nptr, temp->acptr);
 
-      /* Absolutely swell! Down here temp gets free()d and then referenced
-       * again with temp->next!! Gaah! I've quickfixed it referencing it
-       * back to the original start, ie. cptr->access. -kre */
+      /* protect temp->next, since temp gets freed -kre */
+      tempnext = temp->next;
       DeleteAccess(cptr, temp);
-
-      temp = cptr->access;
+      temp = tempnext;
 
     } /* if (found) */
-  }
+    else
+      temp = temp->next;
+  } /* for .. */
   
   if (cnt > 0)
     return (cnt);
@@ -2691,7 +2691,7 @@ DelAkick(struct ChanInfo *cptr, char *mask)
       {
         cptr->akick = temp->next;
         MyFree(temp);
-        temp = NULL;
+        /* temp = NULL; */
       }
     }
 

@@ -188,37 +188,25 @@ char *_version = "$Revision$";
  * 'parc' indices in the array. Space is allocated for the new string.
  * Thanks to kre.
  */
-char * GetString(int parc, char *parv[])
+char *GetString(int parc, char *parv[])
 {
   char *final;
   char temp[MAXLINE];
   int ii = 0;
 
-  final = (char *) MyMalloc(sizeof(char));
+  final = MyMalloc(sizeof(char));
   *final = '\0';
 
   while (ii < parc)
   {
-  
     ircsprintf(temp, "%s%s", parv[ii], ((ii + 1) >= parc) ? "" : " ");
-  
-    final = (char *) MyRealloc(final,  strlen(final) + strlen(temp) + sizeof(char));
+    final = MyRealloc(final,  strlen(final) + strlen(temp) +
+        sizeof(char));
     strcat(final, temp);
-    
     ++ii;
   }
 
-  /* Routine to get rid of spaces at the end of new string. However, we
-   * don't need it atm -kre
-   */
-#if 0
-  ii = strlen(final) - 1;
-  while (final[ii] == ' ' && ii)
-    final[ii--] = 0;
-#endif
-  
   return (final);
-
 } /* GetString() */
 
 
@@ -237,42 +225,41 @@ static void m_identify(struct Client *client_p, struct Client *source_p,
     acptr = find_person("ChanServ");
     if (!acptr || IsServer(acptr))
     {
-      sendto_one(source_p, ":%s NOTICE %s :*** Notice -- Services are currently down. "
-                 "Please wait a few moments, and then try again.",
-		 me.name,
-		 parv[0]);
+      sendto_one(source_p,
+          ":%s NOTICE %s :*** Notice -- Services are currently down. "
+          "Please wait a few moments, and then try again.",
+          me.name, parv[0]);
       return;
     }
     else
-    {
       sendto_one(acptr, ":%s PRIVMSG ChanServ :IDENTIFY %s %s",
 	         parv[0], parv[1], parv[2]);
-    }
   }
-
+  else
   if (parc == 2)
   {
     acptr = find_person("NickServ");
     if (!acptr || IsServer(acptr))
     {
-      sendto_one(source_p, ":%s NOTICE %s :*** Notice -- Services are currently down. "
-                 "Please wait a few moments, and then try again.",
-		 me.name,
-		 parv[0]);
+      sendto_one(source_p,
+          ":%s NOTICE %s :*** Notice -- Services are currently down. "
+          "Please wait a few moments, and then try again.",
+		      me.name, parv[0]);
       return;
     }
     else
-    {
       sendto_one(acptr, ":%s PRIVMSG NickServ :IDENTIFY %s",
                  parv[0], parv[1]);
-    }
   }
-
-  if (parc == 0 || parv[1] == '\0')
+  else
+  /* WTF? -kre */
+  /* if (parc == 0 || parv[1] == '\0') */
   {
-    sendto_one(source_p, ":%s NOTICE %s :Syntax:  IDENTIFY <password>            - for nickname",
+    sendto_one(source_p,
+        ":%s NOTICE %s :Syntax:  IDENTIFY <password>            - for nickname",
                me.name, parv[0]);
-    sendto_one(source_p, ":%s NOTICE %s :Syntax:  IDENTIFY <channel> <password>  - for channel",
+    sendto_one(source_p,
+        ":%s NOTICE %s :Syntax:  IDENTIFY <channel> <password>  - for channel",
                me.name, parv[0]);
   }
 
@@ -286,9 +273,8 @@ static void m_identify(struct Client *client_p, struct Client *source_p,
  *   servmsg    = message for services (using GetString() function).
  *                I think this is better. -ddosen
  */
-static void
-deliver_services_msg(char *service, char *command, struct Client *client_p, struct Client *source_p,
-                     int parc, char *parv[])
+static void deliver_services_msg(char *service, char *command, struct
+    Client *client_p, struct Client *source_p, int parc, char *parv[])
 {
   struct Client *acptr;
   char *servmsg;
@@ -299,15 +285,17 @@ deliver_services_msg(char *service, char *command, struct Client *client_p, stru
 
   if (!acptr || IsServer(acptr))
   {
-    sendto_one(source_p, ":%s NOTICE %s :*** Notice -- Services are currently down. "
-               "Please wait a few moments, and then try again.",
-               me.name, parv[0]);
+    sendto_one(source_p,
+        ":%s NOTICE %s :*** Notice -- Services are currently down. "
+        "Please wait a few moments, and then try again.",
+        me.name, parv[0]);
   }
   else 
   {
     if (parc == 1 || parv[1] == '\0')
     {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0], command);
+      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0],
+          command);
       return;
     }
 
@@ -316,8 +304,8 @@ deliver_services_msg(char *service, char *command, struct Client *client_p, stru
     /* deliver the message.
      * now, it's more secure (using user@host)
      */
-    sendto_one(acptr, ":%s PRIVMSG %s :%s",
-               parv[0], acptr->name, servmsg);
+    sendto_one(acptr, ":%s PRIVMSG %s :%s", parv[0], acptr->name,
+        servmsg);
     }
 } /* deliver_services_msg() */
 
@@ -325,10 +313,9 @@ deliver_services_msg(char *service, char *command, struct Client *client_p, stru
 /* SERV_FUNC
  * Macro for generating service's function.
  */
-#define SERV_FUNC(a,b,c) static void a (struct Client *client_p, struct Client *source_p, int parc, char *parv[]) \
-                         { \
-                           return deliver_services_msg (b, c, client_p, source_p, parc, parv); \
-		         }
+#define SERV_FUNC(a,b,c) static void a (struct Client *client_p, struct \
+    Client *source_p, int parc, char *parv[]) \
+{ return deliver_services_msg (b, c, client_p, source_p, parc, parv); }
 
 /* let's generate :-)
  *

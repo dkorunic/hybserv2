@@ -113,7 +113,7 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
   if (!is_nickname(parv[2]))
   {
     sendto_one(source_p,
-        ":%s NOTICE %s :*** Notice --  Invalid new nickname %s",
+        ":%s NOTICE %s :*** Notice -- Invalid new nickname %s",
         me.name, source_p->name, parv[2]);
     return;
   }
@@ -121,17 +121,17 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
   if (strlen(parv[2]) > NICKLEN - 1)
     parv[2][NICKLEN - 1] = '\0';
 
-  if ((hunt_server(client_p, source_p, ":%s FORCENICK %s %s", 1, parc,
-          parv)) != HUNTED_ISME)
-    return;
-
   if ((target_p = find_client(parv[1])) == NULL)
   {
     sendto_one(source_p,
-        ":%s NOTICE %s :*** Notice --  No such nickname %s",
+        ":%s NOTICE %s :*** Notice -- No such nickname %s",
         me.name, source_p->name, parv[1]);
     return;
   }
+
+  if ((hunt_server(client_p, source_p, ":%s FORCENICK %s %s", 1, parc,
+          parv)) != HUNTED_ISME)
+    return;
 
   if (!IsClient(target_p))
     return;

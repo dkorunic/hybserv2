@@ -788,7 +788,7 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
     strcpy(tempargs, *(tmp + 1) ? tmp + 1 : "");
   else
     tempargs[0] = '\0';
-
+ 
   argcnt = SplitBuf(tempargs, &modeargs);
 
   /*
@@ -1324,8 +1324,10 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
   for (ii = 0; ii < acnt; ii++)
   {
     strcat(done, av[ii]);
-    strcat(done, " ");
-    if (mcnt == MaxModes)
+    /* Rewrote this to fix that nasty " " at the end of done[] -kre */
+    if (mcnt != MaxModes)
+      strcat(done, " ");
+    else
     {
       mcnt = 0;
       mtmp = modestr(MaxModes, mode);

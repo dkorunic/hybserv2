@@ -309,14 +309,6 @@ DeleteServer(struct Server *sptr)
   if (!sptr)
     return;
 
-  /*
-   * Delete server from hash table
-   */
-  (void) HashDelServer(sptr);
-
-  if (sptr->uplink)
-    sptr->uplink->numservs--;
-
 #ifdef EXTRA_SPLIT_INFO
   /* This could spawn too much messages, even flood on connects/reconnects
    * because of severe DoS -kre */
@@ -325,6 +317,14 @@ DeleteServer(struct Server *sptr)
     sptr->name,
     sptr->uplink ? sptr->uplink->name : "*unknown*");
 #endif
+
+  /*
+   * Delete server from hash table
+   */
+  (void) HashDelServer(sptr);
+
+  if (sptr->uplink)
+    sptr->uplink->numservs--;
 
   /*
    * go through server list, and check if any leafs had sptr
@@ -1224,24 +1224,28 @@ s_squit(int ac, char **av)
 
   /* If we defined more info on split, we will not delete
    * non-intentionally splitted servers from hash -kre */
+
 #ifndef SPLIT_INFO
   DeleteServer(sptr); /* delete server from list */
 #else
+
   /* Iterate all server list. Enter split_ts for both splitted hub and his
    * leaves. NULLify uplinks for splitted leaves if there are any -kre */
   for (tmpserv=ServerList; tmpserv; tmpserv=tmpserv->next)
   {
     if (tmpserv->uplink==sptr || tmpserv==sptr)
     {
-      tmpserv->uplink=NULL;
-      tmpserv->split_ts=time(NULL);
-      tmpserv->connect_ts=0;
+
 #ifdef EXTRA_SPLIT_INFO
       /* This could spawn too much messages -kre */
       SendUmode(OPERUMODE_L,
         "*** Netsplit: %s (hub: %s)", tmpserv->name,
         tmpserv->uplink ? tmpserv->uplink->name : "*unknown*");
 #endif
+
+      tmpserv->uplink=NULL;
+      tmpserv->split_ts=time(NULL);
+      tmpserv->connect_ts=0;
     }
   }
 #endif

@@ -93,16 +93,7 @@ GetString(int ac, char **av)
   ii = 0;
   while (ii < ac)
   {
-    if ((ii + 1) >= ac)
-    {
-      /*
-       * This is the last arguement, so don't put an extra
-       * space on the end
-       */
-      sprintf(temp, "%s",  av[ii]);
-    }
-    else
-      sprintf(temp, "%s ", av[ii]);
+    sprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
 
     final = (char *) MyRealloc(final,
                       strlen(final) + strlen(temp) + sizeof(char));
@@ -111,6 +102,10 @@ GetString(int ac, char **av)
     ++ii;
   }
 
+  ii = strlen(final) - 1;
+  while (final[ii] == ' ' && ii)
+    final[ii--] = 0;
+  
   return (final);
 } /* GetString() */
 

@@ -1,3 +1,11 @@
+*** 20010506_2 by kreator
+- fix configure script to detect stdio and stdio-mt more precisely
+- correct some typos in README
+- fix Makefile.in for sources to have correct include hierarchy, to have
+  local includes before system ones (why o why didn't we have this
+  before?)
+
+
 *** 20010506_1 by kreator
 - misc stuff
 

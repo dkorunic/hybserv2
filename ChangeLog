@@ -1,3 +1,8 @@
+*** 20030405_4 by kreator
+- make successful identification update lastseen for master
+  and slave nicknames
+
+
 *** 20030405_3 by kreator
 - oops, wrong order in {}
 

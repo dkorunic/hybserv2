@@ -1,3 +1,11 @@
+*** 20010503_2 by kreator
+- fix for quite nasty problem with dcc connections: dccptr->nick was
+  changed in onick (tempuser from GetUser -> O lines) instead of real
+  lptr->nick, prolly for telnet connections. i don't care if they got
+  b0rked, previous solution was simply stupid and wrong
+- sync TODO and KNOWNBUGS
+
+
 *** 20010503_1 by kreator
 - more fixes for PARAM_STRING in settings.c
 

@@ -56,13 +56,23 @@ HashNick(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHCLIENTS - 1));
+#endif
+
+  /* fix broken hash code -kre */
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % HASHCLIENTS;
+
 } /* HashNick() */
 
 #ifdef NICKSERVICES
@@ -77,13 +87,24 @@ NSHashNick(const char *name)
 
 {
   unsigned int h = 0;
-
+#if 0
   while (*name)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (NICKLIST_MAX - 1));
+#endif
+
+  /* fix broken hash code -kre */
+  while (*name)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+
+  return h % NICKLIST_MAX;
+
 } /* NSHashNick() */
 
 #endif /* NICKSERVICES */
@@ -1030,12 +1051,23 @@ HashUhost(char *userhost)
   register unsigned int h = 0;
   register int i = 30; /* only use first 30 chars of uhost */
 
+#if 0
   while(*hname && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*hname++));
   }
 
   return (h & (HASHCLIENTS - 1));
+#endif
+  
+  while (*hname && --i)
+  {
+    h += ToLower(*hname);
+    hname++;
+  }
+
+  return h % HASHCLIENTS;
+
 } /* HashUhost() */
 
 /*
@@ -1054,12 +1086,23 @@ HashChannel(const char *name)
   register int i = 30;
   unsigned int h = 0;
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (HASHCHANNELS - 1));
+#endif
+
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+
+  return h % HASHCHANNELS;
+  
 } /* HashChannel() */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -1076,12 +1119,23 @@ CSHashChan(const char *name)
   register int i = 30;
   unsigned int h = 0;
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (CHANLIST_MAX - 1));
+#endif
+  
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  
+  return h % CHANLIST_MAX;
+
 } /* CSHashChan() */
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
@@ -1105,12 +1159,22 @@ MSHashMemo(const char *name)
    * to thirty characters
    */
 
+#if 0
   while (*name && --i)
   {
     h = (h << 4) - (h + (unsigned char) ToLower(*name++));
   }
 
   return (h & (MEMOLIST_MAX - 1));
+#endif
+
+  while (*name && --i)
+  {
+    h += ToLower(*name);
+    name++;
+  }
+  return h % MEMOLIST_MAX;
+
 } /* MSHashMemo() */
 
 #endif /* defined(NICKSERVICES) && defined(MEMOSERVICES) */
@@ -1220,6 +1284,7 @@ HashServer(const char *name)
   return (h & (HASHSERVERS - 1));
 #endif
 
+  /* fix broken hash code -kre */
   while (*name)
   {
     h += ToLower(*name);

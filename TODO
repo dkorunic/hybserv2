@@ -7,8 +7,6 @@ Drew's Law of Highway Biology:
 
 Pending bugs:
 -------------
-*) NEW bug in services, somehow connected with hashing code and servers -
-   FindServer does not find servers
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some
@@ -62,6 +60,10 @@ New features:
 
 Done so far:
 ------------
+*) NEW bug in services, somehow connected with hashing code and servers -
+   FindServer does not find servers -- I wonder how come no one found out
+   bug in hashing code that existed from first versions of HybServ1 for
+   masked servers! Ugh. -kre
 *) ultra-buggy DeleteLink() for nicknames! - some fixes, yet to test
    throughly
 *) use snprintf instead of sprintf or possibly use irc_sprintf from

@@ -58,13 +58,13 @@ DISTRIBUTION
   You can get HybServ from:
 
   #1:  ftp.magenet.net/pub/hybserv/
-       (thanks to Bruns)
+       (Thanks to Bruns)
 
   #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
-       (thanks to kreator)
+       (Thanks to kreator)
 
   #3:  ftp://mirrors.botbay.net/pub/hybserv/
-       (thanks to Hwy101)
+       (Thanks to Hwy101)
 
   #4:  Anonymous CVS to this CVSROOT:
        :pserver:cvs@digi.alleged.com:/usr/cvsroot
@@ -86,7 +86,9 @@ INSTALLATION
 
 #########################################################################
 # BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to                #
-# hybserv-bugs@alleged.com                                              #
+#                                                                       #
+#          hybserv-bugs@alleged.com                                     #
+#                                                                       #
 #########################################################################
  
 We can't fix bugs if no one reports them!
@@ -109,9 +111,9 @@ The criteria for reporting bugs is somewhat specific.
 ################################################################
 
 
-These are the official Hybserv2 mailing list hosted by Alleged.com
+Below are the official Hybserv2 mailing lists hosted by Alleged.com
 
-These are  publicly postable lists.
+These are publicly postable lists.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
@@ -185,25 +187,25 @@ enable jupes (#define ALLOW_JUPES), you *MUST* give services an H: line in
 ircd.conf.
 
 Configuration examples:
-NOTE:
-  Suppose the host name of services is "services.name" with an ip of
-  1.2.3.4, and that server accepting the services has name
-  "server.shomewhere" with ircd class "server" (or class 1).
+
+NOTE:	Suppose the host name of services is "services.name" with an ip of
+  	1.2.3.4, and that server accepting the services has name
+  	"server.shomewhere" with ircd class "server" (or class 1).
 
 Required statements in ircd.conf for Hybrid5/6:
+
   C:1.2.3.4:password:services.name::1
   N:1.2.3.4:password:services.name::1
   H:*:*:services.name
-NOTE:
-  You can leave out H line if you don't want to use server jupes and
-  G-Lines.
-NOTE:
-  We recommend using services on same server that is your hub, and then
-  you can use 127.0.0.1 as address in C/N lines (which will give you some
-  performance, since traffic will go through loop back device).
 
-However in Hybrid 7 to accomplish the same you have to put in ircd.conf
-following code:
+NOTE:	You can leave out H line if you don't want to use server jupes and G-Lines.
+
+NOTE:	We recommend using services on same server that is your hub, and then
+  	you can use 127.0.0.1 as address in C/N lines (which will give you some
+  	performance, since traffic will go through loop back device).
+
+However in Hybrid 7 to accomplish the same you have to put in ircd.conf following code:
+
   connect {
     name = "services.name";
     host = "1.2.3.4";
@@ -212,11 +214,10 @@ following code:
     hub_mask = "*";
     class = "server";
   };
-NOTE:
-  You can leave out hub_mask if you don't want to use server jupes and
-  G-Lines.
+
 
 In hybserv.conf configuration should be as follows:
+
   S:password:hub.server.somewhere:6667
   N:services.name:Hybrid services
 

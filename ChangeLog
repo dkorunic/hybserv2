@@ -1,3 +1,8 @@
+*** 20010508_2 by kreator
+- DisplaySettings() in OperServ had same bug as did SaveSettings() in
+  settings.c: it didn't check if PARAM_STRING is empty
+
+
 *** 20010508_1 by kreator
 - misc TODO modifications
 - misc install.fast modifications

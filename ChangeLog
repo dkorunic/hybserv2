@@ -1,3 +1,9 @@
+*** 20010408_1 by kreator
+Seems that we have weird behaviour with Hybrid7 and sjoin (reported by
+larne) - I'm including assertion for GetNick(nicks[0]) I believe since
+nicks[] gets NULL for some reason. 
+
+
 *** 20010401_1 by kreator
 Fixed nasty bug in DccConnectHost(): in FreeBSD gethostbyname() does not
 resolve IP-s, especially IPv4 addresses that are not in dot notation.

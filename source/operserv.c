@@ -5188,6 +5188,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
          
       for (gptr = GlineList; gptr && cnt; gptr = gptr->next)
       {
+        /* Do username/hostname matching here! */
         if (ac > 2)
         {
           if (user && !match(user, gptr->username))
@@ -5213,7 +5214,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
           uh, gptr->reason, expstr, gptr->who);
       }
 
-      os_notice(lptr, sockfd, "-- End of list (%d gline%s) --",
+      os_notice(lptr, sockfd, "-- End of list (from total %d gline%s) --",
         Network->TotalGlines,
         (Network->TotalGlines == 1) ? "" : "s");
     #else

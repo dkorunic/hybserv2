@@ -2191,10 +2191,7 @@ s_version(int ac, char **av)
     who);
 
   toserv(":%s 351 %s HybServ2-%s. %s :TS3\n",
-    Me.name,
-    who,
-    hVersion,
-    Me.name);
+    Me.name, who, hVersion, Me.name);
 } /* s_version() */
 
 /*

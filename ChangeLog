@@ -1,3 +1,9 @@
+*** 20010601_2 by kreator
+- fix Makefile
+- do some fixes for CH_OPPED stuff, so i re-enabled it: this needs more
+  tracing, so current CVS will probably have problems
+
+
 *** 20010601_1 by kreator
 - added fixlevel script for fixing broken ALVL entries which will appear
   for all people using older chan.db-s with newer sources

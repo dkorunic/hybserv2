@@ -1,3 +1,7 @@
+*** 20010408_3 by kreator
+Ugh! I'm dumb. Forgot av[mcnt][0]==':', and put av[mcnt]==':'.
+
+
 *** 20010408_2 by kreator
 I believe this should fix problem with ':' alone as av[5] which makes
 nicks[0] empty.

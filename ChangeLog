@@ -1,3 +1,7 @@
+*** 20010527_2 by kreator
+- fix mkpasswd
+
+
 *** 20010527_1 by kreator
 - document new bug with FindServer
 - import match.c from Hybrid7 and delete old one

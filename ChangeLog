@@ -1,3 +1,8 @@
+*** 20010622_1 by kreator
+- fscanf had \n for pid
+- fixed issue when services would core on large number of clones
+
+
 *** 20010619_2 by kreator
 - bwah. solaris has unsigned long pid_t and bsd has unsigned int
 

@@ -7,7 +7,6 @@
 # access levels on all channels to default after bit changes in flags.
 # -kre
 
-
 if [ ! "x$1" = "x" ]; then
   CHANFILE=$1
   if [ -f $CHANFILE ]; then

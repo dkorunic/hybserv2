@@ -3,6 +3,7 @@ Files you will find in bin/
 cleandb         - Script to delete old database backups
 encryptconf     - Encrypts plaintext O: lines
 encryptdb       - Encrypts plaintext nickname/channel databases
+finddouble      - Find double nicknames in nick.db (usually not needed)
 fixlevel        - Fixes broken chan.db access levels (after upgrade)
 hybserv         - Binary executable
 hybserv.conf    - Configuration file for HybServ

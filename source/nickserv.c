@@ -22,6 +22,7 @@
 #include "client.h"
 #include "conf.h"
 #include "config.h"
+#include "channel.h"
 #include "dcc.h"
 #include "err.h"
 #include "helpserv.h"
@@ -943,7 +944,7 @@ DeleteNick(struct NickInfo *nickptr)
       PromoteSuccessor(cptr);
     else
     {
-      /* Fix by KrisDuv - make OperServ part if on channel */
+      /* Fix by KrisDuv - make ChanServ part if on channel */
       struct Channel *chptr;
       chptr = FindChannel(cptr->name);
       if (IsChannelMember(chptr, Me.csptr))
@@ -3790,6 +3791,14 @@ static void n_set_uin(struct Luser *lptr, int ac, char **av)
     return;
   }
 
+  /* KrisDuv's check for validity of UIN */
+  if (!IsNum(av[2]))
+  {
+    notice(n_NickServ, lptr->nick,
+      "Invalid UIN [\002%s\002]", av[2]);
+    return;
+  }
+  
   nptr->UIN = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,

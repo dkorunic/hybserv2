@@ -872,9 +872,11 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       /*
        * It was sent to a nickname - check if they are online
-       * and notify them
+       * and identified and optionally notify them
        */
-      if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+      if ((master->flags & NS_MEMONOTIFY) &&
+          (realptr->flags & NS_IDENTIFIED) &&
+          FindClient(realptr->nick))
       {
         notice(n_MemoServ, realptr->nick,
           "You have a new memo from \002%s\002 (#%d)",
@@ -1602,7 +1604,9 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
      * It was sent to a nickname - check if they are online
      * and notify them
      */
-    if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+    if ((master->flags & NS_MEMONOTIFY) && 
+        (realptr->flags & NS_IDENTIFIED) &&
+        FindClient(realptr->nick))
     {
       notice(n_MemoServ, realptr->nick,
         "You have %d new forwarded memo%s from \002%s\002",
@@ -1768,7 +1772,9 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
      * It was sent to a nickname - check if they are online
      * and notify them
      */
-    if ((master->flags & NS_MEMONOTIFY) && FindClient(realptr->nick))
+    if ((master->flags & NS_MEMONOTIFY) && 
+        (realptr->flags & NS_IDENTIFIED) &&
+        FindClient(realptr->nick))
     {
       notice(n_MemoServ, realptr->nick,
         "You have a new memo from \002%s\002 (#%d)",

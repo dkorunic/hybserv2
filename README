@@ -66,20 +66,17 @@ DISTRIBUTION
   #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
        (Thanks to kreator)
 
-  #3:  ftp://mirrors.botbay.net/pub/hybserv/
-       (Thanks to Hwy101)
-
-  #4:  Anonymous CVS to this CVSROOT:
+  #3:  Anonymous CVS to this CVSROOT:
        :pserver:cvs@digi.alleged.com:/usr/cvsroot
        cvs login
        <press enter, no password>
        cvs checkout hybserv
 
-  #5:  CVS Web snapshots:
+  #4:  CVS Web snapshots:
        http://fly.srk.fer.hr/~kreator/projects/hybserv/
        http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
 
-  #6:  Web Interface to the CVS Repository:
+  #5:  Web Interface to the CVS Repository:
        http://www.alleged.com/cvsweb
 
 NOTE: CVS is usually more current than the release.

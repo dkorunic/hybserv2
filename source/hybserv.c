@@ -71,6 +71,9 @@ int main(int argc, char *argv[])
 #ifndef DEBUGMODE
   int pid; /* pid of this process */
 #endif /* DEBUGMODE */
+#ifdef GDB_DEBUG
+  int GDBAttached = 0; 
+#endif /* GDB_DEBUG */
 
 #if defined GIMMECORE || defined DEBUGMODE
   struct rlimit rlim; /* resource limits -kre */
@@ -119,11 +122,9 @@ int main(int argc, char *argv[])
     fprintf(stderr, "Running on: computer, probably :-)\n");
 
 #ifdef GDB_DEBUG
-  int GDBAttached = 0; 
-              
   while (!GDBAttached) 
     sleep(1);
-#endif    
+#endif /* GDB_DEBUG */  
 
   /*
    * Load SETPATH (settings.conf) - this must be done

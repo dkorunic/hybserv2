@@ -1,3 +1,7 @@
+*** 20040817_1 by kreator
+- update for hybrid services module for hybrid7 (bane)
+
+
 *** 20040814_1 by kreator
 - merged several fixes from sofit: fixed linkbug, logon news can't exist
   without global services and a couple of warnings left in operserv code

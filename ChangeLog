@@ -1,3 +1,13 @@
+*** 20011125_4 by kreator
+- updated contributors section
+- addedd STRICT_DATA_CHECKING which will hopefully get rid of those pesky
+  nickname loops which are (IMHO) result of DeleteLink()+InsertLink()
+  issues
+  BIG FAT NOTE: YES, THIS WILL SLOW DOWN NICK INITIALISATION *VERY* MUCH.
+  yes, that is intentional. yes, once all problems are eradicated, that
+  double-checks will be removed. hopefully. yes. yes. hope. yes.
+
+
 *** 20011125_3 by kreator
 - update TODO directives
 - yes, update MemoServ to handle master/slave nicknames properly, so users

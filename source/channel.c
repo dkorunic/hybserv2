@@ -975,7 +975,11 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
           break;
 
         /* never mark ChanServ/OperServ as deopped -adx */
-        if (!add && userptr != Me.csptr && userptr != Me.osptr)
+#if defined CHANNELSERVICES
+        if (add || userptr != Me.csptr && userptr != Me.osptr)
+#else
+	if (add && userptr != Me.osptr)
+#endif
           SetChannelMode(cptr, add, MODE_O, userptr, 0);
 
         if (add)

@@ -141,7 +141,7 @@ long      NickRegDelay;
 int       MaxLinks;
 int       AllowKillProtection;
 int       AllowKillImmed;
-int	  AllowGuardChannel;
+int	      AllowGuardChannel;
 
 int       MaxChansPerUser;
 int       MaxAkicks;
@@ -189,7 +189,7 @@ struct Directive directives[] = {
   { "MemoServDB", D_NORUNTIME,      { { PARAM_STRING, &MemoServDB } } },
   { "StatServDB", D_NORUNTIME,      { { PARAM_STRING, &StatServDB } } },
   { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
- { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
+  { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
 
   /* Pseudo-Client Nicknames/Idents/Descriptions and Options */
   { "OperServNick", D_NORUNTIME,    { { PARAM_STRING, &n_OperServ },
@@ -636,11 +636,24 @@ dparse(char *line, int linenum, int rehash)
     if ((dptr->param[ii].type != PARAM_SET) && (pcnt >= larc))
     {
       fatal(1, "%s:%d Not enough arguements to [%s] directive",
-        SETPATH,
-        linenum,
-        dptr->name);
+        SETPATH, linenum, dptr->name);
       return (0);
     }
+
+#if 0
+    /*
+     * There should be code which check for too many arguments for
+     * PARAM_SET - because of bugs in previous HybServ1 code I am leaving
+     * this code under undef, but it _should_ go into distribution once.
+     * However, I don't wont to break old `save -conf' files. -kre
+     */
+     if ((dptr->param[ii].type == PARAM_SET) && (pcnt > 1))
+     {
+        fatal(1, "%s:%d Too many arguments for [%s] directive",
+          SETPATH, linenum, dptr->name);
+        return 0;
+     }
+#endif
 
     switch (dptr->param[ii].type)
     {
@@ -860,7 +873,7 @@ SaveSettings()
 
   for (dptr = directives; dptr->name; dptr++)
   {
-    buffer[0] = '\0';
+    buffer[0] = 0;
     for (ii = 0; ii < PARAM_MAX; ii++)
     {
       if (!dptr->param[ii].type)
@@ -900,13 +913,27 @@ SaveSettings()
         {
           /*
            * Only write out SETs if they are non null
+           *
+           * IMHO if dptr->param[ii].type == PARAM_SET there is no reason
+           * to write numeric value because it is ignored in the first
+           * way.
+           * -kre
            */
           if (*(int *) dptr->param[ii].ptr)
           {
+#if 0
             sprintf(tmp, "%d ",
               *(int *) dptr->param[ii].ptr);
             strcat(buffer, tmp);
+#endif
+            /* Fill in buffer.. */
+            strcat(buffer, " ");
+            /* and then do continue -kre */
           }
+          else
+            /* Any of SETs in param[] was empty, so there is no need to
+             * write directive -kre */
+            buffer[0] = 0;
 
           break;
         } /* case PARAM_SET */

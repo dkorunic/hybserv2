@@ -39,9 +39,10 @@ Some sort of TODO/planning program:
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
 *) save services ignores
+*) if there is AutoKillClones in settings.conf with value 0, it is setup
+   to 1; if there isn't, it is setup to 0 as it should be
 *) #ifdef HYBRID7 - a bug when an user has level 8 (AUTOHALFOP and CMDHALFOP
    is 8 too) and he get only a +v not a +h
-
 
 Done so far:
 ------------
@@ -71,5 +72,5 @@ Done so far:
 *) fix NSSetMemoSignon issue, reported by monolith
    <monolith@mail.orblivion.com>
 *) unforbid (chan/nick)
-*) ............. and various not mentiones, since there were a lot of
+*) ............. and various not mentioned, since there were a lot of
    changes, look in ChangeLog

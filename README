@@ -34,7 +34,7 @@ Janos       John Binder       jbinder@kgazd.bme.hu
 John-Work   F. John Rowan     john@tdkt.org
 kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 toot        Toby Verrall      to7@antipope.fsnet.co.uk
-		
+    
 HybServ was specifically designed to run with hybrid ircd, although it
 *should* work with CSr as well.  You may recieve the hybrid irc daemon
 from ftp.blackened.com in /pub/irc/hybrid.  In our opinion, it is the best
@@ -155,7 +155,7 @@ following code:
     send_password = "password";
     accept_password = "password";
     hub_mask = "*";
-   	class = "server";
+    class = "server";
   };
 NOTE:
   You can leave out hub_mask if you don't want to use server jupes and
@@ -198,23 +198,23 @@ OperServ password, these commands CANNOT be accessed by DCC Chat.
 IMPORTANT NOTE! If you use Hybrid or Hybrid-compatibile IRC daemon, you
 should enable Q-lines (quarantined nickname) for services-reserved
 nicknames because of obvious security reasons:
-	Q:NickServ:This nickname is reserved.
-	Q:ChanServ:This nickname is reserved.
-	Q:OperServ:This nickname is reserved.
+  Q:NickServ:This nickname is reserved.
+  Q:ChanServ:This nickname is reserved.
+  Q:OperServ:This nickname is reserved.
 
 However Q lines changed in Hybrid-7 too, so you should copy/paste these
 lines:
   quarantine {
-	  name = "NickServ";
-	  reason = "This nickname is reserved";
+    name = "NickServ";
+    reason = "This nickname is reserved";
   };
   quarantine {
-	  name = "ChanServ";
-	  reason = "This nickname is reserved";
+    name = "ChanServ";
+    reason = "This nickname is reserved";
   };
   quarantine {
-	  name = "OperServ";
-	  reason = "This nickname is reserved";
+    name = "OperServ";
+    reason = "This nickname is reserved";
   };
 
 ##########################################################################
@@ -244,5 +244,4 @@ The ideas for a settings.conf and the shownicks/showchans programs were
 inspired from this package as well. 
 
 See also the begining of this file.
-
 

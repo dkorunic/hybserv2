@@ -1,3 +1,7 @@
+*** 20010519_3 by kreator
+- fix bug in c_info
+
+
 *** 20010519_2 by kreator
 - do some optimisations in SplitBuf based on profile report, should give us
   some more performance

@@ -1,3 +1,9 @@
+*** 20010411_3 by kreator
+Fixed that nasty " " at the end of modes. Seems there were at least two
+bugs causing server not to update channel/user flags, and that was reason
+of OP ALL not to be working, together with other similar functions.
+
+
 *** 20010411_2 by kreator
 Fix address magenet.com -> magenet.net
 

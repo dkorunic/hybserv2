@@ -501,8 +501,8 @@ ConnectClient(struct PortInfo *portptr)
   struct sockaddr_in RemoteAddr;
   struct hostent *RemoteHost;
   int addrlen,
-      goodid = 1,
-      fd;
+    goodid = 1,
+    fd;
   struct DccUser *tempconn;
 
   if (!portptr)
@@ -510,24 +510,24 @@ ConnectClient(struct PortInfo *portptr)
 
   addrlen = sizeof(struct sockaddr_in);
   if ((fd = accept(portptr->socket, (struct sockaddr *)&RemoteAddr, &addrlen)) < 0 )
-  {
-    putlog(LOG1,
-      "Error in accept on socket %d",
-      portptr->socket);
-    return;
-  }
+    {
+      putlog(LOG1,
+	     "Error in accept on socket %d",
+	     portptr->socket);
+      return;
+    }
 
   if (MaxConnections && (Network->TotalConns >= MaxConnections))
-  {
-    /* maximum users reached */
-    writesocket(fd,
-      "Maximum connections reached, try again later\n");
-    close(fd);
-    return;
-  }
+    {
+      /* maximum users reached */
+      writesocket(fd,
+		  "Maximum connections reached, try again later\n");
+      close(fd);
+      return;
+    }
 
   RemoteHost = gethostbyaddr((char *)&RemoteAddr.sin_addr.s_addr,
-                              4,AF_INET);
+			     4,AF_INET);
   
   tempconn = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
   memset(tempconn, 0, sizeof(struct DccUser));
@@ -546,126 +546,126 @@ ConnectClient(struct PortInfo *portptr)
   SetNonBlocking(tempconn->socket);
 
   switch (portptr->type)
-  {
-    case PRT_TCM:
     {
-      int sock;
-
-    #if 0
-      /*
-       * This is done in BotProcess() now
-       */
-
-      /* Check if the tcm bot has an L: line */
-      if (!GoodTCM(tempconn))
+    case PRT_TCM:
       {
-        putlog(LOG1, "Illegal tcm connection attempt on port %d from %s:%d",
-          portptr->port,
-          tempconn->hostname,
-          tempconn->port);
+	int sock;
 
-        SendUmode(OPERUMODE_B,
-          "*** Unauthorized tcm connection attempt from [%s:%d] on port %d",
-          tempconn->hostname,
-          tempconn->port,
-          portptr->port);
+#if 0
+	/*
+	 * This is done in BotProcess() now
+	 */
 
-        close(tempconn->socket);
-        MyFree(tempconn->hostname);
-        MyFree(tempconn);
-        return;
+	/* Check if the tcm bot has an L: line */
+	if (!GoodTCM(tempconn))
+	  {
+	    putlog(LOG1, "Illegal tcm connection attempt on port %d from %s:%d",
+		   portptr->port,
+		   tempconn->hostname,
+		   tempconn->port);
+
+	    SendUmode(OPERUMODE_B,
+		      "*** Unauthorized tcm connection attempt from [%s:%d] on port %d",
+		      tempconn->hostname,
+		      tempconn->port,
+		      portptr->port);
+
+	    close(tempconn->socket);
+	    MyFree(tempconn->hostname);
+	    MyFree(tempconn);
+	    return;
+	  }
+#endif /* 0 */
+
+	tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
+
+	SendUmode(OPERUMODE_B,
+		  "*** Received tcm connection from [%s:%d] on port %d",
+		  tempconn->hostname,
+		  tempconn->port,
+		  portptr->port);
+
+	sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
+	if (sock < 0)
+	  goodid = 0;
+
+	break;
       }
-    #endif /* 0 */
-
-      tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
-
-      SendUmode(OPERUMODE_B,
-        "*** Received tcm connection from [%s:%d] on port %d",
-        tempconn->hostname,
-        tempconn->port,
-        portptr->port);
-
-      sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
-      if (sock < 0)
-        goodid = 0;
-
-      break;
-    }
 
     case PRT_USERS:
-    {
-      int sock;
-
-      if (portptr->host)
       {
-        /* Check if incoming connection has an authorized host */
-        if (match(portptr->host, tempconn->hostname) == 0)
-        {
-          putlog(LOG1,
-            "Illegal connection attempt on port %d from [%s:%d]",
-            portptr->port,
-            tempconn->hostname,
-            tempconn->port);
+	int sock;
 
-          SendUmode(OPERUMODE_B,
-            "*** Unauthorized connection attempt from [%s:%d] on port %d",
-            tempconn->hostname,
-            tempconn->port,
-            portptr->port);
+	if (portptr->host)
+	  {
+	    /* Check if incoming connection has an authorized host */
+	    if (match(portptr->host, tempconn->hostname) == 0)
+	      {
+		putlog(LOG1,
+		       "Illegal connection attempt on port %d from [%s:%d]",
+		       portptr->port,
+		       tempconn->hostname,
+		       tempconn->port);
 
-          close(tempconn->socket);
-          MyFree(tempconn->hostname);
-          MyFree(tempconn);
-          return;
-        }
+		SendUmode(OPERUMODE_B,
+			  "*** Unauthorized connection attempt from [%s:%d] on port %d",
+			  tempconn->hostname,
+			  tempconn->port,
+			  portptr->port);
+
+		close(tempconn->socket);
+		MyFree(tempconn->hostname);
+		MyFree(tempconn);
+		return;
+	      }
+	  }
+
+	tempconn->flags = SOCK_NEEDID;
+
+	SendUmode(OPERUMODE_Y,
+		  "*** Received connection from [%s:%d] on port %d",
+		  tempconn->hostname,
+		  tempconn->port,
+		  portptr->port);
+
+	sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
+	if (sock < 0)
+	  goodid = 0;
+
+	break;
       }
 
-      tempconn->flags = SOCK_NEEDID;
-
-      SendUmode(OPERUMODE_Y,
-        "*** Received connection from [%s:%d] on port %d",
-        tempconn->hostname,
-        tempconn->port,
-        portptr->port);
-
-      sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
-      if (sock < 0)
-        goodid = 0;
-
-      break;
-    }
-
     default:
-    {
-      /* something is really screwed */
-      putlog(LOG1,
-        "Invalid connection type specified on port [%d] (%s:%d)",
-        portptr->port,
-        tempconn->hostname,
-        tempconn->port);
+      {
+	/* something is really screwed */
+	putlog(LOG1,
+	       "Invalid connection type specified on port [%d] (%s:%d)",
+	       portptr->port,
+	       tempconn->hostname,
+	       tempconn->port);
 
-      close(tempconn->socket);
-      MyFree(tempconn->hostname);
-      MyFree(tempconn);
-      return;
+	close(tempconn->socket);
+	MyFree(tempconn->hostname);
+	MyFree(tempconn);
+	return;
+      }
     }
-  }
 
   if (!goodid)
-  {
-    /* something went wrong while connecting to their ident port */
+    {
+      /* something went wrong while connecting to their ident port */
 
-    close(tempconn->authfd);
-    tempconn->authfd = NOSOCKET;
-    tempconn->flags &= ~SOCK_NEEDID;
+      close(tempconn->authfd);
+      tempconn->authfd = NOSOCKET;
+      tempconn->flags &= ~SOCK_NEEDID;
 
-    /*
-     * Their username will remain "unknown" from above
-     */
+      /*
+       * Their username will remain "unknown" from above
+       */
 
-    if (!(tempconn->flags & SOCK_TCMBOT))
-      TelnetGreet(tempconn);
-  }
+      if (!(tempconn->flags & SOCK_TCMBOT))
+	TelnetGreet(tempconn);
+    }
 
   LinkDccClient(tempconn);
 #ifdef HAVE_SOLARIS_THREADS

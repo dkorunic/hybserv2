@@ -79,7 +79,7 @@ static void n_set(struct Luser *, int, char **);
 static void n_set_kill(struct Luser *, int, char **);
 static void n_set_automask(struct Luser *, int, char **);
 static void n_set_private(struct Luser *, int, char **);
-static void n_set_oper(struct Luser *, int, char **);
+static void n_set_noexpire(struct Luser *, int, char **);
 static void n_set_secure(struct Luser *, int, char **);
 static void n_set_unsecure(struct Luser *, int, char **);
 static void n_set_memos(struct Luser *, int, char **);
@@ -178,7 +178,7 @@ static struct Command setcmds[] = {
   { "KILL", n_set_kill, LVL_NONE },
   { "AUTOMASK", n_set_automask, LVL_NONE },
   { "PRIVATE", n_set_private, LVL_NONE },
-  { "OPER", n_set_oper, LVL_NONE },
+  { "NOEXPIRE", n_set_noexpire, LVL_NONE },
   { "SECURE", n_set_secure, LVL_NONE },
   { "UNSECURE", n_set_unsecure, LVL_NONE },
   { "MEMOS", n_set_memos, LVL_NONE },
@@ -1196,12 +1196,12 @@ CheckOper(char *nickname)
   nptr = GetMaster(realptr);
 
   if (realptr && nptr)
-    if ((realptr->flags & NS_IDENTIFIED) && !(nptr->flags & NS_OPERATOR))
+    if ((realptr->flags & NS_IDENTIFIED) && !(nptr->flags & NS_NOEXPIRE))
     {
       notice(n_NickServ, nickname,
-        "You have not set the IRC Operator flag for your nickname");
+        "You have not set the NoExpire nickname flag for your nickname");
       notice(n_NickServ, nickname,
-        "Please type \002/msg %s SET OPER ON\002 so your nickname does not expire",
+        "Please type \002/msg %s SET NOEXPIRE ON\002 so your nickname does not expire",
         n_NickServ);
     }
 } /* CheckOper() */
@@ -1241,7 +1241,7 @@ ExpireNicknames(time_t unixtime)
 
       if (NickNameExpire)
       {
-        if ((!(nptr->flags & (NS_FORBID | NS_OPERATOR | NS_IDENTIFIED)))
+        if ((!(nptr->flags & (NS_FORBID | NS_NOEXPIRE | NS_IDENTIFIED)))
             && ((unixtime - nptr->lastseen) >= NickNameExpire))
         {
           putlog(LOG2,
@@ -1543,6 +1543,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
   else
     lcnt = 1; /* master is a standalone nickname */
 
+  /* XXX this code sucks anyway. */
   /* leaf is in linked list, add linked_count_leaf to linked_count_hub */
   if (leaf->master)
   {
@@ -1880,7 +1881,7 @@ n_register(struct Luser *lptr, int ac, char **av)
     nptr->flags |= NS_HIDEQUIT;
 
   if (IsOperator(lptr))
-    nptr->flags |= NS_OPERATOR;
+    nptr->flags |= NS_NOEXPIRE;
 
   mask = HostToMask(lptr->username, lptr->hostname);
 
@@ -3085,7 +3086,7 @@ n_set_private(struct Luser *lptr, int ac, char **av)
 } /* n_set_private() */
 
 static void
-n_set_oper(struct Luser *lptr, int ac, char **av)
+n_set_noexpire(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr;
@@ -3095,15 +3096,15 @@ n_set_oper(struct Luser *lptr, int ac, char **av)
 
   if (ac < 3)
   {
-    RecordCommand("%s: %s!%s@%s SET OPER",
+    RecordCommand("%s: %s!%s@%s SET NOEXPIRE",
       n_NickServ,
       lptr->nick,
       lptr->username,
       lptr->hostname);
 
     notice(n_NickServ, lptr->nick,
-      "Operator Status for your nickname is [\002%s\002]",
-      (nptr->flags & NS_OPERATOR) ? "ON" : "OFF");
+      "NoExpire status for your nickname is [\002%s\002]",
+      (nptr->flags & NS_NOEXPIRE) ? "ON" : "OFF");
     return;
   }
 
@@ -3114,7 +3115,7 @@ n_set_oper(struct Luser *lptr, int ac, char **av)
       notice(n_NickServ, lptr->nick,
         "Permission Denied - You are not an IRC Operator");
 
-      RecordCommand("%s: %s!%s@%s failed attempt to use SET OPER ON",
+      RecordCommand("%s: %s!%s@%s failed attempt to use SET NOEXPIRE ON",
         n_NickServ,
         lptr->nick,
         lptr->username,
@@ -3123,40 +3124,40 @@ n_set_oper(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-    RecordCommand("%s: %s!%s@%s SET OPER ON",
+    RecordCommand("%s: %s!%s@%s SET NOEXPIRE ON",
       n_NickServ,
       lptr->nick,
       lptr->username,
       lptr->hostname);
 
-    nptr->flags |= NS_OPERATOR;
+    nptr->flags |= NS_NOEXPIRE;
     notice(n_NickServ, lptr->nick,
-      "Toggled Operator Status [\002ON\002]");
+      "Toggled NoExpire status [\002ON\002]");
     return;
   }
 
   if (!irccmp(av[2], "OFF"))
   {
-    RecordCommand("%s: %s!%s@%s SET OPER OFF",
+    RecordCommand("%s: %s!%s@%s SET NOEXPIRE OFF",
       n_NickServ,
       lptr->nick,
       lptr->username,
       lptr->hostname);
 
-    nptr->flags &= ~NS_OPERATOR;
+    nptr->flags &= ~NS_NOEXPIRE;
     notice(n_NickServ, lptr->nick,
-      "Toggled Operator Status [\002OFF\002]");
+      "Toggled NoExpire status [\002OFF\002]");
     return;
   }
 
   /* user gave an unknown param */
   notice(n_NickServ, lptr->nick,
-    "Syntax: \002SET OPER {ON|OFF}\002");
+    "Syntax: \002SET NOEXPIRE {ON|OFF}\002");
   notice(n_NickServ, lptr->nick,
     ERR_MORE_INFO,
     n_NickServ,
-    "SET OPER");
-} /* n_set_oper() */
+    "SET NOEXPIRE");
+} /* n_set_noexpire() */
 
 static void
 n_set_secure(struct Luser *lptr, int ac, char **av)
@@ -3776,7 +3777,7 @@ void n_clearnoexp(struct Luser *lptr, int ac, char **av)
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
-        nptr->flags &= ~NS_OPERATOR;
+        nptr->flags &= ~NS_NOEXPIRE;
 
   notice(n_ChanServ, lptr->nick,
       "All noexpire flags for nicks have been cleared.");
@@ -4075,7 +4076,7 @@ n_info(struct Luser *lptr, int ac, char **av)
     if (AllowKillProtection)
       if (nptr->flags & NS_PROTECTED)
         strcat(buf, "Kill Protection, ");
-    if (nptr->flags & NS_OPERATOR)
+    if (nptr->flags & NS_NOEXPIRE)
       strcat(buf, "IRC Operator, ");
     if (nptr->flags & NS_AUTOMASK)
       strcat(buf, "AutoMask, ");
@@ -4600,7 +4601,7 @@ n_noexpire(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  nptr->flags |= NS_OPERATOR;
+  nptr->flags |= NS_NOEXPIRE;
 
   notice(n_NickServ, lptr->nick,
     "The nickname [\002%s\002] will never expire",

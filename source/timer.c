@@ -75,8 +75,6 @@ void *p_CheckSignals()
   sigemptyset(&set);
 /*  sigaddset(&set, SIGINT); */
   sigaddset(&set, SIGHUP);
-  sigaddset(&set, SIGSEGV);
-  sigaddset(&set, SIGBUS);
   sigaddset(&set, SIGTERM);
   sigaddset(&set, SIGCHLD);
   sigaddset(&set, SIGPIPE);

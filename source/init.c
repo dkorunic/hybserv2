@@ -125,44 +125,12 @@ ProcessSignal(int sig)
     }
 
     /* something really died */
-    case SIGSEGV:
-    case SIGBUS:
     case SIGTERM:
     {
-      if (sig == SIGSEGV)
-      {
-        toserv(":%s QUIT :%s\n:%s QUIT :%s\n",
-          n_OperServ,
-          "ACK! SIGSEGV!",
-          n_ChanServ,
-          "ACK! SIGSEGV!");
-        putlog(LOG1,
-          "Received signal SIGSEGV, shutting down (databases not saved)");
-      }
-      else
-        putlog(LOG1, "Received signal %s, shutting down",
-          (sig == SIGBUS) ? "SIGBUS" : "SIGTERM");
-
-      if (sig != SIGTERM)
-        abort(); /* make a core file to work with */
-
-      if (sig == SIGSEGV)
-      {
-        SendUmode(OPERUMODE_Y,
-          "*** Received SIGSEGV, shutting down");
-        /*
-         * Don't write databases on SIGSEGV, because there's
-         * a good chance they could get corrupted
-         */
-        /* DoShutdown(NULL, "SIGSEGV Received"); */
-        exit(1);
-      }
-      else
-      {
+        putlog(LOG1, "Received SIGTERM, shutting down");
         SendUmode(OPERUMODE_Y,
           "*** Received SIGTERM, shutting down");
         DoShutdown(NULL, "SIGTERM Received");
-      }
     }
   }
 } /* ProcessSignal() */
@@ -261,8 +229,6 @@ InitSignals()
 
   /* setup signal hooks */
   signal(SIGHUP, ProcessSignal);
-  signal(SIGSEGV, ProcessSignal);
-  signal(SIGBUS, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
 /*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);

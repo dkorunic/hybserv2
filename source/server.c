@@ -699,13 +699,22 @@ s_nick(int ac, char **av)
       nptr->lastseen = current_ts;
 
     newptr = FindNick(newnick);
+
     if (newptr)
     {
-      /*
-       * Un-Identify the new nickname in case it is registered - it could
+      if (nptr && (newptr == nptr))
+      {
+        /* If new nickname is same as old nickname, update connect table
+         * and exit without unregistering. -kre */
+#ifdef ADVFLOOD
+  	    updateConnectTable(lptr->username, lptr->hostname);
+#endif /* ADVFLOOD */
+        return;
+      }
+
+      /* Un-Identify the new nickname in case it is registered - it could
        * possibly be identified from the flags read from the userfile, if
-       * no-one has used this nickname yet.
-       */
+       * no-one has used this nickname yet. */
       newptr->flags &= ~NS_IDENTIFIED;
     }
 
@@ -735,21 +744,18 @@ s_nick(int ac, char **av)
   #endif /* NICKSERVICES */
 
     /*
-     * If the user is a generic operator who registered themselves
-     * by sending OperServ a message, remove that flag now -
-     * This code is here for a very special case scenario: If a
-     * malicious operator registers him/herself with OperServ,
-     * by sending a generic operator command, and then changes
-     * their nickname to one which has administrator privileges
-     * in hybserv.conf, they will be registered without having
-     * to give the correct password, or even without having
-     * to match the correct hostmask. This code removes
-     * their registration flag to ensure that doesn't happen.
-     * Execute this code even if OpersHaveAccess is turned
-     * off, because an operator could have registered with
-     * OperServ, while it was turned on (before a rehash
-     * etc) and the operator could get administrator access
-     * that way.
+     * If the user is a generic operator who registered themselves by
+     * sending OperServ a message, remove that flag now - This code is
+     * here for a very special case scenario: If a malicious operator
+     * registers him/herself with OperServ, by sending a generic operator
+     * command, and then changes their nickname to one which has
+     * administrator privileges in hybserv.conf, they will be registered
+     * without having to give the correct password, or even without having
+     * to match the correct hostmask. This code removes their registration
+     * flag to ensure that doesn't happen. Execute this code even if
+     * OpersHaveAccess is turned off, because an operator could have
+     * registered with OperServ, while it was turned on (before a rehash
+     * etc) and the operator could get administrator access that way.
      */
     if (GetUser(1, lptr->nick, lptr->username, lptr->hostname) == GenericOper)
       lptr->flags &= ~L_OSREGISTERED;
@@ -788,6 +794,8 @@ s_nick(int ac, char **av)
      */
     lptr->nick_ts = atoi(av[3] + 1);
 
+    /* Useless check -kre */
+#if 0
     /*
      * check if new nick is stealing someone's nick - but only
      * if who != av[2], because the user "aba" might change
@@ -796,6 +804,7 @@ s_nick(int ac, char **av)
      */
     if (irccmp(who, av[2]) != 0)
       CheckNick(av[2]);
+#endif
   #endif /* NICKSERVICES */
 
   #ifdef ALLOW_JUPES
@@ -807,7 +816,7 @@ s_nick(int ac, char **av)
   #endif /* SEENSERVICES */
 
 #ifdef ADVFLOOD
-    	updateConnectTable(lptr->username, lptr->hostname);
+  	updateConnectTable(lptr->username, lptr->hostname);
 #endif /* ADVFLOOD */
 
     return;

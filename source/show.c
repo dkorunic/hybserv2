@@ -289,8 +289,8 @@ DisplayNick(struct NickInfo *realptr, int detail)
     buf[0] = '\0';
     if (nptr->flags & NS_PROTECTED)
       strcat(buf, "Kill Protection, ");
-    if (nptr->flags & NS_OPERATOR)
-      strcat(buf, "IRC Operator, ");
+    if (nptr->flags & NS_NOEXPIRE)
+      strcat(buf, "NoExpire, ");
     if (nptr->flags & NS_AUTOMASK)
       strcat(buf, "AutoMask, ");
     if (nptr->flags & NS_PRIVATE)

@@ -1,3 +1,7 @@
+*** 20030903_1 by kreator
+- misc cleanups
+
+
 *** 20030829_1 by kreator
 - tons of putlog() and toserv() fixes -> thanks Sarisa!
 

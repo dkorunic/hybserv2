@@ -742,6 +742,7 @@ int ignore_loaddata()
   FILE *fp;
   char line[MAXLINE], **av;
   int ac, cnt = 0, ret = 1, found;
+  time_t expire;
   struct Ignore *temp;
 
   if (!(fp = fopen(OperServIgnoreDB, "r")))
@@ -780,12 +781,14 @@ int ignore_loaddata()
       MyFree(av);
       continue;
     }
+
+    expire = atol(av[1]);
   
     for (temp = IgnoreList; temp; temp = temp->next)
     {
       if (!irccmp(av[0], temp->hostmask))
       {
-        temp->expire = atol(av[1]);
+        temp->expire = expire;
         MyFree(av);
         found = 1;
         break;
@@ -794,7 +797,7 @@ int ignore_loaddata()
 
     if (!found)
     {
-      AddIgnore(av[0], atol(av[1]));
+      AddIgnore(av[0], expire);
       MyFree(av);
     }
   }

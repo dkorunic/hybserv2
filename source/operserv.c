@@ -4279,9 +4279,13 @@ DisplaySettings(struct Luser *lptr, int sockfd)
       {
         case PARAM_STRING:
         {
-          sprintf(tmp, "\"%s\" ",
-            *(char **) dptr->param[ii].ptr);
-          strcat(sendstr, tmp);
+          /* Try to write out string only if non-null, ie is set -kre */
+          if (*(char **)dptr->param[ii].ptr)
+          {
+            sprintf(tmp, "\"%s\" ",
+              *(char **) dptr->param[ii].ptr);
+            strcat(sendstr, tmp);
+          }
           break;
         }
 

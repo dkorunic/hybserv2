@@ -2703,6 +2703,10 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
   if (!chanptr || !mask)
     return 0;
 
+  /* require at least 1 minute (expire resolution) -kre */
+  if (when && (when - current_ts < 60))
+    return 0;
+
 #if defined HYBRID || defined HYBRID7
   /* Fix bogus masks (in fact, they are only in hybrid bogus -kre */
   if ((tmpmask = strchr(mask, '!')) && (tmpmask - mask > NICKLEN))

@@ -10,10 +10,12 @@ With that said - Per Sidewnder's (Cosine's) request - HYBSERV will no
 longer be supported. So if u have a question please upgrade to a version
 listed in the HYBSERV2 dir. 
 
+The latest version is 8.0 <--------------------
+
 John-Work
 
 
-HybServ(2) TS services - This file last updated by JW @ Nov 20 2000
+HybServ(2) TS services - This file last updated by JW @ April 30 2001
 Copyright (C) 1998-2000 Patrick Alken (wnder@underworld.net)
 
 HybServ was first coded by Patrick Alken (wnder@underworld.net) and is now
@@ -24,14 +26,14 @@ The following people have contributed to this release of HybServ In nick
 alphabetical order:
 
 Bruns       Brian Bruns       bruns@magenet.net
-Cosine      Patrick Alken     wnder@uwns.underworld.net
-Decho       Nedelcho Stanev   decho@csoft.bg
-Hwy101      Walter Campbell   wcampbel@botbay.net
-John-Work   F. John Rowan     john@tdkt.org
-Toot        Toby Verrall      to7@antipope.fsnet.co.uk
-Janos       John Binder       jbinder@kgazd.bme.hu
+cosine      Patrick Alken     wnder@uwns.underworld.net
+decho       Nedelcho Stanev   decho@csoft.bg
 fl_         Lee Hardy         lee@leeh.co.uk
+Hwy101      Walter Campbell   wcampbel@botbay.net
+Janos       John Binder       jbinder@kgazd.bme.hu
+John-Work   F. John Rowan     john@tdkt.org
 kreator     Dinko Korunic     kreator@fly.srk.fer.hr
+toot        Toby Verrall      to7@antipope.fsnet.co.uk
 		
 HybServ was specifically designed to run with hybrid ircd, although it
 *should* work with CSr as well.  You may recieve the hybrid irc daemon
@@ -95,13 +97,13 @@ The criteria for reporting bugs is somewhat specific.
 ################################################################
 
 
-This is the offical Hybserv mailing list hosted on MageNet.
+This is the offical Hybserv mailing list hosted on Botbay.
 
 This is a publically postable list.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
-sending e-mailing to majordomo@magenet.net:
+sending e-mailing to majordomo@botbay.net:
 
 subscribe hybserv <your mail>
 

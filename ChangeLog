@@ -1,3 +1,8 @@
+*** 20030101_1 by kreator
+- fix bug when services would load chan.db with akicks just to be expired,
+  which would cause services to crash
+
+
 *** 20021229_1 by kreator
 - smaller fix for Me.hub NULL
 

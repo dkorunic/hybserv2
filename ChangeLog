@@ -1,3 +1,6 @@
+*** 20020512_5 by kreator
+- reindent all files using gnu style
+
 *** 20020512_4 by kreator
 - add missing parens in UpdateChanModes()
 

@@ -1,3 +1,6 @@
+*** 20020514_1 by kreator
+- care about BSD signal semantics
+
 *** 20020512_7 by kreator
 - cleanup TODO
 

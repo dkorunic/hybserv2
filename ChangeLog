@@ -1,3 +1,7 @@
+*** 20010818_3 by kreator
+- fixed most inconvenient bug in OPERNICKIDENT code
+
+
 *** 20010818_2 by kreator
 - added pre-API documentation that is Janos writing
 - removed old profiling report

@@ -1,3 +1,7 @@
+*** 20020511_2 by kreator
+- misc changes in dcc
+
+
 *** 20020511_1 by kreator
 - add missing gethostbyaddr in SetupVirtualHost()
 

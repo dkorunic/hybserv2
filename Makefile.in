@@ -179,6 +179,10 @@ install-help:
 	@$(CHOWN) $(WHOAMI) $(HELPDIR)
 	@echo
 
+upgrade-chan:
+  @grep -v ALVL $(CONFDIR)/chan.db > $(CONFDIR)/chan.db.$$
+  @mv $(CONFDIR)/chan.db.$$ $(CONFDIR)/chan.db
+
 autoconf:
 	autoconf autoconf/configure.in > configure
 	autoheader -l autoconf

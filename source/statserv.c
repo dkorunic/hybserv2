@@ -73,7 +73,7 @@ static struct Command statcmds[] =
       { "SERVER", ss_server, LVL_ADMIN },
       { "REFRESH", ss_refresh, LVL_ADMIN },
       { "CLEARSTATS", ss_clearstats, LVL_ADMIN },
-      { "SHOWSTATS", ss_showstats, LVL_ADMIN },
+      { "SHOWSTATS", ss_showstats, LVL_NONE },
       { "GREPLOG",   ss_greplog, LVL_ADMIN },
 #ifdef SPLIT_INFO
       { "SPLIT",    ss_splitinfo, LVL_ADMIN },

@@ -186,6 +186,7 @@ static struct UmodeInfo *FindUmode(char);
 static void o_motd(struct Luser *, int, char **, int);
 static void o_motd_display(struct Luser *, int, char **, int);
 static void o_motd_add(struct Luser *, int, char **, int);
+static void o_motd_delete(struct Luser *, int, char **, int);
 static void o_motd_append(struct Luser *, int, char **, int);
 #endif
 
@@ -364,6 +365,7 @@ static struct OperCommand motdcmds[] =
       { "DISPLAY", o_motd_display, 0, 0 },
       { "ADD", o_motd_add, 0, 0 },
       { "APPEND", o_motd_append, 0, 0 },
+      { "DELETE", o_motd_delete, 0, 0 },
       { 0, 0, 0, 0 }
     };
 #endif
@@ -4999,7 +5001,7 @@ static void o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
   if (ac < 2)
     {
       os_notice(lptr, sockfd,
-                "Syntax: \002MOTD {ADD|APPEND|DISPLAY} [line]\002");
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY|DELETE} [line]\002");
       return;
     }
 
@@ -5018,7 +5020,7 @@ static void o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
                 (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
                 av[1]);
       os_notice(lptr, sockfd,
-                "Syntax: \002MOTD {ADD|APPEND|DISPLAY} [line]\002");
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY|DELETE} [line]\002");
     }
 } /* o_motd() */
 
@@ -5103,6 +5105,32 @@ static void o_motd_append(struct Luser *lptr, int ac, char **av, int
   os_notice(lptr, sockfd,
          "Line appended to the current MOTD");
 } /* o_motd_append() */
+
+/*
+  o_motd_delete()
+  Delete current motd
+*/
+static void o_motd_delete(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+
+  o_RecordCommand(sockfd, "MOTD DELETE");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "w")))
+    {
+      os_notice(lptr, sockfd,
+             "Cannot open MOTD file %s!",
+             Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fclose(fp);
+
+  ReadMessageFile(&Network->LogonNewsFile);
+
+  os_notice(lptr, sockfd, "MOTD deleted");
+} /* o_motd_delete() */
 #endif
 
 /*

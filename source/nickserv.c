@@ -1667,13 +1667,12 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
    * leafmaster's channels to master's channels. There's no point in
    * reallocating - just assign master's pointer to leafmaster's
    *
+   * BUG: Dropping the leaf nick, which is a founder of a channel, doesn't
+   * get the channel dropped, because chanserv thinks it is registered to
+   * the master.
    *
-   *
-   * BUG: Dropping the leaf nick, which is a founder of a channel, doesn't get
-   * the channel dropped, because chanserv thinks it is registered to the master.
-   *
-   * POSSIBLE BUG: Leaving the leafnick's access on channels and granting the master's
-   * founder access... This doesn't seem logical?
+   * POSSIBLE BUG: Leaving the leafnick's access on channels and granting
+   * the master's founder access... This doesn't seem logical?
    */
   if (leafmaster->FounderChannels)
     {
@@ -1684,7 +1683,10 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
           if (tmpchan->cptr->founder)
             MyFree(tmpchan->cptr->founder);
 
-	  tmpchan->cptr->founder = MyStrdup(master->nick);
+          /* Add this channel to masters founder list -jared */
+          AddFounderChannelToNick(&master,tmpchan->cptr);
+
+          tmpchan->cptr->founder = MyStrdup(master->nick);
 	}
     }
 
@@ -1693,11 +1695,19 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
       struct AccessChannel *acptr;
 
       for (acptr = leafmaster->AccessChannels; acptr; acptr = acptr->next)
+      {
+        /* Add this channel to masters channel access list -jared */
+        AddAccessChannel(master,acptr->cptr,acptr->accessptr);
         acptr->accessptr->nptr = master;
+      }
     }
 
+  /* Remove this code, or it will clobber the users lists
+   * -jared */
+  /*
   master->FounderChannels = leafmaster->FounderChannels;
   master->AccessChannels = leafmaster->AccessChannels;
+  */
   master->fccnt = leafmaster->fccnt;
   leafmaster->FounderChannels = NULL;
   leafmaster->AccessChannels = NULL;

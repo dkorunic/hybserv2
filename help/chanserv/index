@@ -23,7 +23,7 @@ For more information on a specific command, type
     UNBAN      Unban yourself on a channel
     CLEAR      Clear various channel modes
     MODES      Show the current modes of a channel
-    CYCLE      Cycle a channel and clears variopus options
+    CYCLE      Cycle a channel and clears various options
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b

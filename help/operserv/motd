@@ -1,6 +1,7 @@
 Syntax: %bMOTD ADD [line]%b
         %bMOTD APPEND [line]%b
         %bMOTD DISPLAY%b
+        %bMOTD DELETE%b
 
 Maintain the MOTD (logon news). If there is a
 MOTD it will be sent to a connecting user.
@@ -20,3 +21,7 @@ Examples:
 
          %bMOTD APPEND Read rules!%b
            Add "Read rules!" to current MOTD.
+
+         %bMOTD DELETE%b
+           Deletes current MOTD
+

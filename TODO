@@ -7,6 +7,16 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 
 Pending bugs:
 -------------
+*) From Jared:
+  If a channel is set to restricted with guard off, when a user gets
+  banned from the channel chanserv hops in (and is suppoesd to stay in a
+  for a few minutes to enforce the ban) but he stays in there forever and
+  never leaves even if restricted is turned off..   
+*) From Jared:
+  if a user adds a linked nickname then deletes that linked nickname
+  several times they start getting the too many nicks error.. it looks
+  like the numlinks is being incremented several times every time someone
+  adds a link and not being decremented at the same rate...
 *) secure doesn't clear ban for admin [why?]
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions

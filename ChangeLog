@@ -1,3 +1,7 @@
+*** 20010816_1 by kreator
+- disable unused portion of match.c
+
+
 *** 20010811_1 by kreator
 - added TIME_WITH_SYS_TIME check, did proper change of *.c which use
   time.h

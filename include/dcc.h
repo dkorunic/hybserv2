@@ -96,7 +96,7 @@ struct DccUser *GetBot(char *nick);
 struct DccUser *IsDccSock(int socket);
 struct DccUser *IsOnDcc(char *nick);
 void DccProcess(struct DccUser *dccptr, char *line);
-void BotProcess(struct DccUser *bptr, char *line);
+int BotProcess(struct DccUser *bptr, char *line);
 void SendMotd(int socket);
 void ServReboot();
 

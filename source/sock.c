@@ -709,8 +709,8 @@ ReadSocketInfo(void)
 
 #ifdef HAVE_SOLARIS_THREADS
 
-                  thr_create(NULL, 0, (void *) &ConnectClient, (void *) tempport,
-                             THR_DETACHED, &clientid);
+                  thr_create(NULL, 0, (void *) &ConnectClient, (void *)
+                      tempport, THR_DETACHED, &clientid);
 
 #else
 
@@ -718,8 +718,10 @@ ReadSocketInfo(void)
 
                   /* this way gethostbyaddr() will be non-blocking */
                   pthread_attr_init(&attr);
-                  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-                  pthread_create(&clientid, &attr, (void *) &ConnectClient, (void *) tempport);
+                  pthread_attr_setdetachstate(&attr,
+                      PTHREAD_CREATE_DETACHED);
+                  pthread_create(&clientid, &attr, (void *)
+                      &ConnectClient, (void *) tempport);
 
 #else
 
@@ -737,7 +739,8 @@ ReadSocketInfo(void)
               assert(dccptr->socket != NOSOCKET);
               dccnext = dccptr->next;
 
-              if (IsDccConnect(dccptr) && FD_ISSET(dccptr->socket, &writefds))
+              if (IsDccConnect(dccptr)
+                  && FD_ISSET(dccptr->socket, &writefds))
                 {
                   if (!GreetDccUser(dccptr))
                     DeleteDccClient(dccptr);
@@ -1003,8 +1006,8 @@ ReadSock(struct DccUser *connptr)
 
 {
   int length;
-  register char *ch;
-  register char *linech;
+  char *ch;
+  char *linech;
 
   if (!connptr)
     return 0;
@@ -1049,10 +1052,14 @@ ReadSock(struct DccUser *connptr)
 
           /* process the line */
           if (connptr->flags & SOCK_TCMBOT)
-            BotProcess(connptr, connptr->spill); /* process line from bot */
+          {
+            /* process line from bot */
+            if (BotProcess(connptr, connptr->spill))
+              return 1;
+          }
           else
-            DccProcess(connptr, connptr->spill); /* process line from client */
-
+            /* process line from client */
+            DccProcess(connptr, connptr->spill); 
           linech = connptr->spill;
           connptr->offset = 0;
 
@@ -1223,8 +1230,7 @@ DoListen(struct PortInfo *portptr)
   if (bind(portptr->socket, (struct sockaddr *)&socketname, sizeof(socketname)) < 0)
     {
       putlog(LOG1, "Unable to bind port %d: %s",
-             portptr->port,
-             strerror(errno));
+             portptr->port, strerror(errno));
       close(portptr->socket);
       portptr->socket = NOSOCKET;
       return;
@@ -1233,8 +1239,7 @@ DoListen(struct PortInfo *portptr)
   if (listen(portptr->socket, 4) < 0)
     {
       putlog(LOG1, "Unable to listen on port %d: %s",
-             portptr->port,
-             strerror(errno));
+             portptr->port, strerror(errno));
       close(portptr->socket);
       portptr->socket = NOSOCKET;
       return;

@@ -6,6 +6,7 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) o_match - fix to add *! and similar stuff
 *) set allowguardchannel 0 -> part all channels immediately
 *) segv:
 [19:54:37] <q> 1) register a channel

@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
 {
   char *plaintext = NULL;
   extern char *optarg;
-  extern int optind;
   int c;
   char *saltpara = NULL;
   char *salt;

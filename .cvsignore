@@ -3,3 +3,4 @@ config.cache
 config.status
 Makefile
 configure
+tags

@@ -510,25 +510,23 @@ ConnectClient(struct PortInfo *portptr)
     return;
 
   addrlen = sizeof(struct sockaddr_in);
-  if ((fd = accept(portptr->socket, (struct sockaddr *)&RemoteAddr, &addrlen)) < 0 )
+  if ((fd = accept(portptr->socket, (struct sockaddr *)&RemoteAddr,
+          &addrlen)) < 0)
     {
-      putlog(LOG1,
-             "Error in accept on socket %d",
-             portptr->socket);
+      putlog(LOG1, "Error in accept on socket %d", portptr->socket);
       return;
     }
 
   if (MaxConnections && (Network->TotalConns >= MaxConnections))
     {
       /* maximum users reached */
-      writesocket(fd,
-                  "Maximum connections reached, try again later\n");
+      writesocket(fd, "Maximum connections reached, try again later\n");
       close(fd);
       return;
     }
 
-  RemoteHost = gethostbyaddr((char *)&RemoteAddr.sin_addr.s_addr,
-                             4,AF_INET);
+  RemoteHost = gethostbyaddr((char *)&RemoteAddr.sin_addr.s_addr, 4,
+      AF_INET);
 
   tempconn = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
   memset(tempconn, 0, sizeof(struct DccUser));
@@ -552,39 +550,13 @@ ConnectClient(struct PortInfo *portptr)
       {
         int sock;
 
-#if 0
-        /*
-         * This is done in BotProcess() now
-         */
-
-        /* Check if the tcm bot has an L: line */
-        if (!GoodTCM(tempconn))
-          {
-            putlog(LOG1, "Illegal tcm connection attempt on port %d from %s:%d",
-                   portptr->port,
-                   tempconn->hostname,
-                   tempconn->port);
-
-            SendUmode(OPERUMODE_B,
-                      "*** Unauthorized tcm connection attempt from [%s:%d] on port %d",
-                      tempconn->hostname,
-                      tempconn->port,
-                      portptr->port);
-
-            close(tempconn->socket);
-            MyFree(tempconn->hostname);
-            MyFree(tempconn);
-            return;
-          }
-#endif /* 0 */
-
         tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
 
+        putlog(LOG1, "Received tcm connection from [%s:%d] on port %d",
+                  tempconn->hostname, tempconn->port, portptr->port);
         SendUmode(OPERUMODE_B,
                   "*** Received tcm connection from [%s:%d] on port %d",
-                  tempconn->hostname,
-                  tempconn->port,
-                  portptr->port);
+                  tempconn->hostname, tempconn->port, portptr->port);
 
         sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
         if (sock < 0)
@@ -604,14 +576,11 @@ ConnectClient(struct PortInfo *portptr)
               {
                 putlog(LOG1,
                        "Illegal connection attempt on port %d from [%s:%d]",
-                       portptr->port,
-                       tempconn->hostname,
-                       tempconn->port);
+                       portptr->port, tempconn->hostname, tempconn->port);
 
                 SendUmode(OPERUMODE_B,
                           "*** Unauthorized connection attempt from [%s:%d] on port %d",
-                          tempconn->hostname,
-                          tempconn->port,
+                          tempconn->hostname, tempconn->port,
                           portptr->port);
 
                 close(tempconn->socket);
@@ -685,29 +654,20 @@ readauth()
   dccptr->authfd is active - read the ident reply if there is one
 */
 
-void
-readauth(struct DccUser *dccptr)
-
+void readauth(struct DccUser *dccptr)
 {
   char buffer[MAXLINE], ident[USERLEN + 1];
   int length;
-
-  if (dccptr->authfd == NOSOCKET)
-    return;
 
   memset(buffer, 0, MAXLINE);
   length = recv(dccptr->authfd, buffer, sizeof(buffer), 0);
   if (length > 0)
     {
-      u_short  remport = 0,
-                         locport = 0;
+      u_short remport = 0, locport = 0;
       int num;
 
-      num = sscanf(buffer,
-                   "%hd , %hd : USERID : %*[^:]: %10s",
-                   &remport,
-                   &locport,
-                   ident);
+      num = sscanf(buffer, "%hd , %hd : USERID : %*[^:]: %10s",
+                   &remport, &locport, ident);
 
       /*
        * If num != 3, it's possible the remote identd returned
@@ -973,16 +933,12 @@ GreetDccUser(struct DccUser *dccptr)
 #ifdef DEBUGMODE
       fprintf(stderr,
               "Cannot connect to port %d of %s: %s\n",
-              dccptr->port,
-              dccptr->hostname,
-              strerror(errval));
+              dccptr->port, dccptr->hostname, strerror(errval));
 #endif
 
       SendUmode(OPERUMODE_Y,
                 "*** Lost connection to [%s@%s:%d]: %s",
-                dccptr->username,
-                dccptr->hostname,
-                dccptr->port,
+                dccptr->username, dccptr->hostname, dccptr->port,
                 strerror(errval));
 
       return 0;
@@ -1879,9 +1835,7 @@ DccProcess(struct DccUser *dccptr, char *command)
 
           SendUmode(OPERUMODE_Y,
                     "*** Unauthorized connection attempt from %s@%s:%d [%s]",
-                    dccptr->username,
-                    dccptr->hostname,
-                    dccptr->port,
+                    dccptr->username, dccptr->hostname, dccptr->port,
                     dccptr->nick);
           CloseConnection(dccptr);
           return;
@@ -1904,9 +1858,7 @@ DccProcess(struct DccUser *dccptr, char *command)
 
           SendUmode(OPERUMODE_Y,
                     "Unauthorized connection attempt from %s@%s:%d [%s]",
-                    dccptr->username,
-                    dccptr->hostname,
-                    dccptr->port,
+                    dccptr->username, dccptr->hostname, dccptr->port,
                     tempuser->nick);
           CloseConnection(dccptr);
           return;
@@ -2006,18 +1958,17 @@ BotProcess()
   args: int bindex, char *line
   purpose: send 'line' to all other bots/users on botnet coming from
            botptr
-  return: none
+  return: 1 -> failure (forced close, forget about spill)
+          0 -> success
 */
 
-void
-BotProcess(struct DccUser *botptr, char *line)
-
+int BotProcess(struct DccUser *botptr, char *line)
 {
   struct DccUser *tmp;
   char buf[MAXLINE];
 
   if (!line)
-    return;
+    return 0;
 
   Network->RecvB += (line ? strlen(line) : 0);
 
@@ -2032,17 +1983,13 @@ BotProcess(struct DccUser *botptr, char *line)
 
       if (!(bptr = GoodTCM(botptr)))
         {
+          goodconn = 0;
           SendUmode(OPERUMODE_B,
                     "*** Unauthorized tcm connection received from %s@%s:%d",
-                    botptr->username,
-                    botptr->hostname,
-                    botptr->port);
+                    botptr->username, botptr->hostname, botptr->port);
           putlog(LOG1,
                  "Unauthorized tcm connection received from %s@%s:%d",
-                 botptr->username,
-                 botptr->hostname,
-                 botptr->port);
-          goodconn = 0;
+                 botptr->username, botptr->hostname, botptr->port);
         }
 
       if (goodconn)
@@ -2129,6 +2076,7 @@ BotProcess(struct DccUser *botptr, char *line)
           struct DccUser *prv;
 
           close(botptr->socket);
+          botptr->socket = NOSOCKET;
           MyFree(botptr->username);
           MyFree(botptr->hostname);
 
@@ -2160,9 +2108,10 @@ BotProcess(struct DccUser *botptr, char *line)
             } /* if (connections) */
 
           Network->TotalConns--;
+          return 1;
         }
 
-      return;
+      return 0;
     }
 
   if (*line == '<')
@@ -2178,6 +2127,7 @@ BotProcess(struct DccUser *botptr, char *line)
           writesocket(tmp->socket, buf);
         }
     }
+  return 0;
 } /* BotProcess() */
 
 /*

@@ -1,3 +1,7 @@
+*** 20021229_1 by kreator
+- smaller fix for Me.hub NULL
+
+
 *** 20021212_1 by kreator
 - fix #undef gecosbans warning
 - smaller set of changes

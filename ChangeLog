@@ -1,3 +1,12 @@
+*** 20010510_1 by kreator
+- misc changes to INSTALL
+- added myself as leader developer :-) as result of discussion with John,
+  that doesn't mean I will pretend to be boss -> I will try to continue
+  improving HybServ2 and putting lot of efforts in that wonderful project:
+  just to mention that more people are joining us and hopefully this
+  project will grow even more
+
+
 *** 20010508_2 by kreator
 - DisplaySettings() in OperServ had same bug as did SaveSettings() in
   settings.c: it didn't check if PARAM_STRING is empty

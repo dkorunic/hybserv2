@@ -60,7 +60,7 @@ AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_FUNCS(gethostbyname, , [AC_CHECK_LIB(nsl, gethostbyname), , LIBS="$LIBS -lnsl"])
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt")
-AC_CHECK_LIB(cup, coffe, , AC_MSG_WARN("have no coffe to work with"))
+AC_CHECK_LIB(cup, coffee, , AC_MSG_WARN("have no coffee to work with"))
 
 dnl Do not compile with pthread support if they give a
 dnl --disable-threads or --enable-threads=no to configure

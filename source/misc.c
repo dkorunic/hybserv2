@@ -151,7 +151,7 @@ char *make_md5_salt()
 
   /* Saltify */
   for (i = 3; i <= 10; i++)
-  salt[i] = saltChars[random() % 64];
+    salt[i] = saltChars[random() % 64];
 
   /* And properly finish modular crypt salt string -kre */
   salt[11] = '$';

@@ -171,6 +171,7 @@ void DeleteChan(struct ChanInfo *cptr);
 void RemFounder(struct Luser *lptr, struct ChanInfo *cptr);
 void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr);
 int HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level);
+void SetDefaultALVL(struct ChanInfo *cptr);
 
 /*
  * Extern declarations

@@ -1,14 +1,8 @@
 Today's MOTD
 ------------
-
-        In the beginning was the Tao.  The Tao gave birth to Space and Time.
-Therefore, Space and Time are the Yin and Yang of programming.
-
-        Programmers that do not comprehend the Tao are always running out of
-time and space for their programs.  Programmers that comprehend the Tao always
-have enough time and space to accomplish their goals.
-        How could it be otherwise?
-                -- Geoffrey James, "The Tao of Programming"
+"I was gratified to be able to answer promptly, and I did.  I said I
+didn't know."
+                -- Mark Twain
 
 
 Pending bugs:
@@ -65,6 +59,13 @@ Features to come:
 
 Done so far:
 ------------
+*) applied (some are slightly modified) patches from KrisDuv
+   <krisduv2000@yahoo.fr> in the following order:
+   - fix stupid DefaultAccess problem which ment that anyone could alter
+     global channel levels (how the heck didn't anyone notice that?)
+   - fix broken lastseen updating for nicknames
+   - fix broken "Last Seen" info in n_info()
+*) Walter has fixed restart() problem that was affected with check_pid()
 *) fix stupid bug that services +o people who match() O line, but have not
    registered with OperServ
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some

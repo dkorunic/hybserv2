@@ -686,14 +686,17 @@ s_nick(int ac, char **av)
   #ifdef NICKSERVICES
     nptr = FindNick(lptr->nick);
 
+    /* Update lastseen info for old nickname */
+    if (nptr->flags & NS_IDENTIFIED)
+      nptr->lastseen = current_ts;
+
     newptr = FindNick(newnick);
     if (newptr)
     {
       /*
-       * Un-Identify the new nickname in case it is registered -
-       * it could possibly be identified from the flags read
-       * from the userfile, if no-one has used this nickname
-       * yet.
+       * Un-Identify the new nickname in case it is registered - it could
+       * possibly be identified from the flags read from the userfile, if
+       * no-one has used this nickname yet.
        */
       newptr->flags &= ~NS_IDENTIFIED;
     }
@@ -703,12 +706,11 @@ s_nick(int ac, char **av)
 
     #ifdef LINKED_NICKNAMES
       /*
-       * One of the features of linked nicknames is if you
-       * identify for one nick in the link, you are identified
-       * for every nick. If lptr->nick is changing his/her nick
-       * to another nickname in the link (and is currently
-       * identified), make sure they get correctly identified
-       * for the new nickname.
+       * One of the features of linked nicknames is if you identify for
+       * one nick in the link, you are identified for every nick. If
+       * lptr->nick is changing his/her nick to another nickname in the
+       * link (and is currently identified), make sure they get correctly
+       * identified for the new nickname.
        */
       if (nptr->flags & NS_IDENTIFIED)
       {
@@ -1289,6 +1291,7 @@ s_quit(int ac, char **av)
       if (nptr->lastqmsg)
         MyFree(nptr->lastqmsg);
       nptr->lastqmsg = MyStrdup(av[2] + 1);
+      nptr->lastseen = current_ts;
     }
   }
 #endif /* NICKSERVICES */

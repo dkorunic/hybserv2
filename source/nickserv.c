@@ -296,12 +296,6 @@ ns_process(char *nick, char *command)
     }
   }
 
-  if (nptr) /* they might not have registered yet */
-  {
-    /* update the time they were last seen */
-    nptr->lastseen = current_ts;
-  }
-
   /* call cptr->func to execute command */
   (*cptr->func)(lptr, acnt, arv);
 
@@ -1275,8 +1269,8 @@ ExpireNicknames(time_t unixtime)
 
       if (NickNameExpire)
       {
-        if ((!(nptr->flags & (NS_FORBID | NS_OPERATOR))) &&
-            ((unixtime - nptr->lastseen) >= NickNameExpire))
+        if ((!(nptr->flags & (NS_FORBID | NS_OPERATOR | NS_IDENTIFIED)))
+            && ((unixtime - nptr->lastseen) >= NickNameExpire))
         {
           putlog(LOG2,
             "%s: Expired nickname: [%s]",
@@ -4168,7 +4162,7 @@ n_info(struct Luser *lptr, int ac, char **av)
     "         Registered: %s ago",
     timeago(realptr->created, 1));
 
-  if (realptr->lastseen && !userptr)
+  if (realptr->lastseen && !online)
     notice(n_NickServ, lptr->nick,
       "          Last Seen: %s ago",
       timeago(realptr->lastseen, 1));
@@ -4180,7 +4174,7 @@ n_info(struct Luser *lptr, int ac, char **av)
     if (LastSeenInfo)
     {
       if (!(nptr->flags & NS_HIDEADDR) || isadmin)
-        if (!userptr && realptr->lastu && realptr->lasth)
+        if (!online && realptr->lastu && realptr->lasth)
           notice(n_NickServ, lptr->nick,
             "  Last Seen Address: %s@%s",
             realptr->lastu,

@@ -760,7 +760,7 @@ cs_loaddata()
       {
         if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
         {
-          cptr->access_lvl = DefaultAccess;
+          SetDefaultALVL(cptr);
 
           fatal(1,
             "%s:%d No access level list for registered channel [%s] (using default)",
@@ -840,7 +840,7 @@ cs_loaddata()
   {
     if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
     {
-      cptr->access_lvl = DefaultAccess;
+      SetDefaultALVL(cptr);
 
       fatal(1,
         "%s:%d No access level list for registered channel [%s] (using default)",
@@ -2405,7 +2405,7 @@ DeleteChan(struct ChanInfo *chanptr)
     MyFree(chanptr->url);
   if (chanptr->entrymsg)
     MyFree(chanptr->entrymsg);
-  if (chanptr->access_lvl && (chanptr->access_lvl != DefaultAccess))
+  if (chanptr->access_lvl)
     MyFree(chanptr->access_lvl);
 
   if (chanptr->next)
@@ -3101,7 +3101,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   cptr->name = MyStrdup(av[1]);
   cptr->founder = MyStrdup(nptr->nick);
   cptr->created = cptr->lastused = current_ts;
-  cptr->access_lvl = DefaultAccess;
+  SetDefaultALVL(cptr);
 
   /*
    * If the channel is registered by an operator or higher,
@@ -3336,7 +3336,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (atoi(av[4]) < (DefaultAccess[CA_FOUNDER] * -1) )
+  if (atoi(av[4]) < (-DefaultAccess[CA_FOUNDER]))
   {
      notice(n_ChanServ, lptr->nick,
        "You cannot add an access level lower than [\002-%d\002]",
@@ -4239,7 +4239,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     if (index == (-2))
     {
       /* reset everything */
-      cptr->access_lvl = DefaultAccess;
+      SetDefaultALVL(cptr);
       notice(n_ChanServ, lptr->nick,
         "The access level list for %s has been reset",
         cptr->name);
@@ -6909,7 +6909,7 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     cptr->name = MyStrdup(av[1]);
     cptr->created = current_ts;
     cptr->flags |= CS_FORBID;
-    cptr->access_lvl = DefaultAccess;
+    SetDefaultALVL(cptr);
     AddChan(cptr);
   }
 
@@ -7165,7 +7165,7 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   cptr->name = MyStrdup(av[1]);
   cptr->created = current_ts;
   cptr->flags = CS_FORGET;
-  cptr->access_lvl = DefaultAccess;
+  SetDefaultALVL(cptr);
 
   AddChan(cptr);
 
@@ -7337,7 +7337,7 @@ static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
   for (ii = 0; ii < CHANLIST_MAX; ii++)
     for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
-        cptr->access_lvl = DefaultAccess;
+        SetDefaultALVL(cptr);
 
   notice(n_ChanServ, lptr->nick,
       "All channels have been reset to default access levels." );
@@ -7345,5 +7345,20 @@ static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
 } /* c_resetlevels */
 
 #endif /* EMPOWERADMINS */
+
+/*
+ * Routine to set Channel level to default. This fixes a *huge* bug
+ * reported by KrisDuv <krisduv2000@yahoo.fr>.
+ */
+void SetDefaultALVL(struct ChanInfo *cptr)
+{
+  int i;
+
+  if (cptr->access_lvl == NULL)  
+    cptr->access_lvl = MyMalloc(sizeof(int) * CA_SIZE);
+
+  for (i = 0; i < CA_SIZE; ++i)
+    cptr->access_lvl[i] = DefaultAccess[i];
+}
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

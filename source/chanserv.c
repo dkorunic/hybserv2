@@ -80,7 +80,7 @@ static int DefaultAccess[] = {
 #ifdef HYBRID7
                                /* Default access for halfop and cmdhalfop -Janos */
                                8,           /* CA_AUTOHALFOP */
-                               10,           /* CA_CMDHALFOP */
+                               10,          /* CA_CMDHALFOP */
 #endif /* HYBRID7 */
                                10,          /* CA_AUTOOP */
                                10,          /* CA_CMDOP */

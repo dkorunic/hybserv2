@@ -69,6 +69,10 @@ void
 ProcessSignal(int sig)
 
 {
+#if !defined HAVE_SOLARIS_THREADS && !defined HAVE_PTHREADS
+  InitSignals();
+#endif
+  
   switch (sig)
     {
       /* rehash configuration file */
@@ -111,7 +115,6 @@ ProcessSignal(int sig)
     case SIGPIPE:
       {
         putlog(LOG1, "Received signal SIGPIPE, ignoring");
-        /*abort();*/
         break;
       }
 
@@ -238,7 +241,7 @@ InitSignals()
   signal(SIGTERM, ProcessSignal);
   /*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);
-  signal(SIGPIPE, SIG_IGN);
+  signal(SIGPIPE, ProcessSignal);
 
 #endif /* HAVE_PTHREADS */
 #endif

@@ -69,41 +69,31 @@ int               GoodTimer = 1;
 
 void *p_CheckSignals()
 {
-  sigset_t set
-    ;
+  sigset_t set;
   int caught;
 
-  sigemptyset(&set
-             );
+  sigemptyset(&set);
   /*  sigaddset(&set, SIGINT); */
-  sigaddset(&set
-            , SIGHUP);
-  sigaddset(&set
-            , SIGTERM);
-  sigaddset(&set
-            , SIGCHLD);
-  sigaddset(&set
-            , SIGPIPE);
+  sigaddset(&set, SIGHUP);
+  sigaddset(&set, SIGTERM);
+  sigaddset(&set, SIGCHLD);
+  sigaddset(&set, SIGPIPE);
 
 #ifdef HAVE_SOLARIS_THREADS
 
-  thr_sigsetmask(SIG_BLOCK, &set
-                 , NULL);
+  thr_sigsetmask(SIG_BLOCK, &set, NULL);
 #else
 
-  pthread_sigmask(SIG_BLOCK, &set
-                  , NULL);
+  pthread_sigmask(SIG_BLOCK, &set, NULL);
 #endif
 
   while (1)
     {
 #ifdef HAVE_SOLARIS_THREADS
-      caught=sigwait(&set
-                    );
+      caught = sigwait(&set);
 #else
 
-      sigwait(&set
-              , &caught); /* wait until we get a signal */
+      sigwait(&set, &caught); /* wait until we get a signal */
 #endif
 
       ProcessSignal(caught); /* we got a signal, process it */

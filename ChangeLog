@@ -1,3 +1,10 @@
+*** 20030112_1 by kreator
+- added m_forcenick.c as Hybrid7 FORCENICK module, to be incorporated with
+  identifying and nickchanges..
+- added hybrid_services.c as Hybrid7 module for /nickserv, /operserv,
+  /memoserv, /identify etc.. (thanks bnx!)
+
+
 *** 20030111_2 by kreator
 Directory /home/cvs/hybserv/contrib added to the repository
 

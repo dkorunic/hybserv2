@@ -143,6 +143,10 @@ SplitBuf(char *buff, char ***array)
    * When hybrid sends channel bans during a netjoin, it leaves
    * a preceding space (not sure why) - just make sure there
    * are no preceding spaces
+   *
+   * Note that Hybrid7 sends also spaces after SJOIN's, like in
+   * <fl_> :irc.vchan SJOIN 978405679 #ircd-coders +sptna : @Diane @dia
+   * -kre
    */
   while (IsSpace(*tempbuf))
     ++tempbuf;

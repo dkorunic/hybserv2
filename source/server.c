@@ -1697,20 +1697,33 @@ s_sjoin(int ac, char **av)
    * names list *should* start with a :, if it doesn't, there's a
    * limit and/or key 
    */
-  if (av[5][0] != ':')
+  if (av[mcnt][0] != ':')
   {
     strcat(modes, " ");
-    strcat(modes, av[5]);
+    strcat(modes, av[mcnt]);
     mcnt++;
-    if (av[6][0] != ':')
+    if (av[mcnt][0] != ':') /* XXX - same code, rewrite it! -kre */
     {
       strcat(modes, " ");
-      strcat(modes, av[6]);
+      strcat(modes, av[mcnt]);
       mcnt++;
     }
   }
 
-  ncnt = SplitBuf(av[mcnt] + 1, &nicks);
+  /* OK, we now know that av[mcnt][0]==':', but we have to fix case when
+   * there is av[mcnt]==":" and nothing after, like in 
+   * :irc.vchan SJOIN 978405679 #ircd-coders +sptna : @Diane @dia
+   * --> this happens with hybrid7beta2 -kre
+   *
+   * XXX - this is quickfix, we should rewrite this -kre
+   * */
+    if (av[mcnt] == ':' && !av[mcnt][1])
+    {
+      /* No need to evade ':', since it is in av[mcnt] alone -kre */
+      ncnt = SplitBuf(av[++mcnt], &nicks);
+    }
+    else
+      ncnt = SplitBuf(av[mcnt] + 1, &nicks);
 
   /*
    * when a user joins the channel "0", they get parted from all their

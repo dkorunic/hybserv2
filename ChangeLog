@@ -1,3 +1,12 @@
+*** 20030129_1 by kreator
+- rev to rc1
+- NICKLEN to 18, it makes a day easier for me :-) and evades a ton of
+  false bug reports..
+- smaller operserv string fix
+- remove some stuff from TODO
+- make a working mailing list
+
+
 *** 20030124_1 by kreator
 - fix phread location for FreeBSD
 - smaller operserv stuff

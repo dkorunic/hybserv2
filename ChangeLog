@@ -1,3 +1,9 @@
+*** 20010816_2 by kreator
+- disable ADVFLOOD_NOTIFY_ALL at the moment
+- do some misc changes for flood detections, seems new advflood code is
+  reason of latest cpu-kill deadloops :(
+
+
 *** 20010816_1 by kreator
 - disable unused portion of match.c
 

@@ -12,9 +12,13 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <string.h>
 #include <time.h>
+#ifndef HAVE_CYGWIN
+#include <signal.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "alloc.h"
 #include "chanserv.h"

@@ -18,11 +18,11 @@
 /* Define if you have native Solaris threads. */
 #undef HAVE_SOLARIS_THREADS
 
+/* Define if you have CygWin compiler environment */
+#undef HAVE_CYGWIN
+
 /* Define if you have the gethostbyname function.  */
 #undef HAVE_GETHOSTBYNAME
-
-/* Define if you have the snprintf function.  */
-#undef HAVE_SNPRINTF
 
 /* Define if you have the strdup function.  */
 #undef HAVE_STRDUP
@@ -32,9 +32,6 @@
 
 /* Define if you have the strncpy function.  */
 #undef HAVE_STRNCPY
-
-/* Define if you have the vprintf function.  */
-#undef HAVE_VPRINTF
 
 /* Define if you have the <sys/time.h> header file.  */
 #undef HAVE_SYS_TIME_H

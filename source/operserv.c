@@ -19,9 +19,13 @@
 #include <sys/utsname.h>
 #include <string.h>
 #include <errno.h>
-#include <signal.h>
 #include <time.h>
 #include <assert.h>
+#ifndef HAVE_CYGWIN
+#include <signal.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "alloc.h"
 #include "channel.h"

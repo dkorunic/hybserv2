@@ -19,6 +19,8 @@ case "$host_os" in
 *solaris*)
   _SunOS=1
   ;;
+*cygwin)
+  AC_DEFINE(HAVE_CYGWIN)
 esac
 
 dnl Package information

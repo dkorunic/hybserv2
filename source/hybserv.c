@@ -19,7 +19,13 @@
 #include <sys/resource.h>
 #include <unistd.h>
 #include <time.h>
+
+#ifndef HAVE_CYGWIN
 #include <signal.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
+
 #include <sys/utsname.h>
 
 #include "alloc.h"

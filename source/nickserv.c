@@ -917,18 +917,17 @@ DeleteNick(struct NickInfo *nickptr)
     nickptr->FounderChannels = ftmp;
 
     /*
-     * All channels that this nick registered should be dropped,
-     * unless there is a successor.
+     * All channels that this nick registered should be dropped, unless
+     * there is a successor.
      *
-     * Before calling DeleteChan(), it would be best if nickptr
-     * has already been removed from nicklist[]. Otherwise,
-     * DeleteChan() might try to call RemoveFounderChannelFromNick().
-     * This would be very bad, since this loop is modifying nickptr's
-     * FounderChannels list. Right now, all calls to DeleteNick()
-     * remove nickptr from nicklist[] beforehand, but, being
-     * as paranoid as I am, we'll set cptr->founder to null here,
-     * so there is *NO* chance of it ever being used to delete
-     * nickptr's FounderChannels list.
+     * Before calling DeleteChan(), it would be best if nickptr has
+     * already been removed from nicklist[]. Otherwise, DeleteChan() might
+     * try to call RemoveFounderChannelFromNick(). This would be very bad,
+     * since this loop is modifying nickptr's FounderChannels list. Right
+     * now, all calls to DeleteNick() remove nickptr from nicklist[]
+     * beforehand, but, being as paranoid as I am, we'll set cptr->founder
+     * to null here, so there is *NO* chance of it ever being used to
+     * delete nickptr's FounderChannels list.
      */
     if (cptr->founder)
     {
@@ -943,7 +942,16 @@ DeleteNick(struct NickInfo *nickptr)
     if (cptr->successor)
       PromoteSuccessor(cptr);
     else
+    {
+      /* Fix by KrisDuv - make OperServ part if on channel */
+      struct Channel *chptr;
+      chptr = FindChannel(cptr->name);
+      if (IsChannelMember(chptr, Me.csptr))
+        cs_part(chptr);
+       
+      /* And delete channel finally */   
       DeleteChan(cptr);
+    }
   }
 
   /*
@@ -1021,48 +1029,22 @@ ChangePass(struct NickInfo *nptr, char *newpass)
   if (!nptr || !newpass)
     return 0;
 
-  if (!nptr->password)
-  {
-    /*
-     * The password hasn't been set yet, so we're probably reading
-     * it from nick.db right now, thus we need to make our own
-     * salt
-     * Not any more - now we use hybcrypt() for that -kre
-     */
-  #ifdef CRYPT_PASSWORDS
+  MyFree(nptr->password);
 
-    encr = hybcrypt(newpass, NULL);
-    assert(encr != 0);
+#ifdef CRYPT_PASSWORDS
 
-    nptr->password = MyStrdup(encr);
+  /* encrypt it */
+  encr = hybcrypt(newpass, NULL);
+  assert(encr != 0);
 
-  #else
+  nptr->password = MyStrdup(encr);
 
-    /* just use plaintext */
-    nptr->password = MyStrdup(newpass);
+#else
 
-  #endif
-  }
-  else
-  {
-    /* the password is being changed */
+  /* just use plaintext */
+  nptr->password = MyStrdup(newpass);
 
-  #ifdef CRYPT_PASSWORDS
-
-    encr = hybcrypt(newpass, nptr->password);
-    assert(encr != 0);
-
-    MyFree(nptr->password);
-    nptr->password = MyStrdup(encr);
-
-  #else
-
-    MyFree(nptr->password);
-    nptr->password = MyStrdup(newpass);
-
-  #endif
-
-  } /* else */
+#endif
 
   return 1;
 } /* ChangePass() */

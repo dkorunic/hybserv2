@@ -1,3 +1,7 @@
+*** 20010429_2 by kreator
+- removed cleandb that did not go in last cvs
+
+
 *** 20010429_1 by kreator
 - added unforbid for channels and nicknames
 - added kline for operserv

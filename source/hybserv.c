@@ -118,6 +118,13 @@ int main(int argc, char *argv[])
     /* Blah. It ignored uname(), then pretend to be funny :-) -kre */
     fprintf(stderr, "Running on: computer, probably :-)\n");
 
+#ifdef GDB_DEBUG
+  int GDBAttached = 0; 
+              
+  while (!GDBAttached) 
+    sleep(1);
+#endif    
+
   /*
    * Load SETPATH (settings.conf) - this must be done
    * before the config file is loaded, and before any
@@ -233,7 +240,7 @@ int main(int argc, char *argv[])
   if (LocalHostName)
     SetupVirtualHost();
 
-#ifndef DEBUGMODE
+#if !defined DEBUGMODE || !defined GDB_DEBUG
   pid = fork();
   if (pid == (-1))
   {

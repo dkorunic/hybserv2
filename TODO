@@ -2,15 +2,13 @@ $Id$
 
 Today's MOTD
 ------------
-A pessimist is a man who has been compelled to live with an optimist.
-		-- Elbert Hubbard
+Paranoid schizophrenics outnumber their enemies at least two to one.
 
 
 Pending bugs:
 -------------
 *) fix *LOCK functions
 *) temp ignores rotate (possible overflow)
-*) setpass -> unidentify nickname
 *) forcenick
 *) 20 nicknames problem
 *) > I plan on just setting the nickflood level higher in config.h, but
@@ -21,10 +19,6 @@ Pending bugs:
    [21:15] :: monolith: when using -long
 *) [23:18] :: monolith: hey buddy, i noticed that the OPERWALL/WALLOPS
    thing wasn't in your latest cvs
-*) (12:20:45) :: monolith: about the logon news thing
-   (12:20:50) :: monolith: will there ever be a way to do that via operserv?
-   (12:21:01) :: monolith: editing the file is really a pain bcoz we don't
-   wanna give out shell access to all the opers
 *) (11:00:00) andrew: /msg chanserv halfop #channel nick does not work...it
    gives an error -ChanServ- Unknown command [halfop]
 *) oper can't setup anything with other nicks
@@ -44,8 +38,6 @@ Pending bugs:
    .channel command or SECURE)
 *) sed helpfiles so that they have proper time values
    NOTE: this should be done via %v or %t.. something like it
-*) stuff from tools/* like encryptconf, encryptdb and doencrypt still do
-   not support MD5
 *) add flag for keeping other people's channel/nick status when
    reconnecting - i find it annonying to look at forced synching
 
@@ -76,15 +68,9 @@ Features yet to come:
   <adx> -max 5 (connections)
   <adx> -nolink
   <adx> etc...
-  2)
-  <adx> the other thing is ChanServ's AKICK
-  <adx> couldn't we do it like with operserv's gline
-  <adx> that is, to implement an expiring akick?
-  <adx> for example, you set an AKICK for 3 weeks
   3)
   put operserv glines in oper.db
 *) force nick change - via plain old hacks
-*) choose NOTICES/MESSAGES to communicate with services
 *) rewrite documentation
    ----> work in progress (Hwy)
 *) add SVSNICK, SWHOIS, etc. for other IRCDs

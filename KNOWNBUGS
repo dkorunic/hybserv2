@@ -28,10 +28,6 @@ SERVER *.telnet.kabel.hub 1 :Test
 NICK Saris-T 1 1 +i sarisa sarisa.net test.telnet.kabel.hub :Test
 kaboom.
 
-telnet connections WON'T WORK. old code was buggy, new one just ignores
-telnet (immediately after identification) - yes, i plan to fix it sometime
-in the near future :)
-
 kre:
 (gdb) frame 2
 #2  0x3694c in n_info (lptr=0x55800, ac=1707456, av=0x1a0dc0)
@@ -113,10 +109,5 @@ further analysis
 
 ^^^ leaf count is off by 1, except for services' current hub
 (blackened actually does have 13 leaves)
-
-if a channel is SecureOps and you:
-/mode #chan -o+o chanserv badnick
-^^^^badnick won't get deopped when chanserv rejoins
-(badnick does not have autoop access)
 
 directive to do a /msg opers@server when clones are detected

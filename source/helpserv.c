@@ -483,20 +483,28 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
             }
           return;
         }
+
       while (fgets(line, MAXLINE - 1, fp))
         {
+          if (IsEOL(*line))
+            {
+              if (sockfd != NODCC)
+                writesocket(sockfd, "\r\n");
+              else
+                notice(Serv, helpnick, "\002\002");
+
+              continue;
+            }
+
           final = Substitute(helpnick, line, sockfd);
-          if (sockfd == NODCC)
-            {
-              if (!(final == (char *) -1))
-                notice(Serv, helpnick, final ? final : "\002\002");
-            }
-          else
-            {
-              writesocket(sockfd, final ? final : "");
-              writesocket(sockfd, "\r\n");
-            }
           if (final && (final != (char *) -1))
+            {
+              if (sockfd == NODCC)
+                notice(Serv, helpnick, final);
+              else
+                writesocket(sockfd, final);
+            }
+          if (final != (char *) -1)
             MyFree(final);
         }
       fclose(fp);

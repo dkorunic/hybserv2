@@ -23,6 +23,10 @@
 #include "misc.h"
 #include "server.h"
 
+#ifdef LIBDMALLOC
+#include <dmalloc.h>
+#endif
+
 #ifdef BLOCK_ALLOCATION
 
 Heap *ClientHeap;  /* pointer to client heap structure */

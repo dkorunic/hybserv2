@@ -4550,10 +4550,7 @@ AddIgnore(char *hostmask, time_t expire)
 {
   struct Ignore *ptr;
 
-//  ptr = (struct Ignore *) MyMalloc(sizeof(struct Ignore));
-//  ptr->hostmask = MyStrdup(hostmask);
-
-  ptr = (struct Ignore *) malloc(sizeof(struct Ignore));
+  ptr = (struct Ignore *) MyMalloc(sizeof(struct Ignore));
   ptr->hostmask = MyStrdup(hostmask);
 
   if (!expire)

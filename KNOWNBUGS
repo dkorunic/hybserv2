@@ -1,3 +1,6 @@
+telnet connections WON'T WORK. old code was buggy, new one just ignores
+telnet (immediately after identification).
+
 kre:
 (gdb) frame 2
 #2  0x3694c in n_info (lptr=0x55800, ac=1707456, av=0x1a0dc0)

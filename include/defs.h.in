@@ -15,14 +15,20 @@
 /* Define if you have CygWin compiler environment */
 #undef HAVE_CYGWIN
 
-/* Define if you have the `gethostbyname' function. */
-#undef HAVE_GETHOSTBYNAME
+/* Define if you have the `crypt' library (-lcrypt). */
+#undef HAVE_LIBCRYPT
 
 /* Define if you have the `cup' library (-lcup). */
 #undef HAVE_LIBCUP
 
+/* Define if you have the `dmalloc' library (-ldmalloc). */
+#undef HAVE_LIBDMALLOC
+
 /* Define if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
+
+/* Define if you have the `socket' library (-lsocket). */
+#undef HAVE_LIBSOCKET
 
 /* Define if you have the `strdup' function. */
 #undef HAVE_STRDUP

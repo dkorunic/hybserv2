@@ -853,7 +853,7 @@ TelnetGreet(struct DccUser *dccptr)
 
   SetDccPending(dccptr);
 
-  ircsprintf(ver, "\nHybServ2 (TS Services v%s)\n", hVersion);
+  ircsprintf(ver, "\nHybServ2 (TS Services version %s)\n", hVersion);
   writesocket(dccptr->socket, ver);
 
   writesocket(dccptr->socket, "\nEnter nickname\n");

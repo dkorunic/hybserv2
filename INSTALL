@@ -55,9 +55,9 @@ INSTALLATION
   and may compile on others.
 
     Linux 2.4.x (and older)
-    FreeBSD 4.3 (and older)
+    FreeBSD 4.4 (and older)
     OpenBSD 2.7 (and older)
-    Solaris 2.7 (and older)
+    Solaris 8 (and older)
     Digital Unix 4.0
     Cygwin 1.1.3 (and newer)
 

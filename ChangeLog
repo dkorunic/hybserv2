@@ -1,3 +1,12 @@
+*** 20010420_1 by kreator
+s/psuedo/pseudo/g **/*(.)
+Fixes for nptr==nptr->master in NickServ, userdb
+Quickfixes for memonotify on signon -> decided to notify user right after
+  its identification ---> THIS HAS TO BE REVIEWED! Probably problems with
+  DeleteLink() with copylink turned on.
+Several smaller bugfixes around, too small to mention..
+
+
 *** 20010414_1 by kreator
 More TODO directives, mostly ideas from John Binder <jbinder@kgazd.bme.hu>
 

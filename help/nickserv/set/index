@@ -16,9 +16,8 @@ Configures various nickname options.
     EMAIL      Associate an email address with your nick
     URL        Associate a url with your nick
     HIDE       Hide information in your %bINFO%b reply
-    LANGUAGE   Set language for messages comming from services
     UIN        Set ICQ UIN for this user
-    GSM        Set number of mobbile phone for this user
+    GSM        Set number of mobile phone for this user
     PHONE      Set the phone for this user
     MASTER     Reset the master nickname for your link
 

@@ -833,31 +833,26 @@ ReadHub()
 #endif
 
   /*
-   * buffer could possibly contain several lines of info,
-   * especially if this is the inital connect burst, so go
-   * through, and record each line (until we hit a \n) and
-   * process it separately
+   * buffer could possibly contain several lines of info, especially if
+   * this is the inital connect burst, so go through, and record each line
+   * (until we hit a \n) and process it separately
    */
 
   ch = buffer;
   linech = spill + offset;
 
   /*
-   * The following routine works something like this:
-   * buffer may contain several full lines, and then
-   * a partial line. If this is the case, loop through
-   * buffer, storing each character in 'spill' until
-   * we hit a \n or \r.  When we do, process the line.
-   * When we hit the end of buffer, spill will contain
-   * the partial line that buffer had, and offset will
-   * contain the index of spill where we left off, so the
-   * next time we recv() from the hub, the beginning
-   * characters of buffer will be appended to the end of
-   * spill, thus forming a complete line.
-   * If buffer does not contain a partial line, then
-   * linech will simply point to the first index of 'spill'
-   * (offset will be zero) after we process all of buffer's
-   * lines, and we can continue normally from there.
+   * The following routine works something like this: buffer may contain
+   * several full lines, and then a partial line. If this is the case,
+   * loop through buffer, storing each character in 'spill' until we hit a
+   * \n or \r.  When we do, process the line. When we hit the end of
+   * buffer, spill will contain the partial line that buffer had, and
+   * offset will contain the index of spill where we left off, so the next
+   * time we recv() from the hub, the beginning characters of buffer will
+   * be appended to the end of spill, thus forming a complete line. If
+   * buffer does not contain a partial line, then linech will simply point
+   * to the first index of 'spill' (offset will be zero) after we process
+   * all of buffer's lines, and we can continue normally from there.
    */
 
   while (*ch)
@@ -875,13 +870,12 @@ ReadHub()
       if (nextparam)
       {
         /*
-         * It is possible nextparam will not be NULL here
-         * if there is a line like:
+         * It is possible nextparam will not be NULL here if there is a
+         * line like:
          * PASS password :TS
-         * where the text after the colon does not have
-         * any spaces, so we reach the \n and do not
-         * execute the code below which sets the next
-         * index of param[] to nextparam. Do it here.
+         * where the text after the colon does not have any spaces, so we
+         * reach the \n and do not execute the code below which sets the
+         * next index of param[] to nextparam. Do it here.
          */
         param[paramc++] = nextparam;
       }
@@ -893,9 +887,8 @@ ReadHub()
     #endif
 
       /*
-       * Make sure paramc is non-zero, because if the line
-       * starts with a \n, we will immediately come here,
-       * without initializing param[0]
+       * Make sure paramc is non-zero, because if the line starts with a
+       * \n, we will immediately come here, without initializing param[0]
        */
       if (paramc)
       {
@@ -909,9 +902,9 @@ ReadHub()
       nextparam = (char *) NULL;
 
       /*
-       * If the line ends in \r\n, then this algorithm would
-       * have only picked up the \r. We don't want an entire
-       * other loop to do the \n, so advance ch here.
+       * If the line ends in \r\n, then this algorithm would have only
+       * picked up the \r. We don't want an entire other loop to do the
+       * \n, so advance ch here.
        */
       if (IsEOL(*(ch + 1)))
         ch++;
@@ -929,10 +922,9 @@ ReadHub()
       if (tmp == ' ')
       {
         /*
-         * Only set the space character to \0 if this is
-         * the very first parameter, or if nextparam is
-         * not NULL. If nextparam is NULL, then we've hit
-         * a parameter that starts with a colon (:), so
+         * Only set the space character to \0 if this is the very first
+         * parameter, or if nextparam is not NULL. If nextparam is NULL,
+         * then we've hit a parameter that starts with a colon (:), so
          * leave it as a whole parameter.
          */
         if (nextparam || (paramc == 0))
@@ -941,8 +933,7 @@ ReadHub()
         if (paramc == 0)
         {
           /*
-           * Its the first parameter - set it to the beginning
-           * of spill
+           * Its the first parameter - set it to the beginning of spill
            */
           param[paramc++] = spill;
           nextparam = linech;
@@ -955,15 +946,14 @@ ReadHub()
             if (*nextparam == ':')
             {
               /*
-               * We've hit a colon, set nextparam to NULL,
-               * so we know not to set any more spaces to \0
+               * We've hit a colon, set nextparam to NULL, so we know not
+               * to set any more spaces to \0
                */
               nextparam = (char *) NULL;
 
               /*
-               * Unfortunately, the first space has already
-               * been set to \0 above, so reset to to a
-               * space character
+               * Unfortunately, the first space has already been set to \0
+               * above, so reset to to a space character
                */
               *(linech - 1) = ' ';
             }

@@ -18,7 +18,7 @@ struct Userlist;
 struct Command
 {
   char *cmd;       /* holds command */
-  void (* func)(); /* corresponding function */
+  void (*func)(); /* corresponding function */
 
   /*
    * LVL_NONE if anyone can execute it

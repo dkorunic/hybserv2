@@ -10,7 +10,6 @@ Pending bugs:
 -------------
 *) forcenick
 *) 20 nicknames problem
-*) pth_cancel() on SIGTERM
 *) > I plan on just setting the nickflood level higher in config.h, but
    could there be a configurable option via a operserv set command?
    Also, are there docs on what each operserv set variable is? Some of them

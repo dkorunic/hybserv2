@@ -1178,10 +1178,6 @@ static void o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
   /* As found in Hyb6...this is needed to avoid breaking RESTART */
   unlink(PidFile);
 
-  /* Remove pipefile as well */ 
-  unlink(PipeFile);
-  close(control_pipe);
-
   /* Reinitialise all connections and memory */
   ServReboot();
 
@@ -3891,14 +3887,6 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
   if ((tempsock = ConnectHost(temp->hostname, port)) >= 0)
     {
 
-#ifdef HAVE_PTHREADS
-      /*
-       * Set this to 0, so p_CheckTimer won't call DoTimer()
-       * which might cycle the server list
-       */
-      /*GoodTimer = 0;*/
-#endif
-
       /* Do ERROR string instead of lame SQUIT -kre */
       toserv(":%s ERROR :Rerouting\r\n", Me.name);
       toserv(":%s QUIT\r\n", Me.name);
@@ -3923,11 +3911,6 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
 
       /* send PASS/SERVER combo */
       signon();
-
-#ifdef HAVE_PTHREADS
-      /*GoodTimer = 1;*/
-#endif
-
     }
   else
     {

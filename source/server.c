@@ -50,10 +50,6 @@
 #include "timestr.h"
 #include "sprintf_irc.h"
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #ifdef STATSERVICES
 
 extern aHashEntry hostTable[HASHCLIENTS];

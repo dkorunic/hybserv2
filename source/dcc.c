@@ -47,15 +47,6 @@
 #include "sock.h"
 #include "sprintf_irc.h"
 
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
-
 /* Ugly Solaris hack -kre */
 #ifndef INADDR_NONE
 # define INADDR_NONE ((unsigned long)-1)
@@ -634,15 +625,6 @@ ConnectClient(struct PortInfo *portptr)
     }
 
   LinkDccClient(tempconn);
-#ifdef HAVE_SOLARIS_THREADS
-
-  thr_exit(NULL);
-#else
-#ifdef HAVE_PTHREADS
-
-  pthread_exit(NULL);
-#endif
-#endif
 } /* ConnectClient() */
 
 /*
@@ -1423,6 +1405,7 @@ LinkDccClient(struct DccUser *dccptr)
     dccptr->next->prev = dccptr;
   connections = dccptr;
 
+  /* thread race condition :( -kre */
   Network->TotalConns++;
 } /* LinkDccClient() */
 

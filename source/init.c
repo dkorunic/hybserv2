@@ -49,17 +49,7 @@
 #include "sprintf_irc.h"
 #include "init.h"
 
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
-
 static struct Luser *introduce(char *, char *, char *);
-
 /*
 ProcessSignal()
   args: int sig
@@ -71,9 +61,7 @@ void
 ProcessSignal(int sig)
 
 {
-#if !defined HAVE_SOLARIS_THREADS && !defined HAVE_PTHREADS
   InitSignals();
-#endif
   
   switch (sig)
     {
@@ -101,7 +89,6 @@ ProcessSignal(int sig)
         putlog(LOG1,
                "Received signal SIGUSR1, restarting");
         unlink(PidFile);
-        close(control_pipe);
         ServReboot();
         execvp(myargv[0], myargv);
       }
@@ -212,34 +199,12 @@ void
 InitSignals()
 
 {
-#ifdef HAVE_SOLARIS_THREADS
-  thread_t signalid;
-
-  thr_create(NULL, 0, p_CheckSignals, NULL, THR_DETACHED, &signalid);
-
-#else
-#ifdef HAVE_PTHREADS
-
-  pthread_attr_t attr;
-  pthread_t signalid;
-
-  /* pthreads and signal() do not go well together */
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-  pthread_create(&signalid, &attr, p_CheckSignals, NULL);
-
-#else
-
   /* setup signal hooks */
   signal(SIGHUP, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
   signal(SIGCHLD, ProcessSignal);
   signal(SIGPIPE, ProcessSignal);
   signal(SIGUSR1, ProcessSignal);
-
-#endif /* HAVE_PTHREADS */
-#endif
-
 } /* InitSignals() */
 
 /*

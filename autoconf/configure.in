@@ -47,8 +47,8 @@ AC_CHECK_HEADER(stdarg.h, , AC_MSG_ERROR(You must have stdarg.h))
 AC_HEADER_TIME
 
 dnl Add standard prefix to fix broken environments
-LIBS="${LIBS} -L/usr/local/lib -L/usr/local/lib/pth"
-CFLAGS="${CFLAGS} -I/usr/local/include -I/usr/local/include/pth"
+LIBS="${LIBS}"
+CFLAGS="${CFLAGS}"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
@@ -57,31 +57,6 @@ AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(crypt, crypt)
-
-dnl Do not compile with pthread support if they give a
-dnl --disable-threads or --enable-threads=no to configure
-AC_ARG_ENABLE(threads, [  --enable-threads        Enable thread support [default=yes]])
-
-dnl We will use Solaris native threads if Solaris is present
-if test ! "$enable_threads" = "no"; then
-  AC_CHECK_LIB(thread, thr_create,
-    AC_DEFINE(HAVE_SOLARIS_THREADS)
-    CFLAGS="${CFLAGS} -D_REENTRANT"
-    _have_thread=yes
-    LIBP="-lthread",
-    AC_MSG_WARN(No native Solaris threads - will try pthreads)
-      AC_CHECK_LIB(pthread, pthread_create,
-      AC_DEFINE(HAVE_PTHREADS)
-      _have_pthread=yes
-      if test -n "$_SunOS"; then
-        CFLAGS="${CFLAGS} -D_POSIX_PTHREAD_SEMANTICS"
-      else
-        CFLAGS="${CFLAGS} -D_REENTRANT"
-      fi
-      LIBP="-lpthread",
-          AC_MSG_WARN(Compiling without multithread support)))
-fi
-AC_SUBST(LIBP)
 
 dnl Try dmalloc support
 AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable dmalloc support [default=no]])
@@ -110,20 +85,12 @@ include/config.h        \
 echo "
 
 Configuration:
-
   Detected OS:      ${host_os}
   HybServ2 Version: ${VERSION}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
   Linker flags:     ${LIBS}"
-
-if test -n "${LIBP}"; then
-  echo "  Thread support:   enabled"
-  echo "  Thread library:   ${LIBP}"
-else
-  echo "  Thread support:   disabled"
-fi
 
 echo
 echo Please edit include/config.h to change the settings to match

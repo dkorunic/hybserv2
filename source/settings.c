@@ -35,7 +35,6 @@ char      *HPath;
 char      *ConfigFile;
 char      *LogFile;
 char      *PidFile;
-char      *PipeFile;
 char      *HelpPath;
 char      *MotdFile;
 char      *DccMotdFile;
@@ -182,7 +181,6 @@ struct Directive directives[] =
     { "ConfigFile", D_NORUNTIME,      { { PARAM_STRING, &ConfigFile } } },
     { "LogFile", D_NORUNTIME,         { { PARAM_STRING, &LogFile } } },
     { "PidFile", D_NORUNTIME,         { { PARAM_STRING, &PidFile } } },
-    { "PipeFile", D_NORUNTIME,         { { PARAM_STRING, &PipeFile } } },
     { "HelpPath", D_NORUNTIME,        { { PARAM_STRING, &HelpPath } } },
     { "MotdFile", D_NORUNTIME,        { { PARAM_STRING, &MotdFile } } },
     { "DccMotdFile", D_NORUNTIME,     { { PARAM_STRING, &DccMotdFile } } },

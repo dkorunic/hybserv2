@@ -33,7 +33,6 @@ CFLAGS = @CFLAGS@ -Wall -pipe
 
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-LIBP = @LIBP@
 RM = @RM@ -f
 RMR = @RM@ -rf
 CP = @CP@

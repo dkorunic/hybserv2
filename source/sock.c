@@ -44,15 +44,6 @@
 #include "sprintf_irc.h"
 #include "timer.h"
 
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
-
 /* Solaris does not provide this by default. Anyway this is wrong approach,
    since -1 is 255.255.255.255 addres which is _valid_! Obviously
    inet_aton() should be used instead. I'll fix that later. -kre */
@@ -494,47 +485,28 @@ ReadSocketInfo(void)
   fd_set readfds,
   writefds;
 
-#if defined(HIGHTRAFFIC_MODE) || (!defined(HAVE_PTHREADS) \
-		&& !defined(HAVE_SOLARIS_THREADS))
-
+#if defined HIGHTRAFFIC_MODE
   time_t curr_ts;
 #endif
 
-#if !defined HAVE_PTHREADS && !defined(HAVE_SOLARIS_THREADS)
-
   time_t last_ts = current_ts;
-#endif
 
   spill[0] = '\0';
 
   for (;;)
     {
 
-#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
       /*
-       * If pthreads are not enabled, DoTimer() will be called from this
-       * code, and so we need curr_ts here
-       *
-       * And we also need time setup here -kre
+       * DoTimer() will be called from this code, and so we need curr_ts
+       * here. And we also need time setup here -kre
        */
       curr_ts = current_ts = time(NULL);
-#endif /* !(HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #ifdef HIGHTRAFFIC_MODE
-
-#if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
-      /*
-       * Since pthreads are enabled, HTM mode is the only thing that needs
-       * curr_ts, since DoTimer() is called from a separate thread
-       */
-      curr_ts = current_ts;
-#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
       if (HTM)
         {
           int htm_count;
-
-#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
           if (last_ts != curr_ts)
             {
@@ -550,8 +522,6 @@ ReadSocketInfo(void)
                */
               DoTimer(curr_ts);
             } /* if (last_ts != curr_ts) */
-
-#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
           /* Check if HTM should be turned off */
           if ((curr_ts - HTM_ts) >= HTM_TIMEOUT)
@@ -589,13 +559,9 @@ ReadSocketInfo(void)
             }
 
         } /* if (HTM) */
-#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
       else
-#endif /* ! (HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #endif /* HIGHTRAFFIC_MODE */
-
-#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
         if (last_ts != curr_ts)
           {
@@ -614,8 +580,6 @@ ReadSocketInfo(void)
             last_ts = curr_ts;
             DoTimer(curr_ts);
           }
-
-#endif /* HAVE_PTHREADS */
 
       FD_ZERO(&readfds);
       FD_ZERO(&writefds);
@@ -685,45 +649,13 @@ ReadSocketInfo(void)
 
               if (FD_ISSET(tempport->socket, &readfds))
                 {
-#ifdef HAVE_SOLARIS_THREADS
-                  thread_t clientid;
-#else
-        #ifdef HAVE_PTHREADS
-
-                  pthread_t clientid;
-                  pthread_attr_t attr;
-#endif
-        #endif
-
                   /*
                    * a client has connected on one of our listening ports
                    * (P: lines) - accept their connection, and perform
                    * ident etc
                    */
 
-#ifdef HAVE_SOLARIS_THREADS
-
-                  thr_create(NULL, 0, (void *) &ConnectClient, (void *)
-                      tempport, THR_DETACHED, &clientid);
-
-#else
-
-#ifdef HAVE_PTHREADS
-
-                  /* this way gethostbyaddr() will be non-blocking */
-                  pthread_attr_init(&attr);
-                  pthread_attr_setdetachstate(&attr,
-                      PTHREAD_CREATE_DETACHED);
-                  pthread_create(&clientid, &attr, (void *)
-                      &ConnectClient, (void *) tempport);
-
-#else
-
                   ConnectClient(tempport);
-
-#endif /* HAVE_PTHREADS */
-        #endif
-
                 }
             }
 

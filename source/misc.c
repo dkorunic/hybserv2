@@ -38,15 +38,6 @@
 #include "nickserv.h"
 #include "server.h"
 
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
-
 extern char *crypt();
 
 /*
@@ -325,8 +316,6 @@ DoShutdown(char *who, char *reason)
   ClearHashes(0);
 #endif
 
-  /* Hmmh! exit(1) should be called from main() to ensure proper threading
-   * system termination. Fix this. -kre */
   exit(1);
 } /* DoShutdown() */
 

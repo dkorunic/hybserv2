@@ -52,15 +52,6 @@
 #include "misc.h"
 #include "sprintf_irc.h"
 
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
-
 /* unixtime of when services was started */
 time_t                       TimeStarted;
 
@@ -82,9 +73,6 @@ int                          SafeConnect = 0;
 /* Arguments list */
 char **myargv;
 
-/* FD to a named fifo that accepts commands like "DIE" */
-int control_pipe;
-
 int main(int argc, char *argv[])
 {
 #ifndef DEBUGMODE
@@ -105,22 +93,6 @@ int main(int argc, char *argv[])
   uid_t uid, /* real user id */
   euid; /* effective user id */
   struct utsname un;
-
-#ifdef HAVE_SOLARIS_THREADS
-
-  thread_t selectid;
-  thread_t timerid;
-
-#else
-
-#ifdef HAVE_PTHREADS
-
-  pthread_attr_t attr;
-  pthread_t selectid;
-  pthread_t timerid;
-#endif /* HAVE_PTHREADS */
-
-#endif /* HAVE_SOLARIS_THREADS */
 
   myargv = argv;
 
@@ -323,22 +295,6 @@ int main(int argc, char *argv[])
       fclose(pidfile);
     }
 
-  /* Create the control pipe */
-  if (unlink(PipeFile) == -1)
-  {
-    if (errno != ENOENT)
-      putlog(LOG1, "Unable to remove old control pipe %s: %s",
-        PipeFile, strerror(errno));
-  }
-  if (mkfifo(PipeFile, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) == -1)
-  {
-    putlog(LOG1, "Unable to create control pipe %s: %s",
-    PipeFile, strerror(errno));
-  }
-  if ((control_pipe = open(PipeFile, O_RDONLY | O_NONBLOCK)) == -1)
-    putlog(LOG1, "Unable to open control pipe %s: %s",
-      PipeFile, strerror(errno));
-
   /* initialize tcm/user listening ports */
   InitListenPorts();
 
@@ -353,96 +309,10 @@ int main(int argc, char *argv[])
   HubSock = NOSOCKET;
   CycleServers();
 
-#ifdef HAVE_SOLARIS_THREADS
-
-  /* This thread will call DoTimer() every second -kre */
-  thr_create(NULL, 0, p_CheckTime, NULL, THR_DETACHED, &timerid);
-
-#else
-
-#ifdef HAVE_PTHREADS
-
-  /* This thread will call DoTimer() every second */
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-  pthread_create(&timerid, &attr, p_CheckTime, NULL);
-
-#endif /* HAVE_PTHREADS */
-
-#endif /* HAVE_SOLARIS_THREADS */
-
   while (1)
     {
       /* enter loop waiting for server info */
-#ifdef HAVE_SOLARIS_THREADS
-
-      thr_create(NULL, 0, (void *) &ReadSocketInfo, NULL,
-                 THR_BOUND, &selectid);
-      thr_join(selectid, NULL, NULL);
-
-#else
-
-#ifdef HAVE_PTHREADS
-
-    read_socket_done = 0;
-    pthread_create(&selectid, NULL, (void * (*)(void *))&ReadSocketInfo, NULL);
-    /* OK, here is a hacky control pipe implementation */
-    while (!read_socket_done)
-    {
-      fd_set rfds;
-      struct timeval tv;
-      if (control_pipe != -1)
-      {
-        FD_ZERO(&rfds);
-        FD_SET(control_pipe, &rfds);
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-
-        if (select(control_pipe + 1, &rfds, NULL, NULL, &tv))
-        {
-          static char buf[512];
-          int len = read(control_pipe, buf, 511);
-          char *p = buf, *next;
-
-          if (len == -1)
-          {
-            putlog(LOG1, "Control pipe %s read() failed: %s",
-              PipeFile, strerror(errno));
-            close(control_pipe);
-            control_pipe = -1;
-          }
-        else
-        {
-          buf[511] = '\0';
-          buf[len] = '\0';
-          next = strchr(buf, '\n');
-
-          /* Terminate at the first \n, throw the lot away if we don't get
-           * one */
-          while (next)
-          {
-            *next = '\0';
-            if (strncmp("DIE", p, 4) == 0)
-              DoShutdown("control_pipe", "Received DIE");
-            p = next + 1; /* At most points to buf[511], since strchr()
-                             can never get past that \0 */
-            next = strchr(p, '\n');
-          }
-          memmove(buf, p, strlen(p) + 1);
-        }
-      }
-    }
-  }
-  
-  pthread_join(selectid, NULL);
-
-#else
-
-  ReadSocketInfo();
-
-#endif /* HAVE_PTHREADS */
-
-#endif /* HAVE_SOLARIS_THREADS */
+      ReadSocketInfo();
 
       if (Me.hub)
         SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);

@@ -108,6 +108,7 @@ struct AutoKick
   struct AutoKick *next;
   char *hostmask; /* mask to autokick */
   char *reason;   /* reason for autokick */
+  long expires; /* AKICK expiration */
 };
 
 struct ChanInfo
@@ -172,6 +173,7 @@ void ExpireChannels(time_t unixtime);
 #ifdef GECOSBANS
 void ExpireBans(time_t unixtime);
 #endif
+void ExpireAkicks(time_t unixtime);
 
 #ifndef HYBRID_ONLY
 void CheckEmptyChans();

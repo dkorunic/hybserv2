@@ -271,10 +271,7 @@ WarnClone(char *nickname)
   if (!nickname || !MaxClonesWarning)
     return;
 
-  toserv(":%s NOTICE %s :%s\n",
-         n_OperServ,
-         nickname,
-         MaxClonesWarning);
+  notice(n_OperServ, nickname, MaxClonesWarning);
 } /* WarnClone() */
 
 /*

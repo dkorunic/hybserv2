@@ -61,7 +61,7 @@ static int AddAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *, int, time_t, time_t);
 static int DelAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *);
-static int AddAkick(struct ChanInfo *, struct Luser *, char *, char *);
+static int AddAkick(struct ChanInfo *, struct Luser *, char *, char *, long);
 static int DelAkick(struct ChanInfo *, char *);
 static int IsFounder(struct Luser *, struct ChanInfo *);
 static int GetAccess(struct ChanInfo *, struct Luser *);
@@ -630,7 +630,13 @@ cs_loaddata()
                   ret = -2;
                 }
               else
-                AddAkick(cptr, (struct Luser *) NULL, av[1], av[2] + 1);
+              {
+                if (ac == 4)
+                  AddAkick(cptr, NULL, av[2], av[3] + 1, atol(av[1]));
+                else
+                  if (ac == 3)
+                    AddAkick(cptr, NULL, av[1], av[2] + 1, 0);
+              }
             }
           else if (!ircncmp("ALVL", keyword, 4))
             {
@@ -1849,8 +1855,8 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       /*
        * Send cptr->entrymsg to lptr->nick in the form of a NOTICE
        */
-      toserv(":%s NOTICE %s :[%s] %s\n",
-             n_ChanServ, lptr->nick, chanptr->name, cptr->entrymsg);
+      notice(n_ChanServ, lptr->nick, "[%s] %s", chanptr->name,
+          cptr->entrymsg);
     }
   
   /* Is this the founder? (not somebody with founder _access_, but the
@@ -2005,10 +2011,8 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
        */
       if (GiveNotice)
         {
-          toserv(":%s NOTICE %s :You do not have AutoOp access to [%s]\n",
-                 n_ChanServ,
-                 nlptr->nick,
-                 cptr->name);
+			    notice(n_ChanServ, nlptr->nick,
+            "You do not have AutoOp access to [%s]", cptr->name);
         }
     }
 
@@ -2688,7 +2692,7 @@ void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
  * Add 'mask' to 'chanptr' 's autokick list
  */
 static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
-                    *mask, char *reason)
+                    *mask, char *reason, long when)
 {
   struct AutoKick *ptr;
 #if defined HYBRID || defined HYBRID7
@@ -2753,6 +2757,9 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
     ptr->reason = MyStrdup(reason);
   else
     ptr->reason = NULL;
+
+  ptr->expires = when;
+
   ptr->next = chanptr->akick;
   chanptr->akick = ptr;
   chanptr->akickcnt++;
@@ -2792,7 +2799,7 @@ DelAkick(struct ChanInfo *cptr, char *mask)
           MyFree(temp->hostmask);
           if (temp->reason)
             MyFree(temp->reason);
-
+			
           if (prev)
             {
               prev->next = temp->next;
@@ -3045,18 +3052,17 @@ OnAkickList()
   Return 1 if 'hostmask' is on cptr's akick list
 */
 
-static struct AutoKick *
-      OnAkickList(struct ChanInfo *cptr, char *hostmask)
+static struct AutoKick *OnAkickList(struct ChanInfo *cptr, char *hostmask)
+{
+  struct AutoKick *ak;
 
-  {
-    struct AutoKick *ak;
+  for (ak = cptr->akick; ak; ak = ak->next)
+    if (match(ak->hostmask, hostmask) && (!ak->expires ||
+          (ak->expires - current_ts > 0)))
+      return (ak);
 
-    for (ak = cptr->akick; ak; ak = ak->next)
-      if (match(ak->hostmask, hostmask))
-        return (ak);
-
-    return (NULL);
-  } /* OnAkickList() */
+  return (NULL);
+} /* OnAkickList() */
 
 /*
 c_help()
@@ -3381,16 +3387,6 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (cptr->flags & CS_VERBOSE)
-    {
-      char line[MAXLINE];
-      ircsprintf(line, "%s!%s@%s ACCESS [%s] %s %s %s",
-            lptr->nick, lptr->username, lptr->hostname, cptr->name,
-            StrToupper(av[2]), (ac >= 4) ? av[3] : "",
-            (ac >= 5) ? av[4] : "");
-      chanopsnotice(FindChannel(cptr->name), line);
-    }
-
   cmdptr = GetCommand(accesscmds, av[2]);
 
   if (cmdptr && (cmdptr != (struct Command *) -1))
@@ -3515,16 +3511,24 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         nickptr ? nickptr->nick : hostmask ? hostmask : "unknown!",
         newlevel);
 
-      /* Notify user -KrisDuv
-         I've added identification check -kre */
-      if ((cptr->flags & CS_VERBOSE) && nickptr &&
-          (nickptr->flags & NS_IDENTIFIED))
+      if ((cptr->flags & CS_VERBOSE))
+      {
+        char line[MAXLINE];
+        ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %d", lptr->nick,
+            lptr->username, lptr->hostname, cptr->name, nickptr ?
+            nickptr->nick : hostmask ? hostmask : "unknown!", newlevel);
+        chanopsnotice(FindChannel(cptr->name), line);
+      }
+
+      /* Notify user -KrisDuv */
+      if (nickptr && (nickptr->flags & NS_IDENTIFIED))
         {
           struct Channel *chptr = FindChannel(cptr->name);
 
-          notice(n_ChanServ, nickptr->nick,
-                 "You have been added to the access list for %s "
-                 "with level [\002%d\002]", cptr->name, newlevel);
+	        if (cptr->flags & CS_VERBOSE)
+            notice(n_ChanServ, nickptr->nick,
+              "You have been added to the access list for %s "
+              "with level [\002%d\002]", cptr->name, newlevel);
 
           /* autoop him if newlevel >= CA_AUTOOP */
           if (chptr)
@@ -3639,20 +3643,25 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
              cptr->name);
 
       RecordCommand("%s: %s!%s@%s ACCESS [%s] DEL %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
-                    nickptr ? nickptr->nick : host);
+        n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+        cptr->name, nickptr ? nickptr->nick : host);
+
+      if (cptr->flags & CS_VERBOSE)
+      {
+        char line[MAXLINE];
+        ircsprintf(line, "%s!%s@%s ACCESS [%s] DEL %s",
+          lptr->nick, lptr->username, lptr->hostname, cptr->name,
+          nickptr ? nickptr->nick : host);
+        chanopsnotice(FindChannel(cptr->name), line);
+      }
 
       /* Notify user if channel is verbose and user is identified -kre */
       if ((cptr->flags & CS_VERBOSE) && nickptr &&
           (nickptr->flags & NS_IDENTIFIED))
         {
           notice(n_ChanServ, nickptr->nick,
-                 "You have been deleted from the access list for [\002%s\002]",
-                 cptr->name);
+            "You have been deleted from the access list for [\002%s\002]",
+            cptr->name);
         }
     }
   else
@@ -3795,7 +3804,7 @@ c_akick(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 3)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002AKICK <channel> {ADD|DEL|LIST} [mask]\002");
+             "Syntax: \002AKICK <channel> {ADD|DEL|LIST} [time] [mask] [reason]\002");
       notice(n_ChanServ, lptr->nick,
              ERR_MORE_INFO,
              n_ChanServ,
@@ -3860,7 +3869,9 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   char hostmask[MAXLINE];
-  char *reason;
+  char *reason = NULL;
+  int sidx;
+  long expires;
 
   if (!(cptr = FindChan(av[1])))
     return;
@@ -3868,7 +3879,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 4)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002AKICK <channel> ADD <hostmask> [reason]\002");
+             "Syntax: \002AKICK <channel> ADD [time] <hostmask> [reason]\002");
       notice(n_ChanServ, lptr->nick,
              ERR_MORE_INFO,
              n_ChanServ,
@@ -3884,22 +3895,28 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (match("*!*@*", av[3]))
-    strcpy(hostmask, av[3]);
-  else if (match("*!*", av[3]))
+  expires = timestr(av[3]);
+  if ((ac > 4) && expires)
+    sidx = 4;
+  else
+    sidx = 3;
+
+  if (match("*!*@*", av[sidx]))
+    strcpy(hostmask, av[sidx]);
+  else if (match("*!*", av[sidx]))
     {
-      strcpy(hostmask, av[3]);
+      strcpy(hostmask, av[sidx]);
       strcat(hostmask, "@*");
     }
-  else if (match("*@*", av[3]))
+  else if (match("*@*", av[sidx]))
     {
       strcpy(hostmask, "*!");
-      strcat(hostmask, av[3]);
+      strcat(hostmask, av[sidx]);
     }
-  else if (match("*.*", av[3]))
+  else if (match("*.*", av[sidx]))
     {
       strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[3]);
+      strcat(hostmask, av[sidx]);
     }
   else
     {
@@ -3907,7 +3924,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       char *mask;
 
       /* it must be a nickname - try to get hostmask */
-      if ((ptr = FindClient(av[3])))
+      if ((ptr = FindClient(av[sidx])))
         {
           mask = HostToMask(ptr->username, ptr->hostname);
           ircsprintf(hostmask, "*!%s", mask);
@@ -3915,7 +3932,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
       else
         {
-          strcpy(hostmask, av[3]);
+          strcpy(hostmask, av[sidx]);
           strcat(hostmask, "!*@*");
         }
     }
@@ -3929,34 +3946,87 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (ac < 5)
-    reason = NULL;
+  if (ac < (sidx + 2))
+  {
+    char temp[MAXLINE];
+    ircsprintf(temp, "(by %s)", lptr->nick);
+    reason = MyStrdup(temp);
+  }
   else
-    reason = GetString(ac - 4, av + 4);
+  {
+    char temp[MAXLINE];
+    reason = GetString(ac - (sidx + 1), av + (sidx + 1));
+    ircsprintf(temp, "%s (by %s)", reason, lptr->nick);
+    reason = MyStrdup(temp);
+  }
 
   /* add hostmask to the akick list */
-  if (AddAkick(cptr, lptr, hostmask, reason))
-    {
-      notice(n_ChanServ, lptr->nick,
-             "[\002%s\002] has been added to the autokick "
-             "list for %s with reason [%s]",
-             hostmask, cptr->name, reason ? reason : "");
+  if (AddAkick(cptr, lptr, hostmask, reason,
+    (expires ? (expires + current_ts) : 0)))
+  {
+    struct ChannelUser *tempuser;
+    char nuhost[NICKLEN + USERLEN + HOSTLEN + 3];
+    struct Channel *chptr;
+	  char modes[MAXLINE];
 
-      RecordCommand("%s: %s!%s@%s AKICK [%s] ADD %s %s",
-                    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-                    hostmask, reason ? reason : "");
-    }
+	  if (!expires)
+      notice(n_ChanServ, lptr->nick,
+        "[\002%s\002] has been added to the autokick list for %s with"
+        "reason [%s]", hostmask, cptr->name, reason ? reason : "");
+	  else
+    	notice(n_ChanServ, lptr->nick,
+        "[\002%s\002] has been added to the temporary autokick list"
+        " for %s with reason [%s]", hostmask, cptr->name,
+        reason ? reason : "");
+
+      RecordCommand("%s: %s!%s@%s AKICK [%s] ADD %s %s time(%ld)",
+          n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+          cptr->name, hostmask, reason ? reason : "", expires);
+
+    sidx = 1;
+
+    if (!(chptr = FindChannel(cptr->name)))
+		  return;
+
+	  for (tempuser = chptr->firstuser; tempuser; tempuser = tempuser->next)
+	  {
+		  if (FindService(tempuser->lptr))
+		    continue;
+
+		  if (IsFounder(tempuser->lptr, cptr)) 
+		    continue;
+
+		  memset(nuhost, 0, sizeof(nuhost));
+		  strncpy(nuhost, tempuser->lptr->nick, NICKLEN);
+		  strcat(nuhost, "!");
+		  strncat(nuhost, tempuser->lptr->username, USERLEN);
+		  strcat(nuhost, "@");
+		  strncat(nuhost, tempuser->lptr->hostname, HOSTLEN);
+
+		  if (!match(hostmask, nuhost))
+		    continue;
+
+		  if (sidx == 1)
+		  {
+		    ircsprintf(modes, "+b %s", hostmask);
+	      toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
+		    UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+		    sidx = 0;
+		  }
+
+      toserv(":%s KICK %s %s :%s\n", n_ChanServ, cptr->name,
+          tempuser->lptr->nick, reason ? reason : "");
+	  }
+  }
   else
     {
       notice(n_ChanServ, lptr->nick,
              "You may not add [\002%s\002] to the autokick list for %s",
-             hostmask,
-             cptr->name);
+             hostmask, cptr->name);
 
       RecordCommand("%s: %s!%s@%s failed AKICK [%s] ADD %s %s",
-                    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-                    av[3],
-                    reason ? reason : "");
+          n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+          cptr->name, av[3], reason ? reason : "");
 
       MyFree(reason);
       return;
@@ -4011,8 +4081,32 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
     }
   else
-    host = MyStrdup(av[3]);
-
+  {
+    char hostmask[MAXLINE];
+    if (match("*!*@*", av[3]))
+	  strcpy(hostmask, av[3]);
+    else if (match("*!*", av[3]))
+	  {
+      strcpy(hostmask, av[3]);
+      strcat(hostmask, "@*");
+    }
+    else if (match("*@*", av[3]))
+    {
+      strcpy(hostmask, "*!");
+      strcat(hostmask, av[3]);
+    }
+    else if (match("*.*", av[3]))
+    {
+      strcpy(hostmask, "*!*@");
+      strcat(hostmask, av[3]);
+    }
+    else
+    {
+      strcpy(hostmask, av[3]);
+      strcat(hostmask, "!*@*");
+    }
+	  host = MyStrdup(hostmask);
+  }
   if (!DelAkick(cptr, host))
     {
       notice(n_ChanServ, lptr->nick,
@@ -4029,13 +4123,16 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
          cptr->name);
 
   RecordCommand("%s: %s!%s@%s AKICK [%s] DEL %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name,
-                host);
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+    host);
 
+  if (cptr->flags & CS_VERBOSE)
+  {
+    char line[MAXLINE];
+    ircsprintf(line, "%s!%s@%s AKICK [%s] DEL %s",
+      lptr->nick, lptr->username, lptr->hostname, cptr->name, host);
+    chanopsnotice(FindChannel(cptr->name), line);
+  }
   MyFree(host);
 } /* c_akick_del() */
 
@@ -4068,22 +4165,21 @@ c_akick_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
              "-- AutoKick List for [\002%s\002] --",
              cptr->name);
       notice(n_ChanServ, lptr->nick,
-             "Num %-35s Reason",
-             "Hostmask");
+             "Num %-30s %-10s Reason",
+             "Hostmask", "Expires");
       notice(n_ChanServ, lptr->nick,
-             "--- %-35s ------",
-             "--------");
+             "--- %-30s %-10s ------",
+             "--------", "-------");
       idx = 1;
       for (ak = cptr->akick; ak; ak = ak->next, idx++)
         {
           if (mask)
             if (match(mask, ak->hostmask) == 0)
               continue;
-          notice(n_ChanServ, lptr->nick,
-                 "%-3d %-35s %s",
-                 idx,
-                 ak->hostmask,
-                 ak->reason ? ak->reason : "");
+          notice(n_ChanServ, lptr->nick, "%-3d %-30s %-10s %s", idx,
+              ak->hostmask, ak->expires ? (ak->expires - current_ts > 0) ?
+              timeago((ak->expires - current_ts), 4) : "Expired" :
+              "Never", ak->reason ? ak->reason : "");
         }
       notice(n_ChanServ, lptr->nick,
              "-- End of list --");
@@ -4103,7 +4199,6 @@ c_list()
 
 static void
 c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
-
 {
   struct ChanInfo *temp;
   int IsAnAdmin;
@@ -5672,9 +5767,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if ((chptr = FindChannel(cptr->name)))
     {
       toserv(":%s MODE %s %s %s\n",
-             n_ChanServ,
-             cptr->name,
-             modes,
+             n_ChanServ, cptr->name, modes,
              ((cptr->modes_off & MODE_K) && (chptr->key)) ? chptr->key : "");
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
@@ -6164,19 +6257,19 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       if (!(cptr->flags & CS_GUARD))
         {
           toserv(":%s SJOIN %ld %s + :@%s\n",
-                 Me.name,
-                 chptr->since,
-                 cptr->name,
-                 n_ChanServ);
+                 Me.name, chptr->since, cptr->name, n_ChanServ);
         }
 
-      toserv(":%s INVITE %s %s\n:%s NOTICE %s :Inviting %s\n",
-             n_ChanServ,
-             lptr->nick,
-             cptr->name,
-             n_ChanServ,
-             cptr->name,
-             lptr->nick);
+      toserv(":%s INVITE %s %s\n",
+             n_ChanServ, lptr->nick, cptr->name);
+
+      if ((cptr->flags & CS_VERBOSE))
+      {
+        char line[MAXLINE];
+	      ircsprintf(line, "%s!%s@%s INVITE [%s]",
+	        lptr->nick, lptr->username, lptr->hostname, cptr->name);
+	      chanopsnotice(FindChannel(cptr->name), line);
+      }
 
       /* only PART if it's not in GUARD mode - toot */
       /* It will PART also if AllowGuardChannel is not set -kre */
@@ -7861,6 +7954,57 @@ void ExpireBans(time_t unixtime)
     } /* for (cptr = chanlist[ii]; cptr; cptr = cptr->next) */
   } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
 } /* ExpireBans(time_t unixtime) */
+
+/*
+ExpireAkicks()
+ Delete any akicks that have expired
+*/
+
+void
+ExpireAkicks(time_t unixtime)
+
+{
+  struct AutoKick *temp, *prev, *next;
+  struct ChanInfo *cptr;
+  int ii;
+
+  prev = NULL;
+
+  for (ii = 0; ii < CHANLIST_MAX; ii++)
+  {
+	  for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
+	  {
+	    for (temp = cptr->akick; temp; temp = next)
+  	  {
+		    next = temp->next;
+
+    	  if ((temp->expires) && (temp->expires <= unixtime))
+        {
+          SendUmode(OPERUMODE_Y, "*** Expired akick: %s [%s]",
+              temp->hostmask, temp->reason ? temp->reason : "");
+		      MyFree(temp->hostmask);
+
+		      if (temp->reason)
+            MyFree(temp->reason);
+
+          if (prev)
+          {
+            prev->next = temp->next;
+            MyFree(temp);
+            temp = prev;
+          }
+          else
+          {
+            cptr->akick = temp->next;
+            MyFree(temp);
+            /* temp = NULL; */
+          }
+        }
+        prev = temp;
+	    }
+	  }
+  }
+} /* ExpireAkicks() */
 
 static void c_set_expirebans(struct Luser *lptr,
     struct NickInfo *nptr, int ac, char **av)

@@ -67,15 +67,10 @@ DISTRIBUTION
        <press enter, no password>
        cvs checkout hybserv
 
-  #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
-       (Thanks to kreator)
-
-  #3:  ftp.magenet.net/pub/hybserv/
-       (Thanks to Bruns)
-
-  #4:  CVS Web snapshots:
-       http://fly.srk.fer.hr/~kreator/projects/hybserv/
-       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
+  #2:  CVS Web snapshots:
+       http://hybserv.dyndns.org/
+       (obsolete: http://www.srce.hr/~kreator/projects/hybserv/)
+       http://fly.srk.fer.hr/~kreator/projects/tarballs/
 
 NOTE: CVS is usually more current than the release.
 

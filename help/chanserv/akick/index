@@ -1,4 +1,4 @@
-Syntax: %bAKICK <channel> ADD <mask> [reason]%b
+Syntax: %bAKICK <channel> ADD [time] <mask> [reason]%b
         %bAKICK <channel> DEL <mask | index>%b
         %bAKICK <channel> LIST [mask]
 

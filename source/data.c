@@ -349,9 +349,7 @@ CreateDatabase(char *name, char *info)
 
   currtime = current_ts;
   fprintf(fptr, "; HybServ2 %s - %s - created %s",
-          hVersion,
-          info,
-          ctime(&currtime));
+          hVersion, info, ctime(&currtime));
 
   return (fptr);
 } /* CreateDatabase() */
@@ -1033,9 +1031,9 @@ WriteChans()
                     ca->level, (long)ca->created, (long)ca->last_used);
 
               for (ak = cptr->akick; ak; ak = ak->next)
-                fprintf(fp, "->AKICK %s :%s\n",
-                        stripctrlsymbols(ak->hostmask),
-                        ak->reason ? stripctrlsymbols(ak->reason) : "");
+                fprintf(fp, "->AKICK %ld %s :%s\n",
+                  (long)ak->expires, stripctrlsymbols(ak->hostmask),
+                  ak->reason ? stripctrlsymbols(ak->reason) : "");
             } /* if (!(cptr->flags & CS_FORGET)) */
         } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
     } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */

@@ -56,8 +56,7 @@ static void FreeSeen();
 
 static struct Command seencmds[] =
     {
-      { "SEEN", es_seen, LVL_NONE
-      },
+      { "SEEN", es_seen, LVL_NONE },
       { "SEENNICK", es_seennick, LVL_NONE },
       { "HELP", es_help, LVL_NONE },
       { "UNSEEN", es_unseen, LVL_ADMIN },
@@ -296,10 +295,11 @@ static void FreeSeen()
  */
 static void es_seen(struct Luser *lptr, int ac, char **av)
 {
-  int i, count;
+  int j, i, count, found;
   aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
   char nuhost[NICKLEN + USERLEN + HOSTLEN + 3], sendstr[256];
   time_t mytime, last;
+  char seenstring[MAXLINE];
 
   if (ac < 2)
     {
@@ -310,8 +310,24 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       return ;
     }
 
-  if (strchr(av[1], '*') || strchr(av[1], '?'))
+  if (strchr(av[1], '*') || strchr(av[1], '?') ||
+      strchr(av[1], '@') || strchr(av[1], '!'))
     {
+      if (match("*!*@*", av[1]))
+        strncpy(seenstring, av[1], MAXLINE);
+      else if (match("*!*", av[1]))
+      {
+        strncpy(seenstring, av[1], MAXLINE - 2);
+        strcat(seenstring, "@*");
+      }
+      else if (match("*@*", av[1]))
+      {
+        strcpy(seenstring, "*!");
+        strncat(seenstring, av[1], MAXLINE - 2);
+      }
+      else
+        strncpy(seenstring, av[1], MAXLINE);
+
       count = 0;
       for (seen = seenp; seen; seen = seen->prev)
         {
@@ -319,7 +335,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
           strncpy(nuhost, seen->nick, NICKLEN);
           strcat(nuhost, "!");
           strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
-          if (match(av[1], nuhost))
+          if (match(seenstring, nuhost))
             {
               seen->seen = saved;
               saved = seen;
@@ -351,13 +367,20 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
                 saved = first;
                 last = 0;
                 for (; saved; saved = saved->seen)
+                {
+                  if ((saved->time <= mytime) && (saved->time >= last))
                   {
-                    if ((saved->time < mytime) && (saved->time > last))
-                      {
-                        sorted[i] = saved;
-                        last = saved->time;
-                      }
+						        found = 0;
+						        for (j = 0; j < i; j++)
+						          if (!strcmp(saved->nick, sorted[j]->nick))
+							          found = 1;
+						        if (!found)
+						        {
+                  	  sorted[i] = saved;
+                  	  last = saved->time;
+						        }
                   }
+                }
                 mytime = sorted[i]->time;
               }
           }

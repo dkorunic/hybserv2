@@ -246,6 +246,7 @@ void DoTimer(time_t unixtime)
 
 #if defined CHANNELSERVICES
       ExpireBans(unixtime);
+	    ExpireAkicks(unixtime);
 #endif
 
 #ifdef JUPEVOTES

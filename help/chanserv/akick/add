@@ -1,6 +1,9 @@
-Syntax: %bAKICK <channel> ADD <hostmask> [reason]%b
+Syntax: %bAKICK <channel> ADD [time] <hostmask> [reason]%b
 
 Adds <hostmask> to the autokick list for <channel> with
-[reason].  You may not add an autokick entry that
-matches an access level higher than your own on the
-channel.
+[reason].  If you specify [time] the akick will expire after
+that period of time, otherwise it will never expire.
+You may not add an autokick entry that matches an access
+level higher than your own on the channel. If there are matching
+users on the channel, when the akick is added the users will be
+banned kick.

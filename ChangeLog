@@ -1,3 +1,10 @@
+*** 20010429_3 by kreator
+- more fixes for both unforbid()s - make it work as drop on fake
+  nicknames/channels
+- some more fixes for smooth upgrade on unforbid()
+- move to pre-1.8.0 that will appear on syncing with Binder
+
+
 *** 20010429_2 by kreator
 - removed cleandb that did not go in last cvs
 

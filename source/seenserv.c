@@ -36,6 +36,7 @@
 #include "sock.h"
 #include "log.h"
 #include "err.h"
+#include "sprintf_irc.h"
 
 #ifdef SEENSERVICES
 
@@ -342,7 +343,7 @@ es_seen(struct Luser *lptr, int ac, char **av)
       }
     }
 
-    sprintf(sendstr, "I found %d match(es), ", count);
+    ircsprintf(sendstr, "I found %d match(es), ", count);
     if (count > 5)
       strcat(sendstr, "here are the 5 most recent, ");
     strcat(sendstr, "sorted:"); count = i;
@@ -350,7 +351,8 @@ es_seen(struct Luser *lptr, int ac, char **av)
       strcat(sendstr, " "); strcat(sendstr, sorted[i]->nick);
     }; strcat(sendstr, ". ");
     if (sorted[0]->type == 1) {
-      notice(n_SeenServ, lptr->nick, "%s %s (%s) was last seen %s ago, quiting: %s",
+      notice(n_SeenServ, lptr->nick,
+          "%s %s (%s) was last seen %s ago, quiting: %s",
              sendstr, sorted[0]->nick, sorted[0]->userhost,
              timeago(sorted[0]->time, 0), sorted[0]->msg); 
     } else if (sorted[0]->type == 2) {
@@ -446,7 +448,7 @@ es_help(struct Luser *lptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_SeenServ, lptr->nick, str, NODCC);
   }
@@ -575,7 +577,7 @@ es_joinpart(struct Luser *lptr, int ac, char **av)
     {
       if (!strcmp(av[0], "JOIN")) {
 
-	sprintf(sendstr, ":%s SJOIN %ld %s + :+%s\n", Me.name,
+	ircsprintf(sendstr, ":%s SJOIN %ld %s + :+%s\n", Me.name,
 		(long) chptr->since, chptr->name, n_SeenServ);
 	toserv(sendstr);
 

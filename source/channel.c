@@ -33,7 +33,7 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 
 /*
  * Global - linked list of channels
@@ -407,7 +407,7 @@ AddChannel(char **line, int nickcnt, char **nicks)
 
     tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
     memset(tempchan, 0, sizeof(struct Channel));
-    Strncpy(tempchan->name, line[3], CHANNELLEN);
+    strncpy(tempchan->name, line[3], CHANNELLEN);
 
   #else
 
@@ -1160,7 +1160,7 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         if (add)
         {
         #ifdef BLOCK_ALLOCATION
-          Strncpy(cptr->key, modeargs[argidx], KEYLEN);
+          strncpy(cptr->key, modeargs[argidx], KEYLEN);
           cptr->key[KEYLEN] = '\0';
         #else
           cptr->key = MyStrdup(modeargs[argidx]);
@@ -1545,10 +1545,8 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
     {
       mcnt = 0;
       mtmp = modestr(MaxModes, mode);
-      sprintf(sendstr, "%s%s %s",
-        plus ? "+" : "-",
-        mtmp,
-        done);
+      ircsprintf(sendstr, "%s%s %s",
+        plus ? "+" : "-", mtmp, done);
       toserv(":%s MODE %s %s\n",
         source,
         chptr->name,
@@ -1563,7 +1561,7 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
   if (done[0] != '\0')
   {
     mtmp = modestr(mcnt - 1, mode);
-    sprintf(sendstr, "%s%s %s",
+    ircsprintf(sendstr, "%s%s %s",
       plus ? "+" : "-",
       mtmp,
       done);
@@ -1607,8 +1605,9 @@ KickBan(int ban, char *source, struct Channel *channel, char *nicks, char *reaso
       if (!(lptr = FindClient(av[ii])))
         continue;
       mask = HostToMask(lptr->username, lptr->hostname);
-      sprintf(temp, "*!%s", mask);
-      bans = (char *) MyRealloc(bans, strlen(bans) + strlen(temp) + (2 * sizeof(char)));
+      ircsprintf(temp, "*!%s", mask);
+      bans = (char *) MyRealloc(bans, strlen(bans)
+          + strlen(temp) + (2 * sizeof(char)));
       strcat(bans, temp);
       strcat(bans, " ");
       MyFree(mask);

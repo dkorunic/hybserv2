@@ -62,8 +62,17 @@ CONFFILES = motd.dcc motd.global
 # File containing HPath variable
 HPATHFIX = settings.conf
 
+all: source tools
+	@echo '** Building Hybserv binary **'
+	@cd source ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"
+	@echo
+	@echo '** Building Hybserv tools **'
+	@cd tools ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
+	@echo
+	@echo "*** Done building HybServ version $(VERSION) ***"
+	@echo
 
-all: libString source tools
+oldall: libString source tools
 	@echo '** Building libString library **'
 	@cd libString ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
 	@echo

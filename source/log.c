@@ -27,8 +27,9 @@
 #include "log.h"
 #include "operserv.h"
 #include "settings.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 /*
 putlog()
@@ -130,8 +131,7 @@ CheckLogs(time_t unixtime)
       return;
     }
 
-    sprintf(tmplog, "%s.",
-      LogFile);
+    ircsprintf(tmplog, "%s.", LogFile);
     len = strlen(tmplog);
 
     lmatches = 0;
@@ -169,10 +169,7 @@ CheckLogs(time_t unixtime)
        * There are too many log files in the directory,
        * delete the oldest one - it will be: LogFile.olddate
        */
-      sprintf(tmplog, "%s/%s.%s",
-        HPath,
-        LogFile,
-        olddate);
+      ircsprintf(tmplog, "%s/%s.%s", HPath, LogFile, olddate);
       unlink(tmplog);
     }
 
@@ -187,11 +184,8 @@ CheckLogs(time_t unixtime)
 
   oldts = unixtime - 1;
   log_tm = localtime(&oldts);
-  sprintf(tmplog, "%s.%d%02d%02d",
-    LogFile,
-    1900 + log_tm->tm_year,
-    log_tm->tm_mon + 1,
-    log_tm->tm_mday);
+  ircsprintf(tmplog, "%s.%d%02d%02d",
+    LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
 
   rename(LogFile, tmplog);
 } /* CheckLogs() */
@@ -211,7 +205,7 @@ RecordCommand(char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buffer, sizeof(buffer), format, args);
+  vsprintf_irc(buffer, format, args);
 
   va_end(args);
 

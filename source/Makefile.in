@@ -3,11 +3,13 @@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
-LDFLAGS = -L../libString @LDFLAGS@
+LDFLAGS = @LDFLAGS@
+#LDFLAGS = -L../libString @LDFLAGS@
 INCLUDE = -I. -I../include
 # DEFS =
-LIBS = -lString @LIBS@ @LIBP@
-LIBDEPS = ../libString/libString.a
+LIBS = @LIBS@ @LIBP@
+#LIBS = -lString @LIBS@ @LIBP@
+#LIBDEPS = ../libString/libString.a
 MKDEP = $(CC) -MM
 
 RM = @RM@ -f
@@ -47,7 +49,8 @@ SOURCES =                  \
   sock.c                   \
   statserv.c               \
   timer.c                  \
-  timestr.c
+  timestr.c                \
+  sprintf_irc.c
 
 OBJECTS = ${SOURCES:.c=.o} version.o
 

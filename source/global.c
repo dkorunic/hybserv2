@@ -27,7 +27,7 @@
 #include "nickserv.h"
 #include "operserv.h"
 #include "settings.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 #include "server.h"
 
 #ifdef GLOBALSERVICES
@@ -161,7 +161,7 @@ g_help(struct Luser *lptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_Global, lptr->nick, str, NODCC);
   }
@@ -219,7 +219,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
       admins;
   char *message;
   char argbuf[MAXLINE + 1];
-  char temp[MAXLINE + 1];
+  char temp[MAXLINE * 2];
   struct Luser *tempuser;
   struct Userlist *userptr;
 
@@ -286,8 +286,8 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   if (admins)
     strcat(argbuf, "-admins ");
 
-  Snprintf(temp, sizeof(temp) - 1, "%s%s", argbuf, message);
-  Strncpy(argbuf, temp, MAXLINE);
+  ircsprintf(temp, "%s%s", argbuf, message);
+  strncpy(argbuf, temp, MAXLINE);
   argbuf[MAXLINE] = '\0';
 
   RecordCommand("%s: %s!%s@%s GNOTE %s",
@@ -416,15 +416,11 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
   *argbuf = '\0';
 
   if (mask)
-    Snprintf(argbuf, sizeof(argbuf) - 1,
-      "-mask %s ",
-      mask);
+    ircsprintf(argbuf, "-mask %s ", mask);
 
-  Snprintf(temp, sizeof(temp) - 1, "%s%s",
-    argbuf,
-    message);
+  ircsprintf(temp, "%s%s", argbuf, message);
 
-  Strncpy(argbuf, temp, sizeof(argbuf) - 1);
+  strncpy(argbuf, temp, sizeof(argbuf) - 1);
   argbuf[sizeof(argbuf) - 1] = '\0';
 
   RecordCommand("%s: %s!%s@%s GCHANNOTE %s",

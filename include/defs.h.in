@@ -30,6 +30,9 @@
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
 
+/* Define if you have the strncpy function.  */
+#undef HAVE_STRNCPY
+
 /* Define if you have the vprintf function.  */
 #undef HAVE_VPRINTF
 

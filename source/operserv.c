@@ -51,6 +51,7 @@
 #include "statserv.h"
 #include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 
 /*
@@ -768,7 +769,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(finstr, sizeof(finstr), format, args);
+  vsprintf_irc(finstr, format, args);
 
   va_end(args);
 
@@ -802,7 +803,7 @@ os_join(struct Channel *cptr)
   if (!cptr)
     return;
 
-  sprintf(sendstr,
+  ircsprintf(sendstr,
     ":%s SJOIN %ld %s + :@%s\n",
     Me.name,
     (long) cptr->since,
@@ -836,7 +837,7 @@ os_join_ts_minus_1(struct Channel *cptr)
   if (!cptr)
     return;
 
-  sprintf(sendstr,
+  ircsprintf(sendstr,
     ":%s SJOIN %ld %s + :@%s\n",
     Me.name,
     (cptr->since != 0) ? (long) cptr->since - 1 : 0,
@@ -883,7 +884,7 @@ o_RecordCommand(int sockfd, char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buffer, sizeof(buffer), format, args);
+  vsprintf_irc(buffer, format, args);
 
   va_end(args);
 
@@ -941,29 +942,15 @@ o_Wallops(char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buffer, sizeof(buffer), format, args);
+  vsprintf_irc(buffer, format, args);
 
   va_end(args);
-#if 0
-  if( onick == NULL || ouser == NULL || ohost == NULL ) 
-#endif
+
   toserv(":%s WALLOPS :%s: %s\n",
      Me.name,
      n_OperServ,
      buffer);
-  /* This commented out code is silly. Other functions in NickServ and co.
-   * do not care too much about onick and co. so they usually contain
-   * garbage. -kre */
-#if 0
-  else
-  toserv(":%s WALLOPS :%s: %s!%s@%s %s\n",
-    Me.name,
-    n_OperServ,
-    onick,
-    ouser,
-    ohost,
-    buffer);
-#endif
+
 } /* o_Wallops() */
 
 /*
@@ -1525,12 +1512,9 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
   CurrTime = current_ts;
   jupe_tm = localtime(&CurrTime);
-  sprintf(whostr, "%d/%02d/%02d %s@%s",
-    1900 + jupe_tm->tm_year,
-    jupe_tm->tm_mon + 1,
-    jupe_tm->tm_mday,
-    onick,
-    n_OperServ);
+  ircsprintf(whostr, "%d/%02d/%02d %s@%s",
+    1900 + jupe_tm->tm_year, jupe_tm->tm_mon + 1, jupe_tm->tm_mday,
+    onick, n_OperServ);
 
   fprintf(fp, "J:%s:%s:%s\n", av[1], reason, whostr);
   fclose(fp);
@@ -1578,12 +1562,9 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
     } /* if ((jptr = FindClient(av[1]))) */
 
     /* replace nick with a fake user */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "NICK %s 1 %ld +i juped juped.com %s :%s\n",
-      av[1],
-      (long) CurrTime,
-      Me.name,
-      reason);
+      av[1], (long) CurrTime, Me.name, reason);
     toserv(sendstr);
     SplitBuf(sendstr, &arv);
     AddClient(arv);
@@ -1640,8 +1621,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
-  sprintf(tmpfile, "%s.tmp",
-    configname);
+  ircsprintf(tmpfile, "%s.tmp", configname);
 
   fp = fopen(tmpfile, "w"); 
   jcnt = 0;
@@ -1911,12 +1891,9 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 
   CurrTime = current_ts;
   gline_tm = localtime(&CurrTime);
-  sprintf(whostr, "%d/%02d/%02d %s@%s",
-    1900 + gline_tm->tm_year,
-    gline_tm->tm_mon + 1,
-    gline_tm->tm_mday,
-    onick,
-    n_OperServ);
+  ircsprintf(whostr, "%d/%02d/%02d %s@%s",
+    1900 + gline_tm->tm_year, gline_tm->tm_mon + 1,
+    gline_tm->tm_mday, onick, n_OperServ);
 
   /* don't add temp glines to the config file */
   if (!expires)
@@ -1928,9 +1905,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 
   fclose(fp);
 
-  sprintf(uhost, "%s@%s",
-    username ? username : "*",
-    hostname);
+  ircsprintf(uhost, "%s@%s", username ? username : "*", hostname);
 
   /* add gline to list */
   AddGline(uhost, reason, whostr, expires);
@@ -2127,8 +2102,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
-  sprintf(tmpfile, "%s.tmp",
-    configname);
+  ircsprintf(tmpfile, "%s.tmp", configname);
 
   fp = fopen(tmpfile, "w"); 
 
@@ -2335,8 +2309,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
-  sprintf(tmpfile, "%s.tmp",
-    ConfigFile);
+  ircsprintf(tmpfile, "%s.tmp", ConfigFile);
   fp = fopen(tmpfile, "w"); 
 
   while (fgets(line, MAXLINE - 1, configfp))
@@ -2880,8 +2853,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
   argbuf = (char *) MyMalloc(argmem + 4);
 
-  sprintf(argbuf, "[%s] ",
-    target);
+  ircsprintf(argbuf, "[%s] ", target);
 
   if (showlong)
     strcat(argbuf, "-long ");
@@ -2991,10 +2963,8 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
       continue;
     }
 
-    sprintf(chkstr, "%s!%s@%s",
-      tempuser->nick,
-      tempuser->username,
-      tempuser->hostname);
+    ircsprintf(chkstr, "%s!%s@%s", tempuser->nick,
+      tempuser->username, tempuser->hostname);
 
     if (exactmatch || (match(target, chkstr)))
     {
@@ -3399,8 +3369,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
-  sprintf(argbuf, "[%s] ",
-    target);
+  ircsprintf(argbuf, "[%s] ", target);
 
   if (nolimit)
     strcat(argbuf, "-nolimit ");
@@ -3408,18 +3377,14 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   if (min)
   {
     strcat(argbuf, "-minimum");
-    sprintf(temp, "%s %d ",
-      argbuf,
-      min);
+    ircsprintf(temp, "%s %d ", argbuf, min);
     strcpy(argbuf, temp);
   }
 
   if (max)
   {
     strcat(argbuf, "-maximum");
-    sprintf(temp, "%s %d ",
-      argbuf,
-      max);
+    ircsprintf(temp, "%s %d ", argbuf, max);
     strcpy(argbuf, temp);
   }
 
@@ -3550,7 +3515,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   {
     char  temp[MAXLINE];
 
-    sprintf(temp, "%s %d", modes, cptr->limit);
+    ircsprintf(temp, "%s %d", modes, cptr->limit);
     strcpy(modes, temp);
   }
 
@@ -3558,7 +3523,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   {
     char  temp[MAXLINE];
 
-    sprintf(temp, "%s %s", modes, cptr->key);
+    ircsprintf(temp, "%s %s", modes, cptr->key);
     strcpy(modes, temp);
   }
 
@@ -4020,7 +3985,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
       {
         case PARAM_STRING:
         {
-          sprintf(tmp, "\"%s\" ",
+          ircsprintf(tmp, "\"%s\" ",
             *(char **) dptr->param[ii].ptr);
           strcat(sendstr, tmp);
           break;
@@ -4028,7 +3993,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
         case PARAM_TIME:
         {
-          sprintf(tmp, "%s ",
+          ircsprintf(tmp, "%s ",
             timeago(*(long *) dptr->param[ii].ptr, 2));
           strcat(sendstr, tmp);
           break;
@@ -4038,8 +4003,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
         case PARAM_SET:
         case PARAM_PORT:
         {
-          sprintf(tmp, "%d ",
-            *(int *) dptr->param[ii].ptr);
+          ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
           strcat(sendstr, tmp);
           break;
         }
@@ -4111,8 +4075,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
         *(char **) dptr->param[ii].ptr = MyStrdup(strptr);
 
-        sprintf(tmp, "\"%s\" ",
-          strptr);
+        ircsprintf(tmp, "\"%s\" ", strptr);
         strcat(sendstr, tmp);
 
         break;
@@ -4139,8 +4102,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
         value = atoi(av[pcnt]);
         *(int *) dptr->param[ii].ptr = value;
 
-        sprintf(tmp, "%d ",
-          value);
+        ircsprintf(tmp, "%d ", value);
         strcat(sendstr, tmp);
 
         break;
@@ -4161,8 +4123,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
         *(long *) dptr->param[ii].ptr = value;
 
-        sprintf(tmp, "%s ",
-          timeago(value, 2));
+        ircsprintf(tmp, "%s ", timeago(value, 2));
         strcat(sendstr, tmp);
 
         break;
@@ -4222,8 +4183,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
         *(int *) dptr->param[ii].ptr = value;
 
-        sprintf(tmp, "%d ",
-          value);
+        ircsprintf(tmp, "%d ", value);
         strcat(sendstr, tmp);
 
         break;
@@ -4282,7 +4242,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
           /* Try to write out string only if non-null, ie is set -kre */
           if (*(char **)dptr->param[ii].ptr)
           {
-            sprintf(tmp, "\"%s\" ",
+            ircsprintf(tmp, "\"%s\" ",
               *(char **) dptr->param[ii].ptr);
             strcat(sendstr, tmp);
           }
@@ -4291,7 +4251,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
 
         case PARAM_TIME:
         {
-          sprintf(tmp, "%s ",
+          ircsprintf(tmp, "%s ",
             timeago(*(long *) dptr->param[ii].ptr, 2));
           strcat(sendstr, tmp);
           break;
@@ -4301,7 +4261,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
         case PARAM_SET:
         case PARAM_PORT:
         {
-          sprintf(tmp, "%d ",
+          ircsprintf(tmp, "%d ",
             *(int *) dptr->param[ii].ptr);
           strcat(sendstr, tmp);
           break;
@@ -4738,9 +4698,7 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
     else
       idle[0] = '\0';
 
-    sprintf(uhost, "%s@%s",
-      tempconn->username,
-      tempconn->hostname);
+    ircsprintf(uhost, "%s@%s", tempconn->username, tempconn->hostname);
 
     os_notice(lptr, sockfd, "  %c%-10s %-25s %s",
       prefix,
@@ -4951,16 +4909,13 @@ o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
 
   if (reason[0] == '\0')
   {
-    sprintf(sendstr, "(%s)",
-      onick);
+    ircsprintf(sendstr, "(%s)", onick);
     MyFree(reason);
     reason = MyStrdup(sendstr);
   }
   else
   {
-    sprintf(sendstr, "(%s: %s)",
-      onick,
-      reason);
+    ircsprintf(sendstr, "(%s: %s)", onick, reason);
     MyFree(reason);
     reason = MyStrdup(sendstr);
   }
@@ -4972,17 +4927,14 @@ o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
 
     if (tmp->flags & SOCK_TCMBOT)
     {
-      sprintf(sendstr, "(%s) Unlinked from %s %s\n",
-        n_OperServ,
-        botptr->nick,
-        reason);
+      ircsprintf(sendstr, "(%s) Unlinked from %s %s\n",
+        n_OperServ, botptr->nick, reason);
       writesocket(tmp->socket, sendstr);
     }
     else
     {
-      sprintf(sendstr, "*** Unlinked from %s %s\n",
-        botptr->nick,
-        reason);
+      ircsprintf(sendstr, "*** Unlinked from %s %s\n",
+        botptr->nick, reason);
       writesocket(tmp->socket, sendstr);
     }
   }
@@ -5047,9 +4999,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 
         for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
         {
-          sprintf(uh, "%s@%s",
-            tempbot->username,
-            tempbot->hostname);
+          ircsprintf(uh, "%s@%s", tempbot->username, tempbot->hostname);
 
           os_notice(lptr, sockfd, "[L] [%-15s] [%-25s]",
             tempbot->name,
@@ -5115,9 +5065,8 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
         if (tempuser->flags & PRIV_SADMIN)
           strcat(flags, "S");
 
-        sprintf(uhost, "%s@%s",
-          tempuser->username,
-          tempuser->hostname);
+        ircsprintf(uhost, "%s@%s", tempuser->username,
+            tempuser->hostname);
 
         os_notice(lptr, sockfd, "[%-14s] [%-25s] [%-10s]",
           tempuser->nick,
@@ -5156,9 +5105,8 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
       os_notice(lptr, sockfd, "[Hostmask                 ] [Max connections]");
       for (temphost = rHostList; temphost; temphost = temphost->next)
       {
-        sprintf(uhost, "%s@%s",
-          temphost->username,
-          temphost->hostname);
+        ircsprintf(uhost, "%s@%s", temphost->username,
+            temphost->hostname);
 
         os_notice(lptr, sockfd, "[%-25s] [%-15d]",
           uhost,
@@ -5185,15 +5133,13 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
       {
         if (gptr->expires)
         {
-          sprintf(expstr, "%-6.1f",
+          ircsprintf(expstr, "%-6.1f",
             (((float) (gptr->expires - currtime)) / 60));
         }
         else
-          sprintf(expstr, "never ");
+          ircsprintf(expstr, "never ");
 
-        sprintf(uh, "%s@%s",
-          gptr->username,
-          gptr->hostname);
+        ircsprintf(uh, "%s@%s", gptr->username, gptr->hostname);
 
         os_notice(lptr, sockfd,
           "[%-25s] [%-25s] [%s] [%-15s]",
@@ -6196,7 +6142,7 @@ TakeOver(struct Channel *cptr)
       {
         mcnt = 0;
         mtmp = modestr(MaxModes, 'o');
-        sprintf(sendstr, "-%s %s", mtmp, done);
+        ircsprintf(sendstr, "-%s %s", mtmp, done);
         DoMode(cptr, sendstr, 0);
         MyFree(mtmp);
         memset(&done, 0, MAXLINE);
@@ -6206,7 +6152,7 @@ TakeOver(struct Channel *cptr)
     if (done[0] != '\0')
     {
       mtmp = modestr(mcnt - 1, 'o');
-      sprintf(sendstr, "-%s %s", mtmp, done);
+      ircsprintf(sendstr, "-%s %s", mtmp, done);
       DoMode(cptr, sendstr, 0);
       MyFree(mtmp);
     }
@@ -6257,7 +6203,7 @@ TakeOver(struct Channel *cptr)
     {
       mcnt = 0;
       mtmp = modestr(MaxModes, 'b');
-      sprintf(sendstr, "-%s %s", mtmp, done);
+      ircsprintf(sendstr, "-%s %s", mtmp, done);
       DoMode(cptr, sendstr, 0);
       MyFree(mtmp);
       memset(&done, 0, MAXLINE);
@@ -6267,7 +6213,7 @@ TakeOver(struct Channel *cptr)
   if (done[0] != '\0')
   {
     mtmp = modestr(mcnt - 1, 'b');
-    sprintf(sendstr, "-%s %s", mtmp, done);
+    ircsprintf(sendstr, "-%s %s", mtmp, done);
     DoMode(cptr, sendstr, 0);
     MyFree(mtmp);
   }
@@ -6305,7 +6251,7 @@ TakeOver(struct Channel *cptr)
     {
       mcnt = 0;
       mtmp = modestr(MaxModes, 'o');
-      sprintf(sendstr, "+%s %s", mtmp, done);
+      ircsprintf(sendstr, "+%s %s", mtmp, done);
       DoMode(cptr, sendstr, 0);
       MyFree(mtmp);
       memset(&done, 0, MAXLINE);
@@ -6315,7 +6261,7 @@ TakeOver(struct Channel *cptr)
   if (done[0] != '\0')
   {
     mtmp = modestr(mcnt - 1, 'o');
-    sprintf(sendstr, "+%s %s", mtmp, done);
+    ircsprintf(sendstr, "+%s %s", mtmp, done);
     DoMode(cptr, sendstr, 0);
     MyFree(mtmp);
   }
@@ -6808,7 +6754,7 @@ CalcMem(char *nick, int socket)
   if ((nick) || (socket != NODCC))
   {
     /* User structures usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Clients:    %5.0f (%10.0fb) (%10.2fkb)\n",
       Network->TotalUsers,
       clientm,
@@ -6822,7 +6768,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Server structures usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Servers:    %5.0f (%10.0fb) (%10.2fkb)\n",
       Network->TotalServers,
       servm,
@@ -6836,7 +6782,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Channel structures usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Channels:   %5.0f (%10.0fb) (%10.2fkb)\n",
       Network->TotalChannels,
       chanm,
@@ -6850,14 +6796,14 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Channel ban mem usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
       chanbanc,
       chanbanm,
       chanbanm / 1024);
 #ifdef GECOSBANS
    /* Channel gecos ban mem usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
       changecosbanc,
       changecosbanm,
@@ -6872,7 +6818,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Channel exception memory usage */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Exceptions: %5ld (%10.0fb) (%10.2fkb)\n",
       chanexceptc,
       chanexceptm,
@@ -6885,7 +6831,7 @@ CalcMem(char *nick, int socket)
     else
       writesocket(socket, sendstr);
 
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Conf lines: %5ld (%10.0fb) (%10.2fkb)\n",
       confc,
       confm,
@@ -6898,7 +6844,7 @@ CalcMem(char *nick, int socket)
     else
       writesocket(socket, sendstr);
 
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Ignores: %8ld (%10.0fb) (%10.2fkb)\n",
       igc,
       igm,
@@ -6911,7 +6857,7 @@ CalcMem(char *nick, int socket)
     else
       writesocket(socket, sendstr);
 
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Partyline: %6d (%10.0fb) (%10.2fkb)\n",
       Network->TotalConns,
       connm,
@@ -6925,7 +6871,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
   #ifdef NICKSERVICES
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "NickServ:         (%10.0fb) (%10.2fkb)\n",
       nsm,
       nsm / 1024);
@@ -6938,7 +6884,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
   #ifdef CHANNELSERVICES
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "ChanServ:         (%10.0fb) (%10.2fkb)\n",
       csm,
       csm / 1024);
@@ -6952,7 +6898,7 @@ CalcMem(char *nick, int socket)
   #endif
 
   #ifdef MEMOSERVICES
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "MemoServ:         (%10.0fb) (%10.2fkb)\n",
       msm,
       msm / 1024);
@@ -6968,7 +6914,7 @@ CalcMem(char *nick, int socket)
   #endif /* NICKSERVICES */
 
   #ifdef STATSERVICES
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "StatServ:         (%10.0fb) (%10.2fkb)\n",
       ssm,
       ssm / 1024);
@@ -6982,7 +6928,7 @@ CalcMem(char *nick, int socket)
   #endif /* STATSERVICES */
 
     /* Client Hash */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Client Hash:      (%10.0fb) (%10.2fkb)\n",
       hashc,
       hashc / 1024);
@@ -6995,7 +6941,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Channel Hash */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Channel Hash:     (%10.0fb) (%10.2fkb)\n",
       hashch,
       hashch / 1024);
@@ -7008,7 +6954,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Clone Hash */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Clone Hash:       (%10.0fb) (%10.2fkb)\n",
       hashcl,
       hashcl / 1024);
@@ -7021,7 +6967,7 @@ CalcMem(char *nick, int socket)
       writesocket(socket, sendstr);
 
     /* Total memory used */
-    sprintf(sendstr,
+    ircsprintf(sendstr,
       "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)\n",
       total,
       total / 1024,

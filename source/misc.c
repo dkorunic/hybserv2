@@ -30,7 +30,7 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -190,7 +190,7 @@ debug(char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -216,7 +216,7 @@ fatal(int keepgoing, char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -256,7 +256,7 @@ notice(char *from, char *nick, char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(finalstr, sizeof(finalstr), format, args);
+  vsprintf_irc(finalstr, format, args);
 
   if (ServerNotices)
     strcpy(who, Me.name);
@@ -302,13 +302,13 @@ DoShutdown(char *who, char *reason)
   if (reason)
   {
     if (who)
-      sprintf(sendstr, "%s (authorized by %s)", reason, who);
+      ircsprintf(sendstr, "%s (authorized by %s)", reason, who);
     else
       strcpy(sendstr, reason);
   }
   else
     if (who)
-      sprintf(sendstr, "Authorized by %s", who);
+      ircsprintf(sendstr, "Authorized by %s", who);
     else
       sendstr[0] = '\0';
 
@@ -365,9 +365,7 @@ HostToMask (char *username, char *hostname)
   if (!username || !hostname)
     return ((char *) NULL);
 
-  sprintf(userhost, "%s@%s",
-    username,
-    hostname);
+  ircsprintf(userhost, "%s@%s", username, hostname);
 
   len = strlen(userhost) + 32;
 
@@ -444,7 +442,7 @@ HostToMask (char *username, char *hostname)
        * copy the ip address (except the last .XXX) into the 
        * right spot in 'final'
        */
-      Strncpy(final + ii, host, temp - host);
+      strncpy(final + ii, host, temp - host);
 
       /* stick a .* on the end :-) */
       ii += (temp - host);
@@ -493,7 +491,7 @@ HostToMask (char *username, char *hostname)
        * Check if there is another period in topsegment,
        * and if so use it. Otherwise use realhost
        */
-      sprintf(final + ii, "*%s", 
+      ircsprintf(final + ii, "*%s", 
         strchr(topsegment + 1, '.') ? topsegment : realhost);
     }
   }

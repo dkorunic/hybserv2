@@ -30,8 +30,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #ifdef  STATSERVICES
 
@@ -470,7 +470,7 @@ GetDomain(char *hostname)
   else if ((dotcnt != 1) || (*domain == '.'))
     return (NULL); /* invalid domain */
 
-  Strncpy(done, domain, sizeof(done) - 1);
+  strncpy(done, domain, sizeof(done) - 1);
   done[sizeof(done) - 1] = '\0';
 
   return (done);
@@ -760,15 +760,13 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
   if (maxusers >= 0)
   {
-    sprintf(str, "-maxusers %d ",
-      maxusers);
+    ircsprintf(str, "-maxusers %d ", maxusers);
     strcat(argbuf, str);
   }
 
   if (minusers >= 0)
   {
-    sprintf(str, "-minusers %d ",
-      minusers);
+    ircsprintf(str, "-minusers %d ", minusers);
     strcat(argbuf, str);
   }
 
@@ -777,8 +775,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
   if (hub)
   {
-    sprintf(str, "-hub %s ",
-      hub->name);
+    ircsprintf(str, "-hub %s ", hub->name);
     strcat(argbuf, str);
   }
 
@@ -949,8 +946,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
     if ((servptr->maxping > 0.0) && servptr->maxping_ts)
     {
-      sprintf(str, "on %s",
-        ctime(&servptr->maxping_ts));
+      ircsprintf(str, "on %s", ctime(&servptr->maxping_ts));
       str[strlen(str) - 1] = '\0';
       notice(n_StatServ, lptr->nick,
         "Highest Ping:          %5.4f seconds %s",
@@ -960,8 +956,7 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
     if ((servptr->minping > 0.0) && servptr->minping_ts)
     {
-      sprintf(str, "on %s",
-        ctime(&servptr->minping_ts));
+      ircsprintf(str, "on %s", ctime(&servptr->minping_ts));
       str[strlen(str) - 1] = '\0';
       notice(n_StatServ, lptr->nick,
         "Lowest Ping:           %5.4f seconds %s",
@@ -1084,11 +1079,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   currtime = current_ts;
   strcpy(tmp, ctime(&currtime));
   SplitBuf(tmp, &tav);
-  sprintf(str, "%s %s %s, %s",
-    tav[0],
-    tav[1],
-    tav[2],
-    tav[4]);
+  ircsprintf(str, "%s %s %s, %s", tav[0], tav[1], tav[2], tav[4]);
   notice(n_StatServ, lptr->nick,
     "-- \002So far today:\002 (%s) --",
     str);
@@ -1097,10 +1088,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxUsersT_ts)
   {
     tmp_tm = localtime(&Network->MaxUsersT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1112,10 +1101,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxOperatorsT_ts)
   {
     tmp_tm = localtime(&Network->MaxOperatorsT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1127,10 +1114,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxChannelsT_ts)
   {
     tmp_tm = localtime(&Network->MaxChannelsT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1142,10 +1127,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
   if (Network->MaxServersT_ts)
   {
     tmp_tm = localtime(&Network->MaxServersT_ts);
-    sprintf(str, "at %d:%02d:%02d",
-      tmp_tm->tm_hour,
-      tmp_tm->tm_min,
-      tmp_tm->tm_sec);
+    ircsprintf(str, "at %d:%02d:%02d", tmp_tm->tm_hour, tmp_tm->tm_min,
+        tmp_tm->tm_sec);
   }
   else
     str[0] = '\0';
@@ -1190,7 +1173,7 @@ ss_help(struct Luser *lptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_StatServ, lptr->nick, str, NODCC);
   }
@@ -1422,15 +1405,16 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
         }
 
 
-        if( strlen(av[1]) > 15 || strlen(av[2]) > 31 || strlen(lptr->nick) > 15 ) {
+        if( strlen(av[1]) > 15 || strlen(av[2]) > 31 || strlen(lptr->nick)
+            > 15 ) {
 			notice(n_StatServ,lptr->nick,
                        "Invalid params!" );
                 return;
         }
 
-        sprintf( who,  "%s", StrToupper(av[1]));
-        sprintf( what, "%s", StrToupper(av[2]));
-        sprintf( nick, "%s", lptr->nick );
+        ircsprintf( who,  "%s", StrToupper(av[1]));
+        ircsprintf( what, "%s", StrToupper(av[2]));
+        ircsprintf( nick, "%s", lptr->nick );
 
 //        if( av[3] != NULL )
 	if (ac > 3 && av[3] != NULL)
@@ -1458,13 +1442,14 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
         tm = *localtime(&t);
         putlog( LOG1, "Thread for log browsing started.");
  
-        sprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday );
+        ircsprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1,
+            tm.tm_mday );
 
         for( i=0; i<=day; i++ ) {
            if( i == 0 )
-              sprintf(grep_log_filename, "%s", LogFile );
+              ircsprintf(grep_log_filename, "%s", LogFile );
            else
-              sprintf(grep_log_filename, "%s.%8.8ld", 
+              ircsprintf(grep_log_filename, "%s.%8.8ld", 
                    LogFile, 
                    korectdat(atol(date), i*-1)
               );

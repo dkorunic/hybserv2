@@ -28,6 +28,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
+#include "sprintf_irc.h"
 
 static aHashEntry clientTable[HASHCLIENTS];
 static aHashEntry channelTable[HASHCHANNELS];
@@ -211,7 +212,7 @@ IsClone(struct Luser *lptr)
   if (lptr->server == Me.sptr)
     return (0);
 
-  sprintf(uhost, "%s@%s",
+  ircsprintf(uhost, "%s@%s",
     (lptr->username[0] == '~') ? lptr->username + 1 : lptr->username,
     lptr->hostname);
 
@@ -297,9 +298,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
    */
   if (lptr->username[0] == '~')
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username + 1,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username + 1, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->NonIdentd++;
@@ -307,9 +306,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
   }
   else
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->Identd++;
@@ -639,12 +636,12 @@ HashAddClient(struct Luser *lptr, int nickchange)
     char  *killmsg = (char *) NULL;
     struct Luser  *prev = (struct Luser *) NULL;
 
-    killmsg = (char *) MyMalloc(strlen(tempuser->nick) + strlen(lptr->nick) + 32);
-    sprintf(killmsg, "%s -> %s",
-      tempuser->nick,
-      lptr->nick);
+    killmsg = (char *) MyMalloc(strlen(tempuser->nick) +
+        strlen(lptr->nick) + 32);
+    ircsprintf(killmsg, "%s -> %s", tempuser->nick, lptr->nick);
 
-    for (tempuser = cloneTable[hashv].list; tempuser; tempuser = tempuser->cnext)
+    for (tempuser = cloneTable[hashv].list; tempuser; tempuser =
+        tempuser->cnext)
     {
       if (tempuser->cnext == lptr)
       {
@@ -861,9 +858,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
 
   if (lptr->username[0] == '~')
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username + 1,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username + 1, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->NonIdentd--;
@@ -871,9 +866,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
   }
   else
   {
-    sprintf(uhost, "%s@%s",
-      lptr->username,
-      lptr->hostname);
+    ircsprintf(uhost, "%s@%s", lptr->username, lptr->hostname);
 
   #ifdef STATSERVICES
     Network->Identd--;

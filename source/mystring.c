@@ -19,6 +19,7 @@
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"
+#include "sprintf_irc.h"
 
 /*
 StrToupper()
@@ -93,7 +94,7 @@ GetString(int ac, char **av)
   ii = 0;
   while (ii < ac)
   {
-    sprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
+    ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
 
     final = (char *) MyRealloc(final,
                       strlen(final) + strlen(temp) + sizeof(char));

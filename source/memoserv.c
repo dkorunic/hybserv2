@@ -29,6 +29,7 @@
 #include "nickserv.h"
 #include "settings.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
 
@@ -930,10 +931,7 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       }
 
       newtext = (char *) MyMalloc(strlen(memotext) + strlen(ci->name) + 4);
-      sprintf(newtext,
-        "(%s) %s",
-        ci->name,
-        memotext);
+      ircsprintf(newtext, "(%s) %s", ci->name, memotext);
       for (ca = ci->access; ca; ca = ca->next)
       {
         if (ca->nptr)
@@ -1155,7 +1153,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "%d", index);
+    ircsprintf(istr, "%d", index);
   else
     strcpy(istr, "ALL");
 
@@ -1201,7 +1199,7 @@ m_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         return;
       }
 
-    sprintf(str, "%s", av[1]);
+    ircsprintf(str, "%s", av[1]);
 
     GiveHelp(n_MemoServ, lptr->nick, str, NODCC);
   }
@@ -1304,7 +1302,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "Memo #%d has", index);
+    ircsprintf(istr, "Memo #%d has", index);
   else
     strcpy(istr, "All memos have");
 
@@ -1412,7 +1410,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (index)
-    sprintf(istr, "Memo #%d has", index);
+    ircsprintf(istr, "Memo #%d has", index);
   else
     strcpy(istr, "All memos have");
 
@@ -1588,9 +1586,9 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (!index)
-    sprintf(buf, "All memos have");
+    ircsprintf(buf, "All memos have");
   else
-    sprintf(buf, "Memo #%d has", index);
+    ircsprintf(buf, "Memo #%d has", index);
 
   notice(n_MemoServ, lptr->nick,
     "%s been forwarded to [\002%s\002]",
@@ -1743,11 +1741,12 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac >= 3)
   {
     memotext = (char *) MyMalloc(strlen("[Re]: ") + strlen(av[2]) + 1);
-    sprintf(memotext, "[Re]: %s", av[2]);
+    ircsprintf(memotext, "[Re]: %s", av[2]);
     ii = 3;
     while (ii < ac)
     {
-      memotext = (char *) MyRealloc(memotext, strlen(memotext) + strlen(av[ii]) + (2 * sizeof(char)));
+      memotext = (char *) MyRealloc(memotext, strlen(memotext) +
+          strlen(av[ii]) + (2 * sizeof(char)));
       strcat(memotext, " ");
       strcat(memotext, av[ii]);
       ii++;

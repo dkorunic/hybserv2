@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "timer.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -318,14 +319,8 @@ introduce(char *nick, char *ident, char *info)
   char **av;
   struct Luser *lptr;
   
-  sprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", 
-       nick,
-       (long) CurrTime,
-       ServiceUmodes,
-       ident,
-       Me.name,
-       Me.name,
-       info);
+  ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", nick, (long)
+      CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
   toserv(sendstr);
 
   SplitBuf(sendstr, &av);

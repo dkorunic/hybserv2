@@ -33,8 +33,8 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 /* Solaris does not provide this by default. Anyway this is wrong approach,
    since -1 is 255.255.255.255 addres which is _valid_! Obviously
@@ -299,7 +299,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.admin = (char *) MyMalloc(REALLEN);
           memset(Me.admin, 0, REALLEN);
-          Strncpy(Me.admin, temp, REALLEN - 1);
+          strncpy(Me.admin, temp, REALLEN - 1);
         }
         else
           Me.admin = MyStrdup(temp);
@@ -451,7 +451,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.name = (char *) MyMalloc(REALLEN);
           memset(Me.name, 0, REALLEN);
-          Strncpy(Me.name, name, REALLEN - 1);
+          strncpy(Me.name, name, REALLEN - 1);
         }
         else
           Me.name = MyStrdup(name);
@@ -460,7 +460,7 @@ ParseConf(char *filename, int rehash)
         {
           Me.info = (char *) MyMalloc(REALLEN);
           memset(Me.info, 0, REALLEN);
-          Strncpy(Me.info, info, REALLEN - 1);
+          strncpy(Me.info, info, REALLEN - 1);
         }
         else
           Me.info = MyStrdup(info);
@@ -1690,9 +1690,8 @@ MatchesAdmin(char *mask)
   {
     if (IsAdmin(tempuser))
     {
-      sprintf(tempstr, "*!%s@%s",
-        tempuser->username,
-        tempuser->hostname);
+      ircsprintf(tempstr, "*!%s@%s", tempuser->username,
+          tempuser->hostname);
 
       if (match(mask, tempstr))
         return (1);

@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #ifdef NICKSERVICES
 
@@ -1294,9 +1295,7 @@ OnAccessList(char *username, char *hostname, struct NickInfo *nptr)
   if (!username || !hostname || !nptr)
     return 0;
 
-  sprintf(hostmask, "%s@%s",
-    username,
-    hostname);
+  ircsprintf(hostmask, "%s@%s", username, hostname);
 
   for (hptr = nptr->hosts; hptr; hptr = hptr->next)
     if (match(hptr->hostmask, hostmask))
@@ -1324,7 +1323,7 @@ collide(char *nick)
   if (!(lptr = FindClient(nick)))
     return;
 
-  sprintf(sendstr,
+  ircsprintf(sendstr,
     "NICK %s 1 %ld +i %s %s %s :%s\n",
     lptr->nick,
     (long) (lptr->nick_ts - 1),
@@ -1843,12 +1842,12 @@ n_help(struct Luser *lptr, int ac, char **av)
     char  str[MAXLINE];
 
     if (ac >= 3)
-      sprintf(str, "%s %s", av[1], av[2]);
+      ircsprintf(str, "%s %s", av[1], av[2]);
     else
     {
       if ((!strcasecmp(av[1], "ACCESS")) ||
           (!strcasecmp(av[1], "SET")))
-        sprintf(str, "%s index", av[1]);
+        ircsprintf(str, "%s index", av[1]);
       else
       {
         struct Command *cptr;
@@ -1867,7 +1866,7 @@ n_help(struct Luser *lptr, int ac, char **av)
             return;
           }
 
-        sprintf(str, "%s", av[1]);
+        ircsprintf(str, "%s", av[1]);
       }
     }
 
@@ -4772,8 +4771,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
     set = 1;
   }
 
-  sprintf(argbuf, "[%s] ",
-    target);
+  ircsprintf(argbuf, "[%s] ", target);
 
   if (list)
     strcat(argbuf, "-list ");

@@ -41,7 +41,7 @@
 #include "server.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -147,7 +147,7 @@ BroadcastDcc(int towho, char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buffer, sizeof(buffer), format, args);
+  vsprintf_irc(buffer, format, args);
 
   va_end(args);
 
@@ -157,14 +157,8 @@ BroadcastDcc(int towho, char *format, ...)
   tcmbuf[0] = '\0';
   if (towho == DCCALL)
   {
-    /*
-     * Make the tcm buffer look like:
-     * (OperServ) Message
-     */
-    Snprintf(tcmbuf, sizeof(tcmbuf),
-      "(%s) %s",
-      n_OperServ,
-      buffer);
+    /* Make the tcm buffer look like: (OperServ) Message */
+    ircsprintf(tcmbuf, "(%s) %s", n_OperServ, buffer);
   }
 
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
@@ -260,17 +254,13 @@ void
 SendDccMessage(struct DccUser *from, char *message)
 
 {
-  char final[MAXLINE];
+  char final[MAXLINE * 2];
   struct DccUser *dccptr;
 
   if (!from || !message)
     return;
 
-  Snprintf(final, sizeof(final) - 2,
-    "<%s@%s> %s",
-    from->nick,
-    n_OperServ,
-    message);
+  ircsprintf(final, "<%s@%s> %s", from->nick, n_OperServ, message);
   strcat(final, "\n");
 
   /* now send the string to all clients */
@@ -303,7 +293,7 @@ SendUmode(int umode, char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
   struct DccUser *dccptr;
   struct Userlist *tempuser;
   struct tm *tmp_tm;
@@ -320,17 +310,15 @@ SendUmode(int umode, char *format, ...)
   {
     va_start(args, format);
 
-    vSnprintf(buffer, sizeof(buffer), format, args);
+    vsprintf_irc(buffer, format, args);
 
     va_end(args);
   } /* if (!ActiveFlood) */
 
   tmp_tm = localtime(&current_ts);
 
-  sprintf(timestr, "[%02d:%02d:%02d]",
-    tmp_tm->tm_hour,
-    tmp_tm->tm_min,
-    tmp_tm->tm_sec);
+  ircsprintf(timestr, "[%02d:%02d:%02d]",
+    tmp_tm->tm_hour, tmp_tm->tm_min, tmp_tm->tm_sec);
 
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
   {
@@ -767,7 +755,7 @@ writeauth(struct DccUser *dccptr)
   }
 
   /* send ident request */
-  sprintf(idstr, "%u , %u\n",
+  ircsprintf(idstr, "%u , %u\n",
     (unsigned int) ntohs(remote.sin_port),
     (unsigned int) ntohs(local.sin_port));
   writesocket(dccptr->authfd, idstr);
@@ -861,7 +849,7 @@ TelnetGreet(struct DccUser *dccptr)
 
   SetDccPending(dccptr);
 
-  sprintf(ver, "\nHybServ (TS Services v%s)\n", hVersion);
+  ircsprintf(ver, "\nHybServ2 (TS Services v%s)\n", hVersion);
   writesocket(dccptr->socket, ver);
 
   writesocket(dccptr->socket, "\nEnter nickname\n");
@@ -993,13 +981,9 @@ GreetDccUser(struct DccUser *dccptr)
   }
 
   motd_tm = localtime(&CurrTime);
-  sprintf(sendstr, "HybServ2 %s (%d/%d/%d %d:%02d)\n", 
-    hVersion,
-    1900 + motd_tm->tm_year,
-    motd_tm->tm_mon + 1,
-    motd_tm->tm_mday,
-    motd_tm->tm_hour,
-    motd_tm->tm_min);
+  ircsprintf(sendstr, "HybServ2 %s (%d/%d/%d %d:%02d)\n", 
+    hVersion, 1900 + motd_tm->tm_year, motd_tm->tm_mon + 1,
+    motd_tm->tm_mday, motd_tm->tm_hour, motd_tm->tm_min);
   writesocket(dccptr->socket, sendstr);
 
   /* give new user the motd */
@@ -1181,7 +1165,7 @@ onctcp(char *nick, char *target, char *msg)
     }
 
 		cnt = strlen(msg) - 1;
-    Strncpy(temp, msg, cnt);
+    strncpy(temp, msg, cnt);
     temp[cnt] = '\0';
 
     acnt = SplitBuf(temp, &av);
@@ -1222,7 +1206,7 @@ onctcp(char *nick, char *target, char *msg)
      */
 
   	cnt = strlen(msg) - 1;
-    Strncpy(temp, msg, cnt);
+    strncpy(temp, msg, cnt);
     temp[cnt] = '\0';
 
     SendUmode(OPERUMODE_Y,
@@ -1276,10 +1260,8 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
 
     if (nptr)
     {
-      sprintf(sendstr, "Unable to connect to port %d of %s: %s\n", 
-        bptr->port,
-        bptr->hostname,
-        strerror(errno));
+      ircsprintf(sendstr, "Unable to connect to port %d of %s: %s\n", 
+        bptr->port, bptr->hostname, strerror(errno));
       writesocket(nptr->socket, sendstr);
     }
     MyFree(dccptr);
@@ -1290,10 +1272,8 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
     The fields for linking to a tcm are in order:
     <remote tcm's nick> <connecting bot's nick> <password>
   */
-  sprintf(sendstr, "%s %s %s\n",
-    bptr->name, 
-    n_OperServ,
-    bptr->password);
+  ircsprintf(sendstr, "%s %s %s\n",
+    bptr->name, n_OperServ, bptr->password);
   writesocket(dccptr->socket, sendstr);
 
   dccptr->flags = (SOCK_TCMBOT | SOCK_BOTHUB);
@@ -1306,9 +1286,7 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
     /* just make the bot's hostname ip:port */
     dccptr->username = MyStrdup("unknown");
 
-    sprintf(sendstr, "%s:%d",
-      bptr->hostname,
-      bptr->port);
+    ircsprintf(sendstr, "%s:%d", bptr->hostname, bptr->port);
     dccptr->hostname = MyStrdup(sendstr);
   }
   else /* give the bot a user@host if possible */
@@ -1330,19 +1308,14 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
 
     if (tmp->flags & SOCK_TCMBOT)
     {
-      sprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
-        n_OperServ,
-        bptr->name,
-        dccptr->username,
-        dccptr->hostname);
+      ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
+        n_OperServ, bptr->name, dccptr->username, dccptr->hostname);
       writesocket(tmp->socket, sendstr);
     }
     else
     {
-      sprintf(sendstr, "*** Linked to %s [%s@%s]\n",
-        bptr->name,
-        dccptr->username,
-        dccptr->hostname);
+      ircsprintf(sendstr, "*** Linked to %s [%s@%s]\n",
+        bptr->name, dccptr->username, dccptr->hostname);
       writesocket(tmp->socket, sendstr);
     }
   }
@@ -2124,19 +2097,15 @@ BotProcess(struct DccUser *botptr, char *line)
   
           if (tmp->flags & SOCK_TCMBOT)
           {
-            sprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
-              n_OperServ,
-              botptr->nick,
-              botptr->username,
+            ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
+              n_OperServ, botptr->nick, botptr->username,
               botptr->hostname);
             writesocket(tmp->socket, sendstr);
           }
           else
           {
-            sprintf(sendstr, "*** Linked to %s [%s@%s]\n",
-              botptr->nick,
-              botptr->username,
-              botptr->hostname);
+            ircsprintf(sendstr, "*** Linked to %s [%s@%s]\n",
+              botptr->nick, botptr->username, botptr->hostname);
             writesocket(tmp->socket, sendstr);
           }
         }
@@ -2189,7 +2158,7 @@ BotProcess(struct DccUser *botptr, char *line)
   {
     /* <nick@bot> said something */
 
-    sprintf(buf, "%s\n", line);
+    ircsprintf(buf, "%s\n", line);
     for (tmp = connections; tmp; tmp = tmp->next)
     {
       if (botptr == tmp)

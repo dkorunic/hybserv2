@@ -30,6 +30,7 @@
 #include "sock.h"
 #include "statserv.h"
 #include "seenserv.h"
+#include "sprintf_irc.h"
 
 #ifdef HELPSERVICES
 
@@ -169,14 +170,11 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
       strcpy(str, "HELP");
     else if (ac >= 3)
     {
-      sprintf(str, "HELP %s %s",
-        av[1],
-        av[2]);
+      ircsprintf(str, "HELP %s %s", av[1], av[2]);
     }
     else
     {
-      sprintf(str, "HELP %s",
-        av[1]);
+      ircsprintf(str, "HELP %s", av[1]);
     }
 
     if (serviceptr == Me.osptr)
@@ -245,43 +243,43 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     {
       sendstr[0] = '\0';
       if (servptr == Me.osptr)
-        sprintf(sendstr, "%s/operserv/index", HelpPath);
+        ircsprintf(sendstr, "%s/operserv/index", HelpPath);
 
     #ifdef NICKSERVICES
 
       else if (servptr == Me.nsptr)
-        sprintf(sendstr, "%s/nickserv/index", HelpPath);
+        ircsprintf(sendstr, "%s/nickserv/index", HelpPath);
 
       #ifdef CHANNELSERVICES
         else if (servptr == Me.csptr)
-          sprintf(sendstr, "%s/chanserv/index", HelpPath);
+          ircsprintf(sendstr, "%s/chanserv/index", HelpPath);
       #endif
 
       #ifdef MEMOSERVICES
         else if (servptr == Me.msptr)
-          sprintf(sendstr, "%s/memoserv/index", HelpPath);
+          ircsprintf(sendstr, "%s/memoserv/index", HelpPath);
       #endif
 
     #endif /* NICKSERVICES */
 
     #ifdef STATSERVICES
       else if (servptr == Me.ssptr)
-        sprintf(sendstr, "%s/statserv/index", HelpPath);
+        ircsprintf(sendstr, "%s/statserv/index", HelpPath);
     #endif /* STATSERVICES */
 
     #ifdef HELPSERVICES
       else if (servptr == Me.hsptr)
-        sprintf(sendstr, "%s/helpserv/index", HelpPath);
+        ircsprintf(sendstr, "%s/helpserv/index", HelpPath);
     #endif /* HELPSERVICES */
 
     #ifdef GLOBALSERVICES
       else if (servptr == Me.gsptr)
-        sprintf(sendstr, "%s/global/index", HelpPath);
+        ircsprintf(sendstr, "%s/global/index", HelpPath);
     #endif /* GLOBALSERVICES */
 
     #ifdef SEENSERVICES
       else if (servptr == Me.esptr)
-          sprintf(sendstr, "%s/seenserv/index", HelpPath );
+          ircsprintf(sendstr, "%s/seenserv/index", HelpPath );
     #endif /* SEENSERVICES */
 
       if (sendstr[0])
@@ -299,7 +297,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     {
       if (servptr == Me.osptr)
       {
-        sprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
+        ircsprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
         if ((fp = fopen(sendstr, "r")) == NULL)
         {
           writesocket(sockfd, "Unable to open help file\n");
@@ -346,7 +344,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     /* Bug found by larne and binder -kre */
     if (strchr(command, '/') || strstr(command, ".."))
     {
-      sprintf(sendstr, "Invalid help string");
+      ircsprintf(sendstr, "Invalid help string");
       if (sockfd == NODCC)
         notice(Serv, helpnick, sendstr);
       else
@@ -367,31 +365,31 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     if (sockfd == NODCC)
     {
       if (servptr == Me.osptr)
-        sprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
+        ircsprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
 
     #ifdef NICKSERVICES
 
       else if (servptr == Me.nsptr)
       {
         if (arg2[0])
-          sprintf(sendstr, "%s/nickserv/%s/%s",
+          ircsprintf(sendstr, "%s/nickserv/%s/%s",
             HelpPath,
             helparg,
             arg2);
         else
-          sprintf(sendstr, "%s/nickserv/%s", HelpPath, helparg);
+          ircsprintf(sendstr, "%s/nickserv/%s", HelpPath, helparg);
       }
 
       #ifdef CHANNELSERVICES
         else if (servptr == Me.csptr)
         {
           if (arg2[0])
-            sprintf(sendstr, "%s/chanserv/%s/%s",
+            ircsprintf(sendstr, "%s/chanserv/%s/%s",
               HelpPath,
               helparg,
               arg2);
           else
-            sprintf(sendstr, "%s/chanserv/%s", HelpPath, helparg);
+            ircsprintf(sendstr, "%s/chanserv/%s", HelpPath, helparg);
         }
       #endif /* CHANNELSERVICES */
 
@@ -399,12 +397,12 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
         else if (servptr == Me.msptr)
         {
           if (arg2[0])
-            sprintf(sendstr, "%s/memoserv/%s/%s",
+            ircsprintf(sendstr, "%s/memoserv/%s/%s",
               HelpPath,
               helparg,
               arg2);
           else
-            sprintf(sendstr, "%s/memoserv/%s", HelpPath, helparg);
+            ircsprintf(sendstr, "%s/memoserv/%s", HelpPath, helparg);
         }
       #endif /* MEMOSERVICES */
 
@@ -414,12 +412,12 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
       else if (servptr == Me.ssptr)
       {
         if (arg2[0])
-          sprintf(sendstr, "%s/statserv/%s/%s",
+          ircsprintf(sendstr, "%s/statserv/%s/%s",
             HelpPath,
             helparg,
             arg2);
         else
-          sprintf(sendstr, "%s/statserv/%s", HelpPath, helparg);
+          ircsprintf(sendstr, "%s/statserv/%s", HelpPath, helparg);
       }
     #endif /* STATSERVICES */
 
@@ -427,12 +425,12 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
       else if (servptr == Me.hsptr)
       {
         if (arg2[0])
-          sprintf(sendstr, "%s/helpserv/%s/%s",
+          ircsprintf(sendstr, "%s/helpserv/%s/%s",
             HelpPath,
             helparg,
             arg2);
         else
-          sprintf(sendstr, "%s/helpserv/%s", HelpPath, helparg);
+          ircsprintf(sendstr, "%s/helpserv/%s", HelpPath, helparg);
       }
     #endif /* HELPSERVICES */
 
@@ -440,21 +438,21 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
       else if (servptr == Me.gsptr)
       {
         if (arg2[0])
-          sprintf(sendstr, "%s/global/%s/%s",
+          ircsprintf(sendstr, "%s/global/%s/%s",
             HelpPath,
             helparg,
             arg2);
         else
-          sprintf(sendstr, "%s/global/%s", HelpPath, helparg);
+          ircsprintf(sendstr, "%s/global/%s", HelpPath, helparg);
       }
     #endif /* GLOBALSERVICES */
 
     }
     else
     {
-      sprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
+      ircsprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
       if ((fp = fopen(sendstr, "r")) == (FILE *) NULL)
-        sprintf(sendstr, "%s/operserv/dcc/%s", HelpPath, helparg);
+        ircsprintf(sendstr, "%s/operserv/dcc/%s", HelpPath, helparg);
       else
         fclose(fp);
     }
@@ -463,7 +461,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
     if ((fp = fopen(sendstr, "r")) == (FILE *)NULL)
     {
-      sprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
+      ircsprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
       if (sockfd == NODCC)
         notice(Serv, helpnick, sendstr);
       else

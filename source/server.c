@@ -43,8 +43,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
@@ -178,7 +178,7 @@ AddServer(int argcnt, char **line)
   if (argcnt == 4)
   {
   #ifdef BLOCK_ALLOCATION
-    Strncpy(tempserv->name, line[1], SERVERLEN);
+    strncpy(tempserv->name, line[1], SERVERLEN);
   #else
     tempserv->name = MyStrdup(line[1]);
   #endif
@@ -199,7 +199,7 @@ AddServer(int argcnt, char **line)
       return (NULL);
 
   #ifdef BLOCK_ALLOCATION
-    Strncpy(tempserv->name, line[2], SERVERLEN);
+    strncpy(tempserv->name, line[2], SERVERLEN);
   #else
     tempserv->name = MyStrdup(line[2]);
   #endif
@@ -550,7 +550,6 @@ s_server(int ac, char **av)
   {
     if ((ac == 5) && !IsJupe(tempserv->name))
     {
-      time_t current_ts = current_ts;
       tempserv->uplink = FindServer(av[0] + 1);
       SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
           "after %s split time",
@@ -578,10 +577,8 @@ s_server(int ac, char **av)
     /*
      * add the services (our) server as well
      */
-    sprintf(sendstr, ":%s SERVER %s 1 :%s",
-      av[1],
-      Me.name,
-      Me.info);
+    ircsprintf(sendstr, ":%s SERVER %s 1 :%s",
+      av[1], Me.name, Me.info);
 
     SplitBuf(sendstr, &line);
 
@@ -676,7 +673,7 @@ s_nick(int ac, char **av)
 
   #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
     /*memset(&newnick, 0, NICKLEN + 1);*/
-    Strncpy(newnick, av[2], NICKLEN);
+    strncpy(newnick, av[2], NICKLEN);
     newnick[NICKLEN] = '\0';
   #endif
 
@@ -1010,9 +1007,7 @@ s_privmsg(int ac, char **av)
 
     if (lptr)
     {
-      sprintf(chkstr, "*!%s@%s",
-        lptr->username,
-        lptr->hostname);
+      ircsprintf(chkstr, "*!%s@%s", lptr->username, lptr->hostname);
       if (OnIgnoreList(chkstr))
         return;
     }
@@ -1642,11 +1637,8 @@ s_sjoin(int ac, char **av)
     CurrTime = current_ts;
 
     /* kludge for older ircds that don't use SJOIN */
-    sprintf(sendstr, ":%s SJOIN %ld %s + :%s",
-      currenthub->realname,
-      (long) CurrTime,
-      chan,
-      av[0]);
+    ircsprintf(sendstr, ":%s SJOIN %ld %s + :%s",
+      currenthub->realname, (long) CurrTime, chan, av[0]);
 
     SplitBuf(sendstr, &line);
     SplitBuf(av[0], &nicks);

@@ -28,7 +28,6 @@
 #include "server.h"
 #include "settings.h"
 #include "statserv.h"
-#include "Strn.h"
 
 /*
  * Global - linked list of clients
@@ -218,10 +217,10 @@ AddClient(char **line)
 
   memset(tempuser, 0, sizeof(struct Luser));
 
-  Strncpy(tempuser->nick, line[1], NICKLEN);
-  Strncpy(tempuser->username, line[5], USERLEN);
-  Strncpy(tempuser->hostname, line[6], HOSTLEN);
-  Strncpy(tempuser->realname, line[8] + 1, REALLEN);
+  strncpy(tempuser->nick, line[1], NICKLEN);
+  strncpy(tempuser->username, line[5], USERLEN);
+  strncpy(tempuser->hostname, line[6], HOSTLEN);
+  strncpy(tempuser->realname, line[8] + 1, REALLEN);
 
 #else
 

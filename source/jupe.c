@@ -25,6 +25,7 @@
 #include "sock.h"
 #include "timestr.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 #ifdef ALLOW_JUPES
 
@@ -184,10 +185,8 @@ DoJupeSquit(char *serv, char *reason, char *who)
   }
 
   /* add a fake server to replace it */
-  sprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n",
-    Me.name,
-    serv,
-    reason);
+  ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, serv,
+      reason);
 
   toserv(sendstr);
 
@@ -227,9 +226,8 @@ CheckJuped(char *name)
         /* its a nick jupe, not a server jupe */
 
         /* collide the nickname */
-        sprintf(sendstr,
-          "NICK %s 1 %ld +i juped juped.com %s :%s\n",
-          tempjupe->name,
+        ircsprintf(sendstr, "NICK %s 1 %ld +i juped juped.com %s :%s\n",
+            tempjupe->name,
         #ifdef NICKSERVICES
           (long) (lptr->nick_ts - 1),
         #else
@@ -263,10 +261,8 @@ CheckJuped(char *name)
         DeleteServer(tempserv);
 
         /* replace it with fake server */
-        sprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n",
-          Me.name,
-          name,
-          tempjupe->reason);
+        ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\n", Me.name, name,
+            tempjupe->reason);
         toserv(sendstr);
         SplitBuf(sendstr, &arv);
 
@@ -319,11 +315,9 @@ InitJupes()
     if (tmpjupe->isnick)
     {
       /* collide the nickname */
-      sprintf(sendstr,
-        "NICK %s 1 1 +i juped juped.com %s :%s\n",
-        tmpjupe->name,
-        Me.name,
-        tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
+      ircsprintf(sendstr, "NICK %s 1 1 +i juped juped.com %s :%s\n",
+          tmpjupe->name, Me.name, tmpjupe->reason ? tmpjupe->reason :
+          "Jupitered Nickname");
       toserv(sendstr);
 
       SplitBuf(sendstr, &av);
@@ -331,11 +325,8 @@ InitJupes()
     }
     else
     {
-      sprintf(sendstr,
-        ":%s SERVER %s 2 :Juped: %s",
-        Me.name,
-        tmpjupe->name,
-        tmpjupe->reason);
+      ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
+          tmpjupe->name, tmpjupe->reason);
 
       toserv(":%s SQUIT %s :%s (%s)\n%s\n",
         Me.name,

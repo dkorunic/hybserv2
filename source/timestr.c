@@ -22,6 +22,7 @@
 #include "match.h"
 #include "misc.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 /*
 timeago()
@@ -110,15 +111,10 @@ timeago(time_t timestamp, int flag)
   if (years)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld year%s ",
-        years,
-        (years == 1) ? "" : "s");
+      ircsprintf(temp, "%ld year%s ", years, (years == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldy",
-        years);
+      ircsprintf(temp, "%ldy", years);
       if (spaces)
         strcat(temp, " ");
     }
@@ -128,15 +124,10 @@ timeago(time_t timestamp, int flag)
   if (weeks)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld week%s ",
-        weeks,
-        (weeks == 1) ? "" : "s");
+      ircsprintf(temp, "%ld week%s ", weeks, (weeks == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldw",
-        weeks);
+      ircsprintf(temp, "%ldw", weeks);
       if (spaces)
         strcat(temp, " ");
     }
@@ -146,15 +137,10 @@ timeago(time_t timestamp, int flag)
   if (days)
   {
     if (longfmt)
-      sprintf(temp,
-        "%ld day%s ",
-        days,
-        (days == 1) ? "" : "s");
+      ircsprintf(temp, "%ld day%s ", days, (days == 1) ? "" : "s");
     else
     {
-      sprintf(temp,
-        "%ldd",
-        days);
+      ircsprintf(temp, "%ldd", days);
       if (spaces)
         strcat(temp, " ");
     }
@@ -173,11 +159,7 @@ timeago(time_t timestamp, int flag)
        */
       if (hours || minutes || seconds)
       {
-        sprintf(temp,
-          "(%ldh %ldm %lds)",
-          hours,
-          minutes,
-          seconds);
+        ircsprintf(temp, "(%ldh %ldm %lds)", hours, minutes, seconds);
         strcat(final, temp);
       }
     }
@@ -186,9 +168,7 @@ timeago(time_t timestamp, int flag)
       temp[0] = '\0';
       if (hours)
       {
-        sprintf(temp,
-          "%ldh",
-          hours);
+        ircsprintf(temp, "%ldh", hours);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -196,9 +176,7 @@ timeago(time_t timestamp, int flag)
 
       if (minutes)
       {
-        sprintf(temp,
-          "%ldm",
-          minutes);
+        ircsprintf(temp, "%ldm", minutes);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -206,9 +184,7 @@ timeago(time_t timestamp, int flag)
 
       if (seconds)
       {
-        sprintf(temp,
-          "%lds",
-          seconds);
+        ircsprintf(temp, "%lds", seconds);
         if (spaces)
           strcat(temp, " ");
         strcat(final, temp);
@@ -227,15 +203,13 @@ timeago(time_t timestamp, int flag)
     if (hours)
     {
       if (longfmt)
-        sprintf(temp,
+        ircsprintf(temp,
           "%ld hour%s ",
           hours,
           (hours == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%ldh",
-          hours);
+        ircsprintf(temp, "%ldh", hours);
         if (spaces)
           strcat(temp, " ");
       }
@@ -245,15 +219,11 @@ timeago(time_t timestamp, int flag)
     if (minutes)
     {
       if (longfmt)
-        sprintf(temp,
-          "%ld minute%s ",
-          minutes,
-          (minutes == 1) ? "" : "s");
+        ircsprintf(temp, "%ld minute%s ",
+          minutes, (minutes == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%ldm",
-           minutes);
+        ircsprintf(temp, "%ldm", minutes);
         if (spaces)
           strcat(temp, " ");
       }
@@ -263,15 +233,11 @@ timeago(time_t timestamp, int flag)
     if (seconds)
     {
       if (longfmt)
-        sprintf(temp,
-          "%ld second%s ",
-          seconds,
-          (seconds == 1) ? "" : "s");
+        ircsprintf(temp, "%ld second%s ",
+          seconds, (seconds == 1) ? "" : "s");
       else
       {
-        sprintf(temp,
-          "%lds",
-          seconds);
+        ircsprintf(temp, "%lds", seconds);
         if (spaces)
           strcat(temp, " ");
       }
@@ -324,8 +290,7 @@ timestr(char *format)
      * 'm', or 's' in it - assume it is in seconds so we don't
      * break the below loop
      */
-    sprintf(fmtbuf, "%ss",
-      format);
+    ircsprintf(fmtbuf, "%ss", format);
   }
   else
     strcpy(fmtbuf, format);

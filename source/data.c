@@ -33,6 +33,7 @@
 #include "settings.h"
 #include "seenserv.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 static int CopyFile(char *oldfile, char *newfile);
 
@@ -363,9 +364,7 @@ BackupDatabases(time_t unixtime)
    * First make sure HPath/backup/ exists
    * Notice that %s/backup/something has to be under 512 characters. -kre
    */
-  sprintf(bpath,
-    "%s/backup",
-    HPath);
+  ircsprintf(bpath, "%s/backup", HPath);
   /* Function mkdir() returns -1 on failure -kre */
   if (mkdir(bpath, 0700)==-1)
   {
@@ -383,12 +382,8 @@ BackupDatabases(time_t unixtime)
 
   backup_tm = localtime(&unixtime);
 
-  sprintf(bpath,
-    "%s/backup/%d%02d%02d",
-    HPath,
-    1900 + backup_tm->tm_year,
-    backup_tm->tm_mon + 1,
-    backup_tm->tm_mday);
+  ircsprintf(bpath, "%s/backup/%d%02d%02d", HPath, 1900 +
+      backup_tm->tm_year, backup_tm->tm_mon + 1, backup_tm->tm_mday);
 
   /*
    * Make the directory permissions: drwx------
@@ -408,17 +403,13 @@ BackupDatabases(time_t unixtime)
     }
   }
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    OperServDB);
+  ircsprintf(temp, "%s/%s", bpath, OperServDB);
 
   CopyFile(OperServDB, temp);
 
 #ifdef STATSERVICES
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    StatServDB);
+  ircsprintf(temp, "%s/%s", bpath, StatServDB);
 
   CopyFile(StatServDB, temp);
 
@@ -426,33 +417,25 @@ BackupDatabases(time_t unixtime)
 
 #ifdef NICKSERVICES
 
-  sprintf(temp, "%s/%s",
-    bpath,
-    NickServDB);
+  ircsprintf(temp, "%s/%s", bpath, NickServDB);
 
   CopyFile(NickServDB, temp);
 
 #ifdef CHANNELSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    ChanServDB);
+  ircsprintf(temp, "%s/%s", bpath, ChanServDB);
 
   CopyFile(ChanServDB, temp);
 #endif /* CHANNELSERVICES */
 
 #ifdef MEMOSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    MemoServDB);
+  ircsprintf(temp, "%s/%s", bpath, MemoServDB);
 
   CopyFile(MemoServDB, temp);
 #endif /* MEMOSERVICES */
 
 /* SeenServDB should be backed up too. -kre */
 #ifdef SEENSERVICES
-  sprintf(temp, "%s/%s",
-    bpath,
-    SeenServDB);
+  ircsprintf(temp, "%s/%s", bpath, SeenServDB);
 
   CopyFile(SeenServDB, temp);
 #endif
@@ -534,7 +517,7 @@ WriteOpers()
   char *donestr; /* list of nicks we wrote */
   char temp[MAXLINE];
 
-  sprintf(tempname, "%s.tmp", OperServDB);
+  ircsprintf(tempname, "%s.tmp", OperServDB);
   fp = CreateDatabase(tempname, "OperServ Database");
   if (!fp)
   {
@@ -560,16 +543,13 @@ WriteOpers()
   *donestr = '\0';
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
   {
-    sprintf(temp, "*%s*",
-      tempuser->nick);
+    ircsprintf(temp, "*%s*", tempuser->nick);
     if (match(temp, donestr) == 0)
     {
-      fprintf(fp, "%s %ld\n",
-        tempuser->nick,
-        tempuser->umodes);
-      sprintf(temp, "%s ",
-        tempuser->nick);
-      donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp) + 1);
+      fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+      ircsprintf(temp, "%s ", tempuser->nick);
+      donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
+          + 1);
       strcat(donestr, temp);
     }
   }
@@ -601,7 +581,7 @@ WriteStats()
   FILE *fp;
   char tempname[MAXLINE];
 
-  sprintf(tempname, "%s.tmp", StatServDB);
+  ircsprintf(tempname, "%s.tmp", StatServDB);
   fp = CreateDatabase(tempname, "StatServ Database");
   if (!fp)
   {
@@ -658,7 +638,7 @@ WriteNicks()
   struct NickHost *hptr;
   int islinked;
 
-  sprintf(tempname, "%s.tmp", NickServDB);
+  ircsprintf(tempname, "%s.tmp", NickServDB);
   fp = CreateDatabase(tempname, "NickServ Database");
   if (!fp)
   {
@@ -848,7 +828,7 @@ WriteChans()
   int ii,
       ccnt;
 
-  sprintf(tempname, "%s.tmp", ChanServDB);
+  ircsprintf(tempname, "%s.tmp", ChanServDB);
   fp = CreateDatabase(tempname, "ChanServ Database");
   if (!fp)
   {
@@ -1021,7 +1001,7 @@ WriteMemos()
   struct MemoInfo *mi;
   struct Memo *memoptr;
 
-  sprintf(tempname, "%s.tmp", MemoServDB);
+  ircsprintf(tempname, "%s.tmp", MemoServDB);
   fp = CreateDatabase(tempname, "MemoServ Database");
   if (!fp)
   {
@@ -1258,7 +1238,7 @@ WriteSeen()
   char tempname[MAXLINE];
   aSeen *seen;
 
-  sprintf(tempname, "%s.tmp", SeenServDB);
+  ircsprintf(tempname, "%s.tmp", SeenServDB);
   fp = CreateDatabase(tempname, "SeenServ Database");
   if (!fp)
   {

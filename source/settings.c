@@ -22,6 +22,7 @@
 #include "misc.h"
 #include "settings.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 /*
  * These variables, or directives, are set by parsing
@@ -867,7 +868,7 @@ int SaveSettings()
 
   /* MMkay, this should write safe config files so that they won't get
    * b0rked if something happens when writing. -kre */
-  sprintf(tempname, "%s.tmp", SETPATH);
+  ircsprintf(tempname, "%s.tmp", SETPATH);
   
   if (!(fp = fopen(tempname, "w")))
   {
@@ -893,7 +894,7 @@ int SaveSettings()
           /* Try to write out string only if non-null, ie is set -kre */
           if (*(char **)dptr->param[ii].ptr)
           {
-            sprintf(tmp, "\"%s\" ",
+            ircsprintf(tmp, "\"%s\" ",
               *(char **) dptr->param[ii].ptr);
             strcat(buffer, tmp);
           }
@@ -903,7 +904,7 @@ int SaveSettings()
 
         case PARAM_TIME:
         {
-          sprintf(tmp, "%s ",
+          ircsprintf(tmp, "%s ",
             timeago(*(long *) dptr->param[ii].ptr, 4));
           strcat(buffer, tmp);
 
@@ -913,8 +914,7 @@ int SaveSettings()
         case PARAM_INT:
         case PARAM_PORT:
         {
-          sprintf(tmp, "%d ",
-            *(int *) dptr->param[ii].ptr);
+          ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
           strcat(buffer, tmp);
 
           break;
@@ -933,7 +933,7 @@ int SaveSettings()
           if (*(int *) dptr->param[ii].ptr)
           {
 #if 0
-            sprintf(tmp, "%d ",
+            ircsprintf(tmp, "%d ",
               *(int *) dptr->param[ii].ptr);
             strcat(buffer, tmp);
 #endif

@@ -38,7 +38,7 @@
 #include "operserv.h"
 #include "server.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
 #include "timer.h"
 
 #ifdef HAVE_SOLARIS_THREADS
@@ -163,7 +163,7 @@ void
 toserv(char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   int ii;
   va_list args;
 
@@ -172,7 +172,7 @@ toserv(char *format, ...)
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 
@@ -197,12 +197,12 @@ void
 tosock(int sockfd, char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   va_list args;
 
   va_start(args, format);
 
-  vSnprintf(buf, sizeof(buf), format, args);
+  vsprintf_irc(buf, format, args);
 
   va_end(args);
 

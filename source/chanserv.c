@@ -37,8 +37,8 @@
 #include "server.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
@@ -914,12 +914,8 @@ cs_join(struct ChanInfo *chanptr)
     else
       chants = current_ts;
 
-    sprintf(sendstr,
-      ":%s SJOIN %ld %s + :@%s\n",
-      Me.name,
-      (long) chants,
-      chanptr->name,
-      n_ChanServ);
+    ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\n", Me.name,
+      (long) chants, chanptr->name, n_ChanServ);
     toserv(sendstr);
 
     SplitBuf(sendstr, &av);
@@ -955,12 +951,9 @@ cs_joinchan(struct ChanInfo *chanptr)
 
   chptr = FindChannel(chanptr->name);
 
-  sprintf(sendstr,
-    ":%s SJOIN %ld %s + :@%s\n",
-    Me.name,
-    chptr ? (long) chptr->since : (long) current_ts,
-    chanptr->name,
-    n_ChanServ);
+  ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\n",
+    Me.name, chptr ? (long) chptr->since : (long) current_ts,
+    chanptr->name, n_ChanServ);
   toserv(sendstr);
 
   SplitBuf(sendstr, &av);
@@ -981,12 +974,10 @@ cs_join_ts_minus_1(struct ChanInfo *chanptr)
   struct Channel *cptr = FindChannel(chanptr->name);
   int ac;
 
-  sprintf(sendstr,
+  ircsprintf(sendstr,
     ":%s SJOIN %ld %s + :@%s\n",
-    Me.name,
-    cptr ? (long) (cptr->since - 1) : (long) current_ts,
-    cptr->name,
-    n_ChanServ);
+    Me.name, cptr ? (long) (cptr->since - 1) : (long) current_ts,
+    cptr->name, n_ChanServ);
   toserv(sendstr);
 
   ac = SplitBuf(sendstr, &av);
@@ -1153,7 +1144,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     {
       char temp[MAXLINE];
 
-      sprintf(temp, "%s %ld", modes, cptr->limit);
+      ircsprintf(temp, "%s %ld", modes, cptr->limit);
       strcpy(modes, temp);
     }
     if (cptr->key)
@@ -1162,14 +1153,11 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
       if (chptr->key)
       {
-        sprintf(temp, "-k %s", chptr->key);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          chptr->name,
-          temp);
+        ircsprintf(temp, "-k %s", chptr->key);
+        toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, temp);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, temp);
       }
-      sprintf(temp, "%s %s", modes, cptr->key);
+      ircsprintf(temp, "%s %s", modes, cptr->key);
       strcpy(modes, temp);
     }
   }
@@ -1337,12 +1325,8 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
         if (HasFlag(lptr->nick, NS_NOCHANOPS))
           return;
 
-        sprintf(modes, "+o %s",
-          lptr->nick);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          cptr->name,
-          modes);
+        ircsprintf(modes, "+o %s", lptr->nick);
+        toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
       }
     }
@@ -1352,22 +1336,14 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
           !HasAccess(cptr, lptr, CA_AUTOOP)) ||
           (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP]))
       {
-        sprintf(modes, "-o %s",
-          lptr->nick);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          cptr->name,
-          modes);
+        ircsprintf(modes, "-o %s", lptr->nick);
+        toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
       }
       else if (HasFlag(lptr->nick, NS_NOCHANOPS))
       {
-        sprintf(modes, "-o %s",
-          lptr->nick);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          cptr->name,
-          modes);
+        ircsprintf(modes, "-o %s", lptr->nick);
+        toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 
         notice(n_ChanServ, lptr->nick,
@@ -1391,12 +1367,8 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       /* autodeop people aren't allowed voice status either */
       if (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP])
       {
-        sprintf(modes, "-v %s",
-          lptr->nick);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          cptr->name,
-          modes);
+        ircsprintf(modes, "-v %s", lptr->nick);
+        toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
       }
     }
@@ -1414,12 +1386,8 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       /* Autodeop people aren't allowed halfop status either */
       if (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP])
       {
-        sprintf(modes, "-h %s",
-          lptr->nick);
-        toserv(":%s MODE %s %s\n",
-          n_ChanServ,
-          cptr->name,
-          modes);
+        ircsprintf(modes, "-h %s", lptr->nick);
+        toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
         UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
       }
     }
@@ -1436,37 +1404,37 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     if ((mode == MODE_S) &&
         (cptr->modes_on & MODE_S))
 #ifndef HYBRID
-      sprintf(modes, "+s-p");
+      ircsprintf(modes, "+s-p");
 #else
       /* In hybrid +p and +s has another meaning -Janos */
-      sprintf(modes, "+s");
+      ircsprintf(modes, "+s");
 #endif /* HYBRID7 */
     if ((mode == MODE_P) &&
         (cptr->modes_on & MODE_P))
 #ifndef HYBRID
-      sprintf(modes, "+p-s");
+      ircsprintf(modes, "+p-s");
 #else
       /* In hybrid +p and +s has another meaning -Janos */
-      sprintf(modes, "+p");
+      ircsprintf(modes, "+p");
 #endif /* HYBRID7 */
     if ((mode == MODE_N) &&
         (cptr->modes_on & MODE_N))
-      sprintf(modes, "+n");
+      ircsprintf(modes, "+n");
 #ifdef HYBRID7
     /* -Janos */
     if ((mode == MODE_A) &&
         (cptr->modes_on & MODE_A))
-      sprintf(modes, "+a");
+      ircsprintf(modes, "+a");
 #endif /* HYBRID7 */
     if ((mode == MODE_T) &&
         (cptr->modes_on & MODE_T))
-      sprintf(modes, "+t");
+      ircsprintf(modes, "+t");
     if ((mode == MODE_M) &&
         (cptr->modes_on & MODE_M))
-      sprintf(modes, "+m");
+      ircsprintf(modes, "+m");
     if ((mode == MODE_I) &&
         (cptr->modes_on & MODE_I))
-      sprintf(modes, "+i");
+      ircsprintf(modes, "+i");
 
     if (modes[0])
     {
@@ -1480,11 +1448,8 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
   if ((mode == MODE_L) &&
       (cptr->limit))
   {
-    sprintf(modes, "+l %ld", cptr->limit);
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      cptr->name,
-      modes);
+    ircsprintf(modes, "+l %ld", cptr->limit);
+    toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
   }
   if ((mode == MODE_K) &&
@@ -1492,18 +1457,12 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
   {
     if (!isminus)
     {
-      sprintf(modes, "-k %s", chptr->key);
-      toserv(":%s MODE %s %s\n",
-        n_ChanServ,
-        cptr->name,
-        modes);
+      ircsprintf(modes, "-k %s", chptr->key);
+      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
-    sprintf(modes, "+k %s", cptr->key);
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      cptr->name,
-      modes);
+    ircsprintf(modes, "+k %s", cptr->key);
+    toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
   }
 
@@ -1512,36 +1471,36 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     modes[0] = '\0';
     if ((mode == MODE_S) &&
         (cptr->modes_off & MODE_S))
-      sprintf(modes, "-s");
+      ircsprintf(modes, "-s");
     if ((mode == MODE_P) &&
         (cptr->modes_off & MODE_P))
-      sprintf(modes, "-p");
+      ircsprintf(modes, "-p");
     if ((mode == MODE_N) &&
         (cptr->modes_off & MODE_N))
-      sprintf(modes, "-n");
+      ircsprintf(modes, "-n");
 #ifdef HYBRID7
     /* -Janos */
     if ((mode == MODE_A) &&
         (cptr->modes_off & MODE_S))
-      sprintf(modes, "-a");
+      ircsprintf(modes, "-a");
 #endif /* HYBRID7 */
     if ((mode == MODE_T) &&
         (cptr->modes_off & MODE_T))
-      sprintf(modes, "-t");
+      ircsprintf(modes, "-t");
     if ((mode == MODE_M) &&
         (cptr->modes_off & MODE_M))
-      sprintf(modes, "-m");
+      ircsprintf(modes, "-m");
     if ((mode == MODE_I) &&
         (cptr->modes_off & MODE_I))
-      sprintf(modes, "-i");
+      ircsprintf(modes, "-i");
     if ((mode == MODE_L) &&
         (cptr->modes_off & MODE_L))
-      sprintf(modes, "-l");
+      ircsprintf(modes, "-l");
     if ((mode == MODE_K) &&
         (cptr->modes_off & MODE_K))
     {
       if (chptr->key)
-        sprintf(modes, "-k %s", chptr->key);
+        ircsprintf(modes, "-k %s", chptr->key);
     }
 
     if (modes[0])
@@ -1629,12 +1588,8 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
 
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
   {
-    sprintf(modes, "+o %s",
-      tempuser->lptr->nick);
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      chanptr->name,
-      modes);
+    ircsprintf(modes, "+o %s", tempuser->lptr->nick);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
 #ifdef HYBRID7
@@ -1642,7 +1597,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   else if (!(tempuser->flags & CH_HOPPED) &&
         HasAccess(cptr, tempuser->lptr, CA_AUTOHALFOP))
   {
-    sprintf(modes, "+h %s", tempuser->lptr->nick);
+    ircsprintf(modes, "+h %s", tempuser->lptr->nick);
     toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
@@ -1650,12 +1605,8 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   else if (!(tempuser->flags & CH_VOICED) &&
         HasAccess(cptr, tempuser->lptr, CA_AUTOVOICE))
   {
-    sprintf(modes, "+v %s",
-      tempuser->lptr->nick);
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      chanptr->name,
-      modes);
+    ircsprintf(modes, "+v %s", tempuser->lptr->nick);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
 } /* cs_CheckOp() */
@@ -1735,10 +1686,8 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     return;
   }
 
-  sprintf(chkstr, "%s!%s@%s",
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+  ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
 
   if ((ak = OnAkickList(cptr, chkstr)))
   {
@@ -1761,19 +1710,12 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       cs_joinchan(cptr);
     }
 
-    sprintf(modes, "+b %s",
-      ak->hostmask);
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      chanptr->name,
-      modes);
+    ircsprintf(modes, "+b %s", ak->hostmask);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
 
-    toserv(":%s KICK %s %s :%s\n",
-      n_ChanServ,
-      chanptr->name,
-      lptr->nick,
-      ak->reason ? ak->reason : "");
+    toserv(":%s KICK %s %s :%s\n", n_ChanServ, chanptr->name,
+        lptr->nick, ak->reason ? ak->reason : "");
     RemoveFromChannel(chanptr, lptr);
   }
   else if ((cptr->flags & CS_RESTRICTED) &&
@@ -1784,13 +1726,9 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     if (!IsChannelMember(chanptr, Me.csptr))
       cs_joinchan(cptr);
 
-    sprintf(modes, "+b *!%s",
-      mask);
+    ircsprintf(modes, "+b *!%s", mask);
 
-    toserv(":%s MODE %s %s\n",
-      n_ChanServ,
-      chanptr->name,
-      modes);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
 
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
 
@@ -2672,7 +2610,7 @@ AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char *mask,
           if (strchr(hptr->hostmask, '!'))
             strcpy(chkstr, hptr->hostmask);
           else
-            sprintf(chkstr, "*!%s", hptr->hostmask);
+            ircsprintf(chkstr, "*!%s", hptr->hostmask);
 
           if (match(mask, chkstr))
           {
@@ -2806,10 +2744,8 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
   if (IsFounder(lptr, cptr))
     return (cptr->access_lvl[CA_FOUNDER]);
 
-  sprintf(chkstr, "%s!%s@%s",
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+  ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
 
   if ((nptr = FindNick(lptr->nick)))
   {
@@ -2939,10 +2875,8 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
     struct ChanAccess *ca;
     char nmask[MAXLINE];
 
-    sprintf(nmask, "%s!%s@%s",
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+    ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
+        lptr->hostname);
     if ((ca = OnAccessList(cptr, nmask, FindNick(lptr->nick))))
       if (ca->level >= cptr->access_lvl[level])
         return 1;
@@ -3014,14 +2948,14 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     char str[MAXLINE];
 
     if (ac >= 3)
-      sprintf(str, "%s %s", av[1], av[2]);
+      ircsprintf(str, "%s %s", av[1], av[2]);
     else
     {
       if ((!strcasecmp(av[1], "ACCESS")) ||
           (!strcasecmp(av[1], "AKICK")) ||
           (!strcasecmp(av[1], "LEVEL")) ||
           (!strcasecmp(av[1], "SET")))
-        sprintf(str, "%s index", av[1]);
+        ircsprintf(str, "%s index", av[1]);
       else
       {
         struct Command *cptr;
@@ -3040,7 +2974,7 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             return;
           }
 
-        sprintf(str, "%s", av[1]);
+        ircsprintf(str, "%s", av[1]);
       }
     }
 
@@ -3776,7 +3710,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     if ((ptr = FindClient(av[3])))
     {
       mask = HostToMask(ptr->username, ptr->hostname);
-      sprintf(hostmask, "*!%s", mask);
+      ircsprintf(hostmask, "*!%s", mask);
       MyFree(mask);
     }
     else
@@ -4425,10 +4359,8 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     "Password accepted - you are now recognized as a founder for [\002%s\002]",
     av[1]);
 
-  sprintf(nmask, "%s!%s@%s",
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+  ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
   if (!OnAccessList(cptr, nmask, nptr))
   {
     AddAccess(cptr, (struct Luser *) NULL, (char *) NULL, nptr, cptr->access_lvl[CA_SUPEROP]);
@@ -4487,7 +4419,7 @@ c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       av[1]);
 
     /* static buffers .. argh */
-    Strncpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
+    strncpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
     tmp[sizeof(tmp) - 1] = '\0';
 
     RecordCommand("%s: %s!%s@%s failed SET [%s] %s %s",
@@ -5401,7 +5333,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       char  temp[MAXLINE];
 
-      sprintf(temp, "%s %ld", modes, cptr->limit);
+      ircsprintf(temp, "%s %ld", modes, cptr->limit);
       strcpy(modes, temp);
     }
     if (cptr->key)
@@ -6236,10 +6168,8 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  sprintf(chkstr, "%s!%s@%s",
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+  ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
 
   if (ac >= 3)
     if (!strcasecmp(av[2], "ALL"))

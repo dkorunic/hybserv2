@@ -3801,6 +3801,7 @@ static void n_set_uin(struct Luser *lptr, int ac, char **av)
   {
     notice(n_NickServ, lptr->nick,
       "Invalid UIN [\002%s\002]", av[2]);
+    nptr->UIN = NULL;
     return;
   }
   

@@ -88,9 +88,7 @@ long      NickNameExpire;
 long      ChannelExpire;
 long      MemoExpire;
 long      StatExpire;
-#ifdef GECOSBANS
 long      BanExpire;
-#endif
 long      NSReleaseTimeout;
 
 int       FloodProtection;
@@ -246,9 +244,7 @@ struct Directive directives[] =
     { "ChannelExpire", D_OPTIONAL,    { { PARAM_TIME, &ChannelExpire } } },
     { "MemoExpire", D_OPTIONAL,       { { PARAM_TIME, &MemoExpire } } },
     { "StatExpire", D_OPTIONAL,       { { PARAM_TIME, &StatExpire } } },
-#ifdef GECOSBANS
     { "BanExpire", D_OPTIONAL,        { { PARAM_TIME, &BanExpire  } } },
-#endif
     { "NSReleaseTimeout", D_OPTIONAL, { { PARAM_TIME, &NSReleaseTimeout } } },
 
     /* Flood Protection */

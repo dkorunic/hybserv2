@@ -2062,28 +2062,23 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   if (!expires)
     {
       os_notice(lptr, sockfd, "Gline for %s@%s [%s] has been activated",
-                username ? username : "*",
-                hostname,
-                reason);
+                username ? username : "*", hostname, reason);
     }
   else
     {
       os_notice(lptr, sockfd,
                 "Temporary gline [%s] for %s@%s [%s] activated",
-                av[1],
-                username ? username : "*",
-                hostname,
-                reason);
+                av[1], username ? username : "*", hostname, reason);
     }
 
   if (!expires)
     {
       o_RecordCommand(sockfd,
-                      "GLINE from %s for %s@%s [%s]",
-                      lptr->nick, username ? username : "*", hostname, reason);
+        "GLINE from %s for %s@%s [%s]",
+         lptr->nick, username ? username : "*", hostname, reason);
 
       o_Wallops("GLINE from %s for %s@%s [%s]",
-                lptr->nick, username ? username : "*", hostname, reason);
+         lptr->nick, username ? username : "*", hostname, reason);
     }
   else
     {

@@ -189,17 +189,16 @@ CheckGlined(struct Luser *lptr)
 
 #ifdef HYBRID_GLINES
 
-      ExecuteGline(tempgline->username,
-                   tempgline->hostname,
-                   tempgline->reason);
+      ExecuteGline(tempgline->username, tempgline->hostname,
+          tempgline->reason);
 #endif /* HYBRID_GLINES */
 
 #ifdef HYBRID7_GLINES
 
-      Execute7Gline(tempgline->username,
-                    tempgline->hostname,
-                    tempgline->reason,
-                    tempgline->expires);
+      /* Hybrid7 accepts time in minutes, not seconds -kre */
+      Execute7Gline(tempgline->username, tempgline->hostname,
+          tempgline->reason,
+          tempgline->expires ? tempgline->expires / 60 : 0);
 #endif /* HYBRID7_GLINES */
 
     }
@@ -251,10 +250,8 @@ ExecuteGline(char *username, char *hostname, char *reason)
  * 
  * :SERVER kline OPERNICK TARGET_SERVER DURATION USER HOST REASON
  */
-
-void
-Execute7Gline(char *username, char *hostname, char *reason, time_t time)
-
+void Execute7Gline(char *username, char *hostname, char *reason, time_t
+    time)
 {
   toserv(":%s KLINE %s %lu %s %s :%s\n",
          n_OperServ, "*", time,

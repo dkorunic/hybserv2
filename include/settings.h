@@ -108,9 +108,7 @@ extern  long      NickNameExpire;
 extern  long      ChannelExpire;
 extern  long      MemoExpire;
 extern  long      StatExpire;
-#ifdef GECOSBANS
 extern  long      BanExpire;
-#endif
 extern  long      NSReleaseTimeout;
 
 extern  int       FloodProtection;

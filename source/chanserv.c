@@ -132,9 +132,7 @@ static void c_set_topic(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_entrymsg(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
-#ifdef GECOSBANS
 static void c_set_expirebans(struct Luser *, struct NickInfo *, int, char **);
-#endif
 
 static void c_invite(struct Luser *, struct NickInfo *, int, char **);
 static void c_op(struct Luser *, struct NickInfo *, int, char **);
@@ -252,9 +250,7 @@ static struct Command setcmds[] =
       { "MAIL", c_set_email, LVL_NONE },
       { "URL", c_set_url, LVL_NONE },
       { "WEBSITE", c_set_url, LVL_NONE },
-#ifdef GECOSBANS
       { "EXPIREBANS", c_set_expirebans, LVL_NONE },
-#endif
       { 0, 0, 0 }
     };
 
@@ -6696,10 +6692,8 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     strcat(buf, "SplitOps, ");
   if (cptr->flags & CS_VERBOSE)
     strcat(buf, "Verbose, ");
-#ifdef GECOSBANS
   if ((cptr->flags & CS_EXPIREBANS) && BanExpire)
     strcat(buf, "Expirebans, "); 
-#endif
 
   if (*buf)
     {
@@ -7683,7 +7677,6 @@ void SetDefaultALVL(struct ChanInfo *cptr)
     cptr->access_lvl[i] = DefaultAccess[i];
 }
 
-#ifdef GECOSBANS
 /*
  * ExpireBans()
  * Remove any bans that have expired. -harly 
@@ -7781,7 +7774,5 @@ static void c_set_expirebans(struct Luser *lptr,
   notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
     n_ChanServ, "SET EXPIREBANS");
 } /* c_set_expirebans() */
-
-#endif /* GECOSBANS */
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

@@ -565,6 +565,7 @@ s_server(int ac, char **av)
 
     return;
 #else
+#ifdef ALLOW_JUPES
     /* Yeah, this is server that has already been in server list. Now, we
     * have 2 cases - either this is juped server or is not. If it is,
     * ignore whole split stuff -kre */
@@ -580,6 +581,7 @@ s_server(int ac, char **av)
         }
       return;
     }
+#endif /* ALLOW_JUPES */
 #endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);

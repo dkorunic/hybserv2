@@ -1503,75 +1503,46 @@ CollisionCheck(time_t unixtime)
 #ifdef LINKED_NICKNAMES
 
 /*
-InsertLink()
- Insert the nick 'leaf' into 'hub's linked nickname list.
-Return: 1 if successful,
-        0 for NULL arguements,
-        -1 if a circular link is detected,
-        -2 if more than MaxLinks links are formed
-*/
-
-static int
-InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
-
+ * InsertLink()
+ * Insert the nick 'leaf' into 'hub's linked nickname list.
+ * Return: 1 if successful,
+ *         0 for NULL arguments,
+ *        -1 if a circular link is detected,
+ *        -2 if more than MaxLinks links are formed
+ *
+ * rewrote it, but just a little bit -kre
+ */
+static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 {
-  struct NickInfo *master, /* new master for link list */
-                  *leafmaster, /* previous master for leaf's list */
-                  *tmp;
-  int lcnt; /* link count */
+  struct NickInfo *master = NULL, /* new master for link list */
+                  *leafmaster = NULL, /* previous master for leaf's list */
+                  *tmp = NULL;
+  int lcnt = 0 ; /* link count */
 
 
   if (!hub || !leaf)
-    return (0);
+    return(0);
 
-  master = NULL;
-
+  /* discover master */
   if (!hub->master)
-  {
-    /*
-     * "hub" is either a plain nickname, not linked to anyone
-     * else, or it is the master nickname for a particular
-     * list. In either case, it will be the master nickname
-     * for leaf and all of leaf's current links.
-     */
-
     master = hub;
-  }
   else
-  {
-    /*
-     * "hub" is already part of a link list, since it has a
-     * master. So, make sure leaf and all of leaf's current
-     * links get their master entry set to hub's current
-     * master
-     */
-
     master = hub->master;
-  }
 
-  if (!master)
-  {
-    /* something is very wrong */
-    return (0);
-  }
-
+  /* check for circular link */
   for (tmp = master; tmp; tmp = tmp->nextlink)
   {
     if (tmp == leaf)
-    {
-      /*
-       * circular link: a user in the link is attempting to
-       * link to another user in the same link
-       */
-      return (-1);
-    }
+      return(-1);
   }
 
+  /* find out number of linked nicknames in a list */
   if (master->numlinks)
     lcnt = master->numlinks;
   else
     lcnt = 1; /* master is a standalone nickname */
 
+  /* leaf is in linked list, add linked_count_leaf to linked_count_hub */
   if (leaf->master)
   {
     if (leaf->master->numlinks)
@@ -1579,51 +1550,38 @@ InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
     else
       lcnt++;
   }
-  else if (leaf->numlinks)
-    lcnt += leaf->numlinks;
   else
-    ++lcnt;
+  {
+    if (leaf->numlinks)
+      lcnt += leaf->numlinks;
+    else
+      ++lcnt;
+  }
 
+  /* seems there are too many links, so die instantly */
   if (MaxLinks && (lcnt > MaxLinks))
     return (-2);
 
-  /*
-   * Store leaf's current master into 'leafmaster'
-   */
+  /* setup leaf master */
   if (leaf->master)
   {
     leafmaster = leaf->master;
-
-    /*
-     * leaf's current master will no longer be a list master -
-     * set its master field to the new master
-     */
     leaf->master->master = master;
   }
   else
     leafmaster = leaf;
 
-  /*
-   * Add 1 to link count to account for "leaf"
-   */
   ++master->numlinks;
 
   if (!master->nextlink)
-  {
-    /*
-     * master was previously a standalone nickname, add 1
-     * to its link count to account for itself
-     */
     ++master->numlinks;
-  }
 
 #ifdef CHANNELSERVICES
 
   /*
-   * leafmaster should no longer have a FounderChannels list -
-   * add all of leafmaster's channels to master's channels.
-   * There's no point in reallocating - just assign master's
-   * pointer to leafmaster's
+   * leafmaster should no longer have a FounderChannels list - add all of
+   * leafmaster's channels to master's channels. There's no point in
+   * reallocating - just assign master's pointer to leafmaster's
    */
   master->FounderChannels = leafmaster->FounderChannels;
   master->fccnt = leafmaster->fccnt;
@@ -1632,126 +1590,85 @@ InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
 #endif /* CHANNELSERVICES */
 
-  /*
-   * Now traverse leaf's link list and set all the master
-   * entries to the "master" variable, which will point
-   * to the rightful master of the new list
-   */
-
-
+  /* setup masters in whole list */
   for (tmp = leafmaster; tmp->nextlink; tmp = tmp->nextlink)
   {
     tmp->master = master;
     ++master->numlinks;
   }
 
-  /*
-   * The above loop stopped without setting the very last
-   * link's master, do that now.
-   */
+  /* do last master, insert hub's list at the end of leaf's list */
   tmp->master = master;
-
-  /*
-   * tmp now points to the very last nick structure in
-   * leaf's link list. In order to keep leaf's current
-   * link list intact, set tmp->nextlink to hub->nextlink,
-   * and set hub->nextlink to leaf. The new list will
-   * look something like:
-   *   master -> hub -> leaflist -> hub->nextlink
-   */
-
   tmp->nextlink = hub->nextlink;
-  hub->nextlink = leafmaster;
-  /*if (hub != master)
-    master->nextlink = leafmaster;*/
 
-  return (1);
+  /* and start list at the leaf's master */
+  hub->nextlink = leafmaster;
+
+  return(1);
 } /* InsertLink() */
 
 /*
-DeleteLink()
- Remove nptr from it's current link list. If copyhosts == 1, copy nptr's
- master's access list
-
-Return: 1  if successful
-        0  if NULL pointer
-        -1 if nptr is not in a link
-
-XXX: We have bugs here. Fix them! -kre
-*/
-
+ * DeleteLink()
+ *  Remove nptr from it's current link list. If copyhosts == 1, copy
+ *  nptr's master's access list
+ * 
+ * Return: 1 if successful
+ *         0 if NULL pointer
+ *        -1 if nptr is not in a link
+ *
+ * XXX: We have bugs here. Fix them! -kre
+ * started rewriting, however very slowly -kre
+ */
 static int DeleteLink(struct NickInfo *nptr, int copyhosts)
 {
-  struct NickInfo *tmp, *master;
-  struct NickHost *hptr;
+  struct NickInfo *tmp = NULL, *master = NULL;
+  struct NickHost *hptr = NULL;
 
   if (!nptr)
-    return (0);
+    return(0);
 
+  /* nptr is master but there is NO list! */
   if (!nptr->master && !nptr->nextlink)
-    return (-1);
+    return(-1);
 
-  if (!nptr->master && nptr->nextlink)
-    /* "nptr" IS the master of the list */
-    tmp = NULL;
-  else
+  /* let us find structure -before- nptr */
+  if (nptr->master)
   {
     for (tmp = nptr->master; tmp; tmp = tmp->nextlink)
       if (tmp->nextlink == nptr)
         break;
-
+    /* we've reached the end, and there was no nptr? now that's kinda
+     * strange */
     if (!tmp)
-      return (0);
+      return(0);
   }
 
-  /*
-   * "tmp" now points to the link structure right before nptr in the link.
-   * If tmp is NULL, then nptr is the master of the list, and there is
-   * no-one before it.
-   */
-
+  /* do relink: before nptr to after nptr */
   if (tmp)
   {
     master = nptr->master;
     tmp->nextlink = nptr->nextlink;
+
+    /* and make a master from nptr */
     nptr->master = nptr->nextlink = NULL;
     nptr->numlinks = 0;
 
     if (copyhosts)
-    {
-      /*
-        * Now, since nptr is a standalone nick again, it needs
-        * an access list - give it master's access list
-        */
+      /* make hosts list for nptr since it is alone now */
       for (hptr = master->hosts; hptr; hptr = hptr->next)
         AddHostToNick(hptr->hostmask, nptr);
-    }
   }
   else
   {
-    /*
-     * The master (nptr) is being deleted, make nptr->nextlink the new
-     * master - copy access list to new master as well.
-     */
-
+    /* make nptr->nextlink the new master */
     nptr->nextlink->master = NULL;
     nptr->nextlink->numlinks = nptr->numlinks;
-
-    /*
-     * Go through list and set everyone's master entry to the new master
-     * (nptr->nextlink)
-     */
     for (tmp = nptr->nextlink->nextlink; tmp; tmp = tmp->nextlink)
       tmp->master = nptr->nextlink;
 
     if (copyhosts)
-    {
-      /*
-       * Now give nptr->nextlink, nptr's access list
-       */
       for (hptr = nptr->hosts; hptr; hptr = hptr->next)
         AddHostToNick(hptr->hostmask, nptr->nextlink);
-    }
 
   #ifdef CHANNELSERVICES
 
@@ -1769,17 +1686,9 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
     master = nptr->nextlink;
   }
 
-  if (!master)
-    return (0); /* shouldn't happen */
-
   --master->numlinks;
   if (master->numlinks == 1)
   {
-    /*
-     * There were only 2 links in the list to begin with,
-     * and we deleted one, so the master is no longer a
-     * master
-     */
     master->numlinks = 0;
     master->master = NULL;
   }
@@ -1788,51 +1697,37 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
 } /* DeleteLink() */
 
 /*
-IsLinked()
- Determine if nick1 and nick2 are in the same link.
-Return 1 if yes, 0 if not
-*/
-
-int
-IsLinked(struct NickInfo *nick1, struct NickInfo *nick2)
-
+ * IsLinked()
+ * Determine if nick1 and nick2 are in the same link.
+ * Return 1 if yes, 0 if not
+ */
+int IsLinked(struct NickInfo *nick1, struct NickInfo *nick2)
 {
   struct NickInfo *tmp1, *tmp2;
 
   if (!nick1 || !nick2)
     return (0);
 
-  /*
-   * Check to see if nick1's master is equal to nick2's master -
-   * if so, they are in the same link
-   */
-
-  if (nick1->master)
-    tmp1 = nick1->master;
-  else
+  if (!(tmp1 = nick1->master))
     tmp1 = nick1;
 
-  if (nick2->master)
-    tmp2 = nick2->master;
-  else
+  if (!(tmp2 = nick2->master))
     tmp2 = nick2;
 
+  /* if nick1's master is equal to nick2's master they are linked */
   if (tmp1 == tmp2)
-    return (1);
+    return(1);
 
-  return (0);
+  return(0);
 } /* IsLinked() */
 
 #endif /* LINKED_NICKNAMES */
 
 /*
-GetMaster()
- Return a pointer to nptr's nick link master
-*/
-
-struct NickInfo *
-GetMaster(struct NickInfo *nptr)
-
+ * GetMaster()
+ * Return a pointer to nptr's nick link master
+ */
+struct NickInfo *GetMaster(struct NickInfo *nptr)
 {
   if (!nptr)
     return (NULL);
@@ -1845,9 +1740,8 @@ GetMaster(struct NickInfo *nptr)
   return (nptr);
 } /* GetMaster() */
 
-static void
-n_help(struct Luser *lptr, int ac, char **av)
-
+/* Helper for return-requested-help-item-from-file function */
+static void n_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
   {
@@ -4302,10 +4196,7 @@ n_link(struct Luser *lptr, int ac, char **av)
   {
     notice(n_NickServ, lptr->nick,
       "Syntax: \002LINK <nickname> <password>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "LINK");
+    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "LINK");
     return;
   }
 
@@ -4359,11 +4250,7 @@ n_link(struct Luser *lptr, int ac, char **av)
   }
 
   RecordCommand("%s: %s!%s@%s LINK %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    target->nick);
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, target->nick);
 
   if ((ret = InsertLink(target, nptr)) > 0)
   {

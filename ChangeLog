@@ -1,3 +1,14 @@
+*** 20010517_1 by janos
+- YESSS, Hybserv2 mailing lists are working again. John-Work moved it to
+  Alleged, so README was updated
+  Mailing list infos:
+  hybserv@alleged.com - Hybserv Public List
+  hybserv-bugs@alleged.com - Hybserv Bugs
+  hybserv-coders@alleged.com - Hybserv Coders
+  hybserv-cvs@alleged.com - Hybserv CVS
+
+
+
 *** 20010516_4 by kreator
 - misc fixes all around
 - Makefile changes

@@ -81,8 +81,17 @@ void InitHeaps();
 void *MyMalloc(size_t bytes);
 void *MyRealloc(void *oldptr, size_t bytes);
 char *MyStrdup(const char *str);
-inline void MyFree(void *ptr);
 void OutOfMem();
+
+/* MyFree - free an argument */
+#define MyFree(ptr) \
+{                   \
+  if (ptr != NULL)  \
+  {                 \
+    free(ptr);      \
+    ptr = NULL;     \
+  }                 \
+}
 
 /*
  * External declarations

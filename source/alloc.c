@@ -88,25 +88,6 @@ char *MyStrdup(const char *str)
 } /* MyStrdup() */
 
 /*
- * MyFree()
- *
- * Free memory pointed to by 'ptr'
- */
-inline void MyFree(void *ptr)
-{
-  if (!ptr)
-    return;
-
-  free(ptr);
-
-  /* rollback change i've done long time ago - seems it causes hybserv
-     to crash at various different places. unfortunately, original
-     author made services require this :-( -kre */
-  /* thanks, adx -kre */
-  *ptr = NULL;
-} /* MyFree() */
-
-/*
  * OutOfMem()
  *
  * Called when a memory allocation attempt has failed - make a log entry

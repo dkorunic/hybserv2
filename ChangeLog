@@ -1,3 +1,7 @@
+*** 20010605_3 by kreator
+- oops, last commit f***ed up things :-(
+
+
 *** 20010605_2 by kreator
 - add routine that will check on load if there are more than 1 nick
   entry per 1 nick: this will slow down reading routines a bit so we can

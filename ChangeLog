@@ -1,3 +1,14 @@
+*** 20021007_1 by kreator
+- import identifoper code from ddb
+- document gdb_debug
+- add c_modes and c_cycle (will fix later a bit more) (LHG team)
+- speedup setdefaultalvl()
+- fixed my wrong ifdef bug in banexpire
+- add set privmsg for nicks, fix notice() and os_notice() as well as a lot
+  of operserv code to support os_notice() (idea and some parts of code
+  from LHG team)
+
+
 *** 20020922_5 by kreator
 - this time really fix execute7gline() (TS was sent, doh)
 

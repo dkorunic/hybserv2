@@ -709,7 +709,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
           {
             if (AutoKillClones && (clcnt > MaxClones ))
             {
-              toserv(":%s KILL %s :%s!%s (Clones))\n",
+              toserv(":%s KILL %s :%s!%s (Clones)\n",
                 n_OperServ, temp2->nick, Me.name, n_OperServ);
               DeleteClient(temp2);
               temp2 = prev;
@@ -734,14 +734,14 @@ HashAddClient(struct Luser *lptr, int nickchange)
     {
       killclones = 1;
 
-      toserv(":%s KILL %s :%s!%s (Clones))\n",
+      toserv(":%s KILL %s :%s!%s (Clones)\n",
         n_OperServ,
         lptr->nick,
         Me.name,
         n_OperServ);
       DeleteClient(lptr);
 
-      toserv(":%s KILL %s :%s!%s (Clones))\n",
+      toserv(":%s KILL %s :%s!%s (Clones)\n",
         n_OperServ,
         tempuser->nick,
         Me.name,

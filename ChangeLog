@@ -1,3 +1,10 @@
+*** 20010410_1 by kreator
+Fix for SplitBuf() and s_sjoin() for blank sjoins. More fixes for
+SplitBuf() to handle some bad situations.
+Fix for pthread_exit() in DoShutDown() and SIGSEGV in ProcessSignals()
+Some fixes for Snprintf where char is propagated to int in `...'.
+
+
 *** 20010408_6 by kreator
 Fix for ChanServ not parting channels with too long topics. There was no
 topiclen check. Also, it would join, set topic and part, which could be

@@ -260,10 +260,8 @@ static AccessInfo accessinfo[] = {
   { CA_CMDVOICE, "CMDVOICE", "Use of command VOICE" },
   { CA_ACCESS, "ACCESS", "Allow ACCESS modification" },
   { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
-#ifdef HYBRID7
   { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
   { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
-#endif /* HYBRID7 */
   { CA_AUTOOP, "AUTOOP", "Automatic op" },
   { CA_CMDOP, "CMDOP", "Use of comand OP" },
   { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },

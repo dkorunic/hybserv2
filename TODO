@@ -7,6 +7,7 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 
 Pending bugs:
 -------------
+*) secure doesn't clear ban for admin [why?]
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions
 *) temp ignores rotate (possible overflow)

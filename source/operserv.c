@@ -6365,7 +6365,11 @@ TakeOver(struct Channel *cptr)
           strcat(dopnicks, tempnick->lptr->nick);
           strcat(dopnicks, " ");
         }
-      else if (!IsChannelOp(cptr, tempnick->lptr) && IsFriend(tempuser))
+      else if (!IsChannelOp(cptr, tempnick->lptr) && (IsFriend(tempuser)
+#ifdef EMPOWERADMINS
+            || IsValidAdmin(tempnick->lptr)
+#endif
+            ))
         {
           opnicks = (char *) MyRealloc(opnicks, strlen(opnicks)
                                        + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));

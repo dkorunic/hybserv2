@@ -1,3 +1,8 @@
+*** 20010507_2 by kreator
+- small hybserv.conf modifications
+- reviewed TODO
+
+
 *** 20010507_1 by kreator
 - add experimental MD5 support via hybcrypt()
 - fix problem with ChanServ ignoring valid operators

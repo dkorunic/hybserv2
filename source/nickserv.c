@@ -612,7 +612,7 @@ g first)",
         nptr = NULL;
         continue;
       }
-
+#if 0
       /* Check if there already exists that nickname in list. This will
        * give some overhead, but this will make sure no nicknames are
        * twice or more times in db. */
@@ -625,13 +625,16 @@ g first)",
       }
       else
       {
+#endif
         nptr = MakeNick();
         nptr->nick = MyStrdup(av[0]);
         nptr->flags = atol(av[1]);
         nptr->created = atol(av[2]);
         nptr->lastseen = atol(av[3]);
         nptr->flags &= ~NS_IDENTIFIED;
+#if 0
       }
+#endif
     }
     MyFree(av);
   } /* while */

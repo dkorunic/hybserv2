@@ -1,3 +1,8 @@
+*** 20020208_3 by kreator
+- fixed a couple of things
+- removed SEGV handler (wtf did we have it at the first place..)
+
+
 *** 20020208_2 by kreator
 - move nickserv ircop flag into NoExpire as it should be
 

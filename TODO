@@ -19,7 +19,6 @@ Pending bugs:
    .channel command or SECURE)
 *) sed helpfiles so that they have proper time values
    NOTE: this should be done via %v or %t.. something like it
-*) save services ignores
 *) stuff from tools/* like encryptconf, encryptdb and doencrypt still do
    not support MD5
 *) add flag for keeping other people's channel/nick status when

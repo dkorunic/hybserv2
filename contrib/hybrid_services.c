@@ -9,8 +9,8 @@
  *
  *  Contact info:
  *
- *    E-mail : ddosen@irc.vef.hr
- *    IRC    : (*) Bane, CARNet IRC Network, irc.vef.hr, #tisina
+ *    E-mail : ddosen@ffzg.hr
+ *    IRC    : (*) bane, idolNET IRC Network, irc.ffzg.hr, #twilight_zone
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are
@@ -88,39 +88,39 @@ static void m_identify(struct Client *client_p, struct Client *source_p,
  */
 struct Message global_msgtab = {
   "GLOBAL", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_global, m_ignore, m_global}
+  {m_unregistered, m_global, m_ignore, m_ignore, m_global}
 };
 struct Message nickserv_msgtab = {
   "NICKSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_nickserv, m_ignore, m_nickserv}
+  {m_unregistered, m_nickserv, m_ignore, m_ignore, m_nickserv}
 };
 struct Message chanserv_msgtab = {
   "CHANSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_chanserv, m_ignore, m_chanserv}
+  {m_unregistered, m_chanserv, m_ignore, m_ignore, m_chanserv}
 };
 struct Message memoserv_msgtab = {
   "MEMOSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_memoserv, m_ignore, m_memoserv}
+  {m_unregistered, m_memoserv, m_ignore, m_ignore, m_memoserv}
 };
 struct Message seenserv_msgtab = {
   "SEENSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_seenserv, m_ignore, m_seenserv}
+  {m_unregistered, m_seenserv, m_ignore, m_ignore, m_seenserv}
 };
 struct Message operserv_msgtab = {
   "OPERSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_operserv, m_ignore, m_operserv}
+  {m_unregistered, m_operserv, m_ignore, m_ignore, m_operserv}
 };
 struct Message statserv_msgtab = {
   "STATSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_statserv, m_ignore, m_statserv}
+  {m_unregistered, m_statserv, m_ignore, m_ignore, m_statserv}
 };
 struct Message helpserv_msgtab = {
   "HELPSERV", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_helpserv, m_ignore, m_helpserv}
+  {m_unregistered, m_helpserv, m_ignore, m_ignore, m_helpserv}
 };
 struct Message identify_msgtab = {
   "IDENTIFY", 0, 0, 0, 2, MFLG_SLOW, 0,
-  {m_unregistered, m_identify, m_ignore, m_identify}
+  {m_unregistered, m_identify, m_ignore, m_ignore, m_identify}
 };
 
 
@@ -129,15 +129,15 @@ struct Message identify_msgtab = {
  */
 struct Message ns_msgtab = {
   "NS", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_nickserv, m_ignore, m_nickserv}
+  {m_unregistered, m_nickserv, m_ignore, m_ignore, m_nickserv}
 };
 struct Message cs_msgtab = {
   "CS", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_chanserv, m_ignore, m_chanserv}
+  {m_unregistered, m_chanserv, m_ignore, m_ignore, m_chanserv}
 };
 struct Message ms_msgtab = {
   "MS", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_memoserv, m_ignore, m_memoserv}
+  {m_unregistered, m_memoserv, m_ignore, m_ignore, m_memoserv}
 };
 
 

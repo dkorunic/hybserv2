@@ -4105,7 +4105,8 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   isadmin = IsValidAdmin(lptr);
   tmpnick = FindNick(lptr->nick);
-  isowner = (nptr == GetMaster(tmpnick));
+  isowner = (nptr == GetMaster(tmpnick)) &&
+    (realptr->flags & NS_IDENTIFIED);
 
   if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
       !isowner

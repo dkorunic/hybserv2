@@ -250,7 +250,7 @@ and you have given yourself a O: line in hybserv.conf. You should
 be allowed to give OperServ commands through /msg or DCC CHAT.  
 
 For a list of commands do:
-  /msg OperServ help.
+  /msg OperServ help
 
 Most commands may also be done through DCC CHAT, and in fact more
 commands are available through DCC CHAT. Simply /dcc chat

@@ -1,3 +1,7 @@
+*** 20020512_4 by kreator
+- add missing parens in UpdateChanModes()
+
+
 *** 20020512_3 by kreator
 - another bunch of smaller fixes
 

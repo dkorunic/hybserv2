@@ -5973,10 +5973,11 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     return;
   }
 
-  if (!HasAccess(cptr, lptr, CA_CMDHALFOP))
+  /* NOTE: only CMDOP people can +h other people */
+  if (!HasAccess(cptr, lptr, CA_CMDOP))
   {
     notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
-      cptr->access_lvl[CA_CMDHALFOP], "HALFOP", cptr->name);
+      cptr->access_lvl[CA_CMDOP], "OP", cptr->name);
     RecordCommand("%s: %s!%s@%s failed HALFOP [%s]",
       n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
     return;

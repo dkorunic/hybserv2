@@ -1,3 +1,7 @@
+*** 20010820_3 by kreator
+- misc stuff for n_info()
+
+
 *** 20010820_2 by kreator
 - added KrisDuv's ideas into the code:
   - fix memory leak in c_op()

@@ -7213,33 +7213,66 @@ void ReconnectCheck(time_t expire)
  * o_kline()
  * Side effects: will kline user, locally or globally, depends on U or
  * share lines.
+ *
+ * You -need- appropriate shared{} block for Hybrid7.
  * -kre
  */
 static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
 {
 
+#ifdef HYBRID7
+  struct Luser *klptr = NULL;
+  char *user, *host, *reason, *tkline;
+  int i = 1;
+#else
   char *klinestr;
+#endif
 
   /* At least we need two arguments */
   if (ac < 2)
     {
       os_notice(lptr, sockfd,
-                "Syntax: \002KLINE [time] <nick|user@host> [:reason]");
+                "Syntax: \002KLINE\002 [time] <nick|user@host> [:reason]");
       return;
     }
 
-  klinestr = GetString(ac - 1, av + 1);
+#ifdef HYBRID7
+  if (atoi(av[i]))
+    tkline = av[i++];
+  else
+    tkline = NULL;
 
-  /* It is IMHO stupid to parse it and send to IRCD that will parse it all
-   * over again, so we will just hand it over to ircd. -kre */
+  if (!strchr(av[i], '@'))
+  {
+    klptr = FindClient(av[i]);
+    if (!klptr)
+    {
+      os_notice(lptr, sockfd, "KLINE %s: no such nickname", av[i]);
+      return;
+    }
+    user = klptr->username;
+    host = klptr->hostname;
+  }
+  else
+  {
+    user = strtok(av[i++], "@");
+    host = strtok(NULL, "@");
+  }
 
-#ifdef HYBRID7_KLINE
+  if (i < ac)
+    reason = av[i];
+  else
+    reason = NULL;
 
-  toserv(":%s KLINE %s %s %s\n", Me.name, n_OperServ, "*", klinestr);
+  /* Prototype: :%s KLINE %s %lu %s %s :%s */
+  /* :OperServ KLINE * 0 prvi drugi :treci */
+  /* sourcenick, targetserver, tkline_time, user, host, reason */
+  toserv(":%s KLINE %s %s %s %s :%s\n", n_OperServ, "*",
+      tkline ? tkline : "0", user, host,
+      reason ? reason : "HybServ remote kline");
 #else
-
+  klinestr = GetString(ac - 1, av + 1);
   toserv(":%s KLINE %s %s\n", Me.name, n_OperServ, klinestr);
-#endif
-
   MyFree(klinestr);
+#endif
 }

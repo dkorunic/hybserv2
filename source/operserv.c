@@ -492,7 +492,7 @@ os_process(char *nick, char *command, int sockfd)
 #ifdef OPERNICKIDENT
       nptr = FindNick(lptr->nick);
       if (lptr && (cmduser == GenericOper)
-          && ((Network->flags & NET_OFF)
+          && ((!nptr || Network->flags & NET_OFF)
           || nptr->flags & NS_IDENTIFIED))
 #else
       if (lptr && (cmduser == GenericOper))

@@ -1,3 +1,8 @@
+*** 20010413_1 by wcampbel
+Removed serno.h in the root
+serno.h is only in include/
+
+
 *** 20010411_4 by kreator
 Quickfixed CH_OPPED stuff. However, this is _not_ real solution, since it
 seems CH_OPPED flags are not functional ATM.

@@ -1,3 +1,8 @@
+*** 20010528_3 by kreator
+- fix autoconf for snprintf
+- remove bogus snprintf from chanserv
+
+
 *** 20010528_2 by kreator
 - completely remove support for LibSfio and LibHoard since they give us no
   better performance & updated docs accordingly

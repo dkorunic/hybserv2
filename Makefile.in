@@ -69,7 +69,7 @@ all: source tools
 	@for i in $(SUBDIRS); do \
 		echo "*** Building $$i ***"; \
 		cd $$i; \
-		${MAKE} "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"; \
+		${MAKE} "VERSION=$(VERSION)"; \
 		cd ..; \
 		echo; \
 	done

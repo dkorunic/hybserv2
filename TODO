@@ -10,6 +10,7 @@ Some sort of TODO/planning program:
 (not necessarily in `right' order)
 -----------------------------------
 
+*) fix mailing list
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
 *) trace possible leaks
@@ -38,13 +39,12 @@ Some sort of TODO/planning program:
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
 *) save services ignores
-*) nasty .gline bug
 
 
 Done so far:
 ------------
 
-*) fix mailing list
+*) nasty .gline bug (dcc)
 *) hybrid7 features (Janos did it)
 *) weird level redefine on all channels 
 *) check older KNOWNBUGS

@@ -1413,7 +1413,7 @@ collide(char *nick)
          lptr->nick, Me.name, n_NickServ, sendstr);
 #else
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
-  toserv("%s SVSNICK %s %s\r\n%s", Me.name, lptr->nick, newnick, sendstr);
+  toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #endif
 
   /* erase the old user */
@@ -3897,19 +3897,19 @@ void n_clearnoexp(struct Luser *lptr, int ac, char **av)
   if (ac < 2)
     {
       notice(n_NickServ, lptr->nick, "Syntax: CLEARNOEXP");
-      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
              "CLEARNOEXP");
       return;
     }
 
   RecordCommand("%s: %s!%s@%s CLEARNOEXP",
-                n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
       nptr->flags &= ~NS_NOEXPIRE;
 
-  notice(n_ChanServ, lptr->nick,
+  notice(n_NickServ, lptr->nick,
          "All noexpire flags for nicks have been cleared.");
 
 } /* n_clearnoexp() */
@@ -5189,7 +5189,7 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
   /* Be paranoid */
   if (tsdelta <= 0)
     {
-      notice(n_ChanServ, lptr->nick,
+      notice(n_NickServ, lptr->nick,
              "Wrong TS_MAX_DELTA specified, using default of 8w");
       tsdelta = 4838400; /* 8 weeks */
     }
@@ -5202,7 +5202,7 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
           notice(n_NickServ, lptr->nick, dMsg, ouser->nick, ouser->since,
                  tsdelta);
           putlog(LOG1, "%s: Bogus TS nickname: [%s] (TS=%d)",
-                 n_ChanServ, ouser->nick, ouser->since);
+                 n_NickServ, ouser->nick, ouser->since);
 
           collide(ouser->nick);
           notice(n_NickServ, lptr->nick,

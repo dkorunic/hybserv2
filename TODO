@@ -8,6 +8,8 @@ A pessimist is a man who has been compelled to live with an optimist.
 
 Pending bugs:
 -------------
+*) temp ignores rotate (possible overflow)
+*) setpass -> unidentify nickname
 *) forcenick
 *) 20 nicknames problem
 *) > I plan on just setting the nickflood level higher in config.h, but
@@ -49,6 +51,7 @@ Pending bugs:
 
 Features yet to come:
 ---------------------
+*) global change: notice -> privmsg via /msg operserv set
 *) (13:37:00) padde: Any chance there could be coded an option, that would
    allow to specify a range of ports to be used to DCC services?
    (13:37:00) padde: would be usefull if the services is behind firewall

@@ -1704,6 +1704,13 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
       return;
     }
 
+  if (HasAccess(cptr, tempuser->lptr, CA_AUTODEOP))
+  {
+    /* If user has autodeop access, do nothing
+     * -- OnGeboren -- */
+    return;
+  }
+
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
     {
       ircsprintf(modes, "+o %s", tempuser->lptr->nick);
@@ -3911,22 +3918,24 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
     sidx = 3;
 
+  memset(hostmask, 0, MAXLINE);
+
   if (match("*!*@*", av[sidx]))
-    strcpy(hostmask, av[sidx]);
+    strncpy(hostmask, av[sidx], MAXLINE - 1);
   else if (match("*!*", av[sidx]))
     {
-      strcpy(hostmask, av[sidx]);
+      strncpy(hostmask, av[sidx], MAXLINE - 3);
       strcat(hostmask, "@*");
     }
   else if (match("*@*", av[sidx]))
     {
       strcpy(hostmask, "*!");
-      strcat(hostmask, av[sidx]);
+      strncpy(hostmask, av[sidx], MAXLINE - 3);
     }
   else if (match("*.*", av[sidx]))
     {
       strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[sidx]);
+      strncpy(hostmask, av[sidx], MAXLINE - 5);
     }
   else
     {
@@ -3942,7 +3951,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
       else
         {
-          strcpy(hostmask, av[sidx]);
+          strncpy(hostmask, av[sidx], MAXLINE - 5);
           strcat(hostmask, "!*@*");
         }
     }
@@ -3965,8 +3974,15 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
   {
     char temp[MAXLINE];
+    int cutoff;
+    
     reason = GetString(ac - (sidx + 1), av + (sidx + 1));
+    cutoff = MAXLINE - 7 - strlen(lptr->nick);
+    
+    if (strlen(reason) >= cutoff)
+      reason[cutoff] = 0;
     ircsprintf(temp, "%s (by %s)", reason, lptr->nick);
+    MyFree(reason);
     reason = MyStrdup(temp);
   }
 
@@ -6166,7 +6182,7 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
     if ((chptr->key) && (chptr->key[0] != '\0'))
     {
       char temp[MAXLINE];
-      sprintf(temp, "%s %d", modes, chptr->limit);
+      sprintf(temp, "%s %s", modes, chptr->key);
       strcpy(modes, temp);
     }
 

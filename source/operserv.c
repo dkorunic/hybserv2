@@ -1213,6 +1213,9 @@ o_die(struct Luser *lptr, int ac, char **av, int sockfd)
 
   os_notice(lptr, sockfd, "Shutting down");
 
+  /* -Joshua */
+  unlink (PidFile);
+
   DoShutdown(onick, reason);
 } /* o_die() */
 
@@ -2475,8 +2478,9 @@ o_clones(struct Luser *lptr, int ac, char **av, int sockfd)
   int ii,
   doneset,
   cnt,
-  clcnt;
-  struct Luser *tempuser;
+  clcnt,
+  maxclone;
+  struct Luser *tempuser, *tempuser2;
 
   o_RecordCommand(sockfd,
                   "CLONES");
@@ -2489,8 +2493,28 @@ o_clones(struct Luser *lptr, int ac, char **av, int sockfd)
       if (cloneTable[ii].list == NULL)
         continue;
 
-      for (tempuser = cloneTable[ii].list; tempuser; tempuser = tempuser->cnext)
+      for (tempuser = cloneTable[ii].list; tempuser; tempuser =
+          tempuser->cnext)
+      {
+
+        /* If MaxClones is defined, check of there is enough clones */
+        if (MaxClones && MaxClones > 2)
         {
+          maxclone = 1;
+          /* cycle all clones */
+          for (tempuser2 = tempuser; tempuser2; tempuser2 =
+              tempuser2->cnext)
+          {
+            if (CloneMatch(tempuser, tempuser2))
+              ++maxclone;
+            else
+              if (maxclone < MaxClones)
+                continue;
+          }
+          if (maxclone < MaxClones)
+            continue;
+        }
+          
           /* we know there must be at least 1 user in the list */
           if (tempuser->cnext)
             {

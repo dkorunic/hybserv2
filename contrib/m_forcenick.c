@@ -74,8 +74,33 @@ _moddeinit(void)
 char *_version = "$Revision$";
 #endif
 
+/* is_nickname()
+ *
+ * input        - nickname
+ * output       - none
+ * side effects - walks through the nickname, returning 0 if erroneous
+ */
+static int is_nickname(char *nick)
+{
+  if (nick == NULL)
+    return 0;
+
+  /* nicks cant start with a digit or - or be 0 length */
+  /* This closer duplicates behaviour of hybrid-6 */
+  if (*nick == '-' || IsDigit(*nick) || *nick == '\0')
+    return 0;
+
+  for (; *nick; nick++)
+  {
+    if (!IsNickChar(*nick))
+      return 0;
+  }
+
+  return 1;
+}
+
 /*
- * m_forcenick
+ * mo_forcenick()
  *      parv[0] = sender prefix
  *      parv[1] = user to force
  *      parv[2] = nick to force them to
@@ -90,14 +115,12 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
   char sjmode;
   char *newch;
 
-  /* no need for this, since operserv won't have A flag */
-  /*
-  if (!IsAdmin(source_p))
+  if (!is_nickname(parv[2]))
   {
-    sendto_one(source_p, ":%s NOTICE %s :You have no A flag", me.name, parv[0]);
+    sendto_one(source_p, ":%s NOTICE %s :Invalid new nickname %s",
+        me.name, source_p->name, parv[2]);
     return;
   }
-  */
 
   if (strlen(parv[2]) > NICKLEN - 1)
     parv[2][NICKLEN - 1] = '\0';
@@ -109,7 +132,7 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
   if ((target_p = find_client(parv[1])) == NULL)
   {
     sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name,
-	       source_p->name, parv[1]);
+         source_p->name, parv[1]);
     return;
   }
 
@@ -118,8 +141,8 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
 
   if (find_client(parv[2]) != NULL)
   {
-    sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name,
-                       source_p->name, parv[2]);
+    sendto_one(source_p, ":%s NOTICE %s :Nickname %s is in use",
+        me.name, source_p->name, parv[2]);
     return;
   }
 

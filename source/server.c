@@ -687,7 +687,7 @@ s_nick(int ac, char **av)
     nptr = FindNick(lptr->nick);
 
     /* Update lastseen info for old nickname */
-    if (nptr->flags & NS_IDENTIFIED)
+    if (nptr && (nptr->flags & NS_IDENTIFIED))
       nptr->lastseen = current_ts;
 
     newptr = FindNick(newnick);

@@ -1,3 +1,9 @@
+*** 20010408_6 by kreator
+Fix for ChanServ not parting channels with too long topics. There was no
+topiclen check. Also, it would join, set topic and part, which could be
+too long for ircd linebuf, and could therefore be truncated.
+
+
 *** 20010408_5 by kreator
 Fixed dcc.c with INADDR_NONE that was missing for Solaris.
 Fixed chanserv.c with ChanServ that would not part after INVITE on

@@ -329,17 +329,21 @@
 
 /* This is feature that should give some information on netsplits - what
  * servers are split, for how long, etc. */
+
 #define        SPLIT_INFO
 
 /* Sends notices to all +l operators about netsplits -kre */
+
 #define        EXTRA_SPLIT_INFO
 
 /* Still highly experimental feature. Using this and M: lines can make
  * your HybServ send CONNECT commands when split time expires for leaf/hub
  * in M: line */
+
 #define        AUTO_ROUTING
 
 /* Turn off assertions by default if not debugging -kre */
+
 #ifndef DEBUG
  #define NDEBUG /* #undef this if you still want assertions */
 #endif

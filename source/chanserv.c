@@ -1211,17 +1211,21 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
   {
     /*
      * Hybrid won't accept a TOPIC from a user unless they are
-     * on the channel - have ChanServ join and leave. Do it all
-     * in one line so ChanServ can't get kicked out etc.
+     * on the channel - have ChanServ join and leave.
+     *
+     * Modifications to be sure all fits in linebuf of ircd.
+     * -kre
      */
-    toserv(":%s SJOIN %ld %s + :@%s\n:%s TOPIC %s :%s\n:%s PART %s\n",
+    toserv(":%s SJOIN %ld %s + :@%s\n",
       Me.name,
       chanptr->since,
       chanptr->name,
-      n_ChanServ,
+      n_ChanServ);
+    toserv(":%s TOPIC %s :%s\n",
       n_ChanServ,
       chanptr->name,
-      topic,
+      topic);
+    toserv(":%s PART %s\n",
       n_ChanServ,
       chanptr->name);
   }
@@ -5316,10 +5320,17 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
+  /* But hey we've already checked (ac < 4)! -kre */
+#if 0
   if (ac < 4)
     topic = NULL;
   else
+#endif
     topic = GetString(ac - 3, av + 3);
+
+  /* Truncate topiclen. It can't be NULL, since ac would be < 4 -kre */
+  if (strlen(topic) > TOPICLEN)
+      topic[TOPICLEN]=0;
 
   RecordCommand("%s: %s!%s@%s SET [%s] TOPIC %s",
     n_ChanServ,

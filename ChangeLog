@@ -1,3 +1,7 @@
+*** 20010619_2 by kreator
+- bwah. solaris has unsigned long pid_t and bsd has unsigned int
+
+
 *** 20010619_1 by kreator
 - oopsies, i had one `,' too much in last commit
 

@@ -1,3 +1,13 @@
+*** 20010501_1 by kreator
+- updates for Makefile.in to support mrproper that some users are used to,
+  it does distclean by default
+- changes to configure.in and configure to have proper system detection,
+  especially solaris: previously we tested for "/bin/sun", and that sucks;
+  now we have config.guess and config.sub for that
+- more syncing with Janos: properly added gecosbans on all sources and
+  includes, rechecked all, modified CAPABS, etc.
+
+
 *** 20010430_4 by john
 
 

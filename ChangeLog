@@ -1,3 +1,7 @@
+*** 20030405_3 by kreator
+- oops, wrong order in {}
+
+
 *** 20030405_2 by kreator
 - fix service notices
 - fix grave bug with master nicknames expiring while slaves

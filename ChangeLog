@@ -1,3 +1,7 @@
+*** 20011014_2 by kreator
+- add "stats g pattern" matching for easier gline examination
+
+
 *** 20011014_1 by kreator
 - add owallop for reload
 - add printing matches for ungline

@@ -1060,6 +1060,7 @@ ReadSock(struct DccUser *connptr)
           else
             /* process line from client */
             DccProcess(connptr, connptr->spill); 
+
           linech = connptr->spill;
           connptr->offset = 0;
 

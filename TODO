@@ -6,6 +6,7 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff
 *) set allowguardchannel 0 -> part all channels immediately
 *) segv:

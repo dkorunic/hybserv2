@@ -212,9 +212,7 @@ ns_process()
   Process command coming from 'nick' directed towards n_NickServ
 */
 
-void
-ns_process(char *nick, char *command)
-
+void ns_process(const char *nick, char *command)
 {
   int acnt;
   char **arv;
@@ -4111,19 +4109,18 @@ n_info(struct Luser *lptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s INFO %s",
-                n_NickServ, lptr->nick, lptr->username, lptr->hostname,
-                realptr->nick);
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+    realptr->nick);
 
   isadmin = IsValidAdmin(lptr);
   isowner = ((nptr == GetMaster(tmpnick)) &&
-             (tmpnick->flags & NS_IDENTIFIED));
+    (tmpnick->flags & NS_IDENTIFIED));
 
   if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
       !isowner
 #ifdef EMPOWERADMINS
       && !isadmin)
 #else
-
      )
 #endif
     {
@@ -4136,8 +4133,7 @@ n_info(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-  if ((userptr = FindClient(realptr->nick))
-     )
+  if ((userptr = FindClient(realptr->nick)))
     if (realptr->flags & NS_IDENTIFIED)
       online = 1;
 
@@ -4148,17 +4144,14 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   notice(n_NickServ, lptr->nick,
          "         Registered: %s ago",
-         timeago(realptr->created, 1)
-        );
+         timeago(realptr->created, 1));
 
   if (realptr->lastseen && !online)
     notice(n_NickServ, lptr->nick,
            "          Last Seen: %s ago",
-           timeago(realptr->lastseen, 1)
-          );
+           timeago(realptr->lastseen, 1));
 
-  if (!(nptr->flags & NS_HIDEALL)
-      || isadmin || isowner)
+  if (!(nptr->flags & NS_HIDEALL) || isadmin || isowner)
     {
       char buf[MAXLINE];
 
@@ -4168,8 +4161,7 @@ n_info(struct Luser *lptr, int ac, char **av)
             if (!online && realptr->lastu && realptr->lasth)
               notice(n_NickServ, lptr->nick,
                      "  Last Seen Address: %s@%s",
-                     realptr->lastu,
-                     realptr->lasth);
+                     realptr->lastu, realptr->lasth);
 
           if (!(nptr->flags & NS_HIDEQUIT) || isadmin || isowner)
             if (realptr->lastqmsg)

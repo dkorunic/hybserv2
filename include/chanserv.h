@@ -170,9 +170,7 @@ int cs_ShouldBeOnChan(struct ChanInfo *cptr);
 void cs_RejoinChannels();
 void PromoteSuccessor(struct ChanInfo *cptr);
 void ExpireChannels(time_t unixtime);
-#ifdef GECOSBANS
 void ExpireBans(time_t unixtime);
-#endif
 void ExpireAkicks(time_t unixtime);
 
 #ifndef HYBRID_ONLY

@@ -122,9 +122,7 @@ FindClient()
   returns a pointer to client structure containing "name" or NULL
 */
 
-struct Luser *
-      FindClient(const char *name)
-
+struct Luser *FindClient(const char *name)
   {
     register struct Luser *tempuser;
     register aHashEntry *temphash;
@@ -139,11 +137,12 @@ struct Luser *
     /*
      * Got the bucket, now search the chain.
      */
-    for (tempuser = (struct Luser *)temphash->list; tempuser; tempuser = tempuser->hnext)
+    for (tempuser = (struct Luser *)temphash->list; tempuser; tempuser =
+        tempuser->hnext)
       if (!irccmp(name, tempuser->nick))
         return(tempuser);
 
-    return ((struct Luser *) NULL);
+    return NULL;
   } /* FindClient() */
 
 /*

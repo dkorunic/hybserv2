@@ -150,7 +150,7 @@ struct NickInfo
  * Prototypes
  */
 
-void ns_process(char *nick, char *command);
+void ns_process(const char *nick, char *command);
 int CheckNick(char *nick);
 void CheckOper(char *nick);
 void ExpireNicknames(time_t unixtime);

@@ -43,7 +43,8 @@ Some sort of TODO/planning program:
 *) save services ignores
 *) fix stupid bug that services +o people who match() O line, but have not
    registered with OperServ
-*) OperServ does not support hybrid7 modes yet, (for example .channel command or SECURE)
+*) OperServ does not support hybrid7 modes yet, (for example .channel
+   command or SECURE)
 
 Done so far:
 ------------

@@ -167,16 +167,6 @@ install-help:
 coffe:
 	@echo "*** Gimme coffe to work properly ***"
 
-upgrade-chan:
-	@if test ! "x`egrep '^#define.*HYBRID7' include/config.h`" = "x"; then \
-		if test "x`grep ALVL $(CONFDIR)/chan.db | head -1 | awk '{print NF}'`" = "x14"; then \
-			echo "You have turned on HYBRID7 support"; \
-			echo "but you have old style chan.db - converting it"; \
-			grep -v ALVL $(CONFDIR)/chan.db > $(CONFDIR)/chan.db.$$; \
-			mv $(CONFDIR)/chan.db.$$ $(CONFDIR)/chan.db; \
-		fi \
-	fi
-
 autoconf:
 	autoconf autoconf/configure.in > configure
 	autoheader -l autoconf

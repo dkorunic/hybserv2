@@ -1,3 +1,12 @@
+*** 20020428_3 by kreator
+- add more todo
+- and fix NICKLEN back to 9 chars as original specs say
+- and add small AKICK fixup for hybrid-based ircds: it is possible to put
+  nick mask that is > 9 chars, that is impossible to remove for any mode
+  -b command - as a result of hybrid not checking length of server-sent
+  mask :-(
+
+
 *** 20020428_2 by kreator
 - add more todo
 - and fix NICKLEN back to 9 chars as original specs say

@@ -12,7 +12,6 @@ fixed.
 (12:55:18) OrbDavid: HybServ2-1.9.0-pre1_20021012_1  <-- this version
 (12:55:22) OrbDavid: wallops dont' get sent on glines
 (12:55:43) OrbDavid: didn't have time to look into why not yet though
-*) temp kline wrong for hybrid7
 *) killchan malfunction
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
@@ -39,6 +38,9 @@ fixed.
 
 Features (yet) to come:
 -----------------------
+*) (13:37:00) padde: Any chance there could be coded an option, that would
+   allow to specify a range of ports to be used to DCC services?
+   (13:37:00) padde: would be usefull if the services is behind firewall
 *) (23:37:25) andrew: hello
    (23:37:47) andrew: i'm just wondering if hybserv can be configured to
    block nicks that contain explicit words?

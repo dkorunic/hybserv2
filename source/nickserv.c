@@ -2091,8 +2091,8 @@ n_drop(struct Luser *lptr, int ac, char **av)
   toserv(":%s MODE %s -e\r\n", Me.name, dnick);
 #endif /* DANCER */
 
-  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been
-      dropped", dnick);
+  notice(n_NickServ, lptr->nick,
+      "The nickname [\002%s\002] has been dropped", dnick);
 } /* n_drop() */
 
 /*

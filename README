@@ -62,7 +62,7 @@ DISTRIBUTION
   You can get HybServ from:
 
   #1:  Anonymous CVS to this CVSROOT:
-       :pserver:cvs@hybserv.esa.fer.hr:/home/cvs
+       :pserver:cvs@hybserv.dyndns.org:/home/cvs
        cvs login
        <press enter, no password>
        cvs checkout hybserv

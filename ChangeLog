@@ -1,3 +1,22 @@
+*** 20020917_1 by kreator
+- here is what went into last commit (code merge from dancer-services):
+  - channel mode +f and +c (dancer stuff, will go under define in next
+    commit)
+  - usermode +E (dancer)
+  - hybserv control pipe (DIE)
+  - founder/successor last active flags for last used channels (obsoletes
+    old lastused code)
+  - burst complete flag
+  - more forgotten CS_VERBOSE stuff fixed
+  - verbose channel access lists, as well as nickinfo
+  - a whole bunch of int -> unsigned counters fixup
+  - socklen and time_t variables fixup
+  - missing includes fixup
+  - misc fixes for n_help()
+- and some smaller fixes around, nonrelated to dancer code
+- fix source/includes headers with proper developer information 8-D
+
+
 *** 20020916_1 by kreator
 - add a bunch of features from dancer services; mental note: ifdef mode +e
   and forward channels

@@ -1,3 +1,8 @@
+*** 20011125_5 by kreator
+- add finddouble for debugging purposes. read bin/README and source for
+  explanation
+
+
 *** 20011125_4 by kreator
 - updated contributors section
 - addedd STRICT_DATA_CHECKING which will hopefully get rid of those pesky

@@ -2582,19 +2582,24 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
     *mask, char *reason)
 {
   struct AutoKick *ptr;
+  char *tmpmask;
 
   if (!chanptr || !mask)
     return 0;
+
+#if defined HYBRID || defined HYBRID7
+  /* Fix bogus masks (in fact, they are only in hybrid bogus -kre */
+  if ((tmpmask = strchr(mask, '!')) && (tmpmask - mask > NICKLEN))
+    return 0;
+#endif
 
   if (lptr)
   {
     struct ChanAccess *ca;
     int found = 0;
 
-    /*
-     * Check if lptr is trying to add an akick that matches a
-     * level higher than their own
-     */
+    /* Check if lptr is trying to add an akick that matches a
+     * level higher than their own */
     for (ca = chanptr->access; ca; ca = ca->next)
     {
       if (ca->hostmask)

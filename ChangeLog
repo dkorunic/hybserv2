@@ -1,3 +1,7 @@
+*** 20010414_1 by kreator
+More TODO directives, mostly ideas from John Binder <jbinder@kgazd.bme.hu>
+
+
 *** 20010413_1 by wcampbel
 Removed serno.h in the root
 serno.h is only in include/

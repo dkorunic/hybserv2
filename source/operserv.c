@@ -2115,6 +2115,8 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
        * remove gline from list
        */
       DeleteGline(gptr);
+      os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
+          gptr->hostname);
     }
   }
 
@@ -3953,7 +3955,10 @@ o_reload(struct Luser *lptr, int ac, char **av, int sockfd)
   goodreload = ReloadData();
 
   if (goodreload)
+  {
     os_notice(lptr, sockfd, "Reload successful");
+    o_Wallops("RELOAD");
+  }
   else
     os_notice(lptr, sockfd,
       "Reload contained errors, continuing to use old databases");

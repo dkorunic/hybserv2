@@ -263,7 +263,7 @@
 #ifdef ALLOW_GLINES
 
 /*
- * Define this if you want services to create 3 psuedo operators
+ * Define this if you want services to create 3 pseudo operators
  * and servers to vote for the gline. This is the ircd-hybrid
  * gline implementation, so it will not work on other ircds.
  * 

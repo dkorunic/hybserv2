@@ -192,7 +192,7 @@ Rehash()
 
 #ifdef ALLOW_JUPES
   /*
-   * SQUIT any psuedo-servers who no longer have a J: line
+   * SQUIT any pseudo-servers who no longer have a J: line
    */
   CheckJupes();
 #endif

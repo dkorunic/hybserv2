@@ -191,7 +191,7 @@ struct Directive directives[] = {
   { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
  { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
 
-  /* Psuedo-Client Nicknames/Idents/Descriptions and Options */
+  /* Pseudo-Client Nicknames/Idents/Descriptions and Options */
   { "OperServNick", D_NORUNTIME,    { { PARAM_STRING, &n_OperServ },
                                       { PARAM_STRING, &id_OperServ },
                                       { PARAM_STRING, &desc_OperServ } } },

@@ -1,3 +1,20 @@
+And again by me:
+#4  0xff139470 in abort () from /usr/lib/libc.so.1
+#5  0x690d4 in __lshrdi3 (u=-64393791833450880, b=589032)
+#6  0x28a54 in WriteNicks () at data.c:822
+#7  0x29534 in WriteDatabases () at data.c:495
+#8  0x4efbc in DoTimer (unixtime=987688800) at timer.c:373
+#9  0x4f138 in p_CheckTime () at timer.c:109
+(gdb) frame 6
+#6  0x28a54 in WriteNicks () at data.c:822
+822             assert(nptr != nptr->master);
+(gdb) p nptr->nick
+$3 = 0xfeeeb9f0 "ETFOsBot"
+(gdb) p nptr->master->nick
+$4 = 0xfeeeb9f0 "ETFOsBot"
+(gdb) p nptr->nextlink->nick
+$13 = 0xfeeeb9f0 "ETFOsBot"
+
 Reported by toot, happened on HybNet with older services (kre):
 #0  0x400784e1 in __kill () from /lib/libc.so.6
 #1  0x40078156 in raise (sig=6) at .. /sysdeps/posix/raise.c:27

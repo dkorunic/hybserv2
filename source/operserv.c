@@ -1669,7 +1669,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
       {
         struct Luser *tempuser;
         
-        /* if theres a psuedo client holding the nick, kill it */
+        /* if theres a pseudo client holding the nick, kill it */
         if ((tempuser = FindClient(tempjupe->name)))
         {
           toserv(":%s QUIT :UnJuped\n",
@@ -1680,7 +1680,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
       else
       {
         /*
-         * squit all psuedo servers we created while they were juped
+         * squit all pseudo servers we created while they were juped
          */
         do_squit(tempjupe->name, "UnJuped");
       }
@@ -2504,7 +2504,7 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   if (fptr->server == Me.sptr)
   {
     os_notice(lptr, sockfd,
-      "[%s] is a psuedo nickname, canceling flood",
+      "[%s] is a pseudo nickname, canceling flood",
       fptr->nick);
     return;
   }
@@ -4634,13 +4634,10 @@ DeleteIgnore(struct Ignore *iptr)
 	else
 		IgnoreList = iptr->next;
 
-  putlog(LOG1, "Deleted from IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s", iptr, iptr->prev, iptr->next, iptr->hostmask);
+  putlog(LOG1, "Deleted from IGNORE LIST: ptr %ld, prev %ld, next %ld, hostmask %s", iptr, iptr->prev, iptr->next, iptr->hostmask);
 
-//	MyFree(iptr->hostmask);
-//	MyFree(iptr);
-
-	free(iptr->hostmask);
-	free(iptr);
+	MyFree(iptr->hostmask);
+	MyFree(iptr);
 } /* DeleteIgnore() */
 
 /*

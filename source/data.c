@@ -819,9 +819,13 @@ WriteNicks()
 
       #ifdef LINKED_NICKNAMES
 
+#if 0
         assert(nptr != nptr->master);
-
-	if (nptr->master)
+#endif
+        /* Quickfix. Seems unlink is broken atm. But, there is no need to
+         * die here since master was not written because of
+         * nptr->nextlink. Huh. Should fix link copying routines -kre */
+        if ((nptr != nptr->master) && nptr->master)
           fprintf(fp, "->LINK %s\n",
             nptr->master->nick);
 

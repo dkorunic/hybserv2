@@ -159,7 +159,7 @@ CloneMatch(struct Luser *user1, struct Luser *user2)
     return 0;
 
   /*
-   * Make sure service psuedo nicks are not flagged as
+   * Make sure service pseudo nicks are not flagged as
    * clones.
    */
   if ((user1->server == Me.sptr) ||

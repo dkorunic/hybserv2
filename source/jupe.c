@@ -106,7 +106,7 @@ DeleteJupe(struct Jupe *jptr)
 
 /*
 CheckJupes()
- Called after rehash to check if there are any psuedo-servers
+ Called after rehash to check if there are any pseudo-servers
 which no longer have a J: line. SQUIT any we find
 */
 
@@ -123,7 +123,7 @@ CheckJupes()
   {
     /*
      * Make sure tempserv is using us as an uplink, which
-     * would qualify it as a psuedo-server. But also make
+     * would qualify it as a pseudo-server. But also make
      * sure it's not OUR current hub server - we never
      * want to squit our hub.
      */

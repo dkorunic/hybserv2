@@ -1031,9 +1031,6 @@ CheckNick(char *nickname)
   struct Luser *lptr;
   struct NickInfo *nptr, *realptr;
   int knownhost;
-#ifdef MEMOSERVICES
-  struct MemoInfo *mi;
-#endif
 
   realptr = FindNick(nickname);
   nptr = GetMaster(realptr);
@@ -1144,8 +1141,7 @@ CheckNick(char *nickname)
       realptr->collide_ts = time(NULL) + 60;
     }
    }
-
-    return 0;
+   return 0;
   } /* if (!knownhost) */
 
   if ((knownhost) && (nptr->flags & NS_UNSECURE))
@@ -1156,25 +1152,6 @@ CheckNick(char *nickname)
      */
     realptr->flags |= NS_IDENTIFIED;
   }
-
-#ifdef MEMOSERVICES
-
-  if ((mi = FindMemoList(lptr->nick)))
-  {
-    if ((nptr->flags & NS_MEMOSIGNON) && (mi->newmemos))
-    {
-      notice(n_MemoServ, lptr->nick,
-        "You have \002%d\002 new memo%s",
-        mi->newmemos,
-        (mi->newmemos == 1) ? "" : "s");
-      notice(n_MemoServ, lptr->nick,
-        "Type \002/msg %s LIST\002 to view them",
-        n_MemoServ);
-    }
-  }
-
-#endif /* MEMOSERVICES */
-
   return 1;
 } /* CheckNick() */
 
@@ -1381,7 +1358,7 @@ collide(char *nick)
   {
     /*
      * remove the collide timer, but put a release timer so the
-     * psuedo nick gets removed after NSReleaseTimeout
+     * pseudo nick gets removed after NSReleaseTimeout
      */
     nptr->flags &= ~NS_COLLIDE;
     nptr->flags |= NS_RELEASE;
@@ -1407,7 +1384,7 @@ release(char *nickname)
     return;
 
   if (lptr->server != Me.sptr)
-    return; /* lptr->nick isn't a psuedo-nick */
+    return; /* lptr->nick isn't a pseudo-nick */
 
   toserv(":%s QUIT :Released\n",
     lptr->nick);
@@ -1463,7 +1440,7 @@ CollisionCheck(time_t unixtime)
               lptr->hostname);
 
             /*
-             * kill the nick and replace with a psuedo nick
+             * kill the nick and replace with a pseudo nick
              */
             collide(lptr->nick);
 
@@ -1489,12 +1466,12 @@ CollisionCheck(time_t unixtime)
           if ((unixtime - lptr->nick_ts) >= NSReleaseTimeout)
           {
             putlog(LOG1,
-              "%s: Releasing enforcement psuedo-nick [%s]",
+              "%s: Releasing enforcement pseudo-nick [%s]",
               n_NickServ,
               lptr->nick);
 
             SendUmode(OPERUMODE_S,
-              "%s: Releasing enforcement psuedo-nick [%s]",
+              "%s: Releasing enforcement pseudo-nick [%s]",
               n_NickServ,
               lptr->nick);
 
@@ -2168,6 +2145,9 @@ n_identify(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr, *realptr;
+#ifdef MEMOSERVICES
+  struct MemoInfo *mi;
+#endif
 
   if (ac < 2)
   {
@@ -2251,12 +2231,37 @@ n_identify(struct Luser *lptr, int ac, char **av)
     realptr->lastu = MyStrdup(lptr->username);
     realptr->lasth = MyStrdup(lptr->hostname);
   } /* if (LastSeenInfo) */
+
+  /* I have decided to move here new memo checking code, because it
+   * seems to me more reasonable to have it right after successful
+   * identify, and not every time on signon -kre */
+#ifdef MEMOSERVICES
+  if (nptr->flags & NS_MEMOSIGNON)
+  {
+    if ((mi = FindMemoList(lptr->nick)))
+    {
+      if (mi->newmemos)
+      {
+        notice(n_MemoServ, lptr->nick,
+          "You have \002%d\002 new memo%s",
+          mi->newmemos,
+          (mi->newmemos == 1) ? "" : "s");
+        notice(n_MemoServ, lptr->nick,
+          "Type \002/msg %s LIST\002 to view them",
+          n_MemoServ);
+      }
+    }
+    else
+      notice(n_MemoServ, lptr->nick,
+          "You have no new memos");
+  }
+#endif /* MEMOSERVICES */
 } /* n_identify() */
 
 /*
 n_recover()
   Recover nickname av[1] through a collide, and hold it with a
-psuedo-nick
+pseudo-nick
 */
 
 static void
@@ -2291,7 +2296,8 @@ n_recover(struct Luser *lptr, int ac, char **av)
    * password)
    */
   goodcoll = 0;
-  if (OnAccessList(lptr->username, lptr->hostname, ni) && (!(ni->flags & NS_SECURE)))
+  if (OnAccessList(lptr->username, lptr->hostname, ni)
+      && (!(ni->flags & NS_SECURE)))
     goodcoll = 1;
   else
   {
@@ -2330,7 +2336,8 @@ n_recover(struct Luser *lptr, int ac, char **av)
       "The nickname [\002%s\002] has been recovered",
       av[1]);
     notice(n_NickServ, lptr->nick,
-      "Type: \002/msg %s RELEASE %s\002 to release the nickname before the timeout",
+      "Type: \002/msg %s RELEASE %s\002 to release the "
+      "nickname before the timeout",
         n_NickServ,
         av[1]);
 
@@ -2357,7 +2364,7 @@ n_recover(struct Luser *lptr, int ac, char **av)
 
 /*
 n_release()
-  Release a psuedo nick that is being held after a RECOVER
+  Release a pseudo nick that is being held after a RECOVER
 */
 
 static void

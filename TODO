@@ -1,6 +1,14 @@
-Some sort of TODO/planning program
+Today's MOTD
+------------
+
+"Beware of bugs in the above code;
+ I have only proved it correct, not tried it"
+ - Donald Knuth
+
+
+Some sort of TODO/planning program:
 (not necessarily in `right' order)
-----------------------------------
+-----------------------------------
 
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
@@ -34,37 +42,30 @@ Some sort of TODO/planning program
     deop flood, nick flood -> however, for some features it is obvious
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
+*) fix NSSetMemoSignon issue, reported by monolith
+   <monolith@mail.orblivion.com>
+*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
+   with unlink link copying routine.
+   NOTE: I quickfixed this. However, I need to look at this more closely!
 
-Done section :-)
------------------
+
+Done so far:
+------------
 
 *) .who not working?
-   done.
 *) better multiprocessor support (libhoard!)
-   - done
 *) Recover the lost ChangeLog entries
-   - done
 *) sfio support
-   - done
 *) crashing on /reload
-   -  done(?) - seems another Solaris goddamn bug.
 *) linked tree problems
-   - people report it has gone after 1.7.3
 *) bcflood issue
-  - done.
 *) anon cvs
-   - done
 *) we don't save information on servers on shutdown (statserv)
-   done by previous fixes.
 *) get rid of proxy ch. code (or make it better :) )
-   - done. ripped out -> use tcm-hybrid for that
 *) add support for solaris threads
-   - done.
 *) trace weird SIGPIPE-s
-   - done (probably)
 *) umode command (in msg)
-   - done.
 *) insert support for solaris threads
-   - done.
 *) split and autorouting
-   - done -> testing in progress.
+*) SplitBuff() fixes
+*) various older fixes, look in ChangeLog

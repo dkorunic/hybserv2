@@ -6981,7 +6981,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
            cptr->url);
 
   if (cptr->comment)
-    notice(n_ChanServ, lptr->comment,
+    notice(n_ChanServ, lptr->nick,
            "     Comment: %s",
            cptr->comment);
 

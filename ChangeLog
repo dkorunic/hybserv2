@@ -1,3 +1,8 @@
+*** 20030405_6 by kreator
+- rip out solthread/pthread support because it gives us no benefit;
+  current code has numerous races and problems with that one
+
+
 *** 20030405_5 by kreator
 - and more lastseen updates..
 

@@ -1710,18 +1710,16 @@ s_sjoin(int ac, char **av)
     }
   }
 
-  /* OK, we now know that av[mcnt][0]==':', but we have to fix case when
-   * there is av[mcnt]==":" and nothing after, like in 
+  /* 
    * :irc.vchan SJOIN 978405679 #ircd-coders +sptna : @Diane @dia
    * --> this happens with hybrid7beta2 -kre
    *
    * XXX - this is quickfix, we should rewrite this -kre
-   * */
-    if (av[mcnt][0] == ':' && !av[mcnt][1])
-    {
-      /* No need to evade ':', since it is in av[mcnt] alone -kre */
-      ncnt = SplitBuf(av[++mcnt], &nicks);
-    }
+   */
+    if (!strncmp(av[mcnt], ": ", 2))
+      /* Evade ": ". Note that parsing code lefts all after ':' as one
+       * whole line, so av[blah] + 2 is OK here -kre */
+      ncnt = SplitBuf(av[mcnt] + 2, &nicks);
     else
       ncnt = SplitBuf(av[mcnt] + 1, &nicks);
 

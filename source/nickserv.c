@@ -4131,7 +4131,7 @@ static void
 n_info(struct Luser *lptr, int ac, char **av)
 
 {
-  struct NickInfo *nptr, *realptr;
+  struct NickInfo *nptr, *realptr, *tmpnick;
   struct Luser *userptr;
   int online = 0, isadmin = 0, isowner = 0;
 

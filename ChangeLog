@@ -1,3 +1,7 @@
+*** 20010501_7 by kreator
+- fix that totally weird variable scope bug in ADMININFO, *ugh*
+
+
 *** 20010501_6 by janos
 - some information added about Hybrid7 and HybServ linking in README 
 

@@ -1,3 +1,7 @@
+*** 20020922_5 by kreator
+- this time really fix execute7gline() (TS was sent, doh)
+
+
 *** 20020922_4 by kreator
 - fix finddupe in Makefile.in
 - allow bansexpire for hybrid7

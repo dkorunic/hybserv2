@@ -26,8 +26,7 @@
 struct MyInfo;
 
 #define   MAXLINE     512 /* don't change this */
-
-#define   NICKLEN     15  /* nickname length */
+#define   NICKLEN     9   /* nickname length */
 #define   REALLEN     50  /* ircd value for max server info length */
 #define   USERLEN     10  /* username length */
 #define   HOSTLEN     63  /* hostname length */

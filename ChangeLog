@@ -1,3 +1,7 @@
+*** 20020210_1 by kreator
+- readme small update
+
+
 *** 20020208_3 by kreator
 - fixed a couple of things
 - removed SEGV handler (wtf did we have it at the first place..)

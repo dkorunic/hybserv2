@@ -1,3 +1,9 @@
+*** 20020303_2 by kreator
+- cleanup old code
+- fix hybserv coring on some of commands from clients on masked servers
+- smaller cleanups around
+
+
 *** 20020303_1 by kreator
 - update todo
 

@@ -225,29 +225,30 @@ SetupVirtualHost()
 
   assert(LocalHostName != 0);
 
-  if ((hptr = gethostbyname(LocalHostName)) == NULL)
-  {
-    fprintf(stderr,
-      "Unable to resolve virtual host [%s]: Unknown hostname\n",
-      LocalHostName);
+  if (((hptr = gethostbyname(LocalHostName)) == NULL) &&
+      ((hptr = gethostbyaddr(LocalHostName, 4, AF_INET)) == NULL))
+    {
+      fprintf(stderr,
+	      "Unable to resolve virtual host [%s]: Unknown hostname\n",
+	      LocalHostName);
 
-    MyFree(LocalHostName);
-    LocalHostName = NULL;
-  }
+      MyFree(LocalHostName);
+      LocalHostName = NULL;
+    }
   else
-  {
-    memset((void *) &LocalAddr, 0, sizeof(struct sockaddr_in));
+    {
+      memset((void *) &LocalAddr, 0, sizeof(struct sockaddr_in));
 
-    LocalAddr.sin_family = AF_INET;
-    LocalAddr.sin_port = 0;
+      LocalAddr.sin_family = AF_INET;
+      LocalAddr.sin_port = 0;
 
-    memcpy((void *) &LocalAddr.sin_addr, (void *) hptr->h_addr,
-      hptr->h_length);
+      memcpy((void *) &LocalAddr.sin_addr, (void *) hptr->h_addr,
+	     hptr->h_length);
 
-    fprintf(stderr, "Using virtual host %s[%s]\n",
-      LocalHostName,
-      inet_ntoa(LocalAddr.sin_addr));
-  }
+      fprintf(stderr, "Using virtual host %s[%s]\n",
+	      LocalHostName,
+	      inet_ntoa(LocalAddr.sin_addr));
+    }
 } /* SetupVirtualHost() */
 
 /*

@@ -1,3 +1,11 @@
+*** 20011125_3 by kreator
+- update TODO directives
+- yes, update MemoServ to handle master/slave nicknames properly, so users
+  will be notified of new mail on reconnecting (however, slaves will not
+  be live-notified because it would be too CPU intensitive, at least for
+  now)
+
+
 *** 20011125_2 by kreator
 - fixed n_info() issue which caused nicknames in linked list not to be
   able to see -all- information on other nicks

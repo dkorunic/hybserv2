@@ -14,6 +14,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "defs.h"
+
 #define FLAG_MD5     0x00000001
 #define FLAG_DES     0x00000002
 #define FLAG_SALT    0x00000004
@@ -22,6 +24,9 @@
 
 extern char *getpass();
 extern char *crypt();
+#ifdef HAVE_SOLARIS
+extern char *crypt_md5();
+#endif
 
 char *make_des_salt();
 char *make_md5_salt(int);
@@ -110,7 +115,12 @@ int main(int argc, char *argv[])
       plaintext = getpass("plaintext: ");
     }
 
-  printf("%s\n", crypt(plaintext, salt));
+#ifdef HAVE_SOLARIS
+  if (flag & FLAG_MD5)
+    printf("%s\n", crypt_md5(plaintext, salt));
+  else
+#endif
+    printf("%s\n", crypt(plaintext, salt));
   return 0;
 }
 

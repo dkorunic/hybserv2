@@ -24,6 +24,7 @@ SOURCES =                  \
   chanserv.c               \
   client.c                 \
   conf.c                   \
+  crypt.c                  \
   data.c                   \
   dcc.c                    \
   flood.c                  \

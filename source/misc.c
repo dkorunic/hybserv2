@@ -39,6 +39,9 @@
 #include "server.h"
 
 extern char *crypt();
+#ifdef HAVE_SOLARIS
+extern char *crypt_md5();
+#endif
 
 /*
  * This is an array of all the service bots. It's useful
@@ -122,7 +125,14 @@ char *hybcrypt(char *source, char *oldpass)
   /* We don't do anything with oldpass, we could randomize a bit and feed
    * it as salt, but hey, we have wonderful random() -kre */
 
-  return crypt(source, salt);
+  /* Solaris users will need this.  -bane
+   */
+#ifdef HAVE_SOLARIS
+  if (UseMD5)
+    return crypt_md5(source, salt);
+  else
+#endif
+    return crypt(source, salt);
 }
 
 char *make_des_salt()

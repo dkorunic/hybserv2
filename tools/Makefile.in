@@ -27,13 +27,13 @@ PROGS = \
 all: $(PROGS)
 
 ../bin/encryptconf: encryptconf.o $(COMMON)
-	$(CC) -o ../bin/encryptconf encryptconf.o $(COMMON) $(LIBS)
+	$(CC) -o ../bin/encryptconf encryptconf.o ../source/crypt.o $(COMMON) $(LIBS)
 
 ../bin/encryptdb: encryptdb.o $(COMMON)
-	$(CC) -o ../bin/encryptdb encryptdb.o $(COMMON) $(LIBS)
+	$(CC) -o ../bin/encryptdb encryptdb.o ../source/crypt.o $(COMMON) $(LIBS)
 
 ../bin/mkpasswd: mkpasswd.o $(COMMON)
-	$(CC) -o ../bin/mkpasswd mkpasswd.o $(COMMON) $(LIBS)
+	$(CC) -o ../bin/mkpasswd mkpasswd.o ../source/crypt.o $(COMMON) $(LIBS)
 
 clean:
 	$(RM) $(PROGS) $(OBJECTS)

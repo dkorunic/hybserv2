@@ -25,8 +25,14 @@
 
 #define    MAXLINE    1024
 
+#define    FLAG_MD5   0x00000001
+#define    FLAG_DES   0x00000002
+
+
 extern int rename(const char *oldpath, const char *newpath);
 extern char *doencrypt(char *);
+extern char *doencrypt_md5(char *);
+void usage();
 
 int
 main(int argc, char *argv[])
@@ -41,17 +47,36 @@ main(int argc, char *argv[])
   char *userhost,
   *nick,
   *flags;
-  int ii;
+  int ii = 1;
+  int c;
+  int flag = 0;
 
   if (argc < 2)
+    usage();
+
+  while ( (c=getopt(argc, argv, "h?d:m:")) != -1)
     {
-      fprintf(stderr,
-              "Usage: %s <conf1> [conf2 conf3 ...]\n",
-              argv[0]);
-      return 0;
+      switch(c)
+        {
+        case 'm':
+          flag |= FLAG_MD5;
+          ii = 2;
+          break;
+        case 'd':
+          flag |= FLAG_DES;
+          ii = 2;
+          break;
+        case 'h':
+        case '?':
+          usage();
+          break;
+        default:
+          printf("Invalid Option: -%c\n", c);
+          break;
+        }
     }
 
-  for (ii = 1; ii < argc; ii++)
+  for (; ii < argc; ii++)
     {
       sprintf(newpath, "%s.orig",
               argv[ii]);
@@ -106,7 +131,14 @@ main(int argc, char *argv[])
                 *ch = '\0';
 
               printf("oldpass = [%s]\n", oldpass);
-              newpass = doencrypt(oldpass);
+
+              /*
+               * Encryption type: DES (default) or MD5
+               */
+              if (flag & FLAG_MD5)
+                newpass = doencrypt_md5(oldpass);
+              else
+                newpass = doencrypt(oldpass);
               fprintf(new, "O:%s:%s:%s:%s\n",
                       userhost,
                       newpass,
@@ -128,3 +160,14 @@ main(int argc, char *argv[])
 
   return 0;
 } /* main() */
+
+
+void usage ()
+
+{
+  printf("Usage: encryptconf [-m|-d] <conf1> [conf2 conf3 ...]\n");
+  printf("         -m Use MD5 encyrption\n");
+  printf("         -d Use DES encyrption (default)\n");
+  printf("Example: encryptconf -m test\n");
+  exit(0);
+}

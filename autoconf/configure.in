@@ -15,9 +15,11 @@ MYHOST=$host_os
 case "$host_os" in
 *sunos*)
   _SunOS=1
+  AC_DEFINE(HAVE_SOLARIS)
   ;;
 *solaris*)
   _SunOS=1
+  AC_DEFINE(HAVE_SOLARIS)
   ;;
 *cygwin)
   AC_DEFINE(HAVE_CYGWIN)

@@ -13,3 +13,6 @@
 
 /* Define if you have CygWin compiler environment */
 #undef HAVE_CYGWIN
+
+/* Define if we use Solaris. */
+#undef HAVE_SOLARIS

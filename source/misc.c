@@ -311,7 +311,7 @@ DoShutdown(char *who, char *reason)
     else
       sendstr[0] = '\0';
 
-  putlog(LOG1, sendstr);
+  putlog(LOG1, "%s", sendstr);
 
   /* Instead of SQUIT -kre */
   toserv(":%s ERROR :Shutting down\r\n", Me.name);

@@ -932,7 +932,7 @@ os_join(struct Channel *cptr)
              ":%s SJOIN %ld %s + :@%s\r\n",
              Me.name, (long) cptr->since, cptr->name, n_OperServ);
 
-  toserv(sendstr);
+  toserv("%s", sendstr);
 
   SplitBuf(sendstr, &av);
 
@@ -963,7 +963,7 @@ os_join_ts_minus_1(struct Channel *cptr)
      Me.name, (cptr->since != 0) ? (long) cptr->since - 1 : 0, cptr->name,
      n_OperServ);
 
-  toserv(sendstr);
+  toserv("%s", sendstr);
   ac = SplitBuf(sendstr, &av);
   s_sjoin(ac, av);
   MyFree(av);
@@ -1709,7 +1709,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
          av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
          reason);
 #endif /* DANCER */
-      toserv(sendstr);
+      toserv("%s", sendstr);
       SplitBuf(sendstr, &arv);
       AddClient(arv);
     } /* else */

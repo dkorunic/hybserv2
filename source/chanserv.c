@@ -988,7 +988,7 @@ cs_join(struct ChanInfo *chanptr)
 
       ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n", Me.name,
                  (long) chants, chanptr->name, n_ChanServ);
-      toserv(sendstr);
+      toserv("%s", sendstr);
 
       SplitBuf(sendstr, &av);
 
@@ -1026,7 +1026,7 @@ cs_joinchan(struct ChanInfo *chanptr)
   ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n",
              Me.name, chptr ? (long) chptr->since : (long) current_ts,
              chanptr->name, n_ChanServ);
-  toserv(sendstr);
+  toserv("%s", sendstr);
 
   SplitBuf(sendstr, &av);
   AddChannel(av, 0, (char **) NULL);
@@ -1050,7 +1050,7 @@ cs_join_ts_minus_1(struct ChanInfo *chanptr)
              ":%s SJOIN %ld %s + :@%s\r\n",
              Me.name, cptr ? (long) (cptr->since - 1) : (long) current_ts,
              cptr->name, n_ChanServ);
-  toserv(sendstr);
+  toserv("%s", sendstr);
 
   ac = SplitBuf(sendstr, &av);
   s_sjoin(ac, av);

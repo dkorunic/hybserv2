@@ -187,7 +187,7 @@ DoJupeSquit(char *serv, char *reason, char *who)
   ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n", Me.name, serv,
              reason);
 
-  toserv(sendstr);
+  toserv("%s", sendstr);
 
   acnt = SplitBuf(sendstr, &arv);
   AddServer(acnt, arv);
@@ -248,7 +248,7 @@ CheckJuped(char *name)
                          tempjupe->reason ? tempjupe->reason :
                          "Jupitered Nickname");
 #endif /* DANCER */
-              toserv(sendstr);
+              toserv("%s", sendstr);
 
               DeleteClient(lptr);
 
@@ -276,7 +276,7 @@ CheckJuped(char *name)
               /* replace it with fake server */
               ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n",
                   Me.name, name, tempjupe->reason);
-              toserv(sendstr);
+              toserv("%s", sendstr);
               SplitBuf(sendstr, &arv);
 
               AddServer(5, arv);
@@ -337,7 +337,7 @@ InitJupes()
                      tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
                      tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
 #endif /* DANCER */
-          toserv(sendstr);
+          toserv("%s", sendstr);
 
           SplitBuf(sendstr, &av);
           AddClient(av);

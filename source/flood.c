@@ -391,7 +391,7 @@ void updateConnectTable(char *user, char *host)
                                   "operators notified");
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
 
-                          toserv (message);
+                          toserv("%s", message);
                         }
                     }
 #endif

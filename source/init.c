@@ -269,7 +269,7 @@ static struct Luser *introduce(char *nick, char *ident, char *info)
 
     ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\r\n", nick, (long)
                CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
-    toserv(sendstr);
+    toserv("%s", sendstr);
 
     SplitBuf(sendstr, &av);
     lptr = AddClient(av); /* Add 'nick' to user list */

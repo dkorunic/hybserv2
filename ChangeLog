@@ -1,3 +1,7 @@
+*** 20010430_3 by kreator
+- rewrote some TODO entries since we've fixed them
+
+
 *** 20010430_2 by kreator
 - changes to INSTALL and README: mention services through loopback device
   (127.0.0.1), put myself in bug reporting list, etc.

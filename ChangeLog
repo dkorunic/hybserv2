@@ -1,3 +1,9 @@
+*** 20010617_1 by kreator
+- applied KrisDuv's patch for RemoveFounderChannelFromNick() function
+  which _didn't_ decrease fccnt after channel drop: so in fact we had
+  ++fccnt but never --fcnt!
+
+
 *** 20010616_1 by kreator
 - smaller sprintf_irc cleanup
 

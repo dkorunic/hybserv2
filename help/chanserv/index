@@ -22,7 +22,8 @@ For more information on a specific command, type
     VOICE      Voice yourself on a channel
     UNBAN      Unban yourself on a channel
     CLEAR      Clear various channel modes
-    MODES      Show all channel modes including key, etc.
+    MODES      Show the current modes of a channel
+    CYCLE      Cycle a channel and clears variopus options
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b

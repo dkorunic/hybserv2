@@ -6020,6 +6020,7 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
+  char modes[MAXLINE];
 
   if (ac < 2)
   {
@@ -6028,35 +6029,71 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
     return;
   }
 
-  RecordCommand("%s: %s!%s@%s CYCLE [%s]", n_ChanServ, lptr->nick,
-    lptr->username, lptr->hostname, av[1]);
-
   if ((cptr = FindChan(av[1])))
   {
-    if (!(chptr = FindChannel(cptr->name))) /* should never happen */
+    if (cptr->flags & (CS_FORBID | CS_FORGET))
+    {
+      notice(n_ChanServ, lptr->nick, "[\002%s\002] is a %s channel",
+          cptr->name, CS_FORBID ? "forbidden" : "forgotten");
       return;
-
+    }
+    
     if (!HasAccess(cptr, lptr, CA_SET))
     {
       notice(n_ChanServ, lptr->nick,
           ERR_NEED_ACCESS, cptr->access_lvl[CA_SET], "CYCLE", av[1]);
-      RecordCommand("%s: %s!%s@%s failed CYCLE [%s]",
-          n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
-          cptr->name);
       return;
     }
+
+    RecordCommand("%s: %s!%s@%s CYCLE [%s]", n_ChanServ, lptr->nick,
+        lptr->username, lptr->hostname, av[1]);
+
+    if (!(chptr = FindChannel(cptr->name))) /* should never happen */
+      return;
 
     if (!IsChannelMember(chptr, Me.csptr))
       cs_join(cptr);
     else
-    {
       cs_part(chptr);
-      cs_join(cptr);
+
+    if (!(cptr->flags & CS_SECUREOPS))
+    {
+      cptr->flags |= CS_SECUREOPS;
+      cs_CheckChan(cptr, chptr);
+      cptr->flags &= ~CS_SECUREOPS;
     }
+    else
+      cs_CheckChan(cptr, chptr);
+
+    strcpy(modes, "-");
+    if ((chptr->modes & MODE_M) && !(cptr->modes_on & MODE_M))
+      strcat(modes, "m");
+    if ((chptr->modes & MODE_I) && !(cptr->modes_on & MODE_I))
+      strcat(modes, "i");
+    if ((chptr->limit) && (!cptr->limit))
+      strcat(modes, "l");
+    if ((chptr->key) && (chptr->key[0] != '\0') && (!cptr->key))
+    {
+      strcat(modes, "k ");
+      strcat(modes, chptr->key);
+    }
+    toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
+
+    UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+    if (cs_ShouldBeOnChan(cptr))
+    {
+      if (!IsChannelMember(chptr, Me.csptr))
+        cs_joinchan(cptr);
+    }
+    else
+      if (IsChannelMember(chptr, Me.csptr))
+        cs_part(chptr);
+  
   }
   else
-   notice(n_ChanServ, lptr->nick,
-     "Can't cycle channel [\002%s\002]", av[1]);
+    notice(n_ChanServ, lptr->nick,
+      "The channel [\002%s\002] is empty, no use to cycle it.",
+       cptr->name);
 } /* cs_cycle() */
 
 /*
@@ -6100,34 +6137,18 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!HasAccess(cptr, lptr, CA_CMDINVITE))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_NEED_ACCESS,
-             cptr->access_lvl[CA_CMDINVITE],
-             "INVITE",
-             cptr->name);
-
-      RecordCommand("%s: %s!%s@%s failed INVITE [%s]",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name);
-
+      notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
+          cptr->access_lvl[CA_CMDINVITE], "INVITE", cptr->name);
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s INVITE [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name);
+  RecordCommand("%s: %s!%s@%s INVITE [%s]", n_ChanServ, lptr->nick,
+      lptr->username, lptr->hostname, cptr->name);
 
   if (IsChannelMember(FindChannel(av[1]), lptr))
     {
-      notice(n_ChanServ, lptr->nick,
-             "You are already on [\002%s\002]",
-             cptr->name);
+      notice(n_ChanServ, lptr->nick, "You are already on [\002%s\002]",
+          cptr->name);
       return;
     }
 

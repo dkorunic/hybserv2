@@ -1,54 +1,60 @@
 Today's MOTD
 ------------
-
-"Beware of bugs in the above code;
- I have only proved it correct, not tried it"
- - Donald Knuth
+Unnamed Law:
+If it happens, it must be possible.
 
 
-Some sort of TODO/planning program:
-(not necessarily in `right' order)
------------------------------------
-
-*) ziplinks
-*) fix mailing list
-*) add cidr & ranged ip's
-*) add tcpwrap capatibilities
+Pending bugs:
+-------------
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
-*) use btree&mmap (additionally use adns and glib)
-*) improve block allocator
-*) cvsweb
+*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
+   special cases -- FIX FIX FIX THIS!
+*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
+   with unlink link copying routine.
+   NOTE: Quickfixed this. However, I need to look at this more closely!
+*) fix stupid bug that services +o people who match() O line, but have not
+   registered with OperServ
+*) OperServ does not completely support hybrid7 modes yet, (for example
+  .channel command or SECURE)
+
+
+New features:
+-------------
+*) add SVSNICK, SWHOIS, etc. for other IRCDs
+*) modularisation (_very_ unlikely to happen)
+*) completely document API
+*) localisation
+*) operserv function to find improper TS channels and fix them
 *) misc stuff:
    private notes on channel and user records, available only to staff
    PGP/GPG keys per user
    space for realname, address, phone numbers
    multiple URL's, multiple email addresses (with limits)
    geek code
-*) add collapse() and irccmp() (do we need this?)
-*) implement modes flood trigger (and below)
-*) add some features from http://www.appwatch.com/Linux/App/879/data.html
-*) be compatibile with other ircds (!!)
-*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
-   special cases -- FIX FIX FIX THIS!
+*) use btree&mmap (additionally use adns and glib)
+*) improve block allocator
+*) add cidr & ranged ip's
+*) add tcpwrap capatibilities
+*) mailing list
+*) cvsweb
+*) ziplinks
+*) save services ignores
 *) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
    flood ctrl for services itself
    flood ctrl for channels: public flood, join-part flood, kick flood,
     deop flood, nick flood -> however, for some features it is obvious
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
-*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
-   with unlink link copying routine.
-   NOTE: Quickfixed this. However, I need to look at this more closely!
-*) save services ignores
-*) fix stupid bug that services +o people who match() O line, but have not
-   registered with OperServ
-*) OperServ does not support hybrid7 modes yet, (for example .channel
-   command or SECURE)
+*) add collapse() and irccmp() (do we need this?)
+*) implement modes flood trigger (and below)
+*) add some features from http://www.appwatch.com/Linux/App/879/data.html
+*) be compatibile with other ircds (!!)
+
 
 Done so far:
 ------------
-
+*) services ignoring people sometimes
 *) MD5 support
 *) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
 *) let +h people use unban by default (if hyb7 is defined) (fl_)
@@ -81,5 +87,5 @@ Done so far:
 *) fix NSSetMemoSignon issue, reported by monolith
    <monolith@mail.orblivion.com>
 *) unforbid (chan/nick)
-*) ............. and various not mentioned, since there were a lot of
-   changes, look in ChangeLog
+*) <...> and various not mentioned, since there were a lot of changes,
+   look in ChangeLog for more info

@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -88,8 +88,7 @@ UpdateUserModes(struct Luser *user, char *modes)
           if (realptr)
           {
              realptr->flags |= NS_IDENTIFIED;
-             RecordCommand("User %s has +e umode, marking as
-                 identified",user->nick);
+             RecordCommand("User %s has +e umode, marking as identified",user->nick);
              umode = UMODE_E;
           }
           else

@@ -1,4 +1,4 @@
-# HybServ Makefile (C) Patrick Alken 1998
+# HybServ Makefile by HybServ2 team
 # $Id$
 
 # This is installation prefix. It can be overrided by passing PREFIX

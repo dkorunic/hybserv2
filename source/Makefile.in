@@ -1,4 +1,4 @@
-# HybServ ./source Makefile (C) Patrick Alken 1998
+# HybServ ./source Makefile
 # $Id$
 
 CC = @CC@

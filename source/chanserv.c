@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -6648,7 +6648,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
   if (cptr->successor)
     notice(n_ChanServ, lptr->nick,
-    "     Successor: %s%s%s%s",
+    "   Successor: %s%s%s%s",
     cptr->successor ? cptr->successor : "",
     successor_online ? " << ONLINE >>" :
     (cptr->last_successor_active ? ", last seen: " : ""),
@@ -7736,8 +7736,7 @@ static void c_set_expirebans(struct Luser *lptr,
 
   if (!BanExpire)
   {
-    notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled on this
-        server.");
+    notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled on this server.");
     return;
   }
 

@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -2090,8 +2090,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
   /* De-identify the user, for ircds that have such mode -kre */
   toserv(":%s MODE %s -e\n", Me.name, dnick);
 
-  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been
-      dropped", dnick);
+  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been dropped", dnick);
 } /* n_drop() */
 
 /*

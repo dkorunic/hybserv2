@@ -1,6 +1,6 @@
 /*
  * settings.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */

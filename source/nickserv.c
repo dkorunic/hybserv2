@@ -883,6 +883,7 @@ DeleteNick(struct NickInfo *nickptr)
 #ifdef CHANNELSERVICES
   struct ChanInfo *cptr;
   struct aChannelPtr *ftmp;
+  struct aChannelPtr *ntmp;
   struct AccessChannel *atmp;
 #endif
 #ifdef MEMOSERVICES
@@ -917,25 +918,23 @@ DeleteNick(struct NickInfo *nickptr)
 
 #ifdef CHANNELSERVICES
 
-  while (nickptr->FounderChannels)
+  while ((ntmp = nickptr->FounderChannels))
   {
-    cptr = nickptr->FounderChannels->cptr;
+    cptr = ntmp->cptr;
+    ftmp = ntmp->next;
 
-    ftmp = nickptr->FounderChannels->next;
-    MyFree(nickptr->FounderChannels);
+    assert(ntmp);
+    
+    MyFree(ntmp);
     nickptr->FounderChannels = ftmp;
 
-    /*
-     * All channels that this nick registered should be dropped, unless
-     * there is a successor.
-     */
+    /* All channels that this nick registered should be dropped, unless
+     * there is a successor. */
 
     MyFree(cptr->founder);
 
-    /*
-     * If the channel has a successor, promote them to founder,
-     * otherwise delete the channel
-     */
+    /* If the channel has a successor, promote them to founder, otherwise
+     * delete the channel */
     if (cptr->successor)
       PromoteSuccessor(cptr);
     else

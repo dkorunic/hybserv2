@@ -1,3 +1,7 @@
+*** 20010820_1 by kreator
+- misc stuff mostly
+
+
 *** 20010818_6 by kreator
 - fixed some c_r stuff (should have trown out that c_r support ages ago)
 - fix some n_NickServ stuff in OPERNICKIDENT code

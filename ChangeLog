@@ -1,3 +1,10 @@
+*** 20010911_1 by kreator
+- some TODO rewrites
+- sync with autoconf2.50 and autoheader2.50
+- update configure and defs.h properly
+- fix misc warnings
+
+
 *** 20010907_1 by kreator
 - remove darn x=NULL in MyFree() which borked some of wild code we still
   have around :-(

@@ -23,8 +23,6 @@
 #define INCLUDED_hash_h
 #endif
 
-#ifdef CHANNELSERVICES
-
 struct Luser;
 struct Channel;
 
@@ -180,7 +178,5 @@ void SetDefaultALVL(struct ChanInfo *cptr);
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;
 extern long MaxTSDelta;
-
-#endif /* CHANNELSERVICES */
 
 #endif /* INCLUDED_chanserv_h */

@@ -451,16 +451,12 @@ CompleteHubConnection(struct Servlist *hubptr)
   #ifdef DEBUGMODE
     fprintf(stderr,
       "Cannot connect to port %d of %s: %s\n",
-      hubptr->port,
-      hubptr->hostname,
-      strerror(errval));
+      hubptr->port, hubptr->hostname, strerror(errval));
   #endif
 
     putlog(LOG1,
       "Error connecting to port %d of %s: %s",
-      hubptr->port,
-      hubptr->hostname,
-      strerror(errval));
+      hubptr->port, hubptr->hostname, strerror(errval));
 
     return 0;
   }
@@ -469,15 +465,9 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   hubptr->connect_ts = current_ts;
 
-  SendUmode(OPERUMODE_Y,
-    "*** Connected to %s:%d",
-    hubptr->hostname,
-    hubptr->port);
-
-  putlog(LOG1,
-    "Connected to %s:%d",
-    hubptr->hostname,
-    hubptr->port);
+  SendUmode(OPERUMODE_Y, "*** Connected to %s:%d",
+      hubptr->hostname, hubptr->port); 
+  putlog(LOG1, "Connected to %s:%d", hubptr->hostname, hubptr->port);
 
   return 1;
 } /* CompleteHubConnection() */

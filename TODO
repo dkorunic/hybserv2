@@ -5,12 +5,7 @@ Today's MOTD
 
 Pending bugs:
 -------------
-*) fix `protected user'
-*) NICKLEN AKICK fixup
 *) fix invalid gnote count
-*) fix damn malloc() coring..
-*) fix S lines
-*) fix V lines
 *) clear modes doesn't clear limit
 *) fix lcnt issue in InsertLink() after reload command --> seems reload()
    is very stupid
@@ -19,8 +14,6 @@ Pending bugs:
 *) seems it is possible that nickname stays ghosted more than necessary if
    nick QUITs
 *) send all mlock modes on channel creation
-*) trace possible leaks
-   NOTE: I've prepared some parts of code for trace -kre
 *) OperServ does not completely support hybrid7 modes yet, (for example
    .channel command or SECURE)
 *) sed helpfiles so that they have proper time values
@@ -88,6 +81,7 @@ Features to come:
 
 Done so far (and yes, there is even more):
 ------------------------------------------
+*) fix V and S lines
 *) ChanServ not opering when it should (!)
 *) MemoServ not handling memos by master
 *) design chanaccesslists inheritance for linked nicknames

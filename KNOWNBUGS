@@ -1,17 +1,3 @@
-Reported by larne, happened on Hybrid7 testnet.
-<larne> #0  0x280f8934 in kill () from /usr/lib/libc.so.4
-<larne> #1  0x28134c45 in abort () from /usr/lib/libc.so.4
-<larne> #2  0x805d9d4 in ProcessSignal (sig=11) at init.c:135
-<larne> #3  0xbfbfffac in ?? ()
-<larne> #4  0x807272e in s_sjoin (ac=7, av=0x809cfe0) at server.c:1752
-<larne> #5  0x8070f91 in ProcessInfo (arc=7, arv=0x809cfe0) at server.c:146
-<larne> #6  0x807518c in ReadHub () at sock.c:902
-<larne> #7  0x8074ed0 in ReadSocketInfo () at sock.c:673
-<larne> #8  0x805d7e5 in main (argc=1, argv=0xbfbff7e4) at hybserv.c:325
-<larne> #9  0x80497af in _start ()
-<larne> (gdb)
-<larne> (from hybserv core)
-
 Reported by toot, happened on HybNet with older services (kre):
 #0  0x400784e1 in __kill () from /lib/libc.so.6
 #1  0x40078156 in raise (sig=6) at .. /sysdeps/posix/raise.c:27

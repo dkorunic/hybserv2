@@ -42,7 +42,7 @@ Some sort of TODO/planning program
     - done
 22) we don't save information on servers on shutdown (statserv). should
     we?
-    - ?
+    done by previous fixes.
 23) add collapse() and irccmp() (do we need this?)
 24) better multiprocessor support (libhoard!)
     - done
@@ -52,3 +52,5 @@ Some sort of TODO/planning program
 28) be compatibile with other ircds (!!)
 29) unforbid
 30) AUTOHALFOP CMDHALFOP (+h for hybserv7)
+31) .who not working?
+    done.

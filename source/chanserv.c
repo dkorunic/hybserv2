@@ -4714,6 +4714,11 @@ c_set_restricted(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     notice(n_ChanServ, lptr->nick,
       "Toggled Restricted Access for channel %s [\002OFF\002]",
       cptr->name);
+
+    /* Leave channel if there is no need to stay -kre */
+    if (!cs_ShouldBeOnChan(cptr))
+      cs_part(FindChannel(cptr->name)); /* leave the channel */
+
     return;
   }
 

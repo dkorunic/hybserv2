@@ -98,6 +98,12 @@ inline void MyFree(void *ptr)
     return;
 
   free(ptr);
+
+  /* rollback change i've done long time ago - seems it causes hybserv
+     to crash at various different places. unfortunately, original
+     author made services require this :-( -kre */
+  /* thanks, adx -kre */
+  ptr = NULL;
 } /* MyFree() */
 
 /*

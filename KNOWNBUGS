@@ -12,8 +12,6 @@ It is possible to delete master_nick from tree, therefore causing hybserv
 to crash - failing to find master from linked nicknames. Eventually, it
 manages to write the DB that way so it cannot boot next time. (kre)
 
-Ugly proxy-checking code (kre)
-
 [10:53:31] #SideWnder# HUB 
 -- Listing current hubs --
 [Hub Name                      ] [# servers]
@@ -40,7 +38,7 @@ if a channel is SecureOps and you:
 ^^^^badnick won't get deopped when chanserv rejoins
 (badnick does not have autoop access)
 
-test fuckover!!! -- make it use threads -- i don't htink fork() has
+test fuckover!!! -- make it use threads -- i don't think fork() has
 access to the server fd ??
 
 test tcms

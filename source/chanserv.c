@@ -1522,6 +1522,8 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   if (!(tempuser = FindUserByChannel(chanptr, FindClient(nick))))
     return;
 
+  /* CH_OPPED is broken, at least it seems so. */
+#if 0
   if (tempuser->flags & CH_OPPED)
   {
     /*
@@ -1530,6 +1532,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
      */
     return;
   }
+#endif
 
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
   {
@@ -5690,8 +5693,9 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
     for (uchan = lptr->firstchan; uchan; uchan = uchan->next)
     {
-      if (HasAccess(FindChan(uchan->chptr->name), lptr, CA_CMDOP) &&
-          !(uchan->flags & CH_OPPED))
+      /* CH_OPPED does not seem to work atm. This is quick fix. -kre */
+      if (HasAccess(FindChan(uchan->chptr->name), lptr, CA_CMDOP))
+/*        && !(uchan->flags & CH_OPPED)) */
       {
         toserv(":%s MODE %s +o %s\n",
           n_ChanServ,
@@ -5748,6 +5752,9 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
+    /* There seems to be some kind of problem with IsChannelOp() in some
+     * special cases. This is only a quick fix -kre */
+#if 0
     if (IsChannelOp(chptr, lptr))
     {
       notice(n_ChanServ, lptr->nick,
@@ -5755,6 +5762,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         cptr->name);
       return;
     }
+#endif
+
   }
   else
   {

@@ -277,15 +277,15 @@ AddChannel(char **line, int nickcnt, char **nicks)
 
   ncnt = 5; /* default position for channel nicks, if no limit/key */
   strcpy(modes, line[4]);
-  if (line[5][0] != ':') /* names list *should* start w/ a :         */
+  if (line[ncnt][0] != ':') /* names list *should* start w/ a :         */
   {                      /* if it doesn't, theres a limit and/or key */
     strcat(modes, " ");
-    strcat(modes, line[5]);
+    strcat(modes, line[ncnt]);
     ncnt++;
-    if (line[6][0] != ':')
+    if (line[ncnt][0] != ':')
     {
       strcat(modes, " ");
-      strcat(modes, line[6]);
+      strcat(modes, line[ncnt]);
       ncnt++;
     }
   }

@@ -102,9 +102,13 @@ GetString(int ac, char **av)
     ++ii;
   }
 
+  /* Routine to get rid of spaces at the end of new string. However, we
+   * don't need it atm -kre */
+#if 0
   ii = strlen(final) - 1;
   while (final[ii] == ' ' && ii)
     final[ii--] = 0;
+#endif
   
   return (final);
 } /* GetString() */

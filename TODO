@@ -2,55 +2,61 @@ Some sort of TODO/planning program
 (not necessarily in `right' order)
 ----------------------------------
 
-1) crashing on /reload
-   -  done(?) - seems another Solaris goddamn bug.
-2) linked tree problems
-   - people report it has gone after 1.7.3
-3) bcflood issue
-   - done.
 4) add cidr & ranged ip's (if listening on port add tcpwrap capatibilities)
 5) trace possible leaks
 6) use btree&mmap (additionally use adns and glib)
 7) improve block allocator
 8) check older KNOWNBUGS
    - some, done. walter put back nickname len
-9) get rid of proxy ch. code (or make it better :) )
-   - done. ripped out -> use tcm-hybrid for that
-10) add support for solaris threads
-    - done.
-11) trace weird SIGPIPE-s
-    - done (probably)
 12) weird level redefine on all channels 
-13) umode command (in msg)
-    - done.
-14) insert support for solaris threads
-    - done.
-16) split and autorouting
-    - done -> testing in progress.
 17) cvsweb
-18) Recover the lost ChangeLog entries
-    - done
-19) sfio support
-    - in progress
 20) misc stuff:
     private notes on channel and user records, available only to staff
     PGP/GPG keys per user
     space for realname, address, phone numbers
     multiple URL's, multiple email addresses (with limits)
     geek code
-21) anon cvs
-    - done
-22) we don't save information on servers on shutdown (statserv). should
-    we?
-    done by previous fixes.
 23) add collapse() and irccmp() (do we need this?)
-24) better multiprocessor support (libhoard!)
-    - done
 25) hybrid7 features
 26) implement modes flood trigger
 27) add some features from http://www.appwatch.com/Linux/App/879/data.html
 28) be compatibile with other ircds (!!)
 29) unforbid
 30) AUTOHALFOP CMDHALFOP (+h for hybserv7)
+32) something quite _weird_ with CH_OPPED.. seems it isn't working in some
+    special cases -- FIX FIX FIX THIS!
+
+Done section :-)
+-----------------
+
 31) .who not working?
     done.
+24) better multiprocessor support (libhoard!)
+    - done
+18) Recover the lost ChangeLog entries
+    - done
+19) sfio support
+    - done
+1) crashing on /reload
+   -  done(?) - seems another Solaris goddamn bug.
+2) linked tree problems
+   - people report it has gone after 1.7.3
+3) bcflood issue
+   - done.
+21) anon cvs
+    - done
+22) we don't save information on servers on shutdown (statserv). should
+    we?
+    done by previous fixes.
+9) get rid of proxy ch. code (or make it better :) )
+   - done. ripped out -> use tcm-hybrid for that
+10) add support for solaris threads
+    - done.
+11) trace weird SIGPIPE-s
+    - done (probably)
+13) umode command (in msg)
+    - done.
+14) insert support for solaris threads
+    - done.
+16) split and autorouting
+    - done -> testing in progress.

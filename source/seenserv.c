@@ -295,7 +295,7 @@ static void FreeSeen()
  */
 static void es_seen(struct Luser *lptr, int ac, char **av)
 {
-  int j, i, count, found;
+  int i, count;
   aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
   char nuhost[NICKLEN + USERLEN + HOSTLEN + 3], sendstr[256];
   time_t mytime, last;

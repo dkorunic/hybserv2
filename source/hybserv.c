@@ -50,6 +50,7 @@
 #include "timer.h"
 #include "timestr.h"
 #include "misc.h"
+#include "sprintf_irc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -183,23 +184,26 @@ int main(int argc, char *argv[])
       ShowChannels(argc, argv);
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
 
-      return (0);
+      return 0;
     }
 
   /* Check for running services -kre */
   if ((pidfile = fopen(PidFile, "r")) == NULL)
     putlog(LOG1, "Unable to read %s", PidFile);
   else
+  {
+    pid_t mypid;
+    char line[MAXLINE];
+
+    fgets(line, MAXLINE, pidfile);
+    fclose(pidfile);
+    mypid = atoi(line);
+    if (mypid && !kill(mypid, 0))
     {
-      pid_t mypid;
-      fscanf(pidfile, "%u", &mypid);
-      fclose(pidfile);
-      if (!kill(mypid, 0))
-        {
-          fprintf(stderr, "Services are already running!\n");
-          exit(1);
-        }
+      fprintf(stderr, "Services are already running!\n");
+      exit(EXIT_FAILURE);
     }
+  }
 
   putlog(LOG1, "HybServ2 TS services version %s started", hVersion);
 
@@ -223,7 +227,7 @@ int main(int argc, char *argv[])
               "HPath is an invalid directory, please check %s\n",
               SETPATH);
       putlog(LOG1, "Invalid HPath (%s), shutting down", HPath);
-      exit(0);
+      exit(EXIT_FAILURE);
     }
 
   if (!uid || !euid)
@@ -313,7 +317,9 @@ int main(int argc, char *argv[])
     putlog(LOG1, "Unable to open %s", PidFile);
   else
     {
-      fprintf(pidfile, "%u\n", getpid());
+      char line[MAXLINE];
+      ircsprintf(line, "%u\n", getpid());
+      fputs(line, pidfile);
       fclose(pidfile);
     }
 

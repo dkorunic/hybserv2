@@ -73,10 +73,8 @@ static int DefaultAccess[] = {
   5,           /* CA_CMDVOICE */
   5,           /* CA_ACCESS */
   5,           /* CA_CMDINVITE */
-#ifdef HYBRID7
   8,           /* CA_AUTOHALFOP */
   8,           /* CA_CMDHALFOP */
-#endif
   10,          /* CA_AUTOOP */
   10,          /* CA_CMDOP */
   10,          /* CA_CMDUNBAN */

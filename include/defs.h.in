@@ -1,7 +1,13 @@
-/* include/defs.h.in.  Generated automatically from autoconf/configure.in by autoheader.  */
-/*
- * $Id$
- */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#undef TIME_WITH_SYS_TIME
 
 /* Define if your system supports pthreads.  */
 #undef HAVE_PTHREADS
@@ -15,35 +21,26 @@
 /* Define if you have CygWin compiler environment */
 #undef HAVE_CYGWIN
 
-/* Define if you have the `crypt' library (-lcrypt). */
-#undef HAVE_LIBCRYPT
-
-/* Define if you have the `cup' library (-lcup). */
-#undef HAVE_LIBCUP
-
-/* Define if you have the `dmalloc' library (-ldmalloc). */
-#undef HAVE_LIBDMALLOC
-
-/* Define if you have the `nsl' library (-lnsl). */
-#undef HAVE_LIBNSL
-
-/* Define if you have the `socket' library (-lsocket). */
-#undef HAVE_LIBSOCKET
-
-/* Define if you have the `strdup' function. */
+/* Define if you have the strdup function.  */
 #undef HAVE_STRDUP
 
-/* Define if you have the `strerror' function. */
+/* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
 
-/* Define if you have the `strncpy' function. */
+/* Define if you have the strncpy function.  */
 #undef HAVE_STRNCPY
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
+/* Define if you have the crypt library (-lcrypt).  */
+#undef HAVE_LIBCRYPT
 
-/* Define if you have the ANSI C header files. */
-#undef STDC_HEADERS
+/* Define if you have the cup library (-lcup).  */
+#undef HAVE_LIBCUP
 
-/* Define if you can safely include both <sys/time.h> and <time.h>. */
-#undef TIME_WITH_SYS_TIME
+/* Define if you have the dmalloc library (-ldmalloc).  */
+#undef HAVE_LIBDMALLOC
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL
+
+/* Define if you have the socket library (-lsocket).  */
+#undef HAVE_LIBSOCKET

@@ -613,19 +613,26 @@ g first)",
         continue;
       }
 
-      nptr = MakeNick();
-      nptr->nick = MyStrdup(av[0]);
-      nptr->flags = atol(av[1]);
-      nptr->created = atol(av[2]);
-      nptr->lastseen = atol(av[3]);
-
-      /*
-       * nptr may have been identified when the userfile
-       * was written
-       */
-      nptr->flags &= ~NS_IDENTIFIED;
+      /* Check if there already exists that nickname in list. This will
+       * give some overhead, but this will make sure no nicknames are
+       * twice or more times in db. */
+      if (FindNick(av[0]))
+      {
+        fatal(1, "%s:%d NickServ entry [%s] is already in nick list",
+            NickServDB, cnt, av[0]);
+        nptr = NULL;
+        ret = -1;
+      }
+      else
+      {
+        nptr = MakeNick();
+        nptr->nick = MyStrdup(av[0]);
+        nptr->flags = atol(av[1]);
+        nptr->created = atol(av[2]);
+        nptr->lastseen = atol(av[3]);
+        nptr->flags &= ~NS_IDENTIFIED;
+      }
     }
-
     MyFree(av);
   } /* while */
 

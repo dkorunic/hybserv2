@@ -142,7 +142,7 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
 {
   struct Luser *serviceptr;
 
-  if (!strcasecmp(av[0], "HELP"))
+  if (!irccmp(av[0], "HELP"))
   {
     if (ac >= 2)
       GiveHelp(n_HelpServ, lptr->nick, av[1], NODCC);

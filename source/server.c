@@ -142,7 +142,7 @@ ProcessInfo(int arc, char **arv)
 
   for (stptr = servtab; stptr->cmd; stptr++)
   {
-    if (!strcasecmp(arv[index], stptr->cmd))
+    if (!irccmp(arv[index], stptr->cmd))
     {
       (*stptr->func)(arc, arv);
       break;
@@ -209,7 +209,7 @@ AddServer(int argcnt, char **line)
      * have "Me.sptr" point to it
      */
     if (!Me.sptr)
-      if (!strcasecmp(tempserv->name, Me.name))
+      if (!irccmp(tempserv->name, Me.name))
         Me.sptr = tempserv;
 
     /*
@@ -491,7 +491,7 @@ s_ping(int ac, char **av)
   if (ac < 2)
     return;
 
-  if (!strcasecmp(av[0], "PING"))
+  if (!irccmp(av[0], "PING"))
     who = av[1];
   else
     who = av[0];
@@ -783,7 +783,7 @@ s_nick(int ac, char **av)
      * their nick to "aBa", in which case we don't need to
      * check
      */
-    if (strcasecmp(who, av[2]) != 0)
+    if (irccmp(who, av[2]) != 0)
       CheckNick(av[2]);
   #endif /* NICKSERVICES */
 
@@ -874,7 +874,7 @@ s_nick(int ac, char **av)
 
 #ifdef GLOBALSERVICES
 
-  if (strncasecmp(Me.name, lptr->server->name, strlen(lptr->server->name))) {
+  if (ircncmp(Me.name, lptr->server->name, strlen(lptr->server->name))) {
     /*
      * Send the motd to the new user
      */
@@ -987,7 +987,7 @@ s_privmsg(int ac, char **av)
   /* Obviously, this code down strips '%'. But what if some valid string
      contains regular '%' and it should _not_ be stripped, ie. passwd
      string? So, I'll add search for IDENTIFY string. -kre */
-  if (strncasecmp(command, "IDENTIFY", 8))
+  if (ircncmp(command, "IDENTIFY", 8))
     stripformatsymbols(av[3]);
 
   if (RestrictedAccess)
@@ -1016,7 +1016,7 @@ s_privmsg(int ac, char **av)
 
   if ((tmp = strchr(av[2], '@')))
   {
-    if (!strcasecmp(tmp + 1, Me.name))
+    if (!irccmp(tmp + 1, Me.name))
       *tmp = '\0';
   }
 
@@ -1433,7 +1433,7 @@ s_kill(int ac, char **av)
      * Me.osptr a new value, where serviceptr would be
      * the old value
      */
-    if (!strcasecmp(av[2], n_OperServ))
+    if (!irccmp(av[2], n_OperServ))
     {
       struct Chanlist *tempchan;
       struct Channel *chptr;
@@ -1452,7 +1452,7 @@ s_kill(int ac, char **av)
     /*
      * If ChanServ was killed, rejoin all it's channels
      */
-    else if (!strcasecmp(av[2], n_ChanServ))
+    else if (!irccmp(av[2], n_ChanServ))
       cs_RejoinChannels();
 
   #endif
@@ -1625,7 +1625,7 @@ s_sjoin(int ac, char **av)
   int ii;
 #endif
 
-  if (!strcasecmp(av[1], "JOIN"))
+  if (!irccmp(av[1], "JOIN"))
   {
     char *chan;
 
@@ -2084,7 +2084,7 @@ s_trace(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(av[2] + 1, Me.name) != 0)
+  if (irccmp(av[2] + 1, Me.name) != 0)
     return;
 
   isoper = strchr(ServiceUmodes, 'o');
@@ -2143,7 +2143,7 @@ s_version(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
+  if (irccmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
     return;
 
   if (av[0][0] == ':')
@@ -2182,7 +2182,7 @@ s_motd(int ac, char **av)
   if (ac < 3)
     return;
 
-  if (strcasecmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
+  if (irccmp(Me.name, (av[2][0] == ':') ? av[2] + 1 : av[2]) != 0)
     return;
 
   if (av[0][0] == ':')

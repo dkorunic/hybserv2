@@ -461,7 +461,7 @@ cs_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -489,7 +489,7 @@ cs_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp("PASS", keyword, 4))
+      if (!ircncmp("PASS", keyword, 4))
       {
         if (!cptr->password)
           cptr->password = MyStrdup(av[1]);
@@ -504,7 +504,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("FNDR", keyword, 4))
+      else if (!ircncmp("FNDR", keyword, 4))
       {
         if (!cptr->founder)
         {
@@ -545,7 +545,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp(keyword, "SUCCESSOR", 9))
+      else if (!ircncmp(keyword, "SUCCESSOR", 9))
       {
         if (!cptr->successor)
         {
@@ -574,7 +574,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("ACCESS", keyword, 6))
+      else if (!ircncmp("ACCESS", keyword, 6))
       {
         if (ac < 3)
         {
@@ -593,7 +593,7 @@ cs_loaddata()
             AddAccess(cptr, NULL, av[1], NULL, atoi(av[2]));
         }
       }
-      else if (!strncasecmp("AKICK", keyword, 5))
+      else if (!ircncmp("AKICK", keyword, 5))
       {
         if (ac < 3)
         {
@@ -605,7 +605,7 @@ cs_loaddata()
         else
           AddAkick(cptr, (struct Luser *) NULL, av[1], av[2] + 1);
       }
-      else if (!strncasecmp("ALVL", keyword, 4))
+      else if (!ircncmp("ALVL", keyword, 4))
       {
         /* channel access levels */
         if (ac != (CA_SIZE + 1))
@@ -633,7 +633,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("TOPIC", keyword, 5))
+      else if (!ircncmp("TOPIC", keyword, 5))
       {
         if (!cptr->topic)
           cptr->topic = MyStrdup(av[1] + 1);
@@ -647,7 +647,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("LIMIT", keyword, 5))
+      else if (!ircncmp("LIMIT", keyword, 5))
       {
         if (!cptr->limit)
           cptr->limit = atoi(av[1]);
@@ -661,7 +661,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("KEY", keyword, 3))
+      else if (!ircncmp("KEY", keyword, 3))
       {
         if (!cptr->key)
           cptr->key = MyStrdup(av[1]);
@@ -675,7 +675,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("MON", keyword, 3))
+      else if (!ircncmp("MON", keyword, 3))
       {
         if (!cptr->modes_on)
           cptr->modes_on = atoi(av[1]);
@@ -689,7 +689,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("MOFF", keyword, 5))
+      else if (!ircncmp("MOFF", keyword, 5))
       {
         if (!cptr->modes_off)
           cptr->modes_off = atoi(av[1]);
@@ -703,7 +703,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("ENTRYMSG", keyword, 8))
+      else if (!ircncmp("ENTRYMSG", keyword, 8))
       {
         if (!cptr->entrymsg)
           cptr->entrymsg = MyStrdup(av[1] + 1);
@@ -717,7 +717,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("EMAIL", keyword, 8))
+      else if (!ircncmp("EMAIL", keyword, 8))
       {
         if (!cptr->email)
           cptr->email = MyStrdup(av[1]);
@@ -731,7 +731,7 @@ cs_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp("URL", keyword, 8))
+      else if (!ircncmp("URL", keyword, 8))
       {
         if (!cptr->url)
           cptr->url = MyStrdup(av[1]);
@@ -2110,7 +2110,7 @@ FindChan(char *channel)
 
   hashv = CSHashChan(channel);
   for (cptr = chanlist[hashv]; cptr; cptr = cptr->next)
-    if (!strcasecmp(cptr->name, channel))
+    if (!irccmp(cptr->name, channel))
       return (cptr);
 
   return (NULL);
@@ -2951,17 +2951,17 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       ircsprintf(str, "%s %s", av[1], av[2]);
     else
     {
-      if ((!strcasecmp(av[1], "ACCESS")) ||
-          (!strcasecmp(av[1], "AKICK")) ||
-          (!strcasecmp(av[1], "LEVEL")) ||
-          (!strcasecmp(av[1], "SET")))
+      if ((!irccmp(av[1], "ACCESS")) ||
+          (!irccmp(av[1], "AKICK")) ||
+          (!irccmp(av[1], "LEVEL")) ||
+          (!irccmp(av[1], "SET")))
         ircsprintf(str, "%s index", av[1]);
       else
       {
         struct Command *cptr;
 
         for (cptr = chancmds; cptr->cmd; cptr++)
-          if (!strcasecmp(av[1], cptr->cmd))
+          if (!irccmp(av[1], cptr->cmd))
             break;
 
         if (cptr->cmd)
@@ -4035,7 +4035,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }  
 
-  if (!strcasecmp(av[2], "SET"))
+  if (!irccmp(av[2], "SET"))
   {
     int    newlevel, index;
 
@@ -4053,36 +4053,36 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     index = (-1);
     if (!IsNum(av[3]))
     {
-      if (!strcasecmp(av[3], "AUTODEOP"))
+      if (!irccmp(av[3], "AUTODEOP"))
         index = CA_AUTODEOP;
-      else if (!strcasecmp(av[3], "AUTOVOICE"))
+      else if (!irccmp(av[3], "AUTOVOICE"))
         index = CA_AUTOVOICE;
-      else if (!strcasecmp(av[3], "CMDVOICE"))
+      else if (!irccmp(av[3], "CMDVOICE"))
         index = CA_CMDVOICE;
-      else if (!strcasecmp(av[3], "ACCESS"))
+      else if (!irccmp(av[3], "ACCESS"))
         index = CA_ACCESS;
-      else if (!strcasecmp(av[3], "CMDINVITE"))
+      else if (!irccmp(av[3], "CMDINVITE"))
         index = CA_CMDINVITE;
 #ifdef HYBRID7
       /* Add setup for autohalfop and cmdhalfop -Janos */
-      else if (!strcasecmp(av[3], "AUTOHALFOP"))
+      else if (!irccmp(av[3], "AUTOHALFOP"))
         index = CA_AUTOHALFOP;
-      else if (!strcasecmp(av[3], "CMDHALFOP"))
+      else if (!irccmp(av[3], "CMDHALFOP"))
         index = CA_CMDHALFOP;
 #endif /* HYBRID7 */
-      else if (!strcasecmp(av[3], "AUTOOP"))
+      else if (!irccmp(av[3], "AUTOOP"))
         index = CA_AUTOOP;
-      else if (!strcasecmp(av[3], "CMDOP"))
+      else if (!irccmp(av[3], "CMDOP"))
         index = CA_CMDOP;
-      else if (!strcasecmp(av[3], "CMDUNBAN"))
+      else if (!irccmp(av[3], "CMDUNBAN"))
         index = CA_CMDUNBAN;
-      else if (!strcasecmp(av[3], "AUTOKICK"))
+      else if (!irccmp(av[3], "AUTOKICK"))
         index = CA_AKICK;
-      else if (!strcasecmp(av[3], "CMDCLEAR"))
+      else if (!irccmp(av[3], "CMDCLEAR"))
         index = CA_CMDCLEAR;
-      else if (!strcasecmp(av[3], "SET"))
+      else if (!irccmp(av[3], "SET"))
         index = CA_SET;
-      else if (!strcasecmp(av[3], "SUPEROP"))
+      else if (!irccmp(av[3], "SUPEROP"))
         index = CA_SUPEROP;
 
       if (index == (-1))
@@ -4157,7 +4157,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "RESET"))
+  if (!irccmp(av[2], "RESET"))
   {
     int index;
 
@@ -4175,38 +4175,38 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     index = (-1);
     if (!IsNum(av[3]))
     {
-      if (!strcasecmp(av[3], "AUTODEOP"))
+      if (!irccmp(av[3], "AUTODEOP"))
         index = CA_AUTODEOP;
-      else if (!strcasecmp(av[3], "AUTOVOICE"))
+      else if (!irccmp(av[3], "AUTOVOICE"))
         index = CA_AUTOVOICE;
-      else if (!strcasecmp(av[3], "CMDVOICE"))
+      else if (!irccmp(av[3], "CMDVOICE"))
         index = CA_CMDVOICE;
-      else if (!strcasecmp(av[3], "ACCESS"))
+      else if (!irccmp(av[3], "ACCESS"))
         index = CA_ACCESS;
-      else if (!strcasecmp(av[3], "CMDINVITE"))
+      else if (!irccmp(av[3], "CMDINVITE"))
         index = CA_CMDINVITE;
-      else if (!strcasecmp(av[3], "AUTOOP"))
+      else if (!irccmp(av[3], "AUTOOP"))
         index = CA_AUTOOP;
 #ifdef HYBRID7
       /* Add setup for autohalfop and cmdhalfop -Janos */
-      else if (!strcasecmp(av[3], "AUTOHALFOP"))
+      else if (!irccmp(av[3], "AUTOHALFOP"))
         index = CA_AUTOHALFOP;
-      else if (!strcasecmp(av[3], "CMDHALFOP"))
+      else if (!irccmp(av[3], "CMDHALFOP"))
         index = CA_CMDHALFOP;
 #endif /* HYBRID7 */
-      else if (!strcasecmp(av[3], "CMDOP"))
+      else if (!irccmp(av[3], "CMDOP"))
         index = CA_CMDOP;
-      else if (!strcasecmp(av[3], "CMDUNBAN"))
+      else if (!irccmp(av[3], "CMDUNBAN"))
         index = CA_CMDUNBAN;
-      else if (!strcasecmp(av[3], "AUTOKICK"))
+      else if (!irccmp(av[3], "AUTOKICK"))
         index = CA_AKICK;
-      else if (!strcasecmp(av[3], "CMDCLEAR"))
+      else if (!irccmp(av[3], "CMDCLEAR"))
         index = CA_CMDCLEAR;
-      else if (!strcasecmp(av[3], "SET"))
+      else if (!irccmp(av[3], "SET"))
         index = CA_SET;
-      else if (!strcasecmp(av[3], "SUPEROP"))
+      else if (!irccmp(av[3], "SUPEROP"))
         index = CA_SUPEROP;
-      else if (!strcasecmp(av[3], "ALL"))
+      else if (!irccmp(av[3], "ALL"))
         index = (-2);
 
       if (index == (-1))
@@ -4260,9 +4260,9 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       av[3]);
 
     return;
-  } /* if (!strcasecmp(av[2], "RESET")) */
+  } /* if (!irccmp(av[2], "RESET")) */
 
-  if (!strcasecmp(av[2], "LIST"))
+  if (!irccmp(av[2], "LIST"))
   {
     int ii;
 
@@ -4482,7 +4482,7 @@ c_set_topiclock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_TOPICLOCK;
     notice(n_ChanServ, lptr->nick,
@@ -4491,7 +4491,7 @@ c_set_topiclock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_TOPICLOCK;
     notice(n_ChanServ, lptr->nick,
@@ -4535,7 +4535,7 @@ c_set_private(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_PRIVATE;
     notice(n_ChanServ, lptr->nick,
@@ -4544,7 +4544,7 @@ c_set_private(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_PRIVATE;
     notice(n_ChanServ, lptr->nick,
@@ -4588,7 +4588,7 @@ c_set_secure(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_SECURE;
     notice(n_ChanServ, lptr->nick,
@@ -4597,7 +4597,7 @@ c_set_secure(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_SECURE;
     notice(n_ChanServ, lptr->nick,
@@ -4641,7 +4641,7 @@ c_set_secureops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_SECUREOPS;
     notice(n_ChanServ, lptr->nick,
@@ -4650,7 +4650,7 @@ c_set_secureops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_SECUREOPS;
     notice(n_ChanServ, lptr->nick,
@@ -4694,7 +4694,7 @@ c_set_splitops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_SPLITOPS;
     notice(n_ChanServ, lptr->nick,
@@ -4703,7 +4703,7 @@ c_set_splitops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_SPLITOPS;
     notice(n_ChanServ, lptr->nick,
@@ -4747,7 +4747,7 @@ c_set_restricted(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_RESTRICTED;
     notice(n_ChanServ, lptr->nick,
@@ -4756,7 +4756,7 @@ c_set_restricted(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_RESTRICTED;
     notice(n_ChanServ, lptr->nick,
@@ -4819,7 +4819,7 @@ c_set_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_FORGET;
     notice(n_ChanServ, lptr->nick,
@@ -4832,7 +4832,7 @@ c_set_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_FORGET;
     notice(n_ChanServ, lptr->nick,
@@ -4883,7 +4883,7 @@ c_set_guard(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_GUARD;
     notice(n_ChanServ, lptr->nick,
@@ -4893,7 +4893,7 @@ c_set_guard(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     cptr->flags &= ~CS_GUARD;
     notice(n_ChanServ, lptr->nick,
@@ -5380,7 +5380,7 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "-"))
+  if (!irccmp(av[3], "-"))
   {
     if (cptr->topic)
       MyFree(cptr->topic);
@@ -5451,7 +5451,7 @@ c_set_entrymsg(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "-"))
+  if (!irccmp(av[3], "-"))
   {
     if (cptr->entrymsg)
       MyFree(cptr->entrymsg);
@@ -5515,7 +5515,7 @@ c_set_email(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (cptr->email)
     MyFree(cptr->email);
 
-  if (!strcasecmp(av[3], "-"))
+  if (!irccmp(av[3], "-"))
   {
     cptr->email = NULL;
     notice(n_ChanServ, lptr->nick,
@@ -5569,7 +5569,7 @@ c_set_url(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (cptr->url)
     MyFree(cptr->url);
 
-  if (!strcasecmp(av[3], "-"))
+  if (!irccmp(av[3], "-"))
   {
     cptr->url = NULL;
     notice(n_ChanServ, lptr->nick,
@@ -5739,7 +5739,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[1], "ALL"))
+  if (!irccmp(av[1], "ALL"))
     cptr = NULL;
   else if (!(cptr = FindChan(av[1])))
   {
@@ -6172,7 +6172,7 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       lptr->hostname);
 
   if (ac >= 3)
-    if (!strcasecmp(av[2], "ALL"))
+    if (!irccmp(av[2], "ALL"))
     {
       if (!HasAccess(cptr, lptr, CA_SUPEROP))
       {
@@ -7148,7 +7148,7 @@ c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     cptr->flags |= CS_NOEXPIRE;
     notice(n_ChanServ, lptr->nick,
@@ -7157,7 +7157,7 @@ c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     cptr->flags &= ~CS_NOEXPIRE;
     notice(n_ChanServ, lptr->nick,

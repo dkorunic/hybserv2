@@ -265,7 +265,7 @@ FindBan(struct Channel *cptr, char *ban)
     return (NULL);
 
   tempban = cptr->firstban;
-  while (tempban && (strcasecmp(tempban->mask, ban) != 0))
+  while (tempban && (irccmp(tempban->mask, ban) != 0))
     tempban = tempban->next;
 
   return (tempban);
@@ -306,7 +306,7 @@ FindException(struct Channel *cptr, char *mask)
     return ((struct Exception *) NULL);
 
   tempe = cptr->exceptlist;
-  while (tempe && (strcasecmp(tempe->mask, mask) != 0))
+  while (tempe && (irccmp(tempe->mask, mask) != 0))
     tempe = tempe->next;
 
   return (tempe);
@@ -330,7 +330,7 @@ struct InviteException *FindInviteException(struct Channel *cptr, char
     return NULL;
 
   tempinvex = cptr->inviteexceptlist;
-  while (tempinvex && (strcasecmp(tempinvex->mask, mask) != 0))
+  while (tempinvex && (irccmp(tempinvex->mask, mask) != 0))
     tempinvex = tempinvex->next;
 
   return (tempinvex);
@@ -1707,7 +1707,7 @@ struct ChannelGecosBan * FindGecosBan(struct Channel *cptr, char *ban)
     return (NULL);
 
   tempban = cptr->firstgecosban;
-  while (tempban && (strcasecmp(tempban->mask, ban) != 0))
+  while (tempban && (irccmp(tempban->mask, ban) != 0))
     tempban = tempban->next;
 
   return (tempban);

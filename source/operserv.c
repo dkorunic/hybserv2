@@ -401,9 +401,9 @@ os_process(char *nick, char *command, int sockfd)
     return;
 
   if ((Network->flags & NET_OFF) &&
-      (strncasecmp(command, "ON", 2) != 0) &&
-      (strncasecmp(command, "REGISTER", 8) != 0) &&
-      (strncasecmp(command, "IDENTIFY", 8) != 0))
+      (ircncmp(command, "ON", 2) != 0) &&
+      (ircncmp(command, "REGISTER", 8) != 0) &&
+      (ircncmp(command, "IDENTIFY", 8) != 0))
   {
     os_notice(lptr, sockfd,
       "Services are currently \002disabled\002");
@@ -642,7 +642,7 @@ os_loaddata()
     found = 0;
     for (tempuser = UserList; tempuser; tempuser = tempuser->next)
     {
-      if (!strcasecmp(av[0], tempuser->nick))
+      if (!irccmp(av[0], tempuser->nick))
       {
         found = 1;
         if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
@@ -661,7 +661,7 @@ os_loaddata()
         }
         else
           tempuser->umodes = atol(av[1]);
-      } /* if (!strcasecmp(av[0], tempuser->nick)) */
+      } /* if (!irccmp(av[0], tempuser->nick)) */
     } /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
 
     if (!found)
@@ -721,7 +721,7 @@ GetoCommand(struct OperCommand *cmdlist, char *name)
   clength = strlen(name);
   for (cmdptr = cmdlist; cmdptr->cmd; cmdptr++)
   {
-    if (!strncasecmp(name, cmdptr->cmd, clength))
+    if (!ircncmp(name, cmdptr->cmd, clength))
     {
       if (clength == strlen(cmdptr->cmd))
       {
@@ -2147,7 +2147,7 @@ o_help(struct Luser *lptr, int ac, char **av, int sockfd)
     struct OperCommand *cptr;
 
     for (cptr = opercmds; cptr->cmd; ++cptr)
-      if (!strcasecmp(av[1], cptr->cmd))
+      if (!irccmp(av[1], cptr->cmd))
         break;
 
     if (cptr->cmd && cptr->flag)
@@ -2319,7 +2319,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
     if ((strcmp(key, "c") == 0) || (strcmp(key, "C") == 0))
     {
       ptemp = strtok((char *) NULL, "\r\n");
-      if (strncasecmp(ptemp, av[1], strlen(av[1])) != 0)
+      if (ircncmp(ptemp, av[1], strlen(av[1])) != 0)
         fputs(linetemp, fp);
     }
     else
@@ -2509,7 +2509,7 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   /* check if av[1] is already being flooded */
   for (ftmp = fprocs; ftmp; ftmp = ftmp->next)
   {
-    if (!strcasecmp(av[1], ftmp->target))
+    if (!irccmp(av[1], ftmp->target))
     {
       os_notice(lptr, sockfd,
         "Server flood already in progress for %s[%s@%s]",
@@ -2641,7 +2641,7 @@ CheckFuckoverTarget(struct Luser *fptr, char *newnick)
   prev = NULL;
   for (ftmp = fprocs; ftmp; )
   {
-    if (!strcasecmp(fptr->nick, ftmp->target))
+    if (!irccmp(fptr->nick, ftmp->target))
     {
       /* we have a match - kill the process id */
       killret = kill(ftmp->pid, SIGKILL);
@@ -2755,19 +2755,19 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-ops", alen))
+    if (!ircncmp(av[cnt], "-ops", alen))
       ops = 1;
-    else if (!strncasecmp(av[cnt], "-nonops", alen))
+    else if (!ircncmp(av[cnt], "-nonops", alen))
       ops = 2;
-    else if (!strncasecmp(av[cnt], "-clones", alen))
+    else if (!ircncmp(av[cnt], "-clones", alen))
       clones = 1;
-    else if (!strncasecmp(av[cnt], "-kill", alen))
+    else if (!ircncmp(av[cnt], "-kill", alen))
       kill = 1;
-    else if (!strncasecmp(av[cnt], "-long", alen))
+    else if (!ircncmp(av[cnt], "-long", alen))
       showlong = 1;
-    else if (!strncasecmp(av[cnt], "-nolimit", alen))
+    else if (!ircncmp(av[cnt], "-nolimit", alen))
       nolimit = 1;
-    else if (!strncasecmp(av[cnt], "-info", alen))
+    else if (!ircncmp(av[cnt], "-info", alen))
     {
     #ifndef STATSERVICES
       os_notice(lptr, sockfd, "Stat Services are not enabled");
@@ -2776,7 +2776,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
       showinfo = 1;
     }
-    else if (!strncasecmp(av[cnt], "-realname", alen))
+    else if (!ircncmp(av[cnt], "-realname", alen))
     {
       if (++cnt >= ac)
       {
@@ -2785,7 +2785,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
       }
       realname = av[cnt];
     }
-    else if (!strncasecmp(av[cnt], "-server", alen))
+    else if (!ircncmp(av[cnt], "-server", alen))
     {
       if (++cnt >= ac)
       {
@@ -2800,7 +2800,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
         return;
       }
     }
-    else if (!strncasecmp(av[cnt], "-msg", alen))
+    else if (!ircncmp(av[cnt], "-msg", alen))
     {
       if (++cnt >= ac)
       {
@@ -3304,9 +3304,9 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-nolimit", alen))
+    if (!ircncmp(av[cnt], "-nolimit", alen))
       nolimit = 1;
-    if (!strncasecmp(av[cnt], "-minimum", alen))
+    if (!ircncmp(av[cnt], "-minimum", alen))
     {
       cnt++;
       if (cnt >= ac)
@@ -3317,7 +3317,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
 
       min = atoi(av[cnt]);
     }
-    else if (!strncasecmp(av[cnt], "-maximum", alen))
+    else if (!ircncmp(av[cnt], "-maximum", alen))
     {
       ++cnt;
       if (cnt >= ac)
@@ -3328,7 +3328,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
 
       max = atoi(av[cnt]);
     }
-    else if (!strncasecmp(av[cnt], "-banmatch", alen))
+    else if (!ircncmp(av[cnt], "-banmatch", alen))
     {
       cnt++;
       if (cnt >= ac)
@@ -3339,7 +3339,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
 
       banmatch = av[cnt];
     }
-    else if (!strncasecmp(av[cnt], "-exmatch", alen))
+    else if (!ircncmp(av[cnt], "-exmatch", alen))
     {
       cnt++;
       if (cnt >= ac)
@@ -3843,11 +3843,11 @@ o_save(struct Luser *lptr, int ac, char **av, int sockfd)
     for (ii = 1; ii < ac; ii++)
     {
       alen = strlen(av[ii]);
-      if (!strncasecmp(av[ii], "-dbs", alen))
+      if (!ircncmp(av[ii], "-dbs", alen))
         savedbs = 1;
-      else if (!strncasecmp(av[ii], "-sets", alen))
+      else if (!ircncmp(av[ii], "-sets", alen))
         savesets = 1;
-      else if (!strncasecmp(av[ii], "-all", alen))
+      else if (!ircncmp(av[ii], "-all", alen))
         savedbs = savesets = 1;
     }
   }
@@ -3951,7 +3951,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
-  if (!strncasecmp(av[1], "list", strlen(av[1])))
+  if (!ircncmp(av[1], "list", strlen(av[1])))
   {
     o_RecordCommand(sockfd,
       "SET LIST");
@@ -5333,15 +5333,15 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   for (cnt = 1; cnt < ac; cnt++)
   {
     alen = strlen(av[cnt]);
-    if (!strncasecmp(av[cnt], "-nonopers", alen))
+    if (!ircncmp(av[cnt], "-nonopers", alen))
       nonopers = 1;
-    else if (!strncasecmp(av[cnt], "-ops", alen))
+    else if (!ircncmp(av[cnt], "-ops", alen))
       ops = 1;
-    else if (!strncasecmp(av[cnt], "-nonops", alen))
+    else if (!ircncmp(av[cnt], "-nonops", alen))
       nonops = 1;
-    else if (!strncasecmp(av[cnt], "-voices", alen))
+    else if (!ircncmp(av[cnt], "-voices", alen))
       voices = 1;
-    else if (!strncasecmp(av[cnt], "-nonvoices", alen))
+    else if (!ircncmp(av[cnt], "-nonvoices", alen))
       nonvoices = 1;
     else
     {
@@ -5932,7 +5932,7 @@ o_umode(struct Luser *lptr, int ac, char **av, int sockfd)
   newmodes = userptr->umodes;
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
   {
-    if (!strcasecmp(userptr->nick, tempuser->nick))
+    if (!irccmp(userptr->nick, tempuser->nick))
       tempuser->umodes = newmodes;
   }
 

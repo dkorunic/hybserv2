@@ -218,7 +218,7 @@ ms_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -246,7 +246,7 @@ ms_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp(keyword, "TEXT", 4))
+      if (!ircncmp(keyword, "TEXT", 4))
       {
         struct Memo *memoptr;
 
@@ -261,7 +261,7 @@ ms_loaddata()
         AddMemo(mi, memoptr);
       }
 
-    } /* if (!strncasecmp("->", keyword, 2)) */
+    } /* if (!ircncmp("->", keyword, 2)) */
     else
     {
       if (mi)
@@ -651,7 +651,7 @@ FindMemoList(char *name)
   hashv = MSHashMemo(name);
   for (mi = memolist[hashv]; mi; mi = mi->next)
   {
-    if (!strcasecmp(mi->name, name))
+    if (!irccmp(mi->name, name))
       return (mi);
   }
 
@@ -1123,7 +1123,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1186,7 +1186,7 @@ m_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     struct Command *cptr;
 
     for (cptr = memocmds; cptr->cmd; cptr++)
-      if (!strcasecmp(av[1], cptr->cmd))
+      if (!irccmp(av[1], cptr->cmd))
         break;
 
     if (cptr->cmd)
@@ -1287,7 +1287,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1395,7 +1395,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if ((index < 0) || (index > mi->memocnt) || 
-      (!index && (strcasecmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
+      (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",
@@ -1469,7 +1469,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   index = IsNum(av[1]);
   if ((index < 0) || (index > from->memocnt) || 
-      (!index && (strcasecmp(av[1], "ALL") != 0)))
+      (!index && (irccmp(av[1], "ALL") != 0)))
   {
     notice(n_MemoServ, lptr->nick,
       "[\002%s\002] is an invalid index",

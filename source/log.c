@@ -144,7 +144,7 @@ CheckLogs(time_t unixtime)
      */
     while ((dirp = readdir(dp)))
     {
-      if (!strncasecmp(dirp->d_name, tmplog, len))
+      if (!ircncmp(dirp->d_name, tmplog, len))
       {
         ++lmatches;
 

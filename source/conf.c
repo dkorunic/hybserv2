@@ -593,7 +593,7 @@ ParseConf(char *filename, int rehash)
         char *start, *end;
         char *filename;
 
-        if (!strncasecmp(line, ".include", 8))
+        if (!ircncmp(line, ".include", 8))
         {
           /*
            * It is a .include statement - meaning they
@@ -634,7 +634,7 @@ ParseConf(char *filename, int rehash)
            * configuration file
            */
           ParseConf(filename, 0);
-        } /* if (!strncasecmp(line, ".include", 8)) */
+        } /* if (!ircncmp(line, ".include", 8)) */
 
         break;
       } /* case '.' */
@@ -770,7 +770,7 @@ IsChannel(char *chan)
   struct Chanlist *tempchan;
 
   for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
-    if (!strcasecmp(tempchan->name, chan))
+    if (!irccmp(tempchan->name, chan))
       return(tempchan);
 
   return (NULL);
@@ -800,7 +800,7 @@ IsServLine(char *name, char *port)
 
   for (tempserv = ServList; tempserv; tempserv = tempserv->next)
     if ((tempserv->port == portnum) &&
-        (!strcasecmp(tempserv->hostname, name)))
+        (!irccmp(tempserv->hostname, name)))
       return (tempserv);
 
   return (NULL);
@@ -892,7 +892,7 @@ IsBot(char *bname)
     return (NULL);
 
   tempbot = BotList;
-  while (tempbot && (strcasecmp(tempbot->name, bname) != 0))
+  while (tempbot && (irccmp(tempbot->name, bname) != 0))
     tempbot = tempbot->next;
 
   return (tempbot);
@@ -1287,9 +1287,9 @@ AddPort(int port, char *host, char *type)
   {
     ptr->type = 0;
 
-    if (!strcasecmp(type, "TCM"))
+    if (!irccmp(type, "TCM"))
       ptr->type = PRT_TCM;
-    if (!strcasecmp(type, "USERS"))
+    if (!irccmp(type, "USERS"))
       ptr->type = PRT_USERS;
 
     if (!ptr->type)
@@ -1732,7 +1732,7 @@ GetUser(int nickonly, char *nickname, char *user, char *host)
 
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
   {
-    if (!strcasecmp(tempuser->nick, nickname))
+    if (!irccmp(tempuser->nick, nickname))
     {
       if (nickonly && (!user && !host))
       {

@@ -133,7 +133,7 @@ FindClient(const char *name)
    * Got the bucket, now search the chain.
    */
   for (tempuser = (struct Luser *)temphash->list; tempuser; tempuser = tempuser->hnext)
-    if (!strcasecmp(name, tempuser->nick))
+    if (!irccmp(name, tempuser->nick))
       return(tempuser);
 
   return ((struct Luser *) NULL);
@@ -198,10 +198,10 @@ CloneMatch(struct Luser *user1, struct Luser *user2)
   else
     username2 = user2->username;
 
-  if (strcasecmp(username1, username2) != 0)
+  if (irccmp(username1, username2) != 0)
     return 0;
 
-  if (strcasecmp(user1->hostname, user2->hostname) != 0)
+  if (irccmp(user1->hostname, user2->hostname) != 0)
     return 0;
 
   /* both the usernames and hostnames match - must be a clone */
@@ -1259,7 +1259,7 @@ FindChannel(const char *name)
   temphash = &channelTable[hashv];
 
   for (tempchan = (struct Channel *)temphash->list; tempchan; tempchan = tempchan->hnext)
-    if (!strcasecmp(name, tempchan->name))
+    if (!irccmp(name, tempchan->name))
       return (tempchan);
 
   return ((struct Channel *) NULL);
@@ -1311,7 +1311,7 @@ FindServer(const char *name)
       tempserv->hnext)
   {
     /*
-     * This has to be a match() instead of strcasecmp()
+     * This has to be a match() instead of irccmp()
      * because the N: for HybServ on the hub server may have
      * hostmask stripping, in which case the hub server would
      * appear like *.hub.net

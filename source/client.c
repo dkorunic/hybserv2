@@ -668,8 +668,8 @@ IsNickCollide(struct Luser *servptr, char **av)
     else
       user = av[5];
 
-    sameuh = (!strcasecmp(user, servptr->username) &&
-              !strcasecmp(av[6], servptr->hostname));
+    sameuh = (!irccmp(user, servptr->username) &&
+              !irccmp(av[6], servptr->hostname));
 
     if (newts > servptr->since)
     {

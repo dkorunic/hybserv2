@@ -2,7 +2,7 @@
 # $Id$
 
 CC = @CC@
-CFLAGS = @CFLAGS@
+CFLAGS = -pipe @CFLAGS@
 LDFLAGS = @LDFLAGS@
 #LDFLAGS = -L../libString @LDFLAGS@
 INCLUDE = -I. -I../include

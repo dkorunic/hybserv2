@@ -497,7 +497,7 @@ FindDirective(char *directive)
     return (NULL);
 
   for (tmp = directives; tmp->name; tmp++)
-    if (!strcasecmp(directive, tmp->name))
+    if (!irccmp(directive, tmp->name))
       return (tmp);
 
   return (NULL);

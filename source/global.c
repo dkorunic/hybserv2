@@ -148,7 +148,7 @@ g_help(struct Luser *lptr, int ac, char **av)
     struct Command *cptr;
 
     for (cptr = globalcmds; cptr->cmd; ++cptr)
-      if (!strcasecmp(av[1], cptr->cmd))
+      if (!irccmp(av[1], cptr->cmd))
         break;
 
     if (cptr->cmd)
@@ -247,13 +247,13 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-all", alen))
+    if (!ircncmp(av[cnt], "-all", alen))
       all = 1;
-    else if (!strncasecmp(av[cnt], "-ops", alen))
+    else if (!ircncmp(av[cnt], "-ops", alen))
       ops = 1;
-    else if (!strncasecmp(av[cnt], "-opers", alen))
+    else if (!ircncmp(av[cnt], "-opers", alen))
       opers = 1;
-    else if (!strncasecmp(av[cnt], "-admins", alen))
+    else if (!ircncmp(av[cnt], "-admins", alen))
       admins = 1;
     else
     {
@@ -304,7 +304,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     if (FindService(tempuser))
       continue;
 
-    if (!strncasecmp(Me.name, tempuser->server->name, 
+    if (!ircncmp(Me.name, tempuser->server->name, 
         strlen(tempuser->server->name)))
       continue;
 
@@ -388,7 +388,7 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
   {
     alen = strlen(av[cnt]);
 
-    if (!strncasecmp(av[cnt], "-mask", alen))
+    if (!ircncmp(av[cnt], "-mask", alen))
     {
       if (++cnt >= ac)
       {

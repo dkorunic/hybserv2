@@ -346,7 +346,7 @@ ns_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -372,7 +372,7 @@ ns_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp(keyword, "PASS", 4))
+      if (!ircncmp(keyword, "PASS", 4))
       {
         if (!nptr->password)
           nptr->password = MyStrdup(av[1]);
@@ -386,11 +386,11 @@ ns_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp(keyword, "HOST", 4) && !islink)
+      else if (!ircncmp(keyword, "HOST", 4) && !islink)
       {
         AddHostToNick(av[1], nptr);
       }
-      else if (!strncasecmp(keyword, "EMAIL", 5))
+      else if (!ircncmp(keyword, "EMAIL", 5))
       {
         if (!nptr->email)
           nptr->email = MyStrdup(av[1]);
@@ -404,7 +404,7 @@ ns_loaddata()
             ret = -1;
         }
       }
-      else if (!strncasecmp(keyword, "URL", 3))
+      else if (!ircncmp(keyword, "URL", 3))
       {
         if (!nptr->url)
           nptr->url = MyStrdup(av[1]);
@@ -418,7 +418,7 @@ ns_loaddata()
             ret = -1;
         }
       }
-      else if (LastSeenInfo && !strncasecmp(keyword, "LASTUH", 6))
+      else if (LastSeenInfo && !ircncmp(keyword, "LASTUH", 6))
       {
         if (!nptr->lastu && !nptr->lasth)
         {
@@ -435,7 +435,7 @@ ns_loaddata()
             ret = -1;
         }
       }
-      else if (LastSeenInfo && !strncasecmp(keyword, "LASTQMSG", 6))
+      else if (LastSeenInfo && !ircncmp(keyword, "LASTQMSG", 6))
       {
         if (!nptr->lastqmsg)
           nptr->lastqmsg = MyStrdup(av[1] + 1);
@@ -452,7 +452,7 @@ ns_loaddata()
 
     #ifdef LINKED_NICKNAMES
 
-      else if (!strncasecmp(keyword, "LINK", 4))
+      else if (!ircncmp(keyword, "LINK", 4))
       {
         if (!nptr->master)
         {
@@ -515,7 +515,7 @@ ns_loaddata()
 
     #endif /* LINKED_NICKNAMES */
 
-    } /* if (!strncasecmp("->", keyword, 2)) */
+    } /* if (!ircncmp("->", keyword, 2)) */
     else
     {
       if (nptr)
@@ -1250,7 +1250,7 @@ FindNick(char *nickname)
 
   hashv = NSHashNick(nickname);
   for (nptr = nicklist[hashv]; nptr; nptr = nptr->next)
-    if (!strcasecmp(nptr->nick, nickname))
+    if (!irccmp(nptr->nick, nickname))
       return (nptr);
 
   return (NULL);
@@ -1845,15 +1845,15 @@ n_help(struct Luser *lptr, int ac, char **av)
       ircsprintf(str, "%s %s", av[1], av[2]);
     else
     {
-      if ((!strcasecmp(av[1], "ACCESS")) ||
-          (!strcasecmp(av[1], "SET")))
+      if ((!irccmp(av[1], "ACCESS")) ||
+          (!irccmp(av[1], "SET")))
         ircsprintf(str, "%s index", av[1]);
       else
       {
         struct Command *cptr;
 
         for (cptr = nickcmds; cptr->cmd; cptr++)
-          if (!strcasecmp(av[1], cptr->cmd))
+          if (!irccmp(av[1], cptr->cmd))
             break;
 
         if (cptr->cmd)
@@ -3029,7 +3029,7 @@ n_set_kill(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags &= ~NS_KILLIMMED;
     if (AllowKillProtection)
@@ -3044,7 +3044,7 @@ n_set_kill(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~(NS_PROTECTED | NS_KILLIMMED);
     notice(n_NickServ, lptr->nick,
@@ -3052,7 +3052,7 @@ n_set_kill(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "IMMED"))
+  if (!irccmp(av[2], "IMMED"))
   {
     if (AllowKillImmed)
     {
@@ -3103,7 +3103,7 @@ n_set_automask(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_AUTOMASK;
     notice(n_NickServ, lptr->nick,
@@ -3111,7 +3111,7 @@ n_set_automask(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_AUTOMASK;
     notice(n_NickServ, lptr->nick,
@@ -3152,7 +3152,7 @@ n_set_private(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_PRIVATE;
     notice(n_NickServ, lptr->nick,
@@ -3160,7 +3160,7 @@ n_set_private(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_PRIVATE;
     notice(n_NickServ, lptr->nick,
@@ -3200,7 +3200,7 @@ n_set_oper(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     if (!IsOperator(lptr))
     {
@@ -3228,7 +3228,7 @@ n_set_oper(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     RecordCommand("%s: %s!%s@%s SET OPER OFF",
       n_NickServ,
@@ -3275,7 +3275,7 @@ n_set_secure(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_SECURE;
     notice(n_NickServ, lptr->nick,
@@ -3283,7 +3283,7 @@ n_set_secure(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_SECURE;
     notice(n_NickServ, lptr->nick,
@@ -3324,7 +3324,7 @@ n_set_unsecure(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_UNSECURE;
     notice(n_NickServ, lptr->nick,
@@ -3332,7 +3332,7 @@ n_set_unsecure(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_UNSECURE;
     notice(n_NickServ, lptr->nick,
@@ -3373,7 +3373,7 @@ n_set_memos(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_MEMOS;
     notice(n_NickServ, lptr->nick,
@@ -3381,7 +3381,7 @@ n_set_memos(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_MEMOS;
     notice(n_NickServ, lptr->nick,
@@ -3422,7 +3422,7 @@ n_set_notify(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_MEMONOTIFY;
     notice(n_NickServ, lptr->nick,
@@ -3430,7 +3430,7 @@ n_set_notify(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_MEMONOTIFY;
     notice(n_NickServ, lptr->nick,
@@ -3471,7 +3471,7 @@ n_set_signon(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "ON"))
+  if (!irccmp(av[2], "ON"))
   {
     nptr->flags |= NS_MEMOSIGNON;
     notice(n_NickServ, lptr->nick,
@@ -3479,7 +3479,7 @@ n_set_signon(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[2], "OFF"))
+  if (!irccmp(av[2], "OFF"))
   {
     nptr->flags &= ~NS_MEMOSIGNON;
     notice(n_NickServ, lptr->nick,
@@ -3530,27 +3530,27 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
   }
 
   flag = 0;
-  if (!strncasecmp(av[2], "ALL", strlen(av[2])))
+  if (!ircncmp(av[2], "ALL", strlen(av[2])))
   {
     flag = NS_HIDEALL;
     strcpy(str, "Hide Info");
   }
-  else if (!strncasecmp(av[2], "EMAIL", strlen(av[2])))
+  else if (!ircncmp(av[2], "EMAIL", strlen(av[2])))
   {
     flag = NS_HIDEEMAIL;
     strcpy(str, "Hide Email");
   }
-  else if (!strncasecmp(av[2], "URL", strlen(av[2])))
+  else if (!ircncmp(av[2], "URL", strlen(av[2])))
   {
     flag = NS_HIDEURL;
     strcpy(str, "Hide Url");
   }
-  else if (!strncasecmp(av[2], "QUIT", strlen(av[2])))
+  else if (!ircncmp(av[2], "QUIT", strlen(av[2])))
   {
     flag = NS_HIDEQUIT;
     strcpy(str, "Hide Quit");
   }
-  else if (!strncasecmp(av[2], "ADDR", strlen(av[2])))
+  else if (!ircncmp(av[2], "ADDR", strlen(av[2])))
   {
     flag = NS_HIDEADDR;
     strcpy(str, "Hide Address");
@@ -3573,7 +3573,7 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "ON"))
+  if (!irccmp(av[3], "ON"))
   {
     nptr->flags |= flag;
     notice(n_NickServ, lptr->nick,
@@ -3582,7 +3582,7 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  if (!strcasecmp(av[3], "OFF"))
+  if (!irccmp(av[3], "OFF"))
   {
     nptr->flags &= ~flag;
     notice(n_NickServ, lptr->nick,
@@ -3668,7 +3668,7 @@ n_set_email(struct Luser *lptr, int ac, char **av)
   if (nptr->email)
     MyFree(nptr->email);
 
-  if (!strcasecmp(av[2], "-"))
+  if (!irccmp(av[2], "-"))
   {
     nptr->email = NULL;
     notice(n_NickServ, lptr->nick,
@@ -3713,7 +3713,7 @@ n_set_url(struct Luser *lptr, int ac, char **av)
   if (nptr->url)
     MyFree(nptr->url);
 
-  if (!strcasecmp(av[2], "-"))
+  if (!irccmp(av[2], "-"))
   {
     nptr->url = NULL;
     notice(n_NickServ, lptr->nick,
@@ -4174,7 +4174,7 @@ n_link(struct Luser *lptr, int ac, char **av)
       target->nick);
     badlink = 1;
   }
-  else if (!strcasecmp(target->nick, lptr->nick))
+  else if (!irccmp(target->nick, lptr->nick))
   {
     notice(n_NickServ, lptr->nick,
       "You cannot link to your current nickname");
@@ -4739,13 +4739,13 @@ n_collide(struct Luser *lptr, int ac, char **av)
 
   for (cnt = 1; cnt < ac; cnt++)
   {
-    if (!strncasecmp(av[cnt], "-list", strlen(av[cnt])))
+    if (!ircncmp(av[cnt], "-list", strlen(av[cnt])))
       list = 1;
-    else if (!strncasecmp(av[cnt], "-halt", strlen(av[cnt])))
+    else if (!ircncmp(av[cnt], "-halt", strlen(av[cnt])))
       halt = 1;
-    else if (!strncasecmp(av[cnt], "-set", strlen(av[cnt])))
+    else if (!ircncmp(av[cnt], "-set", strlen(av[cnt])))
       set = 1;
-    else if (!strncasecmp(av[cnt], "-setnow", strlen(av[cnt])))
+    else if (!ircncmp(av[cnt], "-setnow", strlen(av[cnt])))
       setnow = 1;
     else
     {
@@ -4954,19 +4954,19 @@ n_flag(struct Luser *lptr, int ac, char **av)
    */
   for (ii = 2; ii < ac; ++ii)
   {
-    if (!strncasecmp(av[ii], "-noregister", strlen(av[ii])))
+    if (!ircncmp(av[ii], "-noregister", strlen(av[ii])))
     {
       nptr->flags |= NS_NOREGISTER;
       strcat(buf, "NoRegister, ");
       strcat(pstr, "-noregister ");
     }
-    else if (!strncasecmp(av[ii], "-nochanops", strlen(av[ii])))
+    else if (!ircncmp(av[ii], "-nochanops", strlen(av[ii])))
     {
       nptr->flags |= NS_NOCHANOPS;
       strcat(buf, "NoChannelOps, ");
       strcat(pstr, "-nochanops ");
     }
-    else if (!strncasecmp(av[ii], "-clear", strlen(av[ii])))
+    else if (!ircncmp(av[ii], "-clear", strlen(av[ii])))
     {
       nptr->flags &= ~(NS_NOREGISTER | NS_NOCHANOPS);
       notice(n_NickServ, lptr->nick,

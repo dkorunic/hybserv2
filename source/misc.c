@@ -712,7 +712,7 @@ GetService(char *name)
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
   {
-    if (!strcasecmp(name, *(sptr->name)))
+    if (!irccmp(name, *(sptr->name)))
       return (*(sptr->lptr));
   }
 
@@ -851,7 +851,7 @@ IsInNickArray(int nickcnt, char **nicks, char *nickname)
     if (!ntmp)
       continue;
 
-    if (!strcasecmp(ntmp, nickname))
+    if (!irccmp(ntmp, nickname))
       return (1);
   }
 
@@ -919,7 +919,7 @@ GetCommand(struct Command *cmdlist, char *name)
   clength = strlen(name);
   for (cmdptr = cmdlist; cmdptr->cmd; cmdptr++)
   {
-    if (!strncasecmp(name, cmdptr->cmd, clength))
+    if (!ircncmp(name, cmdptr->cmd, clength))
     {
       if (clength == strlen(cmdptr->cmd))
       {

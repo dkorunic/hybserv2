@@ -87,58 +87,6 @@ if test ! "$enable_threads" = "no"; then
 fi
 AC_SUBST(LIBP)
 
-dnl Add support for sfio stdio library
-hold_libs=$LIBS
-hold_cflags=$CFLAGS
-AC_ARG_WITH(sfio-lib, [  --with-sfio-lib=DIR     Directory containing sfio library], LIBS="${LIBS} -L${withval}")
-hold_libs2=$LIBS
-AC_ARG_WITH(sfio-inc, [  --with-sfio-inc=DIR     Directory containing sfio include files], CFLAGS="${CFLAGS} -I${withval}")
-dnl non-multithread sfio
-if test "x${LIBP}" = "x"; then
-  LIBS="${LIBS} -lsfio"
-  AC_CHECK_LIB(stdio, fprintf, _sfio=yes, _sfio=no)
-  if test "$_sfio" = "no";
-  then
-    CFLAGS=$hold_cflags
-    LIBS=$hold_libs
-  else
-    LIBS="$hold_libs2 -lstdio -lsfio"                                           
-  fi
-else
-dnl multithread sfio
-  LIBS="${LIBS} -lsfio-mt"
-  AC_CHECK_LIB(stdio-mt, fprintf, _sfio=yes, _sfio=no)
-  if test "$_sfio" = "no";
-  then
-    CFLAGS=$hold_cflags
-    LIBS=$hold_libs
-  else
-    LIBS="$hold_libs2 -lstdio-mt -lsfio-mt"
-  fi
-fi
-
-dnl Add support for libhoard
-if test ! "$enable_threads" = "no"; then
-  dnl OK, multithreaded environment
-  hold_libs=$LIBS
-  AC_ARG_WITH(hoard-lib, [  --with-hoard-lib=DIR    Directory containing hoard library], LIBS="${LIBS} -L${withval}")
-  dnl add -lrt for Solaris
-  if test -n "$_SunOS"; then
-    LIBS="${LIBS} -lrt"
-  fi
-  hold_libs2=$LIBS
-  LIBS="${LIBS} ${LIBP}"
-  AC_CHECK_LIB(hoard, malloc, _hoard=yes, _hoard=no)
-  if test "$_hoard" = "yes";
-  then
-    dnl Hoard found, proceed
-    LIBS="$hold_libs2 -lhoard"
-  else
-    dnl restore LIBS since there is no libhoard
-    LIBS=$hold_libs
-  fi
-fi
-
 dnl Use sed to grab the version from Makefile.in
 VERSION_MAJOR=`sed -n -e 's/VERSION_MAJOR = *\(.*\)$/\1/p' Makefile.in`
 

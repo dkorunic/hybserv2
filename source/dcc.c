@@ -1046,12 +1046,12 @@ onctcp(char *nick, char *target, char *msg)
   if (!lptr)
     return;
 
-  if (!strncasecmp(msg, "ACTION", 6))
+  if (!ircncmp(msg, "ACTION", 6))
     return; /* don't log ctcp actions */
 
   memset(temp, 0, MAXLINE);
 
-  if (strncasecmp(msg, "PING", 4) == 0)
+  if (ircncmp(msg, "PING", 4) == 0)
   {
     notice(target, nick, msg - 1);
     SendUmode(OPERUMODE_Y,
@@ -1063,7 +1063,7 @@ onctcp(char *nick, char *target, char *msg)
     return;
   }
 
-  if (strncasecmp(msg, "VERSION", 7) == 0)
+  if (ircncmp(msg, "VERSION", 7) == 0)
   {
 #ifdef ADMININFO
     struct Luser *ouser = NULL;    
@@ -1097,13 +1097,13 @@ onctcp(char *nick, char *target, char *msg)
     return;
   }
 
-  if (strncasecmp(msg, "DCC CHAT", 8) == 0)
+  if (ircncmp(msg, "DCC CHAT", 8) == 0)
   {
     int acnt;
     char **av;
     char buff[MAXLINE];
 
-    if (strcasecmp(target, n_OperServ) != 0)
+    if (irccmp(target, n_OperServ) != 0)
       return; /* only let n_OperServ accept dcc chats */
 
     goodDCC = 1;
@@ -1345,7 +1345,7 @@ LinkBots()
       for (dccptr = connections; dccptr; dccptr = dccptr->next)
       {
         if ((dccptr->flags & SOCK_TCMBOT) &&
-            (!strcasecmp(dccptr->nick, bptr->name)))
+            (!irccmp(dccptr->nick, bptr->name)))
         {
           /* bot is already linked */
           goodlink = 0;
@@ -1661,7 +1661,7 @@ GetBot(char *bname)
 
   for (botptr = connections; botptr; botptr = botptr->next)
     if ((botptr->flags & SOCK_TCMBOT) &&
-        (!strcasecmp(botptr->nick, bname)))
+        (!irccmp(botptr->nick, bname)))
       return(botptr);
 
   return (NULL);
@@ -1709,7 +1709,7 @@ IsOnDcc(char *nick)
         (tmp->flags & SOCK_NEEDID))
       continue;
 
-    if (!strcasecmp(tmp->nick, nick))
+    if (!irccmp(tmp->nick, nick))
       return (tmp);
   }
 
@@ -1761,7 +1761,7 @@ DccGetUser(struct DccUser *dccptr)
      * has already failed. Otherwise UserA would incorrectly
      * get UserB's privileges.
      */
-    if (strcasecmp(dccptr->nick, userptr->nick) != 0)
+    if (irccmp(dccptr->nick, userptr->nick) != 0)
       userptr = GetUser(1, dccptr->nick, (char *) NULL, (char *) NULL);
   }
 
@@ -1974,9 +1974,9 @@ DccProcess(struct DccUser *dccptr, char *command)
       clength++;
     }
 
-    if ((!strncasecmp(command, "REGISTER", clength)) ||
-        (!strncasecmp(command, "IDENTIFY", clength)) ||
-        (!strncasecmp(command, "HELP", clength)))
+    if ((!ircncmp(command, "REGISTER", clength)) ||
+        (!ircncmp(command, "IDENTIFY", clength)) ||
+        (!ircncmp(command, "HELP", clength)))
       os_process(dccptr->nick, command, dccptr->socket);
     else
       writesocket(dccptr->socket, "You must identify first\n");
@@ -2047,7 +2047,7 @@ BotProcess(struct DccUser *botptr, char *line)
         tcmnick = strtok((char *) NULL, " ");
         password = strtok((char *) NULL, "\r\n");
 
-        if (!mynick || (strcasecmp(mynick, n_OperServ) != 0))
+        if (!mynick || (irccmp(mynick, n_OperServ) != 0))
         {
           SendUmode(OPERUMODE_B,
             "*** Invalid myname on tcm connection attempt from %s@%s:%d",
@@ -2058,7 +2058,7 @@ BotProcess(struct DccUser *botptr, char *line)
           break;
         }
   
-        if (!tcmnick || (strcasecmp(tcmnick, bptr->name) != 0))
+        if (!tcmnick || (irccmp(tcmnick, bptr->name) != 0))
         {
           SendUmode(OPERUMODE_B,
             "*** Invalid bot name specified on tcm connection attempt from %s@%s:%d",
@@ -2069,7 +2069,7 @@ BotProcess(struct DccUser *botptr, char *line)
           break;
         }
 
-        if (!password || (strcasecmp(password, bptr->password) != 0))
+        if (!password || (irccmp(password, bptr->password) != 0))
         {
           SendUmode(OPERUMODE_B,
             "*** Invalid password specified on tcm connection attempt from %s@%s:%d",

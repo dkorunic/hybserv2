@@ -187,7 +187,7 @@ ss_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /* 
        * check if there are enough args
@@ -203,7 +203,7 @@ ss_loaddata()
       }
 
       keyword = av[0] + 2;
-      if (!strncasecmp(keyword, "USERS", 5))
+      if (!ircncmp(keyword, "USERS", 5))
       {
         if (Network->TotalUsers <= atol(av[1]))
         {
@@ -211,7 +211,7 @@ ss_loaddata()
           Network->MaxUsers_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "OPERS", 5))
+      else if (!ircncmp(keyword, "OPERS", 5))
       {
         if (Network->TotalOperators <= atol(av[1]))
         {
@@ -219,7 +219,7 @@ ss_loaddata()
           Network->MaxOperators_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "CHANS", 5))
+      else if (!ircncmp(keyword, "CHANS", 5))
       {
         if (Network->TotalChannels <= atol(av[1]))
         {
@@ -227,7 +227,7 @@ ss_loaddata()
           Network->MaxChannels_ts = atol(av[2]);
         }
       }
-      else if (!strncasecmp(keyword, "SERVS", 5))
+      else if (!ircncmp(keyword, "SERVS", 5))
       {
         if (Network->TotalServers <= atol(av[1]))
         {
@@ -361,7 +361,7 @@ FindHost(char *hostname)
   hashv = HashUhost(hostname);
 
   for (tmp = hostTable[hashv].list; tmp; tmp = tmp->hnext)
-    if (!(tmp->flags & SS_DOMAIN) && (!strcasecmp(tmp->hostname, hostname)))
+    if (!(tmp->flags & SS_DOMAIN) && (!irccmp(tmp->hostname, hostname)))
       return (tmp);
 
   return (NULL);
@@ -385,7 +385,7 @@ FindDomain(char *domain)
   hashv = HashUhost(domain);
 
   for (tmp = hostTable[hashv].list; tmp; tmp = tmp->hnext)
-    if ((tmp->flags & SS_DOMAIN) && (!strcasecmp(tmp->hostname, domain)))
+    if ((tmp->flags & SS_DOMAIN) && (!irccmp(tmp->hostname, domain)))
       return (tmp);
 
   return (NULL);
@@ -701,7 +701,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
   {
     alen = strlen(av[ii]);
 
-    if (!strncasecmp(av[ii], "-maxusers", alen))
+    if (!ircncmp(av[ii], "-maxusers", alen))
     {
       if (++ii >= ac)
       {
@@ -712,7 +712,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
       maxusers = atoi(av[ii]);
     }
-    else if (!strncasecmp(av[ii], "-minusers", alen))
+    else if (!ircncmp(av[ii], "-minusers", alen))
     {
       if (++ii >= ac)
       {
@@ -723,9 +723,9 @@ ss_server(struct Luser *lptr, int ac, char **av)
 
       minusers = atoi(av[ii]);
     }
-    else if (!strncasecmp(av[ii], "-info", alen))
+    else if (!ircncmp(av[ii], "-info", alen))
       info = 1;
-    else if (!strncasecmp(av[ii], "-hub", alen))
+    else if (!ircncmp(av[ii], "-hub", alen))
     {
       if (++ii >= ac)
       {
@@ -1160,7 +1160,7 @@ ss_help(struct Luser *lptr, int ac, char **av)
     struct Command *sptr;
 
     for (sptr = statcmds; sptr->cmd; sptr++)
-      if (!strcasecmp(av[1], sptr->cmd))
+      if (!irccmp(av[1], sptr->cmd))
         break;
 
     if (sptr->cmd)
@@ -1237,11 +1237,11 @@ ss_clearstats(struct Luser *lptr, int ac, char **av)
   {
     for (ii = 1; ii < ac; ii++)
     {
-      if (!strncasecmp(av[ii], "-domain", strlen(av[ii])))
+      if (!ircncmp(av[ii], "-domain", strlen(av[ii])))
         domain = 1;
-      else if (!strncasecmp(av[ii], "-host", strlen(av[ii])))
+      else if (!ircncmp(av[ii], "-host", strlen(av[ii])))
         host = 1;
-      else if (!strncasecmp(av[ii], "-all", strlen(av[ii])))
+      else if (!ircncmp(av[ii], "-all", strlen(av[ii])))
         host = domain = 1;
     }
   }

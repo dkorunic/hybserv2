@@ -169,7 +169,7 @@ es_loaddata()
       continue;
     }
 
-    if (!strncasecmp("->", av[0], 2))
+    if (!ircncmp("->", av[0], 2))
     {
       /*
        * check if there are enough args
@@ -185,11 +185,11 @@ es_loaddata()
       }
 
       keyword = av[0] + 2; type = 0;
-      if (!strncasecmp(keyword, "QUIT", 4))
+      if (!ircncmp(keyword, "QUIT", 4))
       {
         type = 1;
       }
-      else if (!strncasecmp(keyword, "NICK", 4))
+      else if (!ircncmp(keyword, "NICK", 4))
       {
         type = 2;
       }
@@ -395,7 +395,7 @@ es_seennick(struct Luser *lptr, int ac, char **av)
   }
 
   for (seen = seenp; seen; seen = seen->prev) {
-    if (!strcasecmp(seen->nick, av[1])) {
+    if (!irccmp(seen->nick, av[1])) {
       seen->seen = saved;
       saved = seen;      
     }
@@ -435,7 +435,7 @@ es_help(struct Luser *lptr, int ac, char **av)
     struct Command *sptr;
 
     for (sptr = seencmds; sptr->cmd; sptr++)
-      if (!strcasecmp(av[1], sptr->cmd))
+      if (!irccmp(av[1], sptr->cmd))
         break;
 
     if (sptr->cmd)

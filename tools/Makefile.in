@@ -2,11 +2,10 @@
 # $Id$
 
 CC = @CC@
-CFLAGS = @CFLAGS@
+CFLAGS = -pipe @CFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDE = -I../include
 # DEFS =
-# Link with pthread because of sfio. Yes, this is ugly cludge
 LIBS = @LIBS@
 
 RM = @RM@ -f

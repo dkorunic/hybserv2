@@ -55,7 +55,7 @@ cd "$BackupDir"
 # Use echo here to take the \n characters out of the ls output
 # and replace them with spaces. This probably isn't the best
 # way to do it :-/
-directories="`echo $(ls)`"
+directories="`echo *`"
 
 for backdir in $directories; do
 

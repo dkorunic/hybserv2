@@ -72,9 +72,10 @@ main(int argc, char *argv[])
 {
 #ifndef DEBUGMODE
   int pid; /* pid of this process */
-#else
+#endif /* DEBUGMODE */
+#if defined GIMMECORE || defined DEBUGMODE
   struct rlimit rlim; /* resource limits -kre */
-#endif
+#endif /* GIMMECORE || DEBUGMODE */
   FILE *pidfile; /* to write our pid */
   uid_t uid, /* real user id */
         euid; /* effective user id */
@@ -103,13 +104,14 @@ main(int argc, char *argv[])
     , __DATE__, __TIME__
 #endif
     );
-  if (uname(&un)!=-1)
+  if (uname(&un) != -1)
   {
     fprintf(stderr, "Running on: %s %s\n", un.sysname,
       un.release);
   }
   else
-    fprintf(stderr, "Running on: *unknown*\n");
+    /* Blah. It ignored uname(), then pretend to be funny :-) -kre */
+    fprintf(stderr, "Running on: computer, probably :-)\n");
 
   /*
    * Load SETPATH (settings.conf) - this must be done
@@ -227,44 +229,40 @@ main(int argc, char *argv[])
     SetupVirtualHost();
 
 #ifndef DEBUGMODE
-
   pid = fork();
   if (pid == (-1))
   {
     printf("Unable to fork(), exiting.\n");
-    exit(0);
+    exit(1);
   }
   if (pid != 0)
   {
-    printf("Running in background (pid: %d)\n\n", pid);
+    printf("Running in background (pid: %d)\n", pid);
     exit(0);
   }
 
   /* Make current process session leader -kre */
   setsid(); 
-
 #else
+  printf("Entering foreground debug mode\n"
+#endif /* DEBUGMODE */
 
-  printf("Entering debug mode\nSetting corefile limit... ");
+#if defined GIMMECORE || defined DEBUGMODE
+  printf("Setting corefile limit... ");
   /* Set corefilesize to maximum - therefore we ensure that core will be
    * generated, no matter of shell limits -kre */
   getrlimit(RLIMIT_CORE, &rlim);
-  rlim.rlim_cur=rlim.rlim_max;
+  rlim.rlim_cur = rlim.rlim_max;
   setrlimit(RLIMIT_CORE, &rlim);
   printf("done.\n");
+#endif /* GIMMECORE || DEBUGMODE */
 
-#endif /* !DEBUGMODE */
-
-
-  /*
-   * Signals must be set up after fork(), since the parent
-   * exits
-   */
+  /* Signals must be set up after fork(), since the parent exits */
   InitSignals();
 
   srandom(time(NULL)+getpid());
 
-  /* write our pid to a file */
+  /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)
     putlog(LOG1, "Unable to open %s", PidFile);
   else

@@ -73,8 +73,11 @@ static int DefaultAccess[] = {
   5,           /* CA_CMDVOICE */
   5,           /* CA_ACCESS */
   5,           /* CA_CMDINVITE */
+#ifdef HYBRID7
+  /* Default access for halfop and cmdhalfop -Janos */
   8,           /* CA_AUTOHALFOP */
   8,           /* CA_CMDHALFOP */
+#endif /* HYBRID7 */
   10,          /* CA_AUTOOP */
   10,          /* CA_CMDOP */
   10,          /* CA_CMDUNBAN */
@@ -166,7 +169,7 @@ static struct Command chancmds[] = {
   { "OP", c_op, LVL_IDENT },
 #ifdef HYBRID7
   { "HALFOP", c_hop, LVL_IDENT },
-#endif
+#endif /* HYBRID7 */
   { "VOICE", c_voice, LVL_IDENT },
   { "UNBAN", c_unban, LVL_IDENT },
   { "INFO", c_info, LVL_NONE },
@@ -236,7 +239,7 @@ static struct Command clearcmds[] = {
 #ifdef HYBRID7
   /* Allow clear halfops for hybrid7, too -Janos */
   { "HALFOPS", c_clear_hops, LVL_NONE },
-#endif
+#endif /* HYBRID7 */
   { "VOICES", c_clear_voices, LVL_NONE },
   { "MODES", c_clear_modes, LVL_NONE },
   { "BANS", c_clear_bans, LVL_NONE },
@@ -260,8 +263,11 @@ static AccessInfo accessinfo[] = {
   { CA_CMDVOICE, "CMDVOICE", "Use of command VOICE" },
   { CA_ACCESS, "ACCESS", "Allow ACCESS modification" },
   { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
+#ifdef HYBRID7
+  /* Halfop help indices -Janos */
   { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
   { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
+#endif /* HYBRID7 */
   { CA_AUTOOP, "AUTOOP", "Automatic op" },
   { CA_CMDOP, "CMDOP", "Use of comand OP" },
   { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },
@@ -1247,7 +1253,8 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
      *
      * Modifications to be sure all fits in linebuf of ircd. -kre
      * However +ins supports topic burst -Janos
-     * It won't help if topiclen > ircdbuflen :-) -kre
+     * It won't help if topiclen > ircdbuflen, that was original bug.
+     * Anyway, it is dealt with c_topic() code, too. :-) -kre
      */
     toserv(":%s SJOIN %ld %s + :@%s\n",
       Me.name,

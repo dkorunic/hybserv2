@@ -45,26 +45,19 @@ CHMOD = @CHMOD@
 CHOWN = @CHOWN@ -R
 LS = @LS@ -l
 
-INSTALL=@INSTALL@
-INSTALL_DATA=@INSTALL_DATA@
-INSTALL_BIN=${INSTALL} -m 755
-INSTALL_SECURE=${INSTALL} -m 600
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_BIN = ${INSTALL} -m 755
+INSTALL_SECURE = ${INSTALL} -m 600
 
 # Executable programs
-BINPROGS = \
- cleandb\
- encryptconf\
- encryptdb\
- mkpasswd\
- servchk
+BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk
 
 # Secure configuration files (mode 600)
-SECUREFILES = hybserv.conf\
-              settings.conf
+SECUREFILES = hybserv.conf settings.conf
 
 # General configuration files
-CONFFILES = motd.dcc\
-            motd.global
+CONFFILES = motd.dcc motd.global
 
 # File containing HPath variable
 HPATHFIX = settings.conf
@@ -180,8 +173,14 @@ install-help:
 	@echo
 
 upgrade-chan:
-  @grep -v ALVL $(CONFDIR)/chan.db > $(CONFDIR)/chan.db.$$
-  @mv $(CONFDIR)/chan.db.$$ $(CONFDIR)/chan.db
+	@if test ! "x`egrep '^#define.*HYBRID7' include/config.h`" = "x"; then \
+		if test "x`grep ALVL $(CONFDIR)/chan.db | head -1 | awk '{print NF}'`" = "x14"; then \
+			echo "You have turned on HYBRID7 support"; \
+			echo "but you have old style chan.db - converting it"; \
+			grep -v ALVL $(CONFDIR)/chan.db > $(CONFDIR)/chan.db.$$; \
+			mv $(CONFDIR)/chan.db.$$ $(CONFDIR)/chan.db; \
+		fi \
+	fi
 
 autoconf:
 	autoconf autoconf/configure.in > configure

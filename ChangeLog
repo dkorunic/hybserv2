@@ -1,3 +1,13 @@
+*** 20030210_1 by kreator
+- rev to rc2
+- fix urls
+- fix n_chanserv -> n_nickserv mistake in chanserv.c
+- fix gline7 
+- add preliminary svsnick support
+- fix servernotices and set privmsg on
+- killchan update
+
+
 *** 20030129_1 by kreator
 - rev to rc1
 - NICKLEN to 18, it makes a day easier for me :-) and evades a ton of

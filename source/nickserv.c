@@ -1141,20 +1141,13 @@ CheckNick(char *nickname)
           */
         putlog(LOG1, 
           "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
-          n_NickServ,
-          lptr->nick,
-          lptr->username,
-          lptr->hostname);
+          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
         SendUmode(OPERUMODE_S,
           "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
-          n_NickServ,
-          lptr->nick,
-          lptr->username,
-          lptr->hostname);
+          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
         collide(lptr->nick);
-
         nptr->collide_ts = 0;
       }
     }
@@ -1346,7 +1339,7 @@ collide(char *nick)
   struct NickInfo *nptr;
   char **av, sendstr[MAXLINE];
 
-  if( !SafeConnect )
+  if(!SafeConnect)
      return;
 
   if (!(lptr = FindClient(nick)))
@@ -1366,10 +1359,7 @@ collide(char *nick)
    * kill since most clients are -k
    */
   toserv("KILL %s :%s!%s (Nickname Enforcement)\n%s",
-    lptr->nick,
-    Me.name,
-    n_NickServ,
-    sendstr);
+    lptr->nick, Me.name, n_NickServ, sendstr);
 
   /* erase the old user */
   DeleteClient(lptr);
@@ -1453,23 +1443,16 @@ CollisionCheck(time_t unixtime)
              */
             putlog(LOG1, 
               "%s: killing %s!%s@%s (Nickname Enforcement)",
-              n_NickServ,
-              lptr->nick,
-              lptr->username,
-              lptr->hostname);
+              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
             SendUmode(OPERUMODE_S,
               "%s: killing %s!%s@%s (Nickname Enforcement)",
-              n_NickServ,
-              lptr->nick,
-              lptr->username,
-              lptr->hostname);
+              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
             /*
              * kill the nick and replace with a pseudo nick
              */
             collide(lptr->nick);
-
             nptr->collide_ts = 0;
           }
         }
@@ -1479,7 +1462,7 @@ CollisionCheck(time_t unixtime)
            * User must have changed their nick or QUIT -
            * remove the collide
            */
-          nptr->flags &= ~NS_COLLIDE;
+          nptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
           nptr->collide_ts = 0;
         }
       } /* if (nptr->flags & NS_COLLIDE) */

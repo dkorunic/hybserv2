@@ -6,6 +6,8 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) seems it is possible that nickname stays ghosted more than necessary if
+   nick QUITs
 *) send all mlock modes on channel creation
 *) trace possible leaks
    NOTE: I've prepared some parts of code for trace -kre

@@ -1,3 +1,9 @@
+*** 20010401_1 by kreator
+Fixed nasty bug in DccConnectHost(): in FreeBSD gethostbyname() does not
+resolve IP-s, especially IPv4 addresses that are not in dot notation.
+Some TODO stuff.
+
+
 *** 20010327_1 by kreator
 Document more TODO entries.
 

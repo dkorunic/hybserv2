@@ -1,3 +1,7 @@
+*** 20010501_5 by kreator
+- oops, ADMININFO had splitted string that should not be like it
+
+
 *** 20010501_4 by kreator
 - fix small typo reported by Janos - Administrators should be
   Administrator in VERSION reply

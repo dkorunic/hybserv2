@@ -1559,8 +1559,9 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
     /* replace nick with a fake user */
     ircsprintf(sendstr,
-      "NICK %s 1 %ld +i juped juped.com %s :%s\n",
-      av[1], (long) CurrTime, Me.name, reason);
+      "NICK %s 1 %ld +i %s %s %s :%s\n",
+      av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME,
+      Me.name, reason);
     toserv(sendstr);
     SplitBuf(sendstr, &arv);
     AddClient(arv);

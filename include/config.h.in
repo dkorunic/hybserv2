@@ -321,6 +321,15 @@
 
 #undef    JUPEVOTES
 
+/*
+ * Define these to the username and the hostname that you want juped
+ * nicks to be introduced with.  This may be extended later to just be
+ * the defaults, and be able to specify the user@host on the .jupe line.
+ */
+
+#define   JUPED_USERNAME "juped"
+#define   JUPED_HOSTNAME "juped.com"
+
 #endif /* ALLOW_JUPES */
 
 /*

@@ -226,14 +226,14 @@ CheckJuped(char *name)
         /* its a nick jupe, not a server jupe */
 
         /* collide the nickname */
-        ircsprintf(sendstr, "NICK %s 1 %ld +i juped juped.com %s :%s\n",
+        ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
             tempjupe->name,
         #ifdef NICKSERVICES
           (long) (lptr->nick_ts - 1),
         #else
           (long) (lptr->since - 1),
         #endif
-          Me.name,
+          JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
           tempjupe->reason ? tempjupe->reason : "Jupitered Nickname");
         toserv(sendstr);
 
@@ -315,9 +315,9 @@ InitJupes()
     if (tmpjupe->isnick)
     {
       /* collide the nickname */
-      ircsprintf(sendstr, "NICK %s 1 1 +i juped juped.com %s :%s\n",
-          tmpjupe->name, Me.name, tmpjupe->reason ? tmpjupe->reason :
-          "Jupitered Nickname");
+      ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
+          tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+          tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
       toserv(sendstr);
 
       SplitBuf(sendstr, &av);

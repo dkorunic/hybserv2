@@ -884,7 +884,7 @@ SaveSettings()
         case PARAM_STRING:
         {
           /* Try to write out string only if non-null, ie is set -kre */
-          if (*(char *)dptr->param[ii].ptr)
+          if (*(char **)dptr->param[ii].ptr)
           {
             sprintf(tmp, "\"%s\" ",
               *(char **) dptr->param[ii].ptr);

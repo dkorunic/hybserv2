@@ -68,13 +68,13 @@ static struct AutoKick *OnAkickList(struct ChanInfo *, char *);
 static int DefaultAccess[] = {
   -1,          /* CA_AUTODEOP */
   5,           /* CA_AUTOVOICE */
-  5,           /* CA_CMDVOICE */
+  8,           /* CA_CMDVOICE */
   5,           /* CA_ACCESS */
   5,           /* CA_CMDINVITE */
 #ifdef HYBRID7
   /* Default access for halfop and cmdhalfop -Janos */
   8,           /* CA_AUTOHALFOP */
-  8,           /* CA_CMDHALFOP */
+  10,           /* CA_CMDHALFOP */
 #endif /* HYBRID7 */
   10,          /* CA_AUTOOP */
   10,          /* CA_CMDOP */

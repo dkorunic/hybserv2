@@ -5194,6 +5194,8 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
             continue;
           if (match(host, gptr->hostname))
             cnt = 0;
+          else
+            continue;
         }
             
         if (gptr->expires)

@@ -1,3 +1,7 @@
+*** 20011128_1 by kreator
+- rename finddouble into finddupe
+
+
 *** 20011125_8 by kreator
 - and another set of GetMaster() patches
 

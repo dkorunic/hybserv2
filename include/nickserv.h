@@ -91,7 +91,7 @@ struct NickInfo
 
   char *gsm;                 /* GSM number */
   char *phone;               /* Phone */
-  long UIN;                  /* ICQ UIN */
+  char *UIN;                 /* ICQ UIN */
 
   char *lastu;               /* last seen username */
   char *lasth;               /* last seen hostname */

@@ -701,7 +701,7 @@ WriteNicks()
         fprintf(fp, "->PHONE %s\n", nptr->phone);
 
       if (nptr->UIN)
-        fprintf(fp, "->UIN %ld\n", (long) nptr->UIN);
+        fprintf(fp, "->UIN %s\n", nptr->UIN);
 
       if (LastSeenInfo)
       {
@@ -770,7 +770,7 @@ WriteNicks()
         fprintf(fp, "->PHONE %s\n", nptr->phone);
 
       if (nptr->UIN)
-        fprintf(fp, "->UIN %ld\n", (long) nptr->UIN);
+        fprintf(fp, "->UIN %s\n", nptr->UIN);
 
       if (LastSeenInfo)
       {

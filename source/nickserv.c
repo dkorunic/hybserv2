@@ -454,7 +454,16 @@ g first)",
       }
       else if (!ircncmp(keyword, "UIN", 3))
       {
-        nptr->UIN = atoi(av[1]);
+        if (!nptr->UIN)
+          nptr->UIN = MyStrdup(av[1]);
+        else
+        {
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple UIN lines (usin
+g first)",
+            NickServDB, cnt, nptr->nick);
+          if (ret > 0)
+            ret = -1;
+        }
       }
       else if (LastSeenInfo && !ircncmp(keyword, "LASTUH", 6))
       {
@@ -3771,33 +3780,34 @@ static void n_set_uin(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr;
 
-  if (!(nptr = GetLink(lptr->nick)))
-    return;
-
-  RecordCommand("%s: %s!%s@%s SET UIN %s", n_NickServ, lptr->nick,
-      lptr->username, lptr->hostname, (ac < 3) ? "" : StrToupper(av[2]));
-
   if (ac < 3)
   {
-    if (nptr->UIN != 0)
-      notice(n_NickServ, lptr->nick,
-        "Current ICQ UIN for you is : [\002%ld\002]", nptr->UIN);
-    else
-      notice(n_NickServ, lptr->nick, "You don't have UIN set.");
+    notice(n_NickServ, lptr->nick, "Syntax: \002SET UIN <uin|->\002");
+    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET UIN");
     return;
   }
 
-  if (strlen(av[2]) > 8)
+  if (!(nptr = FindNick(lptr->nick)))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET UIN %s",
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
+
+  if (nptr->UIN)
+    MyFree(nptr->UIN);
+
+  if (!irccmp(av[2], "-"))
   {
+    nptr->UIN = NULL;
     notice(n_NickServ, lptr->nick,
-      "Too long UIN. Maximum UIN length is 8!");
+      "Your UIN has been cleared");
     return;
   }
 
-  nptr->UIN = atoi(av[2]);
+  nptr->UIN = MyStrdup(av[2]);
 
   notice(n_NickServ, lptr->nick,
-      "Your ICQ UIN is set to : [\002%ld\002]", nptr->UIN);
+    "Your UIN has been set to [\002%s\002]", nptr->UIN);
 
 } /* n_set_uin() */
 
@@ -4185,7 +4195,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 
     if (nptr->UIN)
       notice(n_NickServ, lptr->nick,
-          "                UIN: %ld", nptr->UIN);
+          "                UIN: %s", nptr->UIN);
 
     if (nptr->gsm)
       notice(n_NickServ, lptr->nick,

@@ -2305,7 +2305,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
   {
     strcpy(linetemp, line);
     key = strtok(line, ":");
-    if ((strcmp(key, "c") == 0) || (strcmp(key, "C") == 0))
+    if (!irccmp(key, "c"))
     {
       ptemp = strtok(NULL, "\r\n");
       if (ircncmp(ptemp, av[1], strlen(av[1])) != 0)

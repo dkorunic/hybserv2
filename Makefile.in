@@ -65,11 +65,13 @@ SUBDIRS = source tools
 
 all: source tools
 	@echo "*** Begin building HybServ2 version $(VERSION) ***"
+	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Building $$i ***"; \
 		cd $$i; \
 		${MAKE} "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"; \
 		cd ..; \
+		echo; \
 	done
 	@echo "*** Done building HybServ2 version $(VERSION) ***"
 
@@ -77,11 +79,13 @@ build: all
 
 clean:
 	@echo '** Removing objects **'
+	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Cleaning $$i ***"; \
 		cd $$i; \
 		${MAKE} clean; \
 		cd ..; \
+		echo; \
 	done
 
 distclean: clean

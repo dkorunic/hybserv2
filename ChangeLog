@@ -1,3 +1,8 @@
+*** 20010422_1 by kreator
+Fixed minor bug in s_server() to correctly detect reconnecting hosts if
+SPLIT_INFO on
+
+
 *** 20010420_2 by kreator
 Fixes for nptr==nptr->master in NickServ, userdb ---> THIS has to be
   reviewed. I was tired, and commented the wrong fix..

@@ -2869,15 +2869,15 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 
 #ifdef EMPOWERADMINS_MORE
   /*
-   * If AutoOpAdmins is disabled, check if lptr is an admin and if
-   * level is AUTOOP (or AUTOVOICE) - if so, check if they are on
-   * the channel's access list for the appropriate level; if they
-   * are, they are allowed to get opped/voiced (return 1), otherwise
-   * return 0. This extra check is needed because GetAccess()
-   * will return true if lptr is an admin, regardless of
-   * AutoOpAdmins being enabled.
+   * If AutoOpAdmins is disabled, check if lptr is an admin and if level
+   * is AUTOOP (or AUTOVOICE) - if so, check if they are on the channel's
+   * access list for the appropriate level; if they are, they are allowed
+   * to get opped/voiced (return 1), otherwise return 0. This extra check
+   * is needed because GetAccess() will return true if lptr is an admin,
+   * regardless of AutoOpAdmins being enabled.
    */
-  if (!AutoOpAdmins && IsValidAdmin(lptr) && ((level == CA_AUTOOP) || (level == CA_AUTOVOICE)))
+  if (!AutoOpAdmins && IsValidAdmin(lptr) && ((level == CA_AUTOOP) ||
+        (level == CA_AUTOVOICE)))
   {
     struct ChanAccess *ca;
     char nmask[MAXLINE];
@@ -2901,8 +2901,6 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 /*
  * OnAccessList()
  * Return 1 if 'hostmask' is on cptr's access list
- * 
- * added check for master nicks, too -kre
  */
 static struct ChanAccess *OnAccessList(struct ChanInfo *cptr, char
     *hostmask, struct NickInfo *nptr)
@@ -2912,15 +2910,8 @@ static struct ChanAccess *OnAccessList(struct ChanInfo *cptr, char
   for (ca = cptr->access; ca; ca = ca->next)
   {
     if (nptr && ca->nptr)
-    {
-      /* check if both master nicks match. no need to check
-       * if ca->nptr->master is NULL -kre */
-      if (nptr->master && (nptr->master == ca->nptr->master))
-        return(ca);
-
       if (nptr == ca->nptr)
         return(ca);
-    }
 
     if (hostmask && ca->hostmask)
       if (match(ca->hostmask, hostmask))

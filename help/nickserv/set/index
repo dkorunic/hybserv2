@@ -20,6 +20,7 @@ Configures various nickname options.
     GSM        Set number of mobile phone for this user
     PHONE      Set the phone for this user
     MASTER     Reset the master nickname for your link
+    PRIVMSG    Services will either privmsg or notice you
 
 Type %b/msg %N HELP SET option%b for more information
 on a specific option.

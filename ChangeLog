@@ -1,3 +1,8 @@
+*** 20010522_1 by kreator
+- add mySQL/PostgreSQL support in TODO; hopefully someone will join us who
+  will independently work on this one
+
+
 *** 20010521_1 by kreator
 - misc statserv fix
 

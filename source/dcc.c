@@ -52,6 +52,11 @@
 #endif
 #endif
 
+/* Ugly Solaris hack -kre */
+#ifndef INADDR_NONE
+# define INADDR_NONE ((unsigned long)-1)
+#endif
+
 static int DccConnectHost(char *hostname, unsigned int port);
 static int MakeConnection(char *host, int port, struct Luser *lptr);
 static int IsAuth(struct DccUser *);

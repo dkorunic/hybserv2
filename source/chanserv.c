@@ -5612,7 +5612,8 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       lptr->nick);
 
     /* only PART if it's not in GUARD mode - toot */
-    if (!(cptr->flags & CS_GUARD))
+    /* It will PART also if AllowGuardChannel is not set -kre */
+    if (!(cptr->flags & CS_GUARD) || !AllowGuardChannel)
     {
       toserv(":%s PART %s\n",
         n_ChanServ,

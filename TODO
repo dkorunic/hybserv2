@@ -9,15 +9,11 @@ Pending bugs:
 -------------
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
-*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
-   special cases -- FIX FIX FIX THIS!
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
    NOTE2: traced problem to DeleteLink(), done some more fixes, till
           weird
-*) fix stupid bug that services +o people who match() O line, but have not
-   registered with OperServ
 *) OperServ does not completely support hybrid7 modes yet, (for example
   .channel command or SECURE)
 *) fix "services" fighting by juping offending server/services
@@ -61,6 +57,10 @@ New features:
 
 Done so far:
 ------------
+*) fix stupid bug that services +o people who match() O line, but have not
+   registered with OperServ
+*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
+   special cases -- FIX FIX FIX THIS!
 *) added a lot of features from IrcBg
 *) NEW bug in services, somehow connected with hashing code and servers -
    FindServer does not find servers -- I wonder how come no one found out

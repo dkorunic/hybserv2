@@ -653,21 +653,22 @@ WriteNicks()
 #ifdef LINKED_NICKNAMES
 
   /*
-   * We have to go through the nicklist to write out all
-   * master entries first, because the leaf entries will
-   * have a ->LINK <master nick>, so the next time the
-   * database is read, we have to make sure we can find
-   * the master nickname entry or we've got problems :-).
-   * Basically, make sure the leaf entries don't get written
-   * out before master entries. Unfortunately, we have
-   * to repeat some code here.
+   * We have to go through the nicklist to write out all master entries
+   * first, because the leaf entries will have a ->LINK <master nick>, so
+   * the next time the database is read, we have to make sure we can find
+   * the master nickname entry or we've got problems :-). Basically, make
+   * sure the leaf entries don't get written out before master entries.
+   * Unfortunately, we have to repeat some code here.
    */
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
   {
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      if (nptr->master || !nptr->nextlink)
+      if (nptr->master)
+#if 0
+        || !nptr->nextlink)
+#endif
       {
         /*
          * This is not a master nickname

@@ -55,7 +55,7 @@ CFLAGS="${CFLAGS} -I/usr/local/include"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strdup strerror vprintf snprintf strncpy)
+AC_CHECK_FUNCS(strdup strerror strncpy)
 AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_FUNCS(gethostbyname, , [AC_CHECK_LIB(nsl, gethostbyname), , LIBS="$LIBS -lnsl"])
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")

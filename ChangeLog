@@ -1,3 +1,9 @@
+*** 20010730_1 by wcampbel
+Commit a change to allow the user@host to be specified in config.h for
+juped nicks.  We may want to replace this later with a way to .jupe a
+nick with a specific user@host.  Comments?
+
+
 *** 20010717_1 by wcampbel
 Corrected a URL for CVS checkouts
 

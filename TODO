@@ -1,15 +1,12 @@
 Today's MOTD
 ------------
-Pohl's law:
-         "Nothing is so good that somebody, somewhere, will not hate it."
+"Computers will not be perfected until they can compute how much more
+ than the estimate the job will cost."
 
 
 Pending bugs:
 -------------
 *) send all mlock modes on channel creation
-*) fix "services" fighting by juping offending server/services
-   detect online services and silently drop out
-   detect services fighting
 *) trace possible leaks
    NOTE: I've prepared some parts of code for trace -kre
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
@@ -46,7 +43,6 @@ Features to come:
 *) improve block allocator
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
-*) add mySQL/PostgreSQL support for databases
 *) cvsweb
    ----> work in progress (Hwy and me)
 *) ziplinks (perhaps use servlink?)
@@ -66,6 +62,13 @@ Features to come:
 
 Done so far:
 ------------
+*) add mySQL/PostgreSQL support for databases
+   -> i'm working on this, too; currently i'm involved in libpq to be
+   specific (kre)
+*) fix "services" fighting by juping offending server/services
+   detect online services and silently drop out
+   detect services fighting
+   -> i'm working on this right now (kre)
 *) ike did flood protection, more to come soon - stay tuned :-)
 *) channel verbose stuff
 *) fixed stupid stupid stupid bug with not --fcnt

@@ -548,14 +548,15 @@ s_server(int ac, char **av)
    * have 2 cases - either this is juped server or is not. If it is,
    * ignore whole split stuff -kre */
   {
-    if ((ac==5) && !IsJupe(tempserv->name))
+    if ((ac == 5) && !IsJupe(tempserv->name))
     {
-      time_t current_ts=time(NULL);
-      tempserv->uplink=FindServer(av[0]);
-      SendUmode(OPERUMODE_Y, "Server %s has connected after %s split time",
-        av[2], timeago(tempserv->split_ts, 0));
-      tempserv->split_ts=0;
-      tempserv->connect_ts=current_ts;
+      time_t current_ts = time(NULL);
+      tempserv->uplink = FindServer(av[0] + 1);
+      SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
+          "after %s split time",
+        av[2], av[0] + 1, timeago(tempserv->split_ts, 0));
+      tempserv->split_ts = 0;
+      tempserv->connect_ts = current_ts;
     }
     return;
   }

@@ -665,14 +665,9 @@ WriteNicks()
   {
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
     {
-      if (nptr->master)
-#if 0
-        || !nptr->nextlink)
-#endif
+      if (nptr->master || !nptr->nextlink)
       {
-        /*
-         * This is not a master nickname
-         */
+        /* This is not a master nickname */
         continue;
       }
 
@@ -819,8 +814,7 @@ WriteNicks()
   rename(tempname, NickServDB);
 
   putlog(LOG3, "Wrote %s (%d registered nicknames)",
-    NickServDB,
-    ncnt);
+    NickServDB, ncnt);
 
   return (1);
 } /* WriteNicks() */

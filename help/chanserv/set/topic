@@ -1,0 +1,10 @@
+Syntax: %bSET <channel> TOPIC <topic|->%b
+
+Causes %C to set the topic on <channel> to <topic>.
+Mostly used with TOPICLOCK (%b/msg %C HELP SET TOPICLOCK%b).
+Examples:
+         %b/msg %C SET #channel TOPIC Welcome to our channel%b
+           Causes %C to set the given topic on #channel
+
+         %b/msg %C SET #channel TOPIC -%b
+           Clears the topic on #channel

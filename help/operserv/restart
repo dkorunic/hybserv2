@@ -1,0 +1,4 @@
+Syntax: %bRESTART%b
+
+Closes all dcc chat connections, and reconnects to the
+network to clear out user/channel lists

@@ -1,0 +1,4 @@
+Syntax: %bDIE [reason]%b
+
+Terminates %b%S%b with [reason]. Databases are saved
+prior to shutdown.

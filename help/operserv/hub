@@ -1,0 +1,12 @@
+Syntax: %bHUB [hub server]%b
+
+If [hub server] is given, displays a list of all the servers that
+are using [hub server] as their hub. If [hub server] is not given,
+displays a list of all current hub servers.
+Examples:
+         %bHUB irc.mainhub.com%b
+           Shows all leaf servers using irc.mainhub.com as their
+           hub.
+
+         %bHUB%b
+           Displays a list of all hub servers.

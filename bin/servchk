@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# HybServ restart cron file
+# Patrick Alken (wnder@underworld.net)
+#
+# Simply add the following line to your crontab file:
+# 0,10,20,30,40,50 * * * * /path/to/servchk >/dev/null 2>&1
+
+# Set this to the directory where hybserv is located
+hpath="/usr/local/hybserv"
+
+# Set this to the name of the pid file
+hpidfile="hybserv.pid"
+
+# Set this to the path to the configuration file
+conffile="hybserv.conf"
+
+if test -r $hpath/$hpidfile; then
+	hpid=`cat $hpath/$hpidfile`
+	if `kill -CHLD $hpid >/dev/null 2>&1`; then
+		# still running
+		exit 0
+	fi
+fi
+
+echo ""
+echo "Restarting HybServ..."
+
+if test -x $hpath/hybserv; then
+	$hpath/hybserv $conffile
+	exit 0
+fi
+
+echo "Unable to execute $hpath/hybserv"
+exit 0

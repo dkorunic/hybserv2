@@ -1,0 +1,14 @@
+Syntax: %bSET <channel> URL <url|->%b
+
+Sets the channel url to <url>.  When users perform an
+%bINFO%b on the channel, they will be informed of the
+channel's url. To clear the url use a "-" as the
+parameter.
+Alias: %bWEBSITE%b
+Examples:
+         %b/msg %C SET <channel> URL http://channel.com!%b
+           Sets the url to "http://channel.com" on
+           <channel>
+
+         %b/msg %C SET <channel> URL -%b
+           Clears the url on <channel>

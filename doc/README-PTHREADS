@@ -1,0 +1,46 @@
+ Starting with version 1.2.0, HybServ has pthread support.  Threads
+are very efficient in that one process can have several threads
+performing various tasks concurrently.  HybServ will automatically
+detect if you have pthread libraries on your system with the
+configure script, and compile accordingly.
+ If you experience problems running HybServ with pthread support
+enabled, it is possible that you do not have a thread-safe system,
+or that your pthread libraries are not compatible.  HybServ runs
+perfectly (so far) under LinuxThreads, which are shipped with glibc2,
+or can be obtained from:
+
+ftp.inria.fr/INRIA/Projects/cristal/Xavier.Leroy/linuxthreads.tar.gz
+
+ Solaris threads have also been reported to work very well
+with HybServ.
+
+ I have run HybServ with PMPthreads (Patched MIT Pthreads), and
+for the most part it works, with the exception of a few bugs.
+The major bug I have found with this distribution of pthreads
+is that the telnet service does not work at all, but mostly
+everything else is ok. PMPthreads can be obtained from:
+
+www.humanfactor.com/pthreads/mit-pthreads.html
+
+ The original MIT pthreads are very unstable (hence PMPthreads),
+and have not been developed (as far as I can tell) for quite a
+while. It is strongly recommended you do not run HybServ under
+this distribution. MIT pthreads can be obtained from:
+
+ftp://sipb.mit.edu/pub/pthreads/
+
+ If you find HybServ is crashing frequently under your
+distribution of pthreads, you should run HybServ without thread
+support.  This can be done through the following command:
+
+              ./configure --disable-threads
+              OR
+              ./configure --enable-threads=no
+
+You can then recompile HybServ, and it will not use the pthread
+libraries.
+
+** NOTE: HybServ is known not to perform well under glibc 2.1pre*,
+         therefore you may want to consider running without thread
+         support if you are not running a stable glibc2 release.
+         (Reported by GoodGuy <bmc@visi.net>)

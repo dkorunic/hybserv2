@@ -1,0 +1,8 @@
+Syntax: %bLIST <pattern>%b
+
+Lists all registered channels that match %b<pattern>%b.
+Channels that have %bSET PRIVATE%b ON, will not be
+displayed.
+
+Example: %bLIST #*bleh*%b
+           Lists all channels that contain %bbleh%b

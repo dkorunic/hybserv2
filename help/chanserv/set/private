@@ -1,0 +1,4 @@
+Syntax: %bSET <channel> PRIVATE {ON|OFF}%b
+
+When PRIVATE is enabled, the channel will not show
+up when someone does uses the %C %bLIST%b command.

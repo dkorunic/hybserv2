@@ -1,0 +1,4 @@
+Syntax: %bHELP [command]%b
+
+Displays help on [command].  If [command] not specified, a 
+list of available commands is displayed.

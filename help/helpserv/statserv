@@ -1,0 +1,4 @@
+%bSyntax: STATSERV [command]%b
+
+If [command] specified, displays help on [command], otherwise
+displays general %T help.

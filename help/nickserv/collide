@@ -1,0 +1,25 @@
+Syntax: %bCOLLIDE <pattern> [options]%b
+
+Performs various operations on the specified pattern,
+depending on which options are specified. If no
+options are given, defaults to -set.  Valid options
+are as follows:
+
+  %b-list%b   - List all matches marked for collision
+  %b-halt%b   - Halt nick collision for matches
+  %b-set%b    - Set a one minute nick collide for target
+  %b-setnow%b - Set an immediate nick collide for target
+
+Examples:
+         %b/msg %N COLLIDE lamer -set%b
+           Sets a one minute nick collide for lamer.
+           NOTE: When -set or -setnow is given, <pattern>
+                 must be a registered nickname.
+
+         %b/msg %N COLLIDE *good* -halt%b
+           Halts all nick collisions for users matching
+           *good*.
+
+         %b/msg %N COLLIDE *lame* -list%b
+           Lists all users matching *lame* who are
+           marked for a nickname collision.

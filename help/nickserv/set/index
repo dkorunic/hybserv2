@@ -1,0 +1,22 @@
+Syntax: %bSET <option> [parameters]%b
+
+Configures various nickname options.
+%bOptions:%b
+
+    KILL       Turn kill protection on or off
+    AUTOMASK   Auto add new hostmasks on %bIDENTIFY%b
+    PASSWORD   Reset your nickname password
+    OPER       Turn nickname expiration on or off
+    SECURE     Turn nickname security on or off
+    UNSECURE   Set nickname security very low
+    PRIVATE    Hide nickname information from %bLIST%bs
+    MEMOS      Allow memos sent to your nick
+    NOTIFY     Turn notification of new memos on/off
+    SIGNON     Turn notification of memos on signon on/off
+    EMAIL      Associate an email address with your nick
+    URL        Associate a url with your nick
+    HIDE       Hide information in your %bINFO%b reply
+    MASTER     Reset the master nickname for your link
+
+Type %b/msg %N HELP SET option%b for more information
+on a specific option.

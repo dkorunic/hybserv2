@@ -1,0 +1,5 @@
+Syntax: %bIDENTIFY <channel> <password>%b
+
+Identifies you as the founder for %b<channel>%b.  Many
+%C commands require that you %bIDENTIFY%b before using
+them.

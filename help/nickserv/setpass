@@ -1,0 +1,6 @@
+Syntax: %bSETPASS <nickname> <password>%b
+
+Changes %b<nickname>%b's password to %b<password>%b.
+Useful for preventing users from using a nickname,
+but not getting killed for it.
+Alias: %bCHPASS%b

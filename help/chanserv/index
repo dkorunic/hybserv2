@@ -1,0 +1,31 @@
+%b%C%b allows you to register and control various
+aspects of channels.  %C can often prevent
+malicious users from "taking over" channels by limiting
+who is allowed channel operator priviliges.  Any channel
+which is not used for two weeks, will automatically be
+cancelled.  %b%C%b's commands are listed below.
+For more information on a specific command, type
+%b/msg %C help <command>%b.
+
+    REGISTER   Register a channel
+    DROP       Cancel the registration of a channel
+    IDENTIFY   Identify yourself with your password
+    SET        Set various channel options
+    ACCESS     Modify the list of privileged users
+    AKICK      Maintain the AutoKick list
+    LEVEL      Change the level required for functions
+    LIST       Display list of channels matching a pattern
+    INFO       Display information for a channel
+    INVITE     Invite yourself to a channel
+    OP         Op yourself on a channel
+    VOICE      Voice yourself on a channel
+    UNBAN      Unban yourself on a channel
+    CLEAR      Clear various channel modes
+%+a%b* * * *
+%+aAdministrator commands:
+%+a%b%b
+%+a    FORBID     Prevent anyone from using a channel
+%+a    SETPASS    Reset a channel's founder password
+%+a    STATUS     View a user's access level on a channel
+%+a    FORGET     Prevent a channel from being registered
+%+a    NOEXPIRE   Prevent a channel from expiring

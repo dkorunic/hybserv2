@@ -1,0 +1,5 @@
+Syntax: %bAKICK <channel> LIST [mask]%b
+
+The %bAKICK LIST%b command displays the channel's
+autokick list.  If a mask is specified, only the
+entries matching the mask are displayed.

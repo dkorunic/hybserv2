@@ -1,0 +1,7 @@
+Syntax: %bFORGET <channel>%b
+
+This command basically causes %C to "forget" the existence
+of <channel>.
+When a channel is forgotten, %C will allow anyone to enter, but
+no one will be allowed to register it, or gain ops in it through
+%C.

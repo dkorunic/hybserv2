@@ -1,0 +1,15 @@
+Syntax: %bSTATS <option>%b
+
+Outputs various statistics depending on %b<option>%b.
+Options:
+   %bO%b           - Display users who have access to %O
+   %bB%b           - Display TCM bot lines
+   %bS%b           - Display server link lines
+   %bU%b           - Display current uptime
+   %bM%b           - Display memory usage
+   %bI%b           - Display restricted hostmasks
+   %bG%b           - Display active glines
+   %bJ%b           - Display active jupes
+   %bP%b           - Display port lines
+   %bC%b           - Display monitored channels
+   %b?%b           - Display SendK and RecieveK

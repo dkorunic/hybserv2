@@ -1,0 +1,6 @@
+Syntax: %bSET AUTOMASK {ON|OFF}%b
+
+This toggles auto-adding of new hostmasks ON/OFF.  If
+%bAUTOMASK%b is ON, and you %bIDENTIFY%b from an
+unknown host, the hostmask will automaticaly be added
+to your %bACCESS%b list.

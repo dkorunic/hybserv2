@@ -1,0 +1,14 @@
+Syntax: %bLEVEL <channel> SET <type|index> <newlevel>%b
+
+The %bLEVEL SET%b command changes the level required to
+execute a function for a channel.  If a user satisfies
+the criteria set by this command (ie. the access level),
+then they will be able to do the command or have the
+privilage (depending what the LEVEL your setting is for).
+To obtain a list of indices/types to use for the fourth
+arguement, type %b/msg %C LEVEL <channel> LIST%b
+
+Example:
+          %b/msg %C LEVEL #chan SET autoop 20%b
+            Changes the level required to be auto-opped
+            on #chan to 20

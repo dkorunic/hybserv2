@@ -1,0 +1,17 @@
+Syntax: %bUNLINK [nickname [password]]%b
+
+This command will unlink your nickname from your current
+link. Or, if [nickname [password]] is specified, it will
+unlink [nickname] from it's current link. When you unlink,
+the access list of the master of the link will be copied
+to your own. Memos, however, are not copied. If you are
+unlinking the master nickname, the next nickname in the
+link will become the new master.
+
+Example:
+        %b/msg %N UNLINK%b
+          Unlinks your nickname from your link.
+
+        %b/msg %N UNLINK CoolGuy CoolGuysPassword%b
+          Unlinks "CoolGuy" from whatever link he
+          was in.

@@ -1,0 +1,14 @@
+Syntax: %bRELEASE <nickname> [password]%b
+
+If %b%N%b is enforcing your nickname, as it would
+after a %bRECOVER%b or if you didn't %bIDENTIFY%b
+in time, you can use %bRELEASE%b to regain control
+of your nickname.  If you match a hostmask on
+%b<nickname>%b's %bACCESS%b list, and %b<nickname>%b's
+%bSET SECURE%b is OFF, you do not need to supply a
+password.  However, if %b<nickname>%b's %bSET SECURE%b
+is ON, you will always need to supply the correct
+password.
+%+a%b* * * *
+%+aAdministrators can %bRELEASE%b any nickname.
+%+a(%bRELEASE <nickname>%b)

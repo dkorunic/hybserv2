@@ -1,0 +1,5 @@
+Syntax: %bDEL [channel] <index|ALL>%b
+
+Mark a memo (or all memos) for deletion.  When a memo is
+marked for deletion, it will be deleted within an hour,
+unless you use %bPURGE%b first.

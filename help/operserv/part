@@ -1,0 +1,4 @@
+Syntax: %bPART <channel>%b
+
+Removes %b<channel>%b from the list of channels being 
+monitored.

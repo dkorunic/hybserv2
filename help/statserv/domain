@@ -1,0 +1,5 @@
+Syntax: %bDOMAIN <domain>%b
+
+Gives statistices for the given domain, like current
+clients/opers/unique clients etc.
+Example: %bDOMAIN blah.com%b

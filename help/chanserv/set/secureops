@@ -1,0 +1,4 @@
+Syntax: %bSET <channel> SECUREOPS {ON|OFF}%b
+
+When SECUREOPS is enabled, only users who have autoop
+status or higher on the channel will be allowed ops.

@@ -1,0 +1,4 @@
+Syntax: %bKILLHOST <hostmask> [reason]%b
+
+Kills every user on the network with the hostmask %b<hostmask>%b 
+with [reason], unless %b<hostmask>%b is protected.

@@ -1,0 +1,8 @@
+Syntax: %bFUCKOVER <nickname>%b
+
+Initiates a server flood on <nickname> by sending rfc
+codes between 200 and 512 until <nickname>'s client fails.
+Extremely effective since services can't be flooded off.
+Even if <nickname> attempts a nick change, services
+continues flooding the new nick.  Most clients fail within
+2-3 seconds.

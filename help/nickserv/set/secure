@@ -1,0 +1,13 @@
+Syntax: %bSET SECURE {ON|OFF}%b
+
+If %bSECURE%b is ON, clients that use your nickname
+will be required to %bIDENTIFY%b regardless of
+whether they match a hostmask on your %bACCESS%b
+list.  Also, if someone tries to %bRECOVER%b/%bRELEASE%b
+your nickname, they will need to supply the correct
+password regardless of matching a hostmask on your
+ACCESS list.  When %bSECURE%b is OFF, clients
+that use your nickname will not be killed, if they
+do not IDENTIFY, but they will not be allowed to
+execute %N commands without first IDENTIFY'ing.
+See: %bSET UNSECURE%b

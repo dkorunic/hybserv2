@@ -1,0 +1,5 @@
+Syntax: %bREHASH%b
+
+Rehashs configuration file so new users (O:), jupes (J:),
+glines (G:), administrative info (A:), servers (S:), and
+channels (C:) are added to %b%O%b.

@@ -1,0 +1,6 @@
+Syntax: %bFORBID <channel>%b
+
+When a channel is forbidden, noone will be allowed in
+(If someone tries to join, they will be kickbanned).
+Forbidden channels can be cancelled through the %bDROP%b
+command. (%b/msg %C HELP DROP%b)

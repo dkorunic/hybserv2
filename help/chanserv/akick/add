@@ -1,0 +1,6 @@
+Syntax: %bAKICK <channel> ADD <hostmask> [reason]%b
+
+Adds <hostmask> to the autokick list for <channel> with
+[reason].  You may not add an autokick entry that
+matches an access level higher than your own on the
+channel.

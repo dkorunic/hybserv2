@@ -1,0 +1,53 @@
+Reported by toot, happened on HybNet with older services (kre):
+#0  0x400784e1 in __kill () from /lib/libc.so.6
+#1  0x40078156 in raise (sig=6) at .. /sysdeps/posix/raise.c:27
+#2  0x40079868 in abort () at .. /sysdeps/generic/abort.c:88
+#3  0x400723ce in __assert_fail (assertion=0x8079b37 "nptr != nptr->master",
+    file=0x8079b30 "data.c", line=805, function=0x8079b25 "WriteNicks") at assert.c:59
+#4  0x80563a7 in WriteNicks () at data .c:805
+
+Weird LEVEL redefinition on all channels (kre)
+
+It is possible to delete master_nick from tree, therefore causing hybserv
+to crash - failing to find master from linked nicknames. Eventually, it
+manages to write the DB that way so it cannot boot next time. (kre)
+
+Ugly proxy-checking code (kre)
+
+[10:53:31] #SideWnder# HUB 
+-- Listing current hubs --
+[Hub Name                      ] [# servers]
+[irc.fixers.org                ] [6        ]
+[irc.starlan.com               ] [7        ]
+[irc-a.imyth.com               ] [2        ]
+[irc.exop.net                  ] [8        ]
+[irc.allvirtual.com            ] [5        ]
+[hybrid.blackened.com          ] [2        ]
+[irc.blackened.com             ] [13       ]
+-- End of list (7 hubs found) --
+
+[10:53:59] #SideWnder# HUB irc-a.imyth.com
+-- irc-a.imyth.com --
+[Leaf Name                     ] [Time Connected      ]
+[irc.risciso.com               ] [12h 2m 9s           ]
+-- End of list (1 leaf found) --
+
+^^^ leaf count is off by 1, except for services' current hub
+(blackened actually does have 13 leaves)
+
+if a channel is SecureOps and you:
+/mode #chan -o+o chanserv badnick
+^^^^badnick won't get deopped when chanserv rejoins
+(badnick does not have autoop access)
+
+test fuckover!!! -- make it use threads -- i don't htink fork() has
+access to the server fd ??
+
+test tcms
+
+<sexy> instead of level 40
+<sexy> you can rename level 40 to SuperOp
+
+** continue with connect stuff (S: lines)
+
+directive to do a /msg opers@server when clones are detected

@@ -1,0 +1,5 @@
+Syntax: %bSET <channel> GUARD {ON|OFF}%b
+
+When GUARD is enabled, %C will join and sit in your channel.
+One advantage to this is to keep your channel occupied when
+the last user leaves.

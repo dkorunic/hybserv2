@@ -1,0 +1,29 @@
+Syntax: %bIGNORE ADD <hostmask|nickname> [time]%b
+        %bIGNORE DEL <hostmask|index>%b
+        %bIGNORE LIST [mask]%b
+
+Any hostmask on the ignore list will be unable to use
+services. If [time] is specified with the ADD command,
+the hostmask will be ignored for the given time period.
+[time] may be a string of the format:
+
+  %bXwXdXhXmXs%b
+
+Examples:
+         %bIGNORE ADD *!*@*.lamers.org 1d5h
+           Ignores *!*@*.lamers.org for 1 day, 5 hours
+
+         %bIGNORE ADD lamer%b
+           Ignores user 'lamer' permanently
+
+         %bIGNORE DEL *!*@*.lamers.org%b
+           Removes ignore for *!*@*.lamers.org
+
+         %bIGNORE DEL 1%b
+           Removes the ignore index 1 from the ignorance
+           list.  Use %bIGNORE LIST%b to list all valid
+           indices.
+
+         %bIGNORE LIST *.com%b
+           Lists entries in the ignore list matching *.com.
+           (%bIGNORE LIST%b with no mask lists all entries).

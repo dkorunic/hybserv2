@@ -1,0 +1,5 @@
+Syntax: %bSET PRIVATE {ON|OFF}%b
+
+If %bPRIVATE%b is ON, your nickname will not show up when
+someone does a %bLIST%b with a pattern matching a
+hostmask on your %bACCESS%b list.

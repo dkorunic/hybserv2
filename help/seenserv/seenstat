@@ -1,0 +1,5 @@
+Syntax: %bSEENSTAT%b
+
+Gives general 'last seen' statistics, like the total number of 
+seen records, the number of QUIT records and the number of
+NICK (changing nicks) records.

@@ -1,0 +1,3 @@
+Syntax: %bSTATUS <channel> <nickname>%b
+
+Outputs the access level that <nickname> has on <channel>.

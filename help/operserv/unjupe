@@ -1,0 +1,3 @@
+Syntax: %bUNJUPE <server>%b
+
+Removes jupe on all servers matching %b<server>%b.

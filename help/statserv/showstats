@@ -1,0 +1,4 @@
+Syntax: %bSHOWSTATS%b
+
+ Displays number of registered nicknames and channels, and the
+total number of recorded memos.

@@ -1,0 +1,24 @@
+Release Notes for HybServ 1.6.0
+======= ===== === ======= =====
+
+ Some new directives have been added. Those marked with a "*"
+are required. The provided settings.conf contains more information.
+
+GlobalNick (*)  - A new service bot which performs global functions.
+                  /msg Global help for more information.
+
+DoWallops       - Have services send a wallops when operators
+                  exectute commands
+
+LogonNews       - file containing logon information for users
+
+GlobalNotices   - Allow use of Global's "GNOTE" and "GCHANNOTE"
+                  commands
+
+BCFloodCount    - Flood control for partyline broadcasts
+BCFloodTime
+
+LimitTraceKills - Disable combination of -nolimit and -kill for
+                  OperServ's "trace" command
+
+ Lots of bugs have been fixed. See the ChangeLog for more details.

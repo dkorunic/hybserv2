@@ -1,0 +1,6 @@
+Syntax: %bREPLY <index> <message>%b
+
+Sends a reply to the nick who sent you message index <index>.
+The text "[Re]:" is prepended to the reply.  You cannot
+reply to channel memos.
+Example: %bREPLY 1 Thanks for your memo man! :)%b

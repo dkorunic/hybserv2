@@ -1,0 +1,8 @@
+Syntax: %bSET <channel> TOPICLOCK {ON|OFF}%b
+
+If TOPICLOCK is ON, %C will not allow anyone
+(except founders) to change the topic on <channel>.
+The only way to change the topic with TOPICLOCK enabled
+is %b/msg %C SET <channel> TOPIC <topic>%b. Type:
+%b/msg %C HELP SET TOPIC%b for more information.
+Alias: %bTLOCK%b

@@ -1,0 +1,9 @@
+Syntax: %bJUMP <server> [port]%b
+
+Attempts to connect to <server> with [port].  <server> may
+contain wildcards. <server> *must* have an S: line in
+hybserv.conf.  If [port] is not specified, it uses the port
+given in the server's S: line.  If HybServ is unable to
+connect to <server>, it keeps the existing connection with
+the current hub.
+Alias: %bREROUTE%b

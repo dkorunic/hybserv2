@@ -1,0 +1,8 @@
+Syntax: %bREGISTER <password>%b
+
+This enables you to register your nickname with a
+password so only you can use it.  Please try to
+use obscure passwords that cannot be easily guessed.
+Passwords *ARE* case sensitive.  Once you have
+registered a nickname, you can use the %bSET%b and
+%bACCESS%b commands to configure it.

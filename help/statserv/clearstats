@@ -1,0 +1,21 @@
+Syntax: %bCLEARSTATS [options]%b
+
+This command is available for admins to clear certain
+statistics in order to free up memory or start collecting
+host/domain statistics from scratch without restarting
+services. If no [options] are given, all databases are
+cleared.
+
+Valid Options:
+
+    -host     - Clears all hostname database entries
+    -domain   - Clears all domain database entries
+    -all      - Clears all database entries (default)
+
+Examples:
+         %b/msg %T CLEARSTATS -host%b
+           Clears all hostname entries in the database.
+
+         %b/msg %T CLEARSTATS -host -domain%b
+           Clears both hostname and domain entries.
+           (Equivalent to -all).

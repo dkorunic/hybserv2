@@ -1,0 +1,8 @@
+Syntax: %bACCESS <channel> DEL <mask | index>%b
+
+The %bACCESS DEL%b command deletes all hostmasks
+matching %b<mask>%b from the access list.  If an
+index number is given instead of a hostmask, the
+corresponding hostmask is deleted.  You can get a
+list of indices from the %bACCESS LIST%b command.
+(%b/msg %C HELP ACCESS LIST%b)

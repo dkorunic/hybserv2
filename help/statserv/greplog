@@ -1,0 +1,6 @@
+Syntax: %bGREPLOG%b <service> <mask> [days]
+
+ Grep logs for specific mask.Mask must be start and end with * for
+ordinary requests.But can be used ? for wildcards too.Service is 
+one from services - NickServ, ChanServ, OperServ etc.Days are days
+for grepping, default is grep for daily log

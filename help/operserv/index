@@ -1,0 +1,43 @@
+%b%O%b allows Operators/Administrators with access, to
+maintain control on the network.
+For more information on the commands, type
+%b/msg %O HELP <command>%b
+
+    HELP       Display this screen
+    IDENTIFY   Identify with %O with your password
+%+o%b* * * *
+%+o%bOperator commands:%b
+%+o    CLONES     Display list of clones on the network
+%+g    GLINE      Prevent a user from joining the network 
+%+o    HTM        Toggle HTM on/off
+%+o    HUB        Display a hub's leaf servers
+%+j    JUPE       Prevent a server from connecting
+%+o    KILL       Disconnect a user from the network
+%+o    STATS      Display various statistics
+%+o    STATUS     Display current status
+%+o    UMODE      Set various usermodes for yourself
+%+g    UNGLINE    Remove a gline
+%+j    UNJUPE     Remove a jupe on a server
+%+a%b* * * *
+%+a%bAdministrator commands:%b
+%+a    CHANNEL    Display channels matching a pattern
+%+a    IGNORE     Prevent a user from using services
+%+a    JOIN       Monitor a channel
+%+a    JUMP       Switch hub servers
+%+a    KILLCHAN   Kill users in a channel
+%+a    KILLHOST   Kill users matching a certain host
+%+s    OMODE      Set modes on any channel
+%+a    PART       Stop monitoring a channel
+%+a    SECURE     Secure a channel
+%+a    TRACE      Display users matching a pattern
+%+s%b* * * *
+%+s%bServices Administrator commands:%b
+%+s    DIE        Shutdown services
+%+s    DUMP       Send raw data to hub server
+%+s    FUCKOVER   Activate server flood for a user
+%+s    OFF/ON     (De)activate services
+%+s    REHASH     Reload configuration file
+%+s    RELOAD     Reload nickname/channel/memo/stat databases
+%+s    RESTART    Restart services
+%+s    SAVE       Save nick/chan/memo/stat/oper databases
+%+s    SET        Set configuration options at runtime

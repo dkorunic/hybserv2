@@ -1,0 +1,32 @@
+TCM (TexasNet Connection Monitor) bot linking
+
+	First of all, you may obtain a copy of the TCM bot from
+		http://www.db.net/~db/tcm.html
+
+	A TCM bot is a program that connects to your server as a client
+and monitors clones, flooders, etc.  It must be opered in order
+to kline clones and flooders.
+	A useful feature of TCM is linking, similarly to eggdrop's linking
+feature.  I've tried to make HybServ compatible with TCM for linking
+purposes so you may connect HybServ to your TCM botnet.
+	Once you download TCM and compile it, you will need to edit it's
+user file (userlist.cf) to give HybServ access to link to it.  You will
+probably want to add both a C: and an N: line for HybServ.  For example,
+if the hostname HybServ is running on is services.us, your C: and N: 
+lines would look something like this:
+		C:services.us:HybServ:Password:6800
+		N:*services.us:HybServ:Password:OKB
+	Also, you must modify hybserv.conf to let HybServ know about the TCM
+bot(s) you wish to link.  If a TCM's host is mybot.com, your linking
+lines would look something like this:
+		B:mybot.com:TcmNick:Password:6800
+		L:*mybot.com:TcmNick:Password
+	Once you have HybServ and the TCM running with the userfiles set up,
+you can link them in one of two ways.  You can either /dcc chat HybServ
+and type ".link TcmNick", or you could /dcc chat the TCM bot, and type
+".tcmconn".  Then, hopefully the two will link.
+	If both TCM and HybServ are located on same server, you can remap
+port in either one to 6801 using DefaultTcmPort directive in HybServ
+(settings.conf) or P: directive in TCM (tcm.cf).
+	If you have any questions, or bugs to report, please email 
+wnder@underworld.net.  Thank you.

@@ -1,0 +1,38 @@
+Syntax: %bUMODE +|-<modes>%b
+
+Sets usermodes <modes> for your nickname.  %O will
+notify you (on the partyline) of various events if you
+have the corresponding usermode set.
+
+Alias: %bUSERMODE%b
+
+Valid usermodes are as follows:
+
+  %bb%b - display tcm bot related information
+  %bc%b - display clone connections
+  %bC%b - display client connections
+  %bd%b - debugging usermode - combination of all
+      other usermodes plus debugging information
+  %be%b - display clone exits
+  %bE%b - display client exits
+  %bj%b - display channel joins
+  %bk%b - display channel kicks
+  %bl%b - display server links/delinks
+  %bm%b - display channel mode changes
+  %bn%b - display nickname changes
+  %bo%b - display new operators
+  %bO%b - display operator kills
+  %bp%b - display channel parts
+  %bs%b - notify you when someone executes a command on
+      %O, %N, %C, or %T
+  %bS%b - display server kills
+  %bt%b - display channel topic changes
+  %by%b - display various important services events
+
+Examples:
+         %bUMODE +ce%b
+           Notify you whenever a clone connects or exits.
+
+         %bUMODE +cs-b%b
+           Notify you of clone connections and service nick
+           commands, but no tcm information.

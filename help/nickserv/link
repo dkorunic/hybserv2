@@ -1,0 +1,27 @@
+Syntax: %bLINK <nickname> <password>%b
+
+This command will link your current nickname to
+<nickname>, assuming you have supplied the correct
+password for <nickname>. Once you have linked nicknames,
+your %bACCESS%b list will be deleted, and you will share
+<nickname>'s access list. Your memos will also be added
+to <nickname>'s memos. If <nickname> was previously
+unlinked, it will become the master nickname for your
+link.
+
+When any nickname in your link gives a command to services,
+it will be processed as if it came from the master nickname,
+with the exception of %bDROP%b, %bUNLINK%b, %bSET PASSWORD%b,
+%bSET EMAIL%b, and %bSET URL%b.
+
+The advantage of linked nicknames is whenever you
+%bIDENTIFY%b for one nick, you will be identified for
+every nick in the link. Also, memos sent to any nickname
+will all be stored in the master nickname's record, for
+any nickname in the link to read. Furthermore, if any
+nickname in the link is on a channel's access list, all
+nicknames will receive the same access.
+
+Example:
+        %b/msg %N LINK CoolGuy CoolGuysPassword%b
+          Links your nickname to "CoolGuy".

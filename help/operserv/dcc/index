@@ -1,0 +1,19 @@
+
+User commands:
+help      identify motd     quit      who
+
+%+oOperator commands:
+%+ojupe      unjupe   gline    ungline   kill
+%+oboot      link     unlink   stats     status
+%+oclones    jump     htm      hub       umode
+%+o
+%+aAdministrator commands:
+%+achannel   join     jump     ignore    killchan
+%+akillhost  omode    part     secure    trace
+%+a
+%+sServices Administrator commands:
+%+sdie       dump     fuckover off/on    rehash
+%+sreload    restart  save     set
+Use .help <command> for specific help
+
+Please send any questions to: %A

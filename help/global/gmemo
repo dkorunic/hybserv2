@@ -1,0 +1,5 @@
+Syntax: %bGMEMO <memotext>%b
+
+Sends the memo <memotext> to all registered nicknames, regardless
+of whether they are currently accepting memos. Nickname and Memo
+services must be enabled.

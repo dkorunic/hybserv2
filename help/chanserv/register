@@ -1,0 +1,19 @@
+Syntax: %bREGISTER <channel> <password>%b
+
+Registers <channel> in %C's database.  %b<password>%b
+is needed so you may %bIDENTIFY%b at a later time to
+change channel settings.  You must be a channel operator
+on the channel you wish to register. Once you register
+a channel, you will automatically be given founder
+access, and be added to the %bACCESS%b list as a SuperOp.
+You can give other channel members limited access to
+your channel through the %bACCESS%b command (%b/msg %C%b
+%bHELP ACCESS%b)
+
+In order to register a channel, you must first register
+your nickname with %N (%b/msg %N HELP REGISTER%b).
+If the founder's nickname expires or is %bDROP%b'd, the
+channel will also be dropped.  Also, if noone on the
+channel's %bACCESS%b list enters the channel at least
+once every two weeks, the channel will be automatically
+dropped.

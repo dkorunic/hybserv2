@@ -1,0 +1,4 @@
+Syntax: %bSHOWLINK <nickname>%b
+
+Displays all the nicks that are linked to <nickname>,
+including the master nickname.

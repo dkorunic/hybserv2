@@ -1,0 +1,26 @@
+Release Notes for HybServ 1.6.1
+======= ===== === ======= =====
+
+ Some new directives have been added. Those marked with a "*"
+are required. The provided settings.conf contains more information.
+
+SeenServNick (*)  - A new service bot which provides a seen command
+                    similar to eggdrop scripts.
+                    /msg SeenServ help for more information.
+
+SeenServDB   (*)  - SeenServs database name.
+
+SeenMaxRecs  (*)  - How many records SeenServ will keep.
+
+
+ChanServ can now remove GecosBans (+d mode) from channels.  
+ChanServ also has a new channel setting called SplitOps.  When this is
+enabled ChanServ will not deop people who get ops from a netsplit, which
+can prevent mass-deops in some channels.
+
+some 'features' of EMPOWERADMINS has been moved to a new define called
+EMPOWERADMINS_MORE, see config.h for details.
+
+A jupe voting system has been introduced, also see config.h for details.
+
+ Lots of bugs have been fixed. See the ChangeLog for more details.

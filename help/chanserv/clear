@@ -1,0 +1,15 @@
+Syntax: %bCLEAR <channel> <option>%b
+
+%C will clear certain channel modes depending on
+<option>.
+
+%bOptions:%b
+
+     %bOPS%b       - Deops every channel op
+     %bVOICES%b    - Devoices every voiced user
+     %bMODES%b     - Clears all channel modes
+     %bBANS%b      - Removes all channel bans
+     %bGECOSBANS%b - Remove all channel gecos bans
+     %bUSERS%b     - Kicks all users from channel
+     %bALL%b       - Combination of %bOPS%b, %bVOICES%b, %bMODES%b,
+                     and %bBANS%b (does not kick users)

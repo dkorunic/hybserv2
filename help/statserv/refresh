@@ -1,0 +1,8 @@
+Syntax: %bREFRESH%b
+
+This command will cause services to ping all servers
+on the network, in order to update individual server
+lag information, as shown in the %bSERVER%b command.
+Normally, services performs a lag update every minute,
+but this command allows administrators to update more
+frequently.

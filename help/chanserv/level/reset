@@ -1,0 +1,15 @@
+Syntax: %bLEVEL <channel> RESET <type|index>%b
+
+The %bLEVEL RESET%b command will set the level specified
+to the default one specified by services. To obtain a
+list of types/indices to use for the fourth arguement,
+type: %b/msg %C LEVEL <channel> LIST%b.
+
+Examples:
+         %b/msg %C LEVEL #chan RESET autovoice%b
+           Resets the level required for an autovoice
+           on #chan to the default level (5)
+
+         %b/msg %C LEVEL #chan RESET all%b
+           Resets the entire access level list for
+           #chan to the default list.

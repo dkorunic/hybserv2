@@ -1,0 +1,9 @@
+Syntax: %bDROP <channel> [password]%b
+
+Cancels the registration of %b<channel>%b.  Only a
+channel founder may %bDROP%b a channel.  Also,
+the founder must %bIDENTIFY%b before using this
+command, or supply the correct channel password.
+%+a%b* * * *%b
+%+aAdministrators may drop any channel using
+%+a%bDROP <channel>%b.

@@ -1,0 +1,5 @@
+Syntax: %bDUMP <string>%b
+
+Sends a raw string to services' current hub server.
+
+Aliases: %bQUOTE%b, %bRAW%b

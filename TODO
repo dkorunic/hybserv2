@@ -1,0 +1,28 @@
+kreator
+-------
+1) crashing on /reload
+   -  done(?) - seems another Solaris goddamn bug.
+2) linked tree problems
+   - people report it has gone after 1.7.3
+3) bcflood issue
+   - done.
+4) add cidr & ranged ip's (if listening on port add tcpwrap capatibilities)
+5) trace possible leaks
+6) use btree&mmap (additionally use adns and glib)
+7) improve block allocator
+8) check older KNOWNBUGS
+   - some.
+9) get rid of proxy ch. code (or make it better :) )
+   - done. ripped out -> use tcm-hybrid for that
+10) add support for solaris threads
+    - done.
+11) trace weird SIGPIPE-s
+    - done (probably)
+12) weird level redefine on all channels 
+13) umode command (in msg)
+    - done.
+14) insert support for solaris threads
+    - done.
+16) split and autorouting
+    - done -> testing in progress.
+

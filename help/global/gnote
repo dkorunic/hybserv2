@@ -1,0 +1,18 @@
+Syntax: %bGNOTE [options] <message>%b
+
+ Sends the given message to all users who match [options].
+Alias: %bGNOTICE%b
+
+Valid Options:
+  -all        Sends message to all users (default)
+  -opers      Sends message to all IRC Operators
+  -ops        Sends message to all users with an 'o' flag
+  -admins     Sends message to all users with an 'a' flag
+
+Examples:
+         %b/msg %G GNOTE -opers -ops Hi there.%b
+           Sends the message "Hi there." to all IRC Operators
+          and users who have an 'o' flag in hybserv.conf.
+
+         %b/msg %G GNOTE -all Services going down in 10 minutes%b
+           Sends the given message to all users on the network.

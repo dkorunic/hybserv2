@@ -1,0 +1,3 @@
+ %bquit%b [message]
+  Terminates your session on the partyline with [message]
+Example: .%bquit%b Thats enough for now

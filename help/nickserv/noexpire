@@ -1,0 +1,5 @@
+Syntax: %bNOEXPIRE <nickname>%b
+
+When NOEXPIRE is used on a nickname, that nickname will
+never expire. After that, the only way to cancel the
+nickname will be to %bDROP%b it.

@@ -1,0 +1,12 @@
+Syntax: %bSET <channel> ENTRYMSG <message|->%b
+
+Sets the entry message for <channel> to <message>.  When
+users enter the channel, %C will send them the message.
+To clear the entry message use a "-" as the message.
+Alias: %bONJOIN%b
+Examples:
+         %b/msg %C SET <channel> ENTRYMSG Welcome!%b
+           Sets the entry message to "Welcome" on <channel>
+
+         %b/msg %C SET <channel> ENTRYMSG -%b
+           Clears the entry message on <channel>

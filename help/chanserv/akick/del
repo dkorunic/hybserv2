@@ -1,0 +1,8 @@
+Syntax: %bAKICK <channel> DEL <mask | index>%b
+
+The %bAKICK DEL%b command deletes all hostmasks
+matching %b<mask>%b from the autokick list.  If an
+index number is given instead of a hostmask, the
+corresponding hostmask is deleted.  You can get a
+list of indices from the %bAKICK LIST%b command.
+(%b/msg %C HELP AKICK LIST%b)

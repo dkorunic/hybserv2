@@ -1,0 +1,12 @@
+Files you will find in bin/
+
+cleandb         - Script to delete old database backups
+hybserv         - Binary executable
+hybserv.conf    - Configuration file for HybServ
+encryptconf     - Encrypts plaintext O: lines
+encryptdb       - Encrypts plaintext nickname/channel databases
+mkpasswd        - Encrypted password generating utility
+motd.dcc        - Motd file for dcc/telnet clients
+motd.global     - Motd file for global clients
+servchk         - Crontab script to restart HybServ
+settings.conf   - Configuration settings for HybServ

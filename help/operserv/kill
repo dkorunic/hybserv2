@@ -1,0 +1,3 @@
+Syntax: %bKILL <nick> [reason]%b
+
+Kills %b<nick>%b with [reason].

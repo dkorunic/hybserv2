@@ -1,0 +1,4 @@
+%bSyntax: NICKSERV [command [subcommand]]%b
+
+If [command] specified, displays help on [command], otherwise
+displays general %N help.

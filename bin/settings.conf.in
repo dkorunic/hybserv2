@@ -1,0 +1,791 @@
+# This file contains many run-time configurable options
+# for HybServ services.
+#
+# The format for this file is as follows:
+#
+# Directive Parameter1 Parameter2 ...
+#
+# Directive is the name of some feature or variable,
+# and the parameters are values you wish to specify
+# for it. The directive is case-insensitive.
+#
+# If you wish to specify a string as a parameter, you
+# may enclose it with quotation marks. This is especially
+# a good idea if the string has spaces in it:
+#
+# "Parameter string with spaces"
+# "Parameter string with \"double quotes\" in it"
+#
+# Time parameters may be specified as one integer,
+# representing the number of seconds ("3600" = 1 hour),
+# or as a combination of integers and unit specifiers:
+#  "w" = weeks
+#  "d" = days
+#  "h" = hours
+#  "m" = minutes
+#  "s" = seconds
+# Examples:
+#  "1h30m"     = 1 hour 30 minutes
+#  "2d"        = 2 days
+#  "5w1d10m5s" = 5 weeks 1 day 10 minutes 5 seconds
+#
+# Each directive is thoroughly documented, and should contain
+# one of the following to let you know if an option is
+# required:
+#
+# [REQUIRED]
+#   Indicates a required directive. Without it, services will
+#   not start.
+#
+# [RECOMMENDED]
+#   Indicates a strongly recommended directive, but omitting it
+#   will not affect the starting or running of services.
+#   Recommended options can typically be disabled by setting
+#   them to 0 (if they have a value associated with them), or
+#   commenting them out.
+#
+# [OPTIONAL]
+#   Indicates an optional directive. It is entirely up to you
+#   whether to include it or not. In most cases, commenting
+#   out the directive will disable the feature. If this is
+#   not the case, it will be explained in detail.
+#
+# [NOT RECOMMENDED]
+#   Indicates a directive which may cause ill effects if
+#   used. More information would be included in it's
+#   documentation.
+
+################################################################
+#
+# File Paths [REQUIRED]
+#
+# HPath       - Directory to locate all other files (don't modify)
+# ConfigFile  - Configuration file to use
+# LogFile     - Log file
+# PidFile     - Pid file
+# HelpPath    - Directory in which to locate help files
+# DccMotdFile - Message of the Day file for telnet/dcc clients
+# MotdFile    - Global Motd file (when client does /motd services.us)
+#
+# These two file paths are optional. If they are not specified
+# glines and/or jupes will be stored in ConfigFile.
+#
+# GlineFile   - File to store glines in
+# JupeFile    - File to store jupes in
+#
+# This file path is also optional. If not specified, no logon news
+# will be sent to users.
+#
+# LogonNews   - File containing logon news information
+# 
+################################################################
+
+HPath              "@prefix@/hybserv"
+ConfigFile         "hybserv.conf"
+LogFile            "hybserv.log"
+PidFile            "hybserv.pid"
+HelpPath           "help"
+DccMotdFile        "motd.dcc"
+MotdFile           "motd.global"
+
+GlineFile          "glines.conf"
+JupeFile           "jupes.conf"
+
+LogonNews          "logon.news"
+
+################################################################
+#
+# Services Database Files [REQUIRED]
+#
+# HybServ will attempt to locate these files in the directory
+# specified above by HPath. If the files do not exist, they
+# will be created the next time HybServ saves its databases
+# (see DatabaseSync).
+#
+# NickServDB - NickServ database
+# ChanServDB - ChanServ database
+# MemoServDB - MemoServ database
+# StatServDB - StatServ database
+# SeenServDB - SeenServ database
+# OperServDB - OperServ database
+#
+################################################################
+
+NickServDB         "nick.db"
+ChanServDB         "chan.db"
+MemoServDB         "memo.db"
+StatServDB         "stat.db"
+OperServDB         "oper.db"
+SeenServDB         "seen.db"
+
+################################################################
+#
+# Services Psuedo-Client Nicknames and Options
+#
+################################################################
+
+# ...ServNick <nickname> <ident> <description> [REQUIRED]
+#
+#  Specify the nicknames, idents, and realnames of the various
+# service bots. The first arguement is the nickname of the
+# service bot. The second is the ident that the nickname will
+# use (ie: ident@services.us). Finally, the last arguement
+# is the description (or realname) of the bot. Although you
+# may wish to disable some of these bots (which you can do in
+# config.h), you must specify all of their nicknames.
+
+OperServNick       "OperServ"  "OperServ"  "Operator Services"
+NickServNick       "NickServ"  "NickServ"  "Nickname Services"
+ChanServNick       "ChanServ"  "ChanServ"  "Channel Services"
+MemoServNick       "MemoServ"  "MemoServ"  "Memo Services"
+StatServNick       "StatServ"  "StatServ"  "Statistic Services"
+HelpServNick       "HelpServ"  "HelpServ"  "Help Services"
+GlobalNick         "Global"    "Global"    "Global Services"
+SeenServNick       "SeenServ"  "SeenServ"  "Seen Services"
+
+# ServiceUmodes <string> [REQUIRED]
+#
+#  Specifies the usermodes that will be given to service bots
+# when they are introduced to the network. They do not need
+# to be IRC Operators to perform their tasks, so I left +o
+# out, but if you wish them to be operators, insert an "o".
+
+ServiceUmodes      "+i"
+
+################################################################
+#
+# Services Security Settings
+#
+################################################################
+
+# RestrictedAccess [OPTIONAL]
+#
+#  Enabling this will prevent everyone from using services,
+# except those listed in hybserv.conf with at least "o"
+# privileges.
+
+#RestrictedAccess
+
+# AutoOpAdmins [OPTIONAL]
+#
+#  Enable this to give channel operator status to administrators
+# who enter any ChanServ-monitored channel. This feature
+# will only work if EMPOWERADMINS is defined in config.h.
+
+AutoOpAdmins
+
+# OpersHaveAccess [OPTIONAL]
+#
+#  Enable this to allow any global operator to access OperServ.
+# Any operator (who doesn't have an O: line in hybserv.conf)
+# will be given the equivalent of an "o", "j", and "g" flag,
+# but they will not be given partyline access. It is disabled
+# by default because I do not like the idea of just any
+# operator to be able to access OperServ.
+
+#OpersHaveAccess
+
+# SmartMasking [OPTIONAL]
+#
+#  Without this option, NickServ will use almost all of
+# the segments of your hostname to use for your hostmask,
+# when you enable SET AUTOMASK. This means that if you
+# have a very long hostname because of your isp, or
+# even if you have a second TLD (such as xx.xx.xx.isp.com.au),
+# your automask will be very specific: (ie: *.xx.xx.isp.com.au).
+#  However, with this option enabled, services will attempt
+# to compensate for this by detecting how long your hostname
+# is. If it detects a very long hostname, it will use only
+# the last 3 segments of your hostname for your hostmask.
+#
+#  For example, if you come from the host:
+#
+#     My.ISP.likes.to.have.very.long.hosts.com
+#
+# your hostmask would be: *.long.hosts.com with this
+# option enabled, rather than *.likes.to.have.very.long.hosts.com.
+
+SmartMasking
+
+################################################################
+#
+# Services Expire Settings
+#
+################################################################
+
+# NickNameExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time to hold an unused nickname.
+# If no one uses the nickname for this time period, NickServ
+# will automatically expire the nickname.
+#  If you disable this, nicknames will never expire.
+
+NickNameExpire     "4w"
+
+# ChannelExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time to hold an unused channel.
+# If no one on the channel access list enters the channel
+# for this time period, ChanServ will automatically expire
+# the channel.
+#  If you disable this, channels will never expire.
+
+ChannelExpire      "4w"
+
+# MemoExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time MemoServ will hold memos.
+# If you disable this, memos will never expire.
+
+MemoExpire         "3w"
+
+# StatExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time StatServ will hold
+# hostname/domain entries which have 0 current clients.
+#  If you disable this, the data will never expire.
+
+StatExpire         "1w"
+
+################################################################
+#
+# Flood Protection
+#
+################################################################
+
+# FloodProtection [RECOMMENDED]
+#
+#  Enable this to give service bots flood protection against
+# multiple messages from users.
+
+FloodProtection
+
+# FloodCount <value> [REQUIRED (if FloodProtection enabled)]
+# FloodTime <time> [REQUIRED (if FloodProtection enabled)]
+#
+#  Set these to your desired flood control settings. A client
+# will be automatically ignored if they send FloodCount messages
+# to a service bot within the amount of time given by FloodTime.
+# Default: 5 messages within 10 seconds.
+
+FloodCount         5
+FloodTime          "10s"
+
+# IgnoreTime <time> [REQUIRED (if FloodProtection enabled)]
+# IgnoreOffenses <value> [REQUIRED (if FloodProtection enabled)]
+#
+#  IgnoreTime specifies the amount of time to ignore someone
+# when they have triggered flood protection.
+#  IgnoreOffenses specifies the number of times someone can
+# trigger flood protection before being permanently ignored.
+
+IgnoreTime         "20s"
+IgnoreOffenses     5
+
+################################################################
+#
+# Clone Control
+#
+################################################################
+
+# MaxClones <value> [OPTIONAL]
+# MaxClonesWarning <string> [RECOMMENDED (if MaxClones enabled)]
+#
+#  Enable this to give clones a warning if they reach <value>.
+# Specify the warning to give in MaxClonesWarning. If
+# MaxClonesWarning is not defined, clones will not be given a
+# warning, even if they exceed <MaxClones>.
+
+MaxClones          4
+MaxClonesWarning   "Multiple clients were found matching your user@host. Clones are strictly prohibited, remove them immediately."
+
+# AutoKillClones [NOT RECOMMENDED]
+#
+#  Enable this to auto-kill clones if they exceed a value
+# greater than MaxClones. If MaxClones is disabled, this will
+# have no effect.
+#  NOTE: This feature is not recommended since it can very
+# easily generate a large amount of traffic in the case of
+# auto-reconnecting clones.
+
+#AutoKillClones
+
+################################################################
+#
+# OperServ Configuration
+#
+################################################################
+
+# MaxTrace <value> [REQUIRED]
+#
+#  Set this to the maximum number of outputs from the TRACE
+# command before the list is truncated.
+
+MaxTrace           15
+
+# MaxChannel <value> [REQUIRED]
+#
+#  Set this to the maximum number of outputs from the CHANNEL
+# command before the list is truncated.
+
+MaxChannel         15
+
+# MaxKill <value> [REQUIRED]
+#
+#  Set this to the maximum number of kills to allow KILLHOST or
+# TRACE -k to perform - to prevent huge mass kills.
+
+MaxKill            5
+
+# LimitTraceKills [OPTIONAL]
+#
+#  Enable this to disable the combination "TRACE -nolimit -kill".
+# Normally, -nolimit -kill ignores the MaxKill limit but this
+# option helps to avoid catastrophes.
+
+#LimitTraceKills
+
+# ServerNotices [OPTIONAL]
+#
+#  Enable this to have the actual server name send notices to
+# clients instead of the service bot nicknames.
+
+#ServerNotices
+
+# DoWallops [OPTIONAL]
+#
+#  Enable this to have services send a server wallops when an oper
+# executes one of the following commands:
+#  rehash, restart, die, kill, jupe, unjupe, gline, ungline,
+#  omode, secure, on, off, jump, killchan, killhost, htm
+
+DoWallops
+
+# BCFloodCount [RECOMMENDED]
+# BCFloodTime  [RECOMMENDED]
+#
+#  Enable these options to have OperServ halt partyline broadcasts
+# if BCFloodCount lines are sent to the partyline within BCFloodTime.
+# This feature is mainly directed towards large netjoins or netsplits
+# where partyline users may not wish to see all the clients and
+# servers connecting/splitting.
+# I have noticed most weird behaviour of this option on large networks,
+# therefore it should be disabled by default. I've also increased
+# bcfloodcount from 30 to 100. -kre
+
+#BCFloodCount       100
+#BCFloodTime        "5s"
+
+################################################################
+#
+# NickServ Configuration
+#
+################################################################
+
+# NSSet... [OPTIONAL]
+#
+#  These are the default nickname options that will be
+# given to newly registered nicknames.
+
+#NSSetKill
+NSSetAutoMask
+#NSSetPrivate
+NSSetSecure
+#NSSetUnSecure
+NSSetAllowMemos
+NSSetMemoSignon
+NSSetMemoNotify
+#NSSetHide
+#NSSetHideEmail
+#NSSetHideUrl
+#NSSetHideQuit
+
+# LastSeenInfo [OPTIONAL]
+#
+#  Enable this to keep track of users' last seen addresses
+# and quit messages, to display in the INFO command. This
+# feature will require a bit of memory on a fairly large
+# network.
+
+LastSeenInfo
+
+# NicknameWarn [OPTIONAL]
+#
+#  Enable this to give a warning to new users to identify
+# with their password in order to access more commands.
+# Nicknames that have kill protection will be warned
+# regardless of this option being enabled.
+
+NicknameWarn
+
+# NSReleaseTimeout <time> [OPTIONAL]
+#
+#  Set this to the amount of time to wait before releasing
+# a nickname enforcer after a nick collide. If you disable
+# this, nicknames will never be released.
+
+NSReleaseTimeout   "60s"
+
+# NickRegDelay <time> [RECOMMENDED]
+#
+#  Set this to the amount of time to wait between successive
+# uses of the register command. This prevents malicious users
+# coming on your network and registering a ton of nicknames.
+
+NickRegDelay       "30s"
+
+# MaxLinks <value> [RECOMMENDED (if Linked Nicknames enabled)]
+#
+#  Maximum number of nicknames that can be in one link. Only
+# effective if LINKED_NICKNAMES is defined in config.h.
+
+MaxLinks           20
+
+# AllowKillProtection [OPTIONAL]
+#
+# This allows users to have nickserv automatically
+# kill someone who uses thier nickname.  Even with this
+# disabled, they may still use /msg nickserv ghost/recover
+
+AllowKillProtection
+
+# AllowKillImmed [OPTIONAL]
+#
+#  Enable this to allow users to SET KILL IMMED for their
+# nicknames. When they have done this, clients who take
+# their nicknames will not be given a 1 minute delay as
+# usual to identify. They will be collided immediately.
+
+AllowKillImmed
+
+################################################################
+#
+# ChanServ Configuration
+#
+################################################################
+
+# MaxChannelsPerUser <value> [RECOMMENDED]
+#
+#  Set this to the maximum number of channels one user
+# can register. Administrators may register unlimited
+# channels.
+
+MaxChansPerUser    10
+
+# MaxAkicks <value> [RECOMMENDED]
+#
+#  Set this to the maximum number of auto-kicks a channel
+# can have at one time.
+
+MaxAkicks          20
+
+# InhabitTimeout <time> [RECOMMENDED]
+#
+#  Set this to the amount of time ChanServ will stay in
+# an empty channel (after the last user leaves).
+
+InhabitTimeout     "5m"
+
+# AllowAccessIfSOp [OPTIONAL]
+#
+#  Enable this so ChanServ won't deop anyone on a channel
+# as long as there is a SuperOp or higher opped on the
+# channel. This option only works when services first
+# connects to the network, so it won't deop entire channels
+# (since no-one has identified yet). If this feature
+# is enabled, and there is no SuperOp on the channel,
+# every non-autoop will be deoped.
+#  Disabling this feature will cause ChanServ to deop
+# every non-autoop on the channel after a netjoin.
+
+AllowAccessIfSOp
+
+# RestrictRegister [OPTIONAL]
+#
+#  Enabling this option will prevent normal users from
+# registering new channels. Only services operators
+# and administrators will be allowed to use the register
+# command. Normal users will still be allowed to enter
+# registered channels and execute commands on channels
+# they have access to.
+
+#RestrictRegister
+
+# GiveNotice [OPTIONAL]
+#
+#  Enabling this will cause ChanServ to send a notice to
+# users when they are deopped to explain why. For example,
+# if a channel has SECURE set, ChanServ will notice all
+# users it deops that the channel is secured.
+
+GiveNotice
+
+# AllowGuardChannel [OPTIONAL]
+#
+# Enabling this will ignore CS_GUARD option for any channel,
+# so Chanserv will not sit on any channel. I have found this
+# quite annoying feature, so this is how you can turn if off.
+
+#AllowGuardChannel
+
+################################################################
+#
+# MemoServ Configuration
+#
+################################################################
+
+# MaxMemos <value> [RECOMMENDED]
+#
+#  Set this to the maximum number of memos a user can have
+# at one time.
+
+MaxMemos           20
+
+# MemoPurgeFreq <time> [RECOMMENDED]
+#
+#  Set this to the amount of time between automatic deletions
+# of memos that have been marked as deleted.
+
+MemoPurgeFreq     "1h"
+
+################################################################
+#
+# StatServ Configuration
+#
+################################################################
+
+# LagDetect [OPTIONAL]
+#
+#  Enable this to have StatServ perform server pings every
+# minute in order to compile a list of ping replies from
+# all servers. This can help determine which servers are
+# badly lagged. Of course, the information could be deceiving
+# if services itself is lagged.
+#  The ping reply information can be obtained on an individual
+# server basis by using StatServ's "SERVER" command.
+#
+# NOTE: If you are on a *very* large network, you may not
+#       want StatServ pinging all servers every minute, unless
+#       of course you have an obscene amount of bandwidth :-).
+
+#LagDetect
+
+# MaxPing <time> [OPTIONAL]
+#
+#  Set this to the maximum ping time services should accept
+# from it's current hub server. If the ping reply from the hub
+# is greater than this value, services will assume the lag
+# is too great, and will attempt to switch hubs. Of course,
+# if there is only one S: line in hybserv.conf, this option
+# will have no effect.
+#  Generally, it is a good idea to try and keep services as
+# "lag-free" as possible, so it can properly handle nickname
+# and channel issues quickly. This feature makes it easier
+# to keep a decent route to the network.
+#  This feature has no effect unless "LagDetect" (above) is
+# enabled.
+
+MaxPing            "1m"
+
+################################################################
+#
+# Global Configuration
+#
+################################################################
+
+# GlobalNotices [OPTIONAL]
+#
+#  Enable this to allow administrators to send global notices
+# to all users on the network.
+
+GlobalNotices
+
+################################################################
+#
+# General Configuration
+#
+################################################################
+
+# ConnectFrequency <time> [REQUIRED]
+#
+#  Set this to the amount of time to delay before reconnecting
+# to the network after being squitted, or after the server
+# list is exhausted.
+
+ConnectFrequency   "20s"
+
+# ConnectBurst <time> [REQUIRED]
+#
+#  Set this to the amount of time after a connection to
+# a hub server, that we can assume no more initial
+# connect burst information is coming. This is needed
+# so we can tell when it is safe to start broadcasting
+# client connections to +d users, and clone detections
+# to +y users, etc. Otherwise the partyline users would
+# be flooded with hundreds of client/server/etc connections
+# every time services connects to the network.
+#  On most networks, 2 minutes should be fine. If you are
+# on a really small network, you could set this even
+# lower.
+
+ConnectBurst       "2m"
+
+# AutoLinkFreq <time> [OPTIONAL]
+#
+#  Set this to the amount of time between attempts to link
+# to tcm bots who are not already linked.
+
+AutoLinkFreq       "5m"
+
+# TelnetTimeout <time> [REQUIRED]
+#
+#  Set this to the amount of time to allow a telnet client
+# to enter their nickname and password before disconnecting
+# them.
+
+TelnetTimeout      "30s"
+
+# IdentTimeout <time> [REQUIRED]
+#
+#  Set this to the amount of time to wait for an ident reply
+# from an incoming telnet connection before giving up.
+
+IdentTimeout       "30s"
+
+# BindAttemptFreq <time> [RECOMMENDED]
+# MaxBinds <value> [REQUIRED (if BindAttemptFreq enabled)]
+#
+#  Set BindAttemptFreq to the amount of time between attempts
+# to bind P: lined ports. HybServ will give up the attempt
+# to bind the port after MaxBinds unsuccessful tries.
+
+BindAttemptFreq    "2m"
+MaxBinds           5
+
+# MaxConnections <value> [RECOMMENDED]
+#
+#  Set this to the maximum number of telnet/dcc connections
+# to allow at any one time. This includes tcm bot connections.
+#  Setting this option to 0, or commenting it out, will
+# allow as many connections as possible. It is, however,
+# recommended you control the number of connections allowed.
+
+MaxConnections     20
+
+# OpersOnlyDcc [OPTIONAL]
+#
+#  Enable this to allow only operators/administrators to use
+# the telnet/dcc service.
+# NOTE: With this option enabled, Operators must have a "d"
+#       flag in order to use the telnet/dcc service, but
+#       administrators do not.
+
+#OpersOnlyDcc
+
+# DatabaseSync <time> [REQUIRED]
+#
+#  Set this to the amount of time in between nickname, channel,
+# memo, stat, and oper database saves.
+
+DatabaseSync       "30m"
+
+# BackupFreq <time> [OPTIONAL]
+#
+#  Set this to the amount of time between backups of
+# nickname, channel, memo, stat, and oper databases. The
+# files will be backed up in HPath/backup/ and be
+# organized according to date. If you comment this option
+# out, databases will not be backed up.
+#
+# NOTE: The script bin/cleandb is provided to "beautify"
+#       the backup directory. Running this script will
+#       remove all backup directories that are one or
+#       more months old.
+
+BackupFreq         "1d"
+
+# ReloadDbsOnHup [OPTIONAL]
+#
+#  Enable this to reload databases when a SIGHUP signal
+# is received.
+# NOTE: Enabling this will cause data to be lost if the
+#       databases were not saved prior to the SIGHUP.
+
+#ReloadDbsOnHup
+
+# NonStarChars <value> [OPTIONAL]
+#
+#  Enable this to specify how many non (*,?,@,.) characters
+# operators will need to give for the GLINE command.
+# For example, a value of 3 means *.net will work, but
+# *.uk will not. A value of 4 will mean *a.bcd will work,
+# but *.bcd will not. This helps to prevent ignorant
+# operators from glining *@* *@*.com etc.
+
+NonStarChars       4
+
+# DefaultHubPort <port> [REQUIRED]
+#
+#  Set this to the default port to use for hub server
+# connections (if none is specified in the S: line).
+
+DefaultHubPort     6667
+
+# DefaultTcmPort <port> [REQUIRED]
+#
+#  Set this to the default port to use for tcm bot
+# connections (if none is specified in the B: line).
+
+DefaultTcmPort     6800
+
+# LogLevel <value> [REQUIRED]
+#
+#  Set this to the level with which you want to log events.
+#
+# Accepted levels are as follows:
+#
+# 0 - Do not log anything
+#
+# 1 - Log mostly security information
+#     (commands given by opers/admins, unauthorized DCC CHAT
+#     attempts etc).
+#
+# 2 - Same as level 1, but log server events (kills, squits etc),
+#     as well. Also, log all commands sent to Service Bots.
+#
+# 3 - Same as level 2, but log all channel activity as well
+#     (modes/kicks).
+#     NOTE: Level 3 will cause your log file to be huge if you
+#     are on a fairly big net.  It was mainly implemented
+#     to debug, but is available for those who wish to 
+#     keep track of who's doing what in channels.
+
+LogLevel           2
+
+# MaxLogs <value> [RECOMMENDED]
+#
+#  Set this to the maximum number of log files you want
+# to keep. At midnight every day, the log file will be
+# renamed to something like: hybserv.log.YYYYMMDD, and
+# a new log file will be started. After the number of log
+# files has reached MaxLogs, the oldest log file will be
+# deleted to make room for the new one.
+#  You may comment this out to never delete log files.
+
+MaxLogs            5
+
+# MaxModes <value> [REQUIRED]
+#
+#  Set this to the maximum number of modes your ircd can
+# handle at one time. Hybrid ircd allows a maximum of
+# 12 modes from a server connection.
+# NOTE: Due to a yet unfixed bug, this number must be
+#       left at 2 or lower :(
+
+MaxModes           2
+
+# MaxSeenRecs <value> [REQUIRED]
+#
+# This is how many Seen records seenserv will store
+
+SeenMaxRecs        4000

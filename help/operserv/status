@@ -1,0 +1,3 @@
+Syntax: %bSTATUS%b
+
+Displays various internal statistics for services.

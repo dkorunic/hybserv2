@@ -1,0 +1,15 @@
+%S running HybServ %b%V%b.
+
+Services available:
+   %O - Operator Services
+   %N - Nickname Services
+   %C - Channel Services
+   %M - Memo Services
+   %T - Statistic Services
+   %H - Help Services
+   %E - Seen Services
+   %G - Global Services
+
+For help, type %b/msg <service> help%b.
+
+Services Administrator: %A

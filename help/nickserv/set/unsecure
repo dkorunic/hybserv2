@@ -1,0 +1,6 @@
+Syntax: %bSET UNSECURE {ON|OFF}%b
+
+If UNSECURE is ON, clients using your nickname will not be
+required to %bIDENTIFY%b in order to execute %N
+commands, as long as they match a hostmask on your
+%bACCESS%b list. This is not recommended.

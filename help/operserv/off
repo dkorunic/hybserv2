@@ -1,0 +1,6 @@
+Syntax: %bOFF%b
+
+Deactivates services but does not terminate them.  The
+only commands %b%O%b accepts in OFF mode are %bON%b and
+%bIDENTIFY%b.
+Aliases: %bSHUTDOWN%b, %bDISABLE%b

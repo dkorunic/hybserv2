@@ -1,0 +1,14 @@
+Syntax: %bUNBAN <channel> [ALL]%b
+
+Unbans every ban matching your user@host on <channel>.
+If you specify ALL, every ban on <channel> will be
+cleared.  You must have SuperOp access to <channel> to
+use the ALL option.
+Examples:
+         %b/msg %C UNBAN #channel%b
+            Clears every ban on #channel matching your
+            hostmask
+
+         %b/msg %C UNBAN #channel ALL%b
+            Clears every ban on #channel. (Must be
+            SuperOp on #channel).

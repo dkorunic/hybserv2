@@ -1,0 +1,191 @@
+alloc.o: alloc.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/client.h ../include/log.h ../include/misc.h \
+ ../include/server.h
+channel.o: channel.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/conf.h ../include/dcc.h ../include/flood.h \
+ ../include/log.h ../include/match.h ../include/misc.h \
+ ../include/mystring.h ../include/operserv.h ../include/settings.h \
+ ../include/sock.h ../include/Strn.h
+chanserv.o: chanserv.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/conf.h ../include/dcc.h ../include/err.h \
+ ../include/helpserv.h ../include/log.h ../include/match.h \
+ ../include/memoserv.h ../include/misc.h ../include/mystring.h \
+ ../include/nickserv.h ../include/operserv.h ../include/server.h \
+ ../include/settings.h ../include/sock.h ../include/Strn.h \
+ ../include/timestr.h
+client.o: client.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/dcc.h ../include/gline.h ../include/match.h \
+ ../include/misc.h ../include/nickserv.h ../include/operserv.h \
+ ../include/conf.h ../include/server.h ../include/settings.h \
+ ../include/statserv.h ../include/Strn.h
+conf.o: conf.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/client.h ../include/conf.h ../include/data.h \
+ ../include/dcc.h ../include/gline.h ../include/hash.h \
+ ../include/jupe.h ../include/log.h ../include/match.h \
+ ../include/misc.h ../include/operserv.h ../include/settings.h \
+ ../include/sock.h ../include/Strn.h
+data.o: data.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/conf.h ../include/data.h ../include/log.h \
+ ../include/match.h ../include/memoserv.h ../include/nickserv.h \
+ ../include/settings.h ../include/seenserv.h ../include/misc.h
+dcc.o: dcc.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/conf.h ../include/dcc.h ../include/defs.h \
+ ../include/flood.h ../include/hash.h ../include/log.h \
+ ../include/match.h ../include/misc.h ../include/mystring.h \
+ ../include/operserv.h ../include/server.h ../include/settings.h \
+ ../include/sock.h ../include/Strn.h
+flood.o: flood.c ../include/channel.h ../include/hybdefs.h \
+ ../include/config.h ../include/motd.h ../include/chanserv.h \
+ ../include/hash.h ../include/client.h ../include/flood.h \
+ ../include/log.h ../include/misc.h ../include/operserv.h \
+ ../include/conf.h ../include/settings.h
+gline.o: gline.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/conf.h ../include/dcc.h ../include/gline.h \
+ ../include/match.h ../include/operserv.h ../include/server.h \
+ ../include/settings.h ../include/sock.h
+global.o: global.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/helpserv.h ../include/log.h ../include/match.h \
+ ../include/memoserv.h ../include/misc.h ../include/mystring.h \
+ ../include/nickserv.h ../include/operserv.h ../include/conf.h \
+ ../include/settings.h ../include/Strn.h ../include/server.h
+hash.o: hash.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/channel.h ../include/dcc.h ../include/hash.h \
+ ../include/log.h ../include/match.h ../include/misc.h \
+ ../include/operserv.h ../include/conf.h ../include/server.h \
+ ../include/settings.h ../include/sock.h ../include/statserv.h
+helpserv.o: helpserv.c ../include/alloc.h ../include/config.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/hybdefs.h ../include/motd.h ../include/conf.h \
+ ../include/helpserv.h ../include/match.h ../include/memoserv.h \
+ ../include/misc.h ../include/mystring.h ../include/nickserv.h \
+ ../include/operserv.h ../include/settings.h ../include/sock.h \
+ ../include/statserv.h ../include/seenserv.h
+hybserv.o: hybserv.c ../include/alloc.h ../include/config.h \
+ ../include/data.h ../include/dcc.h ../include/defs.h \
+ ../include/hash.h ../include/hybdefs.h ../include/motd.h \
+ ../include/init.h ../include/log.h ../include/operserv.h \
+ ../include/conf.h ../include/server.h ../include/settings.h \
+ ../include/show.h ../include/sock.h ../include/timer.h \
+ ../include/timestr.h
+init.o: init.c ../include/alloc.h ../include/config.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/hybdefs.h ../include/motd.h ../include/conf.h \
+ ../include/data.h ../include/dcc.h ../include/defs.h \
+ ../include/flood.h ../include/log.h ../include/memoserv.h \
+ ../include/misc.h ../include/mystring.h ../include/nickserv.h \
+ ../include/operserv.h ../include/settings.h ../include/sock.h \
+ ../include/timer.h
+jupe.o: jupe.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/conf.h ../include/hash.h ../include/jupe.h \
+ ../include/match.h ../include/mystring.h ../include/server.h \
+ ../include/sock.h ../include/timestr.h ../include/misc.h
+log.o: log.c ../include/config.h ../include/dcc.h ../include/defs.h \
+ ../include/hybdefs.h ../include/motd.h ../include/log.h \
+ ../include/operserv.h ../include/conf.h ../include/settings.h \
+ ../include/Strn.h ../include/misc.h
+match.o: match.c ../include/config.h ../include/match.h
+memoserv.o: memoserv.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/err.h ../include/helpserv.h ../include/memoserv.h \
+ ../include/misc.h ../include/mystring.h ../include/nickserv.h \
+ ../include/settings.h ../include/timestr.h
+misc.o: misc.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/conf.h ../include/data.h ../include/dcc.h \
+ ../include/defs.h ../include/hash.h ../include/log.h \
+ ../include/match.h ../include/misc.h ../include/operserv.h \
+ ../include/settings.h ../include/sock.h ../include/Strn.h
+motd.o: motd.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/settings.h ../include/sock.h ../include/conf.h \
+ ../include/Strn.h
+mystring.o: mystring.c ../include/alloc.h ../include/config.h \
+ ../include/defs.h ../include/hybdefs.h ../include/motd.h \
+ ../include/log.h ../include/match.h
+nickserv.o: nickserv.c ../include/alloc.h ../include/config.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/hybdefs.h ../include/motd.h ../include/conf.h \
+ ../include/dcc.h ../include/err.h ../include/helpserv.h \
+ ../include/log.h ../include/match.h ../include/memoserv.h \
+ ../include/misc.h ../include/mystring.h ../include/nickserv.h \
+ ../include/operserv.h ../include/settings.h ../include/sock.h \
+ ../include/timestr.h
+operserv.o: operserv.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/conf.h ../include/data.h ../include/defs.h \
+ ../include/dcc.h ../include/err.h ../include/gline.h \
+ ../include/helpserv.h ../include/jupe.h ../include/log.h \
+ ../include/match.h ../include/memoserv.h ../include/misc.h \
+ ../include/mystring.h ../include/nickserv.h ../include/operserv.h \
+ ../include/server.h ../include/settings.h ../include/sock.h \
+ ../include/statserv.h ../include/Strn.h ../include/timestr.h
+seenserv.o: seenserv.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/channel.h ../include/conf.h ../include/hash.h \
+ ../include/helpserv.h ../include/seenserv.h ../include/match.h \
+ ../include/misc.h ../include/timestr.h ../include/mystring.h \
+ ../include/settings.h ../include/sock.h ../include/log.h \
+ ../include/err.h
+server.o: server.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/client.h \
+ ../include/conf.h ../include/dcc.h ../include/defs.h \
+ ../include/flood.h ../include/global.h ../include/helpserv.h \
+ ../include/init.h ../include/jupe.h ../include/log.h \
+ ../include/match.h ../include/memoserv.h ../include/misc.h \
+ ../include/mystring.h ../include/nickserv.h ../include/operserv.h \
+ ../include/seenserv.h ../include/server.h ../include/settings.h \
+ ../include/sock.h ../include/statserv.h ../include/Strn.h \
+ ../include/timestr.h
+settings.o: settings.c ../include/alloc.h ../include/config.h \
+ ../include/hybdefs.h ../include/motd.h ../include/log.h \
+ ../include/match.h ../include/misc.h ../include/settings.h \
+ ../include/timestr.h
+show.o: show.c ../include/alloc.h ../include/config.h \
+ ../include/channel.h ../include/hybdefs.h ../include/motd.h \
+ ../include/chanserv.h ../include/hash.h ../include/conf.h \
+ ../include/data.h ../include/init.h ../include/nickserv.h \
+ ../include/client.h ../include/settings.h ../include/show.h \
+ ../include/timestr.h
+sock.o: sock.c ../include/alloc.h ../include/config.h \
+ ../include/conf.h ../include/dcc.h ../include/defs.h \
+ ../include/hybdefs.h ../include/motd.h ../include/log.h \
+ ../include/match.h ../include/misc.h ../include/operserv.h \
+ ../include/server.h ../include/sock.h ../include/Strn.h \
+ ../include/timer.h
+statserv.o: statserv.c ../include/alloc.h ../include/config.h \
+ ../include/client.h ../include/hybdefs.h ../include/motd.h \
+ ../include/err.h ../include/hash.h ../include/helpserv.h \
+ ../include/log.h ../include/match.h ../include/misc.h \
+ ../include/mystring.h ../include/server.h ../include/settings.h \
+ ../include/sock.h ../include/conf.h ../include/statserv.h \
+ ../include/Strn.h ../include/timestr.h
+timer.o: timer.c ../include/chanserv.h ../include/config.h \
+ ../include/hash.h ../include/data.h ../include/dcc.h \
+ ../include/defs.h ../include/flood.h ../include/gline.h \
+ ../include/hybdefs.h ../include/motd.h ../include/init.h \
+ ../include/log.h ../include/memoserv.h ../include/nickserv.h \
+ ../include/client.h ../include/operserv.h ../include/conf.h \
+ ../include/settings.h ../include/sock.h ../include/statserv.h \
+ ../include/timer.h ../include/jupe.h
+timestr.o: timestr.c ../include/config.h ../include/defs.h \
+ ../include/hybdefs.h ../include/motd.h ../include/match.h \
+ ../include/misc.h

@@ -1,0 +1,12 @@
+Syntax: %bLEVEL <channel> SET <type|index> <level>%b
+        %bLEVEL <channel> RESET <type|index|ALL>%b
+        %bLEVEL <channel> LIST%b
+
+Changes the access level required to be able to execute
+certain commands.  This allows a channel founder to be
+able to customize their access level list to their own
+channel needs.  For more specific help on each command,
+type: %b/msg %C HELP LEVEL {SET|RESET|LIST}%b
+%+a%b* * * *%b
+%+aAdministrators can modify/view the access level list
+%+afor any channel.

@@ -1,0 +1,4 @@
+Syntax: %bSET OPER {ON|OFF}%b
+
+If %bOPER%b is ON, your nickname will never expire.  You
+must be an IRC Operator when you set this option.

@@ -1,0 +1,16 @@
+Syntax: %bACCESS <channel> ADD <mask> <level>%b
+        %bACCESS <channel> DEL <mask | index>%b
+        %bACCESS <channel> LIST [mask]
+
+Maintains the channel access list for %b<channel>%b.
+Users matching a hostmask on the access list will
+have access to various %C commands depending on
+what level they have (%b/msg %C HELP LEVEL%b for
+a list of default user levels).  Anyone not on
+the channel's access list, has a default access
+level of 0.  You may type:
+%b/msg %C HELP ACCESS {ADD|DEL|LIST}%b for more
+specific information on each command.
+%+a%b* * * *%b
+%+aAdministrators can modify the access list for
+%+aany registered channel.

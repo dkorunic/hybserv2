@@ -1,0 +1,7 @@
+Syntax: %bSECURE <channel>%b
+
+Secures %b<channel>%b by clearing all bans matching an
+administrator, clearing all conflicting modes (imslk),
+oping users who match an "f" (friend) flag, and deoping users
+who don't.
+Alias: %bTAKEOVER%b

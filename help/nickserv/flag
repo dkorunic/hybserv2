@@ -1,0 +1,29 @@
+Syntax: %bFLAG <nickname> [flags]%b
+
+This command allows administrators to maintain some control
+over naughty users on their network. You can set various
+flags for a user which will limit his/her services
+privileges.
+If <nickname> is in a nickname link, the restrictive
+flags will affect all nicknames in the link.
+
+Available Flags:
+
+  %b-noregister%b  - Prevents user from registering any
+                 channels.
+
+  %b-nochanops%b   - ChanServ will not allow the user to
+                 be opped on any registered channel.
+
+  %b-clear%b       - Clear all current flags for the user.
+
+Examples:
+         %b/msg %N FLAG meanie -noreg -nochan%b
+           The user "meanie" cannot register any channels,
+           and cannot receive channel operator status in
+           any registered channel - even if they are on
+           the access list.
+
+         %b/msg %N FLAG meanie -clear%b
+           "meanie" has repented and is allowed to use
+           services normally again.

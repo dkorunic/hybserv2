@@ -1,0 +1,4 @@
+Syntax: %bINFO <nickname>%b
+
+Displays information for <nickname> such as time registered,
+%bSET%b options, whether they are online, etc.

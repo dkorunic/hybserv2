@@ -1,0 +1,5 @@
+Syntax: %bSEEN <nick|hostmask>%b
+
+This will give 'last seen' information for the specified
+nick/hostmask, displaying sorted list of all matches or
+a single match with its QUIT reason (or nickname change).

@@ -1,0 +1,7 @@
+Syntax: %bACCESS LIST [mask]%b
+
+Displays a list of your recognized hostmasks.  If [mask] is
+specified, only hostmasks matching [mask] will be displayed.
+%+a%b* * * *
+%+aAdministrators may list hostmasks for any registered
+%+anickname via: %bACCESS <nickname> LIST [mask]%b

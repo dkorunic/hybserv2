@@ -1,0 +1,17 @@
+%b%T%b is a utility allowing IRC users to obtain
+statistics on certain hostnames, domains, or servers.
+To use the following commands, type: %b/msg %T <command>%b.
+For more information on a specific command, type:
+%b/msg %T help <command>%b.
+
+    STATS      Gives general network statistics
+    HOST       List statistics for a hostname
+    DOMAIN     List statistics for a domain
+    SERVER     List statistics for a server
+%+a%b* * * *
+%+aAdministrator commands:
+%+a%b%b
+%+a    REFRESH    Update server lag information
+%+a    CLEARSTATS Clear statistic information
+%+a    GREPLOG    Grep services logs
+%+a    SPLIT      Shows infomation about netsplits

@@ -1,0 +1,5 @@
+Syntax: %bSET <channel> RESTRICTED {ON|OFF}%b
+
+When the RESTRICTED setting is ON, any user who
+does not have auto-op access or higher on <channel>
+will be kick-banned when they attempt to join.

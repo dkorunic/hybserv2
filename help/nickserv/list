@@ -1,0 +1,8 @@
+Syntax: %bLIST <pattern>%b
+
+Lists all registered nicknames that match %b<pattern>%b.
+Nicknames that have %bSET PRIVATE%b ON, will not be
+displayed.
+
+Example: %bLIST *nick*%b
+           Lists all nicknames that contain %bnick%b

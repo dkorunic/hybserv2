@@ -1,0 +1,5 @@
+Syntax: %bREAD [channel] <index|ALL>%b
+
+Displays memo number <index> from your memo list, or, if
+specified, [channel]'s memo list.  If ALL is specified,
+displays all memos.

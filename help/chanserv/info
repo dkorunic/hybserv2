@@ -1,0 +1,4 @@
+Syntax: %bINFO <channel>%b
+
+Displays information for <channel>, including founder,
+time of registration, topic, and mode lock, if any.

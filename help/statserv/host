@@ -1,0 +1,7 @@
+Syntax: %bHOST <hostname>%b
+
+This will give statistics for the specified hostname, such
+as how many clients are currently using the host, the
+maximum clients seen with the host, how many operators
+are using the host, and how many unique (non-cloned) clients
+are using the host.

@@ -1,0 +1,23 @@
+Syntax: %bSET HIDE {ALL|EMAIL|URL|ADDR|QUIT} {ON|OFF}%b
+
+When you use HIDE, others will not be able to see certain
+information when they use %bINFO%b on your nickname.
+%bHIDE ALL%b will hide your email, url, nickname options,
+last seen address, and last seen quit message.
+%bHIDE EMAIL%b will hide your email address.
+%bHIDE URL%b will hide your url.
+%bHIDE ADDR%b will hide your last seen address.
+%bHIDE QUIT%b will hide your last seen quit message.
+Examples:
+         %b/msg %N SET HIDE ALL ON%b
+           Hides all information about your nickname.
+
+         %b/msg %N SET HIDE QUIT OFF%b
+           Allows others to see your last seen quit
+           message.
+
+         %b/msg %N SET HIDE EMAIL ON%b
+           Hides your email address from others.
+%+a%b* * * *
+%+aAdministrators can see all information about a nickname
+%+ain an %bINFO%b command regardless of it being hidden.

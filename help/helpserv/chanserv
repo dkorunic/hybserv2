@@ -1,0 +1,4 @@
+%bSyntax: CHANSERV [command [subcommand]]%b
+
+If [command] specified, displays help on [command], otherwise
+displays general %C help.

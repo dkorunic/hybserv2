@@ -1,0 +1,7 @@
+Syntax: %bINVITE <channel>%b
+
+Invites the sender to <channel>.  Useful if %bSET MLOCK%b
+is set to +i on the channel.
+Example:
+        %b/msg %C INVITE #channel%b
+          %C will invite you to #channel.

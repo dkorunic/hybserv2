@@ -1,0 +1,12 @@
+Syntax: %bAKICK <channel> ADD <mask> [reason]%b
+        %bAKICK <channel> DEL <mask | index>%b
+        %bAKICK <channel> LIST [mask]
+
+Maintains the channel autokick list for %b<channel>%b.
+If a user on the autokick list attempts to join the
+channel, %C will ban/kick the user.
+%b/msg %C HELP AKICK {ADD|DEL|LIST}%b for more
+specific information on each command.
+%+a%b* * * *%b
+%+aAdministrators can modify the autokick list for
+%+aany registered channel.

@@ -1,0 +1,5 @@
+Syntax: %bLEVEL <channel> LIST%b
+
+The %bLEVEL LIST%b command displays the current levels,
+along with their types/indices required for the
+%bLEVEL SET%b and %bLEVEL RESET%b commands.

@@ -1,0 +1,3 @@
+Syntax: %bSPLIT%b [server]
+
+ Displays information on all currenty splitted servers, or about [server].

@@ -1,0 +1,118 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(source/hybserv.c)
+
+AC_CONFIG_AUX_DIR(autoconf)
+AC_CONFIG_HEADER(include/defs.h)
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PATH_PROG(RM, rm)
+AC_PATH_PROG(CP, cp)
+AC_PATH_PROG(LN, ln)
+AC_PATH_PROG(LS, ls)
+AC_PATH_PROG(CHMOD, chmod)
+AC_PATH_PROG(CHOWN, chown)
+AC_PATH_PROG(AR, ar)
+AC_PATH_PROG(RANLIB, ranlib)
+
+dnl Check for a suitable install program
+AC_PROG_INSTALL
+
+WHOAMI=`whoami`
+AC_SUBST(WHOAMI)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+
+AC_CHECK_HEADERS(sys/time.h)
+
+AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ **))
+
+AC_HEADER_TIME
+
+dnl Check for solaris (got this from ircII-EPIC)
+
+AC_MSG_CHECKING(for Solaris/SunOS)
+
+if /bin/sun 2> /dev/null
+then
+  AC_MSG_RESULT(yes)
+  _SunOS=1
+else
+  AC_MSG_RESULT(no)
+fi
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(strdup strerror)
+AC_CHECK_FUNCS(vprintf)
+
+AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),)
+
+AC_CHECK_LIB(nsl, gethostbyname, LIBS="$LIBS -lnsl",)
+AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket",)
+AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt",)
+
+dnl Do not compile with pthread support if they give a
+dnl --disable-threads or --enable-threads=no to configure
+
+AC_ARG_ENABLE(threads, [  --enable-threads        Enable thread support [default=yes]])
+
+AC_SUBST(LIBP)
+
+dnl We will use Solaris native threads if Solaris is present
+if test ! "$enable_threads" = "no"; then
+
+  AC_CHECK_LIB(thread, thr_create,
+    AC_DEFINE(HAVE_SOLARIS_THREADS)
+    CFLAGS="$CFLAGS -D_REENTRANT"
+    LIBP="-lthread",
+    AC_MSG_WARN(No native Solaris threads - will try pthreads)
+      AC_CHECK_LIB(pthread, pthread_create,
+      AC_DEFINE(HAVE_PTHREADS)
+      if test -n "$_SunOS"; then
+        CFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+      else
+        CFLAGS="$CFLAGS -D_REENTRANT"
+      fi
+      LIBP="-lpthread",
+      AC_MSG_WARN(Compiling without pthread support)))
+fi
+
+dnl Use sed to grab the version from Makefile.in
+VERSION_MAJOR=`sed -n -e 's/VERSION_MAJOR = *\(.*\)$/\1/p' Makefile.in`
+
+dnl And awk to process CVS serial no.
+VERSION=$VERSION_MAJOR"_"`awk '{print $3}' include/serno.h| tr -d '"'`
+
+dnl And subst-it.
+AC_SUBST(VERSION)
+
+AC_OUTPUT(              \
+Makefile                \
+libString/Makefile      \
+source/Makefile         \
+tools/Makefile          \
+bin/settings.conf \
+include/config.h  \
+)
+
+echo "
+Configuration:
+
+  HybServ Version:                ${VERSION}
+  Install path:                   ${prefix}/hybserv
+  Compiler:                       ${CC}
+  Compiler Flags:                 ${CFLAGS}"
+
+if test -n "${LIBP}"; then
+  echo "  Thread support:                 enabled"
+  echo "  Thread library:                 ${LIBP}"
+else
+  echo "  Thread support:                 disabled"
+fi
+
+echo
+echo Please edit include/config.h to change the settings to match
+echo your network before running make
+echo

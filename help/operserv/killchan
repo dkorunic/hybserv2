@@ -1,0 +1,17 @@
+Syntax: %bKILLCHAN [options] <channel> [reason]%b
+
+Kills users on <channel> who match [options] with [reason].
+
+Valid Options:
+  %b-ops%b        - Limit matches to channel operators
+  %b-nonops%b     - Limit matches to non channel operators
+  %b-voices%b     - Limit matches to channel voices
+  %b-nonvoices%b  - Limit matches to non channel voices
+  %b-nonopers%b   - Limit matches to non IRC Operators
+
+Users who match an exception O: line are not affected.
+
+Examples:
+        %b/msg %O killchan -nonopers -ops #channel Grr.%b
+          Kills all opped users on #channel who are not
+         IRC Operators with reason "Grr."

@@ -1,0 +1,3 @@
+Syntax: %bSETPASS <channel> <password>%b
+
+Changes the founder password for <channel> to <password>.

@@ -1,0 +1,7 @@
+Syntax: %bIDENTIFY <password>%b
+
+When you identify with %b%O%b, you will have access to other
+commands.
+Alias: %bREGISTER%b
+Example:
+        %b/msg %O IDENTIFY MyPassword%b

@@ -1,0 +1,1833 @@
+*** 20010221_1 by kreator
+More fixes for autoroute stuff.
+
+
+*** 20010220_1 by kreator
+Added preliminary rerouting logic through M: lines.
+Fixed rename() bug - XXX check this again.
+
+
+*** 20010219_4 by kreator
+Was tired and put notice(.., connect_ts) instead of split_ts. Zeroed
+connect_ts on SQUIT, too. Perhaps I should save it for "Last successful
+connection lasted for.."?
+
+
+*** 20010219_3 by kreator
+Forgot to mention - Makefile.in fixes, SED, proper symbolic links with ln
+-s, etc. It was attempting to do hardlinks all the time. TODO update. Some
+smaller changes..
+
+
+*** 20010219_2 by kreator
+Forgot to cvs add help/statserv/split.
+
+
+*** 20010219_1 by kreator
+Added SPLIT_INFO and EXTRA_SPLIT_INFO code - as split command for StatServ,
+as well as netsplit server detection that is delivered by SendUmode(L..
+Added CycleServer() in o_Restart() that was missing.
+Added some __DATE__ and __TIME__ macros in info on startup and o_status()
+Added pid validation checking, services shouldn't start if they were
+already running.
+Killed all (void *)NULL. Why cast something that is already (void *)?
+
+
+*** 20010218_2 by kreator
+Added AllowGuardChannel option in settings.conf, since it is somewhat
+annonoying to have ChanServ sit on large amount of channels on large
+network.
+Fixed o_status() that was not precisely written in last commit.
+
+
+*** 20010218_1 by kreator
+Removed that kludgy proxy checking code - use Hybrid-TCM for that.
+Modified documentation, too. 
+Added support for native Solaris threads - now it is default on Solaris
+platforms. This includes updates both in source and configure script.
+Some small code updates, fixes - ex. <time.h> was missing.
+
+
+*** 20010215_1 by kreator
+OperServ - onick and co. in o_Wallops() did not have to be NULLed, so
+wallop could contain garbage
+ChanServ - bug reported on mailing list - EMPOWERADMINS defined, admins
+can FORGET/FORBID but cannot DROP such channels
+NickServ - allow registred administrators (if EMPOWERADMINS) to drop
+nicknames without their own password. Updated the helpfiles accordingly.
+
+
+*** 20010214_2 by kreator
+Fixed several bugs, made config.h -> config.h.in, settings.h ->
+settings.h.in for automatic HPath and SETPATH setup. Some docs rewrite,
+too.
+
+
+*** 20010214_1 by kreator
+Fixed a nasty Solaris (and perhaps other OS') bug: seems socket() has
+problems when using fd=1 (that we got after closing 0,1,2 and perhaps
+other 64 fds). We have setsid() that I did in last commit, so it should be
+enough.
+Fixed some Makefile.in stuff, and random things I have seen all around.
+
+
+*** 20010213_1 by kreator
+Fixed AllowKillProtection - there was PARAM_INT instead of PARAM_SET
+Put setrlimit() to generate core on SIGBUS if -DDEBUG, no matter of shell
+limits
+Put setsid() after fork() to daemonize as session leader, and break
+anything with tty, closed first 64 fd-s for proper daemonizing, too.
+Fixed install target - right order of making targets
+Made HYBRID7_GLINES and removed them because of Dianora's request
+Cleaned a bit Makefile.in
+
+
+*** 20010212_6 by kreator
+Fixed BCFlood issue by eliminating bogus code. It was funny to see that
+broadcast anti-flood code generates some more flood by flooding all +d
+opers that broadcast flood is happening :-)
+
+
+*** 20010212_5 by kreator
+Changed Makefile.in and configure.in for VERSION string to use MAJOR
+version - release, and include/serno.h from CVS. Useful for anon-CVS and
+other. Notice: awk used.
+
+
+*** 20010212_4 by kreator
+And removed it afterwards.
+
+
+*** 20010212_3 by kreator
+Added bogus test-add.
+
+
+*** 20010212_2 by kreator
+Forgot to mention BCFlood. Test, once again.
+
+
+*** 20010212_1 by kreator
+Preliminary changes to test CVS and state what has to be done.
+
+
+*** 20010211_2 by wcampbel
+Ok, ChangeLog should properly update.
+
+
+*** 20010211_1 by wcampbel
+Imported Hybserv
+
+
+HybServ Change Log
+
+1.7.2 
+
+  - Finally added install-help target into install (kre)
+
+  - Fix for nasty ghost kill (Hwy101)
+ 
+  - Jupe patch (voting and help updates) (toot)
+ 
+  - KillProtection option (toot) 
+
+  - Added chroot() to HPath when UID 0, as well as 077 umask (kre)
+
+  - Fixed nasty bug with gline on symbolic address containing some/any
+    digits (kre)
+
+  - Fixed uname problem in status report of OperServ (kre)
+
+  - Time constants are now permitted to be 0 as it should be (kre)
+
+  - Added backup of SeenServDB (kre)
+
+  - Some code updates in SeenServ code (kre)
+  
+  - Fixed bug with `DCC CHAT' and Solaris (kre)
+  
+  - Fixed weird backup bug on Solaris (kre)
+  
+  - Some documentation updates (kre)
+  
+  - Fixed funny bug with translating `%' to `*' in IDENTIFY password
+    strings - in fact, this was expected behaviour :-) (kre)
+
+  - Moved SETPATH to Makefile, as it should be. This includes various
+    Makefile changes (kre)
+
+  - Made OperServ more verbose on `Access Denied' thing (kre)
+
+1.7.1
+
+  - Fixed a nasty chanserv bug which would cause it to crash hybserv (toot)
+
+1.7
+
+  - Fixed the README and notes.  No actual bug fixes or features.
+
+1.6.1
+
+  - SplitOps channel setting to prevent mass-deops
+
+  - A voting system for server jupes
+
+  - Split some #define EMPOWERADMINS features into a new
+    define in config.h
+
+  - ChanServ won't part a Guarded channel after inviting someone
+    to it.
+
+  - Logon.news is re-read on .rehash.
+
+  - features and fixes from UniBG's version of HybServ by
+    Nedelcho Stanev <decho@csoft.bg>:
+
+     . a SeenServ bot
+     . support for Gecos channel bans
+     . a greplog command on statserv for admins to
+       scan hybserv logs for certain commands
+     . more commands are shown on wallops
+     . fixed a bug with adding long host masks on nickserv
+
+1.6.0
+
+  - reverted GMT offset calculation back to old method - but
+    it is still an hour off for daylight savings time people
+
+  - added "libString" directory with some useful optimized
+    string functions
+
+  - added commands "gmemo" and "gcmemo" to Global
+    (/msg Global help {gmemo|gcmemo})
+
+  - fixed two issues regarding NickServ's KILL IMMED option
+
+      . if you did a SET KILL IMMED followed by a SET KILL ON,
+        the KILLIMMED flag would not be cleared
+      . a combination of SET SECURE ON and SET KILL IMMED
+        caused NickServ to kill the user no matter what - now
+        it gives the user a 1 minute delay to identify
+    (found by Jetchko Jekov <jeka@ieee.bg>)
+
+  - added a bunch of new fixes/features from Nedelcho Stanev
+    (<decho@csoft.bg>):
+
+      . fixed compatibility issue wrt ChanServ's "invite"
+        command and ircd-hybrid-6
+      . bug fix in ChanServ's "access add" command
+      . bug fix in OperServ's "ungline" command
+      . minor security fix in gline handling
+      . made OperServ's "jupe" command more robust
+      . bug fix in MemoServ's "purge" command
+      . added new service: Global - sends a motd to users
+        upon logon, and some other neat stuff
+        (/msg Global help)
+        Directives GlobalNick, LogonNews and GlobalNotices
+        added to settings.conf
+      . added command "SHOWSTATS" to StatServ
+        (/msg StatServ help showstats)
+      . New directive: DoWallops to send a wallops upon
+        the use of certain OperServ commands
+      . nickname jupes can now have a reason other than
+        "Jupitered Nickname"
+      . bug fix in MemoServ's "send" command
+
+  - partyline messages referring to database saves and memo
+    purges are now sent to the +d usermode instead of +y -
+    a few complaints about this :-)
+
+  - NickServ's "info" command now shows administraters all
+    channels a user has access to
+
+  - server jupes now show the reason they are juped in the
+    links list
+
+  - implemented a cleaner, more efficient method of remote
+    trace and whois replies
+
+  - optimized NickServ's "info" command wrt displaying
+    the nick's registered channels
+
+  - optimized channel mode handling a little
+
+  - fix for IRIX 6.5 where server hostnames were not resolving
+    correctly
+
+  - bug fix involving linked nicknames and memo notification
+    (found by screwedup <rrooott@hotmail.com>)
+
+  - cosmetic bug fix in NickServ's "SET OPER"
+
+  - bug fix where channel exceptions were not being
+    calculated in stats m
+
+  - hub and dcc client connections are now non-blocking
+
+  - redid CheckLogs() because solaris doesn't support
+    scandir(3)
+
+  - bug fix involving the calculation of the GMT
+    offset
+
+  - *major* bug fix where if the length of a user's
+    nickname equaled NICKLEN, they would not receive
+    a terminating \0 on the end of their buffer and thus
+    could not execute any services commands since they
+    were not correctly added to the hash - the only
+    operating system I could reproduce this on was
+    solaris, but in theory it would be a problem on any
+    OS.
+    (many thanks to Nathan Mehl <memory@blank.org> for this)
+
+  - redid all header files so we (hopefully) won't have
+    many double includes
+
+  - optimized Makefiles a bit
+
+  - bug fix where a user could continually cycle a restricted
+    channel - this was also causing the use of a bad pointer
+    which eventually caused a crash
+    (found by screwedup <rrooott@hotmail.com>)
+
+1.5.0     08/30/1999
+
+  - added a pile of fixes/features from Philippe Levan
+    (<levan@epix.net>):
+
+      . don't check mode changes by OperServ
+      . let the users deop themselves
+      . core dump if tolower()'s result is used as a signed integer
+        (may be compiler specific)
+      . allow turning noexpire on/off on channels (useful if
+        RestrictRegister because all channels registered by
+        admins/opers are NOEXPIRE)
+      . preserve "real-time" information when reloading nickname
+        database (especially the NS_IDENTIFIED : the list command
+        won't show anybody as ONLINE after a reload ; or NickServ
+        would forget to collide a nick because of the loss of
+        collide_ts)
+      . allow admins to list and change users' access lists if
+        EMPOWERADMINS
+      . allow people to unset oper flag
+      . default to short output for trace, add -long for long output
+      . fix nick TS handling code : I have a companion program whose
+        only purpose is to take over the nicks if hybserv dies and it
+        uses the same user@host's as hybserv ; when hybserv returns,
+        let the TS protocol do the cleaning and don't send KILL's
+      . allow people to use *Serv@MyName in messages : more secure
+        in case hybserv dies and somebody takes over the nick
+      . be consistent with desc_*Serv in whois
+    Thanks to Philippe for going to all this work :-)
+
+  - NickServ's "info" command now shows administrators
+    the user's linked nicknames and all channels the user
+    has registered
+
+  - fixed a problem with the proxy detector which could
+    spawn a huge amount of threads during a netjoin
+    (found by mike <mike@victim.com>)
+
+  - heavily rewrote StatServ's "server" command, and added
+    some neat options
+    (/msg StatServ help server)
+
+  - servers are now stored in a hash table to ensure
+    faster lookups
+
+  - added tools "encryptconf" and "encryptdb" to convert your
+    plaintext conf files and databases (respectively) to
+    encrypted form
+
+  - added command "set" to OperServ so you can configure
+    settings.conf items while services is running (also
+    added -sets flag to OperServ's "save" command to save
+    the new settings - /msg OperServ help save)
+
+  - new O: line flag added: "s" for Services Administrators -
+    this way, you can give server administrators +a, but
+    reserve the most powerful commands for a select few.
+    (requested by Ryan <socfam@hotmail.com>)
+
+  - added directives "MaxLogs" and "MaxChansPerUser" to
+    settings.conf
+    (latter suggested by Ryan <socfam@hotmail.com>)
+
+  - better log file control
+
+  - made nick collisions a little quieter
+
+  - added ircd-hybrid's faster nickname/channel hashing
+    functions
+
+  - finally redid the nick/chan/memo hashes so they're
+    actually "real" hashes now :-)
+
+  - glines are more "hybrid"ized - creates 3 fake opers and
+    servers to vote for the gline
+
+  - added some options to OperServ's "killchan" command
+    (/msg OperServ help killchan)
+    (suggested by mike <mike@victim.com>)
+
+  - broke up OperServ's +d usermode into a bunch of more
+    specific ones - +d now represents every other usermode
+    (.help umode)
+    (requested by mike <mike@victim.com>)
+
+  - bug fix in NickServ's "access add" command
+
+  - added command "dump" to OperServ - ALLOW_DUMP must be
+    defined
+    (/msg OperServ help dump)
+    (requested by Cloud90 <Cloud90@earthlink.net>)
+
+  - better checks for glines of service bots
+
+  - bug fix where if you used SET #channel GUARD ON with no one
+    in the channel, it would core
+    (found by neph|l|m <adel@cybercable.fr>)
+
+  - cleaned up up a great deal of code - also moved much of
+    the code into smaller modules
+
+  - added ircd-hybrid-6 match() and removed WildCompare()
+
+  - OperServ's "trace" command could fail occasionally if
+    if you used -nolimit and there were many users on the network.
+    It was filling up the sendq buffer too fast, so eventually
+    an errno of EDEADLK would occur during write(). Now uses
+    select() to determine if the socket is writeable. This only
+    affected dcc/telnet connections as far as I could tell.
+
+  - the OVisin() beast is dead (finally)
+
+  - no longer broadcasts tcm links to clients who have
+    not yet entered their password
+
+  - no longer broadcasts clone detections/exits for
+    nickname enforcement psuedo-clients
+
+  - bug fix involving bans set by ChanServ
+
+  - bug fix involving #undef BLOCK_ALLOCATION and OperServ's
+    "channel" command
+    (found by Mshadow <mshadow@localnet.com>)
+
+  - added "OP ALL" to ChanServ to op you in all channels you
+    have access to
+    (suggested by screwedup <rrooott@hotmail.com>)
+
+  - yanked the varargs code (ANSI II C has been out for how many
+    years?) :-)
+
+  - added flag "-nolimit" to OperServ's "trace" and "channel"
+    commands
+    (/msg OperServ help trace/channel)
+
+  - optimized conf handling a bit
+
+  - OperServ's "join" and "part" commands are now administrator
+    only
+    (requested by Ryan <socfam@hotmail.com>)
+
+  - handles service nick kills more efficiently now
+
+  - optimized the sjoin routine a bit - it was calling FindChan()
+    way too many times
+
+  - bug fix in the lag detector where services was pinging
+    juped servers
+
+  - bug fix involving server kicks
+    (found by xirphoid <xirphoid@excite.com>)
+
+  - OperServ no longer allows you to jupe services'
+    current hub server
+    (thanks to good for "demonstrating" this :-))
+
+  - ./configure now outputs some configuration info when
+    it completes
+
+  - added flag "-proxy" to OperServ's trace command
+
+  - added command: "droplink" to NickServ (admins only)
+    (/msg NickServ help droplink)
+
+  - added a wingate/proxy detector (ProxyCheck in
+    settings.conf). This will only work if you
+    have a pthreads library.
+
+1.4.6     06/18/1999
+
+  - added command "clearstats" to StatServ (admins only)
+
+  - bug fix in GetChanUser() routine
+    (found by Kryten <euro.kryten@btinternet.com>)
+
+  - added GlineFile/JupeFile directives to settings.conf
+    (suggested by Nathan Mehl <memory@blank.org>)
+
+  - bug fix in OperServ's "unjupe" and "ungline" commands
+
+  - added .include directive to hybserv.conf
+    (suggested by Ryan <socfam@hotmail.com>)
+
+  - "a" and "o" flags in O: lines no longer include
+    the jupe, "j", flag automatically - you must
+    include a "j" flag yourself to give jupe privileges
+    (requested by Ryan <socfam@hotmail.com>)
+
+  - added a few bandaids which were causing compile
+    warnings on OpenBSD
+
+  - bug fix in OperServ's "omode" command
+    (found by aeon <aeon@darkscape.cx>)
+
+1.4.5     06/03/1999
+
+  - added a somewhat Big Brotherish command to NickServ:
+    "flag" - for admins to play with
+    (/msg NickServ help flag)
+
+  - added a neato lag detector to StatServ - check out
+    RELEASENOTES-1.4.5 (LagDetect/MaxPing directives
+    added to settings.conf).
+    Also: added command "refresh" to StatServ to manually
+    update lag information (admins only).
+
+  - bug fix in ChanServ forbid handling
+
+  - bug fix where services would not correctly respond to
+    a server ping request if it was from a client
+
+  - bug fix in OperServ "part" command
+
+  - added command "SET GUARD" to ChanServ - user requested
+    Note: this feature is only effective when configured
+          with #define HYBRID_ONLY
+    (/msg ChanServ help set guard)
+
+  - ChanServ now automatically sets "NoExpire" for channels
+    registered by an operator or higher
+
+  - ChanServ now displays "NoExpire" as a channel option
+    in an "info" output
+
+  - added MaxClonesWarning to settings.conf
+
+  - fixed a few bugs in ChanServ's SET SECURE handling
+    (found by metalman <jimmyo@fastrans.net>)
+
+  - cleaned up list.c and server.c a bit
+
+  - added hybrid-6 +e (ban exception) support, and added
+    option "-exmatch" to OperServ's "channel" command
+
+  - bug fix where ChanServ would deop all non-autoops
+    that were previously opped the moment someone new
+    joined the channel
+
+1.4.4     05/09/1999
+
+  - bug fix in cs_CheckJoin() which could cause
+    ChanServ to quit flood the network if it was
+    trying to send an entry message to itself
+
+  - bug fix in ChanServ topic handling - introduced in
+    1.4.3
+    (found by Neph|l|m <adel@cybercable.fr>)
+
+1.4.3     05/09/1999
+
+  - topics can now be cleared through SET TOPIC -
+    (/msg ChanServ help set topic)
+
+  - bug fix involving ChanServ SET TOPIC and HYBRID_ONLY
+
+  - added a minor security check to bin/cleandb
+
+  - optimized top level Makefile a bit
+
+  - bug fix in ChanServ's ENTRYMSG handling
+    (found by Ryan <ryanduarte@hotmail.com>)
+
+  - "ReloadDbsOnHup" is now disabled by default in
+    settings.conf
+
+  - added C/N line examples to the README file
+
+1.4.2     05/03/1999
+
+  - made script bin/cleandb to cleanup the backup
+    directory by removing backups that are a month
+    or more old
+
+  - bug fix in rehashing settings.conf
+
+  - bug fix in "fuckover" where if the client was
+    able to withstand the flood for 20 seconds,
+    it would incorrectly issue a "Flood successful"
+    message to the partyline
+
+  - found and fixed memory leak in database reloads
+
+  - bug fix where a database reload could incorrectly
+    make a nickname identified
+
+  - you can now customize each service nick's ident
+    in settings.conf (see ...ServNick section)
+    (suggested by John-Work <irc@alleged.com>)
+
+  - added option "RestrictRegister" to settings.conf
+
+  - added two helpful command line programs:
+    "shownicks" and "showchans" - they are installed
+    as hard links to the hybserv binary
+    (./show{nicks,chans} -h for more information)
+
+1.4.1     04/18/1999
+
+  - added "NonStarChars" to settings.conf
+    (suggested by XShadow <castro@usmatrix.net>)
+
+  - added some neat options to OperServ's "channel" command
+    (/msg OperServ help channel)
+
+  - implemented a system of backing up database files -
+    check out "BackupFreq" in settings.conf
+
+  - "rehash" now rehashes settings.conf - should have
+    put this in 1.4.0 =/
+
+  - added #define HYBRID_ONLY to config.h, so
+    ChanServ does not join registered channels
+    anymore - please be aware that this will work
+    only on a 100% hybrid network
+    (this was suggested by holobyte a long time ago (-:)
+
+1.4.0     04/16/1999
+
+  - New feature: linked nicknames - so you can have
+    different aliases for the same nickname, and have
+    all of them share the same access list, set options,
+    memos, etc.
+    See settings.conf for "LinkedNicknames" and "MaxLinks"
+    Administrator command "showlinks" added to NickServ
+    accordingly
+    (/msg NickServ help {link|unlink|showlinks})
+    (/msg NickServ help set master)
+
+  - New feature: settings.conf - this file contains
+    most of the old config.h options, so you can
+    configure many of HybServ's features at run
+    time, rather than compile time. The example
+    settings.conf contains documentation on each
+    option.
+    (Please read RELEASENOTES-1.4 for more information)
+
+  - devised a method of ensuring +y users don't get
+    flooded with clone warnings when services
+    is connecting to the network for the first time
+
+  - added "set kill immed" to NickServ as well as
+    "AllowKillImmed" option in settings.conf
+    (/msg NickServ help set kill)
+
+  - added feature "SmartMasking" to settings.conf -
+    it is thoroughly explained in that file
+    (suggested by XShadow <castro@usmatrix.net>)
+
+  - added "set hide {email|url|addr|quit}" to NickServ
+    (/msg NickServ help set hide)
+
+  - bug fix in telnet service where you could raise
+    a SIGPIPE by sending data and closing the
+    connection without waiting for the nickname
+    prompt
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - kill protection is now off by default for newly
+    registered nicknames - can be turned on by
+    default in settings.conf (NSSetKill)
+
+  - long standing bug fix where a secure nickname
+    would not be given a full minute to identify
+    when services first connects to the network
+
+  - bug fix where a clone would change his/her nick and
+    +y users would see clone exit/detected messages
+
+  - OperServ's "gline" and "ignore add" commands now
+    understand more complex time formats for
+    temporary glines/ignores: XwXdXhXmXs
+    (/msg OperServ help {gline|ignore})
+    (suggested by darkskull <darkness@damnation.net>)
+
+  - enhanced timeago() a bit to work with the new
+    settings.conf
+
+  - created directory "doc" for documentation files
+
+  - the "ServerNotices" option now affects every
+    service bot, not just OperServ
+
+  - minor bug fix involving "MaxConnections"
+
+  - obscure bug fix involving GetUser() and incoming telnet
+    connections
+
+  - minor bug fix in ident reply handling
+
+  - bug fix where if a channel expired while ChanServ
+    was in the channel, ChanServ wouldn't part - you would
+    have to set "ChannelExpire" obscenely low to produce
+    this error
+
+  - NickServ/ChanServ now display "<< PRIVATE >>" to
+    administrators who use "list" on private nicks/chans
+
+  - added command "collide" to NickServ (admins only)
+    (/msg NickServ help collide)
+
+  - databases are no longer saved after a SIGSEGV
+
+  - bug fix where if your nickname had secure on,
+    and you changed your nick to the same nickname
+    with a different combination of upper/lowercase
+    letters, you could be collided
+
+  - Service nicks now treat NOTICEs like PRIVMSGs
+
+  - StatServ now keeps track of current resolving host
+    users instead of total resolving host users seen
+    today
+
+  - bug fix where if you identified with OperServ not
+    using the nickname in your O: line, you would not
+    be able to see administrator commands on NickServ,
+    ChanServ, or OperServ in a "help" request
+    (found by darkskull <darkness@damnation.net> and
+     Riggs <riggs@amused.net>)
+
+  - bug fix where "reload" would cause OperServ to log
+    an incorrect warning about users' umodes
+
+  - bug fix where "reload" would cause ChanServ to join
+    forgotten channels
+    (found by darkskull <darkness@damnation.net>)
+
+  - two new usermodes: +n/+l
+    (/msg OperServ help umode)
+
+  - remote whois/version/trace/motd queries are now
+    broadcast to +y users
+
+  - added some more information to OperServ "status"
+
+  - OperServ no longer warns/kills clones if they match
+    an exception (e) flag
+
+  - bug fix where SendUmode() would broadcast to dcc
+    clients who had not yet identified
+
+  - now notifies +y users of clients who /oper
+
+  - added flood protection to SendUmode() to prevent against
+    many calls in very short time periods (such as during
+    netsplits)
+
+  - added #define NICKREG_DELAY to config.h
+
+  - command abbreviation now works on ChanServ's "clear"
+    sub-commands - forgot this one while I was doing the
+    others :-)
+
+  - if ChanServ happens to be in a channel when an admin
+    uses "forget" on it, ChanServ now parts
+
+  - added command "noexpire" to NickServ and ChanServ -
+    admins only
+    (/msg {Nick,Chan}Serv help noexpire)
+
+  - bug fix where O: lined users' umodes would be erased
+    after a SIGHUP or rehash
+
+  - bug fix where OperServ would join empty C: lined channels
+    after receiving a SIGHUP
+
+  - cleaned up server.c a little
+
+  - added #define MAXKILL to config.h - for "killhost"
+    and "trace -kill"
+
+  - bug fix where NickServ would respond if you sent
+    an unknown command to StatServ
+    (found by darkskull <darkness@damnation.net>)
+
+  - added a ton of options to OperServ's "trace" command
+    (/msg OperServ help trace)
+
+  - added #define LOWERCASE_IDENT to config.h
+    (requested by Riggs <riggs@amused.net>)
+
+  - OperServ now notifies users with +y usermodes of
+    new maximum user/channel/oper/server counts
+    (as long as STATSERVICES is enabled)
+
+  - NickServ no longer says "<< ONLINE >>" next to the
+    nickname in "info" unless the user is currently
+    identified
+    (found by Riggs <riggs@amused.net>)
+
+  - StatServ now keeps track of clients running identd
+
+  - fuckover is back under #define ALLOW_FUCKOVER -
+    disabled by default
+    (user-requested)
+
+  - Administrators can now boot other administrators off
+    the partyline (in the case of a ghost etc)
+
+  - bug fix where #undef'ing NICKSERVICES and STATSERVICES
+    at the same time would cause a compile error
+    (found by darkskull <darkness@damnation.net>)
+
+1.3.0     03/06/1999
+
+  - bug fix involving pthreads and signals
+
+  - added #define RESTRICTED_ACCESS to config.h, so
+    only operators or above may use *Servs - disabled
+    by default
+    (requested by John-Work <irc@alleged.com>)
+
+  - ChanServ no longer says "<< ONLINE >>" next to the
+    founder entry in the "info" command, unless the
+    founder is currently identified with NickServ
+
+  - added NickServ's memo set options to NickServ "info"
+    output
+
+  - NickServ's set "nomemos", "nonotify", and "nosignon"
+    have been changed to "memos", "notify", and "signon",
+    because that way is easier to understand - unfortunately
+    this is not backwards compatible, meaning whatever
+    memo settings you had in prior versions will be reversed
+    by this version, so you'll have to reset them :-) Sorry.
+
+  - bug fix in ignore host matching
+
+  - all NickServ and ChanServ "set" commands are now logged
+
+  - NickServ's "access list" now supports hostmask matching
+    (/msg NickServ help access list)
+
+  - command abbreviation now works for sub-commands such as
+    /msg NickServ set pass <password> instead of:
+    /msg NickServ set password <password> - This includes
+    NickServ/ChanServ's "access" and "set" commands, ChanServ's
+    "akick" command, and OperServ's "ignore" and "htm" commands
+
+  - new OperServ command: "umode"
+    (/msg OperServ help umode)
+
+  - cleaned up all functions which use varargs to use the
+    more standard/portable stdarg.h if possible
+
+  - buffer overflow fixed in o_unlink()
+
+  - OperServ now logs uses of "status", "boot", and
+    "identify", which I forgot to do a while ago :-)
+
+  - fixed a few things that were causing some compile
+    warnings on Solaris/SunOS
+
+  - bug fix in OperServ's "killhost" command
+
+  - bug fix where if you removed a J: line from the conf,
+    and rehashed, the psuedo-server would not be SQUIT'd
+
+  - bug fix where OperServ could be fooled into thinking
+    juped nicks were clones, if they exceeded MAXCLONES
+
+  - bug fix where connection count wasn't updated properly
+    if a tcm wasn't authorized to connect
+
+  - minor bug fix in NickServ's "access del"
+
+  - added "stats p" and "stats c" to display port/channel lines
+
+  - replaced .glines and .jupes with "stats g" and "stats j"
+
+  - Administrators can now see private nicknames/channels in
+    NickServ/ChanServ "list"
+
+  - fixed a null pointer bug introduced in 1.2.0 that was causing
+    unpleasant seg faults after a rehash
+    (found by LauraDax <lauradax@magenet.com>)
+
+  - OperServ now accepts "mode" in place of "omode"
+
+  - minor bugfix in OperServ's "restart"
+
+  - command abbreviation now works if you are initially .identify'ing
+    through dcc chat
+
+  - added command: "hub" to OperServ
+    (/msg OperServ help hub)
+
+  - added "Current Hub:" info to StatServ's "server" command
+
+  - made p_CheckTime() a bit more rugged
+
+  - minor bandaids to BroadcastDcc()
+
+1.2.0     02/13/1999
+
+  - gethostbyaddr() is now non-blocking (yay!) on telnet
+    clients thanks to pthreads
+
+  - pthread support added - configure will detect if it
+    should compile with pthreads - if you don't have
+    pthreads installed on your system, consider installing
+    them; they're awesome :-) - Read README.PTHREADS for
+    more information
+
+  - CRYPT_OPER_PASSWORDS is now on by default for security
+    reasons - please remember to update your conf or #undef
+    this option
+
+  - server connection attempts and clone detections are now
+    broadcast to the partyline
+
+  - "rehash" now rehashes S: lines
+
+  - removed OperServ's obsoleted "stats n" (StatServ does all
+    that and much more) also, added "stats s" - displays S:
+    lines
+
+  - bug fix in OperServ "gline"
+
+  - potential buffer overflow fixed
+
+  - bug fix in CheckNick() involving RECORD_SPLIT_TS
+ 
+  - rewrote user verification code
+
+  - added check to make sure hybserv doesn't run as root
+
+  - OperServ now accepts "identify" in place of "register"
+
+  - added #define OPERS_HAVE_ACCESS to config.h so any
+    global operator will have oper/jupe/gline privileges
+    on OperServ, without needing an O: line in hybserv.conf.
+    This feature was user-requested, and it is disabled
+    by default because I don't like the idea of just any
+    oper being able to gline someone (that is why newnet
+    and dalnet are so lame)
+
+  - bug fix where telnet service allowed people to connect
+    without having a "d" flag in their O: line
+
+  - redid htm code a bit
+
+  - OperServ's "jump" now supports wildcards in the
+    server name
+
+  - bug fix in nick change handling of nicknames equal
+    to NICKLEN
+
+  - last seen address/quit message is no longer updated unless
+    the user was identified when they quit
+
+  - NickServ "info" no longer shows last seen address if the
+    user is currently online
+
+  - bug fix where last seen user@host for NickServ wasn't
+    being updated when the user /quit
+
+1.1.12    01/15/1999
+
+  - added #define CRYPT_OPER_PASSWORDS to config.h so you
+    can put encrypted passwords in O: lines, with the
+    mkpasswd program.  It is #undef'd by default so your
+    current hybserv.conf will still work.
+    mkpasswd.c is copyright (C) Nelson Minar 1991
+
+  - now reloads databases on a SIGHUP if RELOAD_DBS_ON_SIGHUP
+    is defined in config.h (defined by default)
+
+  - bug fix where services would seg fault if you used OperServ's
+    "omode" to -i/+o yournick on a forbidden channel
+    (found by zarf <zarf@li.com>)
+
+  - bug fix in memo adding routine
+
+  - added command "ghost" to NickServ
+    (/msg NickServ help ghost)
+
+  - nickname security is now turned on by default when you
+    register
+
+  - OperServ's "reload" now reloads ChanServ, MemoServ, and
+    StatServ databases
+
+  - STATSERV_DB added to keep track of all time high counts for
+    users/opers/chans/servs etc.
+
+  - bug fix where services wasn't clearing channel bans
+    after an SJOIN with TS - 1
+
+1.1.11    01/14/1999
+
+  - bug fix in ctcp handling which was causing an infinite loop,
+    and on some systems, a seg fault
+    (found by zarf <zarf@li.com>)
+
+  - bug fix in BlockSubAllocate() which was causing a seg fault
+
+1.1.10    01/08/1999
+
+  - new feature: if HybServ cannot bind a P: lined port
+    on startup, it will continue attempting to bind the
+    port at 10 second intervals.  If it cannot bind
+    the port after so many tries (MAX_BINDS), it gives
+    up
+
+  - added option: MAX to OperServ's "htm" command so you
+    can set the maximum htm rate on the fly
+
+  - OperServ no longer joins C: lined channels unless there
+    are users in them - no point guarding an empty channel,
+    and this also fixes the bug where OperServ would
+    join, part, and join again on startup
+
+  - added SET SUCCESSOR to ChanServ
+    (/msg ChanServ help set successor)
+
+  - memory leak found and fixed in chanserv.c
+
+  - added script "install.fast" to quickly compile and
+    install HybServ
+
+  - added #define LAST_SEEN_INFO to config.h to have NickServ
+    keep track of users' last seen addresses and quit messages
+    to display in an INFO
+
+  - added options: EMAIL, URL and HIDE to NickServ's "set"
+    command
+    (/msg NickServ help set {EMAIL|URL|HIDE})
+
+  - added options: ENTRYMSG, EMAIL, URL, and FORGET to
+    ChanServ's "set" command
+    (/msg ChanServ help set {ENTRYMSG|EMAIL|URL|FORGET})
+    (FORGET option suggested by holobyte <holobyte@holobyte.org>)
+
+  - RECORD_SPLIT_TS now works after a .jump
+
+  - make install-help now chown's the help directory to the
+    user who ran configure
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - added #define ALLOW_ACCESS_IF_OPPED to make optional
+    the feature where ChanServ doesn't deop anyone
+    as long as a SuperOp is opped on the channel
+    (requested by holobyte <holobyte@holobyte.org>)
+
+  - bug fix where ChanServ would rejoin every channel
+    regardless of it being empty when it was killed -
+    also, no longer joins forgotten channels after
+    being killed
+
+1.1.9     12/30/1998
+
+  - when ChanServ now joins a channel, it no longer deops
+    anyone as long as there is a SuperOp or higher opped
+    on the channel - the SuperOp does NOT need to be
+    identified with NickServ
+    (requested by Cloud90 <Cloud90@earthlink.net>)
+
+  - new feature: #define HIGHTRAFFIC_MODE
+    to handle high traffic loads more efficiently - read
+    config.h for more information - command "htm" added
+    to OperServ accordingly
+
+  - Now checks to make sure there is a '#' in the channel
+    name in a C: line
+    (found by NEPH|L|M <adel@cybercable.fr>)
+
+  - uses of the ChanServ "clear" command are now logged
+
+  - bug fix in ChanServ's "akick" command
+    (found by Cloud90 <Cloud90@earthlink.net>)
+
+  - now introduces all juped servers/nicks on connection
+    to the hub, instead of waiting for the nick/server to
+    show up, and then introducing the jupe
+    (suggested by ^joey- <apryan@dimensional.org>)
+
+  - new ChanServ command: forget (admins only)
+    (/msg ChanServ help forget)
+    (requested by holobyte <holobyte@holobyte.org>)
+
+  - added #define SERVER_NOTICES to config.h, to have the
+    server name issue NOTICES, instead of OperServ/StatServ
+    (requested by ^joey- <apryan@dimensional.org>)
+
+  - added #define RECORD_SPLIT_TS to config.h, so when services
+    splits, users won't have to re-identify with NickServ or
+    OperServ
+    (suggested by holobyte <holobyte@holobyte.org>)
+
+  - memory leak fixed in RemUserInfo()
+    (introduced in 1.1.7)
+
+  - added new memory handling routines (alloc.c)
+      a) Now detects if we run out of memory on a malloc(),
+         realloc() call etc.
+      b) Block Allocation added (#define BLOCK_ALLOCATION) -
+         read the section in config.h for more information
+
+  - added HelpServ (#define HELPSERVICES)
+    (/msg HelpServ help)
+    %H now expands to HELPSERV_NICK in motd files as well
+
+  - new ChanServ command: status (admins only)
+    (/msg ChanServ help status)
+
+  - recoded hashing algorithms - hashes use much less memory
+    now for smaller nets
+
+1.1.8p3   12/07/1998
+
+  - bug fix where StatServ wasn't resetting daily domain
+    resolving/nonresolving counts
+
+  - bug fix in ChanServ's "access list" command introduced
+    in 1.1.7p1
+    (found by geniusj <geniusj@home.com>)
+
+  - bug fix in StatServ that was causing a seg fault when
+    services was /squit'd
+
+  - redid paths in config.h a bit - you no longer have to
+    specify the entire path name for hybserv.conf/hybserv.motd
+    etc. - just give the name of the directory with all the
+    files in HPATH; of course, if your files are scattered
+    around, you'll need to give individual paths :-)
+
+  - now responds to remote /motd requests - motd file path
+    is MOTDFILE in config.h (dcc motd file is now DCCMOTDFILE)
+    motd file may contain % characters that expand to various
+    strings as explained in the example motd.global file
+
+  - made dcc/telnet socket parsing code a little more efficient
+
+1.1.8p2   12/04/1998
+
+  - buffer overflow fixed
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - added MemoServ command: "reply"
+    (/msg MemoServ help reply)
+
+  - bug fix where StatServ's daily counts weren't being reset
+    at midnight if you didn't live in the GMT timezone
+
+  - added more info to StatServ's "server" command
+
+  - all *Serv's now support command abbreviation - for example
+    if you wanted to identify with NickServ, you could type:
+    /msg NickServ ident <password>, instead of the entire
+    word "identify"
+    (suggested by holobyte <holobyte@holobyte.org>)
+
+  - added help on NickServ's "info" command, which I forgot
+    to do in 1.1.6p3 :-/
+
+  - bug fix in config file parsing
+
+  - now responds to remote trace, whois, and version queries
+
+  - OperServ/ChanServ no longer quit with a SIGSEGV error
+    if a SIGTERM is received
+    (found by holobyte <holobyte@holobyte.org>)
+
+1.1.8p1   11/28/1998
+
+  - bug fix where users with numerical ips would be stored
+    in the StatServ domain hash using the last two segments
+    of their ip instead of the first two
+
+  - new StatServ command: stats
+    (/msg StatServ help stats)
+
+  - StatServ's "domain" command is much more informative now
+
+  - added #define AUTOLINK_FREQ to config.h to auto link to
+    unconnected tcm bots that have B: lines
+
+  - fixed potential memory leak
+
+  - bug fix where hubs wouldn't be cycled correctly on startup
+    or after CONNECT_FREQ seconds
+    (introduced in 1.1.8)
+
+1.1.8     11/26/1998
+
+  - added #define STATDEL_FREQ to config.h to specify number
+    of days to wait before deleting StatServ hostname entries
+    that have 0 clients (default: 1 week)
+
+  - bug fix involving #define MAXCLONES
+
+  - added new OperServ command "jump"
+    (/msg OperServ help jump)
+
+  - bug fix where if the hub server was .jupe'd, the client/channel
+    hashes wouldn't be cleared properly
+
+  - bug fix in RemUserInfo()
+
+  - bug fix in timeago() which was causing a buffer overflow,
+    and as a result, a seg fault if the given TS was equal
+    to the current TS
+
+  - telnet interface now uses the nickname in the O: line
+    rather than the nickname entered at the prompt as
+    the client's nick
+
+  - added some more information to OperServ's "status"
+
+  - channel memos are now cc'd to nicks on the channel access
+    list
+    (suggested by holobyte <holobyte@holobyte.org>)
+
+  - bug fix where .jupe wouldn't create a psuedo-server if
+    the server wasn't currently connected to the network
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - added StatServ (#define STATSERVICES)
+    implemented commands:
+      HOST, DOMAIN, SERVER, HELP
+    (/msg StatServ help <command>)
+
+  - bug fix involving AUTOOP_ADMINS introduced in 1.1.7p1
+    (found by holobyte <holobyte@holobyte.org>)
+
+1.1.7p1   11/16/1998
+
+  - bug fix where ChanServ wouldn't reset mlocked modes
+    after joining with TS - 1, from a kick/deop flood
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - bug fix where an oper from an unknown host, but
+    with a nick that has an O: line could execute
+    OperServ commands without first registering
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - added #define AUTOOP_ADMINS to config.h so if an
+    admin isn't on a channel's access list, they won't
+    be auto-opped, but they will still have founder
+    access to the channel as long as EMPOWERADMINS is
+    defined
+    (requested by holobyte <holobyte@holobyte.org>)
+
+  - MEMO_EXPIRE added to config.h so memos will expire
+    after a certain number of days
+
+  - registered nicknames can now be added to a channel's
+    ACCESS list; this way, someone can't spoof a host
+    on the access list, register any nickname, and get ops
+    (suggested by holobyte <holobyte@holobyte.org>)
+
+  - no longer exits program if pid file can't be written
+
+  - added virtual host support (read the section on V: lines in
+    the example hybserv.conf)
+
+  - bug fix in AddChanInfo()
+
+  - bug fix where forbidden channels couldn't be dropped
+    (found by holobyte <holobyte@holobyte.org>)
+
+  - bug fix where memoserv.c wouldn't compile if CHANNELSERVICES
+    was #undef'd
+    (found by holobyte <holobyte@holobyte.org>)
+
+1.1.7     11/12/1998
+
+  - ChanServ no longer deops non-autoops when joining a channel
+    if there is an opped SuperOp or higher on the channel, when
+    joining from a split; if SECUREOPS or RESTRICTED is set,
+    however, non-autoops will be deoped regardless of having
+    a SuperOp or higher opped on the channel
+
+  - "stats m" now shows MemoServ memory usage
+
+  - priority logging of database saves changed to LOG3,
+    because it tends to flood your log file
+
+  - added #define PURGE_FREQ to config.h to specify the
+    number of seconds between automatic memo purges
+
+  - bug fix in OperServ's UNJUPE command that was causing a
+    segfault
+    (found by ^joey- <apryan@dimensional.org>)
+
+  - bug fix in timeago()
+
+  - added three memo SET options to NickServ:
+    NOMEMOS, NONOTIFY, and NOSIGNON
+    (/msg NickServ help set)
+
+  - added #define MAXMEMOS to config.h to specify maximum
+    number of memos someone can have at once
+
+  - MemoServ added (#define MEMOSERVICES)
+    implemented commands:
+      SEND, LIST, READ, HELP, DEL, UNDEL, FORWARD, PURGE
+    (/msg MemoServ help <command>)
+
+  - bug fix where buffer overflow would occur if the hub server
+    had NICKLEN set to a value greater than hybserv's NICKLEN,
+    and someone did a /nick very-long-nickname
+
+  - ChanServ's forbid command now checks if the channel has a
+    leading #
+
+1.1.6p5   10/31/1998
+
+  - bug fix where some data was being lost when the hub sent
+    the initial connect burst
+    (introduced in 1.1.6)
+
+1.1.6p4   10/30/1998
+
+  - always asks for a nickname now in telnet interface in case
+    two people have similar hostmasks
+
+  - tells telnet clients to turn off local echo when entering
+    their password
+
+  - bug fix in .boot
+
+  - added version.c and removed -DVERSION="" from other source
+    files in Makefile
+
+  - bug fix involving IDENT_TIMEOUT
+
+  - bug fix in .who
+
+  - ident requests are now non-blocking, so services can
+    act normally while idents are being performed
+
+  - bug fix where #undef NICKSERVICES combined with a
+    #define FLOOD_PROTECTION would cause a compile error
+
+1.1.6p3   10/25/1998
+
+  - .who now shows idle times of clients idle more than 5
+    minutes
+
+  - unauthorized tcm connection attempts are now logged
+
+  - tcm bots are now idented, so you may now use usernames in
+    L: lines: L:tcm@*.tcm.org:TcmNick:password
+
+  - several bug fixes in tcm linking code introduced in 1.1.6p2
+
+  - bug fix in .boot
+
+  - Administrators can now use the ChanServ/NickServ "info" command
+    on private and forbidden nicknames/channels if EMPOWERADMINS
+    is defined
+
+  - added command "info" to NickServ
+    (/msg NickServ help info)
+
+  - added command "set unsecure" to NickServ
+    (/msg NickServ help set unsecure)
+
+  - bug fix where if you registered a channel and dropped your
+    nickname, it would crash
+
+  - the fuckover command has been disabled because of it's
+    possible use as a DoS attack; I've thought long and hard
+    about this, and I know many people like the command,
+    so if you have any questions/comments/suggestions, email
+    wnder@underworld.net
+
+  - now idents incoming telnet connections so the clients username
+    is no longer *@hostname (if an ident request fails, the client
+    will be known as "unknown@host"); IDENT_TIMEOUT added to
+    config.h accordingly
+
+  - now saves channel/nickname databases before shutting down
+    after a SIGTERM
+
+  - no longer logs connections to dcc chat clients
+
+  - no longer displays blank lines sent by telnet clients to
+    partyline
+
+  - added #define TELNET_TIMEOUT to config.h so telnet clients
+    who haven't entered their password within a certain number
+    of seconds will be disconnected
+
+1.1.6p2   10/16/1998
+
+  - added #define CONNECTFREQ to config.h to specify the delay
+    between reconnect attempts (if the hubs are down etc)
+
+  - removed modes field from C: lines in hybserv.conf
+    (it did nothing)
+
+  - .stats o now displays nicknames
+
+  - several bug fixes in telnet interface
+
+  - .rehash now reloads P: lines
+
+  - .stats m now accounts for dcc/telnet memory usage and
+    P: line memory usage
+
+  - optimized memory usage a bit more in the user structures
+
+  - bug fix where HybServ wouldn't detect if the hub closed
+    the connection properly
+    (introduced in 1.1.6p1)
+
+  - bug fix in OperServ's "restart" command
+
+  - bug fix where if the socket descriptor used for the hub
+    server happened to be 0, hybserv wouldn't connect properly
+
+1.1.6p1   10/10/1998
+
+  - added a telnet DCC CHAT interface, so you can telnet to
+    a port on the box hybserv is running on to give commands
+    to hybserv - added P: lines to hybserv.conf to specify
+    which ports to listen on for users (tcm ports are now
+    specified this way also, instead of in config.h) - read
+    the example hybserv.conf for more information.
+    This code is very experimental, and probably contains
+    all sorts of bugs :-), so I'd appreciate anyone who
+    can use the telnet feature frequently to test it out.
+    Any bug reports can be sent to wnder@pheared.underworld.net
+
+  - deop flood protection added - if OperServ or ChanServ is
+    deoped from a channel 5 times in <= 20 seconds, everyone
+    on the channel is deoped, so the *Serv can regain ops
+
+  - bug fix where commands that were previously dcc only,
+    were not being displayed correctly to opers/admins on
+    the partyline, if given through /msg
+
+  - bug fix where HybServ would crash when someone /oper'd
+    if the N: line for services had a hostmask stripping
+    field
+    (found by DevilM <devilm@r337.com>)
+
+  - O: lines in hybserv.conf *MUST* contain nicknames now
+    (read the example hybserv.conf for more information)
+
+  - removed "op" command from OperServ (it did nothing anyway)
+
+  - bug fix in ChanServ's "identify" command
+
+  - bug fix in s_error()
+
+  - bug fix where if someone not on a channel's access list
+    was the first to join the channel, ChanServ did not deop
+    them after joining
+
+  - the OperServ commands "on", "off", and "clones" are now
+    logged
+
+  - bug fix where if you changed your nickname during a dcc chat
+    it would screw up the dcc connection
+
+  - bug fix where ChanServ wouldn't join a channel OperServ
+    was monitoring in older ircds
+
+  - redid dcc code to use a little less memory when dealing
+    with a small number of connections
+
+  - services now logs when people trigger flood/kick protection
+
+  - bug fix where if both OperServ and ChanServ were on the
+    same channel, only 1 of them would respond to a channel
+    ctcp
+
+  - DATABASE_SYNC in config.h was changed to 1800 seconds
+    (every half hour) to save the databases
+
+1.1.6     09/30/1998
+
+  - kick flood protection added - if OperServ or ChanServ is
+    kicked from a channel 5 times in <= 20 seconds, everyone
+    on the channel is deoped, so the *Serv can regain ops
+
+  - bug fix involving MLOCKs for +l/+k modes
+
+  - added command "clear" to ChanServ (/msg ChanServ help clear)
+
+  - Makefile modified so 'make install' no longer installs
+    the help files - use 'make install-help' now
+
+  - added "stats ?" to OperServ (/msg OperServ help stats)
+
+  - added command "info" to ChanServ (/msg ChanServ help info)
+
+  - ChanServ now automatically drops channels when the
+    founder's nickname expires
+
+  - "stats m" now accounts for NickServ/ChanServ/ignorelist
+    memory usage
+
+  - ChanServ now responds to channel ctcps
+
+  - added flood protection (read the section of config.h dealing
+    with flood protection)
+
+  - added command "ignore" to OperServ to prevent certain
+    users from using services
+
+  - ChanServ now parts channels that have been empty for 5
+    minutes
+
+  - bug fix in detection of expired channels
+
+  - the AUTODEOP level now autodevoices too
+
+1.1.5p1   09/24/1998
+
+  - bug fix in SJOIN handling
+
+1.1.5     09/24/1998
+
+  - ChanServ's AUTODEOP level works now
+
+  - added commands "invite", "op", "voice", and "unban"
+    to ChanServ
+
+  - added command "level" to ChanServ so founders can
+    customize their channel's access levels
+    (/msg ChanServ HELP LEVEL)
+
+  - added "set" command to ChanServ
+
+  - bug fix where if you did /msg OperServ omode #channel +p
+    and the channel was already +s, it wouldn't update the
+    modes properly by "-s"ing first
+
+  - added "setpass" and "forbid" commands to ChanServ
+    (EMPOWERADMINS must be defined)
+
+  - added #define MAX_AKICKS to limit the number of autokicks
+    per channel (default: 20)
+
+  - the "save" and "reload" commands from NickServ are now
+    under OperServ
+
+  - added "akick" and "list" commands to ChanServ
+
+  - the NickServ "list" command can now be executed by anyone
+    regardless if they have a registered nickname or have
+    identified
+
+  - got AUTOOP and AUTOVOICE access levels for ChanServ working
+
+  - added a lot of neat info to the "status" command for
+    OperServ :-)
+
+  - added #define DATABASE_SYNC to config.h to save the
+    nickname/channel databases every so often
+
+  - bug fix involving a user joining the channel "0"
+
+  - bug fix where deoping OperServ and another client in the
+    same mode string wouldn't update the channel op flags
+    properly
+
+  - added #define EMPOWERADMINS to config.h to give the option
+    of allowing administrators to control channels/nicknames -
+    read config.h for more details (it is #undef'd by default)
+
+  - added ChanServ commands "help" and "access"
+
+  - die command now saves channel/nickname databases before
+    shutting down
+
+  - added commands "register", "identify", and "drop" to
+    ChanServ
+
+  - #define CHANNELSERVICES in config.h now introduces
+    CHANSERV_NICK to the network (#define CHANSERV_DB is
+    the location of the channel database)
+
+  - fixed a bug in OperServ's .register
+    (found by LauraDax <lauradax@magenet.com>)
+
+  - added commands "off" and "on" to OperServ (.help off/on)
+
+  - bug fixed in CheckJuped()
+
+  - added #define NICKNAME_EXPIRE to config.h to have
+    nicknames expire if the are not used for a certain
+    period of time
+
+  - added commands "save" and "reload" to NickServ
+
+  - added new set switch to NickServ - SECURE
+    (/msg NickServ HELP SET SECURE)
+
+  - added commands "recover" and "release" to NickServ
+
+  - redid OperServ help so people who don't have access
+    to a command, can't get help on it; also redid the
+    output to /msg OperServ HELP - looks much better
+    now :-)
+
+  - OperServ commands "trace", "channel", "stats",
+    "killchan", and "killhost" can now be executed through 
+    /msg
+
+  - redid .stats u output to account for weeks and years
+
+  - added command "list" to NickServ
+
+  - added command "set" to NickServ
+
+  - got NickServ help command working and created help files
+
+  - killchan/killhost no longer kill *Servs if they happen to
+    be in the channel or match the hostmask
+
+  - bug fix in rehashing of jupe entries
+
+  - bug fix in CheckChans() where it was trying to read a NULL
+    channel list
+
+  - bug fix in .stats n (floating point exception)
+
+  - .join and .part now require an "o" flag
+
+  - bug fix in IsProtectedHost()
+
+  - bug fix where "o" flag users could dcc chat even if they
+    did not have a "d" flag (admins ("a") can still dcc chat 
+    regardless of possessing a "d" flag)
+
+  - added command "access" to NickServ to modify the list of 
+    authorized hosts for your nick
+
+  - added command "identify" to NickServ (if you identify with
+    NickServ from an unknown host, it automatically adds the new
+    hostmask to the list of known hosts for your nick =) )
+
+  - added commands "register" and "drop" to NickServ
+
+  - added #define NICKSERV_DB to config.h to specify the location
+    of the NickServ database
+
+  - changed SERVICENICK to OPERSERV_NICK in config.h
+
+  - added #define NICKSERVICES to config.h to introduce NICKSERV_NICK
+    to the network
+
+1.1.4p5   08/25/1998
+
+  - added temporary glines (.help gline)
+
+  - .channel now allows the channel to have wildcards in it -
+    MAXCHANNEL was added to config.h to truncate the list after
+    so many matches
+
+  - minor bug fixes in .help
+
+  - bug fix where seg fault would occur if the second field of the N:
+    line was greater than 256 characters
+
+  - hybserv now writes its pid to a file so servchk is much more
+    efficient
+
+  - modified .stats m slightly
+
+1.1.4p4   08/18/1998
+
+  - removed .stats l - it's all under .stats b now
+
+  - .stats m is a bit more accurate now
+
+  - bug fix where B: and L: lines weren't being re-read during a 
+    rehash
+
+  - there is no longer a limit as to how many C:, B:, or L: lines
+    you may have in hybserv.conf
+
+  - bug fix where dcc messages meant for "o" flag users were being
+    sent to other tcm bots if the tcm's hostmask matched an "o" user
+
+  - make install now chown's the install directory to the user
+    who ran configure - so hybserv doesn't automatically run as
+    root - you can change the user by editing Makefile
+
+1.1.4p3   08/12/1998
+
+  - there is no longer a limit as to how many O: or S: lines you
+    can have in hybserv.conf
+
+  - bug fix in RemChanInfo() which could potentially become a 
+    memory leak
+
+  - bug fix introduced in 1.1.4p2 where .secure was no longer opping 
+    "f" flag users
+
+  - bug fix where netjoins involving a lesser TS could fool
+    SERVICENICK into thinking it was deoped on a channel it was
+    not even on
+
+  - bug fix where only administrators could use .who
+
+  - added: .stats i (.help stats) to go along with the new I: line
+
+  - new conf line: I: line - read about it in the example hybserv.conf
+    (requested by Alpha232 <alpha@freeshells.com>)
+
+  - added commands: .killchan, .killhost (.help .kill[chan,host]) -
+    you can disable them in config.h if desired
+    (requested by Alpha232 <alpha@freeshells.com>)
+
+  - added #define MAXCLONES and #define AUTOKILL_CLONES to config.h -
+    read that section of config.h for more information (they are both
+    disabled by default)
+
+  - if SERVICENICK is kicked before it has a chance to set modes with
+    .omode, it no longer tries to rejoin
+
+  - bug fix in s_sjoin() involving SERVICENICK being deoped on a
+    netjoin
+
+1.1.4p2   08/07/1998
+
+  - added function: toserv() to send server commands more easily
+
+  - converted storing of channel members to a list rather than
+    a messy string
+
+  - bug fix when SERVICENICK didn't reop itself on a netjoin with 
+    a lesser TS on a monitered channel
+
+  - .trace no longer shows an empty "Channels: " line if the user
+    is not in any channels
+
+  - 2 bug fixes in .secure:
+      a) when SAVE_TS was #undef'd, non "f" flag users weren't being
+         deoped
+      b) channels with TS of 0 weren't being handled properly
+
+  - several bug fixes in .fuckover:
+      a) users with an exception (e) flag can no longer be fuckover'd
+      b) if a user was killed while they were being flooded, the flood
+         process was not removed from the fprocs table
+      c) psuedo nicks like SERVICENICK and any juped nicknames can no
+         no longer be fuckover'd
+
+  - changed name of package to hybserv
+
+  - bug fix where jupe and gline kills weren't updating oper kill
+    counts properly
+
+  - a flags value of SOCK_UNUSED now designates an unused index in
+    connections[] rather than a socket value of -1
+
+  - .jupe can now be used to jupe nicknames as well as servers
+    (.help jupe)
+
+  - juped servers are now replaced with a fake server so services
+    doesn't have to keep squit'ing them (make sure services has an
+    H: line if you enable jupes)
+
+  - ctcp ACTIONs are no longer logged
+
+  - obscure dcc chat bug fix where if a client EOF'd before the motd
+    was sent to them, the program would crash
+
+  - bug fix where it informed a user twice when a dcc chat connection
+    failed
+
+1.1.4p1   07/22/1998
+
+  - bug fix where ghosted partyline members weren't being detected
+    due to the lame writesocket() routine I had
+
+  - bug fix where SERVICENICK wasn't responding to channel ctcps
+
+  - bug fix in notification of a user disconnecting from the partyline
+
+  - added command: .fuckover (.help fuckover) - inspired by FEFNet's
+    AlcServ/IceServ command - this implementation however fork()'s a new
+    process to do the flood, so the services can function normally while
+    the flood(s) are in progress.  Also, it tracks nick changes, and
+    starts flooding the new nick if necessary.
+
+  - added .stats m (.help stats)
+
+  - wildcard jupe bug fixed
+
+  - bug fix where gline kills weren't removing users from the list
+
+  - bug fix in .secure if the channel is already monitored
+
+  - bug fix in c_kill()
+
+  - bug fix in UpdateChanModes()
+
+  - .secure and .omode no longer break TS if SAVE_TS is defined in
+    config.h - also, when SERVICENICK is deoped, it saves TS while
+    reopping itself
+
+  - added modestr() to make .secure more efficient
+
+  - added some more info to .channel
+
+  - added command: .clones (.help clones)
+
+  - converted channel and nick lists to use a hash, for speedier
+    processing
+
+  - added #define MAXTRACE to config.h to truncate .trace list
+    after so many matches
+
+  - bug fix in nick change handling
+
+  - bug fix in umodes handling
+
+  - bug fix where it was seg faulting if the hub had no C/N's for
+    services
+
+  - added cron script bin/obchk to restart observ if the box reboots 
+    etc.
+
+  - added ./configure script to make compilation a little easier :-)
+
+  - added some more info to .stats n
+
+  - added command: .channel (.help channel)
+
+  - added command: .trace (.help trace)
+
+  - added command: .stats (.help stats)
+
+  - tcm linking code is a little more stable
+
+  - converted command parsing to a *much* more efficient routine
+
+1.1.3     03/10/1998
+
+  - First stable release of OBServ - right now it's basically an
+    OperServ with a dcc chat interface.
+
+  - This file created

@@ -1,0 +1,11 @@
+Syntax: %bSET MASTER <nickname>%b
+
+Resets the master nickname for your nickname link to
+<nickname>. The master nickname contains the %bACCESS%b
+list for the entire link, and all other nicknames in
+the link are aliased to the master nickname. In order
+to change the master nickname, <nickname> must already
+be in the nickname link (through the %bLINK%b command).
+Example:
+        %b/msg %N SET MASTER MainNick%b
+          Sets the new master to "MainNick".

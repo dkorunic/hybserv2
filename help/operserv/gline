@@ -1,0 +1,19 @@
+Syntax: %bGLINE [time] <user@host> [reason]%b
+
+Bans all users matching <user@host> from network with [reason].
+Users matching a gline will be auto-killed when they attempt
+to connect.  If [time] is specified, the gline will only be
+active for the given amount of time. [time] may be a string
+of the format:
+
+   %bXwXdXhXmXs%b
+
+Alias: %bAKILL%b
+
+Examples:
+         %bGLINE%b *@*.lamers.org Don't come back
+           Creates a permanent gline for *@*.lamers.org.
+
+         %bGLINE%b 1h30m *clone@clone.com Grrr.
+           Glines *clone@clone.com for an hour and a half,
+           with the message "Grrr."

@@ -1,0 +1,37 @@
+These are the flags you may give users in the config file.
+Format: O:user@host:password:Nickname:<flags>
+
+Example: O:*wnder@*underworld.net:NotaRealPass:SideWnder:sgj
+
+Available flags:
+
+a    -     Administrator - combination of "f", "o", and "d" 
+           flags. Many more commands are available (.help)
+
+d    -     Allows user to use DCC CHAT service.  If OpersOnlyDcc
+           is enabled, and the user doesn't have an "o" flag,
+           they won't be allowed to use DCC CHAT.
+
+e    -     Exception flag - Any user with this flag will not
+           be KILLed or GLINEd by HybServ if someone attempts 
+           to do so.
+
+f    -     "Friend" - when an administrator SECUREs a channel,
+           "f" users will be opped if they are registered at
+           the time.
+
+g    -     Gives user gline privileges, allowing them
+           the use of the GLINE and UNGLINE commands.
+
+j    -     Allows user to JUPE and UNJUPE servers
+
+o    -     Normal Operator - automatic "f" flag. Many more
+           commands are available (.help)
+
+s    -     Services Administrator - most powerful flag. This
+           flag is a combination of every other flag (except +j
+           and +g), and it also gives you access to the most
+           powerful OperServ commands - use sparingly.
+
+** Note: Anyone with a O: line may use the IDENTIFY and HELP commands
+         no matter what flags they have.

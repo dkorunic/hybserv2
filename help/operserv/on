@@ -1,0 +1,5 @@
+Syntax: %bON%b
+
+Reactivates services when in OFF mode.  After services
+have been reactivated, they will function normally.
+Alias: %bENABLE%b

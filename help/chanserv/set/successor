@@ -1,0 +1,7 @@
+Syntax: %bSET <channel> SUCCESSOR <nickname>%b
+
+Sets the channel successor to <nickname>.  If the founder's
+nickname ever expires, services will promote the
+successor to the rank of founder.  If both the founder
+and successor nicknames expire, the channel will be
+dropped.

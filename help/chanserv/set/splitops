@@ -1,0 +1,6 @@
+Syntax: %bSET <channel> SPLITOPS {ON|OFF}%b
+
+When the SPLITOPS setting is ON, any user who
+gains ops from over a netsplit will be allowed
+to keep thier ops.  This can avoid mass-deops in
+a channel where not everyone is on %C

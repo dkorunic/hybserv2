@@ -1,0 +1,4 @@
+Syntax: %bSET NOTIFY {ON/OFF}%b
+
+When NOTIFY is OFF, you will not be notified when someone
+sends you a new memo.

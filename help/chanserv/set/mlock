@@ -1,0 +1,21 @@
+Syntax: %bSET <channel> MLOCK <modes>%b
+
+Causes %C to enforce <modes> for <channel>.  Modes
+following a "+" are locked ON, while modes following
+a "-" are locked OFF.
+Alias: %bMODELOCK%b
+
+Examples:
+         %bSET #channel MLOCK -mi+sntl 6%b
+           Modes 'm' and 'i' are not allowed to be set,
+           while modes 's', 'n', and 't' are forced on.
+           The channel limit will also always be set to
+           6.
+
+         %bSET #channel MLOCK +sk hello%b
+           Mode 's' is forced on, and the channel key
+           is forced to be "hello".
+
+         %bSET #channel MLOCK +%b
+           Removes all locks on modes, so any modes
+           are free to be on/off.

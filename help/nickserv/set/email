@@ -1,0 +1,13 @@
+Syntax: %bSET EMAIL <email address|->%b
+
+Sets the your email address to <email address>.
+When users perform an %bINFO%b on your nickname,
+they will be informed of the your email address,
+unless you set %bHIDE%b ON. To clear your email
+address use a "-" as the parameter.
+Examples:
+         %b/msg %N SET EMAIL me@me.com%b
+           Sets your email address to "me@me.com".
+
+         %b/msg %N SET EMAIL -%b
+           Clears your email address.

@@ -1,0 +1,28 @@
+Syntax: %bSET <channel> <option> [parameters]%b
+
+Allows the channel founder or level 25 to set various
+channel options and other information. All options may
+be abbreviated, such as:
+/msg %C set #channel FOUND newfounder
+to set the FOUNDER nickname to "newfounder".  For more
+specific information on each option, type:
+%b/msg %C HELP SET <option>%b
+
+Available options:
+
+    FOUNDER     Set the founder of a channel (founder)
+    SUCCESSOR   Set the successor for the channel
+    PASSWORD    Set the founder password (founder)
+    MLOCK       Lock channel modes on or off
+    TOPIC       Change the topic on a channel
+    TOPICLOCK   Topic can only be changed with SET TOPIC
+    PRIVATE     Hide channel from ChanServ lists
+    SECUREOPS   Stricter control of chanop status
+    RESTRICTED  Restricts access to channel
+    SECURE      Activate ChanServ security features
+    ENTRYMSG    Send a message to users upon entry
+    EMAIL       Set the channel email address
+    URL         Set the channel url
+    FORGET      Make %C forget your channel %bFOREVER%b
+    GUARD       Have %C join your channel
+    SPLITOPS    Let anyone keep ops from a netsplit

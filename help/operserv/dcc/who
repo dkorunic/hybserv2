@@ -1,0 +1,4 @@
+ %bwho%b
+  Displays a list of users who are currently on the DCC CHAT
+partyline.  A %b'*'%b in front of the user's nickname indicates that
+they are an administrator.  A %b'+'%b indicates they are an operator.

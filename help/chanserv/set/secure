@@ -1,0 +1,7 @@
+Syntax: %bSET <channel> SECURE {ON|OFF}%b
+
+Enables or disables %C's security features for a
+channel.  When SECURE is ON, only users who have
+registered their nicknames with %N and IDENTIFY'd
+with their password will be given access to the channel
+as controlled by the %bACCESS LIST%b.

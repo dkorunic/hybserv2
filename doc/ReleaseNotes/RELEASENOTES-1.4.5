@@ -1,0 +1,28 @@
+Release Notes for HybServ 1.4.5
+======= ===== === ======= =====
+
+ Several new directives were added to settings.conf in this
+version. It is not imperative that you upgrade settings.conf,
+but it is recommended.
+
+I. MaxClonesWarning
+   This directive was previously defined in config.h, but
+  this way makes it run time configurable. Defining this directive,
+  will cause clones to be given a warning when they exceed MaxClones.
+
+II. LagDetect and MaxPing
+   I personally think this is a very neat feature, probably
+  because it was the "funnest" thing I've coded in a while :P.
+  Anyhow, StatServ now pings all servers on the network every
+  minute in order to determine how lagged individual servers
+  are. To a degree, it is only accurate if services itself
+  is not lagged. StatServ displays all ping information
+  when you specify a server using the "SERVER" command. The
+  ping replies are displayed to four decimal places :-).
+   The command "REFRESH" was added to StatServ so you can
+  manually force services to re-ping all servers to update
+  the lag information. This command can only be executed by
+  administrators.
+   The MaxPing directive was added to help services minimize
+  lag. If the ping response from services' current hub exceeds
+  "MaxPing", services will attempt to switch hub servers.

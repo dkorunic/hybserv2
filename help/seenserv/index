@@ -1,0 +1,14 @@
+%b%E%b is a utility allowing IRC users to obtain
+'last seen' information on certain nicknames or hosts.
+To use the following commands, type: %b/msg %E <command>%b.
+For more information on a specific command, type:
+%b/msg %E help <command>%b.
+
+    SEEN       Gives information on a nick/hostmask
+    SEENNICK   Gives information on specific nick only
+
+%+a%b* * * *
+%+aAdministrator commands:
+%+a%b%b
+%+a    UNSEEN    Removes all information on a n!u@h mask
+%+a    SEENSTAT  Gives general 'last seen' statistics

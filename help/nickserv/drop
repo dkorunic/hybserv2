@@ -1,0 +1,11 @@
+Syntax: %bDROP [password]%b
+
+%bDROP%b allows you to cancel the registration of your
+nickname, thus allowing others to re-register it.
+If you have not %bIDENTIFY%b'd when you use the %bDROP%b 
+command, you will need to supply your password; otherwise 
+you do not need to.
+%+a%b* * * *%b
+%+aAdministrators can use %bDROP <nickname>%b
+%+ato cancel the registration of any nickname. (This is
+%+auseful for cancelling forbidden nicknames also)

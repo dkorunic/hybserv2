@@ -1,0 +1,4 @@
+Syntax: %bUNSEEN <mask>%b
+
+This will remove all 'last seen' records matching the mask
+given (the match is against a nick!user@host type mask).

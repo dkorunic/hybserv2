@@ -1,0 +1,8 @@
+Syntax: %bJUPE <server/nick> [reason]%b
+
+Bans %b<server>%b from the network with [reason].  %b<server>%b
+will not be allowed to connected again, unless it is unjuped.
+%b<server>%b may contain wildcards.
+ If a nick is given instead of a server, no one will be allowed
+to use that nick until it is unjuped. In this case, [reason]
+will become the realname of the nickname.

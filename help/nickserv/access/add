@@ -1,0 +1,6 @@
+Syntax: %bACCESS ADD <hostmask>%b
+
+Adds %b<hostmask>%b to the list of your recognized hosts.
+%+a%b* * * *
+%+aAdministrators may add hostmasks to any registered
+%+anickname via: %bACCESS <nickname> ADD <hostmask>%b

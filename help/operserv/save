@@ -1,0 +1,10 @@
+Syntax: %bSAVE [options]%b
+
+ Saves configuration files and/or databases depending
+on [options]. If no options are given, it will default
+to saving the databases.
+
+Valid Options:
+  -dbs        - Saves nick/chan/memo/stat/oper databases
+  -sets       - Saves configuration settings to settings.conf
+  -all        - Saves databases and configuration settings

@@ -1,0 +1,4 @@
+Syntax: %bJOIN <channel>%b
+
+Will have %O add <channel> to the list of channels being
+monitored.

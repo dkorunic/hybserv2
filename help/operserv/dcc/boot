@@ -1,0 +1,3 @@
+ %bboot%b <nick> [reason]
+  Forcefully removes <nick> from the DCC CHAT partyline with 
+<reason>.  Similar to a /kick in a channel.

@@ -1,0 +1,12 @@
+Syntax: %bSET URL <url|->%b
+
+Sets the your url to <url>. When users perform an %bINFO%b
+on your nickname, they will be informed of the your url,
+unless you set %bHIDE%b ON. To clear your url use a "-" as
+the parameter.
+Examples:
+         %b/msg %N SET URL http://my.site.com%b
+           Sets your url to "http://my.site.com".
+
+         %b/msg %N SET URL -%b
+           Clears your url.

@@ -1,0 +1,35 @@
+Syntax: %bTRACE <pattern> [options]%b
+
+Displays information for all users matching %b<pattern>%b,
+and [options].
+Aliases: %bUSER%b, %bWHOIS%b
+
+Valid Options:
+
+  -ops              Limit matches to IRC Operators
+  -nonops           Limit matches to non IRC Operators
+  -clones           Limit matches to clones
+  -realname <name>  Limit matches to those with the given realname
+  -server <server>  Limit matches to those on the given server
+  -kill             Kill all matches
+  -info             Display statistical information for matches
+  -long             Display in long format (defaults to short)
+  -msg <message>    Send all matches the given message
+  -nolimit          Ignore the MaxTrace limit of matches
+
+Examples:
+  %bTRACE *!*@*.lamers.org%b -long -nolimit
+    Display information for all users matching *!*@*.lamers.org,
+   even if there are more than MaxTrace matches.
+
+  %bTRACE *!*@* -r *lamer*%b
+    Display all users who's realnames match *lamer*
+
+  %bTRACE *!*@*.net -o -s irc.server.com%b
+    Display all .net IRC Operators on irc.server.com.
+
+  %bTRACE *!*@* -c -m Clones Suck.%b
+    Send the message "Clones Suck." to every clone on the
+    network.
+
+  %bTRACE *@*.com -n -m Hi all of you .com non-operators%b

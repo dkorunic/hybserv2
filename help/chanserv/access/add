@@ -1,0 +1,9 @@
+Syntax: %bACCESS <channel> ADD <mask | nickname> <level>%b
+
+The %bACCESS ADD%b command adds the specified
+hostmask or nickname to the access list with
+the specified level.  If the nickname or hostmask
+already exists on the access list, the user level
+is changed to the level specified in the command.
+Type: %b/msg %C LEVEL <channel> LIST%b for a list
+of available levels.

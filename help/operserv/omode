@@ -1,0 +1,4 @@
+Syntax: %bOMODE <channel> <modes>%b
+
+Makes %b%O%b set <modes> on <channel>.
+Alias: %bMODE%b

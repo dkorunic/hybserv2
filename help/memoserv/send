@@ -1,0 +1,9 @@
+Syntax: %bSEND <nick|channel> <text>%b
+
+If the recipient is a nick, they will recieve a memo
+containing <text>.  They will also recieve a notice
+saying they have a new memo (as long as their NOTIFY is
+ON).  If the recipient is a channel, all the autoops on
+the channel will recieve a notice of the new memo.  You
+must have autoop access or higher to send a memo to a
+channel.

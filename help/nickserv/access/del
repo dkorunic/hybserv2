@@ -1,0 +1,7 @@
+Syntax: %bACCESS DEL <hostmask>%b
+
+Deletes %b<hostmask>%b from the list of your recognized
+hosts.
+%+a%b* * * *
+%+aAdministrators may delete hostmasks from any registered
+%+anickname via: %bACCESS <nickname> DEL <hostmask>%b

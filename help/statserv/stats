@@ -1,0 +1,5 @@
+Syntax: %bSTATS%b
+
+Gives general network statistics, like current user/oper/server/
+channel count, max users/opers/servers/channels seen, both overall,
+and daily, oper/server kills seen, etc.

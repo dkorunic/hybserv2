@@ -1,0 +1,5 @@
+Syntax: %bMOTD%b
+
+ Displays the current message of the day.
+
+Alias: %bLOGONNEWS%b

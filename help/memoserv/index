@@ -1,0 +1,17 @@
+%b%M%b is a utility allowing IRC users to send short
+messages to other IRC users, whether they are online at
+the time or not, or to channels for anyone with autoop
+access or higher. Both sender and recipient must have
+their nicknames registered with %b%N%b in order to
+send a memo, or if the recipiant is a channel,  it must
+be registered with %b%C%b.  To use the following
+commands, type: %b/msg %M <command>%b.  For more
+information on a specific command, type:
+%b/msg %M help <command>%b.
+
+    SEND    Send a memo to a nick/channel
+    LIST    List all of your or a channel's memos
+    READ    Read a memo (or all memos)
+    FORWARD Forward a memo to a nick/channel
+    REPLY   Reply to a memo by number
+    DEL     Delete a memo (or all memos)

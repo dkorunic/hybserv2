@@ -1,0 +1,14 @@
+Syntax: %bSET <channel> EMAIL <email address|->%b
+
+Sets the channel email address to <email address>.
+When users perform an %bINFO%b on the channel,
+they will be informed of the channel's email address.
+To clear the email address use a "-" as the parameter.
+Alias: %bMAIL%b
+Examples:
+         %b/msg %C SET <channel> EMAIL founder@we.rock%b
+           Sets the email address to "founder@we.rock" on
+           <channel>
+
+         %b/msg %C SET <channel> EMAIL -%b
+           Clears the email address on <channel>

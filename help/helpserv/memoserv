@@ -1,0 +1,4 @@
+%bSyntax: MEMOSERV [command]%b
+
+If [command] specified, displays help on [command], otherwise
+displays general %M help.

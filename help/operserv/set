@@ -1,0 +1,21 @@
+Syntax: %bSET <item | "list"> [value]%b
+
+ This command allows you to configure various items
+in settings.conf on the fly. If you wish to
+configure a string item with multiple arguements,
+use a colon (:) first.
+
+Examples:
+         %b/msg %O SET MaxClonesWarning :Clones are bad.%b
+           Sets the MaxClonesWarning directive to
+          "Clones are bad."
+
+         %b/msg %O SET ChannelExpire 1w3d%b
+           Sets ChannelExpire to 1 week, 3 days.
+
+         %b/msg %O SET DefaultHubPort%b
+           Outputs the current value of DefaultHubPort.
+
+         %b/msg %O SET list%b
+           Outputs a list of all directives and their
+          values.

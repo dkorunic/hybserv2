@@ -1,0 +1,13 @@
+Syntax: %bVOICE <channel> [nicknames]%b
+
+Gives voice status to [nicknames].  If no nicknames
+are specified, %C will voice the nick who gave the 
+command.  Placing a %b-%b in front of a nick will
+devoice that nick.
+Examples:
+         %b/msg %C VOICE #channel%b
+           Voices the nick who gave the command on #channel.
+
+         %b/msg %C VOICE #channel nick1 -nick2 nick3%b
+           Voices nick1 and nick3, but devoices nick2
+           on #channel.

@@ -1,0 +1,5 @@
+Syntax: %bSEENNICK <nick>%b
+
+This will give 'last seen' information for the specified
+nick, only displaying IF there was an exact match with
+its QUIT reason (or nickname change).

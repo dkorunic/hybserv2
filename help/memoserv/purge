@@ -1,0 +1,6 @@
+Syntax: %bPURGE [channel]%b
+
+This permanently deletes all memos you have marked for
+deletion, or if [channel] specified, deletes all memos
+marked for deletion on [channel].  Use carefully, since
+you cannot recover memos after you have purged them.

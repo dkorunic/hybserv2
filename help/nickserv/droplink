@@ -1,0 +1,6 @@
+Syntax: %bDROPLINK <nickname>%b
+
+This command will locate the nickname link that <nickname>
+is a part of (if any), and drop every nickname in that link.
+This is helpful since you won't have to %bDROP%b each
+nickname individually.

@@ -1,0 +1,40 @@
+Syntax: %bCHANNEL <pattern> [options]%b
+
+Displays statistics for all channels matching <pattern>
+and [options].
+
+Valid Options:
+  -minimum <value>     Limit matches to channels with at least
+                       the given value's number of users
+
+  -maximum <value>     Limit matches to channels with at most
+                       the given value's number of users
+
+  -banmatch <hostmask> Limit matches to channels that have
+                       the given hostmask on their ban list
+
+  -exmatch <hostmask>  Limit matches to channels that have
+                       the given hostmask on their ban
+                       exception list
+
+  -nolimit             Ignore the MaxChannel limit of matches
+
+Examples:
+  %bCHANNEL *pattern*%b
+    Display information about all channels matching
+    *pattern*.
+
+  %bCHANNEL * -min 100%b
+    Display all channels with 100 users or more.
+
+  %bCHANNEL * -min 100 -max 200%b
+    Display all channels with 100 or more users, but
+    also 200 or less.
+
+  %bCHANNEL *lame* -banmatch *lamer.org*%b
+    Display all channels matching *lame* that have a
+    hostmask matching *lamer.org* on their ban list.
+
+  %bCHANNEL * -exmatch *good.hostmask*%b
+    Display all channels that have the given hostmask
+    on their ban exception list.

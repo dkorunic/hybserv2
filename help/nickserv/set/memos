@@ -1,0 +1,4 @@
+Syntax: %bSET MEMOS {ON/OFF}%b
+
+When MEMOS is OFF, people who try send you a memo will be
+given a message saying you are currently rejecting memos

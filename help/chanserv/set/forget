@@ -1,0 +1,10 @@
+Syntax: %bSET <channel> FORGET {ON}%b
+
+When you toggle FORGET ON, %C will leave your channel,
+and no one else will be able to register it or use it.
+You will NOT be able to gain ops through %C, or
+use any other %C functions if your channel is forgotten.
+Its purpose is for those who do not wish to have a
+%C in their channel, but still want to prevent others
+from registering the channel.  The only way to "UN"FORGET
+your channel is to %bDROP%b it.

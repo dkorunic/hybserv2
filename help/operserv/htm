@@ -1,0 +1,17 @@
+Syntax: %bHTM [ON|OFF|MAX [rate]]%b
+
+Displays high-traffic mode statistics.  If ON or OFF is
+specified, forces high-traffic mode ON or OFF.  If MAX
+is specified, services won't switch to HTM until the load
+hits the specified rate.  While in high-traffic mode, the
+hub server will be given priority over dcc/telnet clients etc.
+Examples:
+         %bHTM ON%b
+           Forces high-traffic mode ON.
+
+         %bHTM OFF%b
+           Forces high-traffic mode OFF.
+
+         %bHTM MAX 100%b
+           Services won't switch to HTM until the load
+           reaches 100 K/s.

@@ -1,0 +1,12 @@
+Syntax: %bGHOST <nickname> [password]%b
+
+If you suddenly get disconnected from your isp or
+the irc server, sometimes a ghosted client will
+be left behind.  This command can be used to
+kill the ghosted client so you can get your
+nickname back.  If %b<nickname>%b has %bSET SECURE%b
+OFF, and you match a hostmask on %b<nickname>%b's
+ACCESS LIST, then you do not need to supply a password.
+%+a%b* * * *
+%+aAdministrators can %BGHOST%b any nickname -
+%+a%bGHOST <nickname>%b.

@@ -1,0 +1,17 @@
+Syntax: %bOP <channel | ALL> [nicknames]%b
+
+Gives channel operator status to [nicknames].  If no
+nicknames are specified, %C will op the nick who gave
+the command.  Placing a %b-%b in front of a nick will
+deop that nick.  If SECUREOPS is ON, %C will not
+op nicks who do not have a level of AutoOp or higher.
+Examples:
+         %b/msg %C OP #channel%b
+           Ops the nick who gave the command on #channel.
+
+         %b/msg %C OP #channel nick1 -nick2 nick3%b
+           Ops nick1 and nick3, but deops nick2 on #channel.
+
+         %b/msg %C OP ALL%b
+           Ops you in all channels you are currently in, if
+          you have CMDOP access.

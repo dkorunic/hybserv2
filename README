@@ -1,0 +1,188 @@
+Some short notes:
+
+The former Hybserv development team has decided to spin off and 
+focus its energies towards the HYBSERV2 project. Like the name 
+implys this new version will be even better then that last. 
+If their is something you would like to see added to HYBSERV2 
+please let use know as we are always looking for new ideas.
+
+With that said - Per Sidewnder's (Cosine's) request - HYBSERV
+will no longer be supported. So if u have a question please 
+upgrade to a version listed in the HYBSERV2 dir. 
+
+
+John-Work
+
+
+HybServ(2) TS services - This file last updated by JW @ Nov 20 2000
+Copyright (C) 1998-2000 Patrick Alken (wnder@underworld.net)
+
+HybServ was first coded by Patrick Alken (wnder@underworld.net) 
+and is now maintained by the Hybserv2 Coding Team, unless otherwise 
+mentioned in the code or the credits.
+
+The following people have contributed to this release of HybServ
+In nick alphabetical order:
+
+Bruns       Brian Bruns     bruns@magenet.com
+Cosine      Patrick Alken   wnder@uwns.underworld.net
+Decho       Nedelcho Stanev decho@csoft.bg
+Hwy101      Walter Campbell wcampbel@botbay.net
+John-Work   F. John Rowan   john@tdkt.org
+kreator     Dinko Korunic   kreator@fly.srk.fer.hr
+Toot        Toby Verrall    to7@antipope.fsnet.co.uk
+		
+HybServ was specifically designed to run with hybrid ircd, although 
+it *should* work with CSr as well.  You may recieve the hybrid irc 
+daemon from ftp.blackened.com in /pub/irc/hybrid.  In our opinion, 
+it is the best irc daemon available and is currently used by EFNET / 
+Dalnet / ICQ / WFNET / HYBNET and Openprojects.
+
+I'm releasing this software under the terms of the GNU General
+Public License (see COPYING).  Should you choose to use and/or modify
+any of my code, please do so under the terms of the GNU General Public
+License, published by the Free Software Foundation.
+
+DISTRIBUTION
+
+  You can get HybServ from:
+
+       #1:  ftp.magenet.com/pub/hybserv/
+            (Thanks to Bruns :-))
+
+       #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
+            (Thanks to kreator :-))
+
+
+
+
+INSTALLATION
+
+  Read the INSTALL file :-).
+
+#########################################################################
+# BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to john@tdkt.org  #
+#########################################################################
+ 
+We can't fix bugs if no one reports them!
+
+The criteria for reporting bugs is somewhat specific. 
+
+1. We need to know exactly how to reproduce the bugs. Use
+   #define DEBUG in include/config.h to make sure server
+   will produce corefile.
+
+2. If you do not know how to reproduce the bug at will, please
+   do the following: #define EXTREMEDEBUG in config.h, which 
+   will cause the file "hybserv.hubinfo" to be created. If the 
+   bug occurs again, email me the hybserv.hubinfo file, and it 
+   will give us a starting point.
+
+################################################################
+# If you are interested in helping out with the development of #
+# Hybserv feel free to join the Hybserv Development List       #
+################################################################
+
+
+This is the offical Hybserv mailing list hosted on MageNet.
+
+This is a publically postable list.
+
+Here we can discuss anything we need and make sure problems get fixed. 
+Please feel free to give out this address, and you may subscribe by
+sending e-mailing to majordomo@magenet.com:
+
+subscribe hybserv <your mail>
+
+You may also find us online by using the Openprojects Network
+
+ /server vinge.openprojects.net
+ /server irc.linux.com
+
+#twilight_zone
+
+#########################################################
+# Running Hybserv                                       #
+#########################################################
+
+Make sure that each hub server you have specified in your config file
+has C/N lines for HybServ matching the password in the first field of
+the S: line and the server name specified in the N: line.  Also, if you
+wish to enable jupes (#define ALLOW_JUPES), you *MUST* give services
+an H: line in ircd.conf.
+
+  C/N line examples: Suppose the hostname of services is
+"services.us" with an ip of 1.2.3.4.
+
+  In ircd.conf:    C:1.2.3.4:MyPassword:services.us::1
+                   N:1.2.3.4:MyPassword:services.us::1
+
+  In hybserv.conf: S:MyPassword:hub.server.com:6667
+                   N:services.us:Hybrid services
+
+When you have compiled HybServ and edited the necessary files, simply
+type ./hybserv. 
+
+Then, go on IRC and type:            /msg OperServ identify <password>
+
+Assuming OperServ is the OperServNick defined in settings.conf and you
+have given yourself a O: line in hybserv.conf. You should beallowed to 
+give OperServ commands through /msg or DCC CHAT.  
+
+For a list of commands, /msg OperServ help.
+
+Most commands may also be done through DCC CHAT, and in fact more
+commands are available through DCC CHAT. Simply /dcc chat OperServ 
+to connect, and .help
+
+I have tried to make HybServ fully compatible with TCM (linking wise).
+If you wish HybServ to be part of your TCM botnet, read TCM-LINKING
+for instructions.  If you have no idea what a TCM bot is, don't worry
+about it :-).
+
+If you enabled NickServ, ChanServ, MemoServ etc. in config.h, you
+can get lists of their commands through /msg *Serv help. NickServ
+and ChanServ have several commands that can only be executed by
+administrators.  This means you must match an O: line (with an
+"a" flag) in hybserv.conf AND be registered with OperServ to use
+them. This can be done by typing /msg OperServ password, these 
+commands CANNOT be accessed by DCC Chat. 
+
+IMPORTANT NOTE! If you use Hybrid or Hybrid-compatibile IRC daemon, you
+should enable Q-lines (quarantined nickname) for services-reserved
+nicknames because of obvious security reasons:
+
+	Q:NickServ:This nickname is reserved.
+	Q:ChanServ:This nickname is reserved.
+	Q:OperServ:This nickname is reserved.
+
+
+##########################################################################
+# Legal Stuff:                                                           #
+##########################################################################
+
+This package has absolutely no warranty.  Use at your own risk.
+The author will accept no responsibility for any damage, whatsoever,
+caused by this program.
+
+##########################################################################
+# Credits:                                                               #
+##########################################################################
+
+Functions used from other GPL'd sources:
+     match()        -- from ircd-hybrid source
+     HashNick()     -- from ircd-hybrid source
+     HashChannel()  -- from ircd-hybrid source
+
+tools/mkpasswd.c is copyright (C) 1991 Nelson Minar <minar@reed.edu>
+
+Some help files were used from EsperNet's service package:
+
+ftp.dragonfire.net/software/unix/irc
+
+The ideas for a settings.conf and the shownicks/showchans programs
+were inspired from this package as well. 
+
+See also the begining of this file.
+
+

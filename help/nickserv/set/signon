@@ -1,0 +1,5 @@
+Syntax: %bSET SIGNON {ON/OFF}%b
+
+When SIGNON is OFF, you will not be notified of new
+memos when you first connect to the network, or change
+your nickname.

@@ -1,0 +1,8 @@
+Syntax: %bIDENTIFY <password>%b
+
+Most commands require that you identify yourself, in order to
+use them.  Also, nicknames which have kill protection will
+be killed if the user has not identified within one minute.
+If %bSET AUTOMASK%b is ON, and you %bIDENTIFY%b from a host
+which is not on your %bACCESS%b list, the new hostmask will
+automatically be added to it.

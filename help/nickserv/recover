@@ -1,0 +1,15 @@
+Syntax: %bRECOVER <nickname> [password]%b
+
+If someone has stolen your nickname, you can use
+%bRECOVER%b to get it back.  %bRECOVER%b performs
+a nick collide on %b<nickname>%b and enforces the
+nickname until you use the %bRELEASE%b command on
+it, or just wait until the release timeout.  If
+you match a hostmask on %b<nickname>%b's %bACCESS%b
+list, and %b<nickname>%b has NOT %bSET SECURE%b ON,
+you do not need to supply a password.  However,
+if %b<nickname>%b has %bSET SECURE%b ON, you will
+always need to supply the correct password.
+%+a%b* * * *
+%+aAdministrators can %BRECOVER%b any nickname -
+%+a%bRECOVER <nickname>%b.

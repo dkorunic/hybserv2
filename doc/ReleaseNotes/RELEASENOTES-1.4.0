@@ -1,0 +1,36 @@
+Release Notes for HybServ 1.4.0
+======= ===== === ======= =====
+
+There are two significant features added in this version
+that everyone should be made aware of.
+
+One: NickServ now has support for linked nicknames. This means
+     that you can use many different nicknames, but share
+     a common access list, memos, and set options. Thus, you
+     do not have to custom configure each one. See the
+     LINK, UNLINK, and SHOWLINKS help files on NickServ.
+
+Two: The file "settings.conf" was added, which now contains
+     most of the old config.h #defines. For most people,
+     the defaults I've set should be fine.
+
+     Advantages:
+         1. Most of HybServ's features are now run-time
+            configurable, rather than compile-time
+            configurable as with the old config.h. This means
+            you do not need to recompile HybServ to enable or
+            disable many features. In fact, in most cases
+            you can enable/disable features by rehashing HybServ.
+
+         2. Before, you had to edit config.h everytime you
+            upgraded HybServ to a different version. With
+            settings.conf, you can keep your favorite settings
+            and features, without re-editing everytime you
+            upgrade.
+
+     Disadvantages:
+         1. If I ever add new features to settings.conf,
+            the settings.conf you have won't contain them.
+            However, any new added features will be
+            explained in a RELEASENOTES file (similar to
+            this one) for the new version of HybServ.

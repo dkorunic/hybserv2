@@ -1,0 +1,3 @@
+Syntax: %bUNDEL [channel] <index|ALL>%b
+
+Unmarks a memo (or all memos) for deletion.

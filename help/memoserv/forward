@@ -1,0 +1,8 @@
+Syntax: %bFORWARD <index|ALL> <nick/channel>%b
+
+Forwards a memo (or all memos) to the specified nickname or
+channel.  The text "[Fwd]: " will be prepended to the memo
+text so the recipient will know it was forwarded.  A channel
+can be the recipient of a forwarded memo, but you cannot
+forward a channel's memo(s) to another nick/channel.
+Example: %bforward ALL my-pal%b

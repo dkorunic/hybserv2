@@ -1,0 +1,5 @@
+Syntax: %bLIST [channel]%b
+
+Lists all memos you currently have, or if a channel is
+specified, lists all the channel's memos.  Also displays
+when the memo was sent.

@@ -1,0 +1,3 @@
+Syntax: %bSET <channel> FOUNDER <nickname>%b
+
+Resets the founder nickname for <channel> to <nickname>.

@@ -1,0 +1,15 @@
+Syntax: %bGCHANNOTE [options] <message>%b
+
+ Sends the specified message to channels matching [options].
+Alias: %bGCNOTE%b
+
+Valid Options:
+  -mask <mask>    Limit matches to channels matching the given mask.
+
+Examples:
+         %b/msg %G GCNOTE -mask *bad* Bad channel :P%b
+            Sends the message "Bad channel :P" to all channels
+           matching *bad*.
+
+         %b/msg %G GCNOTE Have fun chatting!%b
+            Sends the message to all channels on the network.

@@ -1,0 +1,30 @@
+%b%N%b allows you to "register" a nickname and
+prevent others from using it.  If the nick is not used
+for 30 days, the registration will expire.  The following
+commands allow for registration and maintenance of
+nicknames; to use them, type %b/msg %N <command>%b.
+For more information on a specific command, type
+%b/msg %N help <command>%b.
+
+    REGISTER   Register a nickname
+    DROP       Cancel the registration of a nickname
+    IDENTIFY   Identify yourself with your password
+    ACCESS     Modify the list of authorized addresses
+    SET        Set various options for your nickname
+    LIST       Display list of nicks matching a pattern
+    RECOVER    Kill another user who has taken your nick
+    RELEASE    Regain custody of your nick after %bRECOVER%b
+    GHOST      Kill a ghosted nickname
+    INFO       Get information for a nickname
+    LINK       Link your nickname to another
+    UNLINK     UnLink your nickname
+%+a%b* * * *
+%+aAdministrator commands:
+%+a%b%b
+%+a    FORBID     Prevent anyone from using a nickname
+%+a    SETPASS    Change a nickname's password
+%+a    NOEXPIRE   Prevent a nickname from expiring
+%+a    SHOWLINK   Display a certain nickname link list
+%+a    DROPLINK   Drop an entire nickname link
+%+a    COLLIDE    Manipulate nickname collision list
+%+a    FLAG       Set flags to limit a user's privileges

@@ -1,0 +1,23 @@
+Syntax: %bACCESS {ADD|DEL|LIST} [mask]%b
+
+The %bACCESS%b command allows you to modify the list of
+recognized hostmasks for your nickname.  If you use a
+hostmask that is not on your %bACCESS%b list, you must
+%bIDENTIFY%b with %N.
+
+Examples:
+    %bACCESS ADD *wnder@*underworld.net%b
+       Gives users matching %b*wnder@*underworld.net%b
+       permission to use your nickname.
+
+    %bACCESS DEL *wnder@*underworld.net%b
+       Opposite of previous command.
+
+    %bACCESS LIST%b
+       Displays list of authorized hostmasks for your
+       nickname.
+
+Type: %b/msg %N HELP ACCESS <option>%b for more information
+%+a%b* * * *
+%+aAdministrators may view/modify any nickname's Access List
+%+avia: %bACCESS <nickname> {ADD|DEL|LIST} [mask]%b

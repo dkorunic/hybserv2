@@ -1,0 +1,3 @@
+Syntax: %bUNGLINE <user@host>%b
+
+Removes glines matching %b<user@host>%b.

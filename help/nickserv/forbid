@@ -1,0 +1,6 @@
+Syntax: %bFORBID <nickname>%b
+
+Prevents anyone from using %b<nickname>%b.  Anyone who uses
+a forbidden nickname will be killed within 60 seconds if
+they have not changed their nick.  Forbidden nicknames
+can be cancelled via %bDROP <nickname> <password>%b.

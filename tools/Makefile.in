@@ -1,0 +1,52 @@
+# HybServ ./tools Makefile (C) Patrick Alken 1998
+# $Id$
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+INCLUDE = -I../include
+# DEFS =
+LIBS = @LIBS@
+
+RM = @RM@ -f
+
+COMMON = \
+ doencrypt.o
+
+OBJECTS = \
+ doencrypt.o\
+ encryptconf.o\
+ encryptdb.o\
+ mkpasswd.o
+
+PROGS = \
+ ../bin/encryptconf\
+ ../bin/encryptdb\
+ ../bin/mkpasswd
+
+all: $(PROGS)
+
+../bin/encryptconf: encryptconf.o $(COMMON)
+	$(CC) -o ../bin/encryptconf encryptconf.o $(COMMON) $(LIBS)
+
+../bin/encryptdb: encryptdb.o $(COMMON)
+	$(CC) -o ../bin/encryptdb encryptdb.o $(COMMON) $(LIBS)
+
+../bin/mkpasswd: mkpasswd.o $(COMMON)
+	$(CC) -o ../bin/mkpasswd mkpasswd.o $(COMMON) $(LIBS)
+
+clean:
+	$(RM) $(PROGS) $(OBJECTS)
+
+distclean: clean
+	$(RM) Makefile
+
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDE) -c $<
+
+## Dependencies
+
+mkpasswd.o: mkpasswd.c
+doencrypt.o: doencrypt.c

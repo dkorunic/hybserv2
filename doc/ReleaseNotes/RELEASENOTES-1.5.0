@@ -1,0 +1,53 @@
+Release Notes for HybServ 1.5.0
+======= ===== === ======= =====
+
+ The administrator "a" flag is no longer the highest
+flag in O: lines. The "s" flag was added for "Services
+Administrators". The commands they have access to
+are more services oriented than irc oriented - such
+as rehash, restart, die etc. Read the file doc/README-FLAGS
+for more information.
+
+ A new directive (ProxyCheck) was added to settings.conf.
+With this enabled, HybServ will perform a wingate proxy
+check on each client that connects to the network.
+Insecure proxies will be logged and broadcast to +y users
+on the partyline. You may also get a list of all proxy
+users through OperServ's trace command, using:
+TRACE -proxy - Check out the trace helpfile for more
+information.
+ NOTE: You must have pthreads enabled in HybServ in
+       order for this feature to work. HybServ will
+       create a thread to do the actual wingate check.
+ Also, MaxProxies was added to settings.conf to limit
+the number of concurrent proxy checks that will be
+performed. In the event of a netjoin, we don't want
+services performing hundreds of proxy checks since
+it would create a large amount of lag as well as
+cpu usage.
+
+ Second, the new directive (MaxLogs) was added to
+settings.conf. This allows you to maintain some control
+over how big your log files get, or how many of them
+you wish to keep. Read the section in settings.conf
+for more information.
+
+ Third, the new directive (MaxChansPerUser) was added to
+settings.conf. This allows you to control how many channels
+a user registers at any one time. Read the section in
+settings.conf for more information.
+
+ Fourth, the new directive (NicknameWarn) was added to
+settings.conf. This allows you to decide if users should
+be warned to identify with NickServ when they first
+connect to the network. Read the section in settings.conf
+for more information.
+
+ A new administrator command was added to NickServ.
+"DROPLINK" allows admins to drop an entire nickname link
+without having to drop each nickname in the link individually.
+Check out NickServ's help file for more information.
+
+ Many new usermodes have been added to OperServ. Basically,
+the +d usermode was broken up into many smaller usermodes.
+Use .help umode to get a listing.

@@ -1,0 +1,4 @@
+Syntax: %bGCMEMO <memotext>%b
+
+Sends the memo <memotext> to all registered channels. Channel
+services must be enabled.

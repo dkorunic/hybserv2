@@ -1,0 +1,13 @@
+%b%G%b is a utility allowing IRC users to receive global
+messages from network administrators. To use the following
+commands, type: %b/msg %G <command>%b. For more information
+on a specific command, type:
+%b/msg %G help <command>%b.
+
+    MOTD       Display the current logon news
+%+a%b* * * *%b
+%+a%bAdministrator commands%b
+%+a    GNOTE      Send global notices to users
+%+a    GCHANNOTE  Send global notices to channels
+%+a    GMEMO      Send global memos to users
+%+a    GCMEMO     Send global memos to channels

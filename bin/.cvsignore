@@ -1,0 +1,6 @@
+settings.conf
+cleandb
+hybserv
+encryptconf
+encryptdb
+mkpasswd

@@ -56,7 +56,6 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
 

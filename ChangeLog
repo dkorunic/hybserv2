@@ -1,3 +1,9 @@
+*** 20020922_4 by kreator
+- fix finddupe in Makefile.in
+- allow bansexpire for hybrid7
+- fix execute7gline() for hybrid7 (it accepts mins, not secs)
+
+
 *** 20020922_3 by kreator
 - fixed a dozen of IsNum() < 0 issues in memoserv code
 

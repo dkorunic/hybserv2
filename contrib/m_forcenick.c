@@ -55,7 +55,7 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
 struct Message forcenick_msgtab = 
 {
   "FORCENICK", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_ignore, m_not_oper, mo_forcenick, mo_forcenick}
+  {m_ignore, m_not_oper, mo_forcenick, m_ignore, mo_forcenick}
 };
 
 #ifndef STATIC_MODULES

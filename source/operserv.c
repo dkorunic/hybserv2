@@ -1003,7 +1003,8 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 
 #ifdef OPERNICKIDENT
   nptr = FindNick (lptr->nick);
-  if (!(Network->flags & NET_OFF) && !(nptr->flags & NS_IDENTIFIED)) 
+  if (!(Network->flags & NET_OFF) &&
+      (!nptr || !(nptr->flags & NS_IDENTIFIED)))
   {
     os_notice(lptr, sockfd, "You must first identify to \002NickServ\002");
     return;

@@ -83,7 +83,13 @@ if test ! "$enable_threads" = "no"; then
         CFLAGS="${CFLAGS} -D_REENTRANT"
       fi
       LIBP="-lpthread",
-      AC_MSG_WARN(Compiling without pthread support)))
+       AC_MSG_WARN(No libpth detected - trying libc_r)
+       AC_CHECK_LIB(c_r, pthread_create,
+         AC_DEFINE(HAVE_PTHREADS)
+         _have_pthread=yes
+         CFLAGS="${CFLAGS} -D_REENTRANT"
+         LIBP="-lc_r",
+          AC_MSG_WARN(Compiling without multithread support))))
 fi
 AC_SUBST(LIBP)
 

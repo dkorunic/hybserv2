@@ -115,23 +115,20 @@ GetString(int ac, char **av)
 } /* GetString() */
 
 /*
-SplitBuf()
- Take string "buff" and insert NULLs in the spaces between words.
-Keep pointers to the beginning of each word, and store them
-in "array".
- Returns the number of words in "buff"
-*/
-
-int
-SplitBuf(char *buff, char ***array)
-
+ * SplitBuf()
+ *
+ * Take string "buff" and insert NULLs in the spaces between words. Keep
+ * pointers to the beginning of each word, and store them in "array".
+ * Returns the number of words in "buff"
+ */
+int SplitBuf(char *buff, char ***array)
 {
   int argsize = 8;
-  int acnt,
-      ii;
+  int acnt, ii;
   char *temp1, *tempbuf;
 
-  /* Be safe. If something down fails, it will point to NULL anyway -kre */
+  /* Be safe. If something down fails, it will point to NULL anyway -kre
+   * */
   *array = NULL;
 
   /* Perform this check -kre */
@@ -184,7 +181,10 @@ SplitBuf(char *buff, char ***array)
     }
     else
     {
-      temp1 = strpbrk(tempbuf, " ");
+      /* Why use strpbrk() on only 1 character? We have faster strchr for
+       * that. -kre */
+      /* temp1 = strpbrk(tempbuf, " "); */
+      temp1 = strchr(tempbuf, ' ');
       if (temp1)
       {
         *temp1++ = 0;

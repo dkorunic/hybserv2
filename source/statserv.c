@@ -1566,52 +1566,49 @@ int* get_tg( int year, int *days )
 }
 
 #ifdef SPLIT_INFO
-/* This accepts these parameters:
+/* Accepts these parameters:
  * a) no parameters - to display split data for all servers currently in
- * netsplit
- * b) av[1] - to display split data for current server -kre */
-static void
-ss_splitinfo(struct Luser *lptr, int ac, char **av)
+ *    netsplit
+ * b) av[1] - to display split data for current server
+ * -kre
+ */
+static void ss_splitinfo(struct Luser *lptr, int ac, char **av)
 {
   struct Server *tmpserv;
-  int issplit=0;
+  char sMsg[] = "%-30s currently in \002netsplit\002 for %s";
+  int issplit = 0;
+
   if (ac < 2)
   {
-    for (tmpserv=ServerList; tmpserv; tmpserv=tmpserv->next)
+    for (tmpserv = ServerList; tmpserv; tmpserv = tmpserv->next)
       if (tmpserv->split_ts)
       {
-        ss_printsplit(tmpserv, lptr);
-        issplit=1;
+        notice(n_StatServ, lptr->nick, sMsg, tmpserv->name,
+            timeago(tmpserv->split_ts, 0));
+        issplit = 1;
       }
   }
   else
   {
-    if ((tmpserv=FindServer(av[1])))
+    if ((tmpserv = FindServer(av[1])))
     {
-      ss_printsplit(tmpserv, lptr);
-      issplit=1;
-
+      if (tmpserv->split_ts)
+      {
+        notice(n_StatServ, lptr->nick, sMsg, tmpserv->name,
+            timeago(tmpserv->split_ts, 0));
+        issplit = 1;
+      }
     }
     else
       notice(n_StatServ, lptr->nick,
         "Invalid server %s!", av[1]);
   }
+
   if (!issplit)
     notice(n_StatServ, lptr->nick,
       "No active splits at this moment");
-
 }
 
-/* Routine for printing split info. Should never get NULL as input
- * parameter. -kre */
-void ss_printsplit(struct Server *tmpserv, struct Luser *lptr)
-{
-  notice(n_StatServ, lptr->nick,
-    "%-30s currently in \002netsplit\002 for %s",
-    tmpserv->name,
-    timeago(tmpserv->split_ts, 0));
-}
-
-#endif
+#endif /* SPLIT_INFO */
 
 #endif /* STATSERVICES */

@@ -6,6 +6,7 @@ If it happens, it must be possible.
 
 Pending bugs:
 -------------
+*) ultra-buggy DeleteLink() for nicknames!
 *) use snprintf instead of sprintf
 *) trace possible leaks
     I've prepared some parts of code for trace -kre

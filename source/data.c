@@ -704,34 +704,29 @@ WriteNicks()
         (long) nptr->created,
         (long) nptr->lastseen);
 
-      /* write out password */
-      fprintf(fp, "->PASS %s\n",
-        nptr->password);
+      /* write out password only if not forbidden! -kre */
+      if (nptr->password)
+        fprintf(fp, "->PASS %s\n", nptr->password);
 
       if (nptr->email)
-        fprintf(fp, "->EMAIL %s\n",
-        nptr->email);
+        fprintf(fp, "->EMAIL %s\n", nptr->email);
 
       if (nptr->url)
-        fprintf(fp, "->URL %s\n",
-        nptr->url);
+        fprintf(fp, "->URL %s\n", nptr->url);
 
       if (LastSeenInfo)
       {
         if (nptr->lastu && nptr->lasth)
-          fprintf(fp, "->LASTUH %s %s\n",
-            nptr->lastu,
+          fprintf(fp, "->LASTUH %s %s\n", nptr->lastu,
             nptr->lasth);
 
         if (nptr->lastqmsg)
-          fprintf(fp, "->LASTQMSG :%s\n",
-            nptr->lastqmsg);
+          fprintf(fp, "->LASTQMSG :%s\n", nptr->lastqmsg);
       }
 
       for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+        fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
-        fprintf(fp, "->HOST %s\n",
-          hptr->hostmask);
     } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
   } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 

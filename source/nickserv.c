@@ -1665,6 +1665,8 @@ nptr's master's access list
 Return: 1  if successful
         0  if NULL pointer
         -1 if nptr is not in a link
+
+XXX: We have bugs here. Fix them! -kre
 */
 
 static int
@@ -4407,6 +4409,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
     }
 
     nptr->flags |= NS_FORBID;
+    nptr->flags &= ~NS_IDENTIFIED;
   }
 
   notice(n_NickServ, lptr->nick,

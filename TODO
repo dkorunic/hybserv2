@@ -3,6 +3,7 @@ Today's MOTD
 "A bad marriage is like a horse with a broken leg, you can shoot
  the horse, but it don't fix the leg."
 
+
 Pending bugs:
 -------------
 *) fix invalid gnote count
@@ -25,8 +26,8 @@ Pending bugs:
    reconnecting - i find it annonying to look at forced synching
 
 
-Features to come:
------------------  
+Features (yet) to come:
+-----------------------
 *) adx wishlist:
   1)
   <adx> for example, to create a new operserv's command
@@ -77,100 +78,3 @@ Features to come:
 *) be compatibile with other ircds (!!)
    ----> work in progress (me)
 *) umode +g ACCEPT list (BR's idea)
-
-
-Done so far (and yes, there is even more):
-------------------------------------------
-*) fix V and S lines
-*) ChanServ not opering when it should (!)
-*) MemoServ not handling memos by master
-*) design chanaccesslists inheritance for linked nicknames
-*) fix chan_access to get along with linked nicknames!
-*) n_info doesn't show linked nicknames for non-master
-*) EMERGENCY:
-   - fix insertlink() and n_link() to:
-   a) correctly link nicknames, ie link them using master nickname
-   b) handle correctly master nickname as the begginning of the list
-   c) recover from dead loops and fix those dead loops
-   d) link nickname into list starting FROM master nick, and link one
-      linked list into another (WOO..)
-*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
-   with unlink link copying routine.
-   NOTE: Quickfixed this. However, I need to look at this more closely!
-   NOTE2: traced problem to DeleteLink(), done some more fixes, till
-          weird
-   NOTE3: still having problems.
-*) CVSWeb installed and documented
-*) add mySQL/PostgreSQL support for databases
-   -> i'm working on this, too; currently i'm involved in libpq to be
-   specific (kre)
-*) fix "services" fighting by juping offending server/services
-   detect online services and silently drop out
-   detect services fighting
-   -> i'm working on this right now (kre)
-*) ike did flood protection, more to come soon - stay tuned :-)
-*) channel verbose stuff
-*) fixed stupid stupid stupid bug with not --fcnt
-*) add collapse() and irccmp() (do we need this?)
-*) operserv function to find improper TS channels and fix them
-   ---> still needs to be further tested
-*) space for realname, address, phone numbers
-*) mailing list
-*) applied (some are slightly modified) patches from KrisDuv
-   <krisduv2000@yahoo.fr> in the following order:
-   - fix stupid DefaultAccess problem which ment that anyone could alter
-     global channel levels (how the heck didn't anyone notice that?)
-   - fix broken lastseen updating for nicknames
-   - fix broken "Last Seen" info in n_info()
-*) Hwy has fixed restart() problem that was affected with check_pid()
-*) fix stupid bug that services +o people who match() O line, but have not
-   registered with OperServ
-*) something quite _weird_ with CH_OPPED.. seems it isn't working in some
-   special cases -- FIX FIX FIX THIS!
-*) added a lot of features from IrcBg
-*) NEW bug in services, somehow connected with hashing code and servers -
-   FindServer does not find servers -- I wonder how come no one found out
-   bug in hashing code that existed from first versions of HybServ1 for
-   masked servers! Ugh. -kre
-*) ultra-buggy DeleteLink() for nicknames! - some fixes, yet to test
-   throughly
-*) use snprintf instead of sprintf or possibly use irc_sprintf from
-   Hybrid
-*) lower usage of time() via global variable synched in dotimer()
-*) added fixts for channels and nicknames
-*) added deletion of cleartext password from memory if crypt is on
-*) services ignoring people sometimes
-*) MD5 support (UseMD5 param_set)
-*) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
-*) let +h people use unban by default (if hyb7 is defined) (fl_)
-*) safe write for settings.conf -> it can be truncated in some cases
-*) if there is AutoKillClones in settings.conf with value 0, it is setup
-   to 1; if there isn't, it is setup to 0 as it should be
-*) weird chat problem reported by fl_ -> services do not respond
-*) nasty .gline bug (dcc)
-*) hybrid7 features (Janos did it)
-*) weird level redefine on all channels 
-*) check older KNOWNBUGS
-*) kline/unkline
-*) .who not working?
-*) better multiprocessor support (libhoard!)
-*) Recover the lost ChangeLog entries
-*) sfio support
-*) crashing on /reload
-*) linked tree problems
-*) bcflood issue
-*) anon cvs
-*) we don't save information on servers on shutdown (statserv)
-*) get rid of proxy ch. code (or make it better :) )
-*) add support for solaris threads
-*) trace weird SIGPIPE-s
-*) umode command (in msg)
-*) insert support for solaris threads
-*) split and autorouting
-*) SplitBuff() fixes
-*) various older fixes, look in ChangeLog
-*) fix NSSetMemoSignon issue, reported by monolith
-   <monolith@mail.orblivion.com>
-*) unforbid (chan/nick)
-*) <...> and various not mentioned, since there were a lot of changes,
-   look in ChangeLog for more info

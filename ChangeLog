@@ -1,3 +1,8 @@
+*** 20010810_2 by kreator
+- put *newer* config.guess and config.sub
+- fixed n_set_uin() issue with non-dissapearing "UIN: " in n_info() output
+
+
 *** 20010810_1 by kreator
 - fixed smaller typo, eg:
   [fer]  Foreign OperKill: OperServ killed |DeVa| (Clones))

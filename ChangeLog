@@ -1,3 +1,24 @@
+*** 20010429_1 by kreator
+- added unforbid for channels and nicknames
+- added kline for operserv
+- added gline7 from fl (Lee Hardy <lee@leeh.co.uk>)
+- fix for serious security problem with helpserv, reported by larne
+  (Edward Brocklesby <ejb@leguin.org.uk>) and binder (John Binder
+  <jbinder@kgazd.bme.hu>)
+- fix cleandb with both [ and -d override for older systems
+- fix cleandb into cleandb.in that will configure fix with proper path
+- add releasenotes for 1.8
+- add documentation for kline, unforbid
+- fix forbid documentation
+- fix drop documentation
+- modifications to TODO
+- added fl_ and binder/janos to README, contributors
+- fixed configure script for cleandb
+- fix lame register variables in libstring (%s%register%%g)
+- fix Makefile.in
+- additionally test hybserv against gcc-3.0
+
+
 *** 20010422_1 by kreator
 Fixed minor bug in s_server() to correctly detect reconnecting hosts if
 SPLIT_INFO on

@@ -16,12 +16,17 @@ The latest version is 1.8.0 <--------------------
 John-Work
 
 
-HybServ2 TS services - This file last updated by JW @ April 30 2001
-Copyright (C) 1998-2000 Patrick Alken (wnder@underworld.net)
+HybServ2 TS services - This file last updated by JW @ 6 June 2001
+Copyright (C) 1998-2001 Patrick Alken (wnder@underworld.net)
 
 HybServ was first coded by Patrick Alken (wnder@underworld.net) and is now
 maintained by the Hybserv2 Coding Team, unless otherwise mentioned in the
 code or the credits.
+
+Lead Developer of Hybserv2
+
+kreator     Dinko Korunic     kreator@fly.srk.fer.hr
+
 
 The following people have contributed to this release of HybServ2 (in nick
 alphabetical order):
@@ -35,9 +40,6 @@ Janos       John Binder       jbinder@kgazd.bme.hu
 John-Work   F. John Rowan     john@tdkt.org
 kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 toot        Toby Verrall      to7@antipope.fsnet.co.uk
-
-Current HybServ2 leader developer:
-kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 
     
 HybServ was specifically designed to run with hybrid ircd, although it
@@ -69,12 +71,13 @@ DISTRIBUTION
        cvs login
        <press enter, no password>
        cvs checkout hybserv
-NOTE:
-  CVS is usually more current than the release.
 
-  #5: CVS Web snapshots:
-      http://fly.srk.fer.hr/~kreator/project/hybserv/
-      http://fly.srk.fer.hr/~kreator/project/tarballs/hybserv-cvs.tar.gz
+  #5:  CVS Web snapshots:
+       http://fly.srk.fer.hr/~kreator/project/hybserv/
+       http://fly.srk.fer.hr/~kreator/project/tarballs/hybserv-cvs.tar.gz
+
+
+NOTE: CVS is usually more current than the release.
 
 
 INSTALLATION
@@ -106,18 +109,62 @@ The criteria for reporting bugs is somewhat specific.
 ################################################################
 
 
-This is the official Hybserv mailing list hosted on Alleged.
+These are the official Hybserv2 mailing list hosted by Alleged.com
 
-This is a publicly postable list.
+These are  publicly postable lists.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
-sending e-mailing to majordomo@alleged.com:
+sending email to:
 
-subscribe hybserv <your mail>
+hybserv-request@alleged.com 
 
-NOTE:
-  Mailing list moved from botbay to alleged,but now it is functional.
+(Please use a command from below in the body of the message and not in the subject)
+
+
+Available Lists 
+
+  hybserv_public_list  Hybserv Public List
+  hybserv-bugs         Hybserv Bugs	
+
+
+
+Available List Manager Commands
+-------------------------------
+
+    subscribe	<list> [<address>]
+
+        Subscribe yourself (or <address> if specified) to the named <list>.
+
+    unsubscribe <list> [<address>]
+
+        Unsubscribe yourself (or <address> if specified) from the named <list>.
+
+    which
+
+        Find out which lists you are on.
+
+    who <list>
+
+        Find out who is on the named <list>.
+
+    info <list>
+
+        Retrieve the general introductory information for the named <list>.
+
+    lists
+
+        Show the lists served by this List Manager server.
+
+    help
+
+        Retrieve this message.
+
+    end
+
+        Stop processing commands (useful if your mailer adds a signature).
+
+
 
 You may also find us online by using the EFNow Network
 
@@ -206,12 +253,13 @@ OperServ password, these commands CANNOT be accessed by DCC Chat.
 IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC daemon, you
 should enable Q-lines (quarantined nickname) for services-reserved
 nicknames because of obvious security reasons:
+
   Q:NickServ:This nickname is reserved.
   Q:ChanServ:This nickname is reserved.
   Q:OperServ:This nickname is reserved.
 
-However Q lines changed in Hybrid-7 too, so you should copy/paste these
-lines:
+However Q lines changed in Hybrid-7 Feel free to copy and paste these lines:
+
   quarantine {
     name = "NickServ";
     reason = "This nickname is reserved";

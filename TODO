@@ -5,6 +5,7 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) NICKLEN AKICK fixup
 *) fix invalid gnote count
 *) fix damn malloc() coring..
 *) fix S lines

@@ -248,6 +248,8 @@ int main(int argc, char *argv[])
 
 #if !defined DEBUGMODE && !defined GDB_DEBUG
 
+  /* Daemontools compatibility stuff */
+#ifndef DAEMONTOOLS
   pid = fork();
   if (pid == -1)
   {
@@ -266,6 +268,7 @@ int main(int argc, char *argv[])
 
   printf("Entering foreground debug mode\n");
 #endif /* DEBUGMODE */
+#endif /* DAEMONTOOLS */
 
 #if defined GIMMECORE || defined DEBUGMODE
 

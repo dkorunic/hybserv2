@@ -2510,8 +2510,10 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
 
   ulev = GetAccess(cptr, lptr);
 
-  for (temp = cptr->access; temp; )
+  for (temp = cptr->access; temp != NULL; temp = tempnext)
   {
+    /* be sure we have a valid reference -kre */
+    tempnext = temp->next;
 
     found = 0;
 
@@ -2539,14 +2541,9 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
       if (master_nptr && temp->acptr)
         DeleteAccessChannel(master_nptr, temp->acptr);
 
-      /* protect temp->next, since temp gets freed -kre */
-      tempnext = temp->next;
       DeleteAccess(cptr, temp);
-      temp = tempnext;
 
     } /* if (found) */
-    else
-      temp = temp->next;
   } /* for .. */
   
   if (cnt > 0)

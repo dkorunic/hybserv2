@@ -10,10 +10,12 @@ Some sort of TODO/planning program:
 (not necessarily in `right' order)
 -----------------------------------
 
+*) ziplinks
 *) fix mailing list
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
 *) trace possible leaks
+    I've prepared some parts of code for trace -kre
 *) use btree&mmap (additionally use adns and glib)
 *) improve block allocator
 *) cvsweb
@@ -47,6 +49,7 @@ Some sort of TODO/planning program:
 Done so far:
 ------------
 
+*) let +h people use unban by default (if hyb7 is defined)
 *) safe write for settings.conf -> it can be truncated in some cases
 *) if there is AutoKillClones in settings.conf with value 0, it is setup
    to 1; if there isn't, it is setup to 0 as it should be

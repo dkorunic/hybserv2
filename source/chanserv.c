@@ -80,7 +80,11 @@ static int DefaultAccess[] = {
 #endif /* HYBRID7 */
   10,          /* CA_AUTOOP */
   10,          /* CA_CMDOP */
+#ifndef HYBRID7
   10,          /* CA_CMDUNBAN */
+#else
+  8,           /* CA_CMDUNBAN */
+#endif /* HYBRID7 */
   15,          /* CA_AKICK */
   20,          /* CA_CMDCLEAR */
   25,          /* CA_SET */

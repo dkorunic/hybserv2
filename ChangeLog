@@ -1,3 +1,11 @@
+*** 20010508_1 by kreator
+- misc TODO modifications
+- misc install.fast modifications
+- add FIXTS command for ChanServ and NickServ for fixing bogus TS
+  nicknames; default value is 8 weeks, however this is too much paranoid
+  and has to be further tested
+
+
 *** 20010507_2 by kreator
 - small hybserv.conf modifications
 - reviewed TODO

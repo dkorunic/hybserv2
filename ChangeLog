@@ -1,3 +1,8 @@
+*** 20020901_1 by kreator
+- force nick change via 432 numeric 10 seconds before killing
+  nickname (harly)
+
+
 *** 20020831_1 by kreator
 - multiple founder possibility (harly and kre)
 - if founder has identified with no founder access level,

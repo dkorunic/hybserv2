@@ -1,3 +1,7 @@
+*** 20020524_1 by kreator
+- fix compile error if #undef ALLOW_JUPES
+
+
 *** 20020514_1 by kreator
 - care about BSD signal semantics
 

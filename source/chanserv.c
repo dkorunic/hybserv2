@@ -2870,7 +2870,7 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 
     ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
         lptr->hostname);
-    if ((ca = OnAccessList(cptr, nmask, FindNick(lptr->nick))))
+    if ((ca = OnAccessList(cptr, nmask, GetMaster(FindNick(lptr->nick)))))
       if (ca->level >= cptr->access_lvl[level])
         return 1;
 
@@ -4378,7 +4378,7 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
       lptr->hostname);
-  if (!OnAccessList(cptr, nmask, nptr))
+  if (!OnAccessList(cptr, nmask, GetMaster(nptr)))
   {
     AddAccess(cptr, (struct Luser *) NULL, NULL, nptr,
         cptr->access_lvl[CA_SUPEROP]);

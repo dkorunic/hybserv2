@@ -1,3 +1,7 @@
+*** 20010502_2 by janos
+- a bug added to TODO
+
+
 *** 20010502_1 by kreator
 - after extensive testing I confirm that previous patch completely fixed
   all DCC cores on .command that would end in return message to

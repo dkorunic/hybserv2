@@ -1,3 +1,11 @@
+*** 20010920_1 by kreator
+- misc fixes
+- rewrite MyFree macro into inline func
+- misc stuff, sql stuff, etc..
+- remove c_r support since it is broken for our use
+- new core :-/
+
+
 *** 20010915_2 by kreator
 - added sql stuff to be done later
 

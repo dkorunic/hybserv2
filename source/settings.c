@@ -159,6 +159,8 @@ long      MaxPing;
 int       GlobalNotices;
 int       SeenMaxRecs;
 
+int       UseMD5;
+
 static void ClearDirectives();
 static int CheckDirectives();
 static int dparse(char *, int, int);
@@ -316,6 +318,7 @@ struct Directive directives[] = {
 
   /* Global Configuration */
   { "GlobalNotices", D_OPTIONAL,    { { PARAM_SET, &GlobalNotices } } },
+  { "UseMD5", D_OPTIONAL,           { { PARAM_SET, &UseMD5 } } },
 
   { 0, 0,                           { { 0, 0 } } }
 };

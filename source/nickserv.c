@@ -39,8 +39,6 @@
 
 #ifdef NICKSERVICES
 
-extern char *crypt();
-
 /* 
  * hash containing registered nick info
  */
@@ -974,16 +972,11 @@ ChangePass(struct NickInfo *nptr, char *newpass)
      * The password hasn't been set yet, so we're probably reading
      * it from nick.db right now, thus we need to make our own
      * salt
+     * Not any more - now we use hybcrypt() for that -kre
      */
   #ifdef CRYPT_PASSWORDS
-    static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-    char salt[3];
 
-    salt[0] = saltChars[random() % 64];
-    salt[1] = saltChars[random() % 64];
-    salt[2] = 0;
-
-    encr = crypt(newpass, salt);
+    encr = hybcrypt(newpass, NULL);
     assert(encr != 0);
 
     nptr->password = MyStrdup(encr);
@@ -1001,7 +994,7 @@ ChangePass(struct NickInfo *nptr, char *newpass)
 
   #ifdef CRYPT_PASSWORDS
 
-    encr = crypt(newpass, nptr->password);
+    encr = hybcrypt(newpass, nptr->password);
     assert(encr != 0);
 
     MyFree(nptr->password);

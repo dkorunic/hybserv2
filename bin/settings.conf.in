@@ -789,3 +789,9 @@ MaxModes           2
 # This is how many Seen records seenserv will store
 
 SeenMaxRecs        4000
+
+# UseMD5 [OPTIONAL]
+#
+# This turns on support for MD5 capable crypt using MCF
+
+#UseMD5

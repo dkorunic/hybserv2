@@ -100,6 +100,67 @@ struct aService ServiceBots[] = {
   { 0, 0, 0, 0 }
 };
 
+#ifdef CRYPT_PASSWORDS
+static char saltChars[] = "abcdefghijklmnopqrstuvwxyz"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "0123456789./";
+#endif /* CRYPT_PASSWORDS */
+
+#ifdef CRYPT_PASSWORDS
+/* This specific parts of code are from Hybrid7 mkpasswd tool. Nelson
+ * Minar (minar@reed.edu) wrote the original tool, and Hybrid7 team did
+ * MD5. -kre */
+char *hybcrypt(char *source, char *oldpass)
+{
+  char *salt;
+
+  if (UseMD5)
+    salt = make_md5_salt();
+  else
+    salt = make_des_salt();
+
+  /* We don't do anything with oldpass, we could randomize a bit and feed
+   * it as salt, but hey, we have wonderful random() -kre */
+
+  return crypt(source, salt);
+}
+
+char *make_des_salt()
+{
+  static char salt[3];
+  char *saltptr = salt;
+
+  /* Saltify */
+  salt[0] = saltChars[random() % 64];
+  salt[1] = saltChars[random() % 64];
+  salt[2] = '\0';
+
+  return saltptr;
+}
+
+char *make_md5_salt()
+{
+  static char salt[13];
+  int i;
+  char *saltptr = salt;
+
+  /* This is for setup of modular crypt -kre */
+  salt[0] = '$';
+  salt[1] = '1';
+  salt[2] = '$';
+
+  /* Saltify */
+  for (i = 3; i <= 10; i++)
+  salt[i] = saltChars[random() % 64];
+
+  /* And properly finish modular crypt salt string -kre */
+  salt[11] = '$';
+  salt[12] = '\0';
+
+  return saltptr;
+}
+#endif /* CRYPT_PASSWORDS */
+
 /*
 debug()
   Output a debug message to stderr
@@ -705,7 +766,7 @@ pwmatch(char *password, char *chkpass)
 
 #ifdef CRYPT_PASSWORDS
 
-  encr = (char *) crypt(chkpass, password);
+  encr = crypt(chkpass, password);
   assert(encr != 0);
 
   if (!strcmp(encr, password))
@@ -742,7 +803,7 @@ operpwmatch(char *password, char *chkpass)
 
 #ifdef CRYPT_OPER_PASSWORDS
 
-  encr = (char *) crypt(chkpass, password);
+  encr = crypt(chkpass, password);
   assert(encr != 0);
 
   if (!strcmp(encr, password))
@@ -927,3 +988,4 @@ int checkforproc( char* source )
         return 0;
   
 }
+

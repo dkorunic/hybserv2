@@ -42,8 +42,6 @@
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
-extern char *crypt();
-
 /* hash table of registered channels */
 struct ChanInfo *chanlist[CHANLIST_MAX];
 
@@ -397,16 +395,17 @@ cs_process(char *nick, char *command)
       {
         notice(n_ChanServ, lptr->nick,
           "Cannot execute commands for forbidden channels");
+        MyFree(arv);
+        return;
       }
       else
       if (chptr->flags & CS_FORGET)
       {
         notice(n_ChanServ, lptr->nick,
           "Cannot execute commands for forgotten channels");
+        MyFree(arv);
+        return;
       }
-
-      MyFree(arv);
-      return;
     }
   }
 
@@ -2300,20 +2299,15 @@ ChangeChanPass(struct ChanInfo *cptr, char *newpass)
   if (!cptr->password)
   {
     /*
-     * The password hasn't been set yet, so we're probably
-     * registering the channel right now, thus we need to make
-     * our own salt
+     * The password hasn't been set yet, so we're probably registering the
+     * channel right now, thus we need to make our own salt.
+     *
+     * Use hybcrypt() for that, which will properly salt and encrypt
+     * string, possibly with MD5 if it is setup in UseMD5 -kre
      */
   #ifdef CRYPT_PASSWORDS
 
-    static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
-    char salt[3];
-
-    salt[0] = saltChars[random() % 64];
-    salt[1] = saltChars[random() % 64];
-    salt[2] = 0;
-
-    encr = crypt(newpass, salt);
+    encr = hybcrypt(newpass, NULL);
     assert(encr != 0);
 
     cptr->password = MyStrdup(encr);
@@ -2328,10 +2322,11 @@ ChangeChanPass(struct ChanInfo *cptr, char *newpass)
   else
   {
     /* the password is being changed */
+    /* Use new hybcrypt routine instead -kre */
 
   #ifdef CRYPT_PASSWORDS
 
-    encr = crypt(newpass, cptr->password);
+    encr = hybcrypt(newpass, cptr->password);
     assert(encr != 0);
 
     MyFree(cptr->password);

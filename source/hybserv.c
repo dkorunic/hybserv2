@@ -259,6 +259,7 @@ main(int argc, char *argv[])
   /* Signals must be set up after fork(), since the parent exits */
   InitSignals();
 
+  /* Initialise random number generator -kre */
   srandom(time(NULL)+getpid());
 
   /* Write our pid to a file */

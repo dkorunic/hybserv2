@@ -49,6 +49,7 @@ Some sort of TODO/planning program:
 Done so far:
 ------------
 
+*) MD5 support
 *) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
 *) let +h people use unban by default (if hyb7 is defined) (fl_)
 *) safe write for settings.conf -> it can be truncated in some cases

@@ -1,3 +1,7 @@
+*** 20010603_1 by kreator
+- a lot of fixes and cleanups all around
+
+
 *** 20010602_2 by wcampbel
 In my opinion, forbidden channels should be created with chanmode +s
 in addition to chanmode +i

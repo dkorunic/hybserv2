@@ -195,10 +195,9 @@ CheckGlined(struct Luser *lptr)
 
 #ifdef HYBRID7_GLINES
 
-      /* Hybrid7 accepts time in minutes, not seconds -kre */
       Execute7Gline(tempgline->username, tempgline->hostname,
           tempgline->reason,
-          tempgline->expires ? tempgline->expires / 60 : 0);
+          tempgline->expires ? (tempgline->expires - current_ts) : 0);
 #endif /* HYBRID7_GLINES */
 
     }

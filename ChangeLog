@@ -1,3 +1,9 @@
+*** 20010516_4 by kreator
+- misc fixes all around
+- Makefile changes
+- increase bufs for ircvsprintf
+
+
 *** 20010516_3 by kreator
 - juped libString completely
 - misc changes around

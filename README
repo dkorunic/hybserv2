@@ -1,14 +1,15 @@
 Some short notes:
 
 The former Hybserv development team has decided to spin off and focus its
-energies towards the HYBSERV2 project. Like the name implys this new
+energies towards the HYBSERV2 project. Like the name implies this new
 version will be even better then that last. If their is something you
-would like to see added to HYBSERV2 please let use know as we are always
+would like to see added to HYBSERV2 please let us know as we are always
 looking for new ideas.
 
-With that said - Per Sidewnder's (Cosine's) request - HYBSERV will no
-longer be supported. So if u have a question please upgrade to a version
-listed in the HYBSERV2 dir. 
+IMPORTANT NOTE:
+Per Sidewnder's (Cosine's) request - HYBSERV will no longer be supported.
+So if you have some questions or problems, please *upgrade* first to a
+version listed in the HYBSERV2 dir.
 
 The latest version is 1.8.0 <--------------------
 
@@ -36,13 +37,13 @@ kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 toot        Toby Verrall      to7@antipope.fsnet.co.uk
     
 HybServ was specifically designed to run with hybrid ircd, although it
-*should* work with CSr as well.  You may recieve the hybrid irc daemon
-from ftp.blackened.com in /pub/irc/hybrid.  In our opinion, it is the best
-irc daemon available and is currently used by EFNET / Dalnet / ICQ / WFNET
-/ HYBNET and Openprojects.
+*should* work with CSr as well.  You may receive the hybrid irc daemon
+from ftp.blackened.com in /pub/irc/hybrid. These services (more or less
+same code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet /
+EFNow / Openprojects Network.
 
-I'm releasing this software under the terms of the GNU General Public
-License (see COPYING).  Should you choose to use and/or modify any of my
+This software is released under the terms of the GNU General Public
+License (see COPYING).  Should you choose to use and/or modify any of
 code, please do so under the terms of the GNU General Public License,
 published by the Free Software Foundation.
 
@@ -101,9 +102,9 @@ The criteria for reporting bugs is somewhat specific.
 ################################################################
 
 
-This is the offical Hybserv mailing list hosted on Botbay.
+This is the official Hybserv mailing list hosted on Botbay.
 
-This is a publically postable list.
+This is a publicly postable list.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
@@ -113,7 +114,7 @@ subscribe hybserv <your mail>
 
 NOTE:
   Atm we are reforming, and mailing list is under construction. We
-  appologize for the inconvenience
+  apologize for the inconvenience
 
 You may also find us online by using the EFNow Network
 
@@ -135,7 +136,7 @@ ircd.conf.
 
 Configuration examples:
 NOTE:
-  Suppose the hostname of services is "services.name" with an ip of
+  Suppose the host name of services is "services.name" with an ip of
   1.2.3.4, and that server accepting the services has name
   "server.shomewhere" with ircd class "server" (or class 1).
 
@@ -149,7 +150,7 @@ NOTE:
 NOTE:
   We recommend using services on same server that is your hub, and then
   you can use 127.0.0.1 as address in C/N lines (which will give you some
-  performance, since traffic will go through loopback device).
+  performance, since traffic will go through loop back device).
 
 However in Hybrid 7 to accomplish the same you have to put in ircd.conf
 following code:
@@ -177,7 +178,7 @@ Then, go on IRC and type:
   /msg OperServ identify <password>
 
 Assuming OperServ is the OperServNick defined in settings.conf and you
-have given yourself a O: line in hybserv.conf. You should beallowed to
+have given yourself a O: line in hybserv.conf. You should be allowed to
 give OperServ commands through /msg or DCC CHAT.  
 
 For a list of commands do:
@@ -195,11 +196,11 @@ instructions.  If you have no idea what a TCM bot is, don't worry about it
 If you enabled NickServ, ChanServ, MemoServ etc. in config.h, you can get
 lists of their commands through /msg *Serv help. NickServ and ChanServ
 have several commands that can only be executed by administrators.  This
-means you must match an O: line (with an "a" flag) in hybserv.conf AND be
+means you must match an O: line (with an "a" flag) in hybserv.conf and be
 registered with OperServ to use them. This can be done by typing /msg
 OperServ password, these commands CANNOT be accessed by DCC Chat. 
 
-IMPORTANT NOTE! If you use Hybrid or Hybrid-compatibile IRC daemon, you
+IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC daemon, you
 should enable Q-lines (quarantined nickname) for services-reserved
 nicknames because of obvious security reasons:
   Q:NickServ:This nickname is reserved.
@@ -247,5 +248,5 @@ ftp.dragonfire.net/software/unix/irc
 The ideas for a settings.conf and the shownicks/showchans programs were
 inspired from this package as well. 
 
-See also the begining of this file.
+See also the beginning of this file.
 

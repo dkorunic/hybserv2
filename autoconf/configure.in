@@ -51,6 +51,10 @@ AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ2 **))
 AC_HEADER_TIME
 
+dnl Add standard prefix to fix broken environments
+LIBS="${LIBS} -L/usr/local/lib"
+CFLAGS="${CFLAGS} -I/usr/local/include"
+
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(strdup strerror vprintf)
@@ -90,20 +94,27 @@ hold_cflags=$CFLAGS
 AC_ARG_WITH(sfio-lib, [  --with-sfio-lib=DIR     Directory containing sfio library], LIBS="${LIBS} -L${withval}")
 hold_libs2=$LIBS
 AC_ARG_WITH(sfio-inc, [  --with-sfio-inc=DIR     Directory containing sfio include files], CFLAGS="${CFLAGS} -I${withval}")
-LIBS="${LIBS} -lsfio"
-AC_CHECK_LIB(stdio, fprintf, _sfio=yes, _sfio=no)
-if test "$_sfio" = "no";
-then
-  CFLAGS=$hold_cflags
-  LIBS=$hold_libs
-else
-  dnl Multithreaded environment
-  if test -n "${LIBP}";
+dnl non-multithread sfio
+if test "x${LIBP}" = "x"; then
+  LIBS="${LIBS} -lsfio"
+  AC_CHECK_LIB(stdio, fprintf, _sfio=yes, _sfio=no)
+  if test "$_sfio" = "no";
   then
-    LIBS="$hold_libs2 -lstdio-mt -lsfio-mt"
-  dnl Singlethreaded environment
+    CFLAGS=$hold_cflags
+    LIBS=$hold_libs
   else
-    LIBS="$hold_libs2 -lstdio -lsfio"
+    LIBS="$hold_libs2 -lstdio -lsfio"                                           
+  fi
+else
+dnl multithread sfio
+  LIBS="${LIBS} -lsfio-mt"
+  AC_CHECK_LIB(stdio-mt, fprintf, _sfio=yes, _sfio=no)
+  if test "$_sfio" = "no";
+  then
+    CFLAGS=$hold_cflags
+    LIBS=$hold_libs
+  else
+    LIBS="$hold_libs2 -lstdio-mt -lsfio-mt"
   fi
 fi
 
@@ -149,13 +160,15 @@ include/config.h        \
 )
 
 echo "
+
 Configuration:
 
   Detected OS:      ${host_os}
   HybServ2 Version: ${VERSION}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
-  Compiler Flags:   ${CFLAGS}"
+  Compiler flags:   ${CFLAGS}
+  Linker flags:     ${LIBS}"
 
 if test -n "${LIBP}"; then
   echo "  Thread support:   enabled"

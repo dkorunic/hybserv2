@@ -695,7 +695,7 @@ StoreMemo(char *target, char *text, struct Luser *lptr)
 
   memoptr = MakeMemo();
   memoptr->sender = MyStrdup(lptr->nick);
-  memoptr->sent = time(NULL);
+  memoptr->sent = current_ts;
   memoptr->index = mi->memocnt;
   memoptr->text = MyStrdup(text);
   AddMemo(mi, memoptr);
@@ -1573,7 +1573,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       memoptr = MakeMemo();
       memoptr->sender = MyStrdup(lptr->nick);
-      memoptr->sent = time(NULL);
+      memoptr->sent = current_ts;
       memoptr->index = target->memocnt;
 
       strcpy(buf, "[Fwd]: ");

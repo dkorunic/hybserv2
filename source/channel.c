@@ -51,7 +51,7 @@ void
 AddBan(char *who, struct Channel *cptr, char *ban)
 
 {
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   struct ChannelBan *tempban;
 
   tempban = (struct ChannelBan *) MyMalloc(sizeof(struct ChannelBan));
@@ -125,7 +125,7 @@ AddException(char *who, struct Channel *cptr, char *mask)
     tempe->who = MyStrdup(who);
 
   tempe->mask = MyStrdup(mask);
-  tempe->when = time(NULL);
+  tempe->when = current_ts;
 
   tempe->next = cptr->exceptlist;
   tempe->prev = NULL;
@@ -157,7 +157,7 @@ void AddInviteException(char *who, struct Channel *cptr, char *mask)
     tempinvex->who = MyStrdup(who);
 
   tempinvex->mask = MyStrdup(mask);
-  tempinvex->when = time(NULL);
+  tempinvex->when = current_ts;
 
   tempinvex->next = cptr->inviteexceptlist;
   tempinvex->prev = NULL;
@@ -435,7 +435,7 @@ AddChannel(char **line, int nickcnt, char **nicks)
     if (Network->TotalChannels > Network->MaxChannels)
     {
       Network->MaxChannels = Network->TotalChannels;
-      Network->MaxChannels_ts = time(NULL);
+      Network->MaxChannels_ts = current_ts;
 
       if ((Network->MaxChannels % 10) == 0)
       {
@@ -448,7 +448,7 @@ AddChannel(char **line, int nickcnt, char **nicks)
     if (Network->TotalChannels > Network->MaxChannelsT)
     {
       Network->MaxChannelsT = Network->TotalChannels;
-      Network->MaxChannelsT_ts = time(NULL);
+      Network->MaxChannelsT_ts = current_ts;
     }
   #endif /* STATSERVICES */
   }
@@ -1641,7 +1641,7 @@ AddGecosBan()
 */
 void AddGecosBan(char *who, struct Channel *cptr, char *ban)
 {
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   struct ChannelGecosBan *tempban;
 
   tempban = (struct ChannelGecosBan *)MyMalloc(sizeof(struct ChannelGecosBan));

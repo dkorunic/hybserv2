@@ -21,6 +21,7 @@
 #include "hybdefs.h"
 #include "match.h"
 #include "misc.h"
+#include "timestr.h"
 
 /*
 timeago()
@@ -56,14 +57,14 @@ timeago(time_t timestamp, int flag)
   {
     case 0:
     {
-      delta = time(NULL) - timestamp;
+      delta = current_ts - timestamp;
       longfmt = 0;
       break;
     }
 
     case 1:
     {
-      delta = time(NULL) - timestamp;
+      delta = current_ts - timestamp;
       longfmt = 1;
       break;
     }
@@ -416,7 +417,7 @@ GetTime(struct timeval *timer)
 
 #else
 
-  timer->tv_sec = time(NULL);
+  timer->tv_sec = current_ts;
   timer->tv_usec = 0;
   return (timer);
 

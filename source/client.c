@@ -85,7 +85,7 @@ UpdateUserModes(struct Luser *user, char *modes)
       #ifdef STATSERVICES
         char *hostname, *domain;
         struct HostHash *hosth, *domainh;
-        time_t currtime = time(NULL);
+        time_t currtime = current_ts;
       #endif
 
       #ifdef NICKSERVICES
@@ -106,7 +106,7 @@ UpdateUserModes(struct Luser *user, char *modes)
         if (Network->TotalOperators > Network->MaxOperators)
         {
           Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = time(NULL);
+          Network->MaxOperators_ts = current_ts;
 
           if ((Network->MaxOperators % 5) == 0)
           {
@@ -119,7 +119,7 @@ UpdateUserModes(struct Luser *user, char *modes)
         if (Network->TotalOperators > Network->MaxOperatorsT)
         {
           Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = time(NULL);
+          Network->MaxOperatorsT_ts = current_ts;
         }
       #endif
 
@@ -131,7 +131,7 @@ UpdateUserModes(struct Luser *user, char *modes)
           if (user->server->numopers > user->server->maxopers)
           {
             user->server->maxopers = user->server->numopers;
-            user->server->maxopers_ts = time(NULL);
+            user->server->maxopers_ts = current_ts;
           }
         #endif
         }
@@ -249,7 +249,7 @@ AddClient(char **line)
     if (tempuser->server->numusers > tempuser->server->maxusers)
     {
       tempuser->server->maxusers = tempuser->server->numusers;
-      tempuser->server->maxusers_ts = time(NULL);
+      tempuser->server->maxusers_ts = current_ts;
     }
   #endif
   }
@@ -288,7 +288,7 @@ AddClient(char **line)
         if (Network->TotalOperators > Network->MaxOperators)
         {
           Network->MaxOperators = Network->TotalOperators;
-          Network->MaxOperators_ts = time(NULL);
+          Network->MaxOperators_ts = current_ts;
 
           if ((Network->MaxOperators % 5) == 0)
           {
@@ -301,7 +301,7 @@ AddClient(char **line)
         if (Network->TotalOperators > Network->MaxOperatorsT)
         {
           Network->MaxOperatorsT = Network->TotalOperators;
-          Network->MaxOperatorsT_ts = time(NULL);
+          Network->MaxOperatorsT_ts = current_ts;
         }
       #endif
 
@@ -313,7 +313,7 @@ AddClient(char **line)
           if (tempuser->server->numopers > tempuser->server->maxopers)
           {
             tempuser->server->maxopers = tempuser->server->numopers;
-            tempuser->server->maxopers_ts = time(NULL);
+            tempuser->server->maxopers_ts = current_ts;
           }
         #endif
         }
@@ -338,7 +338,7 @@ AddClient(char **line)
   if (Network->TotalUsers > Network->MaxUsers)
   {
     Network->MaxUsers = Network->TotalUsers;
-    Network->MaxUsers_ts = time(NULL);
+    Network->MaxUsers_ts = current_ts;
 
     if ((Network->MaxUsers % 10) == 0)
     {
@@ -351,7 +351,7 @@ AddClient(char **line)
   if (Network->TotalUsers > Network->MaxUsersT)
   {
     Network->MaxUsersT = Network->TotalUsers;
-    Network->MaxUsersT_ts = time(NULL);
+    Network->MaxUsersT_ts = current_ts;
   }
 #endif /* STATSERVICES */
 
@@ -417,7 +417,7 @@ DeleteClient(struct Luser *user)
     if (realptr->flags & NS_IDENTIFIED)
     {
       realptr->split_ts = user->since;
-      realptr->whensplit = time(NULL);
+      realptr->whensplit = current_ts;
     }
 
   #endif /* RECORD_SPLIT_TS */
@@ -467,7 +467,7 @@ DeleteClient(struct Luser *user)
     if ((uptr = GetUser(0, user->nick, user->username, user->hostname)))
     {
       uptr->split_ts = user->since;
-      uptr->whensplit = time(NULL);
+      uptr->whensplit = current_ts;
     }
   }
 

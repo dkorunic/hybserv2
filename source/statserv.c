@@ -1081,7 +1081,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
     "Non-Resolving Host Users:   %ld",
     (long) Network->TotalUsers - Network->ResHosts);
 
-  currtime = time(NULL);
+  currtime = current_ts;
   strcpy(tmp, ctime(&currtime));
   SplitBuf(tmp, &tav);
   sprintf(str, "%s %s %s, %s",

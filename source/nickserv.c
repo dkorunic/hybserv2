@@ -290,7 +290,7 @@ ns_process(char *nick, char *command)
   if (nptr) /* they might not have registered yet */
   {
     /* update the time they were last seen */
-    nptr->lastseen = time(NULL);
+    nptr->lastseen = current_ts;
   }
 
   /* call cptr->func to execute command */
@@ -1056,7 +1056,7 @@ CheckNick(char *nickname)
     notice(n_NickServ, lptr->nick,
       "If you do not change within one minute, you will be disconnected");
     realptr->flags |= NS_COLLIDE;
-    realptr->collide_ts = time(NULL) + 60;
+    realptr->collide_ts = current_ts + 60;
     return 0;
   }
 
@@ -1101,7 +1101,7 @@ CheckNick(char *nickname)
          */
         notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
         realptr->flags |= NS_COLLIDE;
-        realptr->collide_ts = time(NULL) + 60;
+        realptr->collide_ts = current_ts + 60;
       }
       else
       {
@@ -1136,7 +1136,7 @@ CheckNick(char *nickname)
        */
       notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
       realptr->flags |= NS_COLLIDE;
-      realptr->collide_ts = time(NULL) + 60;
+      realptr->collide_ts = current_ts + 60;
     }
    }
    return 0;
@@ -1908,7 +1908,7 @@ n_register(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  currtime = time(NULL);
+  currtime = current_ts;
 
   if (currtime < (lptr->nickreg_ts + NickRegDelay))
   {
@@ -4385,7 +4385,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 
     nptr = MakeNick();
     nptr->nick = MyStrdup(av[1]);
-    nptr->created = time(NULL);
+    nptr->created = current_ts;
     nptr->flags |= NS_FORBID;
     AddNick(nptr);
   }
@@ -4809,7 +4809,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
     if (set)
     {
       nptr->flags |= NS_COLLIDE;
-      nptr->collide_ts = time(NULL) + 60;
+      nptr->collide_ts = current_ts + 60;
       notice(n_NickServ, lptr->nick,
         "The nickname [\002%s\002] has been marked for collision",
         nptr->nick);
@@ -5022,7 +5022,7 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
   else
     tsdelta = atoi(av[1]);
 
-  now = time(NULL);
+  now = current_ts;
 
   /* Be paranoid */
   if (tsdelta <= 0)

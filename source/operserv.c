@@ -1155,7 +1155,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
     timeago(DatabaseSync, 3));
 
   os_notice(lptr, sockfd, "           Next save: \002%s\002",
-    timeago((DatabaseSync - (time(NULL) % DatabaseSync)), 3));
+    timeago((DatabaseSync - (current_ts % DatabaseSync)), 3));
 
   os_notice(lptr, sockfd, " Password encryption: \002%s\002",
   #ifdef CRYPT_PASSWORDS
@@ -1523,7 +1523,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     reason = GetString(ac - 2, av + 2);
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   jupe_tm = localtime(&CurrTime);
   sprintf(whostr, "%d/%02d/%02d %s@%s",
     1900 + jupe_tm->tm_year,
@@ -1909,7 +1909,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     reason = GetString(ac - sidx, av + sidx);
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   gline_tm = localtime(&CurrTime);
   sprintf(whostr, "%d/%02d/%02d %s@%s",
     1900 + gline_tm->tm_year,
@@ -2593,7 +2593,7 @@ InitFuckoverProcess(char *from, char *ftarget)
       time_t fstart, timecheck;
       int ii, stop = 0;
 
-      fstart = time(NULL);
+      fstart = current_ts;
       while (!stop)
       {
         for (ii = 200; ii < 512; ++ii)
@@ -2603,7 +2603,7 @@ InitFuckoverProcess(char *from, char *ftarget)
            * it - not likely, unless the target's server has an
            * enormous sendQ
            */
-          timecheck = time(NULL);
+          timecheck = current_ts;
           if ((timecheck - fstart) > 20)
           {
             SendUmode(OPERUMODE_Y,
@@ -3826,7 +3826,7 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
     HubSock = tempsock;
 
     currenthub->connect_ts = 0;
-    temp->connect_ts = time(NULL);
+    temp->connect_ts = current_ts;
     currenthub = temp;
 
     /* send PASS/SERVER combo */
@@ -4507,7 +4507,7 @@ o_ignore_list(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Ignore *tmp;
   int idx;
   char *mask = NULL;
-  time_t currtime = time(NULL);
+  time_t currtime = current_ts;
 
   if (ac >= 3)
     mask = av[2];
@@ -4564,7 +4564,7 @@ AddIgnore(char *hostmask, time_t expire)
   if (!expire)
     ptr->expire = (time_t) 0; /* no expiration */
   else
-    ptr->expire = (time(NULL) + expire);
+    ptr->expire = (current_ts + expire);
 
 	ptr->prev = NULL;
   ptr->next = IgnoreList;
@@ -4729,7 +4729,7 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
     else
       prefix = ' ';
 
-    mins = ((time(NULL) - tempconn->idle) / 60) % 60;
+    mins = ((current_ts - tempconn->idle) / 60) % 60;
     if (mins >= 5)
     {
       strcpy(idle, "idle: ");
@@ -5174,7 +5174,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
     {
     #ifdef ALLOW_GLINES
       struct Gline *gptr;
-      time_t currtime = time(NULL);
+      time_t currtime = current_ts;
       char expstr[MAXLINE];
       char uh[UHOSTLEN + 2];
 
@@ -5309,7 +5309,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
     
     case '?':
     {
-      time_t uptime = time(NULL) - TimeStarted;
+      time_t uptime = current_ts - TimeStarted;
 
       os_notice(lptr, sockfd,
         "Total Sent %10.2f %s (%4.1f K/s)",
@@ -5687,7 +5687,7 @@ o_htm_on(struct Luser *lptr, int ac, char **av, int sockfd)
               (float) 1024) / (float) HTM_INTERVAL;
 
   HTM = 1;
-  HTM_ts = time(NULL);
+  HTM_ts = current_ts;
 
   putlog(LOG1,
     "Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s",

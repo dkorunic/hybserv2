@@ -70,7 +70,7 @@ AddGline(char *host, char *reason, char *who, long when)
   if (!when)
     tempgline->expires = 0;
   else
-    tempgline->expires = time(NULL) + when;
+    tempgline->expires = current_ts + when;
 
   tempgline->next = GlineList;
   tempgline->prev = NULL;

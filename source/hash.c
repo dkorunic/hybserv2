@@ -321,7 +321,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
 #ifdef STATSERVICES
 
   hostname = lptr->hostname;
-  currtime = time(NULL);
+  currtime = current_ts;
 
   for (domain = hostname; *domain; domain++);
   while (domain != hostname)
@@ -973,7 +973,7 @@ HashDelClient(struct Luser *lptr, int nickchange)
 
           if (clonematches == 1)
           {
-            time_t  currtime = time(NULL);
+            time_t  currtime = current_ts;
 
             /*
              * there was only 1 other client who matched lptr, so that

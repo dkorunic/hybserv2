@@ -329,7 +329,7 @@ es_seen(struct Luser *lptr, int ac, char **av)
              "I found no matching seen records to your query");
       return;
     } else {
-      mytime = time(NULL) + 1;
+      mytime = current_ts + 1;
       for (i = 0; (i < 5) && (i < count); i++) {
         saved = first; last = 0;
         for (; saved; saved = saved->seen) {

@@ -66,32 +66,37 @@ struct MyInfo                Me;
  */
 int                          SafeConnect = 0;
 
-int
-main(int argc, char *argv[])
-
+int main(int argc, char *argv[])
 {
 #ifndef DEBUGMODE
   int pid; /* pid of this process */
 #endif /* DEBUGMODE */
+
 #if defined GIMMECORE || defined DEBUGMODE
   struct rlimit rlim; /* resource limits -kre */
 #endif /* GIMMECORE || DEBUGMODE */
+
   FILE *pidfile; /* to write our pid */
   uid_t uid, /* real user id */
         euid; /* effective user id */
   struct utsname un;
+
 #ifdef HAVE_SOLARIS_THREADS
   thread_t selectid;
   thread_t timerid;
+
 #else
+
 #ifdef HAVE_PTHREADS
   pthread_attr_t attr;
   pthread_t selectid;
   pthread_t timerid;
-#endif
-#endif
+#endif /* HAVE_PTHREADS */
 
-  TimeStarted = time(NULL);
+#endif /* HAVE_SOLARIS_THREADS */
+
+  /* Initialise current TS for services -kre */
+  TimeStarted = current_ts = time(NULL);
 
   fprintf(stderr,
     "HybServ2 TS services version %s by HybServ2 team\n"
@@ -103,6 +108,7 @@ main(int argc, char *argv[])
     , __DATE__, __TIME__
 #endif
     );
+
   if (uname(&un) != -1)
   {
     fprintf(stderr, "Running on: %s %s\n", un.sysname,
@@ -260,7 +266,7 @@ main(int argc, char *argv[])
   InitSignals();
 
   /* Initialise random number generator -kre */
-  srandom(time(NULL)+getpid());
+  srandom(current_ts + getpid());
 
   /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)
@@ -286,44 +292,45 @@ main(int argc, char *argv[])
 
 #ifdef HAVE_SOLARIS_THREADS
 
+  /* This thread will call DoTimer() every second -kre */
   thr_create(NULL, 0, p_CheckTime, NULL, THR_DETACHED, &timerid);
 
 #else
   
 #ifdef HAVE_PTHREADS
 
-  /*
-   * This thread will call DoTimer() every second
-   */
+  /* This thread will call DoTimer() every second */
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
   pthread_create(&timerid, &attr, p_CheckTime, NULL);
 
-#endif
-#endif
+#endif /* HAVE_PTHREADS */
+
+#endif /* HAVE_SOLARIS_THREADS */
 
   while (1)
   {
     /* enter loop waiting for server info */
-  #ifdef HAVE_SOLARIS_THREADS
+#ifdef HAVE_SOLARIS_THREADS
     
     thr_create(NULL, 0, (void *)&ReadSocketInfo, NULL,
                     THR_BOUND, &selectid);
     thr_join(selectid, NULL, NULL);
 
-  #else
+#else
 
-  #ifdef HAVE_PTHREADS
+#ifdef HAVE_PTHREADS
 
     pthread_create(&selectid, NULL, (void *) &ReadSocketInfo, NULL);
     pthread_join(selectid, NULL);
 
-  #else
+#else
 
     ReadSocketInfo();
 
-  #endif
-  #endif /* HAVE_PTHREADS */
+#endif /* HAVE_PTHREADS */
+
+#endif /* HAVE_SOLARIS_THREADS */
 
     if (Me.hub)
       SendUmode(OPERUMODE_Y,

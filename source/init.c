@@ -314,7 +314,7 @@ introduce(char *nick, char *ident, char *info)
 
 {
   char sendstr[MAXLINE];
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   char **av;
   struct Luser *lptr;
   

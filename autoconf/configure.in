@@ -23,7 +23,7 @@ esac
 
 dnl Package information
 PACKAGE=HybServ2
-VERSION=pre-8.0
+VERSION=pre-1.8.0
 
 dnl Standard installation path
 AC_PREFIX_DEFAULT(/usr/local)
@@ -57,7 +57,7 @@ CFLAGS="${CFLAGS} -I/usr/local/include"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strdup strerror vprintf)
+AC_CHECK_FUNCS(strdup strerror vprintf snprintf)
 AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_FUNCS(gethostbyname, , [AC_CHECK_LIB(nsl, gethostbyname), , LIBS="$LIBS -lnsl"])
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")

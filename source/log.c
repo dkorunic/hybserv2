@@ -65,7 +65,7 @@ putlog(int level, char *format, ...)
     return;
   }
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   strcpy(buf, ctime(&CurrTime));
 
   /*

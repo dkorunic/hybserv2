@@ -361,7 +361,7 @@ int AddVote(char *name, char *who)
   struct JupeVote *tempvote, *votematch = NULL;
   int exists = 0;
   int i;
-  time_t unixtime = time(NULL);
+  time_t unixtime = current_ts;
 
   /* check if someone voted for this server already */
   for (tempvote = VoteList; tempvote; tempvote = tempvote->next)

@@ -912,7 +912,7 @@ cs_join(struct ChanInfo *chanptr)
     if (chptr)
       chants = chptr->since;
     else
-      chants = time(NULL);
+      chants = current_ts;
 
     sprintf(sendstr,
       ":%s SJOIN %ld %s + :@%s\n",
@@ -958,7 +958,7 @@ cs_joinchan(struct ChanInfo *chanptr)
   sprintf(sendstr,
     ":%s SJOIN %ld %s + :@%s\n",
     Me.name,
-    chptr ? (long) chptr->since : (long) time(NULL),
+    chptr ? (long) chptr->since : (long) current_ts,
     chanptr->name,
     n_ChanServ);
   toserv(sendstr);
@@ -984,7 +984,7 @@ cs_join_ts_minus_1(struct ChanInfo *chanptr)
   sprintf(sendstr,
     ":%s SJOIN %ld %s + :@%s\n",
     Me.name,
-    cptr ? (long) (cptr->since - 1) : (long) time(NULL),
+    cptr ? (long) (cptr->since - 1) : (long) current_ts,
     cptr->name,
     n_ChanServ);
   toserv(sendstr);
@@ -1065,7 +1065,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     return;
   }
 
-  cptr->lastused = time(NULL);
+  cptr->lastused = current_ts;
 
   if ((cptr->flags & CS_SECUREOPS) || (cptr->flags & CS_RESTRICTED))
   {
@@ -1703,7 +1703,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     return;
 
   /* someone joined - update lastused time */
-  cptr->lastused = time(NULL);
+  cptr->lastused = current_ts;
 
 #ifndef HYBRID_ONLY
   /*
@@ -3161,7 +3161,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   cptr->name = MyStrdup(av[1]);
   cptr->founder = MyStrdup(nptr->nick);
-  cptr->created = cptr->lastused = time(NULL);
+  cptr->created = cptr->lastused = current_ts;
   cptr->access_lvl = DefaultAccess;
 
   /*
@@ -6904,7 +6904,7 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     /* Create channel - it didn't exist -kre */
     cptr = MakeChan();
     cptr->name = MyStrdup(av[1]);
-    cptr->created = time(NULL);
+    cptr->created = current_ts;
     cptr->flags |= CS_FORBID;
     cptr->access_lvl = DefaultAccess;
     AddChan(cptr);
@@ -7160,7 +7160,7 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   cptr = MakeChan();
   cptr->name = MyStrdup(av[1]);
-  cptr->created = time(NULL);
+  cptr->created = current_ts;
   cptr->flags = CS_FORGET;
   cptr->access_lvl = DefaultAccess;
 
@@ -7270,7 +7270,7 @@ static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
   else
     tsdelta = atoi(av[1]);
 
-  now = time(NULL);
+  now = current_ts;
 
   /* Be paranoid */
   if (tsdelta <= 0)

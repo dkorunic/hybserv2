@@ -307,13 +307,10 @@ SendUmode(int umode, char *format, ...)
   struct DccUser *dccptr;
   struct Userlist *tempuser;
   struct tm *tmp_tm;
-  time_t current_ts;
   char timestr[MAXLINE];
 
   if (ActiveFlood)
     return;
-
-  current_ts = time(NULL);
 
   if (umode != OPERUMODE_D)
     if (IsFlood())
@@ -552,7 +549,7 @@ ConnectClient(struct PortInfo *portptr)
 
   tempconn->username = MyStrdup("unknown");
   tempconn->port = ntohs(RemoteAddr.sin_port);
-  tempconn->idle = time(NULL);
+  tempconn->idle = current_ts;
 
   SetNonBlocking(tempconn->socket);
 
@@ -918,7 +915,7 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   SetDccConnect(dccptr);
 
   dccptr->port = port;
-  dccptr->idle = time(NULL);
+  dccptr->idle = current_ts;
   dccptr->authfd = NOSOCKET;
 
 #if 0
@@ -955,7 +952,7 @@ GreetDccUser(struct DccUser *dccptr)
 {
   char prefix[MAXLINE],
        sendstr[MAXLINE];
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   struct tm *motd_tm;
   struct Userlist *tempuser;
   int errval,
@@ -1543,7 +1540,7 @@ ExpireIdent(time_t unixtime)
       dccptr->username = MyStrdup("unknown");
 
       /* reset idle time for TelnetTimeout */
-      dccptr->idle = time(NULL);
+      dccptr->idle = current_ts;
 
       writesocket(dccptr->socket, "\nIdent-request timed out\n");
       if (!(dccptr->flags & SOCK_TCMBOT))
@@ -1859,7 +1856,7 @@ DccProcess(struct DccUser *dccptr, char *command)
   Network->RecvB += (command ? strlen(command) : 0);
 
   /* reset idle time */
-  dccptr->idle = time(NULL);
+  dccptr->idle = current_ts;
 
   if (!(dccptr->flags & SOCK_DCC) && IsDccPending(dccptr))
   {

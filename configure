@@ -599,7 +599,7 @@ case "$host_os" in
 esac
 
 PACKAGE=HybServ2
-VERSION=pre-8.0
+VERSION=pre-1.8.0
 
 
 
@@ -1512,7 +1512,7 @@ cat >> confdefs.h <<EOF
 EOF
 
 
-for ac_func in strdup strerror vprintf
+for ac_func in strdup strerror vprintf snprintf
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:1519: checking for $ac_func" >&5

@@ -57,10 +57,10 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
 
   ++chptr->floodcnt;
   if (!chptr->flood_ts[0])
-    chptr->flood_ts[0] = time(NULL);
+    chptr->flood_ts[0] = current_ts;
   else
   {
-    chptr->flood_ts[1] = time(NULL);
+    chptr->flood_ts[1] = current_ts;
     if (chptr->floodcnt == 5)
     {
       chptr->floodcnt = 0;
@@ -76,7 +76,7 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
       else
       {
         chptr->floodcnt = 1;
-        chptr->flood_ts[0] = time(NULL);
+        chptr->flood_ts[0] = current_ts;
       }
     } /* if (chptr->floodcnt == 5) */
     else if ((chptr->flood_ts[1] - chptr->flood_ts[0]) > 20)
@@ -86,7 +86,7 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
        * reset everything, and rejoin normally
        */
       chptr->floodcnt = 1;
-      chptr->flood_ts[0] = time(NULL);
+      chptr->flood_ts[0] = current_ts;
     }
   } /* else (if (!chptr->flood_ts[0])) */
 
@@ -182,7 +182,7 @@ IsFlood()
   if (!BCFloodCount || !BCFloodTime)
     return (0);
 
-  currtime = time(NULL);
+  currtime = current_ts;
 
   ++FloodHits;
 

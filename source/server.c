@@ -231,7 +231,7 @@ AddServer(int argcnt, char **line)
         if (tempserv->uplink->numservs > tempserv->uplink->maxservs)
         {
           tempserv->uplink->maxservs = tempserv->uplink->numservs;
-          tempserv->uplink->maxservs_ts = time(NULL);
+          tempserv->uplink->maxservs_ts = current_ts;
         }
       #endif
       }
@@ -244,7 +244,7 @@ AddServer(int argcnt, char **line)
         tempserv->uplink ? tempserv->uplink->name : "*unknown*");
   }
 
-  tempserv->connect_ts = time(NULL);
+  tempserv->connect_ts = current_ts;
   tempserv->numservs = 1;
 
 #ifdef STATSERVICES
@@ -273,7 +273,7 @@ AddServer(int argcnt, char **line)
   if (Network->TotalServers > Network->MaxServers)
   {
     Network->MaxServers = Network->TotalServers;
-    Network->MaxServers_ts = time(NULL);
+    Network->MaxServers_ts = current_ts;
 
     if ((Network->MaxServers % 5) == 0)
     {
@@ -286,7 +286,7 @@ AddServer(int argcnt, char **line)
   if (Network->TotalServers > Network->MaxServersT)
   {
     Network->MaxServersT = Network->TotalServers;
-    Network->MaxServersT_ts = time(NULL);
+    Network->MaxServersT_ts = current_ts;
   }
 #endif
 
@@ -550,7 +550,7 @@ s_server(int ac, char **av)
   {
     if ((ac == 5) && !IsJupe(tempserv->name))
     {
-      time_t current_ts = time(NULL);
+      time_t current_ts = current_ts;
       tempserv->uplink = FindServer(av[0] + 1);
       SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
           "after %s split time",
@@ -795,7 +795,7 @@ s_nick(int ac, char **av)
   #endif
 
   #ifdef SEENSERVICES
-    es_add(oldnick, lptr->username, lptr->hostname, NULL, time(NULL), 2);
+    es_add(oldnick, lptr->username, lptr->hostname, NULL, current_ts, 2);
   #endif /* SEENSERVICES */
 
     return;
@@ -1033,10 +1033,10 @@ s_privmsg(int ac, char **av)
     {
       lptr->messages++;
       if (!lptr->msgs_ts[0])
-        lptr->msgs_ts[0] = time(NULL);
+        lptr->msgs_ts[0] = current_ts;
       else
       {
-        lptr->msgs_ts[1] = time(NULL);
+        lptr->msgs_ts[1] = current_ts;
         if (lptr->messages == FloodCount)
         {
           lptr->messages = 0;
@@ -1094,7 +1094,7 @@ s_privmsg(int ac, char **av)
           else
           {
             lptr->messages = 1;
-            lptr->msgs_ts[0] = time(NULL);
+            lptr->msgs_ts[0] = current_ts;
           }
         }
         else
@@ -1106,7 +1106,7 @@ s_privmsg(int ac, char **av)
              * reset everything
              */
             lptr->messages = 1;
-            lptr->msgs_ts[0] = time(NULL);
+            lptr->msgs_ts[0] = current_ts;
           }
         }
       }
@@ -1244,9 +1244,9 @@ s_squit(int ac, char **av)
         tmpserv->uplink ? tmpserv->uplink->name : "*unknown*");
 #endif
 
-      tmpserv->uplink=NULL;
-      tmpserv->split_ts=time(NULL);
-      tmpserv->connect_ts=0;
+      tmpserv->uplink = NULL;
+      tmpserv->split_ts = current_ts;
+      tmpserv->connect_ts = 0;
     }
   }
 #endif
@@ -1298,7 +1298,8 @@ s_quit(int ac, char **av)
 #endif /* NICKSERVICES */
 
 #ifdef SEENSERVICES
-  es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1, time(NULL), 1);
+  es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1,
+      current_ts, 1);
 #endif /* SEENSERVICES */
 
   DeleteClient(lptr); /* delete user */
@@ -1638,7 +1639,7 @@ s_sjoin(int ac, char **av)
 
     chan = (*av[2] == ':') ? av[2] + 1 : av[2];
 
-    CurrTime = time(NULL);
+    CurrTime = current_ts;
 
     /* kludge for older ircds that don't use SJOIN */
     sprintf(sendstr, ":%s SJOIN %ld %s + :%s",
@@ -2310,7 +2311,7 @@ s_pong(int ac, char **av)
     return;
 
   GetTime(&pong_t);
-  currts = time(NULL);
+  currts = current_ts;
 
   /*
    * Now set delta variables to the delta given by

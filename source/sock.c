@@ -464,7 +464,7 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   signon();
 
-  hubptr->connect_ts = time(NULL);
+  hubptr->connect_ts = current_ts;
 
   SendUmode(OPERUMODE_Y,
     "*** Connected to %s:%d",
@@ -505,7 +505,7 @@ ReadSocketInfo(void)
 #endif
 
 #if !defined HAVE_PTHREADS && !defined(HAVE_SOLARIS_THREADS)
-  time_t last_ts = time(NULL);
+  time_t last_ts = current_ts;
 #endif
 
   spill[0] = '\0';
@@ -514,36 +514,37 @@ ReadSocketInfo(void)
   for (;;)
   {
 
-  #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
     /*
-     * If pthreads are not enabled, DoTimer() will be called
-     * from this code, and so we need curr_ts here
+     * If pthreads are not enabled, DoTimer() will be called from this
+     * code, and so we need curr_ts here
+     *
+     * And we also need time setup here -kre
      */
-    curr_ts = time(NULL);
-  #endif
+    curr_ts = current_ts = time(NULL);
+#endif /* !(HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #ifdef HIGHTRAFFIC_MODE
 
-  #if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
+#if defined HAVE_PTHREADS || defined HAVE_SOLARIS_THREADS
     /*
-     * Since pthreads are enabled, HTM mode is the only thing
-     * that needs curr_ts, since DoTimer() is called from
-     * a separate thread
+     * Since pthreads are enabled, HTM mode is the only thing that needs
+     * curr_ts, since DoTimer() is called from a separate thread
      */
-    curr_ts = time(NULL);
-  #endif
+    curr_ts = current_ts;
+#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
     if (HTM)
     {
       int htm_count;
 
-    #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
 
       if (last_ts != curr_ts)
       {
         /*
-         * So DoTimer() doesn't get called a billion times when
-         * HTM is turned off
+         * So DoTimer() doesn't get called a billion times when HTM is
+         * turned off
          */
         last_ts = curr_ts;
 
@@ -554,7 +555,7 @@ ReadSocketInfo(void)
         DoTimer(curr_ts);
       } /* if (last_ts != curr_ts) */
 
-    #endif /* HAVE_PTHREADS */
+#endif /* HAVE_PTHREADS || HAVE_SOLARIS_THREADS */
 
       /* Check if HTM should be turned off */
       if ((curr_ts - HTM_ts) >= HTM_TIMEOUT)
@@ -589,9 +590,9 @@ ReadSocketInfo(void)
           return;
 
     } /* if (HTM) */
-  #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
+#if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
     else
-  #endif
+#endif /* ! (HAVE_PTHREADS || HAVE_SOLARIS_THREADS) */
 
 #endif /* HIGHTRAFFIC_MODE */
 

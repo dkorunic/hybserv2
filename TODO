@@ -1,7 +1,8 @@
 Today's MOTD
 ------------
-Unnamed Law:
-If it happens, it must be possible.
+Drew's Law of Highway Biology:
+  The first bug to hit a clean windshield lands directly in front of
+  your eyes.
 
 
 Pending bugs:
@@ -56,6 +57,7 @@ New features:
 
 Done so far:
 ------------
+*) lower usage of time() via global variable synched in dotimer()
 *) added fixts for channels and nicknames
 *) added deletion of cleartext password from memory if crypt is on
 *) services ignoring people sometimes

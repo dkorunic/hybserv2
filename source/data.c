@@ -334,8 +334,8 @@ CreateDatabase(char *name, char *info)
   /* change the mode to -rw------- */
   chmod(name, 0600);
 
-  currtime = time(NULL);
-  fprintf(fptr, "; HybServ %s - %s - created %s",
+  currtime = current_ts;
+  fprintf(fptr, "; HybServ2 %s - %s - created %s",
     hVersion,
     info,
     ctime(&currtime));

@@ -54,6 +54,7 @@
 #define NS_NOREGISTER   0x00100000 /* cannot register channels */
 #define NS_NOCHANOPS    0x00200000 /* not allowed to be opped */
 #define NS_NUMERIC      0x00400000 /* ignores 432 numeric */
+#define NS_PRIVMSG      0x00800000 /* PRIVMSG or NOTICE */
 
 struct NickHost
 {

@@ -94,6 +94,15 @@
 #define   OPERNICKIDENT
 
 /*
+ * If IDENTIFOPER is defined, opers IDENTIFYing to OperServ will be
+ * required to become first server operators (and SET NOEXPIRE) or else
+ * they wont be able to identify even if their password and nick/hostname
+ * are correct.(Security reasons). You also must define OPERNICKIDENT for
+ * this to work -ddb
+ */
+#undef   IDENTIFOPER
+
+/*
  * Define this if you want NickServ to record the TS of users who split so
  * that when they rejoin they don't need to re-IDENTIFY if their TS
  * matches. Also, OperServ will record the TS of users who have identified
@@ -304,9 +313,12 @@
 /* 
  * Define this for debugging purposes. It will setup coresize
  * appropriately, and startup daemon in console mode for easier debugging.
+ * Also, you might want to enable GDB_DEBUG to have HybServ wait for Gdb
+ * to attach it - and then you can set GDBAttached=1 to have it continue.
  * -kre
  */
 #undef    DEBUGMODE
+#undef    GDB_DEBUG
 
 /*
  * Use this option wisely, as last resort. It will dump very large amounts

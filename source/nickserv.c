@@ -79,6 +79,7 @@ static void n_set(struct Luser *, int, char **);
 static void n_set_kill(struct Luser *, int, char **);
 static void n_set_automask(struct Luser *, int, char **);
 static void n_set_private(struct Luser *, int, char **);
+static void n_set_privmsg(struct Luser *, int, char **);
 static void n_set_noexpire(struct Luser *, int, char **);
 static void n_set_secure(struct Luser *, int, char **);
 static void n_set_unsecure(struct Luser *, int, char **);
@@ -184,6 +185,7 @@ static struct Command setcmds[] =
       },
       { "AUTOMASK", n_set_automask, LVL_NONE },
       { "PRIVATE", n_set_private, LVL_NONE },
+      { "PRIVMSG", n_set_privmsg, LVL_NONE },
       { "NOEXPIRE", n_set_noexpire, LVL_NONE },
       { "SECURE", n_set_secure, LVL_NONE },
       { "UNSECURE", n_set_unsecure, LVL_NONE },
@@ -1304,10 +1306,8 @@ FindNick()
   Return a pointer to registered nick 'nickname'
 */
 
-struct NickInfo *
-      FindNick(char *nickname)
-
-  {
+struct NickInfo *FindNick(char *nickname)
+{
     struct NickInfo *nptr;
     unsigned int hashv;
 
@@ -1320,7 +1320,7 @@ struct NickInfo *
         return (nptr);
 
     return (NULL);
-  } /* FindNick() */
+} /* FindNick() */
 
 /*
 GetLink()
@@ -3169,6 +3169,46 @@ n_set_private(struct Luser *lptr, int ac, char **av)
          n_NickServ,
          "SET PRIVATE");
 } /* n_set_private() */
+
+
+static void n_set_privmsg(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+
+  if (!(nptr = GetLink(lptr->nick)))
+    return;
+
+  if (ac < 3)
+  {
+    notice(n_NickServ, lptr->nick, "Services are now %s'ing you",
+        (nptr->flags & NS_PRIVMSG) ? "PRIVMSG" : "NOTICE");
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s SET PRIVMSG %s", n_NickServ, lptr->nick,
+      lptr->username, lptr->hostname, (ac < 3) ? "" : StrToupper(av[2]));
+
+  if (!irccmp(av[2], "ON"))
+  {
+    nptr->flags |= NS_PRIVMSG;
+    notice(n_NickServ, lptr->nick,
+        "Services will use PRIVMSG from now on.");
+    return;
+  }
+
+  if (!irccmp(av[2], "OFF"))
+  {
+    nptr->flags &= ~NS_PRIVMSG;
+    notice(n_NickServ, lptr->nick,
+        "Services will use NOTICE from now on.");
+    return;
+  }
+
+  /* user gave an unknown param */
+  notice(n_NickServ, lptr->nick, "Syntax: \002SET PRIVMSG {ON|OFF}\002");
+  notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+      "SET PRIVMSG");
+} /* n_set_privmsg() */
 
 static void
 n_set_noexpire(struct Luser *lptr, int ac, char **av)

@@ -1,0 +1,4 @@
+Syntax: %bMODES <channel>%b
+
+Shows all the modes including the key and the limit of
+specified <channel>.

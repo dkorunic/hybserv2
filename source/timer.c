@@ -244,7 +244,7 @@ void DoTimer(time_t unixtime)
       ExpireGlines(unixtime);
 #endif
 
-#if defined CHANNELSERVICES && defined GECOSBANS
+#if defined CHANNELSERVICES
       ExpireBans(unixtime);
 #endif
 

@@ -71,30 +71,30 @@ static struct AutoKick *OnAkickList(struct ChanInfo *, char *);
 static void chanopsnotice(struct Channel *cptr, char* msg);
 
 /* default access levels for new channels */
-static int DefaultAccess[] = {
-                               -1,          /* CA_AUTODEOP */
-                               5,           /* CA_AUTOVOICE */
-                               8,           /* CA_CMDVOICE */
-                               5,           /* CA_ACCESS */
-                               5,           /* CA_CMDINVITE */
+static int DefaultAccess[CA_SIZE] = {
+     -1,          /* CA_AUTODEOP */
+     5,           /* CA_AUTOVOICE */
+     8,           /* CA_CMDVOICE */
+     5,           /* CA_ACCESS */
+     5,           /* CA_CMDINVITE */
 #ifdef HYBRID7
-                               /* Default access for halfop and cmdhalfop -Janos */
-                               8,           /* CA_AUTOHALFOP */
-                               10,          /* CA_CMDHALFOP */
+     /* Default access for halfop and cmdhalfop -Janos */
+     8,           /* CA_AUTOHALFOP */
+     10,          /* CA_CMDHALFOP */
 #endif /* HYBRID7 */
-                               10,          /* CA_AUTOOP */
-                               10,          /* CA_CMDOP */
+     10,          /* CA_AUTOOP */
+     10,          /* CA_CMDOP */
 #ifndef HYBRID7
-                               10,          /* CA_CMDUNBAN */
+     10,          /* CA_CMDUNBAN */
 #else
-                               8,           /* CA_CMDUNBAN */
+     8,           /* CA_CMDUNBAN */
 #endif /* HYBRID7 */
-                               15,          /* CA_AKICK */
-                               20,          /* CA_CMDCLEAR */
-                               25,          /* CA_SET */
-                               40,          /* CA_SUPEROP */
-                               50           /* CA_FOUNDER */
-                             };
+     15,          /* CA_AKICK */
+     20,          /* CA_CMDCLEAR */
+     25,          /* CA_SET */
+     40,          /* CA_SUPEROP */
+     50           /* CA_FOUNDER */
+     };
 
 static void c_help(struct Luser *, struct NickInfo *, int, char **);
 static void c_register(struct Luser *, struct NickInfo *, int, char **);
@@ -134,6 +134,8 @@ static void c_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_expirebans(struct Luser *, struct NickInfo *, int, char **);
 
+static void c_modes(struct Luser *, struct NickInfo *, int, char **);
+static void c_cycle(struct Luser *, struct NickInfo *, int, char **);
 static void c_invite(struct Luser *, struct NickInfo *, int, char **);
 static void c_op(struct Luser *, struct NickInfo *, int, char **);
 #ifdef HYBRID7
@@ -183,6 +185,8 @@ static struct Command chancmds[] =
       { "LIST", c_list, LVL_NONE },
       { "LEVEL", c_level, LVL_IDENT },
       { "SET", c_set, LVL_IDENT },
+      { "CYCLE", c_cycle, LVL_IDENT },
+      { "MODES", c_modes, LVL_IDENT },
       { "INVITE", c_invite, LVL_IDENT },
       { "OP", c_op, LVL_IDENT },
 #ifdef HYBRID7
@@ -796,7 +800,7 @@ cs_loaddata()
         {
           if (cptr)
             {
-              if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
+              if (!cptr->access_lvl)
                 {
                   SetDefaultALVL(cptr);
 
@@ -1232,10 +1236,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     }
   if (modes[1])
     {
-      toserv(":%s MODE %s %s\n",
-             n_ChanServ,
-             cptr->name,
-             modes);
+      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 
@@ -1293,9 +1294,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
   if (modes[1])
     {
       toserv(":%s MODE %s %s\n",
-             n_ChanServ,
-             cptr->name,
-             modes);
+             n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 
@@ -1336,18 +1335,10 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
        * It won't help if topiclen > ircdbuflen, that was original bug.
        * Anyway, it is dealt with c_topic() code, too. :-) -kre
        */
-      toserv(":%s SJOIN %ld %s + :@%s\n",
-             Me.name,
-             chanptr->since,
-             chanptr->name,
-             n_ChanServ);
-      toserv(":%s TOPIC %s :%s\n",
-             n_ChanServ,
-             chanptr->name,
-             topic);
-      toserv(":%s PART %s\n",
-             n_ChanServ,
-             chanptr->name);
+      toserv(":%s SJOIN %ld %s + :@%s\n", Me.name, chanptr->since,
+          chanptr->name, n_ChanServ);
+      toserv(":%s TOPIC %s :%s\n", n_ChanServ, chanptr->name, topic);
+      toserv(":%s PART %s\n", n_ChanServ, chanptr->name);
     }
 } /* cs_SetTopic() */
 
@@ -4562,11 +4553,11 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   AddFounder(lptr, cptr);
 
   notice(n_ChanServ, lptr->nick,
-         "Password accepted - you are now recognized as a founder for [\002%s\002]",
-         av[1]);
+    "Password accepted - you are now recognized as a founder for [\002%s\002]",
+    av[1]);
 
   ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
-             lptr->hostname);
+    lptr->hostname);
 
   /* If user isn't on the access list when he identifies, give him
    * FOUNDER access instead of SUPEROP. -harly */
@@ -4580,11 +4571,8 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
 
   RecordCommand("%s: %s!%s@%s IDENTIFY [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name);
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+    cptr->name);
 } /* c_identify() */
 
 /*
@@ -4623,22 +4611,15 @@ c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       char tmp[MAXLINE];
 
       notice(n_ChanServ, lptr->nick,
-             ERR_NEED_ACCESS,
-             cptr->access_lvl[CA_SET],
-             "SET",
-             av[1]);
+             ERR_NEED_ACCESS, cptr->access_lvl[CA_SET], "SET", av[1]);
 
       /* static buffers .. argh */
       strncpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
       tmp[sizeof(tmp) - 1] = '\0';
 
       RecordCommand("%s: %s!%s@%s failed SET [%s] %s %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
-                    tmp,
+                    n_ChanServ, lptr->nick, lptr->username,
+                    lptr->hostname, cptr->name, tmp,
                     (ac < 4) ? "" : StrToupper(av[3]));
 
       return;
@@ -5936,6 +5917,147 @@ c_set_url(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
          cptr->name,
          cptr->url);
 } /* c_set_url() */
+
+/*
+ * c_modes()
+ * shows all modes for a chan, including the key. lvl needed cmd_invite
+ * -LHG team
+ */
+static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
+{
+  struct ChanInfo *cptr;
+  struct Channel *chptr;
+  char modes[MAXLINE];
+
+  if (ac < 2)
+  {
+    notice(n_ChanServ, lptr->nick, "Syntax: \002MODES <channel>\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "MODES");
+    return;
+  }
+
+  if (!(cptr = FindChan(av[1])))
+  {
+    notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
+    return;
+  }
+
+  if (cptr->flags & (CS_FORBID | CS_FORGET))
+  {
+    notice(n_ChanServ, lptr->nick, "[\002%s\002] is a forbidden channel",
+      cptr->name);
+    return;
+  }
+
+  if (!HasAccess(cptr, lptr, CA_CMDINVITE))
+  {
+    notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
+        cptr->access_lvl[CA_CMDINVITE], "INVITE", cptr->name);
+    RecordCommand("%s: %s!%s@%s failed MODES [%s]",
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+      cptr->name);
+    return;
+  }
+
+  if (IsChannelMember(FindChannel(av[1]), lptr))
+  {
+    notice(n_ChanServ, lptr->nick, "You are already on [\002%s\002]",
+        cptr->name);
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s MODES [%s]",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
+
+  if ((chptr = FindChannel(cptr->name)))
+  {
+    strcpy(modes, "+");
+    if (chptr->modes & MODE_S)
+      strcat(modes, "s");
+    if (chptr->modes & MODE_P)
+      strcat(modes, "p");
+    if (chptr->modes & MODE_N)
+      strcat(modes, "n");
+    if (chptr->modes & MODE_T)
+      strcat(modes, "t");
+    if (chptr->modes & MODE_M)
+      strcat(modes, "m");
+    if (chptr->modes & MODE_I)
+      strcat(modes, "i");
+    if (chptr->limit)
+      strcat(modes, "l");
+    if ((chptr->key) && (chptr->key[0] != '\0'))
+      strcat(modes, "k");
+    if (chptr->limit)
+    {
+      char temp[MAXLINE];
+      sprintf(temp, "%s %d", modes, chptr->limit);
+      strcpy(modes, temp);
+    }
+    if ((chptr->key) && (chptr->key[0] != '\0'))
+    {
+      char temp[MAXLINE];
+      sprintf(temp, "%s %d", modes, chptr->limit);
+      strcpy(modes, temp);
+    }
+
+    notice(n_ChanServ, lptr->nick,
+      "Channel %s has the following modes: %s",
+      cptr->name, modes);
+  }
+  else
+    notice(n_ChanServ, lptr->nick, "The channel [\002%s\002] is empty",
+      cptr->name);
+} /* c_modes() */
+
+/*
+ * c_cycle()
+ * Cycle individual #channel. -LHG team
+ */
+static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
+{
+  struct ChanInfo *cptr;
+  struct Channel *chptr;
+
+  if (ac < 2)
+  {
+    notice(n_ChanServ, lptr->nick, "Syntax: \002CYCLE <channel>\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "CYCLE");
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s CYCLE [%s]", n_ChanServ, lptr->nick,
+    lptr->username, lptr->hostname, av[1]);
+
+  if ((cptr = FindChan(av[1])))
+  {
+    if (!(chptr = FindChannel(cptr->name))) /* should never happen */
+      return;
+
+    if (!HasAccess(cptr, lptr, CA_SET))
+    {
+      notice(n_ChanServ, lptr->nick,
+          ERR_NEED_ACCESS, cptr->access_lvl[CA_SET], "CYCLE", av[1]);
+      RecordCommand("%s: %s!%s@%s failed CYCLE [%s]",
+          n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+          cptr->name);
+      return;
+    }
+
+    if (!IsChannelMember(chptr, Me.csptr))
+      cs_join(cptr);
+    else
+    {
+      cs_part(chptr);
+      cs_join(cptr);
+    }
+  }
+  else
+   notice(n_ChanServ, lptr->nick,
+     "Can't cycle channel [\002%s\002]", av[1]);
+} /* cs_cycle() */
 
 /*
 c_invite()
@@ -7435,10 +7557,7 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
 
   RecordCommand("%s: %s!%s@%s FORGET [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
                 av[1]);
 
   o_Wallops("Forget from %s!%s@%s for channel [%s]",
@@ -7668,13 +7787,10 @@ static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
  */
 void SetDefaultALVL(struct ChanInfo *cptr)
 {
-  int i;
-
   if (cptr->access_lvl == NULL)
     cptr->access_lvl = MyMalloc(sizeof(int) * CA_SIZE);
 
-  for (i = 0; i < CA_SIZE; ++i)
-    cptr->access_lvl[i] = DefaultAccess[i];
+  memcpy(cptr->access_lvl, DefaultAccess, sizeof(int) * CA_SIZE);
 }
 
 /*
@@ -7703,7 +7819,7 @@ void ExpireBans(time_t unixtime)
           continue;
 
         bans = MyMalloc(sizeof(char));
-        *bans = 0;
+        bans[0] = '\0';
        
         for (bptr = chptr->firstban; bptr; bptr = bptr->next)
         {
@@ -7712,7 +7828,7 @@ void ExpireBans(time_t unixtime)
             /* Ban has expired. Remove it. */
             putlog(LOG2, "%s: Removing ban %s on %s (expired)",
               n_ChanServ, bptr->mask, cptr->name);
-            bans = MyRealloc(bans, strlen(bans) + strlen(bptr->mask)
+            bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask)
                 + (2 * sizeof(char)));
             strcat(bans, bptr->mask);
             strcat(bans, " ");
@@ -7733,7 +7849,7 @@ static void c_set_expirebans(struct Luser *lptr,
 
   if (!BanExpire)
   {
-    notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled on this server.");
+    notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled.");
     return;
   }
 

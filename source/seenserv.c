@@ -522,8 +522,6 @@ static void es_unseen(struct Luser *lptr, int ac, char **av)
   while (seen)
     {
       saved = seen->prev;
-      /* Converted to memset() -kre */
-      /* bzero(nuhost, sizeof(nuhost)); */
       memset(nuhost, 0, sizeof(nuhost));
       strncpy(nuhost, seen->nick, NICKLEN);
       strcat(nuhost, "!");

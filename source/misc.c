@@ -35,6 +35,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "sprintf_irc.h"
+#include "nickserv.h"
+#include "server.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -247,17 +249,15 @@ fatal(int keepgoing, char *format, ...)
 } /* fatal() */
 
 /*
-notice()
-  purpose: send a NOTICE to 'nick' with 'msg'
-  return: none
-*/
-
-void
-notice(char *from, char *nick, char *format, ...)
-
+ * notice()
+ * purpose: send a NOTICE or PRIVMSG to 'nick' with 'msg'
+ * return: none
+ */
+void notice(char *from, char *nick, char *format, ...)
 {
   char finalstr[MAXLINE * 2];
   char who[MAXLINE];
+  struct NickInfo *nptr;
   va_list args;
 
   va_start(args, format);
@@ -269,10 +269,11 @@ notice(char *from, char *nick, char *format, ...)
   else
     strcpy(who, from);
 
-  toserv(":%s NOTICE %s :%s\n",
-         who,
-         nick,
-         finalstr);
+  nptr = GetLink(nick);
+  if (nptr && (nptr->flags & NS_PRIVMSG))
+    toserv(":%s PRIVMSG %s :%s\n", who, nick, finalstr);
+  else
+    toserv(":%s NOTICE %s :%s\n", who, nick, finalstr);
 
   va_end(args);
 } /* notice() */
@@ -296,9 +297,7 @@ DoShutdown(char *who, char *reason)
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
-  toserv(":%s QUIT :%s\n",
-         n_ChanServ,
-         "Shutting Down");
+  toserv(":%s QUIT :%s\n", n_ChanServ, "Shutting Down");
 #endif
 
   /* close listening sockets */
@@ -321,19 +320,11 @@ DoShutdown(char *who, char *reason)
 
   putlog(LOG1, sendstr);
 
-#if 0
-
-  toserv(":%s QUIT :%s\nSQUIT %s :%s\n",
-         n_OperServ,
-         "Shutting Down",
-         currenthub->realname ? currenthub->realname : currenthub->hostname,
-         sendstr);
-#endif
   /* Instead of SQUIT -kre */
   toserv(":%s ERROR :Shutting down\n", Me.name);
   toserv(":%s QUIT\n", Me.name);
 
-#ifdef DEBUG
+#ifdef DEBUGMODE
   /* This can be useful in debug mode -kre */
   close(HubSock);
   ClearUsers();
@@ -342,7 +333,7 @@ DoShutdown(char *who, char *reason)
   ClearHashes(0);
 #endif
 
-  /* HMmh! exit(1) should be called from main() to ensure proper threading
+  /* Hmmh! exit(1) should be called from main() to ensure proper threading
    * system termination. Fix this. -kre */
   exit(1);
 } /* DoShutdown() */

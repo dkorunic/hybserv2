@@ -61,9 +61,11 @@ DISTRIBUTION
 
   You can get HybServ from:
 
-  #1:  CVS Web snapshots:
-       http://fly.srk.fer.hr/~kreator/projects/hybserv/
-       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
+  #1:  Anonymous CVS to this CVSROOT:
+       :pserver:cvs@hybserv.esa.fer.hr:/home/cvs
+       cvs login
+       <press enter, no password>
+       cvs checkout hybserv
 
   #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
        (Thanks to kreator)
@@ -71,11 +73,9 @@ DISTRIBUTION
   #3:  ftp.magenet.net/pub/hybserv/
        (Thanks to Bruns)
 
-  #4:  Anonymous CVS to this CVSROOT:
-       :pserver:cvs@hybserv.esa.fer.hr:/home/cvs
-       cvs login
-       <press enter, no password>
-       cvs checkout hybserv
+  #4:  CVS Web snapshots:
+       http://fly.srk.fer.hr/~kreator/projects/hybserv/
+       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
 
 NOTE: CVS is usually more current than the release.
 

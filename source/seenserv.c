@@ -295,7 +295,7 @@ static void FreeSeen()
  */
 static void es_seen(struct Luser *lptr, int ac, char **av)
 {
-  int i, count;
+  int i, count, j;
   aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
   char nuhost[NICKLEN + USERLEN + HOSTLEN + 3], sendstr[256];
   time_t mytime, last;
@@ -369,10 +369,20 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
             saved = first;
             for (last = 0; saved; saved = saved->seen)
             {
-              if ((saved->time < mytime) && (saved->time > last))
+              if ((saved->time <= mytime) && (saved->time > last))
               {
-                sorted[i] = saved;
-                last = saved->time;
+                for (j = 0; j < i; j++)
+                  if (!irccmp(saved->nick, sorted[j]->nick) &&
+                      saved->time == sorted[j]->time)     
+                      {
+                        j = -1;
+                        break;
+                      }
+                if (j != -1)
+                {
+                  sorted[i] = saved;
+                  last = saved->time;
+                }     
               }
             }
             mytime = sorted[i]->time;

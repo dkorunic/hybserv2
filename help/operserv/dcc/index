@@ -10,6 +10,7 @@ help      identify motd     quit      who
 %+aAdministrator commands:
 %+achannel   join     jump     ignore    killchan
 %+akillhost  omode    part     secure    trace
+%+alogonnews
 %+a
 %+sServices Administrator commands:
 %+sdie       dump     off/on    rehash

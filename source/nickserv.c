@@ -1404,17 +1404,17 @@ collide(char *nick)
       Me.name, "Nickname Enforcement");
 #endif /* DANCER */
 
+#ifdef SVSNICK
+  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
+  toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
+#else
   /*
    * Sending a server kill will be quieter than an oper
    * kill since most clients are -k
    */
-#ifndef SVSNICK
+
   toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
          lptr->nick, Me.name, n_NickServ, sendstr);
-#else
-  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
-  toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
-#endif
 
   /* erase the old user */
   DeleteClient(lptr);
@@ -1424,6 +1424,7 @@ collide(char *nick)
   AddClient(av);
 
   MyFree(av);
+#endif
 
   if ((nptr = FindNick(nick)))
     {
@@ -4680,10 +4681,16 @@ n_setpass(struct Luser *lptr, int ac, char **av)
       return;
     }
 
+  /* unidentify if it is identified */
+  if (nptr->flags & NS_IDENTIFIED)
+  {
+    nptr->flags &= ~NS_IDENTIFIED;
+    CheckNick(nptr->nick);
+  }
+
   notice(n_NickServ, lptr->nick,
-         "Password for [\002%s\002] has been changed to [\002%s\002]",
-         av[1],
-         av[2]);
+    "Password for [\002%s\002] has been changed to [\002%s\002]", av[1],
+    av[2]);
 } /* n_setpass() */
 
 /*

@@ -135,18 +135,15 @@ ReadMessageFile(struct MessageFile *fileptr)
 } /* ReadMessageFile() */
 
 /*
-SendMessageFile()
+ SendMessageFile()
  Send file 'motdptr' to lptr
 */
-
-void
-SendMessageFile(struct Luser *lptr, struct MessageFile *motdptr)
-
+void SendMessageFile(struct Luser *lptr, struct MessageFile *motdptr)
 {
   struct MessageFileLine *lineptr;
 
   assert(lptr && motdptr);
 
   for (lineptr = motdptr->Contents; lineptr; lineptr = lineptr->next)
-    notice( n_Global, lptr->nick, lineptr->line);
+    notice(n_Global, lptr->nick, lineptr->line);
 } /* SendMessageFile() */

@@ -159,13 +159,8 @@ static void o_kline(struct Luser *, int, char **, int);
 static void o_who(struct Luser *, int, char **, int);
 static void o_boot(struct Luser *, int, char **, int);
 static void o_quit(struct Luser *, int, char **, int);
-static void o_motd(struct Luser *, int, char **, int);
 static void o_link(struct Luser *, int, char **, int);
 static void o_unlink(struct Luser *, int, char **, int);
-static void o_blackbook(struct Luser *, int, char **, int);
-static void o_blackbook_add(struct Luser *, int, char **, int);
-static void o_blackbook_del(struct Luser *, int, char **, int);
-static void o_blackbook_list(struct Luser *, int, char **, int);
 
 static void DeleteIgnore(struct Ignore *iptr);
 
@@ -186,6 +181,11 @@ static void show_trace_info(struct Luser *, struct Luser *, int);
 static void DisplaySettings(struct Luser *, int);
 
 static struct UmodeInfo *FindUmode(char);
+
+static void o_motd(struct Luser *, int, char **, int);
+static void o_motd_display(struct Luser *, int, char **, int);
+static void o_motd_add(struct Luser *, int, char **, int);
+static void o_motd_append(struct Luser *, int, char **, int);
 
 static struct OperCommand opercmds[] =
     {
@@ -214,7 +214,6 @@ static struct OperCommand opercmds[] =
       { "STATUS", o_status, 0, 'o' },
       { "UMODE", o_umode, 0, 'o' },
       { "USERMODE", o_umode, 0, 'o' },
-      { "BLACKBOOK", o_blackbook, 0, 'o'},
 
       /*
        * Administrator commands
@@ -316,6 +315,7 @@ static struct OperCommand opercmds[] =
 #endif
 
       { "KLINE", o_kline, 0, 'g' },
+      { "MOTD", o_motd, 0, 'a' },
 
       /*
        * Dcc Only
@@ -324,7 +324,6 @@ static struct OperCommand opercmds[] =
       { "WHO", o_who, 1, 0 },
       { "BOOT", o_boot, 1, 'a' },
       { "QUIT", o_quit, 1, 0 },
-      { "MOTD", o_motd, 1, 0 },
       { "LINK", o_link, 1, 'o' },
       { "UNLINK", o_unlink, 1, 'o' },
 
@@ -337,15 +336,6 @@ static struct OperCommand ignorecmds[] =
       { "ADD", o_ignore_add, 0, 0 },
       { "DEL", o_ignore_del, 0, 0 },
       { "LIST", o_ignore_list, 0, 0 },
-      { 0, 0, 0, 0 }
-    };
-
-/* sub-commands for Operserv BLACKBOOK */ 
-static struct OperCommand blackbookcmds[] =
-    {
-      { "ADD", o_blackbook_add, 0, 0 },
-      { "DEL", o_blackbook_del, 0, 0 },
-      { "LIST", o_blackbook_list, 0, 0 },
       { 0, 0, 0, 0 }
     };
 
@@ -363,6 +353,15 @@ static struct OperCommand htmcmds[] =
     };
 
 #endif /* HIGHTRAFFIC_MODE */
+
+/* sub-commands for OperServ MOTD */
+static struct OperCommand motdcmds[] =
+    {
+      { "DISPLAY", o_motd_display, 0, 0 },
+      { "ADD", o_motd_add, 0, 0 },
+      { "APPEND", o_motd_append, 0, 0 },
+      { 0, 0, 0, 0 }
+    };
 
 /*
  * OperServ usermodes
@@ -1768,7 +1767,12 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
   ircsprintf(tmpfile, "%s.tmp", configname);
 
-  fp = fopen(tmpfile, "w");
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
+
   jcnt = 0;
   while (fgets(line, MAXLINE - 1, configfp))
     {
@@ -1955,6 +1959,12 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   expires = timestr(av[1]);
   if ((strchr(av[1], '@') == NULL) && (ac > 2) && expires)
     {
+      if (expires < 0)
+      {
+        os_notice(lptr, sockfd,
+            "Expire time was too big, the gline is now permanent!");
+        expires = 0;
+      }              
       sidx = 3;
       hostmask = av[2];
     }
@@ -2252,7 +2262,11 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 
   ircsprintf(tmpfile, "%s.tmp", configname);
 
-  fp = fopen(tmpfile, "w");
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
 
   while (fgets(line, MAXLINE - 1, configfp))
     {
@@ -2458,7 +2472,11 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
   ircsprintf(tmpfile, "%s.tmp", ConfigFile);
-  fp = fopen(tmpfile, "w");
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
 
   while (fgets(line, MAXLINE - 1, configfp))
     {
@@ -4960,10 +4978,7 @@ o_quit(struct Luser *lptr, int ac, char **av, int sockfd)
             reason);
 
   BroadcastDcc(DCCALL, "%s (%s@%s) has left the partyline [%s]\n",
-               onick,
-               ouser,
-               ohost,
-               reason);
+               onick, ouser, ohost, reason);
 
   CloseConnection(dccptr);
 
@@ -4971,19 +4986,120 @@ o_quit(struct Luser *lptr, int ac, char **av, int sockfd)
 } /* o_quit() */
 
 /*
-o_motd()
+  o_motd()
+  Modify or show motd.
+*/
+static void o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+  struct OperCommand *cptr;
+
+  if (ac < 2)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY} [line]\002");
+      return;
+    }
+
+  cptr = GetoCommand(motdcmds, av[1]);
+
+  if (cptr && (cptr != (struct OperCommand *) -1))
+    {
+      /* call cptr->func to execute command */
+      (*cptr->func)(lptr, ac, av, sockfd);
+    }
+  else
+    {
+      /* the option they gave was not valid */
+      os_notice(lptr, sockfd,
+                "%s switch [\002%s\002]",
+                (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
+                av[1]);
+      os_notice(lptr, sockfd,
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY} [line]\002");
+    }
+} /* o_motd() */
+
+/*
+o_motd_display()
   Display motd
 */
-
-static void
-o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
-
+static void o_motd_display(struct Luser *lptr, int ac, char **av, int
+    sockfd)
 {
-  o_RecordCommand(sockfd,
-                  "MOTD");
+  o_RecordCommand(sockfd, "MOTD DISPLAY");
 
-  SendMotd(sockfd);
-} /* o_motd() */
+  if (!Network->LogonNewsFile.Contents)
+    {
+      os_notice(lptr, sockfd,
+                "There is nothing in MOTD");
+      return;
+    }
+
+  SendMessageFile(lptr, &Network->LogonNewsFile);
+} /* o_motd_display() */
+
+/*
+  o_motd_add()
+  Delete current motd and add the line given (if any, else blank line)
+*/
+static void o_motd_add(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+  char *line = ((ac >= 3) ? GetString(ac - 2, av + 2) : NULL);
+
+  o_RecordCommand(sockfd, "MOTD ADD %s",
+                  line ? line : "");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "w")))
+    {
+      os_notice(lptr, sockfd,
+             "Cannot open MOTD file %s!",
+             Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fprintf(fp, "%s\n", line ? line : "");
+  fclose(fp);
+
+  /*
+   * it's better to reread the logon news file here with ReadMessageFile
+   * than to make operations with Network->LogonNewsFile believe me :)
+   */
+  ReadMessageFile(&Network->LogonNewsFile);
+
+  os_notice(lptr, sockfd,
+         "MOTD set to %s", line ? line : "a blank line");
+} /* o_motd_add() */
+
+/*
+  o_motd_append()
+  Adds the line given (if any, else blank line) to the current logon news
+*/
+static void o_motd_append(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+  char *line = ((ac >= 3) ? GetString(ac - 2, av + 2) : NULL);
+
+  RecordCommand("%s: %s!%s@%s MOTD APPEND %s",
+                n_Global, lptr->nick, lptr->username, lptr->hostname, line
+                ? line : "");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "a+")))
+    {
+      os_notice(lptr, sockfd,
+         "Cannot open MOTD file %s!", Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fprintf(fp, "%s\n", line ? line : "");
+  fclose(fp);
+
+  ReadMessageFile(&Network->LogonNewsFile);
+  os_notice(lptr, sockfd,
+         "Line appended to the current MOTD");
+} /* o_motd_append() */
 
 /*
 o_link()
@@ -5029,7 +5145,6 @@ o_unlink()
 
 static void
 o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
-
 {
   char sendstr[MAXLINE];
   char *reason;
@@ -7225,186 +7340,4 @@ static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
   toserv(":%s KLINE %s %s\r\n", Me.name, n_OperServ, klinestr);
   MyFree(klinestr);
 #endif
-}
-
-/*
- * o_blackbook
- * Desc: main command for blackbook sub-command set.
- */
-static void o_blackbook(struct Luser *lptr, int ac, char **av, int sockfd)
-{
-  struct OperCommand *cptr;
-
-  if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002BLACKBOOK {ADD|DEL|LIST} [nick|channel|index]\002");
-      return;
-    }
-
-  cptr = GetoCommand(blackbookcmds, av[1]);
-
-  if (cptr && (cptr != (struct OperCommand *) -1))
-    {
-      /* call cptr->func to execute command */
-      (*cptr->func)(lptr, ac, av, sockfd);
-    }
-  else
-    {
-      /* the option they gave was not valid */
-      os_notice(lptr, sockfd,
-        "%s switch [\002%s\002]",
-        (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
-          av[1]);
-      os_notice(lptr, sockfd,
-        "Syntax: \002BLACKBOOK {ADD|DEL|LIST} [mask|channel|index]\002");
-    }
-} /* o_blackbook() */
-
-/*
- * o_blackbook_add
- * Desc: 
- */
-static void o_blackbook_add(struct Luser *lptr, int ac, char **av, int sockfd)
-
-{
-  char hostmask[MAXLINE];
-  time_t expire = (time_t) NULL;
-
-  if (ac < 3)
-    {
-      os_notice(lptr, sockfd,
-                "Syntax: \002IGNORE ADD <nickname|hostmask> [time]\002");
-      return;
-    }
-
-  if (match("*!*@*", av[2]))
-    strcpy(hostmask, av[2]);
-  else if (match("*!*", av[2]))
-    {
-      strcpy(hostmask, av[2]);
-      strcat(hostmask, "@*");
-    }
-  else if (match("*@*", av[2]))
-    {
-      strcpy(hostmask, "*!");
-      strcat(hostmask, av[2]);
-    }
-  else if (match("*.*", av[2]))
-    {
-      strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[2]);
-    }
-  else
-    {
-      struct Luser *ptr;
-      char *mask;
-
-      /* it must be a nickname - try to get hostmask */
-      if ((ptr = FindClient(av[2])))
-        {
-          mask = HostToMask(ptr->username, ptr->hostname);
-          strcpy(hostmask, "*!");
-          strcat(hostmask, mask);
-          MyFree(mask);
-        }
-      else
-        {
-          strcpy(hostmask, av[2]);
-          strcat(hostmask, "!*@*");
-        }
-    }
-
-  if (OnIgnoreList(hostmask))
-    {
-      os_notice(lptr, sockfd,
-                "The hostmask [\002%s\002] is already on the ignorance list",
-                hostmask);
-      return;
-    }
-
-  if (ac >= 4)
-    expire = timestr(av[3]);
-
-  o_RecordCommand(sockfd,
-                  "IGNORE ADD %s %s",
-                  hostmask,
-                  (ac < 4) ? "(perm)" : av[3]);
-
-  AddIgnore(hostmask, expire);
-
-  if (expire)
-    {
-      os_notice(lptr, sockfd,
-                "[\002%s\002] has been added to the ignorance list with an expire of %s",
-                hostmask,
-                timeago(expire, 3));
-    }
-  else
-    {
-      os_notice(lptr, sockfd,
-                "[\002%s\002] has been added to the ignorance list with no expiration",
-                hostmask);
-    }
-} /* o_blackbook_add() */
-
-static void o_blackbook_del(struct Luser *lptr, int ac, char **av, int sockfd)
-{
-  struct Ignore *temp;
-  char *host = NULL;
-  int idx;
-
-  if (ac < 3)
-    {
-      os_notice(lptr, sockfd,
-                "Syntax: \002IGNORE DEL <hostmask | index>\002");
-      return;
-    }
-
-  if ((idx = IsNum(av[2])))
-    {
-      int cnt = 0;
-
-      for (temp = IgnoreList; temp; temp = temp->next, ++cnt)
-        {
-          if (idx == (cnt + 1))
-            {
-              host = MyStrdup(temp->hostmask);
-              break;
-            }
-        }
-
-      if (!host)
-        {
-          os_notice(lptr, sockfd,
-                    "[\002%d\002] is not a valid index",
-                    idx);
-          return;
-        }
-    }
-  else
-    host = MyStrdup(av[2]);
-
-  o_RecordCommand(sockfd,
-                  "IGNORE DEL %s",
-                  host);
-
-  if (!DelIgnore(host))
-    {
-      os_notice(lptr, sockfd,
-                "[\002%s\002] was not found on the ignorance list",
-                host);
-      MyFree(host);
-      return;
-    }
-
-  os_notice(lptr, sockfd,
-            "[\002%s\002] has been removed from the ignorance list",
-            host);
-
-  MyFree(host);
-} /* o_blackbook_del() */
-
-static void o_blackbook_list(struct Luser *lptr, int ac, char **av, int sockfd)
-{
 }

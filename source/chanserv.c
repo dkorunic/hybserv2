@@ -7642,6 +7642,7 @@ c_setpass(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
+  struct f_users *fdrs;
 
   if (ac < 3)
     {
@@ -7685,6 +7686,14 @@ c_setpass(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                     av[2]);
       return;
     }
+
+  /* unidentify all founders */
+  while (cptr->founders)
+  {
+    fdrs = cptr->founders->next;
+    RemFounder(cptr->founders->lptr, cptr);
+    cptr->founders = fdrs;
+  }
 
   notice(n_ChanServ, lptr->nick,
          "Founder password for %s has been changed to [\002%s\002]",

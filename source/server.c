@@ -551,17 +551,20 @@ s_server(int ac, char **av)
    * in the connect burst, but the hub would send the server line
    * to us anyway, before processing our SQUIT
    */
-  if ((tempserv=FindServer(av[2])))
+  if ((tempserv = FindServer(av[2])))
 #ifndef SPLIT_INFO
 
     return;
 #else
-#ifdef ALLOW_JUPES
     /* Yeah, this is server that has already been in server list. Now, we
     * have 2 cases - either this is juped server or is not. If it is,
     * ignore whole split stuff -kre */
     {
-      if ((ac == 5) && !IsJupe(tempserv->name))
+      if ((ac == 5)
+#ifdef ALLOW_JUPES
+          && !IsJupe(tempserv->name)
+#endif /* ALLOW_JUPES */
+       )
         {
           tempserv->uplink = FindServer(av[0] + 1);
           SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
@@ -572,7 +575,6 @@ s_server(int ac, char **av)
         }
       return;
     }
-#endif /* ALLOW_JUPES */
 #endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);

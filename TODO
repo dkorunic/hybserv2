@@ -8,6 +8,7 @@ A pessimist is a man who has been compelled to live with an optimist.
 
 Pending bugs:
 -------------
+*) fix *LOCK functions
 *) temp ignores rotate (possible overflow)
 *) setpass -> unidentify nickname
 *) forcenick

@@ -31,6 +31,7 @@ For more information on the commands, type
 %+a    PART       Stop monitoring a channel
 %+a    SECURE     Secure a channel
 %+a    TRACE      Display users matching a pattern
+%+a    MOTD       Maintains the current motd (logon news)
 %+s%b* * * *
 %+s%bServices Administrator commands:%b
 %+s    DIE        Shutdown services

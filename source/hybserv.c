@@ -243,7 +243,7 @@ main(int argc, char *argv[])
   /* Make current process session leader -kre */
   setsid(); 
 #else
-  printf("Entering foreground debug mode\n"
+  printf("Entering foreground debug mode\n");
 #endif /* DEBUGMODE */
 
 #if defined GIMMECORE || defined DEBUGMODE

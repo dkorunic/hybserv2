@@ -1079,28 +1079,25 @@ onctcp(char *nick, char *target, char *msg)
   if (strncasecmp(msg, "VERSION", 7) == 0)
   {
 #ifdef ADMININFO
-    struct Userlist *tempuser = NULL;    
-    struct Luser *olptr = NULL;
+    struct Luser *tempuser = NULL;    
 #endif /* ADMININFO */
 
     notice(target, nick,
       "\001VERSION HybServ2 TS Services version %s\001",
       hVersion); 
     notice(target, nick,
-      "\001VERSION Administrators: %s\001",
+      "\001VERSION Administrator: %s\001",
       Me.admin);
 
 #ifdef ADMININFO
     /* Print active operators that have identified to OperServ. This could
      * be a little performance hit, blah. -kre */
-    for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+    for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
     {
-      if ((olptr = FindClient(tempuser->nick)) &&
-          (olptr->flags & L_OSREGISTERED) &&
-          match(tempuser->hostname, olptr->hostname) &&
-          match(tempuser->username, olptr->username))
-      notice(target, nick, "\001VERSION Active operators: %s (%s@%s)\001",
-          tempuser->nick, tempuser->username, tempuser->hostname);
+      if (tempuser->flags & L_OSREGISTERED)
+        notice(target, nick, "\001VERSION Active operators: %s
+            (%s@%s)\001", tempuser->nick, tempuser->username,
+            tempuser->hostname);
     }
 #endif /* ADMININFO */
 

@@ -1,5 +1,6 @@
 telnet connections WON'T WORK. old code was buggy, new one just ignores
-telnet (immediately after identification).
+telnet (immediately after identification) - yes, i plan to fix it sometime
+in the near future :)
 
 kre:
 (gdb) frame 2

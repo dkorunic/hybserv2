@@ -1,3 +1,10 @@
+*** 20010516_1 by kreator
+- quite large update, I rewrote lots of code to make current_ts global,
+  which has lowered usage of time() considerably; now we do have services
+  consuming less CPU time
+- preliminary support for snprintf fix
+
+
 *** 20010511_2 by kreator
 - part of DeleteLink fixes.
 

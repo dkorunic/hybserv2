@@ -1,6 +1,8 @@
 #ifndef INCLUDED_config_h
 #define INCLUDED_config_h
 
+/* ------------------- Start of configurable section ------------ */
+
 /*
  * This will automagically transform into correct SETPATH. Don't change
  * it. -kre
@@ -475,14 +477,6 @@
 
 
 /* ------------------- End of configurable section -------------- */
-
-/*
- * Sanity check -kre
- */
-
-#if !defined HYBRID_ONLY && !defined IRCNET
-#error You have to define either HYBRID or IRCNET compatibility
-#endif
 
 /* 
  * Petty don't-flood-opers-with-messages sanity check -ike

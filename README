@@ -64,17 +64,18 @@ DISTRIBUTION
   You can get HybServ from:
 
   #1:  Anonymous CVS:
-       :pserver:cvs@hybserv.dyndns.org:/home/cvs
+       :pserver:cvs@hybserv.net:/home/cvs
        cvs login
        <press enter, no password>
        cvs checkout hybserv
 
   #2:  CVS Web:
-       http://hybserv.dyndns.org/
+       http://hybserv.net/
 
   #3:  Mirrors:
-       http://www.2mbit.com/hybserv2/
        http://www.srce.hr/~kreator/projects/tarballs/
+       http://hybserv.icsbg.net/
+       /* OUTDATED */ http://www.2mbit.com/hybserv2/
 
 NOTE: CVS is usually more current than the release.
 

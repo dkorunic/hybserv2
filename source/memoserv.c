@@ -878,6 +878,10 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       /*
        * It was sent to a nickname - check if they are online
        * and identified and optionally notify them
+       *
+       * we should have here linklist traversal and notifying all clients.
+       * however, that could be a bit cpu intensitive to do for every
+       * memo, so i haven't done it so far. -kre
        */
       if ((master->flags & NS_MEMONOTIFY) &&
           (realptr->flags & NS_IDENTIFIED) &&

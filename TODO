@@ -6,6 +6,8 @@ he has already achieved, but at what he aspires to do."
 
 Pending bugs:
 -------------
+*) ChanServ not opering when it should (!)
+*) remember to transfer access list in DeleteLink()
 *) seems it is possible that nickname stays ghosted more than necessary if
    nick QUITs
 *) send all mlock modes on channel creation
@@ -49,6 +51,7 @@ Features to come:
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
    ----> work in progress (KrisDuv)
+   ----> work in progress (ike)
 *) implement modes flood trigger (and below)
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
@@ -56,8 +59,9 @@ Features to come:
 *) umode +g ACCEPT list (BR's idea)
 
 
-Done so far:
-------------
+Done so far (and yes, there is even more):
+------------------------------------------
+*) MemoServ not handling memos by master
 *) design chanaccesslists inheritance for linked nicknames
 *) fix chan_access to get along with linked nicknames!
 *) n_info doesn't show linked nicknames for non-master

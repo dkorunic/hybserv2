@@ -2135,7 +2135,8 @@ n_identify(struct Luser *lptr, int ac, char **av)
 #ifdef MEMOSERVICES
   if (nptr->flags & NS_MEMOSIGNON)
   {
-    if ((mi = FindMemoList(lptr->nick)))
+    /* search by master -kre */
+    if ((mi = FindMemoList(nptr->nick)))
     {
       if (mi->newmemos)
       {

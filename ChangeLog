@@ -1,3 +1,8 @@
+*** 20010528_7 by kreator
+- original IrcBg code had 8 char limit for UIN and dumped it into long:
+  since they are larger now, move it into string
+
+
 *** 20010528_6 by kreator
 - added some todo directives
 

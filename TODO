@@ -43,3 +43,4 @@ Some sort of TODO/planning program
 22) we don't save information on servers on shutdown (statserv). should
     we?
     - ?
+23) add collapse() and irccmp() (do we need this?)

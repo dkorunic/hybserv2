@@ -1,3 +1,7 @@
+*** 20020903_1 by kreator
+- fix smaller issue in WriteIgnores
+
+
 *** 20020902_2 by kreator
 - fixed WriteIgnores bug: ts should be delta, instead of fixed ts
 

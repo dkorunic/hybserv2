@@ -1,3 +1,13 @@
+*** 20031226_1 by kreator
+- wrong user info for svsnick (jared)
+- services are not introduced if ALLOW_JUPES is off (mark)
+- new MOLI's addy
+- seenserv ts problem (rabble)
+- cosmetic unidentify stuff (rabble)
+- bunch of fopen() checks (rabble)
+- some motd_* functions rewrite (rabble)
+
+
 *** 20030903_1 by kreator
 - misc cleanups
 

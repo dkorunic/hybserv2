@@ -75,7 +75,7 @@ int                          SafeConnect = 0;
 int main(int argc, char *argv[])
 {
 #ifndef DEBUGMODE
-  int pid; /* pid of this process */
+  pid_t pid; /* pid of this process */
 #endif /* DEBUGMODE */
 
 #ifdef GDB_DEBUG
@@ -166,12 +166,12 @@ int main(int argc, char *argv[])
   }
 
   /* Check for running services -kre */
-  if ((pidfile=fopen(PidFile, "r"))==NULL)
+  if ((pidfile = fopen(PidFile, "r")) == NULL)
     putlog(LOG1, "Unable to read %s", PidFile);
   else
   {
     pid_t mypid;
-    fscanf(pidfile, "%u\n", &mypid);
+    fscanf(pidfile, "%lu\n", &mypid);
     fclose(pidfile);
     if (!kill(mypid, 0))
     {
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
     putlog(LOG1, "Unable to open %s", PidFile);
   else
   {
-    fprintf(pidfile, "%i\n", (int) getpid());
+    fprintf(pidfile, "%lu\n", getpid());
     fclose(pidfile);
   }
 

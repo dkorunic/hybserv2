@@ -1246,7 +1246,7 @@ void signon(void)
 #endif /* GECOSBANS */
 #ifdef HYBRID7
       /* Send most of Hybrid7 CAPABS -kre && Janos */
-      " KLN GLN HOPS IE HUB AOPS",
+      " KLN GLN HOPS IE HUB AOPS"
 #endif /* HYBRID7 */
       "\n", currenthub->password);
 #endif /* HYBRID_ONLY */

@@ -2494,7 +2494,7 @@ static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
 static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
     *mask, struct NickInfo *nptr)
 {
-  struct ChanAccess *temp = NULL;
+  struct ChanAccess *temp = NULL, *tempnext;
   struct NickInfo *master_nptr = NULL;
   int ret = 0, cnt = 0, ulev;
   int found = 0;
@@ -2582,7 +2582,9 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
     *mask, char *reason)
 {
   struct AutoKick *ptr;
+#if defined HYBRID || defined HYBRID7
   char *tmpmask;
+#endif
 
   if (!chanptr || !mask)
     return 0;

@@ -43,6 +43,14 @@ int main(void)
       fatal(conn);
   }
 
+  res = PQexec(conn, "INSERT INTO foo VALUES ( 1234, 'bla3' )");
+  if (!res || PQresultStatus(res) != PGRES_COMMAND_OK)
+  {
+    fprintf(stderr, "INSERT command failed\n");
+    PQclear(res);
+    fatal(conn);
+  }
+
   /* Declare cursor for select */
   res = PQexec(conn, "DECLARE mycursor CURSOR FOR SELECT * FROM foo");
   if (!res || PQresultStatus(res) != PGRES_COMMAND_OK)

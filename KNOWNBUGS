@@ -1,4 +1,13 @@
 kre:
+(gdb) bt
+#0  0xff1c6444 in _free_unlocked () from /usr/lib/libc.so.1
+#1  0xff1c63fc in free () from /usr/lib/libc.so.1
+#2  0x3212c in DeleteNick (nickptr=0x13e4c0) at nickserv.c:972
+...
+weird stuff.
+
+
+kre:
 (gdb) where
 #0  0xff2182c4 in _libc_kill () from /usr/lib/libc.so.1
 #1  0xff1b9470 in abort () from /usr/lib/libc.so.1

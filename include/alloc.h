@@ -23,12 +23,6 @@
 #define INCLUDED_config_h
 #endif
 
-#define MyFree(x)       \
-{                       \
-  if ((x))              \
-    free((x));          \
-}
-
 #ifdef BLOCK_ALLOCATION
 
 /* structure definition for a sub block in a preallocated heap */
@@ -87,7 +81,7 @@ void InitHeaps();
 void *MyMalloc(size_t bytes);
 void *MyRealloc(void *oldptr, size_t bytes);
 char *MyStrdup(const char *str);
-/* void MyFree(void *ptr); */
+inline void MyFree(void *ptr);
 void OutOfMem();
 
 /*

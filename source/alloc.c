@@ -87,17 +87,14 @@ char *MyStrdup(const char *str)
  * MyFree()
  *
  * Free memory pointed to by 'ptr'
- * NOTE: This is now a macro in hybdefs.h
  */
-#if 0
-void MyFree(void *ptr)
+inline void MyFree(void *ptr)
 {
   if (!ptr)
     return;
 
   free(ptr);
 } /* MyFree() */
-#endif /* 0 */
 
 /*
  * OutOfMem()

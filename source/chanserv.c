@@ -2564,8 +2564,7 @@ void
 DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
 
 {
-  assert(cptr != 0);
-  assert(ptr != 0);
+  assert(cptr && ptr);
 
   if (ptr->next)
     ptr->next->prev = ptr->prev;
@@ -2574,9 +2573,7 @@ DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
   else
     cptr->access = ptr->next;
 
-  if (ptr->hostmask)
-    MyFree(ptr->hostmask);
-
+  MyFree(ptr->hostmask);
   MyFree(ptr);
 } /* DeleteAccess() */
 

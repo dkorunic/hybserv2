@@ -927,21 +927,9 @@ DeleteNick(struct NickInfo *nickptr)
     /*
      * All channels that this nick registered should be dropped, unless
      * there is a successor.
-     *
-     * Before calling DeleteChan(), it would be best if nickptr has
-     * already been removed from nicklist[]. Otherwise, DeleteChan() might
-     * try to call RemoveFounderChannelFromNick(). This would be very bad,
-     * since this loop is modifying nickptr's FounderChannels list. Right
-     * now, all calls to DeleteNick() remove nickptr from nicklist[]
-     * beforehand, but, being as paranoid as I am, we'll set cptr->founder
-     * to null here, so there is *NO* chance of it ever being used to
-     * delete nickptr's FounderChannels list.
      */
-    if (cptr->founder)
-    {
-      MyFree(cptr->founder);
-      cptr->founder = NULL;
-    }
+
+    MyFree(cptr->founder);
 
     /*
      * If the channel has a successor, promote them to founder,

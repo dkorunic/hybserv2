@@ -61,7 +61,7 @@ AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_FUNCS(gethostbyname, , [AC_CHECK_LIB(nsl, gethostbyname), , LIBS="$LIBS -lnsl"])
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt")
-AC_CHECK_LIB(cup, coffee, , AC_MSG_WARN(have no coffee to work with))
+AC_CHECK_LIB(cup, coffee, , AC_MSG_WARN(I have no coffee))
 
 dnl Do not compile with pthread support if they give a
 dnl --disable-threads or --enable-threads=no to configure
@@ -84,13 +84,7 @@ if test ! "$enable_threads" = "no"; then
         CFLAGS="${CFLAGS} -D_REENTRANT"
       fi
       LIBP="-lpthread",
-       AC_MSG_WARN(No libpth detected - trying libc_r)
-       AC_CHECK_LIB(c_r, pthread_create,
-         AC_DEFINE(HAVE_PTHREADS)
-         _have_pthread=yes
-         CFLAGS="${CFLAGS} -D_REENTRANT"
-         LIBP="-pthread",
-          AC_MSG_WARN(Compiling without multithread support))))
+          AC_MSG_WARN(Compiling without multithread support)))
 fi
 AC_SUBST(LIBP)
 

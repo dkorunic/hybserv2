@@ -388,3 +388,7 @@ int input_chan()
 {
   /* use code from cs_loaddata() and use SQLPutChan instead of AddChan */
 }
+
+int main()
+{
+}

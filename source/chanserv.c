@@ -6178,8 +6178,8 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
   }
   else
     notice(n_ChanServ, lptr->nick,
-      "The channel [\002%s\002] is empty, no use to cycle it.",
-       cptr->name);
+      "The channel [\002%s\002] is empty or nonexistant, no use to cycle it.",
+       av[1]);
 } /* cs_cycle() */
 
 /*

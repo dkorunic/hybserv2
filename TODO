@@ -6,6 +6,13 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*)
+(12:55:15) OrbDavid: i do have a small bug to report thatm ight already be
+fixed.
+(12:55:18) OrbDavid: HybServ2-1.9.0-pre1_20021012_1  <-- this version
+(12:55:22) OrbDavid: wallops dont' get sent on glines
+(12:55:43) OrbDavid: didn't have time to look into why not yet though
+*) temp kline wrong for hybrid7
 *) killchan malfunction
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..

@@ -240,7 +240,7 @@ void Execute7Gline(char *username, char *hostname, char *reason, time_t
     time)
 {
   toserv(":%s KLINE %s %lu %s %s :%s\r\n",
-         n_OperServ, "*", time, username ? username : "*", hostname,
+         n_OperServ, "*", time * 60, username ? username : "*", hostname,
          reason);
 } /* Execute7Gline() */
 

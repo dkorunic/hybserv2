@@ -364,9 +364,9 @@
  * -ike
  */
 #define ADVFLOOD
-#define ADVFLOOD_TABLE  30 
-#define ADVFLOOD_DELAY  60
-#define ADVFLOOD_COUNT  4 
+#define ADVFLOOD_TABLE  60 
+#define ADVFLOOD_DELAY  10
+#define ADVFLOOD_COUNT  10 
 #define ADVFLOOD_NOTIFY
 #undef ADVFLOOD_NOTIFY_ALL
 #define ADVFLOOD_GLINE

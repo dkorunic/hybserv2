@@ -12,31 +12,28 @@ INSTALLATION
 
  In order to compile HybServ2, you should perform the following steps:
 
-    1) Enter the hybserv2-x.x.x tree and run ./configure, a GNU 
-       configure script, which should find whatever it needs for
-       compilation.
+    1) Enter the hybserv tree and run ./configure, a GNU configure script,
+       which should find whatever it needs for compilation.
 
-    2) Edit include/config.h and change the information to suit
-       your IRC Network.  Also, be sure to edit bin/hybserv.conf
-       to set up the services to work with your network. (This is
-       the file where you can give others access to HybServ2)
+    2) Edit include/config.h and change the information to suit your IRC
+       Network.  Also, be sure to edit bin/hybserv.conf to set up the
+       services to work with your network. (This is the file where you can
+       give others access to HybServ2)
 
-    3) Run 'make' in the hybserv2-x.x.x tree to compile the package.
-       When make finishes, you'll probably want to: 'strip bin/hybserv'
-       to remove debugging symbols from the file, since the author
-       is the only one who really uses it.  It also decreases the 
-       file size greatly.
+    3) Run 'make' in the hybserv tree to compile the package. When make
+       finishes, you'll probably want to: 'strip bin/hybserv' to remove
+       debugging symbols from the file, since the author is the only one
+       who really uses it.  It also decreases the file size greatly.
 
-    4) Finally, become root if necessary, and run 'make install' to 
-       install HybServ2 on your system.  The default install directory 
-       is /usr/local/hybserv.  This will automatically chown the install
+    4) Finally, become root if necessary, and run 'make install' to
+       install HybServ2 on your system.  The default install directory is
+       /usr/local/hybserv.  This will automatically chown the install
        directory to the same user who ran the configure script, so it
        won't run as root.  You can change the user by editing Makefile.
 
     5) You may wish to remove any objects/binaries created during
-       installation.  You can do this via 'make clean'.  If you
-       wish to remove any configure generated files as well, use
-       'make distclean'.
+       installation.  You can do this via 'make clean'.  If you wish to
+       remove any configure generated files as well, use 'make distclean'.
 
 	 ** Note: if you want to install HybServ2 in a directory other than
             /usr/local/hybserv, you must run the configure script with 
@@ -50,7 +47,6 @@ INSTALLATION
 
      Then, HybServ2 will be installed in /home/mydir/hybserv.
 
-  HybServ2 was originally developed under Linux 2.0 on a Pentium 200.
   HybServ2 is known to compile cleanly on the following operating systems,
   and may compile on others.
 
@@ -61,6 +57,6 @@ INSTALLATION
     Digital Unix 4.0
     Cygwin 1.1.3 (and newer)
 
- If you are unable to compile HybServ, please let us know at
- hybserv@alleged.com.  Bug reports/suggestions may be sent to the 
- same address.  Now, go read the README :-).
+ If you are unable to compile HybServ, please let me know at
+ kreator@srce.hr.  Bug reports/suggestions may be sent to the same
+ address.  Now, go read the README :-).

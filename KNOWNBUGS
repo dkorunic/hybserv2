@@ -1,15 +1,3 @@
-Program received signal SIGPIPE, Broken pipe.
-0xff21814c in _write () from /usr/lib/libc.so.1
-(gdb) where
-#0  0xff21814c in _write () from /usr/lib/libc.so.1
-#1  0x45420 in writesocket (sockfd=6,
-    writestr=0xffbee558 "Admin(%) DanY (danny@StormLord.WithU) has disconnected\n") at sock.c:141
-#2  0x261e0 in BroadcastDcc (towho=-2, format=0x29d410 "") at dcc.c:197
-#3  0x27868 in CloseConnection (dccptr=0x29d410) at dcc.c:1405
-#4  0x45fc8 in ReadSocketInfo () at sock.c:760
-#5  0x2ba48 in main (argc=328704, argv=0x50400) at hybserv.c:347
-
-
 On Tue, Jan 29, 2002 at 01:29:14AM -0500, marc@egotistical.net wrote:
 > bumped into this just now:
 > [dcc(operserv)] .ungline *@*.fbi.gov
@@ -22,7 +10,6 @@ On Tue, Jan 29, 2002 at 01:29:14AM -0500, marc@egotistical.net wrote:
 SERVER *.telnet.kabel.hub 1 :Test
 NICK Saris-T 1 1 +i sarisa sarisa.net test.telnet.kabel.hub :Test
 kaboom.
-
 
 telnet connections WON'T WORK. old code was buggy, new one just ignores
 telnet (immediately after identification) - yes, i plan to fix it sometime
@@ -72,7 +59,6 @@ kre:
 #1  0xff1c63fc in free () from /usr/lib/libc.so.1
 #2  0x3212c in DeleteNick (nickptr=0x13e4c0) at nickserv.c:972
 ...
-weird stuff.
 
 kre:
 (gdb) where

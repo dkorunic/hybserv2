@@ -637,10 +637,17 @@ cs_loaddata()
               /* channel access levels */
               if (ac != (CA_SIZE + 1))
                 {
+#ifndef HYBRID7
                   fatal(1, "%s:%d Invalid database format (FATAL)",
                         ChanServDB,
                         cnt);
                   ret = -2;
+#else
+                  SetDefaultALVL(cptr);
+                  fatal(1, "%s:%d No access level list for "
+                      "registered channel [%s] (using default)",
+                        ChanServDB, cnt, cptr->name);
+#endif /* HYBRID7 */
                 }
               else if (!cptr->access_lvl)
                 {

@@ -6,6 +6,14 @@ QOTD:
 
 Pending bugs:
 -------------
+*) fix ALVL not working (use default ALVL?)
+*) backup ignore.db
+*) remove chan.db.tmp after fixlvl
+*) no comment:
+-ChanServ(ChanServ@services.hr)- kre!kreator@dark.angel ACCESS [#hr-opers]
+LIST  
+-ChanServ(ChanServ@services.hr)- kre!kreator@dark.angel ACCESS [#hr-opers]
+LIST 
 *) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count

@@ -795,3 +795,12 @@ SeenMaxRecs        4000
 # This turns on support for MD5 capable crypt using MCF
 
 #UseMD5
+
+# MaxTSDelta <integer> [OPTIONAL]
+#
+#  Set this to maximal allowed TS delta value for nicknames and channels.
+# Functions like FIXTS in both ChanServ and NickServ will loop through
+# channels and nicknames searching for bogus TS'. If this is not defined,
+# default value of 8 weeks will be used.
+
+MaxTSDelta          "8w"

@@ -149,6 +149,8 @@ static void c_clear_bans(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_users(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 
+static void c_fixts(struct Luser *, struct NickInfo *, int, char **);
+
 #ifdef EMPOWERADMINS
 static void c_forbid(struct Luser *, struct NickInfo *, int, char **);
 static void c_unforbid(struct Luser *, struct NickInfo *, int, char **);
@@ -178,7 +180,7 @@ static struct Command chancmds[] = {
   { "UNBAN", c_unban, LVL_IDENT },
   { "INFO", c_info, LVL_NONE },
   { "CLEAR", c_clear, LVL_IDENT },
-
+  { "FIXTS" , c_fixts, LVL_ADMIN },
 #ifdef EMPOWERADMINS
   { "FORBID", c_forbid, LVL_ADMIN },
   { "UNFORBID", c_unforbid, LVL_ADMIN },
@@ -6760,12 +6762,14 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
     if (cuser->flags & CH_OPPED)
     {
-      ops = (char *) MyRealloc(ops, strlen(ops) + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
+      ops = (char *) MyRealloc(ops, strlen(ops)
+          + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strcat(ops, cuser->lptr->nick);
       strcat(ops, " ");
     }
 
-    knicks = (char *) MyRealloc(knicks, strlen(knicks) + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
+    knicks = (char *) MyRealloc(knicks, strlen(knicks)
+        + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
     strcat(knicks, cuser->lptr->nick);
     strcat(knicks, " ");
   }
@@ -7242,5 +7246,58 @@ c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 } /* c_noexpire() */
 
 #endif /* EMPOWERADMINS */
+
+/* 
+ * c_fixts()
+ * Traces chanels for TS < TS_MAX_DELTA (either defined in settings or as
+ * av[1]. Then such channel is found, c_clear_users() is used to sync
+ * channel -kre
+ */
+static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
+{
+  int tsdelta = 0;
+  time_t now = 0;
+  struct Channel *cptr = NULL;
+  char dMsg[] = "Detected channel #\002%s\002 with TS %d "
+                "below TS_MAX_DELTA %d";
+  int acnt = 0;
+  char **arv = NULL;
+  char line[MAXLINE];
+  
+  if (ac < 2)
+    tsdelta = MaxTSDelta;
+  else
+    tsdelta = atoi(av[1]);
+
+  now = time(NULL);
+
+  /* Be paranoid */
+  if (tsdelta <= 0)
+  {
+    notice(n_ChanServ, lptr->nick,
+        "Wrong TS_MAX_DELTA specified, using default of 8w");
+    tsdelta = 4838400; /* 8 weeks */
+  }
+
+  for (cptr = ChannelList; cptr; cptr = cptr->next)
+  {
+    if ((now - cptr->since) >= tsdelta)
+    {
+      SendUmode(OPERUMODE_Y, dMsg, cptr->name, cptr->since, tsdelta);
+      notice(n_ChanServ, lptr->nick, dMsg, cptr->name, cptr->since,
+          tsdelta);
+      putlog(LOG1, "%s: Bogus TS channel: [%s] (TS=%d)", 
+          n_ChanServ, cptr->name, cptr->since);
+
+      /* Use c_clear_users() for fixing channel TS. */
+      snprintf(line, MAXLINE, "FOOBAR #%s", cptr->name);
+      acnt = SplitBuf(line, &arv);
+      c_clear_users(lptr, nptr, acnt, arv); 
+
+      MyFree(arv);
+    }
+  }
+}
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

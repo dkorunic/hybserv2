@@ -175,6 +175,8 @@ int HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level);
  */
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
+extern struct Channel *ChannelList;
+extern int MaxTSDelta;
 
 #endif /* CHANNELSERVICES */
 

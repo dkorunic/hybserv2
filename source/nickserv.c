@@ -94,6 +94,8 @@ static void n_link(struct Luser *, int, char **);
 static void n_unlink(struct Luser *, int, char **);
 #endif /* LINKED_NICKNAMES */
 
+static void n_fixts(struct Luser *, int, char **);
+
 #ifdef EMPOWERADMINS
 
 static void n_forbid(struct Luser *, int, char **);
@@ -143,6 +145,7 @@ static struct Command nickcmds[] = {
 #endif /* LINKED_NICKNAMES */
   { "COLLIDE", n_collide, LVL_ADMIN },
   { "FLAG", n_flag, LVL_ADMIN },
+  { "FIXTS", n_fixts, LVL_ADMIN },
 
 #endif /* EMPOWERADMINS */
 
@@ -5007,5 +5010,48 @@ n_flag(struct Luser *lptr, int ac, char **av)
 } /* n_flag() */
 
 #endif /* EMPOWERADMINS */
+
+/*
+ */
+static void n_fixts(struct Luser *lptr, int ac, char **av)
+{
+  int tsdelta = 0;
+  time_t now = 0;
+  char dMsg[] = "Detected nickname \002%s\002 with TS %d "
+                "below TS_MAX_DELTA %d";
+  struct Luser *ouser = NULL;
+
+  if (ac < 2)
+    tsdelta = MaxTSDelta;
+  else
+    tsdelta = atoi(av[1]);
+
+  now = time(NULL);
+
+  /* Be paranoid */
+  if (tsdelta <= 0)
+  {
+    notice(n_ChanServ, lptr->nick,
+        "Wrong TS_MAX_DELTA specified, using default of 8w");
+    tsdelta = 4838400; /* 8 weeks */
+  }
+
+  for (ouser = ClientList; ouser; ouser = ouser->next)
+  {
+    if ((now - ouser->since) >= tsdelta)
+    {
+      SendUmode(OPERUMODE_Y, dMsg, ouser->nick, ouser->since, tsdelta);
+      notice(n_NickServ, lptr->nick, dMsg, ouser->nick, ouser->since,
+          tsdelta);
+      putlog(LOG1, "%s: Bogus TS nickname: [%s] (TS=%d)", 
+          n_ChanServ, ouser->nick, ouser->since);
+
+      collide(ouser->nick);
+      notice(n_NickServ, lptr->nick,
+        "The nickname [\002%s\002] has been collided",
+        ouser->nick);
+    }
+  }
+}
 
 #endif /* NICKSERVICES */

@@ -6,6 +6,7 @@ If it happens, it must be possible.
 
 Pending bugs:
 -------------
+*) use snprintf instead of sprintf
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some
@@ -54,8 +55,10 @@ New features:
 
 Done so far:
 ------------
+*) added fixts for channels and nicknames
+*) added deletion of cleartext password from memory if crypt is on
 *) services ignoring people sometimes
-*) MD5 support
+*) MD5 support (UseMD5 param_set)
 *) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
 *) let +h people use unban by default (if hyb7 is defined) (fl_)
 *) safe write for settings.conf -> it can be truncated in some cases

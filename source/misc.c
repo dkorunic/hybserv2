@@ -759,6 +759,7 @@ pwmatch(char *password, char *chkpass)
 {
 #ifdef CRYPT_PASSWORDS
   char *encr;
+  int cmpresult;
 #endif
 
   if (!password || !chkpass)
@@ -769,7 +770,13 @@ pwmatch(char *password, char *chkpass)
   encr = crypt(chkpass, password);
   assert(encr != 0);
 
-  if (!strcmp(encr, password))
+  cmpresult = strcmp(encr, password);
+
+#ifdef BORKPASSWD
+  memset(chkpass, 0, strlen(chkpass));
+#endif /* BORKPASSWD */
+
+  if (!cmpresult)
     return 1;
   else
     return 0;
@@ -796,6 +803,7 @@ operpwmatch(char *password, char *chkpass)
 {
 #ifdef CRYPT_OPER_PASSWORDS
   char *encr;
+  int cmpresult;
 #endif
 
   if (!password || !chkpass)
@@ -806,7 +814,13 @@ operpwmatch(char *password, char *chkpass)
   encr = crypt(chkpass, password);
   assert(encr != 0);
 
-  if (!strcmp(encr, password))
+  cmpresult = strcmp(encr, password);
+
+#ifdef BORKPASSWD
+  memset(chkpass, 0, strlen(chkpass));
+#endif /* BORKPASSWD */
+
+  if (!cmpresult)
     return 1;
   else
     return 0;

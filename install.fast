@@ -2,6 +2,10 @@
 # Copyright (C) 1998 Patrick Alken <wnder@underworld.net>
 # $Id$
 
+echo
+echo "Starting configuration with default values"
+echo
+
 ./configure
 make
 

@@ -4,7 +4,7 @@
 CC = @CC@
 CFLAGS = @CFLAGS@
 LDFLAGS = -L../libString @LDFLAGS@
-INCLUDE = -I../include
+INCLUDE = -I. -I../include
 # DEFS =
 LIBS = -lString @LIBS@ @LIBP@
 LIBDEPS = ../libString/libString.a

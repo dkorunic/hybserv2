@@ -67,7 +67,7 @@
  * If EMPOWERADMINS_MORE is defined, administrators will have founder
  * access for any channel, thus being able to modify the access lists,
  * change channel SETs etc.  This allows administrators TOTAL access to
- * ANY channel, so you may want to #undef it.
+ * ANY channel, so you may want to undef it.
  */
 
 #define   EMPOWERADMINS_MORE
@@ -245,6 +245,18 @@
  */
 
 #define   CRYPT_OPER_PASSWORDS
+
+#if defined CRYPT_OPER_PASSWORDS || defined CRYPT_PASSWORDS
+
+/*
+ * Define this if you are paranoid and want every cleartext password to be
+ * manually erased from memory before free()-ing. This could affect
+ * performance a bit, so it is undefined by default. -kre
+ */
+
+#undef    BORKPASSWD
+
+#endif /* CRYPT_OPER_PASSWORDS || CRYPT_PASSWORDS */
 
 /* Define this if you wish to allow admins to use the .die command */
 

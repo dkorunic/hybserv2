@@ -149,6 +149,7 @@ long      InhabitTimeout;
 int       AllowAccessIfSOp;
 int       RestrictRegister;
 int       GiveNotice;
+int       MaxTSDelta;
 
 int       MaxMemos;
 long      MemoPurgeFreq;
@@ -265,6 +266,7 @@ struct Directive directives[] = {
   { "LogLevel", D_REQUIRED,         { { PARAM_INT, &LogLevel } } },
   { "MaxLogs", D_OPTIONAL,          { { PARAM_INT, &MaxLogs } } },
   { "MaxModes", D_NORUNTIME,        { { PARAM_INT, &MaxModes } } },
+  { "MaxTSDelta", D_OPTIONAL,       { { PARAM_TIME, &MaxTSDelta } } },
 
   /* SeenServ Configuration */
   { "SeenMaxRecs", D_REQUIRED,      { { PARAM_INT, &SeenMaxRecs } } },

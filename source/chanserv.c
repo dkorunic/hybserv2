@@ -7313,7 +7313,7 @@ static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
   int tsdelta = 0;
   time_t now = 0;
   struct Channel *cptr = NULL;
-  char dMsg[] = "Detected channel #\002%s\002 with TS %d "
+  char dMsg[] = "Detected channel \002%s\002 with TS %d "
                 "below TS_MAX_DELTA %d";
   int acnt = 0;
   char **arv = NULL;

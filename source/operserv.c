@@ -1307,6 +1307,7 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
   char *reason;
   int ii;
   struct Luser *kptr;
+  struct Userlist *tempuser = NULL;
 
   if (ac < 2)
   {
@@ -1344,7 +1345,8 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
     ii = 0;
 
   /* Check if the user has an exception flag */
-  if (IsProtected(GetUser(ii, kptr->nick, kptr->username, kptr->hostname)))
+  tempuser = GetUser(ii, kptr->nick, kptr->username, kptr->hostname);
+  if (IsProtected(tempuser))
   {
     /* The user is protected */
     os_notice(lptr, sockfd, "%s!%s@%s is protected", 
@@ -1924,9 +1926,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   if (!expires)
     fprintf(fp, "G:%s@%s:%s:%s\n",
       username ? username : "*",
-      hostname,
-      reason,
-      whostr);
+      hostname, reason, whostr);
 
   fclose(fp);
 
@@ -2520,15 +2520,10 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   {
     /* The user is protected */
     os_notice(lptr, sockfd, "%s!%s@%s is protected", 
-      fptr->nick,
-      fptr->username,
-      fptr->hostname);
+      fptr->nick, fptr->username, fptr->hostname);
 
     putlog(LOG2, "%s!%s@%s attempted to FUCKOVER protected user %s",
-      onick,
-      ouser,
-      ohost,
-      fptr->nick);
+      onick, ouser, ohost, fptr->nick);
 
     return;
   }
@@ -2540,9 +2535,7 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
     {
       os_notice(lptr, sockfd,
         "Server flood already in progress for %s[%s@%s]",
-        fptr->nick,
-        fptr->username,
-        fptr->hostname);
+        fptr->nick, fptr->username, fptr->hostname);
       return;
     }
   }

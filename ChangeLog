@@ -1,3 +1,7 @@
+*** 20010527_3 by kreator
+- added GDB hook in hybserv.c
+
+
 *** 20010527_2 by kreator
 - fix mkpasswd
 

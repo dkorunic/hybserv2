@@ -1680,10 +1680,10 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     if (!IsChannelMember(chanptr, Me.csptr))
       cs_joinchan(cptr);
 
-    toserv(":%s MODE %s +i\n",
+    toserv(":%s MODE %s +is\n",
       n_ChanServ,
       cptr->name);
-    UpdateChanModes(Me.csptr, n_ChanServ, chanptr, "+i");
+    UpdateChanModes(Me.csptr, n_ChanServ, chanptr, "+is");
     KickBan(0, n_ChanServ, chanptr, lptr->nick, "Forbidden Channel");
     return;
   }

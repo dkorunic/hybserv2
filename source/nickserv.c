@@ -1968,8 +1968,10 @@ n_register(struct Luser *lptr, int ac, char **av)
   notice(n_NickServ, lptr->nick,
          "Your password is [\002%s\002] - Remember this for later use",
          av[1]);
+#ifdef DANCER
   /* for ircds that have +e mode -kre */
   toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
+#endif /* DANCER */
 
   MyFree(mask);
 

@@ -1,3 +1,8 @@
+*** 20010614_2 by kreator
+- oops, was mislead by one of Kris' patches so i forgot to add an extra
+  nptr check in s_quit()
+
+
 *** 20010614_1 by kreator
 - applied (some are slightly modified) patches from KrisDuv
   <krisduv2000@yahoo.fr> in the following order:

@@ -99,6 +99,7 @@ static void n_unlink(struct Luser *, int, char **);
 #ifdef EMPOWERADMINS
 
 static void n_forbid(struct Luser *, int, char **);
+static void n_unforbid(struct Luser *, int, char **);
 static void n_setpass(struct Luser *, int, char **);
 static void n_noexpire(struct Luser *, int, char **);
 
@@ -134,6 +135,7 @@ static struct Command nickcmds[] = {
 #ifdef EMPOWERADMINS
 
   { "FORBID", n_forbid, LVL_ADMIN },
+  { "UNFORBID", n_unforbid, LVL_ADMIN },
   { "SETPASS", n_setpass, LVL_ADMIN },
   { "CHPASS", n_setpass, LVL_ADMIN },
   { "NOEXPIRE", n_noexpire, LVL_ADMIN },
@@ -4384,25 +4386,22 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 
   o_Wallops("FORBID from %s for nick [%s]",
     lptr->nick,
-    av[1] );
-
+    av[1]);
 
   if (!(nptr = FindNick(av[1])))
   {
-    /* nick is not registered - do so now */
+    /* nick is not registered - do so now; add nick to nick table */
+
     nptr = MakeNick();
     nptr->nick = MyStrdup(av[1]);
     nptr->created = time(NULL);
-    nptr->flags = NS_FORBID;
-
-    /* Add nptr to nick table */
+    nptr->flags |= NS_FORBID;
     AddNick(nptr);
   }
   else
   {
-    struct NickHost *hptr;
-
     /* the nickname is already registered */
+
     if (nptr->flags & NS_FORBID)
     {
       notice(n_NickServ, lptr->nick,
@@ -4411,26 +4410,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-    nptr->flags = NS_FORBID;
-
-    /*
-     * NULL the password so the previous owner cannot IDENTIFY
-     */
-    MyFree(nptr->password);
-    nptr->password = NULL;
-
-    /* kill the access list - it would just take up mem doing nothing */
-    while (nptr->hosts)
-    {
-      hptr = nptr->hosts->next;
-      MyFree(nptr->hosts->hostmask);
-      MyFree(nptr->hosts);
-      nptr->hosts = hptr;
-    }
-
-  #ifdef LINKED_NICKNAMES
-    DeleteLink(nptr, 0);
-  #endif
+    nptr->flags |= NS_FORBID;
   }
 
   notice(n_NickServ, lptr->nick,
@@ -4442,6 +4422,46 @@ n_forbid(struct Luser *lptr, int ac, char **av)
    */
   CheckNick(av[1]);
 } /* n_forbid() */
+
+/*
+ * n_unforbid()
+ * Remove forbid flag on nickname av[1]
+ * (assume permission to exec this command has already been checked)
+ * -kre
+ */
+static void
+n_unforbid(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+
+  if (ac < 2)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Syntax: \002UNFORBID <nickname>\002");
+    notice(n_NickServ, lptr->nick,
+      ERR_MORE_INFO, n_NickServ, "UNFORBID");
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+  o_Wallops("UNFORBID from %s for nick [%s]", lptr->nick, av[1]);
+
+  if (!(nptr = FindNick(av[1])))
+  {
+    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+    return;
+  }
+
+  nptr->flags &= ~NS_FORBID;
+  
+  notice(n_NickServ, lptr->nick,
+    "Nickname [\002%s\002] is now unforbidden", av[1]);
+
+  /* Check if av[1] is currently online and tell it to identify */
+  CheckNick(av[1]);
+} /* n_unforbid() */
 
 /*
 n_setpass()

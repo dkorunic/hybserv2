@@ -147,6 +147,8 @@ static void o_dump(struct Luser *, int, char **, int);
 
 static void o_set(struct Luser *, int, char **, int);
 
+static void o_kline(struct Luser *, int, char **, int);
+
 static void o_who(struct Luser *, int, char **, int);
 static void o_boot(struct Luser *, int, char **, int);
 static void o_quit(struct Luser *, int, char **, int);
@@ -299,6 +301,8 @@ static struct OperCommand opercmds[] = {
   { "AKILL", o_gline, 0, 'g' },
   { "UNGLINE", o_ungline, 0, 'g' },
 #endif
+
+  { "KLINE", o_kline, 0, 'g' },
 
   /*
    * Dcc Only
@@ -2033,6 +2037,10 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 #ifdef HYBRID_GLINES
   ExecuteGline(username, hostname, reason);
 #endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+  Execute7Gline(username, hostname, reason);
+#endif /* HYBRID7_GLINES */
 
   MyFree(reason);
 } /* o_gline() */
@@ -7039,3 +7047,36 @@ void ReconnectCheck(time_t expire)
   }
 }  
 #endif
+
+/* 
+ * o_kline()
+ * Side effects: will kline user, locally or globally, depends on U or
+ * share lines.
+ * -kre
+ */
+static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+
+  char *klinestr;
+  
+  /* At least we need two arguments */
+  if (ac < 2)
+  {
+    os_notice(lptr, sockfd,
+        "Syntax: \002KLINE [time] <nick|user@host> [:reason]");
+    return;
+  }
+
+  klinestr = GetString(ac - 1, av + 1);
+
+  /* It is IMHO stupid to parse it and send to IRCD that will parse it all
+   * over again, so we will just hand it over to ircd. -kre */
+
+#ifdef HYBRID7_KLINE
+  toserv(":%s KLINE %s %s %s\n", Me.name, n_OperServ, "*", klinestr);
+#else
+  toserv(":%s KLINE %s %s\n", Me.name, n_OperServ, klinestr);
+#endif
+
+  MyFree(klinestr);
+}

@@ -24,13 +24,15 @@ mentioned in the code or the credits.
 The following people have contributed to this release of HybServ
 In nick alphabetical order:
 
-Bruns       Brian Bruns     bruns@magenet.net
-Cosine      Patrick Alken   wnder@uwns.underworld.net
-Decho       Nedelcho Stanev decho@csoft.bg
-Hwy101      Walter Campbell wcampbel@botbay.net
-John-Work   F. John Rowan   john@tdkt.org
-kreator     Dinko Korunic   kreator@fly.srk.fer.hr
-Toot        Toby Verrall    to7@antipope.fsnet.co.uk
+Bruns       Brian Bruns       bruns@magenet.net
+Cosine      Patrick Alken     wnder@uwns.underworld.net
+Decho       Nedelcho Stanev   decho@csoft.bg
+Hwy101      Walter Campbell   wcampbel@botbay.net
+John-Work   F. John Rowan     john@tdkt.org
+Toot        Toby Verrall      to7@antipope.fsnet.co.uk
+binder      John Binder       jbinder@kgazd.bme.hu
+fl_         Lee Hardy         lee@leeh.co.uk
+kreator     Dinko Korunic     kreator@fly.srk.fer.hr
 		
 HybServ was specifically designed to run with hybrid ircd, although 
 it *should* work with CSr as well.  You may recieve the hybrid irc 

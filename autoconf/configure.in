@@ -136,6 +136,7 @@ libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
 bin/settings.conf       \
+bin/cleandb             \
 include/config.h        \
 )
 

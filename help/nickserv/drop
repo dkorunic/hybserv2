@@ -7,5 +7,4 @@ command, you will need to supply your password; otherwise
 you do not need to.
 %+a%b* * * *%b
 %+aAdministrators can use %bDROP <nickname>%b
-%+ato cancel the registration of any nickname. (This is
-%+auseful for cancelling forbidden nicknames also)
+%+ato cancel the registration of any nickname.

@@ -342,6 +342,22 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     char helparg[MAXLINE], arg2[MAXLINE];
 
     arg2[0] = '\0';
+
+    /* Bug found by larne and binder -kre */
+    if (strchr(command, '/') || strstr(command, ".."))
+    {
+      sprintf(sendstr, "No help available on \002%s\002", helparg);
+      if (sockfd == NODCC)
+        notice(Serv, helpnick, sendstr);
+      else
+      {
+        writesocket(sockfd, sendstr);
+        writesocket(sockfd, "\n");
+      }
+      return;
+    }
+
+    /* Proceed with splitting -kre */
     cac = SplitBuf(command, &cav);
     strcpy(helparg, StrTolower(cav[0]));
 

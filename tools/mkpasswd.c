@@ -2,11 +2,11 @@
  * simple password generator by Nelson Minar (minar@reed.edu)
  * copyright 1991, all rights reserved.
  * You can use this code as long as my name stays with it.
+ *
+ * $Id$
  */
 
 #include	<stdio.h>
-
-static char *rcsid = "$Id$";
 
 extern char *getpass();
 extern char *doencrypt(char *);

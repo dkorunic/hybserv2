@@ -704,39 +704,34 @@ WriteNicks()
         (long) nptr->created,
         (long) nptr->lastseen);
 
-      if (!(nptr->flags & NS_FORBID))
+      /* write out password */
+      fprintf(fp, "->PASS %s\n",
+        nptr->password);
+
+      if (nptr->email)
+        fprintf(fp, "->EMAIL %s\n",
+        nptr->email);
+
+      if (nptr->url)
+        fprintf(fp, "->URL %s\n",
+        nptr->url);
+
+      if (LastSeenInfo)
       {
-        /* write out password */
+        if (nptr->lastu && nptr->lasth)
+          fprintf(fp, "->LASTUH %s %s\n",
+            nptr->lastu,
+            nptr->lasth);
 
-        fprintf(fp, "->PASS %s\n",
-          nptr->password);
+        if (nptr->lastqmsg)
+          fprintf(fp, "->LASTQMSG :%s\n",
+            nptr->lastqmsg);
+      }
 
-        if (nptr->email)
-          fprintf(fp, "->EMAIL %s\n",
-          nptr->email);
+      for (hptr = nptr->hosts; hptr; hptr = hptr->next)
 
-        if (nptr->url)
-          fprintf(fp, "->URL %s\n",
-          nptr->url);
-
-        if (LastSeenInfo)
-        {
-          if (nptr->lastu && nptr->lasth)
-            fprintf(fp, "->LASTUH %s %s\n",
-              nptr->lastu,
-              nptr->lasth);
-
-          if (nptr->lastqmsg)
-            fprintf(fp, "->LASTQMSG :%s\n",
-              nptr->lastqmsg);
-        }
-
-        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-
-          fprintf(fp, "->HOST %s\n",
-            hptr->hostmask);
-
-      } /* if (!(nptr->flags & NS_FORBID)) */
+        fprintf(fp, "->HOST %s\n",
+          hptr->hostmask);
     } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
   } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
@@ -777,61 +772,56 @@ WriteNicks()
         (long) nptr->created,
         (long) nptr->lastseen);
 
-      if (!(nptr->flags & NS_FORBID))
+      /* write out password */
+      fprintf(fp, "->PASS %s\n",
+        nptr->password);
+
+      if (nptr->email)
+        fprintf(fp, "->EMAIL %s\n",
+        nptr->email);
+
+      if (nptr->url)
+        fprintf(fp, "->URL %s\n",
+        nptr->url);
+
+      if (LastSeenInfo)
       {
-        /* write out password */
+        if (nptr->lastu && nptr->lasth)
+          fprintf(fp, "->LASTUH %s %s\n",
+            nptr->lastu,
+            nptr->lasth);
 
-        fprintf(fp, "->PASS %s\n",
-          nptr->password);
+        if (nptr->lastqmsg)
+          fprintf(fp, "->LASTQMSG :%s\n",
+            nptr->lastqmsg);
+      }
 
-        if (nptr->email)
-          fprintf(fp, "->EMAIL %s\n",
-          nptr->email);
+      if (!islinked)
+      {
+        /*
+         * write out hostmasks only if this nickname is
+         * not linked - if it is, the master nickname
+         * (previously written) has the access list
+         */
 
-        if (nptr->url)
-          fprintf(fp, "->URL %s\n",
-          nptr->url);
+        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+          fprintf(fp, "->HOST %s\n",
+            hptr->hostmask);
+      }
 
-        if (LastSeenInfo)
-        {
-          if (nptr->lastu && nptr->lasth)
-            fprintf(fp, "->LASTUH %s %s\n",
-              nptr->lastu,
-              nptr->lasth);
-
-          if (nptr->lastqmsg)
-            fprintf(fp, "->LASTQMSG :%s\n",
-              nptr->lastqmsg);
-        }
-
-        if (!islinked)
-        {
-          /*
-           * write out hostmasks only if this nickname is
-           * not linked - if it is, the master nickname
-           * (previously written) has the access list
-           */
-
-          for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-            fprintf(fp, "->HOST %s\n",
-              hptr->hostmask);
-        }
-
-      #ifdef LINKED_NICKNAMES
+    #ifdef LINKED_NICKNAMES
 
 #if 0
-        assert(nptr != nptr->master);
+      assert(nptr != nptr->master);
 #endif
-        /* Quickfix. Seems unlink is broken atm. But, there is no need to
-         * die here since master was not written because of
-         * nptr->nextlink. Huh. Should fix link copying routines -kre */
-        if ((nptr != nptr->master) && nptr->master)
-          fprintf(fp, "->LINK %s\n",
-            nptr->master->nick);
+      /* Quickfix. Seems unlink is broken atm. But, there is no need to
+       * die here since master was not written because of
+       * nptr->nextlink. Huh. Should fix link copying routines -kre */
+      if ((nptr != nptr->master) && nptr->master)
+        fprintf(fp, "->LINK %s\n",
+          nptr->master->nick);
 
-      #endif /* LINKED_NICKNAMES */
-
-      } /* if (!(nptr->flags & NS_FORBID)) */
+    #endif /* LINKED_NICKNAMES */
     } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
   } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
@@ -882,7 +872,7 @@ WriteChans()
       cnext = cptr->next;
 
       if (!GetLink(cptr->founder) &&
-          !(cptr->flags & (CS_FORBID | CS_FORGET)))
+          !(cptr->flags & CS_FORGET))
       {
         /*
          * There is no founder - check if there is a successor.
@@ -936,7 +926,7 @@ WriteChans()
         (long) cptr->created,
         (long) cptr->lastused);
 
-      if (!(cptr->flags & (CS_FORBID | CS_FORGET)))
+      if (!(cptr->flags & CS_FORGET))
       {
         struct ChanAccess *ca;
         struct AutoKick *ak;
@@ -1001,7 +991,7 @@ WriteChans()
           fprintf(fp, "->AKICK %s :%s\n",
             stripctrlsymbols(ak->hostmask),
             ak->reason ? stripctrlsymbols(ak->reason) : "");
-      } /* if (!(cptr->flags & (CS_FORBID | CS_FORGET))) */
+      } /* if (!(cptr->flags & CS_FORGET)) */
     } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
   } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
 

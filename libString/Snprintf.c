@@ -275,13 +275,13 @@ NOTE: This function handles the following flags only:
 */
 
 int
-vSnprintf(register char *dest, register const size_t bytes,
-          register const char *format, register va_list args)
+vSnprintf(char *dest, const size_t bytes,
+          const char *format, va_list args)
 
 {
-  register char ch;
-  register int written = 0; /* bytes written so far */
-  register int maxbytes = bytes - 1;
+  char ch;
+  int written = 0; /* bytes written so far */
+  int maxbytes = bytes - 1;
 
   while ((ch = *format++) && (written < maxbytes))
   {
@@ -297,7 +297,7 @@ vSnprintf(register char *dest, register const size_t bytes,
        */
       if (ch == 's')
       {
-        register const char *str = va_arg(args, const char *);
+        const char *str = va_arg(args, const char *);
 
         while ((*dest = *str))
         {
@@ -313,10 +313,10 @@ vSnprintf(register char *dest, register const size_t bytes,
 
       if (ch == 'd')
       {
-        register int num = va_arg(args, int);
-        register int quotient;
-        register const char *str;
-        register char *digitptr = TempBuffer;
+        int num = va_arg(args, int);
+        int quotient;
+        const char *str;
+        char *digitptr = TempBuffer;
 
         /*
          * We have to special-case "0" unfortunately
@@ -409,10 +409,10 @@ vSnprintf(register char *dest, register const size_t bytes,
 
       if (ch == 'u')
       {
-        register unsigned int num = va_arg(args, unsigned int);
-        register unsigned int quotient;
-        register const char *str;
-        register char *digitptr = TempBuffer;
+        unsigned int num = va_arg(args, unsigned int);
+        unsigned int quotient;
+        const char *str;
+        char *digitptr = TempBuffer;
 
         if (num == 0)
         {
@@ -455,10 +455,10 @@ vSnprintf(register char *dest, register const size_t bytes,
       {
         if (*format == 'u')
         {
-          register unsigned long num = va_arg(args, unsigned long);
-          register unsigned long quotient;
-          register const char *str;
-          register char *digitptr = TempBuffer;
+          unsigned long num = va_arg(args, unsigned long);
+          unsigned long quotient;
+          const char *str;
+          char *digitptr = TempBuffer;
 
           ++format;
 
@@ -501,10 +501,10 @@ vSnprintf(register char *dest, register const size_t bytes,
 
         if (*format == 'd')
         {
-          register long num = va_arg(args, long);
-          register long quotient;
-          register const char *str;
-          register char *digitptr = TempBuffer;
+          long num = va_arg(args, long);
+          long quotient;
+          const char *str;
+          char *digitptr = TempBuffer;
 
           ++format;
 
@@ -555,7 +555,7 @@ vSnprintf(register char *dest, register const size_t bytes,
 
       if (ch != '%')
       {
-        register int ret;
+        int ret;
 
         /*
          * The character might be invalid, or be a precision, 
@@ -603,12 +603,12 @@ NOTE: This function handles the following flags only:
 */
 
 int
-vSprintf(register char *dest, register const char *format,
-         register va_list args)
+vSprintf(char *dest, const char *format,
+         va_list args)
 
 {
-  register char ch;
-  register int written = 0; /* bytes written so far */
+  char ch;
+  int written = 0; /* bytes written so far */
 
   while ((ch = *format++))
   {
@@ -624,7 +624,7 @@ vSprintf(register char *dest, register const char *format,
        */
       if (ch == 's')
       {
-        register const char *str = va_arg(args, const char *);
+        const char *str = va_arg(args, const char *);
 
         while ((*dest = *str))
         {
@@ -639,10 +639,10 @@ vSprintf(register char *dest, register const char *format,
 
       if (ch == 'd')
       {
-        register int num = va_arg(args, int);
-        register int quotient;
-        register const char *str;
-        register char *digitptr = TempBuffer;
+        int num = va_arg(args, int);
+        int quotient;
+        const char *str;
+        char *digitptr = TempBuffer;
 
         /*
          * We have to special-case "0" unfortunately
@@ -733,10 +733,10 @@ vSprintf(register char *dest, register const char *format,
 
       if (ch == 'u')
       {
-        register unsigned int num = va_arg(args, unsigned int);
-        register unsigned int quotient;
-        register const char *str;
-        register char *digitptr = TempBuffer;
+        unsigned int num = va_arg(args, unsigned int);
+        unsigned int quotient;
+        const char *str;
+        char *digitptr = TempBuffer;
 
         if (num == 0)
         {
@@ -778,10 +778,10 @@ vSprintf(register char *dest, register const char *format,
       {
         if (*format == 'u')
         {
-          register unsigned long num = va_arg(args, unsigned long);
-          register unsigned long quotient;
-          register const char *str;
-          register char *digitptr = TempBuffer;
+          unsigned long num = va_arg(args, unsigned long);
+          unsigned long quotient;
+          const char *str;
+          char *digitptr = TempBuffer;
 
           ++format;
 
@@ -823,10 +823,10 @@ vSprintf(register char *dest, register const char *format,
 
         if (*format == 'd')
         {
-          register long num = va_arg(args, long);
-          register long quotient;
-          register const char *str;
-          register char *digitptr = TempBuffer;
+          long num = va_arg(args, long);
+          long quotient;
+          const char *str;
+          char *digitptr = TempBuffer;
 
           ++format;
 
@@ -875,7 +875,7 @@ vSprintf(register char *dest, register const char *format,
 
       if (ch != '%')
       {
-        register int ret;
+        int ret;
 
         format -= 2;
         ret = vsprintf(dest, format, args);
@@ -912,12 +912,12 @@ Return: number of characters copied, NOT including the terminating
 */
 
 int
-Snprintf(register char *dest, register const size_t bytes,
-         register const char *format, ...)
+Snprintf(char *dest, const size_t bytes,
+         const char *format, ...)
 
 {
-  register va_list args;
-  register int count;
+  va_list args;
+  int count;
 
   va_start(args, format);
 
@@ -941,11 +941,11 @@ Return: number of characters copied, NOT including the terminating
 */
 
 int
-Sprintf(register char *dest, register const char *format, ...)
+Sprintf(char *dest, const char *format, ...)
 
 {
-  register va_list args;
-  register int count;
+  va_list args;
+  int count;
 
   va_start(args, format);
 

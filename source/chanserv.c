@@ -136,6 +136,7 @@ static void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 
 #ifdef EMPOWERADMINS
 static void c_forbid(struct Luser *, struct NickInfo *, int, char **);
+static void c_unforbid(struct Luser *, struct NickInfo *, int, char **);
 static void c_setpass(struct Luser *, struct NickInfo *, int, char **);
 static void c_status(struct Luser *, struct NickInfo *, int, char **);
 static void c_forget(struct Luser *, struct NickInfo *, int, char **);
@@ -162,6 +163,7 @@ static struct Command chancmds[] = {
 
 #ifdef EMPOWERADMINS
   { "FORBID", c_forbid, LVL_ADMIN },
+  { "UNFORBID", c_unforbid, LVL_ADMIN },
   { "SETPASS", c_setpass, LVL_ADMIN },
   { "STATUS", c_status, LVL_ADMIN },
   { "FORGET", c_forget, LVL_ADMIN },
@@ -358,7 +360,8 @@ cs_process(char *nick, char *command)
   if ((chptr = FindChan(acnt >= 2 ? arv[1] : (char *) NULL)))
   {
     if ((chptr->flags & (CS_FORBID | CS_FORGET)) &&
-        (strncasecmp(arv[0], "DROP", strlen(arv[0])) != 0))
+        /* Complain only if it not admin-level command -kre */
+        (cptr->level != LVL_ADMIN))
     {
       if (chptr->flags & CS_FORBID)
       {
@@ -715,7 +718,7 @@ cs_loaddata()
     {
       if (cptr)
       {
-        if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
+        if (!cptr->access_lvl && !(cptr->flags & CS_FORGET))
         {
           cptr->access_lvl = DefaultAccess;
 
@@ -728,7 +731,7 @@ cs_loaddata()
             ret = -1;
         }
 
-        if (!cptr->password && !(cptr->flags & (CS_FORBID | CS_FORGET)))
+        if (!cptr->password && !(cptr->flags & CS_FORGET))
         {
           /* the previous channel didn't have a PASS line */
           fatal(1, "%s:%d No founder password entry for registered channel [%s] (FATAL)",
@@ -738,7 +741,7 @@ cs_loaddata()
           ret = -2;
         }
 
-        if (!cptr->founder && !(cptr->flags & (CS_FORBID | CS_FORGET)))
+        if (!cptr->founder && !(cptr->flags & CS_FORGET))
         {
           /* the previous channel didn't have a FNDR line */
           fatal(1, "%s:%d No founder nickname entry for registered channel [%s] (FATAL)",
@@ -795,7 +798,7 @@ cs_loaddata()
 
   if (cptr)
   {
-    if (!cptr->access_lvl && !(cptr->flags & (CS_FORBID | CS_FORGET)))
+    if (!cptr->access_lvl && !(cptr->flags & CS_FORGET))
     {
       cptr->access_lvl = DefaultAccess;
 
@@ -3156,8 +3159,8 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
   else if (!(IsFounder(lptr, cptr)
 #ifdef EMPOWERADMINS
-  /* We want empowered admins to be able to drop forbidden and forgotten
-   * channels, too. -kre */
+  /* We want empowered (not empoweredmore) admins to be able to drop
+   * forbidden and forgotten channels, too. -kre */
 	  || (IsValidAdmin(lptr) && cptr->flags & (CS_FORBID | CS_FORGET))
 #endif /* EMPOWERADMINS */
 	  ))
@@ -6570,7 +6573,6 @@ c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 c_forbid()
   Prevent anyone from using channel av[1]
 */
-
 static void
 c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
@@ -6611,10 +6613,7 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-    /*
-     * delete channel to kill the access/akick/founder list etc
-     */
-    DeleteChan(cptr);
+    cptr->flags |= CS_FORBID;
   }
   else
   {
@@ -6625,28 +6624,61 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         av[1]);
       return;
     }
+
+    /* Create channel - it didn't exist -kre */
+    cptr = MakeChan();
+    cptr->name = MyStrdup(av[1]);
+    cptr->created = time(NULL);
+    cptr->flags |= CS_FORBID;
+    cptr->access_lvl = DefaultAccess;
+    AddChan(cptr);
   }
-
-  cptr = MakeChan();
-  cptr->name = MyStrdup(av[1]);
-  cptr->created = time(NULL);
-  cptr->flags = CS_FORBID;
-  cptr->access_lvl = DefaultAccess;
-
-  AddChan(cptr);
 
   if ((chptr = FindChannel(av[1])))
   {
-    /*
-     * There are people in the channel - must kick them out
-     */
+    /* There are people in the channel - must kick them out */
     cs_join(cptr);
   }
 
   notice(n_ChanServ, lptr->nick,
-    "The channel [\002%s\002] is now forbidden",
-    av[1]);
+    "The channel [\002%s\002] is now forbidden", av[1]);
 } /* c_forbid() */
+
+/*
+ * c_unforbid()
+ * Removes effects of c_forbid(), admin level required
+ */
+static void c_unforbid(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
+
+{
+  struct ChanInfo *cptr;
+
+  if (ac < 2)
+  {
+    notice(n_ChanServ, lptr->nick, "Syntax: \002UNFORBID <channel>\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "UNFORBID");
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+  o_Wallops("Unforbid from %s!%s@%s for channel [%s]",
+    lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+  if (!(cptr = FindChan(av[1])))
+  {
+    notice(n_ChanServ, lptr->nick,
+      "[\002%s\002] is an invalid or non-existing channel", av[1]);
+    return;
+  }
+
+  cptr->flags &= ~CS_FORBID;
+
+  notice(n_ChanServ, lptr->nick,
+    "The channel [\002%s\002] is now unforbidden", av[1]);
+} /* c_unforbid() */
 
 /*
 c_setpass()

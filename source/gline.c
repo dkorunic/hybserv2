@@ -186,6 +186,13 @@ CheckGlined(struct Luser *lptr)
                  tempgline->hostname,
                  tempgline->reason);
   #endif /* HYBRID_GLINES */
+
+  #ifdef HYBRID7_GLINES
+    Execute7Gline(tempgline->username,
+                 tempgline->hostname,
+                 tempgline->reason);
+  #endif /* HYBRID7_GLINES */
+
   }
 } /* CheckGlined */
 
@@ -227,6 +234,26 @@ ExecuteGline(char *username, char *hostname, char *reason)
 } /* ExecuteGline() */
 
 #endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+/*
+ * Execute7Gline()
+ * Send a KLINE user host on * :reason (effectively a gline)
+ * 
+ * :SERVER kline OPERNICK TARGET_SERVER DURATION USER HOST REASON
+ */
+
+void
+Execute7Gline(char *username, char *hostname, char *reason)
+
+{
+  toserv(":%s KLINE %s %s %lu %s %s :%s\n",
+         Me.name, n_OperServ, "*", 0,
+         username ? username : "*",
+         hostname, reason);
+} /* Execute7Gline() */
+
+#endif /* HYBRID7_GLINES */
 
 /*
 ExpireGlines()

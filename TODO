@@ -30,7 +30,6 @@ Some sort of TODO/planning program:
 *) implement modes flood trigger
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
-*) unforbid
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some
    special cases -- FIX FIX FIX THIS!
 *) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
@@ -42,11 +41,11 @@ Some sort of TODO/planning program:
     deop flood, nick flood -> however, for some features it is obvious
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
-*) fix NSSetMemoSignon issue, reported by monolith
-   <monolith@mail.orblivion.com>
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
+*) kline/unkline
+*) save services ignores
 
 
 Done so far:
@@ -69,3 +68,8 @@ Done so far:
 *) split and autorouting
 *) SplitBuff() fixes
 *) various older fixes, look in ChangeLog
+*) fix NSSetMemoSignon issue, reported by monolith
+   <monolith@mail.orblivion.com>
+*) unforbid (chan/nick)
+*) ............. and various not mentiones, since there were a lot of
+   changes, look in ChangeLog

@@ -2120,6 +2120,7 @@ libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
 bin/settings.conf       \
+bin/cleandb             \
 include/config.h        \
  include/defs.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
@@ -2216,6 +2217,7 @@ libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
 bin/settings.conf       \
+bin/cleandb             \
 include/config.h        \
 "}
 EOF

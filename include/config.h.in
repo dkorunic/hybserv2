@@ -266,12 +266,26 @@
  * Define this if you want services to create 3 pseudo operators
  * and servers to vote for the gline. This is the ircd-hybrid
  * gline implementation, so it will not work on other ircds.
- * 
- * I'm afraid this won't work with Hybrid7 glines. According to Dianora,
- * this should be banned forever! :-) -kre
  */
 
 #define         HYBRID_GLINES
+
+#ifndef HYBRID_GLINES
+
+/*
+ * Define this if you want services to create a gline the Hybrid7 way by
+ * sending a mass-kline to all servers.
+ * This will ONLY work on hyb7, and for it to work, every server must have
+ * a shared block as follows if your services were named services.eu
+ * 
+ * shared {
+ *     name="services.eu";
+ * };
+ */
+
+#undef HYBRID7_GLINES
+
+#endif /* HYBRID7_GLINES */
 
 #endif /* ALLOW_GLINES */
 
@@ -279,10 +293,10 @@
 
 /* Define this if you don't like the idea of one person being able to
  * jupe servers.  If you don't want it, #undef JUPEVOTES.  If you do want
- * it #define JUPEVOTES <how many votes required>
+ * it #define JUPEVOTES <how many votes required> (usually 3).
  */
 
-#undef JUPEVOTES 3
+#undef JUPEVOTES
 
 #endif /* ALLOW_JUPES */
 
@@ -328,7 +342,7 @@
 #undef         EXTREMEDEBUG
 
 /* This is feature that should give some information on netsplits - what
- * servers are split, for how long, etc. */
+ * servers are split, for how long, etc. -kre */
 
 #define        SPLIT_INFO
 
@@ -338,7 +352,7 @@
 
 /* Still highly experimental feature. Using this and M: lines can make
  * your HybServ send CONNECT commands when split time expires for leaf/hub
- * in M: line */
+ * in M: line -kre */
 
 #define        AUTO_ROUTING
 

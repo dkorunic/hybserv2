@@ -46,6 +46,10 @@ void CheckGlined(struct Luser *lptr);
 void ExecuteGline(char *user, char *host, char *reason);
 #endif
 
+#ifdef HYBRID7_GLINES
+void Execute7Gline(char *user, char *host, char *reason);
+#endif
+
 void ExpireGlines(time_t unixtime);
 
 /*

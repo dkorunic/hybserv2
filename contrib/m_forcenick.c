@@ -109,15 +109,11 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
     int parc, char *parv[])
 {
   struct Client *target_p;
-  struct Channel *chptr;
-  int type;
-  char mode;
-  char sjmode;
-  char *newch;
 
   if (!is_nickname(parv[2]))
   {
-    sendto_one(source_p, ":%s NOTICE %s :Invalid new nickname %s",
+    sendto_one(source_p,
+        ":%s NOTICE %s :*** Notice --  Invalid new nickname %s",
         me.name, source_p->name, parv[2]);
     return;
   }
@@ -131,8 +127,9 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
 
   if ((target_p = find_client(parv[1])) == NULL)
   {
-    sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name,
-         source_p->name, parv[1]);
+    sendto_one(source_p,
+        ":%s NOTICE %s :*** Notice --  No such nickname %s",
+        me.name, source_p->name, parv[1]);
     return;
   }
 
@@ -141,7 +138,8 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
 
   if (find_client(parv[2]) != NULL)
   {
-    sendto_one(source_p, ":%s NOTICE %s :Nickname %s is in use",
+    sendto_one(source_p,
+        ":%s NOTICE %s :*** Notice -- Nickname %s is in use",
         me.name, source_p->name, parv[2]);
     return;
   }

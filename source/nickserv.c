@@ -1659,8 +1659,8 @@ InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
 /*
 DeleteLink()
- Remove nptr from it's current link list. If copyhosts == 1, copy
-nptr's master's access list
+ Remove nptr from it's current link list. If copyhosts == 1, copy nptr's
+ master's access list
 
 Return: 1  if successful
         0  if NULL pointer
@@ -1669,9 +1669,7 @@ Return: 1  if successful
 XXX: We have bugs here. Fix them! -kre
 */
 
-static int
-DeleteLink(struct NickInfo *nptr, int copyhosts)
-
+static int DeleteLink(struct NickInfo *nptr, int copyhosts)
 {
   struct NickInfo *tmp, *master;
   struct NickHost *hptr;
@@ -1682,13 +1680,9 @@ DeleteLink(struct NickInfo *nptr, int copyhosts)
   if (!nptr->master && !nptr->nextlink)
     return (-1);
 
-  if (!nptr->master)
-  {
-    /*
-     * "nptr" IS the master of the list
-     */
+  if (!nptr->master && nptr->nextlink)
+    /* "nptr" IS the master of the list */
     tmp = NULL;
-  }
   else
   {
     for (tmp = nptr->master; tmp; tmp = tmp->nextlink)
@@ -1700,9 +1694,9 @@ DeleteLink(struct NickInfo *nptr, int copyhosts)
   }
 
   /*
-   * "tmp" now points to the link structure right before
-   * nptr in the link. If tmp is NULL, then nptr is the
-   * master of the list, and there is no-one before it.
+   * "tmp" now points to the link structure right before nptr in the link.
+   * If tmp is NULL, then nptr is the master of the list, and there is
+   * no-one before it.
    */
 
   if (tmp)
@@ -1725,17 +1719,16 @@ DeleteLink(struct NickInfo *nptr, int copyhosts)
   else
   {
     /*
-     * The master (nptr) is being deleted, make nptr->nextlink
-     * the new master - copy access list to new master
-     * as well.
+     * The master (nptr) is being deleted, make nptr->nextlink the new
+     * master - copy access list to new master as well.
      */
 
     nptr->nextlink->master = NULL;
     nptr->nextlink->numlinks = nptr->numlinks;
 
     /*
-     * Go through list and set everyone's master entry
-     * to the new master (nptr->nextlink)
+     * Go through list and set everyone's master entry to the new master
+     * (nptr->nextlink)
      */
     for (tmp = nptr->nextlink->nextlink; tmp; tmp = tmp->nextlink)
       tmp->master = nptr->nextlink;
@@ -1752,8 +1745,8 @@ DeleteLink(struct NickInfo *nptr, int copyhosts)
   #ifdef CHANNELSERVICES
 
     /*
-     * The new master should keep the list of founder channels
-     * from the old master
+     * The new master should keep the list of founder channels from the
+     * old master
      */
     nptr->nextlink->FounderChannels = nptr->FounderChannels;
     nptr->nextlink->fccnt = nptr->fccnt;

@@ -1,3 +1,7 @@
+*** 20010503_4 by kreator
+- fix small typo in settings.c
+
+
 *** 20010503_3 by kreator
 - remade .depend
 - rewrote SaveSettings() so that conf is saved safe, it won't get

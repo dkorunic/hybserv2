@@ -1,3 +1,7 @@
+*** 20010503_1 by kreator
+- more fixes for PARAM_STRING in settings.c
+
+
 *** 20010502_6 by kreator
 - fix another ugly conf bug with PARAM_STRING
 

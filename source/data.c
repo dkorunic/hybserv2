@@ -637,8 +637,7 @@ WriteNicks()
 {
   FILE *fp;
   char tempname[MAXLINE];
-  int ii,
-      ncnt;
+  int ii, ncnt;
   struct NickInfo *nptr;
   struct NickHost *hptr;
   int islinked;

@@ -1658,7 +1658,7 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
       for (hptr = master->hosts; hptr; hptr = hptr->next)
         AddHostToNick(hptr->hostmask, nptr);
   }
-  else
+  else /* nptr->master is NULL indicating this is master nick */
   {
     /* make nptr->nextlink the new master */
     nptr->nextlink->master = NULL;
@@ -1684,6 +1684,9 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
   #endif /* CHANNELSERVICES */
 
     master = nptr->nextlink;
+
+    /* and yes, declare nptr as nickname which is alone */
+    nptr->nextlink = NULL;
   }
 
   --master->numlinks;

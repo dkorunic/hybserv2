@@ -14,6 +14,7 @@ Pending bugs:
    c) recover from dead loops and fix those dead loops
    d) link nickname into list starting FROM master nick, and link one
       linked list into another (WOO..)
+*) n_info doesn't show linked nicknames for non-master
 *) seems it is possible that nickname stays ghosted more than necessary if
    nick QUITs
 *) send all mlock modes on channel creation

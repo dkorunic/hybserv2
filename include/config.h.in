@@ -457,9 +457,11 @@
  * glined, not just the user (since it's probably a script randomly
  * choosing idents).
  * -ike
+ *
+ * Disabled by default -kre
  */
 
-#define ADVFLOOD
+#undef ADVFLOOD
 
 #ifdef ADVFLOOD
  #define ADVFLOOD_TABLE  30 

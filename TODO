@@ -1,8 +1,14 @@
 Today's MOTD
 ------------
-Drew's Law of Highway Biology:
-  The first bug to hit a clean windshield lands directly in front of
-  your eyes.
+
+        In the beginning was the Tao.  The Tao gave birth to Space and Time.
+Therefore, Space and Time are the Yin and Yang of programming.
+
+        Programmers that do not comprehend the Tao are always running out of
+time and space for their programs.  Programmers that comprehend the Tao always
+have enough time and space to accomplish their goals.
+        How could it be otherwise?
+                -- Geoffrey James, "The Tao of Programming"
 
 
 Pending bugs:
@@ -20,8 +26,9 @@ Pending bugs:
 *) sed helpfiles so that they have proper time values
 
 
-New features:
--------------
+Features to come:
+-----------------  
+*) rewrite documentation
 *) add SVSNICK, SWHOIS, etc. for other IRCDs
 *) modularisation (_very_ unlikely to happen)
 *) completely document API

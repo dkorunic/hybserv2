@@ -1178,7 +1178,11 @@ CheckNick(char *nickname)
                * If the nick is kill protected, give a 1 minute timeout
                * for them to change
                */
+#ifdef FORCE_NICK_CHANGE
+              notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE2);
+#else
               notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
+#endif
               realptr->flags |= NS_COLLIDE;
               realptr->collide_ts = current_ts + 60;
             }
@@ -1451,7 +1455,7 @@ CollisionCheck(time_t unixtime)
         {
           if (nptr->flags & NS_COLLIDE)
             {
-              struct Luser    *lptr;
+              struct Luser *lptr;
 
               if ((lptr = FindClient(nptr->nick)))
                 {
@@ -1462,7 +1466,28 @@ CollisionCheck(time_t unixtime)
                        * last time they changed their nickname or
                        * connected to the network, and they have not
                        * yet identified - kill them
+                       *
+                       * Try first sending him 432, if not sucessful then
+                       * kill him -harly
                        */
+#ifdef FORCE_NICK_CHANGE
+                      if (!(nptr->flags & NS_NUMERIC))
+                      {
+                        putlog(LOG1,
+                             "%s: forcing nick change for %s!%s@%s",
+                             n_NickServ, lptr->nick, lptr->username,
+                             lptr->hostname);
+                        SendUmode(OPERUMODE_S,
+                                "%s: forcing nick change for %s!%s@%s",
+                                n_NickServ, lptr->nick, lptr->username,
+                                lptr->hostname);
+                        toserv(":%s 432 %s :Forcing nick change\n",
+                            Me.name, lptr->nick);
+                        nptr->flags |= NS_NUMERIC;
+                        nptr->collide_ts = current_ts + 10;
+                      }
+#endif
+                      
                       putlog(LOG1,
                              "%s: killing %s!%s@%s (Nickname Enforcement)",
                              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
@@ -1484,7 +1509,7 @@ CollisionCheck(time_t unixtime)
                    * User must have changed their nick or QUIT -
                    * remove the collide
                    */
-                  nptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
+                  nptr->flags &= ~(NS_COLLIDE | NS_RELEASE | NS_NUMERIC);
                   nptr->collide_ts = 0;
                 }
             } /* if (nptr->flags & NS_COLLIDE) */

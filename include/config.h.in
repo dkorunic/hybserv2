@@ -458,7 +458,7 @@
  * choosing idents).
  * -ike
  *
- * Disabled by default -kre
+ * Disabled by default :-) -kre
  */
 
 #undef ADVFLOOD
@@ -490,6 +490,13 @@
 #define SERVICES_FIGHT_FIX
 
 /*
+ * Forces nick change instead of disconnecting the user (when
+ * kill protection is set). -harly
+  */
+
+#define FORCE_NICK_CHANGE
+
+/*
  * This will give MUCH CPU overhead, and usually should not be enabled.
  * This code makes double-checks for duplicate nicks in nick.db which
  * shouldn't happen otherwise, but as a result of sloppy coding in
@@ -499,9 +506,6 @@
  */
 
 #undef STRICT_DATA_CHECK
-
-
-
 
 
 

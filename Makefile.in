@@ -49,7 +49,8 @@ INSTALL_BIN = ${INSTALL} -m 755
 INSTALL_SECURE = ${INSTALL} -m 600
 
 # Executable programs
-BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk fixlevel
+BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
+					 fixlevel finddouble
 
 # Secure configuration files (mode 600)
 SECUREFILES = hybserv.conf settings.conf

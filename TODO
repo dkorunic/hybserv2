@@ -20,6 +20,7 @@ Pending bugs:
    NOTE: Quickfixed this. However, I need to look at this more closely!
    NOTE2: traced problem to DeleteLink(), done some more fixes, till
           weird
+   NOTE3: still having problems.
 *) OperServ does not completely support hybrid7 modes yet, (for example
   .channel command or SECURE)
 *) fix "services" fighting by juping offending server/services

@@ -1,3 +1,7 @@
+*** 20021206_1 by kreator
+- real misc va_* stuff fix for notice
+
+
 *** 20021204_3 by kreator
 - fix exit()s
 - fix pid_t when print("%d")

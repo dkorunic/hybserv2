@@ -227,6 +227,18 @@ CheckJuped(char *name)
 
               /* its a nick jupe, not a server jupe */
 
+#ifdef DANCER
+              ircsprintf(sendstr,
+                  "NICK %s 1 %ld +i juped juped.com %s %lu :%s\n",
+                  tempjupe->name,
+#ifdef NICKSERVICES
+                  (long) (lptr->nick_ts - 1),
+#else
+                  (long) (lptr->since - 1),
+#endif /* NICKSERVICES */
+                  Me.name, 0xffffffffL, tempjupe->reason ?
+                  tempjupe->reason : "Jupitered Nickname");
+#else
               /* collide the nickname */
               ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
                          tempjupe->name,
@@ -234,9 +246,11 @@ CheckJuped(char *name)
                          (long) (lptr->nick_ts - 1),
 #else
                          (long) (lptr->since - 1),
-#endif
+#endif /* NICKSERVICES */
                          JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
-                         tempjupe->reason ? tempjupe->reason : "Jupitered Nickname");
+                         tempjupe->reason ? tempjupe->reason :
+                         "Jupitered Nickname");
+#endif /* DANCER */
               toserv(sendstr);
 
               DeleteClient(lptr);
@@ -318,10 +332,16 @@ InitJupes()
     {
       if (tmpjupe->isnick)
         {
+#ifdef DANCER
+          ircsprintf(sendstr, "NICK %s 1 1 +i juped juped.com %s :%s\n",
+              tmpjupe->name, Me.name, tmpjupe->reason ? tmpjupe->reason :
+              "Jupitered Nickname");
+#else
           /* collide the nickname */
           ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s :%s\n",
                      tmpjupe->name, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
                      tmpjupe->reason ? tmpjupe->reason : "Jupitered Nickname");
+#endif /* DANCER */
           toserv(sendstr);
 
           SplitBuf(sendstr, &av);

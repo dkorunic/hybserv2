@@ -583,19 +583,28 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
             strcat(buf, "t");
           if (chanptr->modes_off & MODE_M)
             strcat(buf, "m");
+#ifdef DANCER
           if (chanptr->modes_off & MODE_C)
             strcat(buf, "c");
+#endif /* DANCER */
           if (chanptr->modes_off & MODE_I)
             strcat(buf, "i");
           if (chanptr->modes_off & MODE_L)
             strcat(buf, "l");
           if (chanptr->modes_off & MODE_K)
             strcat(buf, "k");
+#ifdef DANCER
           if (chanptr->modes_off & MODE_F)
             strcat(buf, "f");
+#endif /* DANCER */
         }
 
-      if (chanptr->modes_on || chanptr->limit || chanptr->key || chanptr->forward)
+#ifdef DANCER
+      if (chanptr->modes_on || chanptr->limit || chanptr->key ||
+          chanptr->forward)
+#else
+      if (chanptr->modes_on || chanptr->limit || chanptr->key)
+#endif /* DANCER */
         {
           strcat(buf, "+");
           if (chanptr->modes_on & MODE_S)
@@ -606,8 +615,10 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
             strcat(buf, "n");
           if (chanptr->modes_on & MODE_T)
             strcat(buf, "t");
+#ifdef DANCER
           if (chanptr->modes_on & MODE_C)
             strcat(buf, "c");
+#endif /* DANCER */
           if (chanptr->modes_on & MODE_M)
             strcat(buf, "m");
           if (chanptr->modes_on & MODE_I)
@@ -616,8 +627,10 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
             strcat(buf, "l");
           if (chanptr->key)
             strcat(buf, "k");
+#ifdef DANCER
           if (chanptr->forward)
             strcat(buf, "f");
+#endif /* DANCER */
         }
 
       if (*buf)

@@ -991,9 +991,11 @@ WriteChans()
                 fprintf(fp, "->KEY %s\n",
                         cptr->key);
 
+#ifdef DANCER
               if (cptr->forward)
                 fprintf(fp, "->FORWARD %s\n",
                   cptr->forward);
+#endif /* DANCER */
 
               if (cptr->modes_on)
                 fprintf(fp, "->MON %d\n",

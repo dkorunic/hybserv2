@@ -755,7 +755,9 @@ s_nick(int ac, char **av)
               if (newptr && IsLinked(nptr, newptr))
               {
                 newptr->flags |= NS_IDENTIFIED;
+#ifdef DANCER
                 toserv(":%s MODE %s +e\n", Me.name, newptr->nick);
+#endif /* DANCER */
               }
             }
 #endif /* LINKED_NICKNAMES */
@@ -970,9 +972,11 @@ s_nick(int ac, char **av)
     {
       nptr->flags &= ~(NS_IDENTIFIED | NS_RELEASE);
 
+#ifdef DANCER
       /* If the user has +e set, mark them as identified */
       if (lptr->umodes & UMODE_E)
         nptr->flags |= NS_IDENTIFIED;
+#endif /* DANCER */
 
 #ifdef RECORD_SPLIT_TS
       /*

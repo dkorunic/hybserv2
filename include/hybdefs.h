@@ -35,6 +35,14 @@ struct MyInfo;
 #define   SERVERLEN   63  /* server hostname length */
 #define   TOPICLEN    90  /* maximum topic length, can be 120 for hybrid6
                              and 90 for others -kre */
+#ifdef DANCER
+# undef NICKLEN
+# undef CHANNELLEN
+# undef TOPICLEN
+# define   NICKLEN     20
+# define   CHANNELLEN  30
+# define   TOPICLEN    450
+#endif /* DANCER */
 
 #define   UHOSTLEN    (USERLEN + HOSTLEN)
 

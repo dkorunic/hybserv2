@@ -1706,10 +1706,15 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
         } /* if ((jptr = FindClient(av[1]))) */
 
       /* replace nick with a fake user */
-      ircsprintf(sendstr,
-                 "NICK %s 1 %ld +i %s %s %s :%s\n",
-                 av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME,
-                 Me.name, reason);
+#ifdef DANCER
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s %lu :%s\n", av[1],
+          (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+          0xffffffffUL, reason);
+#else
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+         av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+         reason);
+#endif /* DANCER */
       toserv(sendstr);
       SplitBuf(sendstr, &arv);
       AddClient(arv);
@@ -3633,8 +3638,10 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "n");
   if (cptr->modes & MODE_T)
     strcat(modes, "t");
+#ifdef DANCER
   if (cptr->modes & MODE_C)
     strcat(modes, "c");
+#endif /* DANCER */
   if (cptr->modes & MODE_M)
     strcat(modes, "m");
   if (cptr->modes & MODE_I)
@@ -3643,8 +3650,10 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "l");
   if (cptr->key && *cptr->key)
     strcat(modes, "k");
+#ifdef DANCER
   if (cptr->forward && *cptr->forward)
     strcat(modes, "f");
+#endif /* DANCER */
 
   if (cptr->limit)
     {
@@ -3662,6 +3671,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
       strcpy(modes, temp);
     }
 
+#ifdef DANCER
   if (cptr->forward && *cptr->forward)
   {
     char  temp[MAXLINE];
@@ -3669,6 +3679,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     ircsprintf(temp, "%s %s", modes, cptr->forward);
     strcpy(modes, temp);
   }
+#endif /* DANCER */
 
   os_notice(lptr, sockfd,
             "Modes:     %s",
@@ -6413,11 +6424,14 @@ TakeOver(struct Channel *cptr)
       strcat(done, "k ");
       strcat(done, cptr->key);
     }
+
+#ifdef DANCER
   if (cptr->forward)
   {
     strcat(done, "f ");
     strcat(done, cptr->forward);
   }
+#endif /* DANCER */
 
   DoMode(cptr, done, 0);
 
@@ -6638,9 +6652,11 @@ CalcMem(char *nick, int socket)
 
       chanm += (strlen(tempchan->name) + keylen + sizeof(struct Channel));
 
+#ifdef DANCER
       if (tempchan->forward)
         keylen = strlen(tempchan->forward);
       chanm += keylen;
+#endif /* DANCER */
 #endif /* BLOCK_ALLOCATION */
 
       for (chanu = tempchan->firstuser; chanu; chanu = chanu->next)
@@ -6867,8 +6883,10 @@ CalcMem(char *nick, int socket)
             csm += strlen(cptr->topic);
           if (cptr->key)
             csm += strlen(cptr->key);
+#ifdef DANCER
           if (cptr->forward)
             csm += strlen(cptr->forward);
+#endif /* DANCER */
           if (cptr->entrymsg)
             csm += strlen(cptr->entrymsg);
           if (cptr->email)

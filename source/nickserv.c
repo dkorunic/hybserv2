@@ -1390,11 +1390,14 @@ collide(char *nick)
   if (!(lptr = FindClient(nick)))
     return;
 
-  ircsprintf(sendstr,
-             "NICK %s 1 %ld +i %s %s %s :%s\n",
-             lptr->nick,
-             (long) (lptr->nick_ts - 1),
-             "enforced", Me.name, Me.name, "Nickname Enforcement");
+#ifdef DANCER
+  ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\n", lptr->nick,
+      "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
+#else
+  ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\n",
+      lptr->nick, (long) (lptr->nick_ts - 1), "enforced", Me.name,
+      Me.name, "Nickname Enforcement");
+#endif /* DANCER */
 
   /*
    * Sending a server kill will be quieter than an oper
@@ -2087,8 +2090,10 @@ n_drop(struct Luser *lptr, int ac, char **av)
   /* remove the nick from the nicklist table */
 
   DeleteNick(ni);
+#ifdef DANCER
   /* De-identify the user, for ircds that have such mode -kre */
   toserv(":%s MODE %s -e\n", Me.name, dnick);
+#endif /* DANCER */
 
   notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been dropped", dnick);
 } /* n_drop() */
@@ -2172,7 +2177,9 @@ n_identify(struct Luser *lptr, int ac, char **av)
   realptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
   notice(n_NickServ, lptr->nick,
          "Password accepted - you are now recognized");
+#ifdef DANCER
   toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
+#endif /* DANCER */
 
   if ((nptr->flags & NS_AUTOMASK) &&
       (!OnAccessList(lptr->username, lptr->hostname, nptr)))

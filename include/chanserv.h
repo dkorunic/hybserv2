@@ -122,7 +122,9 @@ struct ChanInfo
   char *topic;                  /* NULL if no topic lock */
   long limit;                   /* 0 if no limit */
   char *key;                    /* NULL if no key */
+#ifdef DANCER
   char *forward;                /* NULL if no forward target */
+#endif /* DANCER */
   int modes_on,                 /* modes to enforce */
       modes_off;                /* modes to enforce off */
   struct ChanAccess *access;    /* access list */

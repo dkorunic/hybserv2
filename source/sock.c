@@ -1255,8 +1255,9 @@ void signon(void)
   /* Hybrid6 and 7 handshake -kre */
 #ifdef HYBRID_ONLY
   toserv("PASS %s :TS\nCAPAB :EX"
-  /* dancer */
-  /* toserv("PASS %s :TS\nCAPAB :EX DNCR SRV" */
+#ifdef DANCER
+      " DNCR SRV"
+#endif /* DANCER */
 #ifdef GECOSBANS
          /* Send gecosbans capab -Janos */
          " DE"

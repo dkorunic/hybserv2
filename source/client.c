@@ -83,6 +83,7 @@ UpdateUserModes(struct Luser *user, char *modes)
         umode = UMODE_W;
       if (modes[ii] == 'o')
         umode = UMODE_O;
+#ifdef DANCER
       if (modes[ii] == 'e')
         if (PLUS)
         {
@@ -102,6 +103,7 @@ UpdateUserModes(struct Luser *user, char *modes)
              umode = 0;
           }
         }
+#endif /* DANCER */
 
       if (!umode)
         continue;
@@ -360,6 +362,7 @@ struct Luser *
                 }
               break;
             } /* case 'O' */
+#ifdef DANCER
         case 'e':
         case 'E':
         {
@@ -393,6 +396,7 @@ struct Luser *
          }
       break;
       }
+#endif /* DANCER */
           default:
             break;
           } /* switch (*ch) */

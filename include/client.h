@@ -26,7 +26,9 @@
 #define UMODE_I          0x0002 /* Invisible */
 #define UMODE_W          0x0004 /* Wallops */
 #define UMODE_S          0x0008 /* Server Notices */
-#define UMODE_E          0x0010 /* Identified umode */
+#ifdef DANCER
+# define UMODE_E         0x0010 /* Identified umode */
+#endif /* DANCER */
 
 struct UserChannel
 {

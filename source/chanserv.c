@@ -176,8 +176,7 @@ static void c_resetlevels(struct Luser *, struct NickInfo *, int, char
 /* main ChanServ commands */
 static struct Command chancmds[] =
     {
-      { "HELP", c_help, LVL_NONE
-      },
+      { "HELP", c_help, LVL_NONE },
       { "REGISTER", c_register, LVL_IDENT },
       { "DROP", c_drop, LVL_IDENT },
       { "IDENTIFY", c_identify, LVL_IDENT },
@@ -212,8 +211,7 @@ static struct Command chancmds[] =
 /* sub-commands for ChanServ ACCESS */
 static struct Command accesscmds[] =
     {
-      { "ADD", c_access_add, LVL_NONE
-      },
+      { "ADD", c_access_add, LVL_NONE },
       { "DEL", c_access_del, LVL_NONE },
       { "LIST", c_access_list, LVL_NONE },
       { 0, 0, 0 }
@@ -222,8 +220,7 @@ static struct Command accesscmds[] =
 /* sub-commands for ChanServ AKICK */
 static struct Command akickcmds[] =
     {
-      { "ADD", c_akick_add, LVL_NONE
-      },
+      { "ADD", c_akick_add, LVL_NONE },
       { "DEL", c_akick_del, LVL_NONE },
       { "LIST", c_akick_list, LVL_NONE },
       { 0, 0, 0 }
@@ -232,8 +229,7 @@ static struct Command akickcmds[] =
 /* sub-commands for ChanServ SET */
 static struct Command setcmds[] =
     {
-      { "TOPICLOCK", c_set_topiclock, LVL_NONE
-      },
+      { "TOPICLOCK", c_set_topiclock, LVL_NONE },
       { "TLOCK", c_set_topiclock, LVL_NONE },
       { "PRIVATE", c_set_private, LVL_NONE },
       { "VERBOSE", c_set_verbose, LVL_NONE },
@@ -707,6 +703,7 @@ cs_loaddata()
                     ret = -1;
                 }
             }
+#ifdef DANCER
           else if (!strncasecmp("FORWARD", keyword, 3))
           {
             if (!cptr->forward)
@@ -721,6 +718,7 @@ cs_loaddata()
                 ret = -1;
             }
           }
+#endif /* DANCER */
           else if (!ircncmp("MON", keyword, 3))
             {
               if (!cptr->modes_on)
@@ -1156,7 +1154,11 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     }
 
   strcpy(modes, "+");
+#ifdef DANCER
   if (cptr->modes_on || cptr->key || cptr->limit || cptr->forward)
+#else
+  if (cptr->modes_on || cptr->key || cptr->limit)
+#endif /* DANCER */
     {
       if ((cptr->modes_on & MODE_S) &&
           !(chptr->modes & MODE_S))
@@ -1180,9 +1182,11 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_on & MODE_M) &&
           !(chptr->modes & MODE_M))
         strcat(modes, "m");
+#ifdef DANCER
       if ((cptr->modes_on & MODE_C) &&
           !(chptr->modes & MODE_C))
         strcat(modes, "c");
+#endif /* DANCER */
       if ((cptr->modes_on & MODE_I) &&
           !(chptr->modes & MODE_I))
         strcat(modes, "i");
@@ -1190,9 +1194,10 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         strcat(modes, "l");
       if (cptr->key)
         strcat(modes, "k");
+#ifdef DANCER
       if (cptr->forward)
         strcat(modes, "f");
-
+#endif /* DANCER */ /* DANCER */
       if (cptr->limit)
         {
           char temp[MAXLINE];
@@ -1213,6 +1218,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           ircsprintf(temp, "%s %s", modes, cptr->key);
           strcpy(modes, temp);
         }
+#ifdef DANCER
       if (cptr->forward)
       {
         char temp[MAXLINE];
@@ -1220,6 +1226,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         ircsprintf(temp, "%s %s", modes, cptr->forward);
         strcpy(modes, temp);
       }
+#endif /* DANCER */
     }
   if (modes[1])
     {
@@ -1255,9 +1262,11 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_off & MODE_M) &&
           (chptr->modes & MODE_M))
         strcat(modes, "m");
+#ifdef DANCER
       if ((cptr->modes_off & MODE_C) &&
           (chptr->modes & MODE_C))
         strcat(modes, "c");
+#endif /* DANCER */
       if ((cptr->modes_off & MODE_I) &&
           (chptr->modes & MODE_I))
         strcat(modes, "i");
@@ -1270,12 +1279,14 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           strcat(modes, "k ");
           strcat(modes, chptr->key);
         }
+#ifdef DANCER
       if ((cptr->modes_off & MODE_F) &&
           (chptr->forward))
       {
         strcat(modes, "f ");
         strcat(modes, chptr->forward);
       }
+#endif /* DANCER */
     }
   if (modes[1])
     {
@@ -1507,9 +1518,11 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_M) &&
           (cptr->modes_on & MODE_M))
         ircsprintf(modes, "+m");
+#ifdef DANCER
       if ((mode == MODE_C) &&
           (cptr->modes_on & MODE_C))
         ircsprintf(modes, "+c");
+#endif /* DANCER */
       if ((mode == MODE_I) &&
           (cptr->modes_on & MODE_I))
         ircsprintf(modes, "+i");
@@ -1543,6 +1556,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
+#ifdef DANCER
   if ((mode == MODE_F) && (cptr->forward))
   {
     if (!isminus)
@@ -1555,6 +1569,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
   }
+#endif /* DANCER */
 
   if (cptr->modes_off && !isminus)
     {
@@ -1581,9 +1596,11 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_M) &&
           (cptr->modes_off & MODE_M))
         ircsprintf(modes, "-m");
+#ifdef DANCER
       if ((mode == MODE_C) &&
           (cptr->modes_off & MODE_C))
         ircsprintf(modes, "-c");
+#endif /* DANCER */
       if ((mode == MODE_I) &&
           (cptr->modes_off & MODE_I))
         ircsprintf(modes, "-i");
@@ -1596,12 +1613,14 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
           if (chptr->key)
             ircsprintf(modes, "-k %s", chptr->key);
         }
+#ifdef DANCER
       if ((mode == MODE_F) &&
         (cptr->modes_off & MODE_F))
       {
         if (chptr->forward)
           ircsprintf(modes, "-f %s", chptr->forward);
       }
+#endif /* DANCER */
 
       if (modes[0])
         {
@@ -1843,10 +1862,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
        * Send cptr->entrymsg to lptr->nick in the form of a NOTICE
        */
       toserv(":%s NOTICE %s :[%s] %s\n",
-             n_ChanServ,
-             lptr->nick,
-             chanptr->name,
-             cptr->entrymsg);
+             n_ChanServ, lptr->nick, chanptr->name, cptr->entrymsg);
     }
   
   /* Is this the founder? (not somebody with founder _access_, but the
@@ -2456,8 +2472,10 @@ DeleteChan(struct ChanInfo *chanptr)
     MyFree(chanptr->topic);
   if (chanptr->key)
     MyFree(chanptr->key);
+#ifdef DANCER
   if (chanptr->forward)
     MyFree(chanptr->forward);
+#endif /* DANCER */
 
   while (chanptr->akick)
     {
@@ -5450,11 +5468,13 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       MyFree(cptr->key);
       cptr->key = NULL;
     }
+#ifdef DANCER
   if (cptr->forward)
   {
     MyFree(cptr->forward);
     cptr->forward = NULL;
   }
+#endif /* DANCER */
 
   for (ii = 0; ii < strlen(av[3]); ++ii)
     {
@@ -5544,6 +5564,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             break;
           }
 
+#ifdef DANCER
         case 'c':
         case 'C':
           {
@@ -5553,6 +5574,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
               cptr->modes_on |= MODE_C;
             break;
           }
+#endif /* DANCER */
 
         case 'l':
         case 'L':
@@ -5591,6 +5613,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             break;
           }
 
+#ifdef DANCER
         case 'f':
         case 'F':
         {
@@ -5610,6 +5633,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             }
           break;
         }
+#endif /* DANCER */
 
         default:
           break;
@@ -5632,8 +5656,10 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "m");
       if (cptr->modes_off & MODE_I)
         strcat(modes, "i");
+#ifdef DANCER
       if (cptr->modes_off & MODE_C)
         strcat(modes, "c");
+#endif /* DANCER */
       if (cptr->modes_off & MODE_L)
         strcat(modes, "l");
       if (cptr->modes_off & MODE_K)
@@ -5643,11 +5669,17 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       if (cptr->modes_off & MODE_A)
         strcat(modes, "a");
 #endif /* HYBRID7 */
+#ifdef DANCER
       if (cptr->modes_off & MODE_F)
         strcat(modes, "f");
+#endif /* DANCER */
     }
 
+#ifdef DANCER
   if (cptr->modes_on || cptr->limit || cptr->key || cptr->forward)
+#else
+  if (cptr->modes_on || cptr->limit || cptr->key)
+#endif /* DANCER */
     {
       strcat(modes, "+");
       if (cptr->modes_on & MODE_S)
@@ -5664,8 +5696,10 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "n");
       if (cptr->modes_on & MODE_T)
         strcat(modes, "t");
+#ifdef DANCER
       if (cptr->modes_on & MODE_C)
         strcat(modes, "c");
+#endif /* DANCER */
       if (cptr->modes_on & MODE_M)
         strcat(modes, "m");
       if (cptr->modes_on & MODE_I)
@@ -5674,8 +5708,10 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "l");
       if (cptr->key)
         strcat(modes, "k");
+#ifdef DANCER
       if (cptr->forward)
         strcat(modes, "f");
+#endif /* DANCER */
 
       if (cptr->limit)
         {
@@ -5689,11 +5725,13 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           strcat(modes, " ");
           strcat(modes, cptr->key);
         }
+#ifdef DANCER
       if (cptr->forward)
       {
         strcat(modes, " ");
         strcat(modes, cptr->forward);
       }
+#endif /* DANCER */
     }
 
   if ((chptr = FindChannel(cptr->name)))
@@ -6078,7 +6116,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (ac < 2)
     {
-      notice(n_ChanServ, lptr->nick, "Syntax: \002OP <channel> [nicks]\002");
+      notice(n_ChanServ, lptr->nick,
+          "Syntax: \002OP <channel> [nicks]\002");
       notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "OP");
       return;
     }
@@ -6112,7 +6151,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
               else
                 {
                   notice(n_ChanServ, lptr->nick,
-                         "You are already opped on [\002%s\002]", uchan->chptr->name);
+                    "You are already opped on [\002%s\002]",
+                    uchan->chptr->name);
                 }
             }
         }
@@ -6120,8 +6160,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       notice(n_ChanServ, lptr->nick,
              "You have been opped on all channels you have access to");
 
-      RecordCommand("%s: %s!%s@%s OP ALL",
-                    n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+      RecordCommand("%s: %s!%s@%s OP ALL", n_ChanServ, lptr->nick,
+          lptr->username, lptr->hostname);
 
       return;
     }
@@ -6130,8 +6170,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       notice(n_ChanServ, lptr->nick,
              ERR_NEED_ACCESS, cptr->access_lvl[CA_CMDOP], "OP", cptr->name);
-      RecordCommand("%s: %s!%s@%s failed OP [%s]",
-                    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
+      RecordCommand("%s: %s!%s@%s failed OP [%s]", n_ChanServ, lptr->nick,
+          lptr->username, lptr->hostname, cptr->name);
       return;
     }
 
@@ -6731,8 +6771,10 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
         strcat(buf, "n");
       if (cptr->modes_off & MODE_T)
         strcat(buf, "t");
+#ifdef DANCER
       if (cptr->modes_off & MODE_C)
         strcat(buf, "c");
+#endif /* DANCER */
       if (cptr->modes_off & MODE_M)
         strcat(buf, "m");
       if (cptr->modes_off & MODE_I)
@@ -6741,10 +6783,16 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
         strcat(buf, "l");
       if (cptr->modes_off & MODE_K)
         strcat(buf, "k");
+#ifdef DANCER
       if (cptr->modes_off & MODE_F)
         strcat(buf, "f");
+#endif /* DANCER */
     }
+#ifdef DANCER
   if (cptr->modes_on || cptr->limit || cptr->key || cptr->forward)
+#else
+  if (cptr->modes_on || cptr->limit || cptr->key)
+#endif /* DANCER */
     {
       strcat(buf, "+");
       if (cptr->modes_on & MODE_S)
@@ -6761,8 +6809,10 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
         strcat(buf, "n");
       if (cptr->modes_on & MODE_T)
         strcat(buf, "t");
+#ifdef DANCER
       if (cptr->modes_on & MODE_C)
         strcat(buf, "c");
+#endif /* DANCER */
       if (cptr->modes_on & MODE_M)
         strcat(buf, "m");
       if (cptr->modes_on & MODE_I)
@@ -6771,8 +6821,10 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
         strcat(buf, "l");
       if (cptr->key)
         strcat(buf, "k");
+#ifdef DANCER
       if (cptr->forward)
         strcat(buf, "f");
+#endif /* DANCER */
     }
   if (buf[0])
     notice(n_ChanServ, lptr->nick,
@@ -6992,8 +7044,10 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(modes, "n");
   if (chptr->modes & MODE_T)
     strcat(modes, "t");
+#ifdef DANCER
   if (chptr->modes & MODE_C)
     strcat(modes, "c");
+#endif /* DANCER */
   if (chptr->modes & MODE_M)
     strcat(modes, "m");
   if (chptr->modes & MODE_I)
@@ -7005,11 +7059,13 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       strcat(modes, "k ");
       strcat(modes, chptr->key);
     }
+#ifdef DANCER
   if (chptr->forward)
   {
     strcat(modes, "f ");
     strcat(modes, chptr->forward);
   }
+#endif /* DANCER */
 
   toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
 

@@ -660,8 +660,10 @@ DeleteChannel(struct Channel *cptr)
   MyFree(cptr->name);
   if (cptr->key)
     MyFree(cptr->key);
+#ifdef DANCER
   if (cptr->forward)
     MyFree(cptr->forward);
+#endif /* DANCER */
 #endif /* BLOCK_ALLOCATION */
 
   if (cptr->prev)
@@ -1220,6 +1222,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             break;
           } /* case 'k' */
 
+#ifdef DANCER
       /*
        * Channel forwarding target
        */
@@ -1254,6 +1257,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 #endif
         break;
       } /* case 'f' */
+#endif /* DANCER */
 
           /*
            * Channel ban
@@ -1348,9 +1352,11 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
             else if (ch == 'a')
               modeflag = MODE_A;
-#endif
+#endif /* HYBRID7 */
+#ifdef DANCER
             else if (ch == 'c')
               modeflag = MODE_C;
+#endif /* DANCER */
 
             if (modeflag)
               {

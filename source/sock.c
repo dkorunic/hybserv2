@@ -334,7 +334,7 @@ ConnectHost(char *hostname, unsigned int port)
         hostname);
     #endif
       putlog(LOG1,
-        "Unable to connect to %s.%d: Unknown hostname",
+        "Unable to connect to %s:%d: Unknown hostname",
         hostname,
         port);
       return (-1);

@@ -78,7 +78,7 @@ all: source tools
 build: all
 
 clean:
-	@echo '** Removing objects **'
+	@echo '** Begin cleaning and removing objects **'
 	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Cleaning $$i ***"; \
@@ -89,6 +89,7 @@ clean:
 	done
 
 distclean: clean
+	@echo '*** Removing objects and misc files ***'
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
 		include/config.h bin/settings.conf bin/cleandb \
 		config.status config.cache config.log ~* core \

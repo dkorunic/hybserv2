@@ -352,9 +352,11 @@ void updateConnectTable(char *user, char *host)
           AddGline(togline, ADVFLOOD_GLINE_REASON, Me.name,
               timestr(ADVFLOOD_GLINE_TIME));
 
+          /* Bogus code -kre */
+#if 0
           /* It's possible that the client nickchanged, and the GLINE
            * won't take effect until he reconnects. So let's see if he's
-           * still online and KILL him if he is. */
+           * still online and KILL him if he is. -ike */
 
           prevptr = NULL;
           for (luserptr = ClientList; luserptr; )
@@ -399,6 +401,7 @@ void updateConnectTable(char *user, char *host)
             else
               luserptr = ClientList;
           } /* end find user */
+#endif
         } /* end place gline & kill matches */
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
 

@@ -803,7 +803,9 @@ s_nick(int ac, char **av)
   #endif /* SEENSERVICES */
 
 #ifdef ADVFLOOD
+#if 0
     if (lptr->server != Me.sptr)
+#endif
     	updateConnectTable(lptr->username, lptr->hostname);
 #endif /* ADVFLOOD */
 
@@ -1311,7 +1313,9 @@ s_quit(int ac, char **av)
 #endif /* SEENSERVICES */
 
 #ifdef ADVFLOOD
+#if 0
   if (lptr->server != Me.sptr)
+#endif
   	updateConnectTable(lptr->username, lptr->hostname);
 #endif /* ADVFLOOD */
 

@@ -1049,6 +1049,9 @@ o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
     "RESTART");
 
   o_Wallops("RESTART");
+
+  /* As found in Hyb6...this is needed to avoid breaking RESTART */
+  unlink(PidFile);
  
   /* Reinitialise all connections and memory */
   ServReboot();

@@ -694,6 +694,15 @@ WriteNicks()
       if (nptr->url)
         fprintf(fp, "->URL %s\n", nptr->url);
 
+      if (nptr->gsm)
+        fprintf(fp, "->GSM %s\n", nptr->gsm);
+
+      if (nptr->phone)
+        fprintf(fp, "->PHONE %s\n", nptr->phone);
+
+      if (nptr->UIN)
+        fprintf(fp, "->UIN %ld\n", (long) nptr->UIN);
+
       if (LastSeenInfo)
       {
         if (nptr->lastu && nptr->lasth)
@@ -742,22 +751,26 @@ WriteNicks()
 
       /* write out "nickname flags created last-seen" to file */
       fprintf(fp, "%s %ld %ld %ld\n",
-        nptr->nick,
-        nptr->flags,
-        (long) nptr->created,
-        (long) nptr->lastseen);
+        nptr->nick, nptr->flags, (long) nptr->created, (long)
+        nptr->lastseen);
 
       /* write out password */
-      fprintf(fp, "->PASS %s\n",
-        nptr->password);
+      fprintf(fp, "->PASS %s\n", nptr->password);
 
       if (nptr->email)
-        fprintf(fp, "->EMAIL %s\n",
-        nptr->email);
+        fprintf(fp, "->EMAIL %s\n", nptr->email);
 
       if (nptr->url)
-        fprintf(fp, "->URL %s\n",
-        nptr->url);
+        fprintf(fp, "->URL %s\n", nptr->url);
+
+      if (nptr->gsm)
+        fprintf(fp, "->GSM %s\n", nptr->gsm);
+
+      if (nptr->phone)
+        fprintf(fp, "->PHONE %s\n", nptr->phone);
+
+      if (nptr->UIN)
+        fprintf(fp, "->UIN %ld\n", (long) nptr->UIN);
 
       if (LastSeenInfo)
       {

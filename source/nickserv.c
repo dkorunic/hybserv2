@@ -83,6 +83,9 @@ static void n_set_hide(struct Luser *, int, char **);
 static void n_set_password(struct Luser *, int, char **);
 static void n_set_email(struct Luser *, int, char **);
 static void n_set_url(struct Luser *, int, char **);
+static void n_set_uin(struct Luser *, int, char **);
+static void n_set_gsm(struct Luser *, int, char **);
+static void n_set_phone(struct Luser *, int, char **);
 #ifdef LINKED_NICKNAMES
 static void n_set_master(struct Luser *, int, char **);
 #endif
@@ -111,6 +114,7 @@ static void n_droplink(struct Luser *, int, char **);
 
 static void n_collide(struct Luser *, int, char **);
 static void n_flag(struct Luser *, int, char **);
+static void n_clearnoexp(struct Luser *, int, char **);
 
 #endif /* EMPOWERADMINS */
 
@@ -146,6 +150,7 @@ static struct Command nickcmds[] = {
 #endif /* LINKED_NICKNAMES */
   { "COLLIDE", n_collide, LVL_ADMIN },
   { "FLAG", n_flag, LVL_ADMIN },
+  { "CLEARNOEXP", n_clearnoexp, LVL_ADMIN },
   { "FIXTS", n_fixts, LVL_ADMIN },
 
 #endif /* EMPOWERADMINS */
@@ -177,6 +182,9 @@ static struct Command setcmds[] = {
   { "PASSWORD", n_set_password, LVL_NONE },
   { "EMAIL", n_set_email, LVL_NONE },
   { "URL", n_set_url, LVL_NONE },
+  { "UIN", n_set_uin, LVL_NONE },
+  { "GSM", n_set_gsm, LVL_NONE },
+  { "PHONE", n_set_phone, LVL_NONE },
 
 #ifdef LINKED_NICKNAMES
   { "MASTER", n_set_master, LVL_NONE },
@@ -417,6 +425,36 @@ ns_loaddata()
           if (ret > 0)
             ret = -1;
         }
+      }
+      else if (!ircncmp(keyword, "GSM", 3))
+      {
+        if (!nptr->gsm)
+          nptr->gsm = MyStrdup(av[1]);
+        else
+        {
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple GSM lines (using
+first)",
+            NickServDB, cnt, nptr->nick);
+          if (ret > 0)
+            ret = -1;
+        }
+      }
+      else if (!ircncmp(keyword, "PHONE", 5))
+      {
+        if (!nptr->phone)
+          nptr->phone = MyStrdup(av[1]);
+        else
+        {
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple PHONE lines (usin
+g first)",
+            NickServDB, cnt, nptr->nick);
+          if (ret > 0)
+            ret = -1;
+        }
+      }
+      else if (!ircncmp(keyword, "UIN", 3))
+      {
+        nptr->UIN = atoi(av[1]);
       }
       else if (LastSeenInfo && !ircncmp(keyword, "LASTUH", 6))
       {
@@ -3728,6 +3766,143 @@ n_set_url(struct Luser *lptr, int ac, char **av)
     nptr->url);
 } /* n_set_url() */
 
+/* Set UIN for nickname. Taken from IrcBg and modified -kre */
+static void n_set_uin(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+
+  if (!(nptr = GetLink(lptr->nick)))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET UIN %s", n_NickServ, lptr->nick,
+      lptr->username, lptr->hostname, (ac < 3) ? "" : StrToupper(av[2]));
+
+  if (ac < 3)
+  {
+    if (nptr->UIN != 0)
+      notice(n_NickServ, lptr->nick,
+        "Current ICQ UIN for you is : [\002%ld\002]", nptr->UIN);
+    else
+      notice(n_NickServ, lptr->nick, "You don't have UIN set.");
+    return;
+  }
+
+  if (strlen(av[2]) > 8)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Too long UIN. Maximum UIN length is 8!");
+    return;
+  }
+
+  nptr->UIN = atoi(av[2]);
+
+  notice(n_NickServ, lptr->nick,
+      "Your ICQ UIN is set to : [\002%ld\002]", nptr->UIN);
+
+} /* n_set_uin() */
+
+/* Set GSM number for nickname. Taken from IrcBg and modified -kre */
+static void n_set_gsm(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+
+  if (ac < 3)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Syntax: \002SET GSM <GSM number|->\002");
+    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+      "SET GSM");
+    return;
+  }
+
+  if (!(nptr = FindNick(lptr->nick)))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET GSM %s", n_NickServ, lptr->nick,
+      lptr->username, lptr->hostname, av[2]);
+
+  if (nptr->gsm)
+    MyFree(nptr->gsm);
+
+  if (!irccmp(av[2], "-"))
+  {
+    nptr->gsm = NULL;
+    notice(n_NickServ, lptr->nick, "Your GSM number has been cleared.");
+    return;
+  }
+
+  nptr->gsm = MyStrdup(av[2]);
+
+  notice(n_NickServ, lptr->nick,
+    "Your GSM number has been set to [\002%s\002]",
+    nptr->gsm);
+} /* n_set_gsm() */
+
+/* Set phone number for nick. Code taken from IrcBg and modified -kre */
+static void n_set_phone(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+
+  if (ac < 3)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Syntax: \002SET PHONE <phone number|->\002");
+    notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+      "SET PHONE");
+    return;
+  }
+
+  if (!(nptr = FindNick(lptr->nick)))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET PHONE %s",
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
+
+  if (nptr->phone)
+    MyFree(nptr->phone);
+
+  if (!irccmp(av[2], "-"))
+  {
+    nptr->phone = NULL;
+    notice(n_NickServ, lptr->nick, "Your phone number has been cleared");
+    return;
+  }
+
+  nptr->phone = MyStrdup(av[2]);
+
+  notice(n_NickServ, lptr->nick,
+    "Your phone number has been set to [\002%s\002]",
+    nptr->phone);
+
+} /* n_set_phone() */
+
+/* Clear all noexpire flags for all users. Code taken from IrcBg and
+ * modified. -kre */
+void n_clearnoexp(struct Luser *lptr, int ac, char **av)
+{
+  int ii;
+  struct NickInfo *nptr, *next;
+
+  if (ac < 2)
+  {
+    notice(n_NickServ, lptr->nick, "Syntax: CLEARNOEXP");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+        "CLEARNOEXP");
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s CLEARNOEXP",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+
+  for (ii = 0; ii < NICKLIST_MAX; ++ii)
+    for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
+        nptr->flags &= ~NS_OPERATOR;
+
+  notice(n_ChanServ, lptr->nick,
+      "All noexpire flags for nicks have been cleared.");
+
+} /* n_clearnoexp() */
+
 #ifdef LINKED_NICKNAMES
 
 /*
@@ -4001,14 +4176,24 @@ n_info(struct Luser *lptr, int ac, char **av)
     if (!(nptr->flags & NS_HIDEEMAIL) || isadmin)
       if (realptr->email)
         notice(n_NickServ, lptr->nick,
-          "      Email Address: %s",
-          realptr->email);
+          "      Email Address: %s", realptr->email);
 
     if (!(nptr->flags & NS_HIDEURL) || isadmin)
       if (realptr->url)
         notice(n_NickServ, lptr->nick,
-          "                Url: %s",
-          realptr->url);
+          "                URL: %s", realptr->url);
+
+    if (nptr->UIN)
+      notice(n_NickServ, lptr->nick,
+          "                UIN: %ld", nptr->UIN);
+
+    if (nptr->gsm)
+      notice(n_NickServ, lptr->nick,
+          "                GSM: %s", nptr->gsm);
+
+    if (nptr->phone)
+      notice(n_NickServ, lptr->nick,
+          "              Phone: %s", nptr->phone);
 
     buf[0] = '\0';
     if (AllowKillProtection)

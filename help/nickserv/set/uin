@@ -1,0 +1,9 @@
+Syntax: %bSET UIN [number] %b
+
+Sets the your ICQ UIN to [numberur]. When users perform an %bINFO%b
+on your nickname, they will be informed of your UIN,
+unless you set %bHIDE%b ON. To verify your UIN leave out
+[number].
+Examples:
+         %b/msg %N SET UIN 45545465%b
+           Sets your UIN to "45545465".

@@ -26,3 +26,4 @@ Available options:
     FORGET      Make %C forget your channel %bFOREVER%b
     GUARD       Have %C join your channel
     SPLITOPS    Let anyone keep ops from a netsplit
+    VERBOSE     Notify chanops on access changes

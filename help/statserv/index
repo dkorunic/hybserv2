@@ -8,6 +8,10 @@ For more information on a specific command, type:
     HOST       List statistics for a hostname
     DOMAIN     List statistics for a domain
     SERVER     List statistics for a server
+    SHOWSTATS  Statistics for Chan, Nick, Memo Services
+    SHOWOPERS  List currently identified irc operators
+    SHOWADMINS LIST currently identified services admins
+
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b

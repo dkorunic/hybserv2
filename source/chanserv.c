@@ -63,6 +63,7 @@ static int GetAccess(struct ChanInfo *, struct Luser *);
 static struct ChanAccess *OnAccessList(struct ChanInfo *, char *,
                                        struct NickInfo *);
 static struct AutoKick *OnAkickList(struct ChanInfo *, char *);
+static void chanopsnotice(struct Channel *cptr, char* msg); 
 
 /* default access levels for new channels */
 static int DefaultAccess[] = {
@@ -111,6 +112,7 @@ static void c_level(struct Luser *, struct NickInfo *, int, char **);
 static void c_set(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_topiclock(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_private(struct Luser *, struct NickInfo *, int, char **);
+static void c_set_verbose(struct Luser *, struct NickInfo *, int, char **);     
 static void c_set_secure(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_secureops(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_splitops(struct Luser *, struct NickInfo *, int, char **);
@@ -158,6 +160,7 @@ static void c_setpass(struct Luser *, struct NickInfo *, int, char **);
 static void c_status(struct Luser *, struct NickInfo *, int, char **);
 static void c_forget(struct Luser *, struct NickInfo *, int, char **);
 static void c_noexpire(struct Luser *, struct NickInfo *, int, char **);
+static void c_clearnoexpire(struct Luser *, struct NickInfo *, int, char **);   
 #endif /* EMPOWERADMINS */
 
 /* main ChanServ commands */
@@ -188,6 +191,7 @@ static struct Command chancmds[] = {
   { "STATUS", c_status, LVL_ADMIN },
   { "FORGET", c_forget, LVL_ADMIN },
   { "NOEXPIRE", c_noexpire, LVL_ADMIN },
+  { "CLEARNOEXP", c_clearnoexpire, LVL_ADMIN },
 #endif
 
   { 0, 0, 0 }
@@ -216,6 +220,7 @@ static struct Command setcmds[] = {
   { "TOPICLOCK", c_set_topiclock, LVL_NONE },
   { "TLOCK", c_set_topiclock, LVL_NONE },
   { "PRIVATE", c_set_private, LVL_NONE },
+  { "VERBOSE", c_set_verbose, LVL_NONE },
   { "SECURE", c_set_secure, LVL_NONE },
   { "SECUREOPS", c_set_secureops, LVL_NONE },
   { "SPLITOPS", c_set_splitops, LVL_NONE },
@@ -3274,6 +3279,15 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
   }  
 
+  if (cptr->flags & CS_VERBOSE)
+  {
+    char line[MAXLINE];
+    ircsprintf(line, "%s!%s@%s ACCESS [%s] %s %s %s",
+      lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      StrToupper(av[2]), (ac >= 4) ? av[3] : "", (ac >= 5) ? av[4] : "");
+    chanopsnotice(FindChannel(cptr->name), line);
+  }
+
   cmdptr = GetCommand(accesscmds, av[2]);
 
   if (cmdptr && (cmdptr != (struct Command *) -1))
@@ -4561,6 +4575,79 @@ c_set_private(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     n_ChanServ,
     "SET PRIVATE");
 } /* c_set_private() */
+
+/*
+ * Set verbose mode on channel - code from IrcBg, slightly modified. -kre
+ */
+static void c_set_verbose(struct Luser *lptr, struct NickInfo *nptr, int
+    ac, char **av)
+{
+  struct ChanInfo *cptr;
+
+  if (!(cptr = FindChan(av[1])))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET [%s] VERBOSE %s",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+    (ac < 4) ? "" : StrToupper(av[3]));
+
+  if (ac < 4)
+  {
+    notice(n_ChanServ, lptr->nick,
+      "Verbose for channel %s is [\002%s\002]",
+      cptr->name,
+      (cptr->flags & CS_VERBOSE) ? "ON" : "OFF");
+    return;
+  }
+
+  if (!irccmp(av[3], "ON"))
+  {
+    cptr->flags |= CS_VERBOSE;
+    notice(n_ChanServ, lptr->nick,
+      "Toggled Verbose for channel %s [\002ON\002]",
+      cptr->name);
+    return;
+  }
+
+  if (!irccmp(av[3], "OFF"))
+  {
+    cptr->flags &= ~CS_VERBOSE;
+    notice(n_ChanServ, lptr->nick,
+      "Toggled Verbose for channel %s [\002OFF\002]",
+      cptr->name);
+    return;
+  }
+
+  /* user gave an unknown param */
+  notice(n_ChanServ, lptr->nick,
+    "Syntax: \002SET <channel> VERBOSE {ON|OFF}\002");
+  notice(n_ChanServ, lptr->nick,
+    ERR_MORE_INFO, n_ChanServ, "SET VERBOSE");
+
+} /* c_set_verbose() */
+
+/*
+ * Notice channel ops on message when set verbose is on. Code from IrcBg.
+ * -kre
+ */
+void chanopsnotice(struct Channel *cptr, char* msg )
+{
+  struct ChannelUser *tempuser;
+
+  if (!cptr)
+    return;
+
+  for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
+  {
+    if (IsChannelOp(cptr, tempuser->lptr))
+    {
+       if (FindService(tempuser->lptr))
+          continue;
+
+       notice(n_ChanServ, tempuser->lptr->nick, msg);
+    }
+  }
+}
 
 static void
 c_set_secure(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
@@ -6334,6 +6421,8 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(buf, "NoExpire, ");
   if (cptr->flags & CS_SPLITOPS)
     strcat(buf, "SplitOps, ");
+  if (cptr->flags & CS_VERBOSE)
+    strcat(buf, "Verbose, ");
 
   if (*buf)
   {
@@ -7174,6 +7263,29 @@ c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     n_ChanServ,
     "NOEXPIRE");
 } /* c_noexpire() */
+
+
+/*
+ * Clears noexpire modes setup on channels. Code taken from IrcBg and
+ * slightly modified. -kre
+ */
+void c_clearnoexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
+    char **av)
+{
+  int ii;
+  struct ChanInfo *cptr;
+
+  RecordCommand("%s: %s!%s@%s CLEARNOEXP",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+
+  for (ii = 0; ii < CHANLIST_MAX; ii++)
+    for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
+        cptr->flags &= ~CS_NOEXPIRE;
+
+  notice(n_ChanServ, lptr->nick,
+      "All noexpire flags are cleared." );
+
+} /* c_clearnoexpire() */
 
 #endif /* EMPOWERADMINS */
 

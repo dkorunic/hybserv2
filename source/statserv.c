@@ -47,6 +47,8 @@ static void ss_refresh(struct Luser *, int, char **);
 static void ss_clearstats(struct Luser *, int, char **);
 static void ss_showstats(struct Luser *, int, char **);
 static void ss_greplog(struct Luser *, int, char **);
+static void ss_showadmins(struct Luser *, int, char **);
+static void ss_showopers(struct Luser *, int, char **);
 
 #ifdef SPLIT_INFO
 static void ss_splitinfo(struct Luser *, int, char **);  
@@ -61,6 +63,8 @@ static struct Command statcmds[] = {
   { "SERVER", ss_server, LVL_NONE },
   { "STATS", ss_stats, LVL_NONE },
   { "HELP", ss_help, LVL_NONE },
+  { "SHOWADMINS", ss_showadmins, LVL_NONE },
+  { "SHOWOPERS", ss_showopers, LVL_NONE },
 
   { "REFRESH", ss_refresh, LVL_ADMIN },
   { "CLEARSTATS", ss_clearstats, LVL_ADMIN },
@@ -75,8 +79,8 @@ static struct Command statcmds[] = {
 
 long korectdat( long dat1, int dni);
 int* get_tg( int year, int *days );
-int gnw[]={31,28,31,30,31,30,31,31,30,31,30,31,31};
-int gw[] = { 31,29,31,30,31,30,31,31,30,31,30,31,31 };
+int gnw[] = {31,28,31,30,31,30,31,31,30,31,30,31,31};
+int gw[] = {31,29,31,30,31,30,31,31,30,31,30,31,31};
 
 /* This is _wrong_! We do have LogFile, so I've corrected mistakes in code
  * that is down, too -kre */
@@ -1595,5 +1599,54 @@ static void ss_splitinfo(struct Luser *lptr, int ac, char **av)
 }
 
 #endif /* SPLIT_INFO */
+
+
+/*
+ * Show services adminstrators. Code from IrcBg, slightly modified. -kre
+ */
+static void ss_showadmins(struct Luser *lptr, int ac, char **av)
+{
+  int iCnt = 0;
+  struct Luser *tempuser, *next;
+
+  RecordCommand("%s: %s!%s@%s SHOWADMINS",
+    n_StatServ, lptr->nick, lptr->username, lptr->hostname);
+
+  notice(n_StatServ, lptr->nick, "Currently online services admins");
+  notice(n_StatServ, lptr->nick, "--------------------------------");
+
+  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+  {
+    if (IsValidAdmin(tempuser))
+      notice(n_StatServ, lptr->nick , "[%d] %s", ++iCnt,tempuser->nick );
+  }
+
+  notice(n_StatServ, lptr->nick, "--------------------------------");
+  notice(n_StatServ, lptr->nick, " %d admins online.", iCnt);
+}
+
+/*
+ * Show operators. Code from IrcBg, slightly modified. -kre
+ */
+static void ss_showopers(struct Luser *lptr, int ac, char **av)
+{
+  int iCnt = 0;
+  struct Luser *tempuser, *next;
+
+  RecordCommand("%s: %s!%s@%s SHOWOPERS",
+    n_StatServ, lptr->nick, lptr->username, lptr->hostname);
+
+  notice(n_StatServ, lptr->nick, "Currently online irc operators");
+  notice(n_StatServ, lptr->nick, "-------------------------------");
+
+  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+  {
+    if (IsOperator(tempuser))
+      notice(n_StatServ, lptr->nick , "[%d] %s", ++iCnt,tempuser->nick );
+  }
+
+  notice(n_StatServ, lptr->nick, "-------------------------------");
+  notice(n_StatServ, lptr->nick, " %d operators online.", iCnt);
+}
 
 #endif /* STATSERVICES */

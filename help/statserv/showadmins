@@ -1,0 +1,4 @@
+Syntax: %bSHOWADMINS%b
+
+ Displays number of Services admins
+and their nicknames.

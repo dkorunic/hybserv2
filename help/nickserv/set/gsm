@@ -1,0 +1,12 @@
+Syntax: %bSET GSM <GSM number|->%b
+
+Sets the your GSM number to <GSM number>. When users perform 
+an %bINFO%b on your nickname, they will be informed of 
+your GSM number, unless you set %bHIDE%b ON. 
+To clear your GSM number use a "-" as the parameter.
+Examples:
+         %b/msg %N SET GSM +385 91 1234567%b
+           Sets your GSM to "+385 91 1234567".
+
+         %b/msg %N SET GSM -%b
+           Clears your GSM number.

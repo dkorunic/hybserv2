@@ -89,6 +89,10 @@ struct NickInfo
   char *email;               /* email address */
   char *url;                 /* url */
 
+  char *gsm;                 /* GSM number */
+  char *phone;               /* Phone */
+  long UIN;                  /* ICQ UIN */
+
   char *lastu;               /* last seen username */
   char *lasth;               /* last seen hostname */
   char *lastqmsg;            /* last quit message */

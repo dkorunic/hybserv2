@@ -1,0 +1,4 @@
+Syntax: %bSHOWOPERS%b
+
+ Displays number of IRC operators and their
+nicknames.

@@ -29,3 +29,4 @@ For more information on a specific command, type
 %+a    DROPLINK   Drop an entire nickname link
 %+a    COLLIDE    Manipulate nickname collision list
 %+a    FLAG       Set flags to limit a user's privileges
+%+a    CLEARNOEXP Clear all noexpire flags for nicks

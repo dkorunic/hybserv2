@@ -41,6 +41,8 @@ struct Channel;
 #define CS_NOEXPIRE     0x00000200 /* never expires */
 #define CS_GUARD        0x00000400 /* have ChanServ join the channel */
 #define CS_SPLITOPS     0x00000800 /* let people keep ops from splits */
+#define CS_VERBOSE      0x00001000 /* notify chanops for access changes */
+
 
 /* access_lvl[] indices */
 /* We will happily FUBAR old databases by changing this. However, it had

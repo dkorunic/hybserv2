@@ -31,3 +31,4 @@ For more information on a specific command, type
 %+a    STATUS     View a user's access level on a channel
 %+a    FORGET     Prevent a channel from being registered
 %+a    NOEXPIRE   Prevent a channel from expiring
+%+a    CLEARNOEXP Clear all noexpire flags for channels

@@ -2426,27 +2426,27 @@ DeleteChan(struct ChanInfo *chanptr)
 } /* DeleteChan() */
 
 /*
-AddAccess()
-  Add 'mask' or 'nptr' to the access list for 'chanptr' with 'level'
-Return 1 if successful, 0 if not
-*/
-
-static int
-AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char *mask,
-          struct NickInfo *nptr, int level)
-
+ * AddAccess()
+ * Add 'mask' or 'nptr' to the access list for 'chanptr' with 'level'
+ * Return 1 if successful, 0 if not
+ *
+ * rewrote this to use master nicknames for access inheritance -kre
+ */
+static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
+    *mask, struct NickInfo *nptr, int level)
 {
   struct ChanAccess *ptr;
+  struct NickInfo *master_nptr;
 
   if (!chanptr || (!mask && !nptr))
     return 0;
+  
+  /* get master */
+  master_nptr = GetMaster(nptr);
 
-  if ((ptr = OnAccessList(chanptr, mask, nptr)))
+  if ((ptr = OnAccessList(chanptr, mask, master_nptr)))
   {
-    /*
-     * 'mask' is already on the access list - just change the
-     * level
-     */
+    /* 'mask' is already on the access list - just change the level */
     if (lptr)
       if (GetAccess(chanptr, lptr) <= ptr->level)
         return 0;
@@ -2458,17 +2458,15 @@ AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char *mask,
   ptr = (struct ChanAccess *) MyMalloc(sizeof(struct ChanAccess));
   memset(ptr, 0, sizeof(struct ChanAccess));
 
-  if (nptr)
+  if (master_nptr)
   {
-    ptr->nptr = nptr;
+    ptr->nptr = master_nptr;
     ptr->hostmask = NULL;
 
-    /*
-     * We also want the NickInfo structure to keep records
-     * of what channels it has access on, so if we ever delete
-     * the nick, we will know where to remove it's access.
-     */
-    ptr->acptr = AddAccessChannel(nptr, chanptr, ptr);
+    /* We also want the NickInfo structure to keep records of what
+     * channels it has access on, so if we ever delete the nick, we will
+     * know where to remove it's access. */
+    ptr->acptr = AddAccessChannel(master_nptr, chanptr, ptr);
   }
   else
     ptr->hostmask = MyStrdup(mask);
@@ -2486,19 +2484,19 @@ AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char *mask,
 } /* AddAccess() */
 
 /*
-DelAccess()
-  Delete 'mask' from cptr's access list
-Return -1 if 'mask' has a higher user level than lptr, otherwise
-the number of matches
-*/
-
-static int
-DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char *mask,
-          struct NickInfo *nptr)
-
+ * DelAccess()
+ * Delete 'mask' from cptr's access list
+ * Return -1 if 'mask' has a higher user level than lptr, otherwise
+ * the number of matches
+ *
+ * rewrote using master nicks -kre
+ */
+static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
+    *mask, struct NickInfo *nptr)
 {
-  struct ChanAccess *temp, *next;
-  int ret, cnt, ulev;
+  struct ChanAccess *temp;
+  struct NickInfo *master_nptr;
+  int ret = 0, cnt = 0, ulev;
   int found;
 
   if (!cptr || !lptr || (!mask && !nptr))
@@ -2507,17 +2505,15 @@ DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char *mask,
   if (!cptr->access)
     return 0;
 
+  master_nptr = GetMaster(nptr);
+
   ulev = GetAccess(cptr, lptr);
-  ret = 0;
-  cnt = 0;
 
-  for (temp = cptr->access; temp; temp = next)
+  for (temp = cptr->access; temp; temp = temp->next)
   {
-    next = temp->next;
-
     found = 0;
 
-    if (nptr && temp->nptr && (nptr == temp->nptr))
+    if (master_nptr && temp->nptr && (master_nptr == temp->nptr))
       found = 1;
 
     if (mask && temp->hostmask)
@@ -2526,24 +2522,20 @@ DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char *mask,
 
     if (found)
     {
-        /*
-        * don't let lptr->nick delete a hostmask that has a
-        * >= level than it does
-        */
+     /* don't let lptr->nick delete a hostmask that has a >= level than it
+      * does */
       if (temp->level >= ulev)
       {
-        ret = (-1);
+        ret = -1;
         continue;
       }
 
       ++cnt;
 
-      /*
-       * nptr will have an AccessChannel entry which is set to 'temp',
-       * so it must be deleted
-       */
-      if (nptr && temp->acptr)
-        DeleteAccessChannel(nptr, temp->acptr);
+      /* master_nptr will have an AccessChannel entry which is set to
+       * 'temp', so it must be deleted */
+      if (master_nptr && temp->acptr)
+        DeleteAccessChannel(master_nptr, temp->acptr);
 
       DeleteAccess(cptr, temp);
     } /* if (found) */
@@ -2556,13 +2548,10 @@ DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char *mask,
 } /* DelAccess() */
 
 /*
-DeleteAccess()
- Free the ChanAccess structure 'ptr'
-*/
-
-void
-DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
-
+ * DeleteAccess()
+ * Free the ChanAccess structure 'ptr'
+ */
+void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
 {
   assert(cptr && ptr);
 
@@ -2578,14 +2567,11 @@ DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
 } /* DeleteAccess() */
 
 /*
-AddAkick()
-  Add 'mask' to 'chanptr' 's autokick list
-*/
-
-static int
-AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char *mask,
-         char *reason)
-
+ * AddAkick()
+ * Add 'mask' to 'chanptr' 's autokick list
+ */
+static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
+    *mask, char *reason)
 {
   struct AutoKick *ptr;
 

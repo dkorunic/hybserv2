@@ -3959,17 +3959,22 @@ n_info(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr, *realptr, *tmpnick;
   struct Luser *userptr;
-  int online, isadmin, isowner;
+  int online = 0, isadmin = 0, isowner = 0;
 
+  /* find about nick who issued the request */
+  if (!(tmpnick = FindNick(lptr->nick)))
+  {
+    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
+    return;
+  }
+
+  /* if there is less than 2 arguments, target is requester itself */
   if (ac < 2)
   {
-    if (!(realptr = FindNick(lptr->nick)))
-    {
-      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
-      return;
-    }
+    realptr = tmpnick;
   }
   else
+    /* no, target is av[1] */
     if (!(realptr = FindNick(av[1])))
     {
       notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
@@ -3984,9 +3989,8 @@ n_info(struct Luser *lptr, int ac, char **av)
     realptr->nick);
 
   isadmin = IsValidAdmin(lptr);
-  tmpnick = FindNick(lptr->nick);
-  isowner = (nptr == GetMaster(tmpnick)) &&
-    (realptr->flags & NS_IDENTIFIED);
+  isowner = ((nptr == GetMaster(tmpnick)) &&
+      (tmpnick->flags & NS_IDENTIFIED));
 
   if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
       !isowner
@@ -4005,7 +4009,6 @@ n_info(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  online = 0;
   if ((userptr = FindClient(realptr->nick)))
     if (realptr->flags & NS_IDENTIFIED)
       online = 1;
@@ -4118,14 +4121,12 @@ n_info(struct Luser *lptr, int ac, char **av)
       cnt = 0;
 
       notice(n_NickServ, lptr->nick,
-        "   Linked Nicknames:");
+        "   Linked Nicknames (first is master):");
 
-      for (tmp = nptr->master ? nptr->master : nptr; tmp; tmp = tmp->nextlink)
+      for (tmp = GetMaster(nptr); tmp; tmp = tmp->nextlink)
       {
         notice(n_NickServ, lptr->nick,
-          "                     %d) %s",
-          ++cnt,
-          tmp->nick);
+          "                     %d) %s", ++cnt, tmp->nick);
       }
     }
 

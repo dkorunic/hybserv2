@@ -18,6 +18,8 @@ Pending bugs:
 *) save services ignores
 *) stuff from tools/* like encryptconf, encryptdb and doencrypt still do
    not support MD5
+*) add flag for keeping other people's channel/nick status when
+   reconnecting - i find it annonying to look at forced synching
 
 
 Features to come:
@@ -56,6 +58,7 @@ Features to come:
 
 Done so far:
 ------------
+*) design chanaccesslists inheritance for linked nicknames
 *) fix chan_access to get along with linked nicknames!
 *) n_info doesn't show linked nicknames for non-master
 *) EMERGENCY:

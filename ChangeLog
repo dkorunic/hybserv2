@@ -1,3 +1,8 @@
+*** 20020427_1 by kreator
+return nullify back in myfree :-( seems various parts of hybserv code
+require it - i have to carefully review them again.
+
+
 *** 20020421_2 by kreator
 - add adx wishlist
 - fix damn dccnext bug (boot next user -> crash)

@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
   else
   {
     pid_t mypid;
-    fscanf(pidfile, "%lu\n", &mypid);
+    fscanf(pidfile, "%u\n", &mypid);
     fclose(pidfile);
     if (!kill(mypid, 0))
     {
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
     putlog(LOG1, "Unable to open %s", PidFile);
   else
   {
-    fprintf(pidfile, "%lu\n", getpid());
+    fprintf(pidfile, "%u\n", getpid());
     fclose(pidfile);
   }
 

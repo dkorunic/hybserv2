@@ -1,3 +1,9 @@
+*** 20010601_1 by kreator
+- added fixlevel script for fixing broken ALVL entries which will appear
+  for all people using older chan.db-s with newer sources
+- remove that code from Makefile
+
+
 *** 20010530_1 by kreator
 - fix small bug in data.c for saving forbidded nickname's passwords
 

@@ -149,7 +149,7 @@ ms_process(char *nick, char *command)
 
   if (nptr)
     {
-      if (nptr->flags & NS_FORBID)
+      if (master->flags & NS_FORBID)
         {
           notice(n_MemoServ, lptr->nick,
                  "Cannot execute commands for forbidden nicknames");

@@ -319,7 +319,7 @@ void cs_process(char *nick, char *command)
   char **arv;
   struct Command *cptr;
   struct Luser *lptr;
-  struct NickInfo *nptr;
+  struct NickInfo *nptr, *realptr;
   struct ChanInfo *chptr;
 
   if (!command || !(lptr = FindClient(nick)))
@@ -351,7 +351,10 @@ void cs_process(char *nick, char *command)
       return;
     }
 
-  if ((!(nptr = FindNick(lptr->nick))) &&
+  nptr = FindNick(lptr->nick);
+  realptr = GetMaster(nptr);
+
+  if ((nptr == NULL) &&
       (cptr->level != LVL_NONE))
     {
       /* the command requires a registered nickname */
@@ -381,7 +384,7 @@ void cs_process(char *nick, char *command)
 
   if (nptr)
     {
-      if (nptr->flags & NS_FORBID)
+      if (realptr->flags & NS_FORBID)
         {
           notice(n_ChanServ, lptr->nick,
                  "Cannot execute commands for forbidden nicknames");

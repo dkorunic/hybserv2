@@ -295,7 +295,7 @@ DisplayNick(struct NickInfo *realptr, int detail)
         strcat(buf, "AutoMask, ");
       if (nptr->flags & NS_PRIVATE)
         strcat(buf, "Private, ");
-      if (nptr->flags & NS_FORBID)
+      if (realptr->flags & NS_FORBID)
         strcat(buf, "Forbidden, ");
       if (nptr->flags & NS_SECURE)
         strcat(buf, "Secure, ");

@@ -221,7 +221,7 @@ void ns_process(const char *nick, char *command)
   char **arv;
   struct Command *cptr;
   struct Luser *lptr;
-  struct NickInfo *nptr;
+  struct NickInfo *nptr, *realptr;
 
   if (!command)
     return;
@@ -275,8 +275,12 @@ void ns_process(const char *nick, char *command)
    * would tell us if the master of the link is identified,
    * not necessarily this specific nickname
    */
-  if ((nptr = FindNick(lptr->nick)))
-    if (nptr->flags & NS_FORBID)
+
+  nptr = FindNick(lptr->nick);
+  realptr = GetMaster(nptr);
+
+  if (nptr)
+    if (realptr->flags & NS_FORBID)
       {
         notice(n_NickServ, lptr->nick,
                "Cannot execute commands for forbidden nicknames");
@@ -286,7 +290,7 @@ void ns_process(const char *nick, char *command)
 
   if (cptr->level != LVL_NONE)
     {
-      if (!nptr)
+      if (nptr == NULL)
         {
           notice(n_NickServ, lptr->nick,
                  "You must register your nick with \002%s\002 first",
@@ -334,7 +338,7 @@ ns_loaddata()
   char *keyword;
   int ac, ret = 1, cnt;
   int islink;
-  struct NickInfo *nptr = NULL;
+  struct NickInfo *nptr = NULL, *realptr;
 
   if (!(fp = fopen(NickServDB, "r")))
     {
@@ -573,7 +577,9 @@ ns_loaddata()
         {
           if (nptr)
             {
-              if (!nptr->password && !(nptr->flags & NS_FORBID))
+              realptr = GetMaster(nptr);
+
+              if (!nptr->password && !(realptr->flags & NS_FORBID))
                 {
                   /* the previous nick didn't have a PASS line */
                   fatal(1,
@@ -584,7 +590,7 @@ ns_loaddata()
                   ret = -2;
                 }
 
-              if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
+              if (!nptr->hosts && !(realptr->flags & NS_FORBID) && !islink)
                 {
                   /* the previous nick didn't have a HOST line */
                   fatal(1, "%s:%d No hostname entry for registered nick [%s]",
@@ -669,9 +675,11 @@ ns_loaddata()
    */
   if (nptr)
     {
-      if ((nptr->password) || (nptr->flags & NS_FORBID))
+      realptr = GetMaster(nptr);
+
+      if ((nptr->password) || (realptr->flags & NS_FORBID))
         {
-          if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
+          if (!nptr->hosts && !(realptr->flags & NS_FORBID) && !islink)
             {
               fatal(1, "%s:%d No hostname entry for registered nick [%s]",
                     NickServDB,
@@ -688,7 +696,7 @@ ns_loaddata()
         }
       else
         {
-          if (!nptr->password && !(nptr->flags & NS_FORBID))
+          if (!nptr->password && !(realptr->flags & NS_FORBID))
             {
               fatal(1, "%s:%d No password entry for registered nick [%s] (FATAL)",
                     NickServDB,
@@ -1101,6 +1109,7 @@ CheckNick(char *nickname)
 
   realptr = FindNick(nickname);
   nptr = GetMaster(realptr);
+
   if (!realptr || !nptr)
     return 0; /* nickname is not registered */
 
@@ -1838,7 +1847,7 @@ int IsLinked(struct NickInfo *nick1, struct NickInfo *nick2)
  */
 struct NickInfo *GetMaster(struct NickInfo *nptr)
   {
-    if (!nptr)
+    if (nptr == NULL)
       return (NULL);
 
 #ifdef LINKED_NICKNAMES
@@ -4241,7 +4250,7 @@ n_info(struct Luser *lptr, int ac, char **av)
         strcat(buf, "AutoMask, ");
       if (nptr->flags & NS_PRIVATE)
         strcat(buf, "Private, ");
-      if (nptr->flags & NS_FORBID)
+      if (realptr->flags & NS_FORBID)
         strcat(buf, "Forbidden, ");
       if (nptr->flags & NS_SECURE)
         strcat(buf, "Secure, ");
@@ -4352,7 +4361,8 @@ n_link(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *target, /* target nickname */
-        *nptr; /* lptr's nick structure */
+        *nptr, /* lptr's nick structure */
+        *realptr;
   int badlink,
   ret;
 
@@ -4364,7 +4374,10 @@ n_link(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-  if (!(target = FindNick(av[1])))
+  target = FindNick(av[1]);
+  realptr = GetMaster(target);
+
+  if (target == NULL)
     {
       notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
       return;
@@ -4379,7 +4392,7 @@ n_link(struct Luser *lptr, int ac, char **av)
              lptr->nick);
       badlink = 1;
     }
-  else if (target->flags & NS_FORBID)
+  else if (realptr->flags & NS_FORBID)
     {
       notice(n_NickServ, lptr->nick,
              "The nickname [\002%s\002] is forbidden",
@@ -4549,31 +4562,25 @@ static void
 n_forbid(struct Luser *lptr, int ac, char **av)
 
 {
-  struct NickInfo *nptr;
+  struct NickInfo *nptr, *realptr;
 
   if (ac < 2)
     {
       notice(n_NickServ, lptr->nick,
              "Syntax: \002FORBID <nickname>\002");
-      notice(n_NickServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_NickServ,
-             "FORBID");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "FORBID");
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s FORBID [%s]",
-                n_NickServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1]);
+  RecordCommand("%s: %s!%s@%s FORBID [%s]", n_NickServ, lptr->nick,
+      lptr->username, lptr->hostname, av[1]);
 
-  o_Wallops("FORBID from %s for nick [%s]",
-            lptr->nick,
-            av[1]);
+  o_Wallops("FORBID from %s for nick [%s]", lptr->nick, av[1]);
 
-  if (!(nptr = FindNick(av[1])))
+  nptr = FindNick(av[1]);
+  realptr = GetMaster(nptr);
+
+  if (nptr == NULL)
     {
       /* nick is not registered - do so now; add nick to nick table */
 
@@ -4587,7 +4594,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
     {
       /* the nickname is already registered */
 
-      if (nptr->flags & NS_FORBID)
+      if (realptr->flags & NS_FORBID)
         {
           notice(n_NickServ, lptr->nick,
                  "The nickname [\002%s\002] is already forbidden",
@@ -4595,7 +4602,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
           return;
         }
 
-      nptr->flags |= NS_FORBID;
+      realptr->flags |= NS_FORBID;
       nptr->flags &= ~NS_IDENTIFIED;
     }
 
@@ -4618,7 +4625,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 static void
 n_unforbid(struct Luser *lptr, int ac, char **av)
 {
-  struct NickInfo *nptr;
+  struct NickInfo *nptr, *realptr;
 
   if (ac < 2)
     {
@@ -4629,16 +4636,19 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
-                n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
-
-  o_Wallops("UNFORBID from %s for nick [%s]", lptr->nick, av[1]);
-
-  if (!(nptr = FindNick(av[1])))
+  nptr = FindNick(av[1]);
+  realptr = GetMaster(nptr);
+  
+  if (nptr == NULL)
     {
       notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
       return;
     }
+
+  RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+  o_Wallops("UNFORBID from %s for nick [%s]", lptr->nick, av[1]);
 
   if (!nptr->password)
     {
@@ -4651,7 +4661,7 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
     }
   else
     {
-      nptr->flags &= ~NS_FORBID;
+      realptr->flags &= ~NS_FORBID;
 
       notice(n_NickServ, lptr->nick,
              "Nickname [\002%s\002] is now unforbidden", av[1]);

@@ -1,3 +1,9 @@
+*** 20030405_2 by kreator
+- fix service notices
+- fix grave bug with master nicknames expiring while slaves
+  were normally used :(
+
+
 *** 20030405_1 by root
 
 *** 20030210_1 by kreator

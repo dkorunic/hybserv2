@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
 #include "alloc.h"
 #include "channel.h"
@@ -1610,7 +1611,8 @@ s_sjoin(int ac, char **av)
         */
        modes[MAXLINE];
   char **line,
-       **nicks; /* array of SJOINing nicknames */
+       **nicks, /* array of SJOINing nicknames */
+       *oldnick;
   time_t CurrTime; /* current TS if its a new channel */
   struct Channel *cptr, *oldptr;
   int ncnt, /* number of SJOINing nicks */
@@ -1735,6 +1737,10 @@ s_sjoin(int ac, char **av)
   } /* if (*av[3] == '0') */
 
   oldptr = FindChannel(av[3]);
+  oldnick = GetNick(nicks[0]);
+  assert(oldnick != NULL); /* We should always know at least _first_
+                              nickname from list, since there would be no
+                              sjoin otherwise -kre */
 
   if (SafeConnect)
   {
@@ -1746,12 +1752,12 @@ s_sjoin(int ac, char **av)
       SendUmode(OPERUMODE_J,
         "*** New channel: %s (created by %s)",
         av[3],
-        GetNick(nicks[0]));
+        oldnick);
     } /* if (!oldptr) */
     else
       SendUmode(OPERUMODE_J,
         "*** Channel join: %s (%s)",
-        GetNick(nicks[0]),
+        oldnick,
         oldptr->name);
   }
 

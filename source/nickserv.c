@@ -3542,10 +3542,22 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr;
   char str[MAXLINE];
-  int flag;
+  int flag = 0;
 
   if (!(nptr = GetLink(lptr->nick)))
     return;
+
+  /* Check arguments first .. */
+  if (ac < 3)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
+    notice(n_NickServ, lptr->nick,
+      ERR_MORE_INFO,
+      n_NickServ,
+      "SET HIDE");
+    return;
+  }
 
   if (ac >= 3)
     strcpy(str, StrToupper(av[2]));
@@ -3558,18 +3570,6 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
     str, /* can't have 2 StrToupper()'s in the same stmt (static) */
     (ac < 4) ? "" : StrToupper(av[3]));
 
-  if (ac < 3)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002SET HIDE {ALL|EMAIL|URL|QUIT} {ON|OFF}\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_NickServ,
-      "SET HIDE");
-    return;
-  }
-
-  flag = 0;
   if (!ircncmp(av[2], "ALL", strlen(av[2])))
   {
     flag = NS_HIDEALL;
@@ -3596,20 +3596,21 @@ n_set_hide(struct Luser *lptr, int ac, char **av)
     strcpy(str, "Hide Address");
   }
 
+  /* order this properly */
+  if (!flag)
+  {
+    notice(n_NickServ, lptr->nick,
+      "Unknown switch [%s]",
+      av[2]);
+    return;
+  }
+
   if (ac < 4)
   {
     notice(n_NickServ, lptr->nick,
       "%s for your nickname is [\002%s\002]",
       str,
       (nptr->flags & flag) ? "ON" : "OFF");
-    return;
-  }
-
-  if (!flag)
-  {
-    notice(n_NickServ, lptr->nick,
-      "Unknown switch [%s]",
-      av[2]);
     return;
   }
 
@@ -4093,41 +4094,35 @@ n_info(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *nptr, *realptr;
   struct Luser *userptr;
-  int online,
-      isadmin;
+  int online, isadmin, isowner;
 
   if (ac < 2)
   {
-    notice(n_NickServ, lptr->nick,
-      "Syntax: \002INFO <nickname>\002");
-    notice(n_NickServ, lptr->nick,
-      ERR_MORE_INFO, 
-      n_NickServ,
-      "INFO");
-    return;
+    if (!(realptr = FindNick(lptr->nick)))
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
+      return;
+    }
   }
-
-  if (!(realptr = FindNick(av[1])))
-  {
-    notice(n_NickServ, lptr->nick,
-      ERR_NOT_REGGED,
-      av[1]);
-    return;
-  }
+  else
+    if (!(realptr = FindNick(av[1])))
+    {
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+      return;
+    }
 
   if (!(nptr = GetMaster(realptr)))
     return;
 
   RecordCommand("%s: %s!%s@%s INFO %s",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname,
     realptr->nick);
 
   isadmin = IsValidAdmin(lptr);
+  isowner = (nptr == GetMaster(lptr->nick));
 
-  if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID))
+  if (((nptr->flags & NS_PRIVATE) || (nptr->flags & NS_FORBID)) &&
+      !isowner
   #ifdef EMPOWERADMINS
     && !isadmin)
   #else
@@ -4138,10 +4133,7 @@ n_info(struct Luser *lptr, int ac, char **av)
       "The nickname [\002%s\002] is private",
       realptr->nick);
     RecordCommand("%s: %s!%s@%s failed INFO %s",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
+      n_NickServ, lptr->nick, lptr->username, lptr->hostname,
       realptr->nick);
     return;
   }
@@ -4165,32 +4157,32 @@ n_info(struct Luser *lptr, int ac, char **av)
       "          Last Seen: %s ago",
       timeago(realptr->lastseen, 1));
 
-  if (!(nptr->flags & NS_HIDEALL) || isadmin)
+  if (!(nptr->flags & NS_HIDEALL) || isadmin || isowner)
   {
     char buf[MAXLINE];
 
     if (LastSeenInfo)
     {
-      if (!(nptr->flags & NS_HIDEADDR) || isadmin)
+      if (!(nptr->flags & NS_HIDEADDR) || isadmin || isowner)
         if (!online && realptr->lastu && realptr->lasth)
           notice(n_NickServ, lptr->nick,
             "  Last Seen Address: %s@%s",
             realptr->lastu,
             realptr->lasth);
 
-      if (!(nptr->flags & NS_HIDEQUIT) || isadmin)
+      if (!(nptr->flags & NS_HIDEQUIT) || isadmin || isowner)
         if (realptr->lastqmsg)
           notice(n_NickServ, lptr->nick,
             " Last Seen Quit Msg: %s",
             realptr->lastqmsg);
     } /* if (LastSeenInfo) */
 
-    if (!(nptr->flags & NS_HIDEEMAIL) || isadmin)
+    if (!(nptr->flags & NS_HIDEEMAIL) || isadmin || isowner)
       if (realptr->email)
         notice(n_NickServ, lptr->nick,
           "      Email Address: %s", realptr->email);
 
-    if (!(nptr->flags & NS_HIDEURL) || isadmin)
+    if (!(nptr->flags & NS_HIDEURL) || isadmin || isowner)
       if (realptr->url)
         notice(n_NickServ, lptr->nick,
           "                URL: %s", realptr->url);
@@ -4241,7 +4233,7 @@ n_info(struct Luser *lptr, int ac, char **av)
     }
   }
 
-  if (isadmin)
+  if (isadmin || isowner)
   {
     int cnt;
 
@@ -4316,7 +4308,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   #endif /* CHANNELSERVICES */
 
-  } /* if (isadmin) */
+  } /* if (isadmin || isowner) */
 } /* n_info() */
 
 #ifdef LINKED_NICKNAMES

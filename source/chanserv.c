@@ -5897,8 +5897,6 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     if (HasFlag(lptr->nick, NS_NOCHANOPS))
       return;
 
-    onicks = MyStrdup(lptr->nick);
-    dnicks = MyStrdup("");
     if (!IsChannelMember(chptr, lptr))
     {
       notice(n_ChanServ, lptr->nick,
@@ -5913,6 +5911,9 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         "You are already opped on [\002%s\002]", cptr->name);
       return;
     }
+
+    onicks = MyStrdup(lptr->nick);
+    dnicks = MyStrdup("");
 
   }
   else
@@ -6363,6 +6364,7 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   }
 
   if (((cptr->flags & CS_PRIVATE) || (cptr->flags & (CS_FORBID | CS_FORGET)))
+      && !IsFounder(lptr, cptr)
   #ifdef EMPOWERADMINS
       && !IsValidAdmin(lptr))
   #else

@@ -321,6 +321,9 @@ ReloadData()
   if (os_loaddata() == (-2))
     return 0;
 
+  if (ignore_loaddata() == (-2))
+    return 0;
+
   return 1;
 } /* ReloadData() */
 
@@ -469,6 +472,10 @@ WriteDatabases()
   if (!WriteOpers())
     return (0);
 
+  
+  if (FloodProtection && !WriteIgnores())
+    return (0);
+
 #ifdef STATSERVICES
 
   if (!WriteStats())
@@ -575,6 +582,38 @@ WriteOpers()
 
   return 1;
 } /* WriteOpers() */
+
+/*
+ * Name:      WriteIgnores()
+ * Operation: Write OperServ ignore data to disk.
+ * Format:    mask timeout
+ * Return:    1 on success, 0 on failure
+ */
+int WriteIgnores()
+{
+  FILE *fp;
+  char tempname[MAXLINE];
+  struct Ignore *temp;
+
+  ircsprintf(tempname, "%s.tmp", OperServIgnoreDB);
+  fp = CreateDatabase(tempname, "OperServ Ignore Database");
+  if (!fp)
+  {
+    putlog(LOG1, "Error writing OperServ ignore Database (%s): %s",
+        OperServIgnoreDB, strerror(errno));
+    return 0;
+  }
+  
+  for (temp = IgnoreList; temp; temp = temp->next)
+  {
+    fprintf(fp, "%s %ld\n", temp->hostmask, temp->expire);
+  }
+  
+  fclose(fp);
+  rename(tempname, OperServIgnoreDB);
+  putlog(LOG3, "Wrote %s", OperServIgnoreDB);
+  return 1;
+} /* WriteIgnores() */
 
 #ifdef STATSERVICES
 
@@ -1086,6 +1125,15 @@ LoadData()
               OperServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              OperServDB);
+      exit(1);
+    }
+
+  if (ignore_loaddata() == (-2))
+    {
+      fprintf(stderr, "Fatal errors parsing database (%s)\n",
+              OperServIgnoreDB);
+      putlog(LOG1, "Fatal errors parsing database (%s)",
+             OperServIgnoreDB);
       exit(1);
     }
 

@@ -46,6 +46,7 @@
 #include "sock.h"
 #include "timer.h"
 #include "sprintf_irc.h"
+#include "init.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>

@@ -49,6 +49,7 @@ char      *ChanServDB;
 char      *MemoServDB;
 char      *StatServDB;
 char      *OperServDB;
+char      *OperServIgnoreDB;
 char      *SeenServDB;
 
 char      *n_OperServ;
@@ -199,6 +200,7 @@ struct Directive directives[] =
       { "MemoServDB", D_NORUNTIME,      { { PARAM_STRING, &MemoServDB } } },
       { "StatServDB", D_NORUNTIME,      { { PARAM_STRING, &StatServDB } } },
       { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
+      { "OperServIgnoreDB", D_NORUNTIME,      { { PARAM_STRING, &OperServIgnoreDB } } },
       { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
 
       /* Pseudo-Client Nicknames/Idents/Descriptions and Options */

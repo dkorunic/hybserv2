@@ -218,6 +218,9 @@ Rehash()
   if (os_loaddata() == (-2))
     RehashError = 1;
 
+  if (ignore_loaddata() == (-2))
+    RehashError = 1;
+
   /*
    * Rehash settings.conf
    */

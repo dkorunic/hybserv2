@@ -665,7 +665,7 @@ os_loaddata()
           fatal(1, "%s:%d Invalid database format (FATAL)",
                 OperServDB,
                 cnt);
-          ret = (-2);
+          ret = -2;
           MyFree(av);
           continue;
         }
@@ -731,6 +731,77 @@ os_loaddata()
 
   return (ret);
 } /* os_loaddata() */
+
+/*
+ * Name:  ignore_loaddata()
+ * Action:  ignore ignores data from OperServIgnoreDB
+ * Return:  1 on success, -1 on recoverable failure, -2 on fatal failure
+ */
+int ignore_loaddata()
+{
+  FILE *fp;
+  char line[MAXLINE], **av;
+  int ac, cnt = 0, ret = 1, found;
+  struct Ignore *temp;
+
+  if (!(fp = fopen(OperServIgnoreDB, "r")))
+    return (-1);
+
+  /* mark all ignores for expire. */
+  for (temp = IgnoreList; temp; temp = temp->next)
+    temp->expire = current_ts;
+
+  while (fgets(line, MAXLINE - 1, fp))
+  {
+    cnt++;
+    found = 0;
+    ac = SplitBuf(line, &av);
+    
+    /* blank line */
+    if (!ac)
+    {
+      MyFree(av);
+      continue;
+    }
+
+    /* comment */
+    if (av[0][0] == ';')
+    {
+      MyFree(av);
+      continue;
+    }
+
+    /* invalid format */
+    if (ac < 2)
+    {
+      fatal(1, "%s:%d Invalid database format (FATAL)",
+          OperServIgnoreDB, cnt);
+      ret = -2;
+      MyFree(av);
+      continue;
+    }
+  
+    for (temp = IgnoreList; temp; temp = temp->next)
+    {
+      if (!irccmp(av[0], temp->hostmask))
+      {
+        temp->expire = atol(av[1]);
+        MyFree(av);
+        found = 1;
+        break;
+      }
+    }
+
+    if (!found)
+    {
+      AddIgnore(av[0], atol(av[1]));
+      MyFree(av);
+    }
+  }
+
+  fclose(fp);
+  return (ret);
+}
 
 /*
 GetoCommand()

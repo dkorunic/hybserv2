@@ -1,3 +1,8 @@
+*** 20010807_2 by kreator
+- took out #error !defined HYBRID_ONLY || !defined IRCNET since it is
+  more-less meaningless and b0rks Comstud
+
+
 *** 20010807_1 by kreator
 - added ADVFLOOD patch from ike with smaller modifications (here follows
   his comment):

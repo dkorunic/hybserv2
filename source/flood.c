@@ -290,7 +290,9 @@ void updateConnectTable(char *user, char *host)
   char togline[UHOSTLEN];
   struct rHost *rhostptr = NULL;
   struct Gline *gptr;
+#if 0
   struct Luser *luserptr = NULL, *prevptr = NULL;
+#endif
 #endif /* ADVFLOOD_GLINE */
 
 #if defined ADVFLOOD_NOTIFY || defined ADVFLOOD_NOTIFY_ALL

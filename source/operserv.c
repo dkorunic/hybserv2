@@ -985,6 +985,8 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
   }
 
+  /* No need here to check ohost or ouser once again, since they are
+   * already checked in os_process() -kre */
   uptr = GetUser(1, onick, ouser, ohost);
   if (!uptr)
     return;

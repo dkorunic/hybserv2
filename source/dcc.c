@@ -1091,11 +1091,14 @@ onctcp(char *nick, char *target, char *msg)
       Me.admin);
 
 #ifdef ADMININFO
-    /* Print active operators that have identified to OperServ -kre */
+    /* Print active operators that have identified to OperServ. This could
+     * be a little performance hit, blah. -kre */
     for (tempuser = UserList; tempuser; tempuser = tempuser->next)
     {
       if ((olptr = FindClient(tempuser->nick)) &&
-          (olptr->flags & L_OSREGISTERED))
+          (olptr->flags & L_OSREGISTERED) &&
+          match(tempuser->hostname, olptr->hostname) &&
+          match(tempuser->username, olptr->username))
       notice(target, nick, "\001VERSION Active operators: %s (%s@%s)\001",
           tempuser->nick, tempuser->username, tempuser->hostname);
     }

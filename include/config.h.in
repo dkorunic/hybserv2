@@ -377,7 +377,8 @@
 
 /*
  * Defining this will produce "Active operators .." output in VERSION
- * reply of any of the services. -kre
+ * reply of any of the services. This could be a little performance hit on
+ * large O line configuration files.. -kre
  */
 
 #define ADMININFO

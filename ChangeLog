@@ -1,3 +1,7 @@
+*** 20010429_7 by kreator
+- fix ugly core that happens for printing level commands
+
+
 *** 20010429_6 by kreator
 - synched with Janos for Hybrid7 +a, +I and +h - reviewed all patches and
   incorporated them into latest cvs. Note: this is quite large update!

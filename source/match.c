@@ -22,8 +22,11 @@
  * Cleanup of collapse and match
  * Moved static calls variable to match
  * Added asserts for null pointers
- * $Id$
  *
+ * Imported from Hybrid7 since original match.c was taken from Hybrid6
+ * -kre
+ *
+ * $Id$
  */
 #include <assert.h>
 #include <string.h> /* strrchr */

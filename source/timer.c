@@ -65,7 +65,7 @@ void *p_CheckSignals()
   int caught;
 
   sigemptyset(&set);
-  sigaddset(&set, SIGINT);
+/*  sigaddset(&set, SIGINT); */
   sigaddset(&set, SIGHUP);
   sigaddset(&set, SIGSEGV);
   sigaddset(&set, SIGBUS);

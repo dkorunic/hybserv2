@@ -79,6 +79,7 @@ ProcessSignal(int sig)
       break;
     }
 
+#if 0
     /* restart services */
     case SIGINT:
     {
@@ -94,6 +95,7 @@ ProcessSignal(int sig)
     #endif
       break;
     }
+#endif
 
     case SIGPIPE:
     {
@@ -253,7 +255,7 @@ InitSignals()
   signal(SIGSEGV, ProcessSignal);
   signal(SIGBUS, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
-  signal(SIGINT, ProcessSignal);
+/*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);
   signal(SIGPIPE, SIG_IGN);
 

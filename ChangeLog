@@ -1,3 +1,7 @@
+*** 20011125_6 by kreator
+- and add it in install target
+
+
 *** 20011125_5 by kreator
 - add finddouble for debugging purposes. read bin/README and source for
   explanation

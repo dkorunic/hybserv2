@@ -1,3 +1,12 @@
+*** 20020902_1 by kreator
+- clear COLLIDE and NUMERIC flag in ns_loaddata()
+- fix other ERR_MUST_CHANGE into ERR_MUST_CHANGE2 when appropriate
+- add forgotten (yeps, my bad) NS_NUMERIC clear in collide()
+- fix 432 numeric send to be in proper 3 variable format
+- move collide check into 30secs resolution
+- fix numeric-collide delay to be 30 sec (obvious)
+
+
 *** 20020901_1 by kreator
 - force nick change via 432 numeric 10 seconds before killing
   nickname (harly)

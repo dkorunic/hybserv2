@@ -1,3 +1,7 @@
+*** 20010923_1 by wcampbel
+.fuckover no longer exists, remove from the DCC help
+
+
 *** 20010921_1 by kreator
 - fix security issue when non-identified users with registered nickname
   could see info on themselves including all channels and all levels

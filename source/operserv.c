@@ -889,9 +889,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
   struct NickInfo *nptr;
 
   va_start(args, format);
-
   vsprintf_irc(finstr, format, args);
-
   va_end(args);
 
   if (sockfd == NODCC)
@@ -1009,9 +1007,7 @@ o_RecordCommand(int sockfd, char *format, ...)
   char buffer[MAXLINE * 2];
 
   va_start(args, format);
-
   vsprintf_irc(buffer, format, args);
-
   va_end(args);
 
   /* log the command */
@@ -1059,9 +1055,7 @@ o_Wallops(char *format, ...)
     return;
 
   va_start(args, format);
-
   vsprintf_irc(buffer, format, args);
-
   va_end(args);
 
   toserv(":%s OPERWALL :%s: %s\n", Me.name, n_OperServ, buffer);

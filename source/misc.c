@@ -198,9 +198,7 @@ debug(char *format, ...)
   char buf[MAXLINE * 2];
 
   va_start(args, format);
-
   vsprintf_irc(buf, format, args);
-
   va_end(args);
 
   /* send the string to +d users */
@@ -223,9 +221,7 @@ fatal(int keepgoing, char *format, ...)
   int oldlev;
 
   va_start(args, format);
-
   vsprintf_irc(buf, format, args);
-
   va_end(args);
 
   /*
@@ -260,9 +256,10 @@ void notice(char *from, char *nick, char *format, ...)
   struct NickInfo *nptr;
   va_list args;
 
-  va_start(args, format);
 
+  va_start(args, format);
   vsprintf_irc(finalstr, format, args);
+  va_end(args);
 
   if (ServerNotices)
     strcpy(who, Me.name);
@@ -275,7 +272,6 @@ void notice(char *from, char *nick, char *format, ...)
   else
     toserv(":%s NOTICE %s :%s\n", who, nick, finalstr);
 
-  va_end(args);
 } /* notice() */
 
 /*

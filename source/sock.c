@@ -178,9 +178,7 @@ toserv(char *format, ...)
     return;
 
   va_start(args, format);
-
   vsprintf_irc(buf, format, args);
-
   va_end(args);
 
   /* send the string to the server */

@@ -4274,16 +4274,14 @@ n_info(struct Luser *lptr, int ac, char **av)
         {
           struct aChannelPtr *tmpchan;
 
-          notice(n_NickServ, lptr->nick,
-                 "Channels Registered:");
+          notice(n_NickServ, lptr->nick, "Channels Registered:");
 
           cnt = 0;
-          for (tmpchan = nptr->FounderChannels; tmpchan; tmpchan = tmpchan->next)
+          for (tmpchan = nptr->FounderChannels; tmpchan; tmpchan =
+              tmpchan->next)
             {
-              notice(n_NickServ, lptr->nick,
-                     "                     %d) %s",
-                     ++cnt,
-                     tmpchan->cptr->name);
+              notice(n_NickServ, lptr->nick, "                     %d) %s",
+                     ++cnt, tmpchan->cptr->name);
             }
         }
 

@@ -1881,7 +1881,7 @@ EOF
 
          _have_pthread=yes
          CFLAGS="${CFLAGS} -D_REENTRANT"
-         LIBP="-lc_r"
+         LIBP="-pthread"
 else
   echo "$ac_t""no" 1>&6
 echo "configure: warning: Compiling without multithread support" 1>&2

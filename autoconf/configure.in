@@ -89,7 +89,7 @@ if test ! "$enable_threads" = "no"; then
          AC_DEFINE(HAVE_PTHREADS)
          _have_pthread=yes
          CFLAGS="${CFLAGS} -D_REENTRANT"
-         LIBP="-lc_r",
+         LIBP="-pthread",
           AC_MSG_WARN(Compiling without multithread support))))
 fi
 AC_SUBST(LIBP)

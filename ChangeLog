@@ -1,3 +1,10 @@
+*** 20010502_1 by kreator
+- after extensive testing I confirm that previous patch completely fixed
+  all DCC cores on .command that would end in return message to
+  non-existing lptr
+- reformated and changed style of documentation in README
+
+
 *** 20010501_9 by kreator
 - removed fixed bug from TODO and KNOWNBUGS; this was fast :-)
 

@@ -1,3 +1,8 @@
+*** 20021204_2 by kreator
+- fix seenserv.c warnings (trivial)
+- fix misc pidfile issues on Solaris (trivial)
+
+
 *** 20021204_1 by kreator
 - take out supposed seenserv fix
 

@@ -1,3 +1,9 @@
+*** 20010501_8 by kreator
+- fix nasty .gline bug
+- fix kline documentation for OperServ
+- TODO changes
+
+
 *** 20010501_7 by kreator
 - fix that totally weird variable scope bug in ADMININFO, *ugh*
 

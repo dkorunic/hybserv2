@@ -1,3 +1,7 @@
+*** 20010623_1 by wcampbel
+Committed a minor thing to test the e-mail sending upon commits
+
+
 *** 20010622_1 by kreator
 - fscanf had \n for pid
 - fixed issue when services would core on large number of clones

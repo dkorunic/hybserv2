@@ -851,18 +851,20 @@ SaveSettings()
 Return: 1 if successful
         0 if not
 */
-
-int
-SaveSettings()
-
+int SaveSettings()
 {
   FILE *fp;
   struct Directive *dptr;
   int ii;
   char buffer[MAXLINE],
-       tmp[MAXLINE];
+       tmp[MAXLINE],
+       char tempname[MAXLINE];
 
-  if (!(fp = fopen(SETPATH, "w")))
+  /* MMkay, this should write safe config files so that they won't get
+   * b0rked if something happens when writing. -kre */
+  sprintf(tempname, "%s.tmp", SETPATH);
+  
+  if (!(fp = fopen(tempname, "w")))
   {
     putlog(LOG1,
       "SaveSettings(): Unable to open %s: %s",
@@ -951,6 +953,8 @@ SaveSettings()
   }
 
   fclose(fp);
+
+  rename(tempname, SETPATH);
 
   return 1;
 } /* SaveSettings() */

@@ -31,7 +31,7 @@ conf.o: conf.c ../include/alloc.h ../include/config.h \
  ../include/dcc.h ../include/gline.h ../include/hash.h \
  ../include/jupe.h ../include/log.h ../include/match.h \
  ../include/misc.h ../include/operserv.h ../include/settings.h \
- ../include/sock.h ../include/Strn.h
+ ../include/sock.h ../include/Strn.h ../include/timestr.h
 data.o: data.c ../include/alloc.h ../include/config.h \
  ../include/channel.h ../include/hybdefs.h ../include/motd.h \
  ../include/chanserv.h ../include/hash.h ../include/client.h \

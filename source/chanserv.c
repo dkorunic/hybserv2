@@ -3356,7 +3356,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   char hostmask[MAXLINE];
   struct NickInfo *nickptr;
   int level; /* lptr->nick's access level */
-  int newlevel;
+  int newlevel, founder;
 
   if (!(cptr = FindChan(av[1])))
     return;
@@ -3380,17 +3380,29 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
+  founder = IsFounder(lptr, cptr);
+  newlevel = atoi(av[4]);
+  level = GetAccess(cptr, lptr);
+
+  /* Channel founder should be able to add CA_FOUNDER access level
+   * to the list. -harly & kre */
+#if 0
   if (((level = GetAccess(cptr, lptr)) <= atoi(av[4])) ||
       (atoi(av[4]) >= cptr->access_lvl[CA_FOUNDER]))
+#endif
+  if ((founder && (newlevel > cptr->access_lvl[CA_FOUNDER])) ||
+      (!founder && (level <= newlevel)))
+  {
     {
       notice(n_ChanServ, lptr->nick,
              "You cannot add an access level greater than [\002%d\002]",
-             level - 1);
+             founder ? cptr->access_lvl[CA_FOUNDER] : level - 1);
       RecordCommand("%s: %s!%s@%s failed ACCESS [%s] ADD %s %s",
                     n_ChanServ, lptr->nick, lptr->username,
                     lptr->hostname, cptr->name, av[3], av[4]);
       return;
     }
+  }
 
   nickptr = NULL;
   hostmask[0] = '\0';
@@ -3421,10 +3433,8 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
     }
 
-  newlevel = atoi(av[4]);
-
   /* add hostmask (or nickptr) to the access list */
-  if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel ) )
+  if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel))
     {
       notice(n_ChanServ, lptr->nick,
              "[\002%s\002] has been added to the access list "
@@ -4426,12 +4436,15 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
              lptr->hostname);
+
+  /* If user isn't on the access list when he identifies, give him
+   * FOUNDER access instead of SUPEROP. -harly */
   if (!OnAccessList(cptr, nmask, GetMaster(nptr)))
     {
       AddAccess(cptr, (struct Luser *) NULL, NULL, nptr,
-                cptr->access_lvl[CA_SUPEROP]);
+                cptr->access_lvl[CA_FOUNDER]);
       notice(n_ChanServ, lptr->nick,
-             "You have been added to %s as a SuperOp",
+             "You have been added to %s as a \002founder\002",
              cptr->name);
     }
 

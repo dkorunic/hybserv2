@@ -1793,9 +1793,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       if (!IsChannelMember(chanptr, Me.csptr))
         cs_joinchan(cptr);
 
-      toserv(":%s MODE %s +is\n",
-             n_ChanServ,
-             cptr->name);
+      toserv(":%s MODE %s +is\n", n_ChanServ, cptr->name);
       UpdateChanModes(Me.csptr, n_ChanServ, chanptr, "+is");
       KickBan(0, n_ChanServ, chanptr, lptr->nick, "Forbidden Channel");
       return;
@@ -1834,7 +1832,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
   else if ((cptr->flags & CS_RESTRICTED) &&
            !HasAccess(cptr, lptr, CA_AUTOOP))
     {
-      char  *mask = HostToMask(lptr->username, lptr->hostname);
+      char *mask = HostToMask(lptr->username, lptr->hostname);
 
       if (!IsChannelMember(chanptr, Me.csptr))
         cs_joinchan(cptr);
@@ -1848,10 +1846,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       MyFree(mask);
 
       toserv(":%s KICK %s %s :%s\n",
-             n_ChanServ,
-             chanptr->name,
-             lptr->nick,
-             "Restricted Channel");
+             n_ChanServ, chanptr->name, lptr->nick, "Restricted Channel");
 
       RemoveFromChannel(chanptr, lptr);
     }
@@ -3102,8 +3097,7 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                     !(IsValidAdmin(lptr)))
                   {
                     notice(n_ChanServ, lptr->nick,
-                           "No help available on \002%s\002",
-                           av[1]);
+                           "No help available on \002%s\002", av[1]);
                     return;
                   }
 
@@ -3136,10 +3130,8 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       notice(n_ChanServ, lptr->nick,
              "Syntax: \002REGISTER <#channel> <password>\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "REGISTER");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+          "REGISTER");
       return;
     }
 
@@ -3156,10 +3148,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
              "You are not permitted to register channels");
       putlog(LOG1,
              "Flagged user %s!%s@%s attempted to register channel [%s]",
-             lptr->nick,
-             lptr->username,
-             lptr->hostname,
-             av[1]);
+             lptr->nick, lptr->username, lptr->hostname, av[1]);
       return;
     }
 
@@ -3171,11 +3160,8 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           notice(n_ChanServ, lptr->nick,
                  "Use of the [\002REGISTER\002] command is restricted");
           RecordCommand("%s: %s!%s@%s failed REGISTER [%s]",
-                        n_ChanServ,
-                        lptr->nick,
-                        lptr->username,
-                        lptr->hostname,
-                        av[1]);
+                 n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+                 av[1]);
           return;
         }
     }
@@ -3194,10 +3180,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       if (cptr->flags & (CS_FORBID | CS_FORGET))
         RecordCommand("%s: Attempt to register forbidden channel [%s] by %s!%s@%s",
-                      n_ChanServ,
-                      cptr->name,
-                      lptr->nick,
-                      lptr->username,
+                      n_ChanServ, cptr->name, lptr->nick, lptr->username,
                       lptr->hostname);
 
       notice(n_ChanServ, lptr->nick,
@@ -3342,18 +3325,12 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       notice(n_ChanServ, lptr->nick,
              "Syntax: \002DROP <channel> <password>\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "DROP");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "DROP");
       return;
     }
 
   RecordCommand("%s: %s!%s@%s DROP [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
                 cptr->name);
 
   chptr = FindChannel(cptr->name);

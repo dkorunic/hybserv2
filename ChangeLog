@@ -1,3 +1,7 @@
+*** 20010511_2 by kreator
+- part of DeleteLink fixes.
+
+
 *** 20010511_1 by kreator
 - fix nasty bug in WriteNicks() that existed even before
 - found some more bugs in DeleteLink()

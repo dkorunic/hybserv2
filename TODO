@@ -46,7 +46,7 @@ Some sort of TODO/planning program:
    <monolith@mail.orblivion.com>
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
-   NOTE: I quickfixed this. However, I need to look at this more closely!
+   NOTE: Quickfixed this. However, I need to look at this more closely!
 
 
 Done so far:

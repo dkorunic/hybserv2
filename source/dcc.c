@@ -1079,7 +1079,7 @@ onctcp(char *nick, char *target, char *msg)
   if (strncasecmp(msg, "VERSION", 7) == 0)
   {
 #ifdef ADMININFO
-    struct Luser *tempuser = NULL;    
+    struct Luser *ouser = NULL;    
 #endif /* ADMININFO */
 
     notice(target, nick,
@@ -1092,12 +1092,12 @@ onctcp(char *nick, char *target, char *msg)
 #ifdef ADMININFO
     /* Print active operators that have identified to OperServ. This could
      * be a little performance hit, blah. -kre */
-    for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+    for (ouser = ClientList; ouser; ouser = ouser->next)
     {
-      if (tempuser->flags & L_OSREGISTERED)
+      if (ouser->flags & L_OSREGISTERED)
         notice(target, nick, "\001VERSION Active operators: %s"
-            " (%s@%s)\001", tempuser->nick, tempuser->username,
-            tempuser->hostname);
+            " (%s@%s)\001", ouser->nick, ouser->username,
+            ouser->hostname);
     }
 #endif /* ADMININFO */
 

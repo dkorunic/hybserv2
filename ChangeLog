@@ -1,3 +1,9 @@
+*** 20010502_5 by kreator
+- fix for lame SQUIT
+- reported new bug with services ignoring DCC commands (does this have
+  anything to do with previous DCC chat problems?)
+
+
 *** 20010502_4 by kreator
 - fix problem with PARAM_SET directives in conf files: old routines would
   save PARAM_SET with value of 1, but if one would put it into 0, conf

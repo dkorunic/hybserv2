@@ -54,7 +54,7 @@ INSTALLATION
 HybServ is known to compile cleanly on the following operating systems,
 and may compile on others.
 
-    Linux 2.4.x (all)
+    Linux 2.4.x (and older)
     FreeBSD 4.2 (and older)
     OpenBSD 2.7 (and older)
     Solaris 2.7 (and older)

@@ -1,3 +1,14 @@
+*** 20010807_1 by kreator
+- added ADVFLOOD patch from ike with smaller modifications (here follows
+  his comment):
+  * added advanced flood protection against nickchange/reconnect flooders,
+    this is completely tweakable in include/config.h - ADVFLOOD
+  * added option to require opers to identify to nickserv before being
+    able to identify to operserv in include/config.h - OPERNICKIDENT
+  * some code is repetitive, cleanups will be done soon
+- got back from vacations :-)
+
+
 *** 20010731_1 by wcampbel
 Updated config.guess and config.sub for asuffield
 

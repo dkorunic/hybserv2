@@ -1,3 +1,8 @@
+*** 20010315_1 by kreator
+Add better support for multiprocessing machines running HybServ - through
+libhoard. Add configure testing for it. Document it. Update TODO.
+
+
 *** 20010313_2 by wcampbel
 Test commit, make sure the fixed serno.h works
 

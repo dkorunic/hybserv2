@@ -12,7 +12,7 @@ help      identify motd     quit      who
 %+akillhost  omode    part     secure    trace
 %+a
 %+sServices Administrator commands:
-%+sdie       dump     fuckover off/on    rehash
+%+sdie       dump     off/on    rehash
 %+sreload    restart  save     set
 Use .help <command> for specific help
 

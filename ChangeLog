@@ -1,3 +1,10 @@
+*** 20010605_2 by kreator
+- add routine that will check on load if there are more than 1 nick
+  entry per 1 nick: this will slow down reading routines a bit so we can
+  eradicate it when we are sure no problems with linked nicknames exist
+  any more.
+
+
 *** 20010605_1 by kreator
 - undo some fixes for nicklink problem. seems some people are having
   repeated nicknames in nick.db, and funny thing is that i _don't_ have

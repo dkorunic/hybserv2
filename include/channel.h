@@ -83,7 +83,7 @@ struct ChannelUser
 {
   struct ChannelUser *next;
   struct Luser *lptr;   /* pointer to user structure */
-  int flags;            /* flags such as opped/voiced */
+  unsigned flags;       /* flags such as opped/voiced */
 };
 
 /* Stores info for network channels */

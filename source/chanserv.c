@@ -1075,7 +1075,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((tempu->flags & CH_OPPED) && 
           !HasAccess(cptr, tempu->lptr, CA_AUTOOP))
       {
-        dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) + strlen(tempu->lptr->nick) + (2 * sizeof(char)));
+        dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks)
+            + strlen(tempu->lptr->nick) + (2 * sizeof(char)));
         strcat(dopnicks, tempu->lptr->nick);
         strcat(dopnicks, " ");
       }
@@ -1579,17 +1580,13 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   if (!(tempuser = FindUserByChannel(chanptr, FindClient(nick))))
     return;
 
-  /* CH_OPPED is broken, at least it seems so. -kre */
-#if 0
   if (tempuser->flags & CH_OPPED)
   {
     /*
-     * They're already opped on the channel - we don't need
-     * to do anything
+     * They're already opped on the channel - we don't need to do anything
      */
     return;
   }
-#endif
 
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
   {
@@ -5841,16 +5838,22 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     /* They want to be opped in all channels they are currently in. */
     for (uchan = lptr->firstchan; uchan; uchan = uchan->next)
     {
-      /* CH_OPPED does not seem to work atm. This is quick fix. -kre */
       if (HasAccess(FindChan(uchan->chptr->name), lptr, CA_CMDOP))
-/*        && !(uchan->flags & CH_OPPED)) */
       {
-        toserv(":%s MODE %s +o %s\n", n_ChanServ,
-          uchan->chptr->name, lptr->nick);
-        uchan->flags |= CH_OPPED;
+        if (!(uchan->flags & CH_OPPED))
+        {
+          toserv(":%s MODE %s +o %s\n", n_ChanServ,
+            uchan->chptr->name, lptr->nick);
+          uchan->flags |= CH_OPPED;
 
-        if ((cuser = FindUserByChannel(uchan->chptr, lptr)))
-          cuser->flags |= CH_OPPED;
+          if ((cuser = FindUserByChannel(uchan->chptr, lptr)))
+            cuser->flags |= CH_OPPED;
+        }
+        else
+        {
+          notice(n_ChanServ, lptr->nick,
+            "You are already opped on [\002%s\002]", uchan->chptr->name);
+        }
       }
     }
 
@@ -5888,17 +5891,12 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-    /* There seems to be some kind of problem with IsChannelOp() in some
-     * special cases. This is only a quick fix -kre */
-#if 0
     if (IsChannelOp(chptr, lptr))
     {
       notice(n_ChanServ, lptr->nick,
-        "You are already opped on [\002%s\002]",
-        cptr->name);
+        "You are already opped on [\002%s\002]", cptr->name);
       return;
     }
-#endif
 
   }
   else

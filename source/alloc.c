@@ -103,7 +103,7 @@ inline void MyFree(void *ptr)
      to crash at various different places. unfortunately, original
      author made services require this :-( -kre */
   /* thanks, adx -kre */
-  ptr = NULL;
+  *ptr = NULL;
 } /* MyFree() */
 
 /*

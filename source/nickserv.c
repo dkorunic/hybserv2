@@ -596,8 +596,18 @@ ns_loaddata()
                * we've come to a new nick entry, so add the last nick
                * to the list before proceeding
                */
-              if (!FindNick(nptr->nick))
-                AddNick(nptr);
+              /* 
+               * Bug. When the nick is in the list already must have the NS_DELETE flag remove
+               * There are two work arrounds possible. The first one, add the newly 
+               * charged user regardles if is in the current nicklist. The current one, will be 
+               * deleted in ReloadData(). The other, is to reset the NS_DELETE of nptr if the
+               * user is already in the nick list. I rather preffere loading all the database and
+               * throwing away all the current users (that's the meaning of un RELOAD!)
+               * Low memory servers should use the second method. Heh, it's up to you kre.
+               * -ags
+               */
+               /* if (!FindNick(nptr->nick)) */
+               AddNick(nptr);
 
               if (islink)
                 islink = 0;

@@ -3136,7 +3136,14 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if ((lptr->flags & L_OSREGISTERED) && IsOper(userptr))
     cptr->flags |= CS_NOEXPIRE;
 
-  AddAccess(cptr, 0, 0, nptr, cptr->access_lvl[CA_SUPEROP]);
+  /* 
+   * A Founder of un chanel should have CA_FOUNDER access.
+   * $you> /msg chanserv register #alabala blabla
+   * $you> /msg chanserv access #alabala del $you
+   * -- *Serv is gone fishing (SEGFAULT)
+   * -ags
+   */
+  AddAccess(cptr, 0, 0, nptr, cptr->access_lvl[CA_FOUNDER]);
 
   /* add cptr to channel list */
   AddChan(cptr);

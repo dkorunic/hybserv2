@@ -74,8 +74,8 @@ DISTRIBUTION
        cvs checkout hybserv
 
   #5:  CVS Web snapshots:
-       http://fly.srk.fer.hr/~kreator/project/hybserv/
-       http://fly.srk.fer.hr/~kreator/project/tarballs/hybserv-cvs.tar.gz
+       http://fly.srk.fer.hr/~kreator/projects/hybserv/
+       http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
 
 
 NOTE: CVS is usually more current than the release.

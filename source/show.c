@@ -56,7 +56,7 @@ InitData()
       fprintf(stderr,
               "HPath is an invalid directory, please check %s\n",
               SETPATH);
-      exit (0);
+      exit(EXIT_FAILURE);
     }
 
   InitLists();
@@ -185,7 +185,7 @@ ShowNicknames(int ac, char *av[])
               be displayed.\n\
               \n",
               av[0]);
-      exit(0);
+      exit(EXIT_SUCCESS);
     }
 
   if (!(flags & SHOW_TOTALCOUNT))
@@ -432,7 +432,7 @@ ShowChannels(int ac, char *av[])
               be displayed.\n\
               \n",
               av[0]);
-      exit(0);
+      exit(EXIT_SUCCESS);
     }
 
   if (!(flags & SHOW_TOTALCOUNT))

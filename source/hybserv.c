@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
         {
           fprintf(stderr, "Cannot chroot, exiting.\n");
           putlog(LOG1,"Cannot chroot, shutting down");
-          exit(1);
+          exit(EXIT_FAILURE);
         }
     }
 
@@ -277,16 +277,16 @@ int main(int argc, char *argv[])
 #if !defined DEBUGMODE && !defined GDB_DEBUG
 
   pid = fork();
-  if (pid == (-1))
-    {
-      printf("Unable to fork(), exiting.\n");
-      exit(1);
-    }
+  if (pid == -1)
+  {
+    printf("Unable to fork(), exiting.\n");
+    exit(EXIT_FAILURE);
+  }
   if (pid != 0)
-    {
-      printf("Running in background (pid: %d)\n", pid);
-      exit(0);
-    }
+  {
+    printf("Running in background (pid: %d)\n", (int)pid);
+    exit(EXIT_SUCCESS);
+  }
 
   /* Make current process session leader -kre */
   setsid();

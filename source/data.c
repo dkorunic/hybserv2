@@ -1135,7 +1135,7 @@ LoadData()
               OperServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              OperServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
   if (ignore_loaddata() == (-2))
@@ -1144,7 +1144,7 @@ LoadData()
               OperServIgnoreDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              OperServIgnoreDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
 #ifdef SEENSERVICES
@@ -1155,7 +1155,7 @@ LoadData()
               SeenServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              SeenServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 #endif /* SEENSERVICES */
 
@@ -1167,7 +1167,7 @@ LoadData()
               NickServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              NickServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 
 #ifdef CHANNELSERVICES
@@ -1178,7 +1178,7 @@ LoadData()
               ChanServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              ChanServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 #endif
 
@@ -1190,7 +1190,7 @@ LoadData()
               MemoServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              MemoServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 #endif
 
@@ -1204,7 +1204,7 @@ LoadData()
               StatServDB);
       putlog(LOG1, "Fatal errors parsing database (%s)",
              StatServDB);
-      exit(1);
+      exit(EXIT_FAILURE);
     }
 #endif /* STATSERVICES */
 

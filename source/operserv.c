@@ -2727,7 +2727,7 @@ InitFuckoverProcess(char *from, char *ftarget)
               }
           }
 
-        exit(-1);
+        exit(EXIT_FAILURE);
         break;
       } /* case 0: */
 

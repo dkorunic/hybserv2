@@ -264,7 +264,7 @@ ParseConf(char *filename, int rehash)
        * can continue normally.
        */
       if (!rehash && (filename == ConfigFile))
-        exit(0);
+        exit(EXIT_SUCCESS);
 
       return;
     }
@@ -725,7 +725,7 @@ LoadConfig()
     }
 
   if (ConfError)
-    exit(1);
+    exit(EXIT_FAILURE);
 } /* LoadConfig() */
 
 /*

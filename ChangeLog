@@ -1,3 +1,8 @@
+*** 20020919_2 by kreator
+- fixed lastupdate flag when EMPOWERADMINSMORE and valid admin is also
+  founder/successor of any channel
+
+
 *** 20020919_1 by kreator
 - RELEASENOTES
 

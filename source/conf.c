@@ -948,7 +948,7 @@ IsRestrictedHost(char *user, char *host)
       return (temphost);
   }
 
-  return (NULL);
+  return NULL;
 } /* IsRestrictedHost() */
 
 /*

@@ -614,9 +614,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
       if (SafeConnect)
         SendUmode(OPERUMODE_C,
           "*** Clone detected: %s (%s@%s) [%s]",
-          lptr->nick,
-          lptr->username,
-          lptr->hostname,
+          lptr->nick, lptr->username, lptr->hostname,
           lptr->server ? lptr->server->name : "*unknown*");
 
       break;
@@ -654,64 +652,47 @@ HashAddClient(struct Luser *lptr, int nickchange)
   if (MaxClones && foundclone)
   {
     int    clcnt = 2; /* number of clones */
-    char  *killmsg = NULL;
     struct Luser  *prev = (struct Luser *) NULL;
-
-    killmsg = (char *) MyMalloc(strlen(tempuser->nick) +
-        strlen(lptr->nick) + 32);
-    ircsprintf(killmsg, "%s -> %s", tempuser->nick, lptr->nick);
 
     for (tempuser = cloneTable[hashv].list; tempuser; tempuser =
         tempuser->cnext)
     {
       if (tempuser->cnext == lptr)
       {
-        /* 
-         * go through the table and get a list of all the clones
-         * matching lptr's userhost
-         */
+        /* go through the table and get a list of all the clones matching
+         * lptr's userhost */
         for (temp2 = lptr->cnext; temp2; temp2 = temp2->cnext)
         {
           if (CloneMatch(lptr, temp2))
-          {
             ++clcnt;
-            killmsg = (char *) MyRealloc(killmsg, strlen(killmsg) + strlen(temp2->nick) + (5 * sizeof(char)));
-            strcat(killmsg, " -> ");
-            strcat(killmsg, temp2->nick);
-          }
         }
 
         if (clcnt < MaxClones)
         {
-          MyFree(killmsg);
           return (lptr);
         }
 
-        if (AutoKillClones && (clcnt >= (MaxClones + 1)))
+        if (AutoKillClones && (clcnt > MaxClones ))
         {
           killclones = 1;
 
-          putlog(LOG2, "Clones [%s] (%s@%s) killed",
-            killmsg,
+          putlog(LOG2, "Clones from (%s@%s) killed",
             lptr->username,
             lptr->hostname);
 
           SendUmode(OPERUMODE_C,
-            "*** Killing clones [%s] (%s@%s)",
-            killmsg,
+            "*** Killing clones from (%s@%s)",
             lptr->username,
             lptr->hostname);
         }
         else
         {
-          putlog(LOG2, "Sent clone warning to [%s] (%s@%s)",
-            killmsg,
+          putlog(LOG2, "Sent clone warning to (%s@%s)",
             lptr->username,
             lptr->hostname);
 
           SendUmode(OPERUMODE_C,
-            "*** Warning clones [%s] (%s@%s)",
-            killmsg,
+            "*** Warning clones from (%s@%s)",
             lptr->username,
             lptr->hostname);
         }
@@ -726,14 +707,10 @@ HashAddClient(struct Luser *lptr, int nickchange)
         {
           if (CloneMatch(lptr, temp2))
           {
-            if (AutoKillClones && (clcnt >= (MaxClones + 1)))
+            if (AutoKillClones && (clcnt > MaxClones ))
             {
-              toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
-                n_OperServ,
-                temp2->nick,
-                Me.name,
-                n_OperServ,
-                killmsg);
+              toserv(":%s KILL %s :%s!%s (Clones))\n",
+                n_OperServ, temp2->nick, Me.name, n_OperServ);
               DeleteClient(temp2);
               temp2 = prev;
             }
@@ -746,7 +723,8 @@ HashAddClient(struct Luser *lptr, int nickchange)
 
         break;
       } /* if (tempuser->cnext == lptr) */
-    } /* for (tempuser = cloneTable[hashv].list; tempuser; tempuser = tempuser->cnext) */
+    } /* for (tempuser = cloneTable[hashv].list; tempuser; tempuser =
+         tempuser->cnext) */
 
     /*
      * lptr and tempuser were not killed in the above loop -
@@ -756,20 +734,18 @@ HashAddClient(struct Luser *lptr, int nickchange)
     {
       killclones = 1;
 
-      toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
+      toserv(":%s KILL %s :%s!%s (Clones))\n",
         n_OperServ,
         lptr->nick,
         Me.name,
-        n_OperServ,
-        killmsg);
+        n_OperServ);
       DeleteClient(lptr);
 
-      toserv(":%s KILL %s :%s!%s (Clones (%s))\n",
+      toserv(":%s KILL %s :%s!%s (Clones))\n",
         n_OperServ,
         tempuser->nick,
         Me.name,
-        n_OperServ,
-        killmsg);
+        n_OperServ);
       DeleteClient(tempuser);
     }
     else
@@ -777,8 +753,6 @@ HashAddClient(struct Luser *lptr, int nickchange)
       WarnClone(lptr->nick);
       WarnClone(tempuser->nick);
     }
-
-    MyFree(killmsg);
   } /* if (MaxClones && foundclone) */
 
   if (rhostptr)
@@ -809,10 +783,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
           debug("clcnt[%d] is over the allowed value [%d]\n",
             clcnt, rhostptr->hostnum);
           toserv(":%s KILL %s :%s!%s (Restricted hostmask (%d maximum connections allowed))\n",
-            n_OperServ,
-            lptr->nick,
-            Me.name,
-            n_OperServ,
+            n_OperServ, lptr->nick, Me.name, n_OperServ,
             rhostptr->hostnum);
           DeleteClient(lptr);
         }

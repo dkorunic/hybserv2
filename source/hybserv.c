@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
   else
   {
     pid_t mypid;
-    fscanf(pidfile, "%u\n", &mypid);
+    fscanf(pidfile, "%u", &mypid);
     fclose(pidfile);
     if (!kill(mypid, 0))
     {

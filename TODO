@@ -46,3 +46,7 @@ Some sort of TODO/planning program
 23) add collapse() and irccmp() (do we need this?)
 24) better multiprocessor support (libhoard!)
     - done
+25) hybrid7 features
+26) implement modes flood trigger
+27) add some features from http://www.appwatch.com/Linux/App/879/data.html
+28) be compatibile with other ircds (!!)

@@ -89,7 +89,4 @@ if a channel is SecureOps and you:
 ^^^^badnick won't get deopped when chanserv rejoins
 (badnick does not have autoop access)
 
-test fuckover!!! -- make it use threads -- i don't think fork() has
-access to the server fd ?? (No point, fuckover is gone)
-
 directive to do a /msg opers@server when clones are detected

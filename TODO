@@ -82,7 +82,7 @@ Done so far:
      global channel levels (how the heck didn't anyone notice that?)
    - fix broken lastseen updating for nicknames
    - fix broken "Last Seen" info in n_info()
-*) Walter has fixed restart() problem that was affected with check_pid()
+*) Hwy has fixed restart() problem that was affected with check_pid()
 *) fix stupid bug that services +o people who match() O line, but have not
    registered with OperServ
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some

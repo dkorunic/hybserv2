@@ -2,9 +2,9 @@
 ** copyright 1991, all rights reserved.
 ** You can use this code as long as my name stays with it.
 **
-** md5 patch by Walter Campbell <wcampbel@botbay.net>
+** md5 patch by W. Campbell <wcampbel@botbay.net>
 ** Modernization, getopt, etc for the Hybrid IRCD team
-** by Walter Campbell
+** by W. Campbell
 **
 ** $Id$
 */

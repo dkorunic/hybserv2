@@ -1,3 +1,11 @@
+*** 20010818_1 by kreator
+- do smaller fixes in main Makefile
+- update new config.guess and config.sub and install-sh
+- fix some bogus code in ADVFLOOD
+- fix some stupid NULL casts (i was fixing this in last commit, but i'm
+  mentioning just in case)
+
+
 *** 20010816_3 by kreator
 - fixed some more code in ADVFLOOD
 

@@ -1,3 +1,9 @@
+*** 20010810_1 by kreator
+- fixed smaller typo, eg:
+  [fer]  Foreign OperKill: OperServ killed |DeVa| (Clones))
+                                                          ^ note `)'
+
+
 *** 20010807_2 by kreator
 - took out #error !defined HYBRID_ONLY || !defined IRCNET since it is
   more-less meaningless and b0rks Comstud

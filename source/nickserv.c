@@ -51,6 +51,10 @@
  */
 struct NickInfo *nicklist[NICKLIST_MAX];
 
+#ifdef SVSNICK
+static long nicknum;
+#endif
+
 static int ChangePass(struct NickInfo *, char *);
 static void AddHostToNick(char *, struct NickInfo *);
 static struct NickInfo *MakeNick();
@@ -128,8 +132,7 @@ static void n_clearnoexp(struct Luser *, int, char **);
 /* main NickServ commands */
 static struct Command nickcmds[] =
     {
-      { "HELP", n_help, LVL_NONE
-      },
+      { "HELP", n_help, LVL_NONE },
       { "REGISTER", n_register, LVL_NONE },
       { "DROP", n_drop, LVL_NONE },
       { "IDENTIFY", n_identify, LVL_NONE },
@@ -1118,9 +1121,9 @@ CheckNick(char *nickname)
   if (realptr->flags & NS_FORBID)
     {
       notice(n_NickServ, lptr->nick,
-             "This nickname may not be used.  Please choose another.");
+           "This nickname may not be used.  Please choose another.");
       notice(n_NickServ, lptr->nick,
-             "If you do not change within one minute, you will be disconnected");
+           "If you do not change within one minute, you will be disconnected");
       realptr->flags |= NS_COLLIDE;
       realptr->collide_ts = current_ts + 60;
       return 0;
@@ -1165,7 +1168,7 @@ CheckNick(char *nickname)
                    * they logon, whether they come from a known host or not.
                    * Give them one minute to identify.
                    */
-#ifdef FORCE_NICK_CHANGE
+#if defined FORCE_NICK_CHANGE || defined SVSNICK
                   notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE2);
 #else
                   notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
@@ -1381,6 +1384,10 @@ collide(char *nick)
   struct Luser *lptr;
   struct NickInfo *nptr;
   char **av, sendstr[MAXLINE];
+#ifdef SVSNICK
+  char newnick[NICKLEN];
+  nicknum = random();
+#endif
 
   if(!SafeConnect)
     return;
@@ -1401,8 +1408,13 @@ collide(char *nick)
    * Sending a server kill will be quieter than an oper
    * kill since most clients are -k
    */
+#ifndef SVSNICK
   toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
          lptr->nick, Me.name, n_NickServ, sendstr);
+#else
+  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
+  toserv("%s SVSNICK %s %s\r\n%s", Me.name, lptr->nick, newnick, sendstr);
+#endif
 
   /* erase the old user */
   DeleteClient(lptr);

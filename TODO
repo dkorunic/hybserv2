@@ -1,18 +1,19 @@
+$Id$
+
 Today's MOTD
 ------------
-  "Life sucks, but death doesn't put out at all...."
-  -- Thomas J. Kopp
+A pessimist is a man who has been compelled to live with an optimist.
+		-- Elbert Hubbard
 
 
 Pending bugs:
 -------------
-*)
-(12:55:15) OrbDavid: i do have a small bug to report thatm ight already be
-fixed.
-(12:55:18) OrbDavid: HybServ2-1.9.0-pre1_20021012_1  <-- this version
-(12:55:22) OrbDavid: wallops dont' get sent on glines
-(12:55:43) OrbDavid: didn't have time to look into why not yet though
-*) killchan malfunction
+*) (12:20:45) :: monolith: about the logon news thing
+   (12:20:50) :: monolith: will there ever be a way to do that via operserv?
+   (12:21:01) :: monolith: editing the file is really a pain bcoz we don't
+   wanna give out shell access to all the opers
+*) (11:00:00) andrew: /msg chanserv halfop #channel nick does not work...it
+   gives an error -ChanServ- Unknown command [halfop]
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff
@@ -36,8 +37,8 @@ fixed.
    reconnecting - i find it annonying to look at forced synching
 
 
-Features (yet) to come:
------------------------
+Features yet to come:
+---------------------
 *) (13:37:00) padde: Any chance there could be coded an option, that would
    allow to specify a range of ports to be used to DCC services?
    (13:37:00) padde: would be usefull if the services is behind firewall

@@ -899,8 +899,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
         nptr = GetLink(lptr->nick);
         if (nptr && (nptr->flags & NS_PRIVMSG))
           toserv(":%s PRIVMSG %s :%s\r\n",
-              (ServerNotices) ? Me.name : n_OperServ,
-              lptr->nick, finstr);
+              n_OperServ, lptr->nick, finstr);
         else
           toserv(":%s NOTICE %s :%s\r\n",
               (ServerNotices) ? Me.name : n_OperServ,
@@ -2003,8 +2002,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   if (IsProtectedHost(username, hostname))
     {
       os_notice(lptr, sockfd, "%s@%s matches a protected host, unable to gline",
-                username ? username : "*",
-                hostname);
+                username ? username : "*", hostname);
       return;
     }
 
@@ -2013,9 +2011,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
     {
       os_notice(lptr, sockfd,
                 "Gline already exists for %s@%s [%s]",
-                gptr->username,
-                gptr->hostname,
-                gptr->reason);
+                gptr->username, gptr->hostname, gptr->reason);
       return;
     }
 
@@ -5463,13 +5459,8 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   char *reason;
   struct Channel *chptr;
   struct ChannelUser *tempuser, *next;
-#if 0
 
-  int ii;
-#endif
-
-  int bad,
-  cnt;
+  int bad, cnt, iimatch, iitotal;
   int alen;
   int nonops, /* -nonops */
   ops, /* -ops */
@@ -5487,11 +5478,7 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
 
   chptr = NULL;
   reason = NULL;
-  nonopers = 0;
-  ops = 0;
-  nonops = 0;
-  voices = 0;
-  nonvoices = 0;
+  nonopers = ops = nonops = voices = nonvoices = iimatch = iitotal = 0;
 
   for (cnt = 1; cnt < ac; cnt++)
     {
@@ -5567,40 +5554,29 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   for (tempuser = chptr->firstuser; tempuser; tempuser = next)
     {
       next = tempuser->next;
-
       bad = 0;
+      ++iitotal;
 
       if (FindService(tempuser->lptr))
         bad = 1;
-      else if (nonopers && IsOperator(tempuser->lptr))
-        bad = 1;
-      else if (ops && !(tempuser->flags & CH_OPPED))
-        bad = 1;
-      else if (nonops && (tempuser->flags & CH_OPPED))
-        bad = 1;
-      else if (voices && !(tempuser->flags & CH_VOICED))
-        bad = 1;
-      else if (nonvoices && (tempuser->flags & CH_VOICED))
-        bad = 1;
       else
-        {
-          if (tempuser->lptr->flags & L_OSREGISTERED)
-            /*
-             * IMHO, this code is questionable. I think it would be better to
-             * skip L_OSREGISTERED (ie: services oper registered) nicknames, and
-             * not to check O: lines configuration. -kre
-             */
-#if 0
-
-            ii = 1;
-          else
-            ii = 0;
-          if (IsProtected(GetUser(ii, tempuser->lptr->nick,
-                                  tempuser->lptr->username, tempuser->lptr->hostname)))
-#endif
-
-            bad = 1;
-        }
+        if (nonopers && IsOperator(tempuser->lptr))
+          bad = 1;
+      else
+        if (ops && !(tempuser->flags & CH_OPPED))
+          bad = 1;
+      else
+        if (nonops && (tempuser->flags & CH_OPPED))
+          bad = 1;
+      else
+        if (voices && !(tempuser->flags & CH_VOICED))
+          bad = 1;
+      else
+        if (nonvoices && (tempuser->flags & CH_VOICED))
+          bad = 1;
+      else
+        if (tempuser->lptr->flags & L_OSREGISTERED)
+          bad = 1;
 
       if (bad)
         continue;
@@ -5610,10 +5586,11 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
              reason, onick, n_OperServ);
 
       DeleteClient(tempuser->lptr);
+      ++iimatch;
     }
 
-  os_notice(lptr, sockfd, "Channel [%s] has been killed",
-            chptr->name);
+  os_notice(lptr, sockfd, "Channel [%s] has been killed with [%d/%d] match%s",
+            chptr->name, iimatch, iitotal, (iimatch == 1) ? "" : "es");
 
   MyFree(reason);
 } /* o_killchan() */

@@ -8031,7 +8031,7 @@ static void c_set_expirebans(struct Luser *lptr,
   if (!irccmp(av[3], "ON"))
   {
     cptr->flags |= CS_EXPIREBANS;
-    notice(n_NickServ, lptr->nick,
+    notice(n_ChanServ, lptr->nick,
       "Toggled EXPIREBANS for channel %s [\002ON\002]", cptr->name);
     return;
   }

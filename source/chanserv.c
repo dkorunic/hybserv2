@@ -133,6 +133,7 @@ static void c_set_entrymsg(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_expirebans(struct Luser *, struct NickInfo *, int, char **);
+static void c_set_comment(struct Luser *, struct NickInfo *, int, char **);
 
 static void c_modes(struct Luser *, struct NickInfo *, int, char **);
 static void c_cycle(struct Luser *, struct NickInfo *, int, char **);
@@ -255,6 +256,7 @@ static struct Command setcmds[] =
       { "URL", c_set_url, LVL_NONE },
       { "WEBSITE", c_set_url, LVL_NONE },
       { "EXPIREBANS", c_set_expirebans, LVL_NONE },
+      { "COMMENT", c_set_comment, LVL_NONE },
       { 0, 0, 0 }
     };
 
@@ -794,6 +796,20 @@ cs_loaddata()
               else
                 {
                   fatal(1, "%s:%d ChanServ entry for [%s] has multiple URL lines (using first)",
+                        ChanServDB,
+                        cnt,
+                        cptr->name);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp("COMMENT", keyword, 8))
+            {
+              if (!cptr->comment)
+                cptr->comment = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d ChanServ entry for [%s] has multiple COMMENT lines (using first)",
                         ChanServDB,
                         cnt,
                         cptr->name);
@@ -2512,6 +2528,8 @@ DeleteChan(struct ChanInfo *chanptr)
     MyFree(chanptr->entrymsg);
   if (chanptr->access_lvl)
     MyFree(chanptr->access_lvl);
+  if (chanptr->comment)
+    MyFree(chanptr->comment);
 
   if (chanptr->next)
     chanptr->next->prev = chanptr->prev;
@@ -6004,6 +6022,70 @@ c_set_url(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
          cptr->url);
 } /* c_set_url() */
 
+/* Set COMMENT line about channel.  -bane
+ */
+static void
+c_set_comment(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
+
+{
+  struct ChanInfo *cptr;
+  char *cmnt;
+
+  if (!(cptr = FindChan(av[1])))
+    return;
+
+  if (ac < 4)
+    {
+      notice(n_ChanServ, lptr->nick,
+             "Syntax: \002SET <channel> COMMENT <comment|->\002");
+      notice(n_ChanServ, lptr->nick,
+             ERR_MORE_INFO,
+             n_ChanServ,
+             "SET COMMENT");
+      return;
+    }
+
+  if (!irccmp(av[3], "-"))
+    {
+      if (cptr->comment)
+        MyFree(cptr->comment);
+      cptr->comment = NULL;
+      notice(n_ChanServ, lptr->nick,
+             "The comment line for %s has been cleared",
+             cptr->name);
+      RecordCommand("%s: %s!%s@%s SET [%s] COMMENT -",
+                    n_ChanServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    cptr->name);
+      return;
+    }
+
+  if (ac < 4)
+    cmnt = NULL;
+  else
+    cmnt = GetString(ac - 3, av + 3);
+
+  RecordCommand("%s: %s!%s@%s SET [%s] COMMENT %s",
+                    n_ChanServ,
+                    lptr->nick,
+                    lptr->username,
+                    lptr->hostname,
+                    cptr->name,
+                    cmnt);
+
+  if (cptr->comment)
+    MyFree(cptr->comment);
+
+  cptr->comment = cmnt;
+
+  notice(n_ChanServ, lptr->nick,
+         "The comment line for %s has been set to [\002%s\002]",
+         cptr->name,
+         cptr->comment);
+} /* c_set_comment() */
+
 /*
  * c_modes()
  * shows all modes for a chan, including the key. lvl needed cmd_invite
@@ -6897,6 +6979,11 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     notice(n_ChanServ, lptr->nick,
            "         Url: %s",
            cptr->url);
+
+  if (cptr->comment)
+    notice(n_ChanServ, lptr->comment,
+           "     Comment: %s",
+           cptr->comment);
 
   buf[0] = '\0';
   if (cptr->flags & CS_TOPICLOCK)

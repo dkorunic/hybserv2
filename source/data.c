@@ -1019,6 +1019,10 @@ WriteChans()
                 fprintf(fp, "->URL %s\n",
                         cptr->url);
 
+              if (cptr->comment)
+                fprintf(fp, "->COMMENT :%s\n",
+                        cptr->comment);
+
               fprintf(fp, "->ALVL");
               for (jj = 0; jj <= CA_FOUNDER; ++jj)
                 fprintf(fp, " %d",

@@ -6818,6 +6818,8 @@ CalcMem(char *nick, int socket)
             csm += strlen(cptr->email);
           if (cptr->url)
             csm += strlen(cptr->url);
+          if (cptr->comment)
+            csm += strlen(cptr->comment);
           for (ak = cptr->akick; ak; ak = ak->next)
             {
               csm += (strlen(ak->hostmask) + sizeof(struct AutoKick));

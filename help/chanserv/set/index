@@ -23,6 +23,7 @@ Available options:
     ENTRYMSG    Send a message to users upon entry
     EMAIL       Set the channel email address
     URL         Set the channel url
+    COMMENT     Set the channel comment line
     FORGET      Make %C forget your channel %bFOREVER%b
     GUARD       Have %C join your channel
     SPLITOPS    Let anyone keep ops from a netsplit

@@ -135,6 +135,7 @@ struct ChanInfo
   char *entrymsg;               /* msg to send to users upon entry to channel */
   char *email;                  /* email address of channel */
   char *url;                    /* url of channel */
+  char *comment;                /* channel comment line */
 
   /* list of users who have founder access */
   struct f_users

@@ -534,6 +534,11 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
                 "Url:             %s\n",
                 chanptr->url);
 
+      if (chanptr->comment)
+        fprintf(stderr,
+                "Comment:         %s\n",
+                chanptr->comment);
+
       buf[0] = '\0';
       if (chanptr->flags & CS_TOPICLOCK)
         strcat(buf, "TopicLock, ");

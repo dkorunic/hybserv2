@@ -7963,22 +7963,25 @@ void ExpireBans(time_t unixtime)
 /*
 ExpireAkicks()
  Delete any akicks that have expired
+
+Nice functionality but bugged. Fixed.
+  -ags
 */
 
 void
 ExpireAkicks(time_t unixtime)
-
 {
   struct AutoKick *temp, *prev, *next;
   struct ChanInfo *cptr;
+  struct Channel *chptr; /* Ban removal purpose */
   int ii;
-
-  prev = NULL;
+  char modes[MAXLINE];
 
   for (ii = 0; ii < CHANLIST_MAX; ii++)
   {
 	  for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
 	  {
+      prev = NULL;
 	    for (temp = cptr->akick; temp; temp = next)
   	  {
 		    next = temp->next;
@@ -7986,26 +7989,30 @@ ExpireAkicks(time_t unixtime)
     	  if ((temp->expires) && (temp->expires <= unixtime))
         {
           SendUmode(OPERUMODE_Y, "*** Expired akick: %s [%s]",
-              temp->hostmask, temp->reason ? temp->reason : "");
-		      MyFree(temp->hostmask);
-
+            temp->hostmask, temp->reason ? temp->reason : "");
+	
+          memset(&modes, 0, sizeof(modes));
+          ircsprintf(modes, "-b %s", temp->hostmask);
+          modes[sizeof(modes) - 1] = '\0'; /* Paranoic - there is no
+                                              ircnsprintf() :) */
+          /* Send UNBAN */
+          toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+          chptr = FindChannel(cptr->name); 
+          if (chptr)
+            UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+          MyFree(temp->hostmask);
 		      if (temp->reason)
             MyFree(temp->reason);
-
           if (prev)
-          {
             prev->next = temp->next;
-            MyFree(temp);
-            temp = prev;
-          }
           else
-          {
             cptr->akick = temp->next;
-            MyFree(temp);
-            /* temp = NULL; */
-          }
+            /* Mind that prev pointer keeps still! */
+          MyFree(temp); /* Free it! */
         }
-        prev = temp;
+	      else
+          prev = temp; /* Update prev pointer only if there is no cell to
+                          remove! */
 	    }
 	  }
   }

@@ -1,3 +1,9 @@
+*** 20010818_4 by kreator
+- add c0manche as contributor -> he tested O-line security and reported
+  that bug i've fixed last
+- mention once again that this is STILL a prerelease
+
+
 *** 20010818_3 by kreator
 - fixed most inconvenient bug in OPERNICKIDENT code
 

@@ -1,3 +1,11 @@
+*** 20010429_6 by kreator
+- synched with Janos for Hybrid7 +a, +I and +h - reviewed all patches and
+  incorporated them into latest cvs. Note: this is quite large update!
+- updated README and RELEASENOTES
+- updated documentation: clear, index, halfop, etc.
+- updated config.h appropriately with new dependancies
+
+
 *** 20010429_5 by kreator
 - add some more verbose messages in operserv: omode and gline wallops now
   show who issued the command

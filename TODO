@@ -32,6 +32,24 @@ Pending bugs:
 
 Features to come:
 -----------------  
+*) adx wishlist:
+  1)
+  <adx> for example, to create a new operserv's command
+  <adx> "RESTRICT"
+  <adx> you pass the mask, for example *!*@you.are.a.bad.guy
+  <adx> then you can set some restrictions
+  <adx> for example
+  <adx> -nonickreg
+  <adx> -max 5 (connections)
+  <adx> -nolink
+  <adx> etc...
+  2)
+  <adx> the other thing is ChanServ's AKICK
+  <adx> couldn't we do it like with operserv's gline
+  <adx> that is, to implement an expiring akick?
+  <adx> for example, you set an AKICK for 3 weeks
+  3)
+  put operserv glines in oper.db
 *) force nick change - via plain old hacks
 *) choose NOTICES/MESSAGES to communicate with services
 *) rewrite documentation

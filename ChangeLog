@@ -1,3 +1,23 @@
+*** 20020427_7 by kreator
+- another bunch of adx fixes:
+  - DCC I/O loop error (fixed)
+  - CMDHALFOP/AUTOHALFOP mismatch (fixed)
+  - if AutoOpAdmins = 0, then opers get halfopped when they join a #
+    (fixed)
+  - hybrid-7 GLINE now works
+  - bug with writing oper nicknames to oper.db (data.c). We were looking
+    for *opernick* in donestr, but what if there would be another oper
+    named, for example abcopernickdef? - their umodes wouldn't be written
+    into oper.db...  I fixed the bug by looking for
+    *<space>opernick<space>*.
+  - yet another bug.. if SAVE_TS in #undef'd, when someone deops ChanServ
+    on a channel (also if ChanServ is deopped by SJOIN message with older
+    TS), it admittedly reops itself by sending MODE +o, but chanop
+    status is not marked  in local, internal structures (ChanServ doesn't
+    know it is opped...). So if, after deopping chanserv, someone will
+    join a channel, ChanServ won't op them... (fixed)
+
+
 *** 20020427_6 by kreator
 - add adx in credits
 - a whole bunch of adx fixes:

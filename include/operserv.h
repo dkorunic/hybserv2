@@ -108,5 +108,7 @@ void ReconnectCheck(time_t);
  */
 
 extern struct Ignore          *IgnoreList;
+extern char **myargv;
+extern int control_pipe;
 
 #endif /* INCLUDED_operserv_h */

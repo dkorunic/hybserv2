@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <unistd.h>
 #include <time.h>
 #ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
@@ -93,29 +94,21 @@ ProcessSignal(int sig)
         break;
       }
 
-#if 0
-      /* restart services */
-    case SIGINT:
+    case SIGUSR1:
       {
-#ifdef DEBUGMODE
-        DoShutdown("console", "Recieved SIGINT");
-        exit(1);
-#else
-
         SendUmode(OPERUMODE_Y,
-                  "*** Received SIGINT, restarting services");
-        putlog(LOG1, "Received signal SIGINT, restarting");
+                  "*** Received SIGUSR1, restarting");
+        putlog(LOG1,
+               "Received signal SIGUSR1, restarting");
+        unlink(PidFile);
+        close(control_pipe);
         ServReboot();
-        signal(SIGINT, ProcessSignal);
-#endif
-
-        break;
+        execvp(myargv[0], myargv);
       }
-#endif
 
     case SIGPIPE:
       {
-        putlog(LOG1, "Received signal SIGPIPE, ignoring");
+        /* putlog(LOG1, "Received signal SIGPIPE, ignoring"); */
         break;
       }
 
@@ -240,9 +233,9 @@ InitSignals()
   /* setup signal hooks */
   signal(SIGHUP, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
-  /*  signal(SIGINT, ProcessSignal); */
   signal(SIGCHLD, ProcessSignal);
   signal(SIGPIPE, ProcessSignal);
+  signal(SIGUSR1, ProcessSignal);
 
 #endif /* HAVE_PTHREADS */
 #endif

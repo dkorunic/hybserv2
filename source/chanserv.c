@@ -2918,11 +2918,15 @@ static int GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 
       if (found)
       {
-        chptr = FindChannel(cptr->name);
-        /* Only if the user is currently on the channel update usage time
-         * for this access level */
-        if (chptr && IsChannelMember(chptr, lptr))
-          cptr->lastused = ca->last_used = current_ts;
+        if (nptr)
+        {
+          chptr = FindChannel(cptr->name);
+          /* Only if the identified user is currently on the channel update
+           * usage time for this access level */
+          if (chptr && (nptr->flags & NS_IDENTIFIED) &&
+              IsChannelMember(chptr, lptr))
+            cptr->lastused = ca->last_used = current_ts;
+        }
 
         if (ca->level >= level)
             /*
@@ -3788,9 +3792,9 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
              "-- Access List for [\002%s\002] --",
              cptr->name);
       notice(n_ChanServ, lptr->nick,
-             "Num Level Hostmask             Time since last use");
+             "Num Level Hostmask             Since last use");
       notice(n_ChanServ, lptr->nick,
-             "--- ----- --------             -------------------");
+             "--- ----- --------             --------------");
       idx = 1;
       for (ca = cptr->access; ca; ca = ca->next, idx++)
         {
@@ -3798,7 +3802,7 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
             if (match(mask, ca->hostmask ? ca->hostmask : ca->nptr->nick) == 0)
               continue;
           notice(n_ChanServ, lptr->nick,
-            "%-3d %-5d %-35s %-10s", idx, ca->level,
+            "%-3d %-5d %-20s %-10s", idx, ca->level,
             ca->hostmask ? ca->hostmask : (ca->nptr ? ca->nptr->nick : ""),
             ca->last_used ? timeago(ca->last_used, 0) : "");
         }

@@ -23,10 +23,6 @@ case "$host_os" in
   AC_DEFINE(HAVE_CYGWIN)
 esac
 
-dnl Package information
-PACKAGE=HybServ2
-VERSION=1.8.0
-
 dnl Standard installation path
 AC_PREFIX_DEFAULT(/usr/local)
 
@@ -61,7 +57,6 @@ AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(crypt, crypt)
-AC_CHECK_LIB(cup, coffee, , AC_MSG_WARN(I have no coffee))
 
 dnl Do not compile with pthread support if they give a
 dnl --disable-threads or --enable-threads=no to configure

@@ -78,6 +78,9 @@ struct MyInfo                Me;
  */
 int                          SafeConnect = 0;
 
+/* Arguments list */
+char **myargv;
+
 /* FD to a named fifo that accepts commands like "DIE" */
 int control_pipe;
 
@@ -117,6 +120,8 @@ int main(int argc, char *argv[])
 #endif /* HAVE_PTHREADS */
 
 #endif /* HAVE_SOLARIS_THREADS */
+
+  myargv = argv;
 
   /* Initialise current TS for services -kre */
   TimeStarted = current_ts = time(NULL);

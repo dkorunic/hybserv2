@@ -124,6 +124,12 @@
 #undef    IRCNET
 
 /*
+ * Define this if you want DANCER ircd compatibility. It has +c and
+ * +f modes for channels, as well as +e umode for users. -kre
+ */
+#undef    DANCER
+
+/*
  * If this is defined, commands that involve HybServ setting modes, such
  * as .secure and .omode, will not break channel TS.  Instead, the program
  * will have OPERSERV_NICK join the channel to set the modes instead of

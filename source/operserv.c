@@ -75,8 +75,8 @@ static struct Process *fprocs = NULL;
 #endif /* ALLOW_FUCKOVER */
 
 static char *onick, /* nickname of current user giving command */
-*ouser, /* username of current user giving command */
-*ohost; /* hostname of current user giving command */
+            *ouser, /* username of current user giving command */
+            *ohost; /* hostname of current user giving command */
 
 static void os_notice(struct Luser *, int, char *, ...);
 static void o_RecordCommand(int, char *format, ...);
@@ -85,7 +85,6 @@ static struct OperCommand *GetoCommand(struct OperCommand *, char *);
 static void o_identify(struct Luser *, int, char **, int);
 static void o_kill(struct Luser *, int, char **, int);
 static void o_rehash(struct Luser *, int, char **, int);
-static void o_restart(struct Luser *, int, char **, int);
 
 #ifdef ALLOW_JUPES
 static void o_jupe(struct Luser *, int, char **, int);
@@ -124,6 +123,7 @@ static void o_jump(struct Luser *, int, char **, int);
 
 static void o_save(struct Luser *, int, char **, int);
 static void o_reload(struct Luser *, int, char **, int);
+static void o_restart(struct Luser *, int, char **, int);
 
 static void o_ignore(struct Luser *, int, char **, int);
 static void o_ignore_add(struct Luser *, int, char **, int);
@@ -1168,23 +1168,28 @@ o_restart()
   Restart services
 */
 
-static void
-o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
-
+static void o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
 {
-  o_RecordCommand(sockfd,
-                  "RESTART");
+  o_RecordCommand(sockfd, "RESTART");
 
   o_Wallops("RESTART");
 
   /* As found in Hyb6...this is needed to avoid breaking RESTART */
   unlink(PidFile);
 
+  /* Remove pipefile as well */ 
+  unlink(PipeFile);
+  close(control_pipe);
+
   /* Reinitialise all connections and memory */
   ServReboot();
 
   /* And cycle it. It seems that this was missing -kre */
-  CycleServers();
+  /* CycleServers(); */
+
+  /* Real restart -kre */
+  execvp(myargv[0], myargv);
+  
 } /* o_restart() */
 
 #ifdef ALLOW_DIE
@@ -1205,12 +1210,9 @@ o_die(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     reason = GetString(ac - 1, av + 1);
 
-  o_RecordCommand(sockfd,
-                  "DIE [%s]",
-                  reason);
+  o_RecordCommand(sockfd, "DIE [%s]", reason);
 
-  o_Wallops("DIE [%s]",
-            reason);
+  o_Wallops("DIE [%s]", reason);
 
   os_notice(lptr, sockfd, "Shutting down");
 

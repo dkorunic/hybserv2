@@ -73,11 +73,11 @@ void *p_CheckSignals()
   int caught;
 
   sigemptyset(&set);
-  /*  sigaddset(&set, SIGINT); */
   sigaddset(&set, SIGHUP);
   sigaddset(&set, SIGTERM);
   sigaddset(&set, SIGCHLD);
   sigaddset(&set, SIGPIPE);
+  sigaddset(&set, SIGUSR1);
 
 #ifdef HAVE_SOLARIS_THREADS
 

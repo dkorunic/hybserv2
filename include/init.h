@@ -21,4 +21,6 @@ void InitSignals();
 void PostCleanup();
 void InitServs(struct Luser *servptr);
 
+extern int control_pipe;
+
 #endif /* INCLUDED_init_h */

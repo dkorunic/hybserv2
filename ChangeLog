@@ -1,3 +1,7 @@
+*** 20010506_3 by kreator
+- fix problems with cmds on forgotten channels
+
+
 *** 20010506_2 by kreator
 - fix configure script to detect stdio and stdio-mt more precisely
 - correct some typos in README

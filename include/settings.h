@@ -191,4 +191,6 @@ extern  int       SeenMaxRecs;
 extern  int       MaxServerCollides;
 extern  long      MinServerCollidesDelta;
 
+extern  long      MaxTSDelta;
+
 #endif /* INCLUDED_settings_h */

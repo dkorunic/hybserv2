@@ -6,6 +6,7 @@ QOTD:
 
 Pending bugs:
 -------------
+*) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count
 *) clear modes doesn't clear limit

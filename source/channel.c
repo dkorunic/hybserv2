@@ -40,6 +40,8 @@
 #include "sock.h"
 #include "sprintf_irc.h"
 
+#ifdef CHANNELSERVICES
+
 /*
  * Global - linked list of channels
  */
@@ -1806,3 +1808,5 @@ struct ChannelGecosBan * MatchGecosBan(struct Channel *cptr, char *ban)
     return (tempban);
   } /* MatchGecosBan() */
 #endif /* GECOSBANS */
+
+#endif /* CHANNELSERVICES */

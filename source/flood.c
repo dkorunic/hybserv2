@@ -28,6 +28,7 @@
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
+#include "sprintf_irc.h"
 
 #ifdef ADVFLOOD
 #include "match.h"

@@ -36,6 +36,8 @@
 #include "statserv.h"
 #include "sock.h"
 
+#if defined NICKSERVICES || defined CHANNELSERVICES
+
 /*
  * Global - linked list of clients
  */
@@ -763,3 +765,5 @@ IsNickCollide(struct Luser *servptr, char **av)
 
   return 0;
 } /* IsNickCollide() */
+
+#endif

@@ -1933,6 +1933,7 @@ s_sjoin(int ac, char **av)
               if (IsInNickArray(ncnt, nicks, tempuser->lptr->nick))
                 continue;
 
+#if defined(CHANNELSERVICES)
               if (tempuser->flags & CH_OPPED)
                 {
                   /* never set ChanServ/OperServ as deopped.. -adx */
@@ -1948,6 +1949,7 @@ s_sjoin(int ac, char **av)
                         tempchan->flags &= ~CH_OPPED;
                     }
                 }
+#endif
 #ifdef HYBRID7
               /* Yeps, do same for halfops -Janus */
               if (tempuser->flags & CH_HOPPED)
@@ -2020,7 +2022,7 @@ s_sjoin(int ac, char **av)
 
     } /* !oldptr */
 
-#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+#if defined NICKSERVICES && defined CHANNELSERVICES
 
   ci = FindChan(cptr->name);
 

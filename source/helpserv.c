@@ -346,7 +346,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     /* Bug found by larne and binder -kre */
     if (strchr(command, '/') || strstr(command, ".."))
     {
-      sprintf(sendstr, "No help available on \002%s\002", helparg);
+      sprintf(sendstr, "Invalid help string");
       if (sockfd == NODCC)
         notice(Serv, helpnick, sendstr);
       else

@@ -79,6 +79,8 @@ DISTRIBUTION
        http://fly.srk.fer.hr/~kreator/projects/hybserv/
        http://fly.srk.fer.hr/~kreator/projects/tarballs/hybserv-cvs.tar.gz
 
+  #6:  Web Interface to the CVS Repository:
+       http://www.alleged.com/cvsweb
 
 NOTE: CVS is usually more current than the release.
 
@@ -224,6 +226,7 @@ ircd.conf following code:
     host = "1.2.3.4";
     send_password = "password";
     accept_password = "password";
+    compressed = no;
     hub_mask = "*";
     class = "server";
   };
@@ -278,17 +281,12 @@ IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC
 However Q lines changed in Hybrid-7 Feel free to copy and paste
 these lines:
 
-  quarantine {
-    name = "NickServ";
+  resv {
+    # The reason must go first
     reason = "This nickname is reserved";
-  };
-  quarantine {
-    name = "ChanServ";
-    reason = "This nickname is reserved";
-  };
-  quarantine {
-    name = "OperServ";
-    reason = "This nickname is reserved";
+    nick = "NickServ";
+    nick = "ChanServ";
+    nick = "OperServ";
   };
 
 ##########################################################################
@@ -309,7 +307,7 @@ Functions used from other GPL'd sources:
      HashChannel()  -- from ircd-hybrid source
 
 tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
-<minar@reed.edu> and Hybserv7 team.
+<minar@reed.edu>, Walter Campbell, and Hybserv7 team.
 
 Some help files were used from EsperNet's service package:
 

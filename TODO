@@ -43,8 +43,6 @@ Features to come:
 *) improve block allocator
 *) add cidr & ranged ip's
 *) add tcpwrap capatibilities
-*) cvsweb
-   ----> work in progress (Hwy and me)
 *) ziplinks (perhaps use servlink?)
 *) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
    flood ctrl for services itself
@@ -62,6 +60,7 @@ Features to come:
 
 Done so far:
 ------------
+*) CVSWeb installed and documented
 *) add mySQL/PostgreSQL support for databases
    -> i'm working on this, too; currently i'm involved in libpq to be
    specific (kre)

@@ -1,3 +1,9 @@
+*** 20020216_1 by kreator
+- fix a nasty bug reported by <marc@egotistical.net> - referencing deleted
+  structure in loop at DelAccess()
+- smaller optimisations
+
+
 *** 20020210_1 by kreator
 - readme small update
 

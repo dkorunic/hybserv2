@@ -4376,11 +4376,7 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     notice(n_ChanServ, lptr->nick, ERR_BAD_PASS);
 
     RecordCommand("%s: %s!%s@%s failed IDENTIFY [%s]",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      av[1]);
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
 
     return;
   }

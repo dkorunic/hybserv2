@@ -25,6 +25,7 @@ Pending bugs:
 
 Features to come:
 -----------------  
+*) choose NOTICES/MESSAGES to communicate with services
 *) rewrite documentation
    ----> work in progress (Hwy)
 *) add SVSNICK, SWHOIS, etc. for other IRCDs

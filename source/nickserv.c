@@ -2220,19 +2220,15 @@ n_identify(struct Luser *lptr, int ac, char **av)
   if (!pwmatch(realptr->password, av[1]))
   {
     notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+
     RecordCommand("%s: %s!%s@%s failed IDENTIFY",
-      n_NickServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+      n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+
     return;
   }
 
   RecordCommand("%s: %s!%s@%s IDENTIFY",
-    n_NickServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname);
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
   realptr->flags |= NS_IDENTIFIED;
   realptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
@@ -2242,7 +2238,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
   if ((nptr->flags & NS_AUTOMASK) &&
       (!OnAccessList(lptr->username, lptr->hostname, nptr)))
   {
-    char  *mask = HostToMask(lptr->username, lptr->hostname);
+    char *mask = HostToMask(lptr->username, lptr->hostname);
 
     AddHostToNick(mask, nptr);
     notice(n_NickServ, lptr->nick,

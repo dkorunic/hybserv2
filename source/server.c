@@ -2449,8 +2449,8 @@ static void CheckServCollide(struct Server *bad_server)
     /* Check if collides went over top */
     if (ServerCollides >= MaxServerCollides)
     {
-      /* When was last collide? */ 
-      if (ServerCollidesTS - current_ts < MinServerCollidesDelta)
+      /* When was first collide? */ 
+      if (current_ts - ServerCollidesTS < MinServerCollidesDelta)
       {
         char note1[] = "Detected services fight from %s";
         char *reason = MyMalloc(sizeof(note1) + sizeof(bad_server->name));

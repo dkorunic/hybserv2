@@ -2,9 +2,10 @@
 
 --- THIS IS STILL A PRERELEASE ---
 
-This release is result of hard work during last several months. There are
-a lot of bugs that got fixed, as well as we added a bunch of new features.
-Now we support some of Hybrid7 features, ircd of new millenium :-)
+ This release is result of hard work during last several months. There are
+ a lot of bugs that got fixed, as well as we added a bunch of new
+ features. Now we support some of Hybrid7 features, ircd of new millenium
+ :-)
 
 Releases are now available from following sources:
 
@@ -16,5 +17,5 @@ ftp://gnjilux.srk.fer.hr/pub/hybserv/
 
 Web access:
 http://fly.srk.fer.hr/~kreator/projects/hybserv
-or
+ or
 http://fly.srk.fer.hr/~kreator/projects/tarballs/

@@ -162,18 +162,18 @@ Rehash()
   RehashError = 0;
 
   if (!UserList)
-  {
-    RehashError = 1;
-    putlog(LOG1, "Rehash: No O: lines found in %s",
-      ConfigFile);
-  }
+    {
+      RehashError = 1;
+      putlog(LOG1, "Rehash: No O: lines found in %s",
+	     ConfigFile);
+    }
 
   if (!ServList)
-  {
-    RehashError = 1;
-    putlog(LOG1, "Rehash: No S: lines found in %s",
-      ConfigFile);
-  }
+    {
+      RehashError = 1;
+      putlog(LOG1, "Rehash: No S: lines found in %s",
+	     ConfigFile);
+    }
 
   /*
    * PART any channels that have been removed from conf file
@@ -200,15 +200,15 @@ Rehash()
 #endif
 
 #ifdef GLOBALSERVICES
- /*
-  * Re-read LogonNews File
-  */
+  /*
+   * Re-read LogonNews File
+   */
 
   if (LogonNews)
-  {
-    Network->LogonNewsFile.filename = LogonNews;
-    ReadMessageFile(&Network->LogonNewsFile);
-  }
+    {
+      Network->LogonNewsFile.filename = LogonNews;
+      ReadMessageFile(&Network->LogonNewsFile);
+    }
 
 #endif
 
@@ -247,407 +247,407 @@ ParseConf(char *filename, int rehash)
     return;
 
   if ((fileptr = fopen(filename, "r")) == NULL)
-  {
-    fprintf(stderr, "Unable to open %s\n", filename);
-    putlog(LOG1,
-      "Unable to open configuration file: %s %s",
-      filename,
-      (filename == ConfigFile) ? "(FATAL)" : "");
+    {
+      fprintf(stderr, "Unable to open %s\n", filename);
+      putlog(LOG1,
+	     "Unable to open configuration file: %s %s",
+	     filename,
+	     (filename == ConfigFile) ? "(FATAL)" : "");
 
-    /*
-     * If the file is the top-level config file, exit.
-     * If this is a rehash, do not exit, because Rehash()
-     * would NOT have erased the old conf lists, so we
-     * can continue normally.
-     */
-    if (!rehash && (filename == ConfigFile))
-      exit(0);
+      /*
+       * If the file is the top-level config file, exit.
+       * If this is a rehash, do not exit, because Rehash()
+       * would NOT have erased the old conf lists, so we
+       * can continue normally.
+       */
+      if (!rehash && (filename == ConfigFile))
+	exit(0);
 
-    return;
-  }
+      return;
+    }
 
   scnt = 0;
 
   while (fgets(line, MAXLINE - 1, fileptr))
-  {
-    /*
-     * you may add comments to config file using a '#'
-     */
-    if (line[0] == '#')
-      continue;         
-
-    key = getfield(line);
-    if (!key)
-      continue;
-
-    switch (*key)
     {
-      case 'a':
-      case 'A':
-      {
-        char *temp;
+      /*
+       * you may add comments to config file using a '#'
+       */
+      if (line[0] == '#')
+	continue;         
 
-        /*
-         * If this is a rehash, Me.admin should already be
-         * set, so make sure it gets freed.
-         */
-        if (Me.admin)
-          MyFree(Me.admin);
+      key = getfield(line);
+      if (!key)
+	continue;
 
-        if (!(temp = getfield(NULL)))
-          break;
+      switch (*key)
+	{
+	case 'a':
+	case 'A':
+	  {
+	    char *temp;
 
-        if (strlen(temp) > REALLEN)
-        {
-          Me.admin = (char *) MyMalloc(REALLEN);
-          memset(Me.admin, 0, REALLEN);
-          strncpy(Me.admin, temp, REALLEN - 1);
-        }
-        else
-          Me.admin = MyStrdup(temp);
+	    /*
+	     * If this is a rehash, Me.admin should already be
+	     * set, so make sure it gets freed.
+	     */
+	    if (Me.admin)
+	      MyFree(Me.admin);
 
-        break;
-      } /* case 'A' */
+	    if (!(temp = getfield(NULL)))
+	      break;
 
-      case 's':
-      case 'S':
-      {
-        char *pass;
-        char *host;
-        char *port;
-        struct Servlist *servptr;
+	    if (strlen(temp) > REALLEN)
+	      {
+		Me.admin = (char *) MyMalloc(REALLEN);
+		memset(Me.admin, 0, REALLEN);
+		strncpy(Me.admin, temp, REALLEN - 1);
+	      }
+	    else
+	      Me.admin = MyStrdup(temp);
+
+	    break;
+	  } /* case 'A' */
+
+	case 's':
+	case 'S':
+	  {
+	    char *pass;
+	    char *host;
+	    char *port;
+	    struct Servlist *servptr;
         
-        pass = getfield(NULL);
-        host = getfield(NULL);
-        port = getfield(NULL);
-        if (!host || !pass)
-          continue;
+	    pass = getfield(NULL);
+	    host = getfield(NULL);
+	    port = getfield(NULL);
+	    if (!host || !pass)
+	      continue;
 
-        if ((servptr = IsServLine(host, port)))
-        {
-          servptr->flags &= ~SL_DELETE;
-          if (servptr->password)
-          {
-            /*
-             * This must be a rehash, so in case the password
-             * was changed, set servptr->password to the new one.
-             */
-            MyFree(servptr->password);
-            servptr->password = MyStrdup(pass);
-          }
-        }
-        else
-        {
-          AddServ(host, pass, port ? atoi(port) : DefaultHubPort);
-        }
+	    if ((servptr = IsServLine(host, port)))
+	      {
+		servptr->flags &= ~SL_DELETE;
+		if (servptr->password)
+		  {
+		    /*
+		     * This must be a rehash, so in case the password
+		     * was changed, set servptr->password to the new one.
+		     */
+		    MyFree(servptr->password);
+		    servptr->password = MyStrdup(pass);
+		  }
+	      }
+	    else
+	      {
+		AddServ(host, pass, port ? atoi(port) : DefaultHubPort);
+	      }
 
-        scnt++;
-        break;
-      } /* case 'S' */
+	    scnt++;
+	    break;
+	  } /* case 'S' */
 
-  #ifdef ALLOW_JUPES
-      case 'j':
-      case 'J':
-      {
-        char *name;
-        char *reason;
-        char *who;
+#ifdef ALLOW_JUPES
+	case 'j':
+	case 'J':
+	  {
+	    char *name;
+	    char *reason;
+	    char *who;
 
-        name = getfield(NULL);
-        reason = getfield(NULL);
-        who = getfield(NULL);
-        if (!name || !reason || !who)
-          continue;
+	    name = getfield(NULL);
+	    reason = getfield(NULL);
+	    who = getfield(NULL);
+	    if (!name || !reason || !who)
+	      continue;
 
-        AddJupe(name, reason, who);
+	    AddJupe(name, reason, who);
 
-        break;  
-      } /* case 'J' */
-  #endif /* ALLOW_JUPES */
+	    break;  
+	  } /* case 'J' */
+#endif /* ALLOW_JUPES */
 
-  #ifdef ALLOW_GLINES
-      case 'g':
-      case 'G':
-      {
-        char *host;
-        char *reason;
-        char *who;
+#ifdef ALLOW_GLINES
+	case 'g':
+	case 'G':
+	  {
+	    char *host;
+	    char *reason;
+	    char *who;
 
-        host = getfield(NULL);
-        reason = getfield(NULL);
-        who = getfield(NULL);
+	    host = getfield(NULL);
+	    reason = getfield(NULL);
+	    who = getfield(NULL);
 
-        if (!host || !who)
-          continue;
+	    if (!host || !who)
+	      continue;
 
-        AddGline(host, reason, who, 0);
+	    AddGline(host, reason, who, 0);
 
-        break;     
-      } /* case 'G': */
-  #endif /* ALLOW_GLINES */
+	    break;     
+	  } /* case 'G': */
+#endif /* ALLOW_GLINES */
 
-      case 'c':
-      case 'C':
-      {
-        char *cname;
-        struct Chanlist *chanptr;
+	case 'c':
+	case 'C':
+	  {
+	    char *cname;
+	    struct Chanlist *chanptr;
 
-        cname = getfield(NULL);
-        if (!cname)
-          continue;
+	    cname = getfield(NULL);
+	    if (!cname)
+	      continue;
 
-        if (*cname != '#')
-          continue;
+	    if (*cname != '#')
+	      continue;
 
-        if ((chanptr = IsChannel(cname)))
-        {
-          /*
-           * Since cname is already in the channel list,
-           * this must be a rehash. Remove the deletion
-           * flag from chanptr since the C: line was
-           * not deleted prior to the rehash
-           */
-          chanptr->flags &= ~CHAN_DELETE;
-        }
-        else
-        {
-          /* a new chan was added to the conf */
-          AddMyChan(cname);
-        }
+	    if ((chanptr = IsChannel(cname)))
+	      {
+		/*
+		 * Since cname is already in the channel list,
+		 * this must be a rehash. Remove the deletion
+		 * flag from chanptr since the C: line was
+		 * not deleted prior to the rehash
+		 */
+		chanptr->flags &= ~CHAN_DELETE;
+	      }
+	    else
+	      {
+		/* a new chan was added to the conf */
+		AddMyChan(cname);
+	      }
 
-        break;
-      } /* case 'C' */
+	    break;
+	  } /* case 'C' */
 
-      case 'o':
-      case 'O':
-      {
-        char *nick;
-        char *host;
-        char *pass;
-        char *flags;
+	case 'o':
+	case 'O':
+	  {
+	    char *nick;
+	    char *host;
+	    char *pass;
+	    char *flags;
 
-        host = getfield(NULL);
-        pass = getfield(NULL);
-        nick = getfield(NULL);
-        flags = getfield(NULL);
-        if (!host || !pass || !nick || !flags)
-          continue;
+	    host = getfield(NULL);
+	    pass = getfield(NULL);
+	    nick = getfield(NULL);
+	    flags = getfield(NULL);
+	    if (!host || !pass || !nick || !flags)
+	      continue;
 
-        AddUser(host, pass, nick, flags);
+	    AddUser(host, pass, nick, flags);
 
-        break;    
-      } /* case 'O' */
+	    break;    
+	  } /* case 'O' */
 
-      case 'n':
-      case 'N':
-      {
-        char *name;
-        char *info;
+	case 'n':
+	case 'N':
+	  {
+	    char *name;
+	    char *info;
 
-        name = getfield(NULL);
-        info = getfield(NULL);
-        if (!name || !info)
-          continue;
+	    name = getfield(NULL);
+	    info = getfield(NULL);
+	    if (!name || !info)
+	      continue;
 
-        if (strlen(name) > REALLEN)
-        {
-          Me.name = (char *) MyMalloc(REALLEN);
-          memset(Me.name, 0, REALLEN);
-          strncpy(Me.name, name, REALLEN - 1);
-        }
-        else
-          Me.name = MyStrdup(name);
+	    if (strlen(name) > REALLEN)
+	      {
+		Me.name = (char *) MyMalloc(REALLEN);
+		memset(Me.name, 0, REALLEN);
+		strncpy(Me.name, name, REALLEN - 1);
+	      }
+	    else
+	      Me.name = MyStrdup(name);
 
-        if (strlen(info) > REALLEN)
-        {
-          Me.info = (char *) MyMalloc(REALLEN);
-          memset(Me.info, 0, REALLEN);
-          strncpy(Me.info, info, REALLEN - 1);
-        }
-        else
-          Me.info = MyStrdup(info);
+	    if (strlen(info) > REALLEN)
+	      {
+		Me.info = (char *) MyMalloc(REALLEN);
+		memset(Me.info, 0, REALLEN);
+		strncpy(Me.info, info, REALLEN - 1);
+	      }
+	    else
+	      Me.info = MyStrdup(info);
 
-        break;
-      } /* case 'N' */
+	    break;
+	  } /* case 'N' */
 
-      case 'b':
-      case 'B':
-      {
-        char *name;
-        char *host;
-        char *pass;
-        char *port;
+	case 'b':
+	case 'B':
+	  {
+	    char *name;
+	    char *host;
+	    char *pass;
+	    char *port;
 
-        host = getfield(NULL);
-        name = getfield(NULL);
-        pass = getfield(NULL);
-        port = getfield(NULL);
-        if (!name || !host || !pass)
-          continue;
+	    host = getfield(NULL);
+	    name = getfield(NULL);
+	    pass = getfield(NULL);
+	    port = getfield(NULL);
+	    if (!name || !host || !pass)
+	      continue;
 
-        AddBot(name, host, pass, port ? atoi(port) : DefaultTcmPort);
+	    AddBot(name, host, pass, port ? atoi(port) : DefaultTcmPort);
 
-        break;
-      } /* case 'B' */
+	    break;
+	  } /* case 'B' */
 
-      case 'l':
-      case 'L':
-      {
-        char *name;
-        char *host;
-        char *pass;
+	case 'l':
+	case 'L':
+	  {
+	    char *name;
+	    char *host;
+	    char *pass;
 
-        host = getfield(NULL);
-        name = getfield(NULL);
-        pass = getfield(NULL);
-        if (!name || !host || !pass)
-          continue;
+	    host = getfield(NULL);
+	    name = getfield(NULL);
+	    pass = getfield(NULL);
+	    if (!name || !host || !pass)
+	      continue;
 
-        AddRemoteBot(name, host, pass);
+	    AddRemoteBot(name, host, pass);
 
-        break;
-      } /* case 'L' */
+	    break;
+	  } /* case 'L' */
 
-      case 'i':
-      case 'I':
-      {
-        char *host, *num, *banhost;
+	case 'i':
+	case 'I':
+	  {
+	    char *host, *num, *banhost;
 
-        host = getfield(NULL);
-        num = getfield(NULL);
-        banhost = getfield(NULL);
-        if (!banhost)
-          banhost = "0";
-        if (!host || !num)
-          continue;
+	    host = getfield(NULL);
+	    num = getfield(NULL);
+	    banhost = getfield(NULL);
+	    if (!banhost)
+	      banhost = "0";
+	    if (!host || !num)
+	      continue;
 
-        AddHostLimit(host, atoi(num), atoi(banhost));
+	    AddHostLimit(host, atoi(num), atoi(banhost));
 
-        break;
-      } /* case 'I' */
+	    break;
+	  } /* case 'I' */
 
-      case 'p':
-      case 'P':
-      {
-        char *port, *type, *host;
+	case 'p':
+	case 'P':
+	  {
+	    char *port, *type, *host;
 
-        host = getfield(NULL);
-        port = getfield(NULL);
-        type = getfield(NULL);
+	    host = getfield(NULL);
+	    port = getfield(NULL);
+	    type = getfield(NULL);
 
-        if (!port)
-          continue;
-        if (!IsNum(port))
-          continue;
+	    if (!port)
+	      continue;
+	    if (!IsNum(port))
+	      continue;
 
-        AddPort(atoi(port), host, type);
+	    AddPort(atoi(port), host, type);
 
-        break;
-      } /* case 'P' */
+	    break;
+	  } /* case 'P' */
 
-      case 'v':
-      case 'V':
-      {
-        char *vhost;
+	case 'v':
+	case 'V':
+	  {
+	    char *vhost;
 
-        vhost = getfield(NULL);
-        if (!vhost)
-          continue;
+	    vhost = getfield(NULL);
+	    if (!vhost)
+	      continue;
 
-        if (!LocalHostName)
-          LocalHostName = MyStrdup(vhost);
+	    if (!LocalHostName)
+	      LocalHostName = MyStrdup(vhost);
 
-        break;
-      } /* case 'V' */
+	    break;
+	  } /* case 'V' */
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
-      /* This includes routines for auto-connecting in case of split -
-       * HybServ will send required CONNECT string and try to connect
-       * server if splitted. Usually this is not necessary because of
-       * auto-connecting ports, but what if you want to make sure they
-       * will be reconnected after some time if admin is not present, ant
-       * non-autoconnecting c/N lines exist? -kre 
-       */
-      case 'm':
-      case 'M':
-      {
-        char *hub, *leaf, *port_str;
-        long re_time;
-        int port;
+	  /* This includes routines for auto-connecting in case of split -
+	   * HybServ will send required CONNECT string and try to connect
+	   * server if splitted. Usually this is not necessary because of
+	   * auto-connecting ports, but what if you want to make sure they
+	   * will be reconnected after some time if admin is not present, ant
+	   * non-autoconnecting c/N lines exist? -kre 
+	   */
+	case 'm':
+	case 'M':
+	  {
+	    char *hub, *leaf, *port_str;
+	    long re_time;
+	    int port;
 
-        hub=getfield(NULL);
-        port_str=getfield(NULL);
-        if (!port_str)
-          port=DefaultHubPort;
-        else
-          port=atoi(port_str);
-        leaf=getfield(NULL);
-        re_time=timestr(getfield(NULL));
+	    hub=getfield(NULL);
+	    port_str=getfield(NULL);
+	    if (!port_str)
+	      port=DefaultHubPort;
+	    else
+	      port=atoi(port_str);
+	    leaf=getfield(NULL);
+	    re_time=timestr(getfield(NULL));
 
-        if (!hub || !leaf || !re_time)
-          continue;
+	    if (!hub || !leaf || !re_time)
+	      continue;
 
-        AddReconnect(hub, port, leaf, re_time);
+	    AddReconnect(hub, port, leaf, re_time);
 
-        break;
-      } /* case 'M' */
+	    break;
+	  } /* case 'M' */
 #endif /*  AUTO_ROUTING && SPLIT_INFO */
 
-      case '.':
-      {
-        char *start, *end;
-        char *filename;
+	case '.':
+	  {
+	    char *start, *end;
+	    char *filename;
 
-        if (!ircncmp(line, ".include", 8))
-        {
-          /*
-           * It is a .include statement - meaning they
-           * want to include another file to be parsed
-           * as a regular configuration file. Normal
-           * syntax is: .include "filename"
-           */
+	    if (!ircncmp(line, ".include", 8))
+	      {
+		/*
+		 * It is a .include statement - meaning they
+		 * want to include another file to be parsed
+		 * as a regular configuration file. Normal
+		 * syntax is: .include "filename"
+		 */
 
-          if ((start = strchr(line, '"')))
-            filename = start + 1;
-          else
-          {
-            /*
-             * There are no quotes in the line - bad syntax
-             */
-            putlog(LOG1,
-              "Incorrect config file syntax: %s",
-              line);
-            continue;
-          }
+		if ((start = strchr(line, '"')))
+		  filename = start + 1;
+		else
+		  {
+		    /*
+		     * There are no quotes in the line - bad syntax
+		     */
+		    putlog(LOG1,
+			   "Incorrect config file syntax: %s",
+			   line);
+		    continue;
+		  }
 
-          /*
-           * "filename" should now point past the first quote
-           * (ie: file") so now set the end quote to a \0
-           */
-          if ((end = strchr(filename, '"')))
-            *end = '\0';
-          else
-          {
-            putlog(LOG1,
-              "Incorrect config file syntax: %s",
-              line);
-            continue;
-          }
+		/*
+		 * "filename" should now point past the first quote
+		 * (ie: file") so now set the end quote to a \0
+		 */
+		if ((end = strchr(filename, '"')))
+		  *end = '\0';
+		else
+		  {
+		    putlog(LOG1,
+			   "Incorrect config file syntax: %s",
+			   line);
+		    continue;
+		  }
 
-          /*
-           * Now recursively call ParseConf() to parse the new
-           * configuration file
-           */
-          ParseConf(filename, 0);
-        } /* if (!ircncmp(line, ".include", 8)) */
+		/*
+		 * Now recursively call ParseConf() to parse the new
+		 * configuration file
+		 */
+		ParseConf(filename, 0);
+	      } /* if (!ircncmp(line, ".include", 8)) */
 
-        break;
-      } /* case '.' */
+	    break;
+	  } /* case '.' */
 
-      default:
-        break;
+	default:
+	  break;
+	}
     }
-  }
 
   HubCount += scnt;
 
@@ -682,44 +682,44 @@ LoadConfig()
   ConfError = 0;
 
   if (!Me.admin)
-  {
-    fprintf (stderr,
-      "No administrative contact information (A:) found in %s\n",
-      ConfigFile);
-    ConfError = 1;
-  }
+    {
+      fprintf (stderr,
+	       "No administrative contact information (A:) found in %s\n",
+	       ConfigFile);
+      ConfError = 1;
+    }
 
   if (!Me.name)
-  {
-    fprintf(stderr,
-      "No server name (N:) specified in %s\n",
-      ConfigFile);
-    ConfError = 1;
-  }
+    {
+      fprintf(stderr,
+	      "No server name (N:) specified in %s\n",
+	      ConfigFile);
+      ConfError = 1;
+    }
 
   if (!Me.info)
-  {
-    fprintf (stderr,
-      "No server info (N:) specified in %s\n",
-      ConfigFile);
-    ConfError = 1;
-  }
+    {
+      fprintf (stderr,
+	       "No server info (N:) specified in %s\n",
+	       ConfigFile);
+      ConfError = 1;
+    }
 
   if (!ServList)
-  {
-    fprintf (stderr,
-      "No hub servers (S:) specified in %s\n",
-      ConfigFile);
-    ConfError = 1;
-  }
+    {
+      fprintf (stderr,
+	       "No hub servers (S:) specified in %s\n",
+	       ConfigFile);
+      ConfError = 1;
+    }
   
   if (!UserList)
-  {
-    fprintf (stderr,
-      "No users (O:) specified for access to services in %s (at least one user should be added)\n",
-      ConfigFile);
-    ConfError = 1;
-  }
+    {
+      fprintf (stderr,
+	       "No users (O:) specified for access to services in %s (at least one user should be added)\n",
+	       ConfigFile);
+      ConfError = 1;
+    }
 
   if (ConfError)
     exit(1);
@@ -978,76 +978,76 @@ AddUser(char *host, char *pass, char *nick, char *flags)
   ptr->nick = MyStrdup(nick);
 
   if ((tmp = strchr(host, '@')))
-  {
-    *tmp++ = '\0';
-    ptr->username = MyStrdup(host);
-    ptr->hostname = MyStrdup(tmp);
-  }
+    {
+      *tmp++ = '\0';
+      ptr->username = MyStrdup(host);
+      ptr->hostname = MyStrdup(tmp);
+    }
   else
-  {
-    ptr->username = MyStrdup("*");
-    ptr->hostname = MyStrdup(host);
-  }
+    {
+      ptr->username = MyStrdup("*");
+      ptr->hostname = MyStrdup(host);
+    }
 
   ptr->password = MyStrdup(pass);
   ptr->umodes = OPERUMODE_INIT;
 
   for (ii = 0; ii < strlen(flags); ii++)
-  {
-    switch (flags[ii])
     {
-      case 's':
-      case 'S':
-      {
-        ptr->flags |= (PRIV_SADMIN | PRIV_ADMIN | PRIV_OPER | PRIV_FRIEND | PRIV_CHAT | PRIV_EXCEPTION);
-        break;
-      }
-      case 'a':
-      case 'A':
-      {
-        ptr->flags |= (PRIV_ADMIN | PRIV_OPER | PRIV_FRIEND | PRIV_CHAT);
-        break;
-      }
-      case 'o':
-      case 'O':
-      {
-        ptr->flags |= (PRIV_OPER | PRIV_FRIEND);
-        break;
-      }
-      case 'j':
-      case 'J':
-      {
-        ptr->flags |= PRIV_JUPE;
-        break;
-      }
-      case 'g':
-      case 'G':
-      {
-        ptr->flags |= PRIV_GLINE;
-        break;
-      }
-      case 'd':
-      case 'D':
-      {
-        ptr->flags |= PRIV_CHAT;
-        break;
-      }
-      case 'e':
-      case 'E':
-      {
-        ptr->flags |= PRIV_EXCEPTION;
-        break;
-      }
-      case 'f':
-      case 'F':
-      {
-        ptr->flags |= PRIV_FRIEND;
-        break;
-      }
-      default:
-        break;
-    } /* switch (flags[ii]) */
-  }
+      switch (flags[ii])
+	{
+	case 's':
+	case 'S':
+	  {
+	    ptr->flags |= (PRIV_SADMIN | PRIV_ADMIN | PRIV_OPER | PRIV_FRIEND | PRIV_CHAT | PRIV_EXCEPTION);
+	    break;
+	  }
+	case 'a':
+	case 'A':
+	  {
+	    ptr->flags |= (PRIV_ADMIN | PRIV_OPER | PRIV_FRIEND | PRIV_CHAT);
+	    break;
+	  }
+	case 'o':
+	case 'O':
+	  {
+	    ptr->flags |= (PRIV_OPER | PRIV_FRIEND);
+	    break;
+	  }
+	case 'j':
+	case 'J':
+	  {
+	    ptr->flags |= PRIV_JUPE;
+	    break;
+	  }
+	case 'g':
+	case 'G':
+	  {
+	    ptr->flags |= PRIV_GLINE;
+	    break;
+	  }
+	case 'd':
+	case 'D':
+	  {
+	    ptr->flags |= PRIV_CHAT;
+	    break;
+	  }
+	case 'e':
+	case 'E':
+	  {
+	    ptr->flags |= PRIV_EXCEPTION;
+	    break;
+	  }
+	case 'f':
+	case 'F':
+	  {
+	    ptr->flags |= PRIV_FRIEND;
+	    break;
+	  }
+	default:
+	  break;
+	} /* switch (flags[ii]) */
+    }
 
   ptr->next = UserList;
   UserList = ptr;
@@ -1081,29 +1081,29 @@ AddServ(char *hostname, char *password, int port)
   hp = LookupHostname(hostname, &ip);
 
   if (hp)
-  {
-    /*
-     * We have a resolving hostname - it is possible it points
-     * to more than one ip - add all of them
-     */
-    ptr = CreateServer();
-
-    for (curraddr = hp->h_addr_list; *curraddr; ++curraddr)
-      AddAddressToServer(&ptr, *curraddr, hp->h_length);
-  }
-  else
-  {
-    if (ip.s_addr == INADDR_NONE)
     {
-      putlog(LOG1,
-        "Unresolvable server name: %s",
-        hostname);
-      return;
-    }
+      /*
+       * We have a resolving hostname - it is possible it points
+       * to more than one ip - add all of them
+       */
+      ptr = CreateServer();
 
-    ptr = CreateServer();
-    AddAddressToServer(&ptr, (char *) &ip.s_addr, sizeof(ip));
-  }
+      for (curraddr = hp->h_addr_list; *curraddr; ++curraddr)
+	AddAddressToServer(&ptr, *curraddr, hp->h_length);
+    }
+  else
+    {
+      if (ip.s_addr == INADDR_NONE)
+	{
+	  putlog(LOG1,
+		 "Unresolvable server name: %s",
+		 hostname);
+	  return;
+	}
+
+      ptr = CreateServer();
+      AddAddressToServer(&ptr, (char *) &ip.s_addr, sizeof(ip));
+    }
 #endif /* 0 */
 
   ptr = CreateServer();
@@ -1195,16 +1195,16 @@ AddBot(char *nick, char *host, char *pass, int port)
   ptr->name = MyStrdup(nick);
 
   if ((tmp = strchr(host, '@')))
-  {
-    *tmp++ = '\0';
-    ptr->username = MyStrdup(host);
-    ptr->hostname = MyStrdup(tmp);
-  }
+    {
+      *tmp++ = '\0';
+      ptr->username = MyStrdup(host);
+      ptr->hostname = MyStrdup(tmp);
+    }
   else
-  {
-    ptr->username = MyStrdup("*");
-    ptr->hostname = MyStrdup(host);
-  }
+    {
+      ptr->username = MyStrdup("*");
+      ptr->hostname = MyStrdup(host);
+    }
 
   ptr->password = MyStrdup(pass);
   ptr->port = port;
@@ -1230,16 +1230,16 @@ AddRemoteBot(char *nick, char *host, char *pass)
   ptr->name = MyStrdup(nick);
 
   if ((tmp = strchr(host, '@')))
-  {
-    *tmp++ = '\0';
-    ptr->username = MyStrdup(host);
-    ptr->hostname = MyStrdup(tmp);
-  }
+    {
+      *tmp++ = '\0';
+      ptr->username = MyStrdup(host);
+      ptr->hostname = MyStrdup(tmp);
+    }
   else
-  {
-    ptr->username = MyStrdup("*");
-    ptr->hostname = MyStrdup(host);
-  }
+    {
+      ptr->username = MyStrdup("*");
+      ptr->hostname = MyStrdup(host);
+    }
 
   ptr->password = MyStrdup(pass);
 
@@ -1259,50 +1259,50 @@ AddPort(int port, char *host, char *type)
   struct PortInfo *ptr;
 
   if ((ptr = IsPort(port)))
-  {
-    /*
-     * The port is already in the list, so this routine was probably
-     * called from Rehash() - just change the hostmask and type
-     * in case they were changed for the rehash
-     */
-    if (ptr->host)
-      MyFree(ptr->host);
-  }
+    {
+      /*
+       * The port is already in the list, so this routine was probably
+       * called from Rehash() - just change the hostmask and type
+       * in case they were changed for the rehash
+       */
+      if (ptr->host)
+	MyFree(ptr->host);
+    }
   else
-  {
-    ptr = (struct PortInfo *) MyMalloc(sizeof(struct PortInfo));
-    memset(ptr, 0, sizeof(struct PortInfo));
+    {
+      ptr = (struct PortInfo *) MyMalloc(sizeof(struct PortInfo));
+      memset(ptr, 0, sizeof(struct PortInfo));
 
-    ptr->port = port;
-    ptr->socket = NOSOCKET;
-    ptr->next = PortList;
-    PortList = ptr;
-  }
+      ptr->port = port;
+      ptr->socket = NOSOCKET;
+      ptr->next = PortList;
+      PortList = ptr;
+    }
 
   if (host)
-  {
-    if (strlen(host))
-      ptr->host = MyStrdup(host);
-    else
-      ptr->host = NULL;
-  }
+    {
+      if (strlen(host))
+	ptr->host = MyStrdup(host);
+      else
+	ptr->host = NULL;
+    }
   else
     ptr->host = NULL;
 
   if (!type)
     ptr->type = PRT_USERS;
   else
-  {
-    ptr->type = 0;
+    {
+      ptr->type = 0;
 
-    if (!irccmp(type, "TCM"))
-      ptr->type = PRT_TCM;
-    if (!irccmp(type, "USERS"))
-      ptr->type = PRT_USERS;
+      if (!irccmp(type, "TCM"))
+	ptr->type = PRT_TCM;
+      if (!irccmp(type, "USERS"))
+	ptr->type = PRT_USERS;
 
-    if (!ptr->type)
-      ptr->type = PRT_USERS;
-  }
+      if (!ptr->type)
+	ptr->type = PRT_USERS;
+    }
 } /* AddPort() */
 
 /*
@@ -1321,7 +1321,7 @@ ClearConfLines()
   struct Gline *tempgline;
 #endif
   struct Userlist *tempuser;
-/*  struct Servlist *tempserv; */
+  /*  struct Servlist *tempserv; */
   struct Botlist *tempbot;
   struct rHost *temphost;
 #if defined AUTO_ROUTING && defined SPLIT_INFO
@@ -1330,87 +1330,87 @@ ClearConfLines()
 
 #ifdef ALLOW_JUPES
   while (JupeList)
-  {
-    tempjupe = JupeList->next;
-    DeleteJupe(JupeList);
-    JupeList = tempjupe;
-  }
+    {
+      tempjupe = JupeList->next;
+      DeleteJupe(JupeList);
+      JupeList = tempjupe;
+    }
 #endif
 
 #ifdef ALLOW_GLINES
   while (GlineList)
-  {
-    tempgline = GlineList->next;
-    DeleteGline(GlineList);
-    GlineList = tempgline;
-  }
+    {
+      tempgline = GlineList->next;
+      DeleteGline(GlineList);
+      GlineList = tempgline;
+    }
 #endif
 
   while (UserList)
-  {
-    tempuser = UserList->next;
-    MyFree(UserList->nick);
-    MyFree(UserList->username);
-    MyFree(UserList->hostname);
-    MyFree(UserList->password);
-    MyFree(UserList);
-    UserList = tempuser;
-  }
+    {
+      tempuser = UserList->next;
+      MyFree(UserList->nick);
+      MyFree(UserList->username);
+      MyFree(UserList->hostname);
+      MyFree(UserList->password);
+      MyFree(UserList);
+      UserList = tempuser;
+    }
 
-/*
- * Don't clear the ServList during a rehash because currenthub
- * will point to garbage
-  while (ServList)
-  {
-    MyFree(ServList->hostname);
-    MyFree(ServList->password);
-    if (ServList->realname)
-      MyFree(ServList->realname);
-    tempserv = ServList->next;
-    MyFree(ServList);
-    ServList = tempserv;
-  }
-*/
+  /*
+   * Don't clear the ServList during a rehash because currenthub
+   * will point to garbage
+   while (ServList)
+   {
+   MyFree(ServList->hostname);
+   MyFree(ServList->password);
+   if (ServList->realname)
+   MyFree(ServList->realname);
+   tempserv = ServList->next;
+   MyFree(ServList);
+   ServList = tempserv;
+   }
+  */
 
   while (BotList)
-  {
-    MyFree(BotList->name);
-    MyFree(BotList->username);
-    MyFree(BotList->hostname);
-    MyFree(BotList->password);
-    tempbot = BotList->next;
-    MyFree(BotList);
-    BotList = tempbot;
-  }
+    {
+      MyFree(BotList->name);
+      MyFree(BotList->username);
+      MyFree(BotList->hostname);
+      MyFree(BotList->password);
+      tempbot = BotList->next;
+      MyFree(BotList);
+      BotList = tempbot;
+    }
 
   while (RemoteBots)
-  {
-    MyFree(RemoteBots->name);
-    MyFree(RemoteBots->username);
-    MyFree(RemoteBots->hostname);
-    MyFree(RemoteBots->password);
-    tempbot = RemoteBots->next;
-    MyFree(RemoteBots);
-    RemoteBots = tempbot;
-  }
+    {
+      MyFree(RemoteBots->name);
+      MyFree(RemoteBots->username);
+      MyFree(RemoteBots->hostname);
+      MyFree(RemoteBots->password);
+      tempbot = RemoteBots->next;
+      MyFree(RemoteBots);
+      RemoteBots = tempbot;
+    }
 
   while (rHostList)
-  {
-    MyFree(rHostList->username);
-    MyFree(rHostList->hostname);
-    temphost = rHostList->next;
-    MyFree(rHostList);
-    rHostList = temphost;
-  }
+    {
+      MyFree(rHostList->username);
+      MyFree(rHostList->hostname);
+      temphost = rHostList->next;
+      MyFree(rHostList);
+      rHostList = temphost;
+    }
 #if defined AUTO_ROUTING && defined SPLIT_INFO
   while (cHostList)
-  {
-    MyFree(cHostList->hub);
-    MyFree(cHostList->leaf);
-    tempchost=cHostList->next;
-    MyFree(cHostList);
-    cHostList=tempchost;
-  }
+    {
+      MyFree(cHostList->hub);
+      MyFree(cHostList->leaf);
+      tempchost=cHostList->next;
+      MyFree(cHostList);
+      cHostList=tempchost;
+    }
 #endif
 } /* ClearConfLines() */
 
@@ -1437,58 +1437,58 @@ CheckChans()
    */
   prev = NULL;
   for (tempchan = ChanList; tempchan; )
-  {
-    if (tempchan->flags & CHAN_DELETE)
     {
-      putlog(LOG1, "%s: No longer monitoring %s",
-        n_OperServ,
-        tempchan->name);
+      if (tempchan->flags & CHAN_DELETE)
+	{
+	  putlog(LOG1, "%s: No longer monitoring %s",
+		 n_OperServ,
+		 tempchan->name);
 
-      cptr = FindChannel(tempchan->name);
-      if (IsChannelMember(cptr, Me.osptr))
-        os_part(cptr);
+	  cptr = FindChannel(tempchan->name);
+	  if (IsChannelMember(cptr, Me.osptr))
+	    os_part(cptr);
 
-      MyFree(tempchan->name);
+	  MyFree(tempchan->name);
 
-      if (prev)
-      {
-        prev->next = tempchan->next;
-        MyFree(tempchan);
-        tempchan = prev;
-      }
+	  if (prev)
+	    {
+	      prev->next = tempchan->next;
+	      MyFree(tempchan);
+	      tempchan = prev;
+	    }
+	  else
+	    {
+	      ChanList = tempchan->next;
+	      MyFree(tempchan);
+	      tempchan = NULL;
+	    }
+
+	  Network->MyChans--;
+	} /* if (tempchan->flags & CHAN_DELETE) */
+
+      prev = tempchan;
+
+      if (tempchan)
+	tempchan = tempchan->next;
       else
-      {
-        ChanList = tempchan->next;
-        MyFree(tempchan);
-        tempchan = NULL;
-      }
-
-      Network->MyChans--;
-    } /* if (tempchan->flags & CHAN_DELETE) */
-
-    prev = tempchan;
-
-    if (tempchan)
-      tempchan = tempchan->next;
-    else
-      tempchan = ChanList;
-  }
+	tempchan = ChanList;
+    }
 
   /*
    * go through channel list and JOIN any new channels that were added 
    * to the conf
    */
   for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
-  {
-    cptr = FindChannel(tempchan->name);
-    if (cptr && !IsChannelMember(cptr, Me.osptr))
     {
-      os_join(cptr);
-      putlog(LOG1, "%s: Now monitoring channel %s",
-        n_OperServ,
-        tempchan->name);
+      cptr = FindChannel(tempchan->name);
+      if (cptr && !IsChannelMember(cptr, Me.osptr))
+	{
+	  os_join(cptr);
+	  putlog(LOG1, "%s: Now monitoring channel %s",
+		 n_OperServ,
+		 tempchan->name);
+	}
     }
-  }
 } /* CheckChans() */
 
 /*
@@ -1506,46 +1506,46 @@ CheckServers()
   prev = NULL;
 
   for (tempserv = ServList; tempserv; )
-  {
-    if (tempserv->flags & SL_DELETE)
     {
-      if (tempserv == currenthub)
-      {
-        /*
-         * Someone deleted our current hub server out of
-         * hybserv.conf .. just keep it in the list, or it will
-         * screw a lot of stuff up :-)
-         */
-        tempserv->flags &= ~SL_DELETE;
-        tempserv = tempserv->next;
-        continue;
-      }
+      if (tempserv->flags & SL_DELETE)
+	{
+	  if (tempserv == currenthub)
+	    {
+	      /*
+	       * Someone deleted our current hub server out of
+	       * hybserv.conf .. just keep it in the list, or it will
+	       * screw a lot of stuff up :-)
+	       */
+	      tempserv->flags &= ~SL_DELETE;
+	      tempserv = tempserv->next;
+	      continue;
+	    }
 
-      MyFree(tempserv->hostname);
-      MyFree(tempserv->password);
-      if (tempserv->realname)
-        MyFree(tempserv->realname);
+	  MyFree(tempserv->hostname);
+	  MyFree(tempserv->password);
+	  if (tempserv->realname)
+	    MyFree(tempserv->realname);
 
-      if (prev)
-      {
-        prev->next = tempserv->next;
-        MyFree(tempserv);
-        tempserv = prev;
-      }
+	  if (prev)
+	    {
+	      prev->next = tempserv->next;
+	      MyFree(tempserv);
+	      tempserv = prev;
+	    }
+	  else
+	    {
+	      ServList = tempserv->next;
+	      MyFree(tempserv);
+	      tempserv = NULL;
+	    }
+	}
+
+      prev = tempserv;
+      if (tempserv)
+	tempserv = tempserv->next;
       else
-      {
-        ServList = tempserv->next;
-        MyFree(tempserv);
-        tempserv = NULL;
-      }
+	tempserv = ServList;
     }
-
-    prev = tempserv;
-    if (tempserv)
-      tempserv = tempserv->next;
-    else
-      tempserv = ServList;
-  }
 } /* CheckServers() */
 
 /*
@@ -1562,41 +1562,41 @@ CheckListenPorts()
 
   prev = NULL;
   for (tempport = PortList; tempport; )
-  {
-    if (tempport->type == PRT_DELETE)
     {
-      putlog(LOG1, "No longer listening on port %d %s%s%s",
-        tempport->port,
-        tempport->host ? "[" : "",
-        tempport->host ? tempport->host : "",
-        tempport->host ? "]" : "");
+      if (tempport->type == PRT_DELETE)
+	{
+	  putlog(LOG1, "No longer listening on port %d %s%s%s",
+		 tempport->port,
+		 tempport->host ? "[" : "",
+		 tempport->host ? tempport->host : "",
+		 tempport->host ? "]" : "");
 
-      if (tempport->socket != NOSOCKET)
-        close(tempport->socket);
+	  if (tempport->socket != NOSOCKET)
+	    close(tempport->socket);
 
-      if (tempport->host)
-        MyFree(tempport->host);
+	  if (tempport->host)
+	    MyFree(tempport->host);
 
-      if (prev)
-      {
-        prev->next = tempport->next;
-        MyFree(tempport);
-        tempport = prev;
-      }
+	  if (prev)
+	    {
+	      prev->next = tempport->next;
+	      MyFree(tempport);
+	      tempport = prev;
+	    }
+	  else
+	    {
+	      PortList = tempport->next;
+	      MyFree(tempport);
+	      tempport = NULL;
+	    }
+	} /* if (tempport->type == PRT_DELETE) */
+
+      prev = tempport;
+      if (tempport)
+	tempport = tempport->next;
       else
-      {
-        PortList = tempport->next;
-        MyFree(tempport);
-        tempport = NULL;
-      }
-    } /* if (tempport->type == PRT_DELETE) */
-
-    prev = tempport;
-    if (tempport)
-      tempport = tempport->next;
-    else
-      tempport = PortList;
-  }
+	tempport = PortList;
+    }
 
   /*
    * Now go through and listen on new ports
@@ -1623,7 +1623,7 @@ CheckAccess(struct Userlist *user, char flag)
     return 0;
 
   switch (flag)
-  {
+    {
     case '\0':
       return (1);
     case 'a':
@@ -1653,7 +1653,7 @@ CheckAccess(struct Userlist *user, char flag)
 
     default:
       return 0;
-  }
+    }
 } /* CheckAccess() */
 
 /*
@@ -1828,14 +1828,14 @@ void AddReconnect(const char *hub, const int port, const char *leaf,
     const long re_time)
 {
   struct cHost *ptr;
-  ptr=(struct cHost *)MyMalloc(sizeof(struct cHost));
+  ptr = (struct cHost *)MyMalloc(sizeof(struct cHost));
   memset(ptr, 0, sizeof(struct cHost));
-  ptr->hub=MyStrdup(hub);
-  ptr->port=port;
-  ptr->leaf=MyStrdup(leaf);
-  ptr->re_time=re_time;
+  ptr->hub = MyStrdup(hub);
+  ptr->port = port;
+  ptr->leaf = MyStrdup(leaf);
+  ptr->re_time = re_time;
 
-  ptr->next=cHostList;
-  cHostList=ptr;
+  ptr->next = cHostList;
+  cHostList = ptr;
 } /* AddReconnect() */
 #endif

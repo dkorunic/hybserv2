@@ -266,11 +266,8 @@ DoShutdown(char *who, char *reason)
     ClearHashes(0);
 #endif
 
-  /* Ensure proper shutdown. -kre */
-#ifdef HAVE_PTHREADS
-  pthread_exit(1);
-#endif
-
+  /* HMmh! exit(1) should be called from main() to ensure proper threading
+   * system termination. Fix this. -kre */
   exit(1);
 } /* DoShutdown() */
 

@@ -973,7 +973,7 @@ m_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct MemoInfo *mi = NULL;
   struct Memo *memoptr;
-  char status[4];
+  char status[10];
 
   if (!nptr)
     return;
@@ -1036,7 +1036,7 @@ m_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
          "-- Listing memos for [\002%s\002] --",
          mi->name);
   notice(n_MemoServ, lptr->nick,
-         "    Idx Sender             Time Sent");
+         "        Idx Sender             Time Sent");
   for (memoptr = mi->memos; memoptr; memoptr = memoptr->next)
     {
       if (memoptr->flags & MS_DELETE)
@@ -1047,12 +1047,14 @@ m_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             strcpy(status, "(R)");
           else
             strcpy(status, "(N)");
+          if (memoptr->flags & MS_REPLIED)
+            strcat(status, "(RE)");
         }
       else
         status[0] = '\0';
 
       notice(n_MemoServ, lptr->nick,
-             "%3s %-3d %-18s %s ago",
+             "%7s %-3d %-18s %s ago",
              status,
              memoptr->index,
              memoptr->sender,
@@ -1137,7 +1139,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       index = IsNum(av[1]);
     }
 
-  if ((index < 0) || (index > mi->memocnt) ||
+  if ((index > mi->memocnt) ||
       (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
     {
       notice(n_MemoServ, lptr->nick,
@@ -1151,12 +1153,13 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       if (!index || (memoptr->index == index))
         {
           notice(n_MemoServ, lptr->nick,
-                 "Memo #%d from %s (sent %s ago) [%sread/%sreplied]:",
+                 "Memo #%d from %s (sent %s ago) [%s%s%s]:",
                  memoptr->index,
                  memoptr->sender,
                  timeago(memoptr->sent, 1),
-                 (memoptr->flags & MS_READ) ? "" : "not",
-                 (memoptr->flags & MS_REPLIED) ? "" : "not");
+                 (memoptr->flags & MS_READ) ? "R" : "N",
+                 (memoptr->flags & MS_REPLIED) ? "/RE" : "",
+                 (memoptr->flags & MS_DELETE)? "/D" : "");
           notice(n_MemoServ, lptr->nick, memoptr->text);
           if (ac < 3)
             {

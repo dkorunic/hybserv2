@@ -1900,12 +1900,9 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  o_RecordCommand(sockfd,
-                  "SECURE %s",
-                  av[1]);
+  o_RecordCommand(sockfd, "SECURE %s", av[1]);
 
-  o_Wallops("SECURE %s",
-            av[1]);
+  o_Wallops("SECURE %s", av[1]);
 
   cptr = FindChannel(av[1]);
   if (cptr)
@@ -6395,32 +6392,7 @@ TakeOver(struct Channel *cptr)
 
 #endif /* !SAVE_TS */
 
-      acnt = SplitBuf(dopnicks, &av);
-      memset(&done, 0, MAXLINE);
-      mcnt = 1;
-      for (ii = 0; ii < acnt; ++ii)
-        {
-          strcat(done, av[ii]);
-          strcat(done, " ");
-          if (mcnt == MaxModes)
-            {
-              mcnt = 0;
-              mtmp = modestr(MaxModes, 'o');
-              ircsprintf(sendstr, "-%s %s", mtmp, done);
-              DoMode(cptr, sendstr, 0);
-              MyFree(mtmp);
-              memset(&done, 0, MAXLINE);
-            }
-          mcnt++;
-        }
-      if (done[0] != '\0')
-        {
-          mtmp = modestr(mcnt - 1, 'o');
-          ircsprintf(sendstr, "-%s %s", mtmp, done);
-          DoMode(cptr, sendstr, 0);
-          MyFree(mtmp);
-        }
-      MyFree(av);
+      SetModes(n_OperServ, 0, '0', cptr, dopnicks);
     }
   else
     {
@@ -6454,33 +6426,8 @@ TakeOver(struct Channel *cptr)
         }
     }
 
-  memset(&done, 0, MAXLINE);
-  acnt = SplitBuf(abans, &av);
-  mcnt = 1;
-  for (ii = 0; ii < acnt; ++ii)
-    {
-      strcat(done, av[ii]);
-      strcat(done, " ");
-      if (mcnt == MaxModes)
-        {
-          mcnt = 0;
-          mtmp = modestr(MaxModes, 'b');
-          ircsprintf(sendstr, "-%s %s", mtmp, done);
-          DoMode(cptr, sendstr, 0);
-          MyFree(mtmp);
-          memset(&done, 0, MAXLINE);
-        }
-      mcnt++;
-    }
-  if (done[0] != '\0')
-    {
-      mtmp = modestr(mcnt - 1, 'b');
-      ircsprintf(sendstr, "-%s %s", mtmp, done);
-      DoMode(cptr, sendstr, 0);
-      MyFree(mtmp);
-    }
+  SetModes(n_OperServ, 0, 'b', cptr, abans);
   MyFree(abans);
-  MyFree(av);
 
   /* clear all bad modes (smilk) */
   memset(&done, 0, MAXLINE);
@@ -6510,33 +6457,8 @@ TakeOver(struct Channel *cptr)
   DoMode(cptr, done, 0);
 
   /* op "f" flag users */
-  memset(&done, 0, MAXLINE);
-  acnt = SplitBuf(opnicks, &av);
-  mcnt = 1;
-  for (ii = 0; ii < acnt; ++ii)
-    {
-      strcat(done, av[ii]);
-      strcat(done, " ");
-      if (mcnt == MaxModes)
-        {
-          mcnt = 0;
-          mtmp = modestr(MaxModes, 'o');
-          ircsprintf(sendstr, "+%s %s", mtmp, done);
-          DoMode(cptr, sendstr, 0);
-          MyFree(mtmp);
-          memset(&done, 0, MAXLINE);
-        }
-      ++mcnt;
-    }
-  if (done[0] != '\0')
-    {
-      mtmp = modestr(mcnt - 1, 'o');
-      ircsprintf(sendstr, "+%s %s", mtmp, done);
-      DoMode(cptr, sendstr, 0);
-      MyFree(mtmp);
-    }
+  SetModes(n_OperServ, 1, '0', cptr, opnicks);
   MyFree(opnicks);
-  MyFree(av);
 
 #ifdef SAVE_TS
 

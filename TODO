@@ -7,6 +7,7 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 
 Pending bugs:
 -------------
+*) does not want to unforbid sometimes (??)
 *) fix *LOCK functions
 *) temp ignores rotate (possible overflow)
 *) forcenick

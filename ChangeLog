@@ -1,3 +1,13 @@
+*** 20010527_1 by kreator
+- document new bug with FindServer
+- import match.c from Hybrid7 and delete old one
+- fix jupe.c
+- fix operserv.c
+- misc fix for sock.c
+- fix for tools Makefile
+- import mkpasswd.c from Hybrid7 with MD5
+
+
 *** 20010522_2 by kreator
 - added complete profile in doc/20010519_2-profile.gz
 

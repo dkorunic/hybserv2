@@ -921,7 +921,13 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   dccptr->idle = time(NULL);
   dccptr->authfd = NOSOCKET;
 
+#if 0
   dccptr->nick = MyStrdup(tempuser->nick);
+#endif
+  /* I don't care if telnet connections get b0rked, this stupid to put
+   * tempuser->nick since it will contain nick from O line, not _real_
+   * nick from IRC! -kre */
+  dccptr->nick = MyStrdup(lptr->nick);
   dccptr->username = MyStrdup(lptr->username);
   dccptr->hostname = MyStrdup(lptr->hostname);
 

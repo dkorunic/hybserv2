@@ -1,3 +1,7 @@
+*** 20011006_1 by wcampbel
+Fix for NICKOPERIDENT from ike, hopefully this will prevent the odd coring
+
+
 *** 20010923_2 by wcampbel
 .jump is administrator only (spotted by erick@erick.org)
 

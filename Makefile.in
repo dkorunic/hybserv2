@@ -21,14 +21,12 @@ WHOAMI = @WHOAMI@
 
 ############ Don't change anything below here ############
 
-# HybServ Version
+# HybServ2 Version
 VERSION_MAJOR = pre-1.8.0
 VERSION = @VERSION@
 
 CC = @CC@
 CFLAGS = @CFLAGS@ -Wall -pipe
-# Enable on multi-CPU server
-#MAKEFLAGS = -j 6
 
 # Debugging CFLAGS
 #CFLAGS = @CFLAGS@ -Wall -g -D_REENTRANT -pipe
@@ -62,22 +60,29 @@ CONFFILES = motd.dcc motd.global
 # File containing HPath variable
 HPATHFIX = settings.conf
 
+# Subdirs for make
+SUBDIRS = source tools
+
 all: source tools
-	@echo '** Building Hybserv binary **'
-	@cd source ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"
-	@echo
-	@echo '** Building Hybserv tools **'
-	@cd tools ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
-	@echo
-	@echo "*** Done building HybServ version $(VERSION) ***"
-	@echo
+	@echo "*** Begin building HybServ2 version $(VERSION) ***"
+	@for i in $(SUBDIRS); do \
+		echo "*** Building $$i ***"; \
+		cd $$i; \
+		${MAKE} "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"; \
+		cd ..; \
+	done
+	@echo "*** Done building HybServ2 version $(VERSION) ***"
 
 build: all
 
 clean:
 	@echo '** Removing objects **'
-	@cd source ; $(MAKE) clean
-	@cd tools ; $(MAKE) clean
+	@for i in $(SUBDIRS); do \
+		echo "*** Cleaning $$i ***"; \
+		cd $$i; \
+		${MAKE} clean; \
+		cd ..; \
+	done
 
 distclean: clean
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
@@ -97,8 +102,7 @@ depend:
 	@cd source ; $(MAKE) depend
 
 install: all install-binary install-help
-	@echo "*** Done installing HybServ $(VERSION) ***"
-	@echo
+	@echo "*** Done installing HybServ2 $(VERSION) ***"
 
 install-binary:
 	@if test ! -d $(BINDIR); then \
@@ -109,7 +113,7 @@ install-binary:
 		echo Creating $(CONFDIR); \
 		mkdir $(CONFDIR) 2>/dev/null; \
 	fi
-	@echo '** Installing HybServ in $(BINDIR) **'
+	@echo '** Installing HybServ2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
 	@for file in $(BINPROGS); do \
 		if test ! -f "$(BINDIR)/$$file"; then \
@@ -170,7 +174,7 @@ install-help:
 	@echo
 
 coffe:
-	@echo "Gimme coffe to work properly"
+	@echo "*** Gimme coffe to work properly ***"
 
 upgrade-chan:
 	@if test ! "x`egrep '^#define.*HYBRID7' include/config.h`" = "x"; then \

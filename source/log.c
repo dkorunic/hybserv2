@@ -201,7 +201,7 @@ RecordCommand(char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   va_start(args, format);
 

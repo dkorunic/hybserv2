@@ -140,8 +140,8 @@ void
 BroadcastDcc(int towho, char *format, ...)
 
 {
-  char tcmbuf[MAXLINE],
-       buffer[MAXLINE];
+  char tcmbuf[MAXLINE * 2],
+       buffer[MAXLINE * 2];
   struct DccUser *dccptr;
   va_list args;
 

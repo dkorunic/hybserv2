@@ -186,7 +186,7 @@ debug(char *format, ...)
 
 {
   va_list args;
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
 
   va_start(args, format);
 
@@ -195,8 +195,7 @@ debug(char *format, ...)
   va_end(args);
 
   /* send the string to +d users */
-  SendUmode(OPERUMODE_D, "DEBUG: %s",
-    buf);
+  SendUmode(OPERUMODE_D, "DEBUG: %s", buf);
 } /* debug() */
 
 #endif /* DEBUGMODE */
@@ -210,7 +209,7 @@ void
 fatal(int keepgoing, char *format, ...)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE * 2];
   va_list args;
   int oldlev;
 
@@ -250,7 +249,7 @@ void
 notice(char *from, char *nick, char *format, ...)
 
 {
-  char finalstr[MAXLINE];
+  char finalstr[MAXLINE * 2];
   char who[MAXLINE];
   va_list args;
 

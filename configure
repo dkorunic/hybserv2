@@ -1800,6 +1800,54 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+echo $ac_n "checking for coffe in -lcup""... $ac_c" 1>&6
+echo "configure:1805: checking for coffe in -lcup" >&5
+ac_lib_var=`echo cup'_'coffe | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lcup  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 1813 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char coffe();
+
+int main() {
+coffe()
+; return 0; }
+EOF
+if { (eval echo configure:1824: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+    ac_tr_lib=HAVE_LIB`echo cup | sed -e 's/[^a-zA-Z0-9_]/_/g' \
+    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_lib 1
+EOF
+
+  LIBS="-lcup $LIBS"
+
+else
+  echo "$ac_t""no" 1>&6
+echo "configure: warning: "have no coffe to work with"" 1>&2
+fi
+
 
 # Check whether --enable-threads or --disable-threads was given.
 if test "${enable_threads+set}" = set; then
@@ -1810,7 +1858,7 @@ fi
 
 if test ! "$enable_threads" = "no"; then
   echo $ac_n "checking for thr_create in -lthread""... $ac_c" 1>&6
-echo "configure:1814: checking for thr_create in -lthread" >&5
+echo "configure:1862: checking for thr_create in -lthread" >&5
 ac_lib_var=`echo thread'_'thr_create | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1818,7 +1866,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lthread  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1822 "configure"
+#line 1870 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1829,7 +1877,7 @@ int main() {
 thr_create()
 ; return 0; }
 EOF
-if { (eval echo configure:1833: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1881: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1855,7 +1903,7 @@ else
   echo "$ac_t""no" 1>&6
 echo "configure: warning: No native Solaris threads - will try pthreads" 1>&2
       echo $ac_n "checking for pthread_create in -lpthread""... $ac_c" 1>&6
-echo "configure:1859: checking for pthread_create in -lpthread" >&5
+echo "configure:1907: checking for pthread_create in -lpthread" >&5
 ac_lib_var=`echo pthread'_'pthread_create | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1863,7 +1911,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lpthread  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1867 "configure"
+#line 1915 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1874,7 +1922,7 @@ int main() {
 pthread_create()
 ; return 0; }
 EOF
-if { (eval echo configure:1878: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1926: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1928,7 +1976,7 @@ fi
 if test "x${LIBP}" = "x"; then
   LIBS="${LIBS} -lsfio"
   echo $ac_n "checking for fprintf in -lstdio""... $ac_c" 1>&6
-echo "configure:1932: checking for fprintf in -lstdio" >&5
+echo "configure:1980: checking for fprintf in -lstdio" >&5
 ac_lib_var=`echo stdio'_'fprintf | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1936,7 +1984,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lstdio  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1940 "configure"
+#line 1988 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1947,7 +1995,7 @@ int main() {
 fprintf()
 ; return 0; }
 EOF
-if { (eval echo configure:1951: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1999: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1978,7 +2026,7 @@ fi
 else
   LIBS="${LIBS} -lsfio-mt"
   echo $ac_n "checking for fprintf in -lstdio-mt""... $ac_c" 1>&6
-echo "configure:1982: checking for fprintf in -lstdio-mt" >&5
+echo "configure:2030: checking for fprintf in -lstdio-mt" >&5
 ac_lib_var=`echo stdio-mt'_'fprintf | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1986,7 +2034,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lstdio-mt  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1990 "configure"
+#line 2038 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1997,7 +2045,7 @@ int main() {
 fprintf()
 ; return 0; }
 EOF
-if { (eval echo configure:2001: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2049: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2041,7 +2089,7 @@ fi
   hold_libs2=$LIBS
   LIBS="${LIBS} ${LIBP}"
   echo $ac_n "checking for malloc in -lhoard""... $ac_c" 1>&6
-echo "configure:2045: checking for malloc in -lhoard" >&5
+echo "configure:2093: checking for malloc in -lhoard" >&5
 ac_lib_var=`echo hoard'_'malloc | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -2049,7 +2097,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lhoard  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 2053 "configure"
+#line 2101 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -2060,7 +2108,7 @@ int main() {
 malloc()
 ; return 0; }
 EOF
-if { (eval echo configure:2064: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2112: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -2198,7 +2246,6 @@ ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "\
 Makefile                \
-libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
 bin/settings.conf       \
@@ -2300,7 +2347,6 @@ cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"\
 Makefile                \
-libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
 bin/settings.conf       \

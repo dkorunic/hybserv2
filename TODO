@@ -21,6 +21,7 @@ Pending bugs:
 *) OperServ does not completely support hybrid7 modes yet, (for example
   .channel command or SECURE)
 *) fix "services" fighting by juping offending server/services
+*) sed helpfiles so that they have proper time values
 
 
 New features:

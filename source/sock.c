@@ -89,14 +89,14 @@ char                      *nextparam = NULL;    /* address of next parameter */
  * the "spilled over" characters - the partial line that
  * buffer wasn't big enough to hold
  */
-char                      spill[MAXLINE];
+char                      spill[MAXLINE * 2];
 
 /*
  * Index of spill[] where we left off
  */
 int                       offset = 0;
 
-char                      dccspill[MAXLINE];
+char                      dccspill[MAXLINE * 2];
 int                       dccoffset = 0;
 
 #ifdef HIGHTRAFFIC_MODE

@@ -765,7 +765,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
 
 {
   va_list args;
-  char finstr[MAXLINE];
+  char finstr[MAXLINE * 2];
 
   va_start(args, format);
 
@@ -880,7 +880,7 @@ o_RecordCommand(int sockfd, char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   va_start(args, format);
 
@@ -935,7 +935,7 @@ o_Wallops(char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   if (!DoWallops)
     return;

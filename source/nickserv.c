@@ -1657,10 +1657,41 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
    * leafmaster should no longer have a FounderChannels list - add all of
    * leafmaster's channels to master's channels. There's no point in
    * reallocating - just assign master's pointer to leafmaster's
+   *
+   *
+   *
+   * BUG: Dropping the leaf nick, which is a founder of a channel, doesn't get
+   * the channel dropped, because chanserv thinks it is registered to the master.
+   *
+   * POSSIBLE BUG: Leaving the leafnick's access on channels and granting the master's
+   * founder access... This doesn't seem logical?
    */
+  if (leafmaster->FounderChannels)
+    {
+      struct aChannelPtr *tmpchan;
+      for (tmpchan = leafmaster->FounderChannels; tmpchan; tmpchan =
+           tmpchan->next)
+        {
+          if (tmpchan->cptr->founder)
+            MyFree(tmpchan->cptr->founder);
+
+	  tmpchan->cptr->founder = MyStrdup(master->nick);
+	}
+    }
+
+  if (leafmaster->AccessChannels)
+    {
+      struct AccessChannel *acptr;
+
+      for (acptr = leafmaster->AccessChannels; acptr; acptr = acptr->next)
+        acptr->accessptr->nptr = master;
+    }
+
   master->FounderChannels = leafmaster->FounderChannels;
+  master->AccessChannels = leafmaster->AccessChannels;
   master->fccnt = leafmaster->fccnt;
   leafmaster->FounderChannels = NULL;
+  leafmaster->AccessChannels = NULL;
   leafmaster->fccnt = 0;
 
 #endif /* CHANNELSERVICES */

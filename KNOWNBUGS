@@ -46,6 +46,9 @@ kre:
 4286          }
 (gdb) p tmpchan->cptr->name
 $25 = 0x0
+This appears to be happening only on linked nicknames, when leaf nick drops
+and master is a founder of a channel, which should be expired. This is now fixed
+I guess it should be removed, kre?
 
 kre:
 (gdb) where

@@ -182,10 +182,12 @@ static void DisplaySettings(struct Luser *, int);
 
 static struct UmodeInfo *FindUmode(char);
 
+#ifdef GLOBALSERVICES
 static void o_motd(struct Luser *, int, char **, int);
 static void o_motd_display(struct Luser *, int, char **, int);
 static void o_motd_add(struct Luser *, int, char **, int);
 static void o_motd_append(struct Luser *, int, char **, int);
+#endif
 
 static struct OperCommand opercmds[] =
     {
@@ -315,8 +317,9 @@ static struct OperCommand opercmds[] =
 #endif
 
       { "KLINE", o_kline, 0, 'g' },
+#ifdef GLOBALSERVICES
       { "MOTD", o_motd, 0, 'a' },
-
+#endif
       /*
        * Dcc Only
        */
@@ -354,6 +357,7 @@ static struct OperCommand htmcmds[] =
 
 #endif /* HIGHTRAFFIC_MODE */
 
+#ifdef GLOBALSERVICES
 /* sub-commands for OperServ MOTD */
 static struct OperCommand motdcmds[] =
     {
@@ -362,6 +366,7 @@ static struct OperCommand motdcmds[] =
       { "APPEND", o_motd_append, 0, 0 },
       { 0, 0, 0, 0 }
     };
+#endif
 
 /*
  * OperServ usermodes
@@ -4982,6 +4987,7 @@ o_quit(struct Luser *lptr, int ac, char **av, int sockfd)
   MyFree(reason);
 } /* o_quit() */
 
+#ifdef GLOBALSERVICES
 /*
   o_motd()
   Modify or show motd.
@@ -5097,6 +5103,7 @@ static void o_motd_append(struct Luser *lptr, int ac, char **av, int
   os_notice(lptr, sockfd,
          "Line appended to the current MOTD");
 } /* o_motd_append() */
+#endif
 
 /*
 o_link()
@@ -6318,10 +6325,10 @@ static void
 TakeOver(struct Channel *cptr)
 
 {
-  int ii, acnt, mcnt;
-  char sendstr[MAXLINE], done[MAXLINE];
+  int ii, acnt;
+  char done[MAXLINE];
   char *opnicks, *dopnicks;
-  char **av, *abans, *mtmp;
+  char **av, *abans;
   struct ChannelBan *tempban;
   struct Userlist *tempuser;
   struct ChannelUser *tempnick;

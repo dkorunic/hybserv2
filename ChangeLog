@@ -1,3 +1,18 @@
+*** 20021201_1 by kreator
+- oh yeah, we're back with TONZ OF PATCHEZ, sir:
+  * seen.diff from "rabble of helpers" (seen nick!ident@host | ident@host
+    | nick!ident) (fixed)
+  * verbose.diff from "rabble of helpers" (more verbose add/del access)
+  * seenserv.diff from "rabble of helpers" (fix TS seenserv coring)
+  * akick.diff from "rabble of helpers" (fixed a bit) with following:
+    1. AKICK DEL now with /m cs akick del test
+    2. AKICK ADD - with time
+    3. AKICK ADD - when users on chan kick ban them
+    4. AKICK LIST - now supports expiration (Never, Expired, or the Human
+                    readable format).
+- and a lot of different fixups all around..
+
+
 *** 20021127_2 by kreator
 - test strikes back.
 

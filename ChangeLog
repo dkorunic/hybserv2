@@ -1,3 +1,8 @@
+*** 20030120_1 by kreator
+- fix Hybrid7 gline time
+- fix possible bad reference in cs_cycle()
+
+
 *** 20030114_1 by kreator
 - a really big bunch of fixes, "\r\n" stuff, etc..
 

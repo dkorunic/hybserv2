@@ -1,3 +1,12 @@
+*** 20011125_1 by kreator
+- reverted OnAccessList() for ChanServ simply because I will resign
+  chann access lists to handle all things via master nicks -> this will
+  speedup things and it is The Only Proper Way [tm]
+- PS, we should get some speedups from several last commits since I've
+  removed some of useless checks.. I wonder how many of them really are in
+  whole Services :-/
+
+
 *** 20011124_2 by kreator
 - update TODO
 - confirm fixed possible DoS via DeleteLink()

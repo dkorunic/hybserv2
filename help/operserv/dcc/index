@@ -5,7 +5,7 @@ help      identify motd     quit      who
 %+oOperator commands:
 %+ojupe      unjupe   gline    ungline   kill
 %+oboot      link     unlink   stats     status
-%+oclones    jump     htm      hub       umode
+%+oclones    htm      hub      umode
 %+o
 %+aAdministrator commands:
 %+achannel   join     jump     ignore    killchan

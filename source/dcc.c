@@ -379,31 +379,42 @@ DccConnectHost(char *hostname, unsigned int port)
 
 {
   struct sockaddr_in ServAddr;
-  struct hostent *remote_host; /* for gethostbyname() -kre */
+  struct hostent *remote_host;
   int socketfd; /* socket file descriptor */
   int optspacer; /* spacer for setsockopt() later -kre */
+  struct in_addr ip;
 
   memset((void *) &ServAddr, 0, sizeof(struct sockaddr_in));
 
-  /*
-    ServAddr.sin_addr.s_addr = htonl(strtoul(hostname, NULL, 10));
-  */
-  /* Let us use gethostbyname(). -kre */
-  if ((remote_host=gethostbyname(hostname))==NULL)
+  remote_host = LookupHostname(hostname, &ip);
+
+  if (remote_host)
+  {
+    assert(ip.s_addr != INADDR_NONE);
+
+    ServAddr.sin_family = remote_host->h_addrtype;
+    ServAddr.sin_addr.s_addr = ip.s_addr;
+  }
+  else
+  {
+  if (ip.s_addr == INADDR_NONE)
     {
-#ifdef DEBUGMODE
-      fprintf(stderr, "Function gethostbyname(%s) failed.\n",
-	      hostname);
-#endif
-      putlog(LOG1, "Unable to resolve %s: %s", hostname,
-	     strerror(errno));
-      return(-1);
+    #ifdef DEBUGMODE
+      fprintf(stderr,
+        "Cannot connect to port %d of %s: Unknown host\n",
+        port,
+        hostname);
+    #endif
+      putlog(LOG1,
+        "Unable to connect to %s.%d: Unknown hostname",
+        hostname,
+        port);
+      return (-1);
     }
-  /* We can use h_addr because of backwards compatibility on most systems,
-     but it should be better to use h_addr_list[0] -kre */
-  memcpy((void *)&ServAddr.sin_addr, (void *)remote_host->h_addr,
-	 remote_host->h_length);
-  ServAddr.sin_family = AF_INET;
+    ServAddr.sin_family = AF_INET;
+    ServAddr.sin_addr.s_addr = ip.s_addr;
+  }
+
   ServAddr.sin_port = (unsigned short) htons((unsigned short) port);
 
 #ifdef DEBUGMODE

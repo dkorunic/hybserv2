@@ -1,0 +1,22 @@
+Syntax: %bMOTD ADD [line]%b
+        %bMOTD APPEND [line]%b
+        %bMOTD DISPLAY%b
+
+Maintain the MOTD (logon news). If there is a
+MOTD it will be sent to a connecting user.
+
+Examples:
+         %bMOTD DISPLAY%b
+           Display current MOTD (logon news) if any.
+
+         %bMOTD ADD%b
+           Delete current MOTD and add a blank line
+
+         %bMOTD ADD Welcome!%b
+           Delete current MOTD and add "Welcome!".
+
+         %bMOTD APPEND!%b
+           Add a blank line.
+
+         %bMOTD APPEND Read rules!%b
+           Add "Read rules!" to current MOTD.

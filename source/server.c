@@ -751,8 +751,8 @@ s_nick(int ac, char **av)
             {
               if (newptr && IsLinked(nptr, newptr))
               {
-                newptr->flags |= NS_IDENTIFIED;
                 struct NickInfo *tmp;
+                newptr->flags |= NS_IDENTIFIED;
                 tmp = GetMaster(newptr);
                 tmp->lastseen = current_ts;
 #ifdef DANCER

@@ -5162,12 +5162,40 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
       time_t currtime = current_ts;
       char expstr[MAXLINE];
       char uh[UHOSTLEN + 2];
+      char chkstr[MAXLINE];
+      char *user = NULL, *host = NULL;
+      int cnt = 1;
 
       os_notice(lptr, sockfd, "-- Listing Glines --");
        os_notice(lptr, sockfd,
         "[Hostmask                 ] [Reason                   ] [Expire] [Who            ]");
-      for (gptr = GlineList; gptr; gptr = gptr->next)
+
+       /* Test if we will do "stats g pattern" matching -kre */
+       if (ac > 2)
+       {
+          strcpy(chkstr, av[2]);
+          if (!(host = strchr(av[2], '@')))
+          {
+            user = NULL;
+            host = av[2];
+          }
+          else
+          {
+            user = av[2];
+            *host++ = 0;
+          }
+       }
+         
+      for (gptr = GlineList; gptr && cnt; gptr = gptr->next)
       {
+        if (ac > 2)
+        {
+          if (user && !match(user, gptr->username))
+            continue;
+          if (match(host, gptr->hostname))
+            cnt = 0;
+        }
+            
         if (gptr->expires)
         {
           ircsprintf(expstr, "%-6.1f",
@@ -5180,10 +5208,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 
         os_notice(lptr, sockfd,
           "[%-25s] [%-25s] [%s] [%-15s]",
-          uh,
-          gptr->reason,
-          expstr,
-	  gptr->who);
+          uh, gptr->reason, expstr, gptr->who);
       }
 
       os_notice(lptr, sockfd, "-- End of list (%d gline%s) --",

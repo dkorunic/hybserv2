@@ -2226,8 +2226,13 @@ ServReboot()
   }
   connections = NULL;
 
+#if 0
   toserv("SQUIT %s :restarting\n",
     currenthub->realname ? currenthub->realname : "*");
+#endif
+  /* Instead of SQUIT -kre */
+  toserv(":%s ERROR :Restarting\n", Me.name);
+  toserv(":%s QUIT\n", Me.name);
 
   /* kill old connection and clear out user/chan lists etc */
   close(HubSock);

@@ -2373,9 +2373,14 @@ s_pong(int ac, char **av)
           servptr->name,
           timeago(MaxPing, 3));
 
+#if 0
         toserv("SQUIT %s :ReRouting (current lag: %5.4f seconds)\n",
           servptr->name,
           servptr->ping);
+#endif
+        toserv(":%s ERROR :Rerouting (lag: %5.4f seconds)\n",
+            Me.name, servptr->ping);
+        toserv(":%s QUIT\n", Me.name);
 
         close(HubSock);
         ClearUsers();

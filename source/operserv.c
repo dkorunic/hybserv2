@@ -3803,8 +3803,13 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
     /*GoodTimer = 0;*/
   #endif
 
+#if 0
     toserv("SQUIT %s :ReRouting\n",
       currenthub->realname ? currenthub->realname : "*");
+#endif
+    /* Do ERROR string instead of lame SQUIT -kre */
+    toserv(":%s ERROR :Rerouting\n", Me.name);
+    toserv(":%s QUIT\n", Me.name);
 
     /* kill old connection and clear out user/chan lists etc */
     close(HubSock);

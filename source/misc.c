@@ -251,11 +251,16 @@ DoShutdown(char *who, char *reason)
     else
       sendstr[0] = '\0';
 
+#if 0
   toserv(":%s QUIT :%s\nSQUIT %s :%s\n",
     n_OperServ,
     "Shutting Down",
     currenthub->realname ? currenthub->realname : currenthub->hostname,
     sendstr);
+#endif
+  /* Instead of SQUIT -kre */
+  toserv(":%s ERROR :Shutting down\n", Me.name);
+  toserv(":%s QUIT\n", Me.name);
   
 #ifdef DEBUG
     /* This can be useful in debug mode -kre */

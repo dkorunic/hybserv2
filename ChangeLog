@@ -1,3 +1,9 @@
+*** 20010605_1 by kreator
+- undo some fixes for nicklink problem. seems some people are having
+  repeated nicknames in nick.db, and funny thing is that i _don't_ have
+  them with same version of software!
+
+
 *** 20010604_3 by kreator
 - fixed bug for DEBUGMODE in hybserv.c (thanks Janos)
 

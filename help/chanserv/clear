@@ -6,6 +6,7 @@ Syntax: %bCLEAR <channel> <option>%b
 %bOptions:%b
 
      %bOPS%b       - Deops every channel op
+     %bHALFOP%b    - Clears halfops if your ircd supports it
      %bVOICES%b    - Devoices every voiced user
      %bMODES%b     - Clears all channel modes
      %bBANS%b      - Removes all channel bans

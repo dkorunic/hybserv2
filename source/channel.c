@@ -135,6 +135,39 @@ AddException(char *who, struct Channel *cptr, char *mask)
   cptr->exceptlist = tempe;
 } /* AddException() */
 
+#ifdef HYBRID7
+/*
+ * AddInviteException()
+ * Add hostmask 'mask' set by 'who' to channel invite exception list
+ * -Janos
+ *
+ * XXX: This code is all from AddException(). They have to be merged into
+ * single function that has an additional argument which will differ
+ * exceptions -kre 
+ */
+void AddInviteException(char *who, struct Channel *cptr, char *mask)
+{
+  struct InviteException *tempinvex;
+
+  tempinvex = (struct InviteException *)
+    MyMalloc(sizeof(struct InviteException));
+  memset(tempinvex, 0, sizeof(struct InviteException));
+
+  if (who)
+    tempinvex->who = MyStrdup(who);
+
+  tempinvex->mask = MyStrdup(mask);
+  tempinvex->when = time(NULL);
+
+  tempinvex->next = cptr->inviteexceptlist;
+  tempinvex->prev = NULL;
+  if (tempinvex->next)
+    tempinvex->next->prev = tempinvex;
+
+  cptr->inviteexceptlist = tempinvex;
+} /* AddInviteException() */
+#endif /* HYBRID7 */
+
 /*
 DeleteException()
  Remove hostmask 'mask' from cptr's exception list
@@ -163,6 +196,38 @@ DeleteException(struct Channel *cptr, char *mask)
 
   MyFree(tempe);
 } /* DeleteException() */
+
+#ifdef HYBRID7
+/*
+ * DeleteInviteException()
+ * Remove hostmask 'mask' from cptr's invite exception list
+ * -Janos
+ * 
+ * XXX: Same as the above - they _have_ to go in _same_ function, this way
+ * we accumulate useless repeating code. -kre
+*/
+void DeleteInviteException(struct Channel *cptr, char *mask)
+{
+  struct InviteException *tempinvex;
+
+  if (!(tempinvex = FindInviteException(cptr, mask)))
+    return;
+
+  MyFree(tempinvex->mask);
+  if (tempinvex->who)
+    MyFree(tempinvex->who);
+
+  if (tempinvex->prev)
+    tempinvex->prev->next = tempinvex->next;
+  else
+    cptr->inviteexceptlist = tempinvex->next;
+
+  if (tempinvex->next)
+    tempinvex->next->prev = tempinvex->prev;
+
+  MyFree(tempinvex);
+} /* DeleteInviteException() */
+#endif /* HYBRID7 */
 
 /*
 MatchBan()
@@ -246,6 +311,31 @@ FindException(struct Channel *cptr, char *mask)
 
   return (tempe);
 } /* FindException() */
+
+#ifdef HYBRID7
+
+/* 
+ * FindInviteException()
+ * Return a pointer to occurence of 'mask' on cptr's invite exception list
+ * -Janos
+ *
+ * XXX: merge into FindException() -kre
+ */
+struct InviteException *FindInviteException(struct Channel *cptr, char
+    *mask)
+{
+  struct InviteException *tempinvex;
+
+  if (!cptr || !mask)
+    return NULL;
+
+  tempinvex = cptr->inviteexceptlist;
+  while (tempinvex && (strcasecmp(tempinvex->mask, mask) != 0))
+    tempinvex = tempinvex->next;
+
+  return (tempinvex);
+} /* FindInviteException() */
+#endif /* HYBRID7 */
 
 /*
 AddChannel()
@@ -434,6 +524,11 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr->flags |= CH_OPPED;
+#ifdef HYBRID7
+  /* Add halfopped feature - Janos */
+  if ((nick[0] == '%') || (nick[1] == '%'))
+    ptr->flags |= CH_HOPPED;
+#endif
 
   ptr->next = lptr->firstchan;
   lptr->firstchan = ptr;
@@ -445,6 +540,11 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr2->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr2->flags |= CH_OPPED;
+#ifdef HYBRID7
+  /* Add halfopped feature - Janos */
+  if ((nick[0] == '%') || (nick[1] == '%'))
+    ptr2->flags |= CH_HOPPED;
+#endif
   ptr2->next = cptr->firstuser;
   cptr->firstuser = ptr2;
 } /* AddToChannel() */
@@ -464,6 +564,9 @@ DeleteChannel(struct Channel *cptr)
   struct ChannelBan *bnext;
   struct Exception *enext;
   struct ChannelGecosBan *gnext;
+#ifdef HYBRID7
+  struct InviteException *inext;
+#endif /* HYBRID7 */
 
   if (!cptr)
     return;
@@ -526,6 +629,18 @@ DeleteChannel(struct Channel *cptr)
     MyFree(cptr->exceptlist);
     cptr->exceptlist = enext;
   }
+
+#ifdef HYBRID7
+  /* Clear channel invite exceptions -Janos */
+  while (cptr->inviteexceptlist)
+  {
+    inext = cptr->inviteexceptlist->next;
+    MyFree(cptr->inviteexceptlist->who);
+    MyFree(cptr->inviteexceptlist->mask);
+    MyFree(cptr->inviteexceptlist);
+    cptr->inviteexceptlist = inext;
+  }
+#endif /* HYBRID7 */
 
 #ifndef BLOCK_ALLOCATION
   MyFree(cptr->name);
@@ -655,10 +770,10 @@ SetChannelMode()
 Inputs: cptr    - channel
         add     - 1 if add the mode (+) 0 if subtract mode (-)
         type    - mode
-        lptr    - optional user for o/v modes
+        lptr    - optional user for o/v/h modes
         arg     - optional string for b/e modes
 
-NOTE: This is currently used only for o/v modes since the others
+NOTE: This is currently used only for o/v/h modes since the others
       are simplistic enough to handle in UpdateChanModes()
 */
 
@@ -667,16 +782,16 @@ SetChannelMode(struct Channel *cptr, int add, int type,
                struct Luser *lptr, char *arg)
 
 {
+  struct UserChannel *tempc;
+  struct ChannelUser *tempu;
+
+  tempu = FindUserByChannel(cptr, lptr);
+  tempc = FindChannelByUser(lptr, cptr);
+
   assert(cptr != 0);
 
   if (type == MODE_O)
   {
-    struct UserChannel *tempc;
-    struct ChannelUser *tempu;
-
-    tempu = FindUserByChannel(cptr, lptr);
-    tempc = FindChannelByUser(lptr, cptr);
-
     if (tempu && tempc)
     {
       if (add)
@@ -693,12 +808,6 @@ SetChannelMode(struct Channel *cptr, int add, int type,
   }
   else if (type == MODE_V)
   {
-    struct UserChannel *tempc;
-    struct ChannelUser *tempu;
-
-    tempu = FindUserByChannel(cptr, lptr);
-    tempc = FindChannelByUser(lptr, cptr);
-
     if (tempu && tempc)
     {
       if (add)
@@ -713,6 +822,25 @@ SetChannelMode(struct Channel *cptr, int add, int type,
       }
     }
   }
+#ifdef HYBRID7
+  /* Halfop mode setup - Janos */
+  else if (type == MODE_H)
+  {
+    if (tempu && tempc)
+    {
+      if (add)
+      {
+        tempu->flags |= CH_HOPPED;
+        tempc->flags |= CH_HOPPED;
+      }
+      else
+      {
+        tempu->flags &= ~CH_HOPPED;
+        tempc->flags &= ~CH_HOPPED;
+      }
+    } /* if (tempu && tempc) */
+  } /* (type == MODE_H) */
+#endif /* HYBRID7 */
 } /* SetChannelMode() */
 
 /*
@@ -949,6 +1077,41 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         break;
       } /* case 'v' */
 
+#ifdef HYBRID7
+      /* HalfOp/DeHalfOp -Janos */
+      case 'h':
+      {
+        ++argidx;
+        if (argidx >= argcnt)
+          break;
+
+        if (!(userptr = FindClient(modeargs[argidx])))
+          break;
+
+        SetChannelMode(cptr, add, MODE_H, userptr, 0);
+
+        if (add)
+        {
+#ifdef STATSERVICES
+          if (lptr)
+            ++lptr->numhops;
+#endif
+        }
+        else
+        {
+#ifdef STATSERVICES
+          if (lptr)
+            ++lptr->numdhops;
+#endif
+        } /* else if (!add) */
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+        cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_H, userptr);
+#endif
+        break;
+      } /* case 'h'*/
+#endif /* HYBRID7 */
+
       /*
        * Channel limit
        */
@@ -1070,6 +1233,22 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         break;
       } /* case 'e' */
 
+#ifdef HYBRID7
+    /* Channel invite exception -Janos */
+     case 'I':
+     {
+       ++argidx;
+       if (argidx >= argcnt)
+         break;
+
+       if (add)
+         AddInviteException(who, cptr, modeargs[argidx]);
+       else
+         DeleteInviteException(cptr, modeargs[argidx]);
+       break;
+     } /* case 'I' */
+#endif /* HYBRID7 */
+
       default:
       {
         int modeflag = 0;
@@ -1086,6 +1265,10 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
           modeflag = MODE_M;
         else if (ch == 'i')
           modeflag = MODE_I;
+#ifdef HYBRID7
+        else if (ch == 'a')
+          modeflag = MODE_A;
+#endif 
 
         if (modeflag)
         {
@@ -1229,6 +1412,31 @@ IsChannelOp(struct Channel *chptr, struct Luser *lptr)
 
   return 0;
 } /* IsChannelOp() */
+
+/* 
+ * IsChannelHOp()
+ *  args: char *channel, char *nick
+ *  purpose: determine if 'nick' is currently halfoped on 'channel'
+ *  return: 1 if oped, 0 if not
+ *  -Janos
+ *
+ *  XXX: possibly merge this into IsChannelOp() -kre
+ */
+#ifdef HYBRID7
+int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
+{
+  struct UserChannel *tempchan;
+
+  if (!chptr || !lptr)
+    return 0;
+
+  for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
+    if (tempchan->chptr == chptr)
+      return (tempchan->flags & CH_HOPPED);
+
+  return 0;
+} /* IsChannelHOp() */
+#endif /* HYBRID7 */
 
 /*
 DoMode()
@@ -1446,7 +1654,7 @@ AddGecosBan(char *who, struct Channel *cptr, char *ban)
   if (tempban->next)
     tempban->next->prev = tempban;
   cptr->firstgecosban = tempban;
-} /* AddBan() */
+} /* AddGecosBan() */
 
 /*
 DeleteGecosBan()
@@ -1506,7 +1714,7 @@ FindGecosBan(struct Channel *cptr, char *ban)
     tempban = tempban->next;
 
   return (tempban);
-} /* FindBan() */
+} /* FindGecosBan() */
 
 /*
 MatchGecosBan()
@@ -1525,4 +1733,4 @@ MatchGecosBan(struct Channel *cptr, char *ban)
     tempban = tempban->next;
 
   return (tempban);
-} /* MatchBan() */
+} /* MatchGecosBan() */

@@ -113,6 +113,19 @@
 
 #define         HYBRID_ONLY
 
+#ifdef HYBRID_ONLY
+
+/* 
+ * Define this if you plan to use services on Hybrid7 server.
+ * It will make HybServ use Hybrid7 features like glines/klines, etc. -kre
+ *
+ * This includes still experimental +h, +a and +I support -Janos
+ */
+
+#undef HYBRID7
+
+#endif /* #ifdef HYBRID_ONLY */
+
 /*
  * If this is defined, commands that involve HybServ setting modes,
  * such as .secure and .omode, will not break channel TS.  Instead,
@@ -262,15 +275,18 @@
 
 #ifdef ALLOW_GLINES
 
+#ifndef HYBRID7
+
 /*
- * Define this if you want services to create 3 pseudo operators
- * and servers to vote for the gline. This is the ircd-hybrid
- * gline implementation, so it will not work on other ircds.
+ * Define this if you want services to create 3 pseudo operators and
+ * servers to vote for the gline. This is the ircd-hybrid gline
+ * implementation, so it will not work on other ircds.
+ * These are Hybrid5/6 only glines -kre
  */
 
 #define         HYBRID_GLINES
 
-#ifndef HYBRID_GLINES
+#else
 
 /*
  * Define this if you want services to create a gline the Hybrid7 way by
@@ -283,17 +299,18 @@
  * };
  */
 
-#undef HYBRID7_GLINES
+#define HYBRID7_GLINES
 
-#endif /* HYBRID7_GLINES */
+#endif /* HYBRID7 */
 
 #endif /* ALLOW_GLINES */
 
 #ifdef ALLOW_JUPES
 
-/* Define this if you don't like the idea of one person being able to
- * jupe servers.  If you don't want it, #undef JUPEVOTES.  If you do want
- * it #define JUPEVOTES <how many votes required> (usually 3).
+/*
+ * Define this if you don't like the idea of one person being able to jupe
+ * servers.  If you don't want it, #undef JUPEVOTES.  If you do want it
+ * #define JUPEVOTES <how many votes required> (usually 3).
  */
 
 #undef JUPEVOTES

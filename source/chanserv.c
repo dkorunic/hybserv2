@@ -73,6 +73,10 @@ static int DefaultAccess[] = {
   5,           /* CA_CMDVOICE */
   5,           /* CA_ACCESS */
   5,           /* CA_CMDINVITE */
+#ifdef HYBRID7
+  8,           /* CA_AUTOHALFOP */
+  8,           /* CA_CMDHALFOP */
+#endif
   10,          /* CA_AUTOOP */
   10,          /* CA_CMDOP */
   10,          /* CA_CMDUNBAN */
@@ -121,12 +125,18 @@ static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
 
 static void c_invite(struct Luser *, struct NickInfo *, int, char **);
 static void c_op(struct Luser *, struct NickInfo *, int, char **);
+#ifdef HYBRID7
+static void c_hop(struct Luser *, struct NickInfo *, int, char **);
+#endif /* HYBRID7 */
 static void c_voice(struct Luser *, struct NickInfo *, int, char **);
 static void c_unban(struct Luser *, struct NickInfo *, int, char **);
 static void c_info(struct Luser *, struct NickInfo *, int, char **);
 
 static void c_clear(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_ops(struct Luser *, struct NickInfo *, int, char **);
+#ifdef HYBRID7
+static void c_clear_hops(struct Luser *, struct NickInfo *, int, char **);
+#endif /* HYBRID7 */
 static void c_clear_voices(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_modes(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_gecos_bans(struct Luser *, struct NickInfo *, int, char **);
@@ -156,6 +166,9 @@ static struct Command chancmds[] = {
   { "SET", c_set, LVL_IDENT },
   { "INVITE", c_invite, LVL_IDENT },
   { "OP", c_op, LVL_IDENT },
+#ifdef HYBRID7
+  { "HALFOP", c_hop, LVL_IDENT },
+#endif
   { "VOICE", c_voice, LVL_IDENT },
   { "UNBAN", c_unban, LVL_IDENT },
   { "INFO", c_info, LVL_NONE },
@@ -222,6 +235,10 @@ static struct Command setcmds[] = {
 /* sub-commands for ChanServ CLEAR */
 static struct Command clearcmds[] = {
   { "OPS", c_clear_ops, LVL_NONE },
+#ifdef HYBRID7
+  /* Allow clear halfops for hybrid7, too -Janos */
+  { "HALFOPS", c_clear_hops, LVL_NONE },
+#endif
   { "VOICES", c_clear_voices, LVL_NONE },
   { "MODES", c_clear_modes, LVL_NONE },
   { "BANS", c_clear_bans, LVL_NONE },
@@ -245,6 +262,10 @@ static AccessInfo accessinfo[] = {
   { CA_CMDVOICE, "CMDVOICE", "Use of command VOICE" },
   { CA_ACCESS, "ACCESS", "Allow ACCESS modification" },
   { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
+#ifdef HYBRID7
+  { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
+  { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
+#endif /* HYBRID7 */
   { CA_AUTOOP, "AUTOOP", "Automatic op" },
   { CA_CMDOP, "CMDOP", "Use of comand OP" },
   { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },
@@ -1091,6 +1112,12 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     if ((cptr->modes_on & MODE_S) &&
         !(chptr->modes & MODE_S))
       strcat(modes, "s");
+#ifdef HYBRID7
+    /* Add parse for mode_a -Janos*/
+    if ((cptr->modes_on & MODE_A) &&
+        !(chptr->modes & MODE_A))
+      strcat(modes, "a");
+#endif /* HYBRID7 */
     if ((cptr->modes_on & MODE_P) &&
         !(chptr->modes & MODE_P))
       strcat(modes, "p");
@@ -1150,6 +1177,12 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     if ((cptr->modes_off & MODE_S) &&
         (chptr->modes & MODE_S))
       strcat(modes, "s");
+#ifdef HYBRID7
+    /* Add parse for mode_a -Janos*/
+    if ((cptr->modes_off & MODE_A) &&
+        (chptr->modes & MODE_A))
+      strcat(modes, "a");
+#endif /* HYBRID7 */
     if ((cptr->modes_off & MODE_P) &&
         (chptr->modes & MODE_P))
       strcat(modes, "p");
@@ -1216,8 +1249,9 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
      * Hybrid won't accept a TOPIC from a user unless they are
      * on the channel - have ChanServ join and leave.
      *
-     * Modifications to be sure all fits in linebuf of ircd.
-     * -kre
+     * Modifications to be sure all fits in linebuf of ircd. -kre
+     * However +ins supports topic burst -Janos
+     * It won't help if topiclen > ircdbuflen :-) -kre
      */
     toserv(":%s SJOIN %ld %s + :@%s\n",
       Me.name,
@@ -1358,6 +1392,28 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     return;
   } /* if (mode == MODE_V) */
 
+#ifdef HYBRID7
+  /* Properly handle autodeop and halfop -Janos
+   * XXX: Merge this into upper statement! -kre */
+  if (mode == MODE_H)
+  {
+    if (!isminus)
+    {
+      /* Autodeop people aren't allowed halfop status either */
+      if (GetAccess(cptr, lptr) == cptr->access_lvl[CA_AUTODEOP])
+      {
+        sprintf(modes, "-h %s",
+          lptr->nick);
+        toserv(":%s MODE %s %s\n",
+          n_ChanServ,
+          cptr->name,
+          modes);
+        UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+      }
+    }
+  } /* if (mode == MODE_H) */
+#endif /* HYBRID7 */
+
   /*
    * Check if the mode conflicts with any enforced modes for the
    * channel
@@ -1367,13 +1423,29 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     modes[0] = '\0';
     if ((mode == MODE_S) &&
         (cptr->modes_on & MODE_S))
+#ifndef HYBRID
       sprintf(modes, "+s-p");
+#else
+      /* In hybrid +p and +s has another meaning -Janos */
+      sprintf(modes, "+s");
+#endif /* HYBRID7 */
     if ((mode == MODE_P) &&
         (cptr->modes_on & MODE_P))
+#ifndef HYBRID
       sprintf(modes, "+p-s");
+#else
+      /* In hybrid +p and +s has another meaning -Janos */
+      sprintf(modes, "+p");
+#endif /* HYBRID7 */
     if ((mode == MODE_N) &&
         (cptr->modes_on & MODE_N))
       sprintf(modes, "+n");
+#ifdef HYBRID7
+    /* -Janos */
+    if ((mode == MODE_A) &&
+        (cptr->modes_on & MODE_A))
+      sprintf(modes, "+a");
+#endif /* HYBRID7 */
     if ((mode == MODE_T) &&
         (cptr->modes_on & MODE_T))
       sprintf(modes, "+t");
@@ -1435,6 +1507,12 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
     if ((mode == MODE_N) &&
         (cptr->modes_off & MODE_N))
       sprintf(modes, "-n");
+#ifdef HYBRID7
+    /* -Janos */
+    if ((mode == MODE_A) &&
+        (cptr->modes_off & MODE_S))
+      sprintf(modes, "-a");
+#endif /* HYBRID7 */
     if ((mode == MODE_T) &&
         (cptr->modes_off & MODE_T))
       sprintf(modes, "-t");
@@ -1525,7 +1603,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
   if (!(tempuser = FindUserByChannel(chanptr, FindClient(nick))))
     return;
 
-  /* CH_OPPED is broken, at least it seems so. */
+  /* CH_OPPED is broken, at least it seems so. -kre */
 #if 0
   if (tempuser->flags & CH_OPPED)
   {
@@ -1558,6 +1636,16 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
       modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
+#ifdef HYBRID7
+  /* Add autohalfop -Janos */
+  else if (!(tempuser->flags & CH_HOPPED) &&
+        HasAccess(cptr, tempuser->lptr, CA_AUTOHALFOP))
+  {
+    sprintf(modes, "+h %s", tempuser->lptr->nick);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+    UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
+  }
+#endif /* HYBRID7 */
 } /* cs_CheckOp() */
 
 /*
@@ -4033,6 +4121,13 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         index = CA_ACCESS;
       else if (!strcasecmp(av[3], "CMDINVITE"))
         index = CA_CMDINVITE;
+#ifdef HYBRID7
+      /* Add setup for autohalfop and cmdhalfop -Janos */
+      else if (!strcasecmp(av[3], "AUTOHALFOP"))
+        index = CA_AUTOHALFOP;
+      else if (!strcasecmp(av[3], "CMDHALFOP"))
+        index = CA_CMDHALFOP;
+#endif /* HYBRID7 */
       else if (!strcasecmp(av[3], "AUTOOP"))
         index = CA_AUTOOP;
       else if (!strcasecmp(av[3], "CMDOP"))
@@ -4150,6 +4245,13 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         index = CA_CMDINVITE;
       else if (!strcasecmp(av[3], "AUTOOP"))
         index = CA_AUTOOP;
+#ifdef HYBRID7
+      /* Add setup for autohalfop and cmdhalfop -Janos */
+      else if (!strcasecmp(av[3], "AUTOHALFOP"))
+        index = CA_AUTOHALFOP;
+      else if (!strcasecmp(av[3], "CMDHALFOP"))
+        index = CA_CMDHALFOP;
+#endif /* HYBRID7 */
       else if (!strcasecmp(av[3], "CMDOP"))
         index = CA_CMDOP;
       else if (!strcasecmp(av[3], "CMDUNBAN"))
@@ -5129,6 +5231,19 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         break;
       }
 
+#ifdef HYBRID7
+      /* Add mode a removal -Janos */
+     case 'a':
+     case 'A':
+     {
+       if (minus)
+         cptr->modes_off |= MODE_A;
+       else
+         cptr->modes_on |= MODE_A;
+       break;
+     }
+#endif /* HYBRID7 */
+
       case 't':
       case 'T':
       {
@@ -5240,6 +5355,12 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       strcat(modes, "l");
     if (cptr->modes_off & MODE_K)
       strcat(modes, "k");
+#ifdef HYBRID7
+    /* Mode A removal -Janos */
+    if (cptr->modes_off & MODE_A)
+      strcat(modes, "a");
+#endif /* HYBRID7 */
+    
   }
   if (cptr->modes_on ||
       cptr->limit ||
@@ -5248,6 +5369,11 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(modes, "+");
     if (cptr->modes_on & MODE_S)
       strcat(modes, "s");
+#ifdef HYBRID7
+    /* Add mode a -Janos */
+    if (cptr->modes_on & MODE_A)
+      strcat(modes, "a");
+#endif /* HYBRID7 */
     if (cptr->modes_on & MODE_P)
       strcat(modes, "p");
     if (cptr->modes_on & MODE_N)
@@ -5668,12 +5794,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (ac < 2)
   {
-    notice(n_ChanServ, lptr->nick,
-      "Syntax: \002OP <channel> [nicks]\002");
-    notice(n_ChanServ, lptr->nick,
-      ERR_MORE_INFO,
-      n_ChanServ,
-      "OP");
+    notice(n_ChanServ, lptr->nick, "Syntax: \002OP <channel> [nicks]\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "OP");
     return;
   }
 
@@ -5689,21 +5811,15 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!cptr)
   {
-    /*
-     * They want to be opped in all channels they are currently
-     * in.
-     */
-
+    /* They want to be opped in all channels they are currently in. */
     for (uchan = lptr->firstchan; uchan; uchan = uchan->next)
     {
       /* CH_OPPED does not seem to work atm. This is quick fix. -kre */
       if (HasAccess(FindChan(uchan->chptr->name), lptr, CA_CMDOP))
 /*        && !(uchan->flags & CH_OPPED)) */
       {
-        toserv(":%s MODE %s +o %s\n",
-          n_ChanServ,
-          uchan->chptr->name,
-          lptr->nick);
+        toserv(":%s MODE %s +o %s\n", n_ChanServ,
+          uchan->chptr->name, lptr->nick);
         uchan->flags |= CH_OPPED;
 
         if ((cuser = FindUserByChannel(uchan->chptr, lptr)))
@@ -5715,10 +5831,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       "You have been opped on all channels you have access to");
 
     RecordCommand("%s: %s!%s@%s OP ALL",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
 
     return;
   }
@@ -5726,16 +5839,9 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (!HasAccess(cptr, lptr, CA_CMDOP))
   {
     notice(n_ChanServ, lptr->nick,
-      ERR_NEED_ACCESS,
-      cptr->access_lvl[CA_CMDOP],
-      "OP",
-      cptr->name);
+      ERR_NEED_ACCESS, cptr->access_lvl[CA_CMDOP], "OP", cptr->name);
     RecordCommand("%s: %s!%s@%s failed OP [%s]",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name);
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
     return;
   }
 
@@ -5794,7 +5900,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if ((arv[ii][0] == '-') && (IsChannelOp(chptr, currlptr)))
       {
-        dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) + strlen(arv[ii] + 1) + (2 * sizeof(char)));
+        dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
+            + strlen(arv[ii] + 1) + (2 * sizeof(char)));
         strcat(dnicks, arv[ii] + 1);
         strcat(dnicks, " ");
       }
@@ -5810,7 +5917,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         if (HasFlag(arv[ii], NS_NOCHANOPS))
           continue;
         
-        onicks = (char *) MyRealloc(onicks, strlen(onicks) + strlen(arv[ii]) + (2 * sizeof(char)));
+        onicks = (char *) MyRealloc(onicks, strlen(onicks)
+            + strlen(arv[ii]) + (2 * sizeof(char)));
         strcat(onicks, arv[ii]);
         strcat(onicks, " ");
       }
@@ -5824,19 +5932,124 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   SetModes(n_ChanServ, 1, 'o', chptr, onicks);
 
   RecordCommand("%s: %s!%s@%s OP [%s]%s%s%s%s",
-    n_ChanServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    cptr->name,
-    strlen(onicks) ? " [+] " : "",
-    strlen(onicks) ? onicks : "",
-    strlen(dnicks) ? " [-] " : "",
-    strlen(dnicks) ? dnicks : "");
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+    strlen(onicks) ? " [+] " : "", strlen(onicks) ? onicks : "",
+    strlen(dnicks) ? " [-] " : "", strlen(dnicks) ? dnicks : "");
 
   MyFree(onicks);
   MyFree(dnicks);
 } /* c_op() */
+
+#ifdef HYBRID7
+/* c_hop() 
+ * (De)Halfop nicks on channel av[1]
+ * -Janos
+ *
+ * XXX: *Urgh!* Get rid of this nasty long code, merge with c_op() and
+ * rewrite the latter.. -kre
+ */
+static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
+    **av)
+{
+  struct ChanInfo *cptr;
+  struct Channel *chptr;
+  char *hnicks, *dnicks;
+
+  if (ac < 2)
+  {
+    notice(n_ChanServ, lptr->nick, "Syntax: \002HALFOP <channel>\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "HALFOP");
+    return;
+  }
+
+  if (!(cptr = FindChan(av[1])))
+  {
+    notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
+    return;
+  }
+
+  if (!HasAccess(cptr, lptr, CA_CMDHALFOP))
+  {
+    notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
+      cptr->access_lvl[CA_CMDHALFOP], "HALFOF", cptr->name);
+    RecordCommand("%s: %s!%s@%s failed HALFOP [%s]",
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name);
+    return;
+  }
+
+  chptr = FindChannel(av[1]);
+  if (ac < 3)
+  {
+    hnicks = MyStrdup(lptr->nick);
+    dnicks = MyStrdup("");
+    if (!IsChannelMember(chptr, lptr))
+    {
+      notice(n_ChanServ, lptr->nick,
+        "You are not on [\002%s\002]", cptr->name);
+      MyFree(hnicks);
+      MyFree(dnicks);
+      return;
+    }
+  }
+  else
+  {
+    int ii, arc;
+    char *tempnix, *tempptr, **arv;
+    struct Luser *currlptr;
+
+    /* they want to voice other people */
+    tempnix = GetString(ac - 2, av + 2);
+
+    tempptr = tempnix;
+    arc = SplitBuf(tempnix, &arv);
+    hnicks = (char *) MyMalloc(sizeof(char));
+    hnicks[0] = '\0';
+    dnicks = (char *) MyMalloc(sizeof(char));
+    dnicks[0] = '\0';
+    for (ii = 0; ii < arc; ii++)
+    {
+      if (*arv[ii] == '-')
+        currlptr = FindClient(arv[ii] + 1);
+      else
+        currlptr = FindClient(arv[ii]);
+
+      if (!IsChannelMember(chptr, currlptr))
+        continue;
+
+      if (arv[ii][0] == '-')
+      {
+        dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
+            + strlen(arv[ii] + 1) + (2 * sizeof(char)));
+        strcat(dnicks, arv[ii] + 1);
+        strcat(dnicks, " ");
+      }
+      else
+      {
+        hnicks = (char *) MyRealloc(hnicks, strlen(hnicks)
+            + strlen(arv[ii]) + (2 * sizeof(char)));
+        strcat(hnicks, arv[ii]);
+        strcat(hnicks, " ");
+      }
+    }
+
+    MyFree(tempptr);
+    MyFree(arv);
+  }
+
+  SetModes(n_ChanServ, 0, 'h', chptr, dnicks);
+  SetModes(n_ChanServ, 1, 'h', chptr, hnicks);
+
+  RecordCommand("%s: %s!%s@%s HALFOP [%s]%s%s%s%s",
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+    strlen(hnicks) ? " [+] " : "", strlen(hnicks) ? hnicks : "",
+    strlen(dnicks) ? " [-] " : "", strlen(dnicks) ? dnicks : "");
+
+  MyFree(hnicks);
+  MyFree(dnicks);
+
+  return;
+} /* c_halfop() */
+#endif /* HYBRID7 */
 
 /*
 c_voice()
@@ -6199,6 +6412,11 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(buf, "-");
     if (cptr->modes_off & MODE_S)
       strcat(buf, "s");
+#ifdef HYBRID7
+    /* Mode A removal -Janos */
+    if (cptr->modes_off & MODE_A)
+      strcat(buf, "a");
+#endif /* HYBRID7 */
     if (cptr->modes_off & MODE_P)
       strcat(buf, "p");
     if (cptr->modes_off & MODE_N)
@@ -6219,6 +6437,11 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(buf, "+");
     if (cptr->modes_on & MODE_S)
       strcat(buf, "s");
+#ifdef HYBRID7
+    /* Add mode A -Janos */
+    if (cptr->modes_on & MODE_A)
+      strcat(buf, "a");
+#endif /* HYBRID7 */
     if (cptr->modes_on & MODE_P)
       strcat(buf, "p");
     if (cptr->modes_on & MODE_N)
@@ -6242,7 +6465,7 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 /*
 c_clear()
-  Clear modes/bans/ops/voices from a channel
+  Clear modes/bans/ops/halfops/voices from a channel
 */
 
 static void
@@ -6255,7 +6478,13 @@ c_clear(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 3)
   {
     notice(n_ChanServ, lptr->nick,
-      "Syntax: \002CLEAR <channel> {OPS|VOICES|MODES|BANS|GECOSBANS|ALL|USERS}\002");
+      "Syntax: \002CLEAR <channel> {OPS|"
+#ifdef HYBRID7
+      /* Allow halfops for hybrid7 to be cleared, too -kre */
+      "HALFOPS|"
+#endif
+      "VOICES|MODES|"
+      "BANS|GECOSBANS|ALL|USERS}\002");
     notice(n_ChanServ, lptr->nick,
       ERR_MORE_INFO,
       n_ChanServ,
@@ -6334,8 +6563,7 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (!(chptr = FindChannel(av[1])))
   {
     notice(n_ChanServ, lptr->nick,
-      "The channel [\002%s\002] is not active",
-      av[1]);
+      "The channel [\002%s\002] is not active", av[1]);
     return;
   }
 
@@ -6347,7 +6575,8 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         !(cuser->flags & CH_OPPED))
       continue;
 
-    ops = (char *) MyRealloc(ops, strlen(ops) + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
+    ops = (char *) MyRealloc(ops, strlen(ops)
+        + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
     strcat(ops, cuser->lptr->nick);
     strcat(ops, " ");
   }
@@ -6356,6 +6585,42 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   MyFree(ops);
 } /* c_clear_ops() */
+
+#ifdef HYBRID7
+/* Clear halfops on channel -Janos */
+static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
+    ac, char **av)
+{
+  struct ChannelUser *cuser;
+  char *hops;
+  struct Channel *chptr;
+
+  if (!(chptr = FindChannel(av[1])))
+  {
+    notice(n_ChanServ, lptr->nick,
+      "The channel [\002%s\002] is not active", av[1]);
+    return;
+  }
+
+  hops = (char *) MyMalloc(sizeof(char));
+  hops[0] = '\0';
+  for (cuser = chptr->firstuser; cuser; cuser = cuser->next)
+  {
+    if (FindService(cuser->lptr) ||
+        !(cuser->flags & CH_HOPPED))
+    continue;
+
+    hops = (char *) MyRealloc(hops, strlen(hops)
+        + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
+    strcat(hops, cuser->lptr->nick);
+    strcat(hops, " ");
+  }
+
+  SetModes(n_ChanServ, 0, 'h', chptr, hops);
+
+  MyFree(hops);
+} /* c_clear_hops() */
+#endif /* HYBRID7 */
 
 static void
 c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
@@ -6410,6 +6675,11 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (chptr->modes & MODE_S)
     strcat(modes, "s");
+#ifdef HYBRID7
+  /* Support mode A -Janos */
+  if (chptr->modes & MODE_A)
+    strcat(modes, "a");  
+#endif /* HYBRID7 */
   if (chptr->modes & MODE_P)
     strcat(modes, "p");
   if (chptr->modes & MODE_N)
@@ -6530,6 +6800,10 @@ c_clear_all(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   c_clear_ops(lptr, nptr, ac, av);
+#ifdef HYBRID7
+  /* Delete halfops, too -Janos */
+  c_clear_hops(lptr, nptr, ac, av);
+#endif /* HYBRID7 */
   c_clear_voices(lptr, nptr, ac, av);
   c_clear_modes(lptr, nptr, ac, av);
   c_clear_bans(lptr, nptr, ac, av);

@@ -1839,6 +1839,16 @@ s_sjoin(int ac, char **av)
           if (tempchan)
             tempchan->flags &= ~CH_OPPED;
         }
+#ifdef HYBRID7
+        /* Yeps, do same for halfops -Janus */
+        if (tempuser->flags & CH_HOPPED)
+        {
+          tempuser->flags &= ~CH_HOPPED;
+          tempchan = FindChannelByUser(tempuser->lptr, cptr);
+          if (tempchan)
+            tempchan->flags &= ~CH_HOPPED;
+        }        
+#endif /* HYBRID7 */
         if (tempuser->flags & CH_VOICED)
         {
           tempuser->flags &= ~CH_VOICED;
@@ -2040,7 +2050,7 @@ s_whois(int ac, char **av)
 
   if (isoper)
   {
-    toserv(":%s 313 %s %s :is madly feared (is an IRC Operator)\n",
+    toserv(":%s 313 %s %s :is Network Service daemon\n",
       Me.name,
       who,
       serviceptr->nick);

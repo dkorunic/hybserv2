@@ -43,21 +43,25 @@ struct Channel;
 #define CS_SPLITOPS     0x00000800 /* let people keep ops from splits */
 
 /* access_lvl[] indices */
+/* We will happily FUBAR old databases by changing this. However, it had
+ * to be done -kre && Janos */
 #define CA_AUTODEOP     0
 #define CA_AUTOVOICE    1
 #define CA_CMDVOICE     2
 #define CA_ACCESS       3
 #define CA_CMDINVITE    4
-#define CA_AUTOOP       5
-#define CA_CMDOP        6
-#define CA_CMDUNBAN     7
-#define CA_AKICK        8
-#define CA_CMDCLEAR     9
-#define CA_SET          10
-#define CA_SUPEROP      11
-#define CA_FOUNDER      12
+#define CA_AUTOHALFOP   5
+#define CA_CMDHALFOP    6
+#define CA_AUTOOP       7
+#define CA_CMDOP        8
+#define CA_CMDUNBAN     9
+#define CA_AKICK        10
+#define CA_CMDCLEAR     11
+#define CA_SET          12
+#define CA_SUPEROP      13
+#define CA_FOUNDER      14
 
-#define CA_SIZE         13 /* number of indices */
+#define CA_SIZE         15 /* number of indices */
 
 struct ChanAccess
 {

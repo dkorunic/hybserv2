@@ -18,6 +18,7 @@ For more information on a specific command, type
     INFO       Display information for a channel
     INVITE     Invite yourself to a channel
     OP         Op yourself on a channel
+    HALFOP     HalfOp yourself on a channel
     VOICE      Voice yourself on a channel
     UNBAN      Unban yourself on a channel
     CLEAR      Clear various channel modes

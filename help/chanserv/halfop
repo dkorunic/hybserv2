@@ -1,0 +1,6 @@
+Syntax: %bHALFOP <channel | ALL> [nicknames]%b
+
+Gives halfop status to [nicknames].  If no
+nicknames are specified, %C will op the nick who gave
+the command.  Placing a %b-%b in front of a nick will
+deop that nick. Syntax is same as OP.

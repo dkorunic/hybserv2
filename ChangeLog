@@ -1,3 +1,9 @@
+*** 20010614_3 by kreator
+- added patch from KrisDuv: OperServ would not part channels which were
+  dropped on founder nick drop
+- add some CygWin support
+
+
 *** 20010614_2 by kreator
 - oops, was mislead by one of Kris' patches so i forgot to add an extra
   nptr check in s_quit()

@@ -1717,7 +1717,7 @@ s_sjoin(int ac, char **av)
    *
    * XXX - this is quickfix, we should rewrite this -kre
    * */
-    if (av[mcnt] == ':' && !av[mcnt][1])
+    if (av[mcnt][0] == ':' && !av[mcnt][1])
     {
       /* No need to evade ':', since it is in av[mcnt] alone -kre */
       ncnt = SplitBuf(av[++mcnt], &nicks);

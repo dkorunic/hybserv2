@@ -1304,7 +1304,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       index = IsNum(av[1]);
     }
 
-  if ((index < 0) || (index > mi->memocnt) ||
+  if ((index > mi->memocnt) ||
       (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
     {
       notice(n_MemoServ, lptr->nick,
@@ -1414,7 +1414,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       index = IsNum(av[1]);
     }
 
-  if ((index < 0) || (index > mi->memocnt) ||
+  if ((index > mi->memocnt) ||
       (!index && (irccmp(av[(ac >= 3) ? 2 : 1], "ALL") != 0)))
     {
       notice(n_MemoServ, lptr->nick,
@@ -1489,7 +1489,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
 
   index = IsNum(av[1]);
-  if ((index < 0) || (index > from->memocnt) ||
+  if ((index > from->memocnt) ||
       (!index && (irccmp(av[1], "ALL") != 0)))
     {
       notice(n_MemoServ, lptr->nick,

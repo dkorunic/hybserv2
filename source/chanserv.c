@@ -2899,28 +2899,35 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 } /* HasAccess() */
 
 /*
-OnAccessList()
-  Return 1 if 'hostmask' is on cptr's access list
-*/
-
-static struct ChanAccess *
-OnAccessList(struct ChanInfo *cptr, char *hostmask, struct NickInfo *nptr)
-
+ * OnAccessList()
+ * Return 1 if 'hostmask' is on cptr's access list
+ * 
+ * added check for master nicks, too -kre
+ */
+static struct ChanAccess *OnAccessList(struct ChanInfo *cptr, char
+    *hostmask, struct NickInfo *nptr)
 {
   struct ChanAccess *ca;
 
   for (ca = cptr->access; ca; ca = ca->next)
   {
     if (nptr && ca->nptr)
+    {
+      /* check if both master nicks match. no need to check
+       * if ca->nptr->master is NULL -kre */
+      if (nptr->master && (nptr->master == ca->nptr->master))
+        return(ca);
+
       if (nptr == ca->nptr)
-        return (ca);
+        return(ca);
+    }
 
     if (hostmask && ca->hostmask)
       if (match(ca->hostmask, hostmask))
-        return (ca);
+        return(ca);
   }
 
-  return (NULL);
+  return(NULL);
 } /* OnAccessList() */
 
 /*

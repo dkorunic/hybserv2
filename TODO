@@ -1,31 +1,16 @@
 Today's MOTD
 ------------
-"Computers will not be perfected until they can compute how much more
- than the estimate the job will cost."
+"To understand the heart and mind of a person, look not at what
+he has already achieved, but at what he aspires to do."
 
 
 Pending bugs:
 -------------
-*) fix chan_access to get along with linked nicknames! DAMNIT!
-*) EMERGENCY:
-   - fix insertlink() and n_link() to:
-   a) correctly link nicknames, ie link them using master nickname
-   b) handle correctly master nickname as the begginning of the list
-   c) recover from dead loops and fix those dead loops
-   d) link nickname into list starting FROM master nick, and link one
-      linked list into another (WOO..)
-*) n_info doesn't show linked nicknames for non-master
 *) seems it is possible that nickname stays ghosted more than necessary if
    nick QUITs
 *) send all mlock modes on channel creation
 *) trace possible leaks
    NOTE: I've prepared some parts of code for trace -kre
-*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
-   with unlink link copying routine.
-   NOTE: Quickfixed this. However, I need to look at this more closely!
-   NOTE2: traced problem to DeleteLink(), done some more fixes, till
-          weird
-   NOTE3: still having problems.
 *) OperServ does not completely support hybrid7 modes yet, (for example
    .channel command or SECURE)
 *) sed helpfiles so that they have proper time values
@@ -71,6 +56,21 @@ Features to come:
 
 Done so far:
 ------------
+*) fix chan_access to get along with linked nicknames!
+*) n_info doesn't show linked nicknames for non-master
+*) EMERGENCY:
+   - fix insertlink() and n_link() to:
+   a) correctly link nicknames, ie link them using master nickname
+   b) handle correctly master nickname as the begginning of the list
+   c) recover from dead loops and fix those dead loops
+   d) link nickname into list starting FROM master nick, and link one
+      linked list into another (WOO..)
+*) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
+   with unlink link copying routine.
+   NOTE: Quickfixed this. However, I need to look at this more closely!
+   NOTE2: traced problem to DeleteLink(), done some more fixes, till
+          weird
+   NOTE3: still having problems.
 *) CVSWeb installed and documented
 *) add mySQL/PostgreSQL support for databases
    -> i'm working on this, too; currently i'm involved in libpq to be

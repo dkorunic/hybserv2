@@ -132,6 +132,9 @@ static void c_set_topic(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_entrymsg(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
+#ifdef GECOSBANS
+static void c_set_expirebans(struct Luser *, struct NickInfo *, int, char **);
+#endif
 
 static void c_invite(struct Luser *, struct NickInfo *, int, char **);
 static void c_op(struct Luser *, struct NickInfo *, int, char **);
@@ -203,7 +206,6 @@ static struct Command chancmds[] =
       { "CLEARNOEXP", c_clearnoexpire, LVL_ADMIN },
       { "RESETLEVELS", c_resetlevels, LVL_ADMIN },
 #endif
-
       { 0, 0, 0 }
     };
 
@@ -214,7 +216,6 @@ static struct Command accesscmds[] =
       },
       { "DEL", c_access_del, LVL_NONE },
       { "LIST", c_access_list, LVL_NONE },
-
       { 0, 0, 0 }
     };
 
@@ -225,7 +226,6 @@ static struct Command akickcmds[] =
       },
       { "DEL", c_akick_del, LVL_NONE },
       { "LIST", c_akick_list, LVL_NONE },
-
       { 0, 0, 0 }
     };
 
@@ -256,15 +256,16 @@ static struct Command setcmds[] =
       { "MAIL", c_set_email, LVL_NONE },
       { "URL", c_set_url, LVL_NONE },
       { "WEBSITE", c_set_url, LVL_NONE },
-
+#ifdef GECOSBANS
+      { "EXPIREBANS", c_set_expirebans, LVL_NONE },
+#endif
       { 0, 0, 0 }
     };
 
 /* sub-commands for ChanServ CLEAR */
 static struct Command clearcmds[] =
     {
-      { "OPS", c_clear_ops, LVL_NONE
-      },
+      { "OPS", c_clear_ops, LVL_NONE },
 #ifdef HYBRID7
       /* Allow clear halfops for hybrid7, too -Janos */
       { "HALFOPS", c_clear_hops, LVL_NONE },
@@ -277,7 +278,6 @@ static struct Command clearcmds[] =
 #endif /* GECOSBANS */
       { "USERS", c_clear_users, LVL_NONE },
       { "ALL", c_clear_all, LVL_NONE },
-
       { 0, 0, 0 }
     };
 
@@ -290,36 +290,32 @@ typedef struct
 AccessInfo;
 
 static AccessInfo accessinfo[] = {
-                                   { CA_AUTODEOP, "AUTODEOP", "Automatic deop/devoice" },
-                                   { CA_AUTOVOICE, "AUTOVOICE", "Automatic voice" },
-                                   { CA_CMDVOICE, "CMDVOICE", "Use of command VOICE" },
-                                   { CA_ACCESS, "ACCESS", "Allow ACCESS modification" },
-                                   { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
+       { CA_AUTODEOP, "AUTODEOP", "Automatic deop/devoice" },
+       { CA_AUTOVOICE, "AUTOVOICE", "Automatic voice" },
+       { CA_CMDVOICE, "CMDVOICE", "Use of command VOICE" },
+       { CA_ACCESS, "ACCESS", "Allow ACCESS modification" },
+       { CA_CMDINVITE, "CMDINVITE", "Use of command INVITE" },
 #ifdef HYBRID7
-                                   /* Halfop help indices -Janos */
-                                   { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
-                                   { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
+       /* Halfop help indices -Janos */
+       { CA_AUTOHALFOP, "AUTOHALFOP", "Automatic halfop"},
+       { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
 #endif /* HYBRID7 */
-                                   { CA_AUTOOP, "AUTOOP", "Automatic op" },
-                                   { CA_CMDOP, "CMDOP", "Use of comand OP" },
-                                   { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },
-                                   { CA_AKICK, "AUTOKICK", "Allow AKICK modification" },
-                                   { CA_CMDCLEAR, "CMDCLEAR", "Use of command CLEAR" },
-                                   { CA_SET, "SET", "Modify channel SETs" },
-                                   { CA_SUPEROP, "SUPEROP", "All of the above" },
-                                   { CA_FOUNDER, "FOUNDER", "Full access to the channel" },
-
-                                   { 0, 0, 0 }
-                                 };
+       { CA_AUTOOP, "AUTOOP", "Automatic op" },
+       { CA_CMDOP, "CMDOP", "Use of comand OP" },
+       { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },
+       { CA_AKICK, "AUTOKICK", "Allow AKICK modification" },
+       { CA_CMDCLEAR, "CMDCLEAR", "Use of command CLEAR" },
+       { CA_SET, "SET", "Modify channel SETs" },
+       { CA_SUPEROP, "SUPEROP", "All of the above" },
+       { CA_FOUNDER, "FOUNDER", "Full access to the channel" },
+       { 0, 0, 0 }
+};
 
 /*
 cs_process()
   Process command coming from 'nick' directed towards n_ChanServ
 */
-
-void
-cs_process(char *nick, char *command)
-
+void cs_process(char *nick, char *command)
 {
   int acnt;
   char **arv;
@@ -1070,9 +1066,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if (!IsChannelMember(chptr, Me.csptr))
         cs_joinchan(cptr);
 
-      toserv(":%s MODE %s +i\n",
-             n_ChanServ,
-             cptr->name);
+      toserv(":%s MODE %s +i\n", n_ChanServ, cptr->name);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, "+i");
       KickBan(0, n_ChanServ, chptr, knicks, "Forbidden Channel");
       MyFree(knicks);
@@ -6492,6 +6486,10 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(buf, "SplitOps, ");
   if (cptr->flags & CS_VERBOSE)
     strcat(buf, "Verbose, ");
+#ifdef GECOSBANS
+  if ((cptr->flags & CS_EXPIREBANS) && BanExpire)
+    strcat(buf, "Expirebans, "); 
+#endif
 
   if (*buf)
     {
@@ -7454,5 +7452,107 @@ void SetDefaultALVL(struct ChanInfo *cptr)
   for (i = 0; i < CA_SIZE; ++i)
     cptr->access_lvl[i] = DefaultAccess[i];
 }
+
+#ifdef GECOSBANS
+/*
+ * ExpireBans()
+ * Remove any bans that have expired. -harly 
+ */
+void ExpireBans(time_t unixtime)
+{
+  int ii;
+  struct ChanInfo *cptr;
+  struct ChannelBan *bptr;
+  struct Channel *chptr;
+  char *bans;
+
+  /* If ban expire time is 0 seconds, don't remove the ban. */
+  if (!BanExpire)
+    return;
+
+  for (ii = 0; ii < CHANLIST_MAX; ++ii)
+  {
+    for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
+    {
+      if (cptr->flags & CS_EXPIREBANS)
+      {
+        if (!(chptr = FindChannel(cptr->name)))
+          continue;
+
+        bans = MyMalloc(sizeof(char));
+        *bans = 0;
+       
+        for (bptr = chptr->firstban; bptr; bptr = bptr->next)
+        {
+          if ((unixtime - bptr->when) >= BanExpire)
+          {
+            /* Ban has expired. Remove it. */
+            putlog(LOG2, "%s: Removing ban %s on %s (expired)",
+              n_ChanServ, bptr->mask, cptr->name);
+            bans = MyRealloc(bans, strlen(bans) + strlen(bptr->mask)
+                + (2 * sizeof(char)));
+            strcat(bans, bptr->mask);
+            strcat(bans, " ");
+          }
+        }
+       if (bans)
+        SetModes(n_ChanServ, 0, 'b', chptr, bans);
+       MyFree(bans);
+      } /* if (cptr->flags & CS_EXPIREBANS) */
+    } /* for (cptr = chanlist[ii]; cptr; cptr = cptr->next) */
+  } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
+} /* ExpireBans(time_t unixtime) */
+
+static void c_set_expirebans(struct Luser *lptr,
+    struct NickInfo *nptr, int ac, char **av)
+{
+  struct ChanInfo *cptr;
+
+  if (!BanExpire)
+  {
+    notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled on this
+        server.");
+    return;
+  }
+
+  if (!(cptr = FindChan(av[1])))
+    return;
+
+  RecordCommand("%s: %s!%s@%s SET [%s] EXPIREBANS %s",
+   n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+   cptr->name, (ac < 4) ? "" : StrToupper(av[3]));
+
+  if (ac < 4)
+  {
+    notice(n_ChanServ, lptr->nick,
+      "EXPIREBANS for channel %s is [\002%s\002]",
+      cptr->name, (cptr->flags & CS_EXPIREBANS) ? "ON" : "OFF");
+    return;
+  }
+
+  if (!irccmp(av[3], "ON"))
+  {
+    cptr->flags |= CS_EXPIREBANS;
+    notice(n_NickServ, lptr->nick,
+      "Toggled EXPIREBANS for channel %s [\002ON\002]", cptr->name);
+    return;
+  }
+  else
+    if (!irccmp(av[3], "OFF"))
+    {
+      cptr->flags &= ~CS_EXPIREBANS;
+      notice(n_ChanServ, lptr->nick,
+        "Toggled EXPIREBANS of channel %s [\002OFF\002]",
+        cptr->name);
+      return;
+    }
+
+  notice(n_ChanServ, lptr->nick,
+    "Syntax: \002SET <channel> EXPIREBANS {ON|OFF}\002");
+  notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
+    n_ChanServ, "SET EXPIREBANS");
+} /* c_set_expirebans() */
+
+#endif /* GECOSBANS */
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

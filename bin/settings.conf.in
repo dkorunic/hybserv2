@@ -248,6 +248,14 @@ MemoExpire         "3w"
 
 StatExpire         "1w"
 
+# BanExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time after which ChanServ
+# will expire such ban on your channel. If you disable this,
+# bans will never expire (EXPIREBANS flag will be disabled).
+
+BanExpire         "3h"
+
 ################################################################
 #
 # Flood Protection

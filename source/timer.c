@@ -242,7 +242,10 @@ void DoTimer(time_t unixtime)
        * Check for expired temp. glines every 1 minute
        */
       ExpireGlines(unixtime);
+#endif
 
+#if defined CHANNELSERVICES && defined GECOSBANS
+      ExpireBans(unixtime);
 #endif
 
 #ifdef JUPEVOTES

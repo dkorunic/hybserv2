@@ -87,6 +87,9 @@ long      NickNameExpire;
 long      ChannelExpire;
 long      MemoExpire;
 long      StatExpire;
+#ifdef GECOSBANS
+long      BanExpire;
+#endif
 long      NSReleaseTimeout;
 
 int       FloodProtection;
@@ -174,167 +177,168 @@ static int CheckDirectives();
 static int dparse(char *, int, int);
 
 struct Directive directives[] =
-    {
+  {
+    /* File Paths */
+    { "HPath", D_NORUNTIME,           { { PARAM_STRING, &HPath } } },
+    { "ConfigFile", D_NORUNTIME,      { { PARAM_STRING, &ConfigFile } } },
+    { "LogFile", D_NORUNTIME,         { { PARAM_STRING, &LogFile } } },
+    { "PidFile", D_NORUNTIME,         { { PARAM_STRING, &PidFile } } },
+    { "HelpPath", D_NORUNTIME,        { { PARAM_STRING, &HelpPath } } },
+    { "MotdFile", D_NORUNTIME,        { { PARAM_STRING, &MotdFile } } },
+    { "DccMotdFile", D_NORUNTIME,     { { PARAM_STRING, &DccMotdFile } } },
 
-      /* File Paths */
-      { "HPath", D_NORUNTIME,           { { PARAM_STRING, &HPath } } },
-      { "ConfigFile", D_NORUNTIME,      { { PARAM_STRING, &ConfigFile } } },
-      { "LogFile", D_NORUNTIME,         { { PARAM_STRING, &LogFile } } },
-      { "PidFile", D_NORUNTIME,         { { PARAM_STRING, &PidFile } } },
-      { "HelpPath", D_NORUNTIME,        { { PARAM_STRING, &HelpPath } } },
-      { "MotdFile", D_NORUNTIME,        { { PARAM_STRING, &MotdFile } } },
-      { "DccMotdFile", D_NORUNTIME,     { { PARAM_STRING, &DccMotdFile } } },
-
-      { "GlineFile", D_OPTIONAL,       { { PARAM_STRING, &GlineFile } } },
-      { "JupeFile", D_OPTIONAL,        { { PARAM_STRING, &JupeFile } } },
+    { "GlineFile", D_OPTIONAL,       { { PARAM_STRING, &GlineFile } } },
+    { "JupeFile", D_OPTIONAL,        { { PARAM_STRING, &JupeFile } } },
 
 #ifdef GLOBALSERVICES
 
-      { "LogonNews", D_OPTIONAL,       { { PARAM_STRING, &LogonNews } } },
+    { "LogonNews", D_OPTIONAL,       { { PARAM_STRING, &LogonNews } } },
 
 #endif /* GLOBALSERVICES */
 
-      /* Database Files */
-      { "NickServDB", D_NORUNTIME,      { { PARAM_STRING, &NickServDB } } },
-      { "ChanServDB", D_NORUNTIME,      { { PARAM_STRING, &ChanServDB } } },
-      { "MemoServDB", D_NORUNTIME,      { { PARAM_STRING, &MemoServDB } } },
-      { "StatServDB", D_NORUNTIME,      { { PARAM_STRING, &StatServDB } } },
-      { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
-      { "OperServIgnoreDB", D_NORUNTIME,      { { PARAM_STRING, &OperServIgnoreDB } } },
-      { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
+    /* Database Files */
+    { "NickServDB", D_NORUNTIME,      { { PARAM_STRING, &NickServDB } } },
+    { "ChanServDB", D_NORUNTIME,      { { PARAM_STRING, &ChanServDB } } },
+    { "MemoServDB", D_NORUNTIME,      { { PARAM_STRING, &MemoServDB } } },
+    { "StatServDB", D_NORUNTIME,      { { PARAM_STRING, &StatServDB } } },
+    { "OperServDB", D_NORUNTIME,      { { PARAM_STRING, &OperServDB } } },
+    { "OperServIgnoreDB", D_NORUNTIME,{ { PARAM_STRING, &OperServIgnoreDB } } },
+    { "SeenServDB", D_NORUNTIME,      { { PARAM_STRING, &SeenServDB } } },
 
-      /* Pseudo-Client Nicknames/Idents/Descriptions and Options */
-      { "OperServNick", D_NORUNTIME,    { { PARAM_STRING, &n_OperServ },
-                                          { PARAM_STRING, &id_OperServ },
-                                          { PARAM_STRING, &desc_OperServ } } },
-      { "NickServNick", D_NORUNTIME,    { { PARAM_STRING, &n_NickServ },
-                                          { PARAM_STRING, &id_NickServ },
-                                          { PARAM_STRING, &desc_NickServ } } },
-      { "ChanServNick", D_NORUNTIME,    { { PARAM_STRING, &n_ChanServ },
-                                          { PARAM_STRING, &id_ChanServ },
-                                          { PARAM_STRING, &desc_ChanServ } } },
-      { "MemoServNick", D_NORUNTIME,    { { PARAM_STRING, &n_MemoServ },
-                                          { PARAM_STRING, &id_MemoServ },
-                                          { PARAM_STRING, &desc_MemoServ } } },
-      { "StatServNick", D_NORUNTIME,    { { PARAM_STRING, &n_StatServ },
-                                          { PARAM_STRING, &id_StatServ },
-                                          { PARAM_STRING, &desc_StatServ } } },
-      { "HelpServNick", D_NORUNTIME,    { { PARAM_STRING, &n_HelpServ },
-                                          { PARAM_STRING, &id_HelpServ },
-                                          { PARAM_STRING, &desc_HelpServ } } },
-      { "GlobalNick", D_NORUNTIME,      { { PARAM_STRING, &n_Global },
-                                          { PARAM_STRING, &id_Global },
-                                          { PARAM_STRING, &desc_Global } } },
-      { "SeenServNick", D_NORUNTIME,    { { PARAM_STRING, &n_SeenServ },
-                                          { PARAM_STRING, &id_SeenServ },
-                                          { PARAM_STRING, &desc_SeenServ } } },
+    /* Pseudo-Client Nicknames/Idents/Descriptions and Options */
+    { "OperServNick", D_NORUNTIME,    { { PARAM_STRING, &n_OperServ },
+                                        { PARAM_STRING, &id_OperServ },
+                                        { PARAM_STRING, &desc_OperServ } } },
+    { "NickServNick", D_NORUNTIME,    { { PARAM_STRING, &n_NickServ },
+                                        { PARAM_STRING, &id_NickServ },
+                                        { PARAM_STRING, &desc_NickServ } } },
+    { "ChanServNick", D_NORUNTIME,    { { PARAM_STRING, &n_ChanServ },
+                                        { PARAM_STRING, &id_ChanServ },
+                                        { PARAM_STRING, &desc_ChanServ } } },
+    { "MemoServNick", D_NORUNTIME,    { { PARAM_STRING, &n_MemoServ },
+                                        { PARAM_STRING, &id_MemoServ },
+                                        { PARAM_STRING, &desc_MemoServ } } },
+    { "StatServNick", D_NORUNTIME,    { { PARAM_STRING, &n_StatServ },
+                                        { PARAM_STRING, &id_StatServ },
+                                        { PARAM_STRING, &desc_StatServ } } },
+    { "HelpServNick", D_NORUNTIME,    { { PARAM_STRING, &n_HelpServ },
+                                        { PARAM_STRING, &id_HelpServ },
+                                        { PARAM_STRING, &desc_HelpServ } } },
+    { "GlobalNick", D_NORUNTIME,      { { PARAM_STRING, &n_Global },
+                                        { PARAM_STRING, &id_Global },
+                                        { PARAM_STRING, &desc_Global } } },
+    { "SeenServNick", D_NORUNTIME,    { { PARAM_STRING, &n_SeenServ },
+                                        { PARAM_STRING, &id_SeenServ },
+                                        { PARAM_STRING, &desc_SeenServ } } },
 
-      { "ServiceUmodes", D_NORUNTIME,   { { PARAM_STRING, &ServiceUmodes } } },
+    { "ServiceUmodes", D_NORUNTIME,   { { PARAM_STRING, &ServiceUmodes } } },
 
-      /* Security Settings */
-      { "RestrictedAccess", D_OPTIONAL, { { PARAM_SET, &RestrictedAccess } } },
-      { "AutoOpAdmins", D_OPTIONAL,     { { PARAM_SET, &AutoOpAdmins } } },
-      { "OpersHaveAccess", D_OPTIONAL,  { { PARAM_SET, &OpersHaveAccess } } },
-      { "SmartMasking", D_OPTIONAL,     { { PARAM_SET, &SmartMasking } } },
+    /* Security Settings */
+    { "RestrictedAccess", D_OPTIONAL, { { PARAM_SET, &RestrictedAccess } } },
+    { "AutoOpAdmins", D_OPTIONAL,     { { PARAM_SET, &AutoOpAdmins } } },
+    { "OpersHaveAccess", D_OPTIONAL,  { { PARAM_SET, &OpersHaveAccess } } },
+    { "SmartMasking", D_OPTIONAL,     { { PARAM_SET, &SmartMasking } } },
 
-      /* Expire Settings */
-      { "NickNameExpire", D_OPTIONAL,   { { PARAM_TIME, &NickNameExpire } } },
-      { "ChannelExpire", D_OPTIONAL,    { { PARAM_TIME, &ChannelExpire } } },
-      { "MemoExpire", D_OPTIONAL,       { { PARAM_TIME, &MemoExpire } } },
-      { "StatExpire", D_OPTIONAL,       { { PARAM_TIME, &StatExpire } } },
-      { "NSReleaseTimeout", D_OPTIONAL, { { PARAM_TIME, &NSReleaseTimeout } } },
+    /* Expire Settings */
+    { "NickNameExpire", D_OPTIONAL,   { { PARAM_TIME, &NickNameExpire } } },
+    { "ChannelExpire", D_OPTIONAL,    { { PARAM_TIME, &ChannelExpire } } },
+    { "MemoExpire", D_OPTIONAL,       { { PARAM_TIME, &MemoExpire } } },
+    { "StatExpire", D_OPTIONAL,       { { PARAM_TIME, &StatExpire } } },
+#ifdef GECOSBANS
+    { "BanExpire", D_OPTIONAL,        { { PARAM_TIME, &BanExpire  } } },
+#endif
+    { "NSReleaseTimeout", D_OPTIONAL, { { PARAM_TIME, &NSReleaseTimeout } } },
 
-      /* Flood Protection */
-      { "FloodProtection", D_OPTIONAL,  { { PARAM_SET, &FloodProtection } } },
-      { "FloodCount", D_OPTIONAL,       { { PARAM_INT, &FloodCount } } },
-      { "FloodTime", D_OPTIONAL,        { { PARAM_TIME, &FloodTime } } },
-      { "IgnoreTime", D_OPTIONAL,       { { PARAM_TIME, &IgnoreTime } } },
-      { "IgnoreOffenses", D_OPTIONAL,   { { PARAM_INT, &IgnoreOffenses } } },
+    /* Flood Protection */
+    { "FloodProtection", D_OPTIONAL,  { { PARAM_SET, &FloodProtection } } },
+    { "FloodCount", D_OPTIONAL,       { { PARAM_INT, &FloodCount } } },
+    { "FloodTime", D_OPTIONAL,        { { PARAM_TIME, &FloodTime } } },
+    { "IgnoreTime", D_OPTIONAL,       { { PARAM_TIME, &IgnoreTime } } },
+    { "IgnoreOffenses", D_OPTIONAL,   { { PARAM_INT, &IgnoreOffenses } } },
 
-      /* Clone Control */
-      { "MaxClones", D_OPTIONAL,        { { PARAM_INT, &MaxClones } } },
-      { "MaxClonesWarning", D_OPTIONAL, { { PARAM_STRING, &MaxClonesWarning } } },
-      { "AutoKillClones", D_OPTIONAL,   { { PARAM_SET, &AutoKillClones } } },
+    /* Clone Control */
+    { "MaxClones", D_OPTIONAL,        { { PARAM_INT, &MaxClones } } },
+    { "MaxClonesWarning", D_OPTIONAL, { { PARAM_STRING, &MaxClonesWarning } } },
+    { "AutoKillClones", D_OPTIONAL,   { { PARAM_SET, &AutoKillClones } } },
 
-      /* General Configuration */
-      { "ConnectFrequency", D_REQUIRED, { { PARAM_TIME, &ConnectFrequency } } },
-      { "ConnectBurst", D_REQUIRED,     { { PARAM_TIME, &ConnectBurst } } },
-      { "AutoLinkFreq", D_REQUIRED,     { { PARAM_TIME, &AutoLinkFreq } } },
-      { "TelnetTimeout", D_REQUIRED,    { { PARAM_TIME, &TelnetTimeout } } },
-      { "IdentTimeout", D_REQUIRED,     { { PARAM_TIME, &IdentTimeout } } },
-      { "BindAttemptFreq", D_OPTIONAL,  { { PARAM_TIME, &BindAttemptFreq } } },
-      { "MaxBinds", D_OPTIONAL,         { { PARAM_INT, &MaxBinds } } },
-      { "MaxConnections", D_OPTIONAL,   { { PARAM_INT, &MaxConnections } } },
-      { "OpersOnlyDcc", D_OPTIONAL,     { { PARAM_SET, &OpersOnlyDcc } } },
-      { "DatabaseSync", D_REQUIRED,     { { PARAM_TIME, &DatabaseSync } } },
-      { "BackupFreq", D_OPTIONAL,       { { PARAM_TIME, &BackupFreq } } },
-      { "ReloadDbsOnHup", D_OPTIONAL,   { { PARAM_SET, &ReloadDbsOnHup } } },
-      { "NonStarChars", D_OPTIONAL,     { { PARAM_INT, &NonStarChars } } },
-      { "DefaultHubPort", D_REQUIRED,   { { PARAM_PORT, &DefaultHubPort } } },
-      { "DefaultTcmPort", D_REQUIRED,   { { PARAM_PORT, &DefaultTcmPort } } },
-      { "LogLevel", D_REQUIRED,         { { PARAM_INT, &LogLevel } } },
-      { "MaxLogs", D_OPTIONAL,          { { PARAM_INT, &MaxLogs } } },
-      { "MaxModes", D_NORUNTIME,        { { PARAM_INT, &MaxModes } } },
-      { "MaxTSDelta", D_OPTIONAL,       { { PARAM_TIME, &MaxTSDelta } } },
+    /* General Configuration */
+    { "ConnectFrequency", D_REQUIRED, { { PARAM_TIME, &ConnectFrequency } } },
+    { "ConnectBurst", D_REQUIRED,     { { PARAM_TIME, &ConnectBurst } } },
+    { "AutoLinkFreq", D_REQUIRED,     { { PARAM_TIME, &AutoLinkFreq } } },
+    { "TelnetTimeout", D_REQUIRED,    { { PARAM_TIME, &TelnetTimeout } } },
+    { "IdentTimeout", D_REQUIRED,     { { PARAM_TIME, &IdentTimeout } } },
+    { "BindAttemptFreq", D_OPTIONAL,  { { PARAM_TIME, &BindAttemptFreq } } },
+    { "MaxBinds", D_OPTIONAL,         { { PARAM_INT, &MaxBinds } } },
+    { "MaxConnections", D_OPTIONAL,   { { PARAM_INT, &MaxConnections } } },
+    { "OpersOnlyDcc", D_OPTIONAL,     { { PARAM_SET, &OpersOnlyDcc } } },
+    { "DatabaseSync", D_REQUIRED,     { { PARAM_TIME, &DatabaseSync } } },
+    { "BackupFreq", D_OPTIONAL,       { { PARAM_TIME, &BackupFreq } } },
+    { "ReloadDbsOnHup", D_OPTIONAL,   { { PARAM_SET, &ReloadDbsOnHup } } },
+    { "NonStarChars", D_OPTIONAL,     { { PARAM_INT, &NonStarChars } } },
+    { "DefaultHubPort", D_REQUIRED,   { { PARAM_PORT, &DefaultHubPort } } },
+    { "DefaultTcmPort", D_REQUIRED,   { { PARAM_PORT, &DefaultTcmPort } } },
+    { "LogLevel", D_REQUIRED,         { { PARAM_INT, &LogLevel } } },
+    { "MaxLogs", D_OPTIONAL,          { { PARAM_INT, &MaxLogs } } },
+    { "MaxModes", D_NORUNTIME,        { { PARAM_INT, &MaxModes } } },
+    { "MaxTSDelta", D_OPTIONAL,       { { PARAM_TIME, &MaxTSDelta } } },
 
-      /* SeenServ Configuration */
-      { "SeenMaxRecs", D_REQUIRED,      { { PARAM_INT, &SeenMaxRecs } } },
+    /* SeenServ Configuration */
+    { "SeenMaxRecs", D_REQUIRED,      { { PARAM_INT, &SeenMaxRecs } } },
 
-      /* OperServ Configuration */
-      { "MaxTrace", D_REQUIRED,         { { PARAM_INT, &MaxTrace } } },
-      { "MaxChannel", D_REQUIRED,       { { PARAM_INT, &MaxChannel } } },
-      { "MaxKill", D_REQUIRED,          { { PARAM_INT, &MaxKill } } },
-      { "LimitTraceKills", D_OPTIONAL,  { { PARAM_SET, &LimitTraceKills } } },
-      { "ServerNotices", D_OPTIONAL,    { { PARAM_SET, &ServerNotices } } },
-      { "DoWallops", D_OPTIONAL,        { { PARAM_SET, &DoWallops } } },
-      { "BCFloodCount", D_OPTIONAL,     { { PARAM_INT, &BCFloodCount } } },
-      { "BCFloodTime", D_OPTIONAL,      { { PARAM_TIME, &BCFloodTime } } },
+    /* OperServ Configuration */
+    { "MaxTrace", D_REQUIRED,         { { PARAM_INT, &MaxTrace } } },
+    { "MaxChannel", D_REQUIRED,       { { PARAM_INT, &MaxChannel } } },
+    { "MaxKill", D_REQUIRED,          { { PARAM_INT, &MaxKill } } },
+    { "LimitTraceKills", D_OPTIONAL,  { { PARAM_SET, &LimitTraceKills } } },
+    { "ServerNotices", D_OPTIONAL,    { { PARAM_SET, &ServerNotices } } },
+    { "DoWallops", D_OPTIONAL,        { { PARAM_SET, &DoWallops } } },
+    { "BCFloodCount", D_OPTIONAL,     { { PARAM_INT, &BCFloodCount } } },
+    { "BCFloodTime", D_OPTIONAL,      { { PARAM_TIME, &BCFloodTime } } },
 
-      /* NickServ Configuration */
-      { "NSSetKill", D_OPTIONAL,        { { PARAM_SET, &NSSetKill } } },
-      { "NSSetAutoMask", D_OPTIONAL,    { { PARAM_SET, &NSSetAutoMask } } },
-      { "NSSetPrivate", D_OPTIONAL,     { { PARAM_SET, &NSSetPrivate } } },
-      { "NSSetSecure", D_OPTIONAL,      { { PARAM_SET, &NSSetSecure } } },
-      { "NSSetUnSecure", D_OPTIONAL,    { { PARAM_SET, &NSSetUnSecure } } },
-      { "NSSetAllowMemos", D_OPTIONAL,  { { PARAM_SET, &NSSetAllowMemos } } },
-      { "NSSetMemoSignon", D_OPTIONAL,  { { PARAM_SET, &NSSetMemoSignon } } },
-      { "NSSetMemoNotify", D_OPTIONAL,  { { PARAM_SET, &NSSetMemoNotify } } },
-      { "NSSetHide", D_OPTIONAL,        { { PARAM_SET, &NSSetHide } } },
-      { "NSSetHideEmail", D_OPTIONAL,   { { PARAM_SET, &NSSetHideEmail } } },
-      { "NSSetHideUrl", D_OPTIONAL,     { { PARAM_SET, &NSSetHideUrl } } },
-      { "NSSetHideQuit", D_OPTIONAL,    { { PARAM_SET, &NSSetHideQuit } } },
-      { "LastSeenInfo", D_OPTIONAL,     { { PARAM_SET, &LastSeenInfo } } },
-      { "NicknameWarn", D_OPTIONAL,     { { PARAM_SET, &NicknameWarn } } },
-      { "NickRegDelay", D_OPTIONAL,     { { PARAM_TIME, &NickRegDelay } } },
-      { "MaxLinks", D_OPTIONAL,         { { PARAM_INT, &MaxLinks } } },
-      { "AllowKillProtection", D_OPTIONAL, { { PARAM_SET, &AllowKillProtection } } },
-      { "AllowKillImmed", D_OPTIONAL,   { { PARAM_SET, &AllowKillImmed } } },
+    /* NickServ Configuration */
+    { "NSSetKill", D_OPTIONAL,        { { PARAM_SET, &NSSetKill } } },
+    { "NSSetAutoMask", D_OPTIONAL,    { { PARAM_SET, &NSSetAutoMask } } },
+    { "NSSetPrivate", D_OPTIONAL,     { { PARAM_SET, &NSSetPrivate } } },
+    { "NSSetSecure", D_OPTIONAL,      { { PARAM_SET, &NSSetSecure } } },
+    { "NSSetUnSecure", D_OPTIONAL,    { { PARAM_SET, &NSSetUnSecure } } },
+    { "NSSetAllowMemos", D_OPTIONAL,  { { PARAM_SET, &NSSetAllowMemos } } },
+    { "NSSetMemoSignon", D_OPTIONAL,  { { PARAM_SET, &NSSetMemoSignon } } },
+    { "NSSetMemoNotify", D_OPTIONAL,  { { PARAM_SET, &NSSetMemoNotify } } },
+    { "NSSetHide", D_OPTIONAL,        { { PARAM_SET, &NSSetHide } } },
+    { "NSSetHideEmail", D_OPTIONAL,   { { PARAM_SET, &NSSetHideEmail } } },
+    { "NSSetHideUrl", D_OPTIONAL,     { { PARAM_SET, &NSSetHideUrl } } },
+    { "NSSetHideQuit", D_OPTIONAL,    { { PARAM_SET, &NSSetHideQuit } } },
+    { "LastSeenInfo", D_OPTIONAL,     { { PARAM_SET, &LastSeenInfo } } },
+    { "NicknameWarn", D_OPTIONAL,     { { PARAM_SET, &NicknameWarn } } },
+    { "NickRegDelay", D_OPTIONAL,     { { PARAM_TIME, &NickRegDelay } } },
+    { "MaxLinks", D_OPTIONAL,         { { PARAM_INT, &MaxLinks } } },
+    { "AllowKillProtection", D_OPTIONAL,{ { PARAM_SET, &AllowKillProtection } } },
+    { "AllowKillImmed", D_OPTIONAL,   { { PARAM_SET, &AllowKillImmed } } },
 
-      /* ChanServ Configuration */
-      { "MaxChansPerUser", D_OPTIONAL,  { { PARAM_INT, &MaxChansPerUser } } },
-      { "MaxAkicks", D_OPTIONAL,        { { PARAM_INT, &MaxAkicks } } },
-      { "InhabitTimeout", D_OPTIONAL,   { { PARAM_TIME, &InhabitTimeout } } },
-      { "AllowAccessIfSOp", D_OPTIONAL, { { PARAM_SET, &AllowAccessIfSOp } } },
-      { "RestrictRegister", D_OPTIONAL, { { PARAM_SET, &RestrictRegister } } },
-      { "GiveNotice", D_OPTIONAL,       { { PARAM_SET, &GiveNotice } } },
-      { "AllowGuardChannel", D_OPTIONAL, { { PARAM_SET, &AllowGuardChannel } } },
+    /* ChanServ Configuration */
+    { "MaxChansPerUser", D_OPTIONAL,  { { PARAM_INT, &MaxChansPerUser } } },
+    { "MaxAkicks", D_OPTIONAL,        { { PARAM_INT, &MaxAkicks } } },
+    { "InhabitTimeout", D_OPTIONAL,   { { PARAM_TIME, &InhabitTimeout } } },
+    { "AllowAccessIfSOp", D_OPTIONAL, { { PARAM_SET, &AllowAccessIfSOp } } },
+    { "RestrictRegister", D_OPTIONAL, { { PARAM_SET, &RestrictRegister } } },
+    { "GiveNotice", D_OPTIONAL,       { { PARAM_SET, &GiveNotice } } },
+    { "AllowGuardChannel", D_OPTIONAL, { { PARAM_SET, &AllowGuardChannel } } },
 
-      /* MemoServ Configuration */
-      { "MaxMemos", D_OPTIONAL,         { { PARAM_INT, &MaxMemos } } },
-      { "MemoPurgeFreq", D_OPTIONAL,    { { PARAM_TIME, &MemoPurgeFreq } } },
+    /* MemoServ Configuration */
+    { "MaxMemos", D_OPTIONAL,         { { PARAM_INT, &MaxMemos } } },
+    { "MemoPurgeFreq", D_OPTIONAL,    { { PARAM_TIME, &MemoPurgeFreq } } },
 
-      /* StatServ Configuration */
-      { "LagDetect", D_OPTIONAL,        { { PARAM_SET, &LagDetect } } },
-      { "MaxPing", D_OPTIONAL,          { { PARAM_TIME, &MaxPing } } },
+    /* StatServ Configuration */
+    { "LagDetect", D_OPTIONAL,        { { PARAM_SET, &LagDetect } } },
+    { "MaxPing", D_OPTIONAL,          { { PARAM_TIME, &MaxPing } } },
 
-      /* Global Configuration */
-      { "GlobalNotices", D_OPTIONAL,    { { PARAM_SET, &GlobalNotices } } },
-      { "UseMD5", D_OPTIONAL,           { { PARAM_SET, &UseMD5 } } },
-      { "MaxServerCollides", D_OPTIONAL,{ { PARAM_INT, &MaxServerCollides } } },
-      { "MinServerCollidesDelta", D_OPTIONAL,{ { PARAM_TIME, &MinServerCollidesDelta } } },
-
-      { 0, 0,                           { { 0, 0 } } }
-    };
+    /* Global Configuration */
+    { "GlobalNotices", D_OPTIONAL,    { { PARAM_SET, &GlobalNotices } } },
+    { "UseMD5", D_OPTIONAL,           { { PARAM_SET, &UseMD5 } } },
+    { "MaxServerCollides", D_OPTIONAL,{ { PARAM_INT, &MaxServerCollides } } },
+    { "MinServerCollidesDelta", D_OPTIONAL,{ { PARAM_TIME, &MinServerCollidesDelta } } },
+    { 0, 0,                           { { 0, 0 } } }
+  };
 
 /*
 ClearDirectives()

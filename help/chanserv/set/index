@@ -27,3 +27,4 @@ Available options:
     GUARD       Have %C join your channel
     SPLITOPS    Let anyone keep ops from a netsplit
     VERBOSE     Notify chanops on access changes
+    EXPIREBANS  Expire bans on a channel

@@ -555,6 +555,10 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
         strcat(buf, "NoExpire, ");
       if (chanptr->flags & CS_SPLITOPS)
         strcat(buf, "SplitOps, ");
+#ifdef GECOSBANS
+      if ((chanptr->flags & CS_EXPIREBANS) && BanExpire)
+        strcat(buf, "Expirebans, ");
+#endif
 
       if (*buf)
         {

@@ -162,6 +162,10 @@ static void o_quit(struct Luser *, int, char **, int);
 static void o_motd(struct Luser *, int, char **, int);
 static void o_link(struct Luser *, int, char **, int);
 static void o_unlink(struct Luser *, int, char **, int);
+static void o_blackbook(struct Luser *, int, char **, int);
+static void o_blackbook_add(struct Luser *, int, char **, int);
+static void o_blackbook_del(struct Luser *, int, char **, int);
+static void o_blackbook_list(struct Luser *, int, char **, int);
 
 static void DeleteIgnore(struct Ignore *iptr);
 
@@ -210,6 +214,7 @@ static struct OperCommand opercmds[] =
       { "STATUS", o_status, 0, 'o' },
       { "UMODE", o_umode, 0, 'o' },
       { "USERMODE", o_umode, 0, 'o' },
+      { "BLACKBOOK", o_blackbook, 0, 'o'},
 
       /*
        * Administrator commands
@@ -329,11 +334,18 @@ static struct OperCommand opercmds[] =
 /* sub-commands for OperServ IGNORE */
 static struct OperCommand ignorecmds[] =
     {
-      { "ADD", o_ignore_add, 0, 0
-      },
+      { "ADD", o_ignore_add, 0, 0 },
       { "DEL", o_ignore_del, 0, 0 },
       { "LIST", o_ignore_list, 0, 0 },
+      { 0, 0, 0, 0 }
+    };
 
+/* sub-commands for Operserv BLACKBOOK */ 
+static struct OperCommand blackbookcmds[] =
+    {
+      { "ADD", o_blackbook_add, 0, 0 },
+      { "DEL", o_blackbook_del, 0, 0 },
+      { "LIST", o_blackbook_list, 0, 0 },
       { 0, 0, 0, 0 }
     };
 
@@ -1242,6 +1254,14 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 
   os_notice(lptr, sockfd, "               Memos: \002%s\002",
             timeago(MemoExpire, 3));
+#endif
+
+#if defined CHANNELSERVICES && defined GECOSBANS
+
+  if (BanExpire)
+    os_notice(lptr, sockfd, "                Bans: \002%s\002",
+  timeago(BanExpire, 3));
+
 #endif
 
 #endif /* NICKSERVICES */
@@ -2589,17 +2609,13 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   fptr = FindClient(av[1]);
   if (!fptr)
     {
-      os_notice(lptr, sockfd, "No such nick [%s]",
-                av[1]);
+      os_notice(lptr, sockfd, "No such nick [%s]", av[1]);
       return;
     }
 
-  o_RecordCommand(sockfd,
-                  "FUCKOVER %s",
-                  fptr->nick);
+  o_RecordCommand(sockfd, "FUCKOVER %s", fptr->nick);
 
-  o_Wallops("FUCKOVER %s",
-            fptr->nick);
+  o_Wallops("FUCKOVER %s", fptr->nick); 
 
   if (fptr->server == Me.sptr)
     {
@@ -2639,11 +2655,8 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
         }
     }
 
-  os_notice(lptr, sockfd,
-            "Initiating flood for %s[%s@%s]",
-            fptr->nick,
-            fptr->username,
-            fptr->hostname);
+  os_notice(lptr, sockfd, "Initiating flood for %s[%s@%s]",
+            fptr->nick, fptr->username, fptr->hostname);
 
   /*
    * start the flood
@@ -2652,9 +2665,7 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
 
   SendUmode(OPERUMODE_Y,
             "*** Server flood activated for %s[%s@%s]",
-            fptr->nick,
-            fptr->username,
-            fptr->hostname);
+            fptr->nick, fptr->username, fptr->hostname);
 } /* o_fuckover() */
 
 /*
@@ -2709,9 +2720,7 @@ InitFuckoverProcess(char *from, char *ftarget)
 
                 /* send null string to target */
                 toserv(":%s %d %s :\n",
-                       Me.name,
-                       ii,
-                       ftarget);
+                       Me.name, ii, ftarget);
               }
           }
 
@@ -4655,7 +4664,8 @@ AddIgnore(char *hostmask, time_t expire)
     ptr->next->prev = ptr;
 
   IgnoreList = ptr;
-  putlog(LOG1, "Added to IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s", ptr, ptr->prev, ptr->next, ptr->hostmask);
+  putlog(LOG1, "Added to IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s",
+      ptr, ptr->prev, ptr->next, ptr->hostmask);
 } /* AddIgnore() */
 
 /*
@@ -7270,12 +7280,194 @@ static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
   /* Prototype: :%s KLINE %s %lu %s %s :%s */
   /* :OperServ KLINE * 0 prvi drugi :treci */
   /* sourcenick, targetserver, tkline_time, user, host, reason */
-  toserv(":%s KLINE %s %s %s %s :%s\n", n_OperServ, "*",
+  toserv(":%s KLINE %s %s %s %s %s\n", n_OperServ, "*",
       tkline ? tkline : "0", user, host,
-      reason ? reason : "HybServ remote kline");
+      reason ? reason : ":HybServ remote kline");
 #else
   klinestr = GetString(ac - 1, av + 1);
   toserv(":%s KLINE %s %s\n", Me.name, n_OperServ, klinestr);
   MyFree(klinestr);
 #endif
+}
+
+/*
+ * o_blackbook
+ * Desc: main command for blackbook sub-command set.
+ */
+static void o_blackbook(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+  struct OperCommand *cptr;
+
+  if (ac < 2)
+  {
+    os_notice(lptr, sockfd,
+      "Syntax: \002BLACKBOOK {ADD|DEL|LIST} [nick|channel|index]\002");
+      return;
+    }
+
+  cptr = GetoCommand(blackbookcmds, av[1]);
+
+  if (cptr && (cptr != (struct OperCommand *) -1))
+    {
+      /* call cptr->func to execute command */
+      (*cptr->func)(lptr, ac, av, sockfd);
+    }
+  else
+    {
+      /* the option they gave was not valid */
+      os_notice(lptr, sockfd,
+        "%s switch [\002%s\002]",
+        (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
+          av[1]);
+      os_notice(lptr, sockfd,
+        "Syntax: \002BLACKBOOK {ADD|DEL|LIST} [mask|channel|index]\002");
+    }
+} /* o_blackbook() */
+
+/*
+ * o_blackbook_add
+ * Desc: 
+ */
+static void o_blackbook_add(struct Luser *lptr, int ac, char **av, int sockfd)
+
+{
+  char hostmask[MAXLINE];
+  time_t expire = (time_t) NULL;
+
+  if (ac < 3)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002IGNORE ADD <nickname|hostmask> [time]\002");
+      return;
+    }
+
+  if (match("*!*@*", av[2]))
+    strcpy(hostmask, av[2]);
+  else if (match("*!*", av[2]))
+    {
+      strcpy(hostmask, av[2]);
+      strcat(hostmask, "@*");
+    }
+  else if (match("*@*", av[2]))
+    {
+      strcpy(hostmask, "*!");
+      strcat(hostmask, av[2]);
+    }
+  else if (match("*.*", av[2]))
+    {
+      strcpy(hostmask, "*!*@");
+      strcat(hostmask, av[2]);
+    }
+  else
+    {
+      struct Luser *ptr;
+      char *mask;
+
+      /* it must be a nickname - try to get hostmask */
+      if ((ptr = FindClient(av[2])))
+        {
+          mask = HostToMask(ptr->username, ptr->hostname);
+          strcpy(hostmask, "*!");
+          strcat(hostmask, mask);
+          MyFree(mask);
+        }
+      else
+        {
+          strcpy(hostmask, av[2]);
+          strcat(hostmask, "!*@*");
+        }
+    }
+
+  if (OnIgnoreList(hostmask))
+    {
+      os_notice(lptr, sockfd,
+                "The hostmask [\002%s\002] is already on the ignorance list",
+                hostmask);
+      return;
+    }
+
+  if (ac >= 4)
+    expire = timestr(av[3]);
+
+  o_RecordCommand(sockfd,
+                  "IGNORE ADD %s %s",
+                  hostmask,
+                  (ac < 4) ? "(perm)" : av[3]);
+
+  AddIgnore(hostmask, expire);
+
+  if (expire)
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] has been added to the ignorance list with an expire of %s",
+                hostmask,
+                timeago(expire, 3));
+    }
+  else
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] has been added to the ignorance list with no expiration",
+                hostmask);
+    }
+} /* o_blackbook_add() */
+
+static void o_blackbook_del(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+  struct Ignore *temp;
+  char *host = NULL;
+  int idx;
+
+  if (ac < 3)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002IGNORE DEL <hostmask | index>\002");
+      return;
+    }
+
+  if ((idx = IsNum(av[2])))
+    {
+      int cnt = 0;
+
+      for (temp = IgnoreList; temp; temp = temp->next, ++cnt)
+        {
+          if (idx == (cnt + 1))
+            {
+              host = MyStrdup(temp->hostmask);
+              break;
+            }
+        }
+
+      if (!host)
+        {
+          os_notice(lptr, sockfd,
+                    "[\002%d\002] is not a valid index",
+                    idx);
+          return;
+        }
+    }
+  else
+    host = MyStrdup(av[2]);
+
+  o_RecordCommand(sockfd,
+                  "IGNORE DEL %s",
+                  host);
+
+  if (!DelIgnore(host))
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] was not found on the ignorance list",
+                host);
+      MyFree(host);
+      return;
+    }
+
+  os_notice(lptr, sockfd,
+            "[\002%s\002] has been removed from the ignorance list",
+            host);
+
+  MyFree(host);
+} /* o_blackbook_del() */
+
+static void o_blackbook_list(struct Luser *lptr, int ac, char **av, int sockfd)
+{
 }

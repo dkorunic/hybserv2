@@ -40,7 +40,7 @@ struct Channel;
 #define CS_GUARD        0x00000400 /* have ChanServ join the channel */
 #define CS_SPLITOPS     0x00000800 /* let people keep ops from splits */
 #define CS_VERBOSE      0x00001000 /* notify chanops for access changes */
-
+#define CS_EXPIREBANS   0x00002000 /* expire bans after EXPIRETIME */
 
 /* access_lvl[] indices */
 /* We will happily FUBAR old databases by changing this. However, it had
@@ -159,6 +159,9 @@ int cs_ShouldBeOnChan(struct ChanInfo *cptr);
 void cs_RejoinChannels();
 void PromoteSuccessor(struct ChanInfo *cptr);
 void ExpireChannels(time_t unixtime);
+#ifdef GECOSBANS
+void ExpireBans(time_t unixtime);
+#endif
 
 #ifndef HYBRID_ONLY
 void CheckEmptyChans();

@@ -1095,8 +1095,8 @@ onctcp(char *nick, char *target, char *msg)
     for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
     {
       if (tempuser->flags & L_OSREGISTERED)
-        notice(target, nick, "\001VERSION Active operators: %s
-            (%s@%s)\001", tempuser->nick, tempuser->username,
+        notice(target, nick, "\001VERSION Active operators: %s"
+            " (%s@%s)\001", tempuser->nick, tempuser->username,
             tempuser->hostname);
     }
 #endif /* ADMININFO */

@@ -35,6 +35,7 @@
 #include "timestr.h"
 #ifdef ADVFLOOD_GLINE 
 #include "gline.h"
+#include "server.h"
 #endif /* ADVFLOOD_GLINE */
 #endif /* ADVFLOOD */
 

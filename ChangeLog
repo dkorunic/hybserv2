@@ -1,3 +1,9 @@
+*** 20020906_1 by kreator
+- add harly's BanExpire (and fix it)
+- misc fixes scattered around
+- started work on blackbook manager, ATM in unusable state :-)
+
+
 *** 20020903_1 by kreator
 - fix smaller issue in WriteIgnores
 

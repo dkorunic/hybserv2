@@ -6,6 +6,8 @@ QOTD:
 
 Pending bugs:
 -------------
+*) problems with long nicknames: seems it doesn't see long->short nickname
+   changes
 *) fix invalid gnote count
 *) clear modes doesn't clear limit
 *) fix lcnt issue in InsertLink() after reload command --> seems reload()

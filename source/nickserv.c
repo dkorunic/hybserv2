@@ -4110,7 +4110,7 @@ n_info(struct Luser *lptr, int ac, char **av)
         if (nptr->flags & NS_PROTECTED)
           strcat(buf, "Kill Protection, ");
       if (nptr->flags & NS_NOEXPIRE)
-        strcat(buf, "IRC Operator, ");
+        strcat(buf, "NoExpire, ");
       if (nptr->flags & NS_AUTOMASK)
         strcat(buf, "AutoMask, ");
       if (nptr->flags & NS_PRIVATE)

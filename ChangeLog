@@ -1,3 +1,8 @@
+*** 20011125_7 by kreator
+- disable ADVFLOOD by default
+- start autoop thing to work
+
+
 *** 20011125_6 by kreator
 - and add it in install target
 

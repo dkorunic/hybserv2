@@ -413,7 +413,7 @@ DccConnectHost(char *hostname, unsigned int port)
 
 #ifdef DEBUGMODE
   fprintf(stderr,
-	  "Connecting to %s.%d\n",
+	  "Connecting to %s:%d\n",
 	  inet_ntoa(ServAddr.sin_addr),
 	  port);
 #endif /* DEBUGMODE */

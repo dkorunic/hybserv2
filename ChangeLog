@@ -1,3 +1,10 @@
+*** 20010503_6 by kreator
+- add some more files to be cleaned in distclean, especially those left
+  from CVS conflicts
+- force type f for make distclean, we don't want any directories to be
+  erased
+
+
 *** 20010503_5 by kreator
 - add some more bugs in TODO, remove old ones
 

@@ -348,43 +348,36 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       first = saved;
 
       if (count > MAXWILDSEEN)
-        {
-          notice(n_SeenServ, lptr->nick,
-                 "I found more than %d matches to your query; "
-                 "please refine it to see any output", MAXWILDSEEN);
-          return ;
-        }
+      {
+        notice(n_SeenServ, lptr->nick,
+               "I found more than %d matches to your query; "
+               "please refine it to see any output", MAXWILDSEEN);
+        return ;
+      }
       else
         if (count == 0)
-          {
-            notice(n_SeenServ, lptr->nick,
-                   "I found no matching seen records to your query");
-            return ;
-          }
+        {
+          notice(n_SeenServ, lptr->nick,
+                 "I found no matching seen records to your query");
+          return ;
+        }
         else
+        {
+          mytime = current_ts + 1;
+          for (i = 0; (i < 5) && (i < count); ++i)
           {
-            mytime = current_ts + 1;
-            for (i = 0; (i < 5) && (i < count); i++)
+            saved = first;
+            for (last = 0; saved; saved = saved->seen)
+            {
+              if ((saved->time < mytime) && (saved->time > last))
               {
-                saved = first;
-                for (last = 0; saved != NULL; saved = saved->seen)
-                {
-                  if ((saved->time <= mytime) && (saved->time >= last))
-                  {
-						        found = 0;
-						        for (j = 0; j < i; j++)
-						          if (!strcmp(saved->nick, sorted[j]->nick))
-							          found = 1;
-						        if (!found)
-						        {
-                  	  sorted[i] = saved;
-                  	  last = saved->time;
-						        }
-                  }
-                }
-                mytime = sorted[i]->time;
+                sorted[i] = saved;
+                last = saved->time;
               }
+            }
+            mytime = sorted[i]->time;
           }
+        }
 
       ircsprintf(sendstr, "I found %d match(es), ", count);
       if (count > 5)

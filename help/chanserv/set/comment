@@ -1,0 +1,13 @@
+Syntax: %bSET <channel> COMMENT <comment|->%b
+
+Sets the channel comment line to <comment>.  When users
+perform an %bINFO%b on the channel, they will be informed
+of the channel's comment.  To clear the comment use a "-"
+as the parameter.
+
+Examples:
+         %b/msg %C SET <channel> COMMENT John's place%b
+           Sets the comment to "John's place" on <channel>
+
+         %b/msg %C SET <channel> COMMENT -
+           Clears the comment on <channel>

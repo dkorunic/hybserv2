@@ -262,7 +262,7 @@ static char scratch_buffer[32];
 
 int
 vsprintf_irc(register char *str, register const char *format,
-             register va_list args)
+             va_list args)
 
 {
   register char c;
@@ -452,7 +452,7 @@ int
 ircsprintf(register char *str, const char *format, ...)
 
 {
-  register va_list args;
+  va_list args;
   register int bytes;
 
   va_start(args, format);

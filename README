@@ -53,6 +53,11 @@ DISTRIBUTION
        #2:  ftp://gnjilux.srk.fer.hr/pub/hybserv/
             (Thanks to kreator :-))
 
+       #3:  Anonymous CVS to this CVSROOT:
+            :pserver:cvs@digi.alleged.com:/usr/cvsroot
+            cvs login
+            <press enter, no password>
+            cvs checkout hybserv
 
 
 

@@ -1591,7 +1591,7 @@ static void ss_splitinfo(struct Luser *lptr, int ac, char **av)
 
   if (!issplit)
     notice(n_StatServ, lptr->nick,
-      "No active splits at this moment");
+      "No split for specified server or no active splits");
 }
 
 #endif /* SPLIT_INFO */

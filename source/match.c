@@ -274,6 +274,7 @@ int ircncmp(const char* s1, const char *s2, int n)
   return (res);
 }
 
+#if 0
 unsigned long textip_to_ul(const char *ip)
 {
   unsigned long ipr=0;
@@ -295,6 +296,7 @@ unsigned long textip_to_ul(const char *ip)
   ipr += octet;
   return ipr;
 }
+#endif
 
 const unsigned char ToLowerTab[] = { 
   0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa,

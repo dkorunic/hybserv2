@@ -1,3 +1,9 @@
+*** 20010604_2 by kreator
+- do some fixes all around
+- clean seenserv code a bit, do a reformat, remove joinpart() code
+- do misc fixes with operserv code
+
+
 *** 20010604_1 by kreator
 - wrote various missing helpfiles
 - modify MyFree()

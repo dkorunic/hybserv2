@@ -1,3 +1,14 @@
+*** 20010502_4 by kreator
+- fix problem with PARAM_SET directives in conf files: old routines would
+  save PARAM_SET with value of 1, but if one would put it into 0, conf
+  would treat it as it is SET-ed (1). i've fixed it not to write any
+  numerics on PARAM_SET values -> however, this code has to be rewritten
+  and redefined again, since it means we don't have to look a whole
+  param[] structure, just param[0] since whole directive should be one
+  PARAM_SET
+- resynced README and TODO between me and janos :-)
+
+
 *** 20010502_3 by janos
 - I changed hybrid-7.leguin.org.uk to irc.efnow.net because on hybrid-7
 a hybnet server listening on port 6667, so I make sure users will come

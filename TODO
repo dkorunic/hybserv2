@@ -1,13 +1,15 @@
 Today's MOTD
 ------------
-"I know it all.  I just can't remember it all at once."
+Pohl's law:
+         "Nothing is so good that somebody, somewhere, will not hate it."
 
 
 Pending bugs:
 -------------
 *) send all mlock modes on channel creation
-*) detect online services and silently drop out
-*) detect services fighting
+*) fix "services" fighting by juping offending server/services
+   detect online services and silently drop out
+   detect services fighting
 *) trace possible leaks
    NOTE: I've prepared some parts of code for trace -kre
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
@@ -18,7 +20,6 @@ Pending bugs:
    NOTE3: still having problems.
 *) OperServ does not completely support hybrid7 modes yet, (for example
    .channel command or SECURE)
-*) fix "services" fighting by juping offending server/services
 *) sed helpfiles so that they have proper time values
    NOTE: this should be done via %v or %t.. something like it
 *) save services ignores

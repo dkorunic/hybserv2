@@ -1,13 +1,7 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
-
-/* Define as the return type of signal handlers (int or void).  */
-#undef RETSIGTYPE
-
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
-
-/* Define if you can safely include both <sys/time.h> and <time.h>.  */
-#undef TIME_WITH_SYS_TIME
+/* include/defs.h.in.  Generated automatically from autoconf/configure.in by autoheader.  */
+/*
+ * $Id$
+ */
 
 /* Define if your system supports pthreads.  */
 #undef HAVE_PTHREADS
@@ -21,17 +15,29 @@
 /* Define if you have CygWin compiler environment */
 #undef HAVE_CYGWIN
 
-/* Define if you have the gethostbyname function.  */
+/* Define if you have the `gethostbyname' function. */
 #undef HAVE_GETHOSTBYNAME
 
-/* Define if you have the strdup function.  */
+/* Define if you have the `cup' library (-lcup). */
+#undef HAVE_LIBCUP
+
+/* Define if you have the `nsl' library (-lnsl). */
+#undef HAVE_LIBNSL
+
+/* Define if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
-/* Define if you have the strerror function.  */
+/* Define if you have the `strerror' function. */
 #undef HAVE_STRERROR
 
-/* Define if you have the strncpy function.  */
+/* Define if you have the `strncpy' function. */
 #undef HAVE_STRNCPY
 
-/* Define if you have the cup library (-lcup).  */
-#undef HAVE_LIBCUP
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* Define if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME

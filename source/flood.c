@@ -13,6 +13,7 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 #ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
 #endif

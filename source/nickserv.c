@@ -432,8 +432,7 @@ ns_loaddata()
           nptr->gsm = MyStrdup(av[1]);
         else
         {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple GSM lines (using
-first)",
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple GSM lines (using first)",
             NickServDB, cnt, nptr->nick);
           if (ret > 0)
             ret = -1;
@@ -445,8 +444,7 @@ first)",
           nptr->phone = MyStrdup(av[1]);
         else
         {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple PHONE lines (usin
-g first)",
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple PHONE lines (using first)",
             NickServDB, cnt, nptr->nick);
           if (ret > 0)
             ret = -1;
@@ -458,8 +456,7 @@ g first)",
           nptr->UIN = MyStrdup(av[1]);
         else
         {
-          fatal(1, "%s:%d NickServ entry for [%s] has multiple UIN lines (usin
-g first)",
+          fatal(1, "%s:%d NickServ entry for [%s] has multiple UIN lines (using first)",
             NickServDB, cnt, nptr->nick);
           if (ret > 0)
             ret = -1;

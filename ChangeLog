@@ -1,3 +1,9 @@
+*** 20020501_1 by kreator
+- imported adx patches:
+  - fixed reference to deleted gptr in operserv code
+  - fixed invalid total network conns count, which was b0rking dcc
+
+
 *** 20020428_7 by kreator
 - another DelAccess() :-(
 

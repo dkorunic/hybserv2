@@ -2502,7 +2502,7 @@ o_clones(struct Luser *lptr, int ac, char **av, int sockfd)
         {
           maxclone = 1;
           /* cycle all clones */
-          for (tempuser2 = tempuser; tempuser2; tempuser2 =
+          for (tempuser2 = tempuser->cnext; tempuser2; tempuser2 =
               tempuser2->cnext)
           {
             if (CloneMatch(tempuser, tempuser2))

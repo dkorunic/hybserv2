@@ -1,3 +1,7 @@
+*** 20010502_6 by kreator
+- fix another ugly conf bug with PARAM_STRING
+
+
 *** 20010502_5 by kreator
 - fix for lame SQUIT
 - reported new bug with services ignoring DCC commands (does this have

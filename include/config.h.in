@@ -358,7 +358,10 @@
 
 /*
  * Define this if you wish to allow administrators the use of the "dump"
- * command.
+ * command for raw IRC messages (inter-server).
+ * BIG FAT WARNING: This stuff is serious. It can core your ircd, cause
+ *                  desync, etc. This is not to be used in any kind of
+ *                  "normal" IRC network. -kre
  */
 
 #undef    ALLOW_DUMP

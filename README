@@ -19,9 +19,9 @@ otherwise mentioned in the code or the credits.
 
 HYBSERV STAFF:
 
-Lead Developer of Hybserv2
+Lead developer of HybServ2
 
-kreator     Dinko Korunic     kreator@fly.srk.fer.hr
+kreator     Dinko Korunic        kreator@srce.hr
 
 The following people have contributed to this release of HybServ2
 (in nick alphabetical order):
@@ -225,7 +225,7 @@ Functions used from other GPL'd sources:
      HashChannel()  -- from ircd-hybrid source
 
 tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
-<minar@reed.edu>, W. Campbell, and Hybserv7 team.
+<minar@reed.edu>, W. Campbell, and Hybrid7 team.
 
 Some help files were used from EsperNet's service package:
 

@@ -302,9 +302,7 @@ introduce()
   Introduce 'nick' to the network with 'info'
 */
 
-static struct Luser *
-      introduce(char *nick, char *ident, char *info)
-
+static struct Luser *introduce(char *nick, char *ident, char *info)
   {
     char sendstr[MAXLINE];
     time_t CurrTime = current_ts;

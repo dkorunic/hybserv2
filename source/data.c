@@ -968,16 +968,16 @@ WriteChans()
               int jj;
 
               /* write founder */
-              fprintf(fp, "->FNDR %s\n",
-                      cptr->founder);
+              fprintf(fp, "->FNDR %s %ld\n", cptr->founder,
+                  (long)cptr->last_founder_active);
 
               /* write password */
               fprintf(fp, "->PASS %s\n",
                       cptr->password);
 
               if (cptr->successor)
-                fprintf(fp, "->SUCCESSOR %s\n",
-                        cptr->successor);
+                fprintf(fp, "->SUCCESSOR %s %ld\n", cptr->successor,
+                    (long)cptr->last_successor_active);
 
               if (cptr->topic)
                 fprintf(fp, "->TOPIC :%s\n",
@@ -990,6 +990,10 @@ WriteChans()
               if (cptr->key)
                 fprintf(fp, "->KEY %s\n",
                         cptr->key);
+
+              if (cptr->forward)
+                fprintf(fp, "->FORWARD %s\n",
+                  cptr->forward);
 
               if (cptr->modes_on)
                 fprintf(fp, "->MON %d\n",
@@ -1018,9 +1022,9 @@ WriteChans()
               fprintf(fp, "\n");
 
               for (ca = cptr->access; ca; ca = ca->next)
-                fprintf(fp, "->ACCESS %s %d\n",
-                        ca->nptr ? ca->nptr->nick : stripctrlsymbols(ca->hostmask),
-                        ca->level);
+                fprintf(fp, "->ACCESS %s %d %ld %ld\n", ca->nptr ?
+                    ca->nptr->nick : stripctrlsymbols(ca->hostmask),
+                    ca->level, (long)ca->created, (long)ca->last_used);
 
               for (ak = cptr->akick; ak; ak = ak->next)
                 fprintf(fp, "->AKICK %s :%s\n",

@@ -64,15 +64,13 @@ static void ShowServerInfo(struct Server *, struct Luser *, int);
 
 static struct Command statcmds[] =
     {
-      { "HOST", ss_host, LVL_NONE
-      },
-      { "DOMAIN", ss_domain, LVL_NONE },
-      { "SERVER", ss_server, LVL_NONE },
       { "STATS", ss_stats, LVL_NONE },
       { "HELP", ss_help, LVL_NONE },
       { "SHOWADMINS", ss_showadmins, LVL_NONE },
       { "SHOWOPERS", ss_showopers, LVL_NONE },
-
+      { "HOST", ss_host, LVL_ADMIN },
+      { "DOMAIN", ss_domain, LVL_ADMIN },
+      { "SERVER", ss_server, LVL_ADMIN },
       { "REFRESH", ss_refresh, LVL_ADMIN },
       { "CLEARSTATS", ss_clearstats, LVL_ADMIN },
       { "SHOWSTATS", ss_showstats, LVL_ADMIN },

@@ -831,8 +831,8 @@ static struct OperCommand *
 
   {
     struct OperCommand *cmdptr, *tmp;
-    int matches, /* number of matches we've had so far */
-    clength;
+    int matches; /* number of matches we've had so far */
+    unsigned clength;
 
     if (!cmdlist || !name)
       return (NULL);
@@ -1059,7 +1059,7 @@ o_Wallops(char *format, ...)
 
   va_end(args);
 
-  toserv(":%s WALLOPS :%s: %s\n",
+  toserv(":%s OPERWALL :%s: %s\n",
          Me.name, n_OperServ, buffer);
 
 } /* o_Wallops() */
@@ -1521,8 +1521,8 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
   char sendstr[MAXLINE], whostr[MAXLINE], **arv;
   struct Jupe *tempjupe;
   FILE *fp;
-  int ii,
-  nickjupe = 1;
+  unsigned int ii;
+  int nickjupe = 1;
   struct tm *jupe_tm;
   time_t CurrTime;
   struct Luser *jptr;
@@ -2221,10 +2221,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
           ++gcnt;
           os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
                     gptr->hostname);
-
-          /*
-           * remove gline from list
-           */
+          /* remove gline from list */
           DeleteGline(gptr);
         }
     }
@@ -3634,6 +3631,8 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "n");
   if (cptr->modes & MODE_T)
     strcat(modes, "t");
+  if (cptr->modes & MODE_C)
+    strcat(modes, "c");
   if (cptr->modes & MODE_M)
     strcat(modes, "m");
   if (cptr->modes & MODE_I)
@@ -3642,6 +3641,8 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "l");
   if (cptr->key && *cptr->key)
     strcat(modes, "k");
+  if (cptr->forward && *cptr->forward)
+    strcat(modes, "f");
 
   if (cptr->limit)
     {
@@ -3658,6 +3659,14 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
       ircsprintf(temp, "%s %s", modes, cptr->key);
       strcpy(modes, temp);
     }
+
+  if (cptr->forward && *cptr->forward)
+  {
+    char  temp[MAXLINE];
+  
+    ircsprintf(temp, "%s %s", modes, cptr->forward);
+    strcpy(modes, temp);
+  }
 
   os_notice(lptr, sockfd,
             "Modes:     %s",
@@ -6402,6 +6411,11 @@ TakeOver(struct Channel *cptr)
       strcat(done, "k ");
       strcat(done, cptr->key);
     }
+  if (cptr->forward)
+  {
+    strcat(done, "f ");
+    strcat(done, cptr->forward);
+  }
 
   DoMode(cptr, done, 0);
 
@@ -6621,6 +6635,10 @@ CalcMem(char *nick, int socket)
         keylen = strlen(tempchan->key);
 
       chanm += (strlen(tempchan->name) + keylen + sizeof(struct Channel));
+
+      if (tempchan->forward)
+        keylen = strlen(tempchan->forward);
+      chanm += keylen;
 #endif /* BLOCK_ALLOCATION */
 
       for (chanu = tempchan->firstuser; chanu; chanu = chanu->next)
@@ -6847,6 +6865,8 @@ CalcMem(char *nick, int socket)
             csm += strlen(cptr->topic);
           if (cptr->key)
             csm += strlen(cptr->key);
+          if (cptr->forward)
+            csm += strlen(cptr->forward);
           if (cptr->entrymsg)
             csm += strlen(cptr->entrymsg);
           if (cptr->email)

@@ -36,6 +36,8 @@ struct UserChannel;
 #define MODE_T          0x000200 /* channel is +t */
 #define MODE_M          0x000400 /* channel is +m */
 #define MODE_I          0x000800 /* channel is +i */
+#define MODE_C          0x001000 /* channel is +c */
+#define MODE_F          0x002000 /* channel is +f */
 
 #ifdef HYBRID7
 # define CH_HOPPED       0x001000 /* user is halfopped - Janos */
@@ -96,11 +98,13 @@ struct Channel
 
   char name[CHANNELLEN + 1]; /* channel name */
   char key[KEYLEN + 1];
+  char forward[CHANNELLEN + 1];
 
 #else
 
   char *name;             /* channel name */
   char *key;              /* NULL if no key */
+  char *forward;          /* NULL if no forwarding */
 
 #endif /* BLOCK_ALLOCATION */
 

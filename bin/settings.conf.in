@@ -84,6 +84,7 @@ HPath              "@prefix@/hybserv"
 ConfigFile         "hybserv.conf"
 LogFile            "hybserv.log"
 PidFile            "hybserv.pid"
+PipeFile           "hybserv.pipe"
 HelpPath           "help"
 DccMotdFile        "motd.dcc"
 MotdFile           "motd.global"
@@ -151,7 +152,7 @@ SeenServNick       "SeenServ"  "SeenServ"  "Seen Services"
 # to be IRC Operators to perform their tasks, so I left +o
 # out, but if you wish them to be operators, insert an "o".
 
-ServiceUmodes      "+i"
+ServiceUmodes      "+io"
 
 ################################################################
 #

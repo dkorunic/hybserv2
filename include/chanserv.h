@@ -23,6 +23,8 @@
 #define INCLUDED_hash_h
 #endif
 
+#ifdef CHANNELSERVICES
+
 struct Luser;
 struct Channel;
 
@@ -96,6 +98,9 @@ struct ChanAccess
    * access channels to find the corresponding pointer.
    */
   struct AccessChannel *acptr;
+  time_t created; /* time when this entry was added */
+  time_t last_used; /* last time the person joined the channel while
+                       identified */
 };
 
 struct AutoKick
@@ -110,11 +115,14 @@ struct ChanInfo
   struct ChanInfo *next, *prev;
   char *name;                   /* channel name */
   char *founder;                /* founder nick (must be registered) */
+  time_t last_founder_active;   /* last time the founder joined/left */
   char *successor;              /* successor nick (must be registered) */
+  time_t last_successor_active; /* last time the founder joined/left */
   char *password;               /* founder password */
   char *topic;                  /* NULL if no topic lock */
   long limit;                   /* 0 if no limit */
   char *key;                    /* NULL if no key */
+  char *forward;                /* NULL if no forward target */
   int modes_on,                 /* modes to enforce */
       modes_off;                /* modes to enforce off */
   struct ChanAccess *access;    /* access list */
@@ -181,5 +189,7 @@ void SetDefaultALVL(struct ChanInfo *cptr);
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;
 extern long MaxTSDelta;
+
+#endif /* CHANNELSERVICES */
 
 #endif /* INCLUDED_chanserv_h */

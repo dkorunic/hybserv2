@@ -229,8 +229,8 @@ void *BlockSubAllocate(Heap *heapptr)
            * between elements in the block that need to be filled), so just
            * use the slot right after the last element in the block
            */
-          offset = (unsigned long) ((heapptr->ElementsPerBlock
-                                     - subptr->FreeElements) * heapptr->ElementSize);
+          offset = (unsigned long)((heapptr->ElementsPerBlock -
+                subptr->FreeElements) * heapptr->ElementSize);
 #if 0
 
           debug("ElsPerBlock-FreeEls=[%d], offset=[%d] addy=[%p]\n",
@@ -240,7 +240,8 @@ void *BlockSubAllocate(Heap *heapptr)
 
           heapptr->FreeElements--;
           subptr->FreeElements--;
-          subptr->LastUsedSlot = (void *) ((unsigned long) subptr->first + offset);
+          subptr->LastUsedSlot = (void *)((unsigned long)subptr->first +
+              offset);
 
           /* Why duplicating code? -kre */
           /* return((void *) ((unsigned long) subptr->first + offset)); */
@@ -268,17 +269,17 @@ void *BlockSubAllocate(Heap *heapptr)
           subptr->SlotHoles[subptr->LastSlotHole - 1] = NULL;
 
           if (!ptr)
+          {
+            for (ii = 0; ii < subptr->LastSlotHole; ii++)
             {
-              for (ii = 0; ii < subptr->LastSlotHole; ii++)
-                {
-                  if (subptr->SlotHoles[ii] != NULL)
-                    {
-                      ptr = subptr->SlotHoles[ii];
-                      subptr->SlotHoles[ii] = NULL;
-                      break;
-                    }
-                }
+              if (subptr->SlotHoles[ii] != NULL)
+              {
+                ptr = subptr->SlotHoles[ii];
+                subptr->SlotHoles[ii] = NULL;
+                break;
+              }
             }
+          }
 
           /* Check if the pointer we're using is the only pointer in
            * subptr->SlotHoles[], if so, decrement subptr->LastSlotHole */

@@ -52,6 +52,7 @@ extern  char      *HPath;
 extern  char      *ConfigFile;
 extern  char      *LogFile;
 extern  char      *PidFile;
+extern  char      *PipeFile;
 extern  char      *HelpPath;
 extern  char      *MotdFile;
 extern  char      *DccMotdFile;

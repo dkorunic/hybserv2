@@ -49,8 +49,8 @@ AddJupe(char *name, char *reason, char *who)
 
 {
   struct Jupe *tempjupe;
-  int ii,
-  nickjupe = 1;
+  unsigned int ii;
+  int nickjupe = 1;
 
   for (ii = 0; ii < strlen(name); ++ii)
     {

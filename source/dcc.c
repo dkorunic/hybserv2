@@ -502,9 +502,8 @@ ConnectClient(struct PortInfo *portptr)
 {
   struct sockaddr_in RemoteAddr;
   struct hostent *RemoteHost;
-  int addrlen,
-  goodid = 1,
-           fd;
+  socklen_t addrlen;
+  int goodid = 1, fd;
   struct DccUser *tempconn;
 
   if (!portptr)
@@ -748,7 +747,7 @@ writeauth(struct DccUser *dccptr)
 {
   char idstr[MAXLINE];
   struct sockaddr_in local, remote;
-  int len;
+  socklen_t len;
 
   len = sizeof(local);
   if (getsockname(dccptr->socket, (struct sockaddr *) &local, &len) ||
@@ -952,8 +951,8 @@ GreetDccUser(struct DccUser *dccptr)
   time_t CurrTime = current_ts;
   struct tm *motd_tm;
   struct Userlist *tempuser;
-  int errval,
-  errlen;
+  int errval;
+  socklen_t errlen;
 
   assert(dccptr != 0);
 
@@ -1798,7 +1797,7 @@ int
 telnet_check(int socket, char *buf)
 
 {
-  int    ii;
+  unsigned int ii;
   int    ret = 0;
 
   if (!buf)

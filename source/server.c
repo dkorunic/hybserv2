@@ -66,6 +66,7 @@ extern aHashEntry hostTable[HASHCLIENTS];
 struct Server *ServerList = NULL;
 static int ServerCollides = 0;
 static time_t ServerCollidesTS = 0;
+int burst_complete = 0;
 
 static void s_pass(int ac, char **av);
 static void s_ping(int ac, char **av);
@@ -502,9 +503,7 @@ s_ping()
   av[3] = Me.name
 */
 
-static void
-s_ping(int ac, char **av)
-
+static void s_ping(int ac, char **av)
 {
   char *who;
 
@@ -520,9 +519,8 @@ s_ping(int ac, char **av)
     who++;
 
   toserv(":%s PONG %s :%s\n",
-         Me.name,
-         Me.name,
-         who);
+         Me.name, Me.name, who);
+  burst_complete = 1;
 } /* s_ping() */
 
 /*
@@ -755,7 +753,10 @@ s_nick(int ac, char **av)
           if (nptr->flags & NS_IDENTIFIED)
             {
               if (newptr && IsLinked(nptr, newptr))
+              {
                 newptr->flags |= NS_IDENTIFIED;
+                toserv(":%s MODE %s +e\n", Me.name, newptr->nick);
+              }
             }
 #endif /* LINKED_NICKNAMES */
 
@@ -920,10 +921,7 @@ s_nick(int ac, char **av)
   if (SafeConnect)
     SendUmode(OPERUMODE_CAPC,
               "*** Client connection: %s!%s@%s [%s]",
-              av[1],
-              av[5],
-              av[6],
-              av[7]);
+              av[1], av[5], av[6], av[7]);
 
   /* Add user to list */
   lptr = AddClient(av);
@@ -971,6 +969,10 @@ s_nick(int ac, char **av)
   if ((nptr = FindNick(av[1])))
     {
       nptr->flags &= ~(NS_IDENTIFIED | NS_RELEASE);
+
+      /* If the user has +e set, mark them as identified */
+      if (lptr->umodes & UMODE_E)
+        nptr->flags |= NS_IDENTIFIED;
 
 #ifdef RECORD_SPLIT_TS
       /*
@@ -1666,6 +1668,9 @@ s_mode(int ac, char **av)
   lptr = FindClient(who);
 
   modes = GetString(ac - 3, av + 3);
+
+  if (!modes)
+    return;
 
   if (!IsChanPrefix(*av[2]) && lptr)
     {

@@ -31,7 +31,7 @@
 */
 char *StrToupper(char *str)
 {
-  int ii;
+  unsigned int ii;
   static char retstr[MAXLINE];
 
   if (!str)
@@ -55,7 +55,7 @@ char *StrToupper(char *str)
  */
 char *StrTolower(char *str)
 {
-  int ii;
+  unsigned int ii;
   static char retstr[MAXLINE];
 
   if (!str)
@@ -158,6 +158,7 @@ int SplitBuf(char *buff, char ***array)
     return 0;
 
   *array = (char **) MyMalloc(sizeof(char *) * argsize);
+  memset(*array, 0, sizeof(char *) * argsize);
   acnt = 0;
   while (*tempbuf)
     {

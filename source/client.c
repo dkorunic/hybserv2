@@ -26,6 +26,7 @@
 #include "config.h"
 #include "dcc.h"
 #include "gline.h"
+#include "log.h"
 #include "match.h"
 #include "misc.h"
 #include "nickserv.h"
@@ -33,6 +34,7 @@
 #include "server.h"
 #include "settings.h"
 #include "statserv.h"
+#include "sock.h"
 
 /*
  * Global - linked list of clients
@@ -52,8 +54,8 @@ UpdateUserModes(struct Luser *user, char *modes)
 
 {
   int PLUS = 1;
-  int umode,
-  ii;
+  int umode;
+  unsigned int ii;
 
   if (!modes || !user)
     return;
@@ -79,6 +81,27 @@ UpdateUserModes(struct Luser *user, char *modes)
         umode = UMODE_W;
       if (modes[ii] == 'o')
         umode = UMODE_O;
+      if (modes[ii] == 'e')
+        if (PLUS)
+        {
+          struct NickInfo* realptr = FindNick(user->nick);
+          if (realptr)
+          {
+             realptr->flags |= NS_IDENTIFIED;
+             RecordCommand("User %s has +e umode, marking as
+                 identified",user->nick);
+             umode = UMODE_E;
+          }
+          else
+          {
+             /* Blech, who is screwing with us? */
+             toserv(":%s MODE %s -e\n", Me.name, user->nick);
+             RecordCommand("User %s has +e umode but is not known to me, setting -e",
+                 user->nick);
+             umode = 0;
+          }
+        }
+
       if (!umode)
         continue;
 
@@ -336,6 +359,39 @@ struct Luser *
                 }
               break;
             } /* case 'O' */
+        case 'e':
+        case 'E':
+        {
+          struct NickInfo *realptr;
+          realptr = FindNick(tempuser->nick);
+          if (realptr)
+          {
+            realptr->flags |= NS_IDENTIFIED;
+            tempuser->umodes |= UMODE_E;
+            RecordCommand("User %s has +e umode, marking as identified",
+                tempuser->nick);
+          }
+          else
+          {
+            /* Is it one of mine? */
+            int mine = 0;
+            struct aService *sptr;
+            for (sptr = ServiceBots; sptr->name; ++sptr)
+              if (!irccmp(tempuser->nick, *(sptr->name)))
+              {
+                mine = 1;
+                break;
+              }
+            if (!mine)
+            {
+              /* Blech, who is screwing with us? */
+              toserv(":%s MODE %s -e\n", Me.name, tempuser->nick);
+              RecordCommand("User %s has +e umode but is not known to me, setting -e",
+                  tempuser->nick);
+            }
+         }
+      break;
+      }
           default:
             break;
           } /* switch (*ch) */

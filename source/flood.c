@@ -340,7 +340,7 @@ void updateConnectTable(char *user, char *host)
                     last = 0;
 #if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
 
-                  sprintf(togline, "%s@%s", (banhost == 1) ? "*" : user, host);
+                  ircsprintf(togline, "%s@%s", (banhost == 1) ? "*" : user, host);
 
                   if (IsProtectedHost((banhost == 1) ? "*" : user, host))
                     banhost = -1; /* Can't do that. */
@@ -362,7 +362,7 @@ void updateConnectTable(char *user, char *host)
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
 
 #ifdef ADVFLOOD_NOTIFY
-                  sprintf(message, "*** Advanced flood detected from [%s@%s], %s.",
+                  ircsprintf(message, "*** Advanced flood detected from [%s@%s], %s.",
                           (banhost == 1) ? "*" : user, host,
 #if defined ADVFLOOD_GLINE && defined ALLOW_GLINES
                           (banhost == -1) ? "not glining, user protected or gline in place" :
@@ -382,7 +382,7 @@ void updateConnectTable(char *user, char *host)
                     {
                       if (ouser->flags & L_OSREGISTERED)
                         {
-                          sprintf(message,":OperServ NOTICE %s :Advanced flood"
+                          ircsprintf(message,":OperServ NOTICE %s :Advanced flood"
                                   " detected from [%s@%s], %s.\n",
                                   ouser->nick, (banhost == 1) ? "*" : user, host,
 #if defined ADVFLOOD_GLINE && defined ALLOW_GLINES

@@ -106,5 +106,6 @@ void ClearChans();
  */
 
 extern struct Server      *ServerList;
+extern int burst_complete;
 
 #endif /* INCLUDED_server_h */

@@ -114,6 +114,10 @@ struct DccUser            *dccnext;
 
 #endif /* HIGHTRAFFIC_MODE */
 
+/* Set this to 1 when exiting ReadSocketInfo (XXX: CRUDE SEMAPHORE HACK!)
+ * */
+int read_socket_done = 0;
+
 /*
 writesocket()
   args: sockfd, writestr
@@ -433,8 +437,8 @@ int
 CompleteHubConnection(struct Servlist *hubptr)
 
 {
-  int errval,
-  errlen;
+  int errval;
+  socklen_t errlen;
 
   assert(hubptr != 0);
 
@@ -472,6 +476,8 @@ CompleteHubConnection(struct Servlist *hubptr)
   SendUmode(OPERUMODE_Y, "*** Connected to %s:%d",
             hubptr->hostname, hubptr->port);
   putlog(LOG1, "Connected to %s:%d", hubptr->hostname, hubptr->port);
+
+  burst_complete = 0;
 
   return 1;
 } /* CompleteHubConnection() */
@@ -585,7 +591,10 @@ ReadSocketInfo(void)
 
           for (htm_count = 0; htm_count < HTM_RATIO; htm_count++)
             if (!ReadHub())
+            {
+              read_socket_done = 1;
               return;
+            }
 
         } /* if (HTM) */
 #if !defined HAVE_PTHREADS && !defined HAVE_SOLARIS_THREADS
@@ -670,7 +679,10 @@ ReadSocketInfo(void)
               else if (FD_ISSET(HubSock, &readfds))
                 {
                   if (!ReadHub())
+                  {
+                    read_socket_done = 1;
                     return; /* something bad happened */
+                  }
                 }
             } /* if (currenthub && (HubSock != NOSOCKET)) */
 
@@ -1243,6 +1255,8 @@ void signon(void)
   /* Hybrid6 and 7 handshake -kre */
 #ifdef HYBRID_ONLY
   toserv("PASS %s :TS\nCAPAB :EX"
+  /* dancer */
+  /* toserv("PASS %s :TS\nCAPAB :EX DNCR SRV" */
 #ifdef GECOSBANS
          /* Send gecosbans capab -Janos */
          " DE"

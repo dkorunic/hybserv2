@@ -593,17 +593,20 @@ ns_loaddata()
                 }
 
               /*
-               * we've come to a new nick entry, so add the last nick
-               * to the list before proceeding
+               * we've come to a new nick entry, so add the last nick to
+               * the list before proceeding
                */
               /* 
-               * Bug. When the nick is in the list already must have the NS_DELETE flag remove
-               * There are two work arrounds possible. The first one, add the newly 
-               * charged user regardles if is in the current nicklist. The current one, will be 
-               * deleted in ReloadData(). The other, is to reset the NS_DELETE of nptr if the
-               * user is already in the nick list. I rather preffere loading all the database and
-               * throwing away all the current users (that's the meaning of un RELOAD!)
-               * Low memory servers should use the second method. Heh, it's up to you kre.
+               * Bug. When the nick is in the list already must have the
+               * NS_DELETE flag remove There are two work arrounds
+               * possible. The first one, add the newly charged user
+               * regardles if is in the current nicklist. The current one,
+               * will be deleted in ReloadData(). The other, is to reset
+               * the NS_DELETE of nptr if the user is already in the nick
+               * list. I rather preffere loading all the database and
+               * throwing away all the current users (that's the meaning
+               * of un RELOAD!) Low memory servers should use the second
+               * method. Heh, it's up to you kre.
                * -ags
                */
                /* if (!FindNick(nptr->nick)) */
@@ -950,9 +953,21 @@ DeleteNick(struct NickInfo *nickptr)
       nickptr->FounderChannels = ftmp;
 
       /* All channels that this nick registered should be dropped, unless
-       * there is a successor. */
-
-      MyFree(cptr->founder);
+       * there is a successor.
+       * Before calling DeleteChan(), it would be best if nickptr has
+       * already been removed from nicklist[]. Otherwise, DeleteChan()
+       * might try to call RemoveFounderChannelFromNick(). This would be
+       * very bad, since this loop is modifying nickptr's FounderChannels
+       * list. Right now, all calls to DeleteNick() remove nickptr from
+       * nicklist[] beforehand, but, being as paranoid as I am, we'll set
+       * cptr->founder to null here, so there is *NO* chance of it ever
+       * being used to delete nickptr's FounderChannels list.
+       */
+      if (cptr->founder)
+      {
+        MyFree(cptr->founder);
+        cptr->founder = NULL;
+      }
 
       /* If the channel has a successor, promote them to founder, otherwise
        * delete the channel */
@@ -1564,10 +1579,9 @@ CollisionCheck(time_t unixtime)
 static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 {
   struct NickInfo *master = NULL, /* new master for link list */
-                                  *leafmaster = NULL, /* previous master for leaf's list */
-                                                *tmp = NULL;
+      *leafmaster = NULL, /* previous master for leaf's list */
+      *tmp = NULL;
   int lcnt = 0 ; /* link count */
-
 
   if (!hub || !leaf)
     return(0);
@@ -1580,10 +1594,8 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
   /* check for circular link */
   for (tmp = master; tmp; tmp = tmp->nextlink)
-{
-      if (tmp == leaf)
-        return(-1);
-    }
+    if (tmp == leaf)
+      return(-1);
 
   /* find out number of linked nicknames in a list */
   if (master->numlinks)
@@ -1598,7 +1610,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
       if (leaf->master->numlinks)
         lcnt += leaf->master->numlinks;
       else
-        lcnt++;
+        ++lcnt;
     }
   else
     {
@@ -1869,7 +1881,8 @@ n_register(struct Luser *lptr, int ac, char **av)
 
   currtime = current_ts;
 
-  if (currtime < (lptr->nickreg_ts + NickRegDelay))
+  if (!IsValidAdmin(lptr) &&
+      (currtime < (lptr->nickreg_ts + NickRegDelay)))
     {
       notice(n_NickServ, lptr->nick,
              "Please wait %ld seconds before using REGISTER again",
@@ -1878,6 +1891,7 @@ n_register(struct Luser *lptr, int ac, char **av)
     }
 
   nptr = MakeNick();
+  nptr->nick = MyStrdup(lptr->nick);
 
   if (!ChangePass(nptr, av[1]))
     {
@@ -1888,11 +1902,11 @@ n_register(struct Luser *lptr, int ac, char **av)
              lptr->nick,
              lptr->username,
              lptr->hostname);
+      MyFree(nptr->nick);
       MyFree(nptr);
       return;
     }
 
-  nptr->nick = MyStrdup(lptr->nick);
   nptr->created = nptr->lastseen = currtime;
 
   if (LastSeenInfo)
@@ -1929,8 +1943,12 @@ n_register(struct Luser *lptr, int ac, char **av)
   if (NSSetHideQuit)
     nptr->flags |= NS_HIDEQUIT;
 
+#if 0
+  /* Don't do this. Period. If it's meant to be NOEXPIRE, an admin can
+   * NOEXPIRE it */
   if (IsOperator(lptr))
     nptr->flags |= NS_NOEXPIRE;
+#endif
 
   mask = HostToMask(lptr->username, lptr->hostname);
 
@@ -1947,6 +1965,8 @@ n_register(struct Luser *lptr, int ac, char **av)
   notice(n_NickServ, lptr->nick,
          "Your password is [\002%s\002] - Remember this for later use",
          av[1]);
+  /* for ircds that have +e mode -kre */
+  toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
 
   MyFree(mask);
 
@@ -2067,10 +2087,11 @@ n_drop(struct Luser *lptr, int ac, char **av)
   /* remove the nick from the nicklist table */
 
   DeleteNick(ni);
+  /* De-identify the user, for ircds that have such mode -kre */
+  toserv(":%s MODE %s -e\n", Me.name, dnick);
 
-  notice(n_NickServ, lptr->nick,
-         "The nickname [\002%s\002] has been dropped",
-         dnick);
+  notice(n_NickServ, lptr->nick, "The nickname [\002%s\002] has been
+      dropped", dnick);
 } /* n_drop() */
 
 /*
@@ -2152,6 +2173,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
   realptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
   notice(n_NickServ, lptr->nick,
          "Password accepted - you are now recognized");
+  toserv(":%s MODE %s +e\n", Me.name, lptr->nick);
 
   if ((nptr->flags & NS_AUTOMASK) &&
       (!OnAccessList(lptr->username, lptr->hostname, nptr)))
@@ -4028,9 +4050,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   /* if there is less than 2 arguments, target is requester itself */
   if (ac < 2)
-    {
       realptr = tmpnick;
-    }
   else
     /* no, target is av[1] */
     if (!(realptr = FindNick(av[1])))

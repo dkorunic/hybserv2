@@ -166,9 +166,6 @@ install-help:
 	@$(CHOWN) $(WHOAMI) $(HELPDIR)
 	@echo
 
-coffe:
-	@echo "*** Gimme coffe to work properly ***"
-
 autoconf:
 	autoconf autoconf/configure.in > configure
 	autoheader -l autoconf

@@ -11,6 +11,7 @@
 
 #include "defs.h"
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,6 +21,7 @@
 #include <sys/resource.h>
 #include <unistd.h>
 #include <time.h>
+#include <errno.h>
 #ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
 #endif
@@ -47,6 +49,7 @@
 #include "sock.h"
 #include "timer.h"
 #include "timestr.h"
+#include "misc.h"
 
 #ifdef HAVE_SOLARIS_THREADS
 #include <thread.h>
@@ -74,6 +77,9 @@ struct MyInfo                Me;
  * connections to +y users etc, during an initial connect.
  */
 int                          SafeConnect = 0;
+
+/* FD to a named fifo that accepts commands like "DIE" */
+int control_pipe;
 
 int main(int argc, char *argv[])
 {
@@ -306,6 +312,22 @@ int main(int argc, char *argv[])
       fclose(pidfile);
     }
 
+  /* Create the control pipe */
+  if (unlink(PipeFile) == -1)
+  {
+    if (errno != ENOENT)
+      putlog(LOG1, "Unable to remove old control pipe %s: %s",
+        PipeFile, strerror(errno));
+  }
+  if (mkfifo(PipeFile, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) == -1)
+  {
+    putlog(LOG1, "Unable to create control pipe %s: %s",
+    PipeFile, strerror(errno));
+  }
+  if ((control_pipe = open(PipeFile, O_RDONLY | O_NONBLOCK)) == -1)
+    putlog(LOG1, "Unable to open control pipe %s: %s",
+      PipeFile, strerror(errno));
+
   /* initialize tcm/user listening ports */
   InitListenPorts();
 
@@ -351,12 +373,60 @@ int main(int argc, char *argv[])
 
 #ifdef HAVE_PTHREADS
 
-      pthread_create(&selectid, NULL, (void *) &ReadSocketInfo, NULL);
-      pthread_join(selectid, NULL);
+    read_socket_done = 0;
+    pthread_create(&selectid, NULL, (void * (*)(void *))&ReadSocketInfo, NULL);
+    /* OK, here is a hacky control pipe implementation */
+    while (!read_socket_done)
+    {
+      fd_set rfds;
+      struct timeval tv;
+      if (control_pipe != -1)
+      {
+        FD_ZERO(&rfds);
+        FD_SET(control_pipe, &rfds);
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        if (select(control_pipe + 1, &rfds, NULL, NULL, &tv))
+        {
+          static char buf[512];
+          int len = read(control_pipe, buf, 511);
+          char *p = buf, *next;
+
+          if (len == -1)
+          {
+            putlog(LOG1, "Control pipe %s read() failed: %s",
+              PipeFile, strerror(errno));
+            close(control_pipe);
+            control_pipe = -1;
+          }
+        else
+        {
+          buf[511] = '\0';
+          buf[len] = '\0';
+          next = strchr(buf, '\n');
+
+          /* Terminate at the first \n, throw the lot away if we don't get one */
+          while (next)
+          {
+            *next = '\0';
+            if (strncmp("DIE", p, 4) == 0)
+              DoShutdown("control_pipe", "Received DIE");
+            p = next + 1; /* At most points to buf[511], since strchr()
+                             can never get past that \0 */
+            next = strchr(p, '\n');
+          }
+          memmove(buf, p, strlen(p) + 1);
+        }
+      }
+    }
+  }
+  
+  pthread_join(selectid, NULL);
 
 #else
 
-      ReadSocketInfo();
+  ReadSocketInfo();
 
 #endif /* HAVE_PTHREADS */
 

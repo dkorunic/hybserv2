@@ -58,7 +58,7 @@ static void AddChan(struct ChanInfo *);
 static struct ChanInfo *MakeChan();
 static void AddFounder(struct Luser *, struct ChanInfo *);
 static int AddAccess(struct ChanInfo *, struct Luser *, char *,
-                     struct NickInfo *, int);
+                     struct NickInfo *, int, time_t, time_t);
 static int DelAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *);
 static int AddAkick(struct ChanInfo *, struct Luser *, char *, char *);
@@ -301,7 +301,7 @@ static AccessInfo accessinfo[] = {
        { CA_CMDHALFOP, "CMDHALFOP", "Use of command HALFOP"},
 #endif /* HYBRID7 */
        { CA_AUTOOP, "AUTOOP", "Automatic op" },
-       { CA_CMDOP, "CMDOP", "Use of comand OP" },
+       { CA_CMDOP, "CMDOP", "Use of command OP" },
        { CA_CMDUNBAN, "CMDUNBAN", "Use of command UNBAN" },
        { CA_AKICK, "AUTOKICK", "Allow AKICK modification" },
        { CA_CMDCLEAR, "CMDCLEAR", "Use of command CLEAR" },
@@ -554,6 +554,8 @@ cs_loaddata()
                             cptr->name);
                       ret = -2;
                     }
+                  if (ac > 2)
+                    cptr->last_founder_active = atol(av[2]);
                 }
               else
                 {
@@ -593,6 +595,8 @@ cs_loaddata()
                   if (ret > 0)
                     ret = -1;
                 }
+              if (ac > 2)
+                cptr->last_successor_active = atol(av[2]);
             }
           else if (!ircncmp("ACCESS", keyword, 6))
             {
@@ -606,11 +610,19 @@ cs_loaddata()
               else
                 {
                   struct NickInfo *nptr;
+                  time_t created = 0, last_used = 0;
+                  if (ac > 4)
+                  {
+                    created = atol(av[3]);
+                    last_used = atol(av[4]);
+                  }
 
                   if ((nptr = FindNick(av[1])))
-                    AddAccess(cptr, NULL, NULL, nptr, atoi(av[2]));
+                    AddAccess(cptr, NULL, NULL, nptr, atoi(av[2]),
+                        created, last_used);
                   else
-                    AddAccess(cptr, NULL, av[1], NULL, atoi(av[2]));
+                    AddAccess(cptr, NULL, av[1], NULL, atoi(av[2]),
+                        created, last_used);
                 }
             }
           else if (!ircncmp("AKICK", keyword, 5))
@@ -695,6 +707,20 @@ cs_loaddata()
                     ret = -1;
                 }
             }
+          else if (!strncasecmp("FORWARD", keyword, 3))
+          {
+            if (!cptr->forward)
+              cptr->forward = MyStrdup(av[1]);
+            else
+            {
+              fatal(1, "%s:%d ChanServ entry for [%s] has multiple FORWARD lines (using first)",
+                ChanServDB,
+                cnt,
+                cptr->name);
+              if (ret > 0)
+                ret = -1;
+            }
+          }
           else if (!ircncmp("MON", keyword, 3))
             {
               if (!cptr->modes_on)
@@ -1054,7 +1080,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         {
           if (FindService(tempu->lptr))
             continue;
-          knicks = (char *) MyRealloc(knicks, strlen(knicks) + strlen(tempu->lptr->nick) + (2 * sizeof(char)));
+          knicks = (char *) MyRealloc(knicks, strlen(knicks) +
+              strlen(tempu->lptr->nick) + (2 * sizeof(char)));
           strcat(knicks, tempu->lptr->nick);
           strcat(knicks, " ");
         }
@@ -1074,7 +1101,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       return;
     }
 
-  cptr->lastused = current_ts;
+  /* cptr->lastused = current_ts; */
 
   if ((cptr->flags & CS_SECUREOPS) || (cptr->flags & CS_RESTRICTED))
     {
@@ -1088,8 +1115,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           if ((tempu->flags & CH_OPPED) &&
               !HasAccess(cptr, tempu->lptr, CA_AUTOOP))
             {
-              dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks)
-                                            + strlen(tempu->lptr->nick) + (2 * sizeof(char)));
+              dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) +
+                  strlen(tempu->lptr->nick) + (2 * sizeof(char)));
               strcat(dopnicks, tempu->lptr->nick);
               strcat(dopnicks, " ");
             }
@@ -1111,7 +1138,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
             continue;
           if (!HasAccess(cptr, tempu->lptr, CA_AUTOOP))
             {
-              kbnicks = (char *) MyRealloc(kbnicks, strlen(kbnicks) + strlen(tempu->lptr->nick) + (2 * sizeof(char)));
+              kbnicks = (char *) MyRealloc(kbnicks, strlen(kbnicks) +
+                  strlen(tempu->lptr->nick) + (2 * sizeof(char)));
               strcat(kbnicks, tempu->lptr->nick);
               strcat(kbnicks, " ");
             }
@@ -1128,7 +1156,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     }
 
   strcpy(modes, "+");
-  if (cptr->modes_on || cptr->key || cptr->limit)
+  if (cptr->modes_on || cptr->key || cptr->limit || cptr->forward)
     {
       if ((cptr->modes_on & MODE_S) &&
           !(chptr->modes & MODE_S))
@@ -1152,6 +1180,9 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_on & MODE_M) &&
           !(chptr->modes & MODE_M))
         strcat(modes, "m");
+      if ((cptr->modes_on & MODE_C) &&
+          !(chptr->modes & MODE_C))
+        strcat(modes, "c");
       if ((cptr->modes_on & MODE_I) &&
           !(chptr->modes & MODE_I))
         strcat(modes, "i");
@@ -1159,6 +1190,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         strcat(modes, "l");
       if (cptr->key)
         strcat(modes, "k");
+      if (cptr->forward)
+        strcat(modes, "f");
 
       if (cptr->limit)
         {
@@ -1180,6 +1213,13 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           ircsprintf(temp, "%s %s", modes, cptr->key);
           strcpy(modes, temp);
         }
+      if (cptr->forward)
+      {
+        char temp[MAXLINE];
+        
+        ircsprintf(temp, "%s %s", modes, cptr->forward);
+        strcpy(modes, temp);
+      }
     }
   if (modes[1])
     {
@@ -1215,6 +1255,9 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_off & MODE_M) &&
           (chptr->modes & MODE_M))
         strcat(modes, "m");
+      if ((cptr->modes_off & MODE_C) &&
+          (chptr->modes & MODE_C))
+        strcat(modes, "c");
       if ((cptr->modes_off & MODE_I) &&
           (chptr->modes & MODE_I))
         strcat(modes, "i");
@@ -1227,6 +1270,12 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           strcat(modes, "k ");
           strcat(modes, chptr->key);
         }
+      if ((cptr->modes_off & MODE_F) &&
+          (chptr->forward))
+      {
+        strcat(modes, "f ");
+        strcat(modes, chptr->forward);
+      }
     }
   if (modes[1])
     {
@@ -1458,6 +1507,9 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_M) &&
           (cptr->modes_on & MODE_M))
         ircsprintf(modes, "+m");
+      if ((mode == MODE_C) &&
+          (cptr->modes_on & MODE_C))
+        ircsprintf(modes, "+c");
       if ((mode == MODE_I) &&
           (cptr->modes_on & MODE_I))
         ircsprintf(modes, "+i");
@@ -1491,6 +1543,18 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
+  if ((mode == MODE_F) && (cptr->forward))
+  {
+    if (!isminus)
+    {
+      ircsprintf(modes, "-f %s", chptr->forward);
+      toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+      UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+    }
+    ircsprintf(modes, "+f %s", cptr->forward);
+    toserv(":%s MODE %s %s\n", n_ChanServ, cptr->name, modes);
+    UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
+  }
 
   if (cptr->modes_off && !isminus)
     {
@@ -1517,6 +1581,9 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_M) &&
           (cptr->modes_off & MODE_M))
         ircsprintf(modes, "-m");
+      if ((mode == MODE_C) &&
+          (cptr->modes_off & MODE_C))
+        ircsprintf(modes, "-c");
       if ((mode == MODE_I) &&
           (cptr->modes_off & MODE_I))
         ircsprintf(modes, "-i");
@@ -1529,6 +1596,12 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
           if (chptr->key)
             ircsprintf(modes, "-k %s", chptr->key);
         }
+      if ((mode == MODE_F) &&
+        (cptr->modes_off & MODE_F))
+      {
+        if (chptr->forward)
+          ircsprintf(modes, "-f %s", chptr->forward);
+      }
 
       if (modes[0])
         {
@@ -1645,6 +1718,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
 
 {
   struct Luser *lptr;
+  struct NickInfo *nptr;
   struct AutoKick *ak;
   char chkstr[MAXLINE];
   char modes[MAXLINE];
@@ -1677,7 +1751,7 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     return;
 
   /* someone joined - update lastused time */
-  cptr->lastused = current_ts;
+  /* cptr->lastused = current_ts; */
 
 #ifndef HYBRID_ONLY
   /*
@@ -1692,10 +1766,9 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
     {
       /*
        * Normally, we would never get here since ChanServ would have
-       * kicked everyone out of the forbidden channel when services
-       * was first started.  However, if an administrator uses
-       * OMODE -i on the channel, they could conceivably join again,
-       * so rekick them out
+       * kicked everyone out of the forbidden channel when services was
+       * first started.  However, if an administrator uses OMODE -i on the
+       * channel, they could conceivably join again, so rekick them out
        */
 
       if (!IsChannelMember(chanptr, Me.csptr))
@@ -1715,8 +1788,8 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
   if ((ak = OnAkickList(cptr, chkstr)))
     {
       /*
-       * Don't kick founders who have identified - even if they match
-       * an AKICK entry
+       * Don't kick founders who have identified - even if they match an
+       * AKICK entry
        */
       if (IsFounder(lptr, cptr))
         return;
@@ -1724,11 +1797,9 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       if (chanptr->numusers == 1)
         {
           /*
-           * This user is the only one on the channel -
-           * if we kick him out, he could just rejoin
-           * since the channel would have been dropped,
-           * have ChanServ join the channel for a few
-           * minutes
+           * This user is the only one on the channel - if we kick him
+           * out, he could just rejoin since the channel would have been
+           * dropped, have ChanServ join the channel for a few minutes
            */
           cs_joinchan(cptr);
         }
@@ -1765,7 +1836,8 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
 
       RemoveFromChannel(chanptr, lptr);
     }
-  else if (cptr->entrymsg)
+  else if (cptr->entrymsg && burst_complete) /* Don't send entry messages
+                                                during initial burst */
     {
       /*
        * Send cptr->entrymsg to lptr->nick in the form of a NOTICE
@@ -1776,6 +1848,17 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
              chanptr->name,
              cptr->entrymsg);
     }
+  
+  /* Is this the founder? (not somebody with founder _access_, but the
+   * actual founder nick) */
+  if ((nptr = FindNick(lptr->nick)) && nptr->flags & NS_IDENTIFIED)
+  {
+    if (cptr->founder && irccmp(lptr->nick, cptr->founder) == 0)
+    /* That's the founder joining. Update activity timer */
+      cptr->last_founder_active = current_ts;
+    if (cptr->successor && irccmp(lptr->nick, cptr->successor) == 0)
+      cptr->last_successor_active = current_ts;
+  }
 } /* cs_CheckJoin() */
 
 /*
@@ -1908,7 +1991,8 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
           HasAccess(cptr, nlptr, CA_AUTOOP))
         continue;
 
-      dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) + strlen(nlptr->nick) + (2 * sizeof(char)));
+      dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) +
+          strlen(nlptr->nick) + (2 * sizeof(char)));
       strcat(dnicks, nlptr->nick);
       strcat(dnicks, " ");
 
@@ -2017,7 +2101,9 @@ PromoteSuccessor(struct ChanInfo *cptr)
     MyFree(cptr->founder);
 
   cptr->founder = cptr->successor;
+  cptr->last_founder_active = cptr->last_successor_active;
   cptr->successor = NULL;
+  cptr->last_successor_active = 0;
 } /* PromoteSuccessor() */
 
 /*
@@ -2228,7 +2314,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
             {
               cptr->founders = fuptr->next;
               MyFree(fuptr);
-              /* fuptr = NULL; */
+              fuptr = NULL;
             }
 
           break;
@@ -2371,6 +2457,8 @@ DeleteChan(struct ChanInfo *chanptr)
     MyFree(chanptr->topic);
   if (chanptr->key)
     MyFree(chanptr->key);
+  if (chanptr->forward)
+    MyFree(chanptr->forward);
 
   while (chanptr->akick)
     {
@@ -2448,7 +2536,8 @@ DeleteChan(struct ChanInfo *chanptr)
  * rewrote this to use master nicknames for access inheritance -kre
  */
 static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
-                     *mask, struct NickInfo *nptr, int level)
+    *mask, struct NickInfo *nptr, int level, time_t created, time_t
+    last_used)
 {
   struct ChanAccess *ptr;
   struct NickInfo *master_nptr;
@@ -2472,6 +2561,9 @@ static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
 
   ptr = (struct ChanAccess *) MyMalloc(sizeof(struct ChanAccess));
   memset(ptr, 0, sizeof(struct ChanAccess));
+
+  ptr->created = created;
+  ptr->last_used = last_used;
 
   if (master_nptr)
     {
@@ -2572,7 +2664,8 @@ static int DelAccess(struct ChanInfo *cptr, struct Luser *lptr, char
  */
 void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
 {
-  assert(cptr && ptr);
+  assert(cptr);
+  assert(ptr);
 
   if (ptr->next)
     ptr->next->prev = ptr->prev;
@@ -2836,16 +2929,22 @@ GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
           found = 1;
 
       if (found)
+      {
+        struct Channel *chptr = FindChannel(cptr->name);
+        /* Only if the user is currently on the channel */
+        if (IsChannelMember(chptr, lptr))
+        /* Update usage time for this access level */
+          cptr->lastused = ca->last_used = current_ts;
+
         if (ca->level >= level)
-          {
             /*
              * if ca->level is greater then level, keep going because
-             * there may be another hostmask in the access list
-             * which matches lptr's userhost which could have an even
-             * bigger access level
+             * there may be another hostmask in the access list which
+             * matches lptr's userhost which could have an even bigger
+             * access level
              */
             level = ca->level;
-          }
+      }
     }
 
   if (level == (-9999))
@@ -3097,7 +3196,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (!IsChannelOp(FindChannel(av[1]), lptr))
+  if (!IsChannelOp(FindChannel(av[1]), lptr) && !IsValidAdmin(lptr))
     {
       notice(n_ChanServ, lptr->nick,
              "You are not a channel operator on [\002%s\002]",
@@ -3120,7 +3219,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   cptr->name = MyStrdup(av[1]);
   cptr->founder = MyStrdup(nptr->nick);
-  cptr->created = cptr->lastused = current_ts;
+  cptr->created = cptr->lastused = cptr->last_founder_active = current_ts;
   SetDefaultALVL(cptr);
 
   /*
@@ -3134,13 +3233,14 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   cptr->flags |= CS_SECURE;
 
   /* 
-   * A Founder of un chanel should have CA_FOUNDER access.
+   * A Founder of a chanel should have CA_FOUNDER access.
    * $you> /msg chanserv register #alabala blabla
    * $you> /msg chanserv access #alabala del $you
    * -- *Serv is gone fishing (SEGFAULT)
    * -ags
    */
-  AddAccess(cptr, 0, 0, nptr, cptr->access_lvl[CA_FOUNDER]);
+  AddAccess(cptr, 0, 0, nptr, cptr->access_lvl[CA_FOUNDER], current_ts,
+      current_ts);
 
   /* add cptr to channel list */
   AddChan(cptr);
@@ -3284,28 +3384,18 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!(cptr = FindChan(av[1])))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_CH_NOT_REGGED,
-             av[1]);
+      notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
       return;
     }
 
   if (!HasAccess(cptr, lptr, CA_ACCESS))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_NEED_ACCESS,
-             cptr->access_lvl[CA_ACCESS],
-             "ACCESS",
-             cptr->name);
+      notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
+          cptr->access_lvl[CA_ACCESS], "ACCESS", cptr->name);
       RecordCommand("%s: %s!%s@%s failed ACCESS [%s] %s %s %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
-                    StrToupper(av[2]),
-                    (ac >= 4) ? av[3] : "",
-                    (ac >= 5) ? av[4] : "");
+           n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+           cptr->name, StrToupper(av[2]),
+           (ac >= 4) ? av[3] : "", (ac >= 5) ? av[4] : "");
       return;
     }
 
@@ -3313,8 +3403,9 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       char line[MAXLINE];
       ircsprintf(line, "%s!%s@%s ACCESS [%s] %s %s %s",
-                 lptr->nick, lptr->username, lptr->hostname, cptr->name,
-                 StrToupper(av[2]), (ac >= 4) ? av[3] : "", (ac >= 5) ? av[4] : "");
+            lptr->nick, lptr->username, lptr->hostname, cptr->name,
+            StrToupper(av[2]), (ac >= 4) ? av[3] : "",
+            (ac >= 5) ? av[4] : "");
       chanopsnotice(FindChannel(cptr->name), line);
     }
 
@@ -3328,14 +3419,10 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
     {
       /* the option they gave was not valid */
-      notice(n_ChanServ, lptr->nick,
-             "%s switch [\002%s\002]",
-             (cmdptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
-             av[2]);
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "ACCESS");
+      notice(n_ChanServ, lptr->nick, "%s switch [\002%s\002]",
+        (cmdptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
+        av[2]);
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "ACCESS");
       return;
     }
 
@@ -3358,13 +3445,23 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 5)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002ACCESS <channel> ADD <hostmask> <level>\002");
+        "Syntax: \002ACCESS <channel> ADD <hostmask> <level>\002");
       notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "ACCESS ADD");
+        ERR_MORE_INFO, n_ChanServ, "ACCESS ADD");
       return;
     }
+
+  if (!HasAccess(cptr, lptr, CA_ACCESS))
+  {
+    notice(n_ChanServ, lptr->nick,
+      ERR_NEED_ACCESS, cptr->access_lvl[CA_ACCESS], "ACCESS ADD",
+      cptr->name);
+    RecordCommand("%s: %s!%s@%s failed ACCESS [%s] ADD %s %s",
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name, 
+      (ac >= 4) ? av[3] : "",
+      (ac >= 5) ? av[4] : "");
+    return;
+  }  
 
   if (atoi(av[4]) < (-DefaultAccess[CA_FOUNDER]))
     {
@@ -3373,6 +3470,15 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
              DefaultAccess[CA_FOUNDER]);
       return;
     }
+  
+  if (cptr->flags & CS_VERBOSE)
+  {
+    char line[MAXLINE];
+    ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %s",
+      lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      (ac >= 4) ? av[3] : "", (ac >= 5) ? av[4] : "");
+    chanopsnotice(FindChannel(cptr->name), line);
+  }
 
   founder = IsFounder(lptr, cptr);
   newlevel = atoi(av[4]);
@@ -3380,10 +3486,6 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   /* Channel founder should be able to add CA_FOUNDER access level
    * to the list. -harly & kre */
-#if 0
-  if (((level = GetAccess(cptr, lptr)) <= atoi(av[4])) ||
-      (atoi(av[4]) >= cptr->access_lvl[CA_FOUNDER]))
-#endif
   if ((founder && (newlevel > cptr->access_lvl[CA_FOUNDER])) ||
       (!founder && (level <= newlevel)))
   {
@@ -3428,19 +3530,17 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
 
   /* add hostmask (or nickptr) to the access list */
-  if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel))
+  if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel, current_ts, 0))
     {
       notice(n_ChanServ, lptr->nick,
-             "[\002%s\002] has been added to the access list "
-             "for %s with level [\002%d\002]",
-             nickptr ? nickptr->nick : hostmask,
-             cptr->name,
-             newlevel);
+        "[\002%s\002] has been added to the access list "
+        "for %s with level [\002%d\002]",
+        nickptr ? nickptr->nick : hostmask, cptr->name, newlevel);
 
       RecordCommand("%s: %s!%s@%s ACCESS [%s] ADD %s %d",
-                    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-                    nickptr ? nickptr->nick : hostmask ? hostmask : "unknown!",
-                    newlevel);
+        n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+        nickptr ? nickptr->nick : hostmask ? hostmask : "unknown!",
+        newlevel);
 
       /* Notify user -KrisDuv
          I've added identification check -kre */
@@ -3510,6 +3610,26 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
              "ACCESS DEL");
       return;
     }
+
+  if (!HasAccess(cptr, lptr, CA_ACCESS))
+  {
+    notice(n_ChanServ, lptr->nick,
+      ERR_NEED_ACCESS, cptr->access_lvl[CA_ACCESS], "ACCESS DEL",
+      cptr->name);
+    RecordCommand("%s: %s!%s@%s failed ACCESS [%s] DEL %s",
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      (ac >= 4) ? av[3] : "");
+    return;
+  }  
+
+  if (cptr->flags & CS_VERBOSE)
+  {
+    char line[MAXLINE];
+    ircsprintf(line, "%s!%s@%s ACCESS [%s] DEL %s",
+      lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      (ac >= 4) ? av[3] : "");
+    chanopsnotice(FindChannel(cptr->name), line);
+  }
 
   host = NULL;
   nickptr = NULL;
@@ -3618,16 +3738,61 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
   if (!(cptr = FindChan(av[1])))
     return;
 
+
+  if (cptr->flags & CS_PRIVATE)
+  {
+    if (!nptr)
+    {
+      /* the command requires a registered nickname */
+
+      notice(n_ChanServ, lptr->nick,
+        "Your nickname is not registered");
+      notice(n_ChanServ, lptr->nick,
+        "and the channel [\002%s\002] is private",
+        cptr->name);
+      notice(n_ChanServ, lptr->nick,
+        ERR_MORE_INFO, n_NickServ, "REGISTER");
+      return;
+    }
+
+    if (!(nptr->flags & NS_IDENTIFIED))
+    {
+      notice(n_ChanServ, lptr->nick,
+        "Password identification is required for [\002ACCESS LIST\002]");
+      notice(n_ChanServ, lptr->nick,
+        "Type \002/msg %s IDENTIFY <password>\002 and retry",
+        n_NickServ);
+      return;
+    }
+  }
+
+  if (((cptr->flags & CS_PRIVATE) && GetAccess(cptr, lptr) <= 0) ||
+      GetAccess(cptr, lptr) < 0 )
+  {
+    notice(n_ChanServ, lptr->nick,
+      ERR_NEED_ACCESS, cptr->flags & CS_PRIVATE ? 1 : 0, "ACCESS LIST",
+      cptr->name);
+    RecordCommand("%s: %s!%s@%s failed ACCESS [%s] LIST %s",
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      (ac >= 4) ? av[3] : "");
+    return;
+  }  
+
+  if (cptr->flags & CS_VERBOSE)
+  {
+    char line[MAXLINE];
+    ircsprintf(line, "%s!%s@%s ACCESS [%s] LIST %s",
+      lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      (ac >= 4) ? av[3] : "");
+    chanopsnotice(FindChannel(cptr->name), line);
+  }
+
   if (ac >= 4)
     mask = av[3];
 
   RecordCommand("%s: %s!%s@%s ACCESS [%s] LIST %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name,
-                mask ? mask : "");
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+                cptr->name, mask ? mask : "");
 
   if (cptr->access)
     {
@@ -3635,9 +3800,9 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
              "-- Access List for [\002%s\002] --",
              cptr->name);
       notice(n_ChanServ, lptr->nick,
-             "Num Level Hostmask");
+             "Num Level Hostmask                            Time since last use");
       notice(n_ChanServ, lptr->nick,
-             "--- ----- --------");
+             "--- ----- --------                            -------------------");
       idx = 1;
       for (ca = cptr->access; ca; ca = ca->next, idx++)
         {
@@ -3645,10 +3810,9 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
             if (match(mask, ca->hostmask ? ca->hostmask : ca->nptr->nick) == 0)
               continue;
           notice(n_ChanServ, lptr->nick,
-                 "%-3d %-5d %-35s",
-                 idx,
-                 ca->level,
-                 ca->hostmask ? ca->hostmask : (ca->nptr ? ca->nptr->nick : ""));
+            "%-3d %-5d %-35s %-10s", idx, ca->level,
+            ca->hostmask ? ca->hostmask : (ca->nptr ? ca->nptr->nick : ""),
+            ca->last_used ? timeago(ca->last_used, 0) : "          ");
         }
       notice(n_ChanServ, lptr->nick,
              "-- End of list --");
@@ -4089,6 +4253,35 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
+  if (!irccmp(av[2], "LIST"))
+  {
+    int ii;
+
+    notice(n_ChanServ, lptr->nick,
+      "-- Access Levels for [\002%s\002] --",
+      cptr->name);
+    notice(n_ChanServ, lptr->nick,
+      "Index Level %-9s Description",
+      "Type");
+    notice(n_ChanServ, lptr->nick,
+      "----- ----- %-9s -----------",
+      "----");
+    for (ii = 0; ii < CA_FOUNDER; ++ii)
+    {
+      if (cptr->access_lvl[ii] <= cptr->access_lvl[CA_FOUNDER])
+        notice(n_ChanServ, lptr->nick,
+          "%-5d %-5d %-9s %s", ii + 1, cptr->access_lvl[ii],
+          accessinfo[ii].cmd, accessinfo[ii].desc);
+      else
+        notice(n_ChanServ, lptr->nick,
+          "%-5d %-5s %-9s %s", ii + 1, "OFF", accessinfo[ii].cmd,
+          accessinfo[ii].desc);
+    }
+    notice(n_ChanServ, lptr->nick,
+      "-- End of list --");
+    return;
+  }
+
   if (!IsFounder(lptr, cptr))
     {
       notice(n_ChanServ, lptr->nick,
@@ -4201,30 +4394,36 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           return;
         }
 
-      newlevel = atoi(av[4]);
-      if (newlevel >= cptr->access_lvl[CA_FOUNDER])
-        {
-          notice(n_ChanServ, lptr->nick,
+      if (!irccmp(av[4], "OFF"))
+      {
+        cptr->access_lvl[index] = newlevel
+          = cptr->access_lvl[CA_FOUNDER] + 1;
+        notice(n_ChanServ, lptr->nick,
+          "The level required for [\002%s\002] has been changed to \002OFF\002 on %s",
+          accessinfo[index].cmd, cptr->name);
+      }
+      else
+      {
+        newlevel = atoi(av[4]);
+        if (newlevel >= cptr->access_lvl[CA_FOUNDER])
+          {
+            notice(n_ChanServ, lptr->nick,
                  "You cannot create a level greater than [\002%d\002]",
                  cptr->access_lvl[CA_FOUNDER]);
-          return;
-        }
+            return;
+          }
 
-      cptr->access_lvl[index] = newlevel;
-      notice(n_ChanServ, lptr->nick,
+        cptr->access_lvl[index] = newlevel;
+        notice(n_ChanServ, lptr->nick,
              "The level required for [\002%s\002] has been changed to \002%d\002 on %s",
              accessinfo[index].cmd,
              newlevel,
              cptr->name);
+      }
 
       RecordCommand("%s: %s!%s@%s LEVEL [%s] SET %s %s",
-                    n_ChanServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    cptr->name,
-                    av[3],
-                    av[4]);
+                    n_ChanServ, lptr->nick, lptr->username,
+                    lptr->hostname, cptr->name, av[3], av[4]);
 
       return;
     }
@@ -4335,33 +4534,6 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     } /* if (!irccmp(av[2], "RESET")) */
 
-  if (!irccmp(av[2], "LIST"))
-    {
-      int ii;
-
-      notice(n_ChanServ, lptr->nick,
-             "-- Access Levels for [\002%s\002] --",
-             cptr->name);
-      notice(n_ChanServ, lptr->nick,
-             "Index Level %-9s Description",
-             "Type");
-      notice(n_ChanServ, lptr->nick,
-             "----- ----- %-9s -----------",
-             "----");
-      for (ii = 0; ii < CA_FOUNDER; ++ii)
-        {
-          notice(n_ChanServ, lptr->nick,
-                 "%-5d %-5d %-9s %s",
-                 ii + 1,
-                 cptr->access_lvl[ii],
-                 accessinfo[ii].cmd,
-                 accessinfo[ii].desc);
-        }
-      notice(n_ChanServ, lptr->nick,
-             "-- End of list --");
-      return;
-    }
-
   /* the option they gave was not a SET, RESET, or LIST */
   notice(n_ChanServ, lptr->nick,
          "Syntax: \002LEVEL <channel> {SET|RESET|LIST} [index|type [level]]\002");
@@ -4436,7 +4608,7 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (!OnAccessList(cptr, nmask, GetMaster(nptr)))
     {
       AddAccess(cptr, (struct Luser *) NULL, NULL, nptr,
-                cptr->access_lvl[CA_FOUNDER]);
+                cptr->access_lvl[CA_FOUNDER], current_ts, current_ts);
       notice(n_ChanServ, lptr->nick,
              "You have been added to %s as a \002founder\002",
              cptr->name);
@@ -4867,9 +5039,8 @@ c_set_splitops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
          "SET SPLITOPS");
 } /* c_set_splitops() */
 
-static void
-c_set_restricted(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
-
+static void c_set_restricted(struct Luser *lptr, struct NickInfo *nptr,
+    int ac, char **av)
 {
   struct ChanInfo *cptr;
 
@@ -4877,10 +5048,7 @@ c_set_restricted(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
 
   RecordCommand("%s: %s!%s@%s SET [%s] RESTRICTED %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
                 cptr->name,
                 (ac < 4) ? "" : StrToupper(av[3]));
 
@@ -5258,9 +5426,8 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   struct ChanInfo *cptr;
   char modes[MAXLINE];
   struct Channel *chptr;
-  int minus = 0,
-              ii,
-              argidx = 4;
+  int minus = 0, argidx = 4;
+  unsigned int ii;
 
   if (!(cptr = FindChan(av[1])))
     return;
@@ -5291,6 +5458,11 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       MyFree(cptr->key);
       cptr->key = NULL;
     }
+  if (cptr->forward)
+  {
+    MyFree(cptr->forward);
+    cptr->forward = NULL;
+  }
 
   for (ii = 0; ii < strlen(av[3]); ++ii)
     {
@@ -5380,6 +5552,16 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             break;
           }
 
+        case 'c':
+        case 'C':
+          {
+            if (minus)
+              cptr->modes_off |= MODE_C;
+            else
+              cptr->modes_on |= MODE_C;
+            break;
+          }
+
         case 'l':
         case 'L':
           {
@@ -5417,6 +5599,26 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             break;
           }
 
+        case 'f':
+        case 'F':
+        {
+          if (minus)
+          {
+            if (cptr->forward)
+              MyFree(cptr->forward);
+            cptr->forward = NULL;
+            cptr->modes_off |= MODE_F;
+          }
+          else
+            if (ac >= (argidx + 1))
+            {
+              if (cptr->forward)
+                MyFree(cptr->forward);
+              cptr->forward = MyStrdup(av[argidx++]);
+            }
+          break;
+        }
+
         default:
           break;
         } /* switch */
@@ -5438,6 +5640,8 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "m");
       if (cptr->modes_off & MODE_I)
         strcat(modes, "i");
+      if (cptr->modes_off & MODE_C)
+        strcat(modes, "c");
       if (cptr->modes_off & MODE_L)
         strcat(modes, "l");
       if (cptr->modes_off & MODE_K)
@@ -5447,11 +5651,11 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       if (cptr->modes_off & MODE_A)
         strcat(modes, "a");
 #endif /* HYBRID7 */
-
+      if (cptr->modes_off & MODE_F)
+        strcat(modes, "f");
     }
-  if (cptr->modes_on ||
-      cptr->limit ||
-      cptr->key)
+
+  if (cptr->modes_on || cptr->limit || cptr->key || cptr->forward)
     {
       strcat(modes, "+");
       if (cptr->modes_on & MODE_S)
@@ -5468,6 +5672,8 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "n");
       if (cptr->modes_on & MODE_T)
         strcat(modes, "t");
+      if (cptr->modes_on & MODE_C)
+        strcat(modes, "c");
       if (cptr->modes_on & MODE_M)
         strcat(modes, "m");
       if (cptr->modes_on & MODE_I)
@@ -5476,6 +5682,8 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "l");
       if (cptr->key)
         strcat(modes, "k");
+      if (cptr->forward)
+        strcat(modes, "f");
 
       if (cptr->limit)
         {
@@ -5489,6 +5697,11 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           strcat(modes, " ");
           strcat(modes, cptr->key);
         }
+      if (cptr->forward)
+      {
+        strcat(modes, " ");
+        strcat(modes, cptr->forward);
+      }
     }
 
   if ((chptr = FindChannel(cptr->name)))
@@ -5982,14 +6195,20 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           if ((arv[ii][0] == '-') && (IsChannelOp(chptr, currlptr)))
             {
               dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
-                                          + strlen(arv[ii] + 1) + (2 * sizeof(char)));
+                + strlen(arv[ii] + 1) + (2 * sizeof(char)));
               strcat(dnicks, arv[ii] + 1);
               strcat(dnicks, " ");
             }
           else if (!IsChannelOp(chptr, currlptr))
             {
+              struct Luser *alptr = FindClient(arv[ii]);
+#if 0
               if ((cptr->flags & CS_SECUREOPS) &&
                   (!HasAccess(cptr, FindClient(arv[ii]), CA_AUTOOP)))
+#endif
+              if ((cptr->flags & CS_SECUREOPS) && (alptr != lptr) &&
+                  (!HasAccess(cptr, alptr, CA_AUTOOP)))
+                  
                 continue;
 
               /*
@@ -6371,79 +6590,76 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 } /* c_unban() */
 
 /*
-c_info()
-  Display info about channel av[1]
-*/
-
-static void
-c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
-
+ * c_info()
+ * Display info about channel av[1]
+ */
+static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
+    **av)
 {
   struct ChanInfo *cptr;
-  char buf[MAXLINE];
-  int online;
   struct NickInfo *ni;
+  char buf[MAXLINE];
+  int founder_online = 0, successor_online = 0;
 
   if (ac < 2)
-    {
-      notice(n_ChanServ, lptr->nick,
-             "Syntax: \002INFO <channel>\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "INFO");
-      return;
-    }
+  {
+    notice(n_ChanServ, lptr->nick, "Syntax: \002INFO <channel>\002");
+    notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "INFO");
+    return;
+  }
 
   if (!(cptr = FindChan(av[1])))
-    {
-      notice(n_ChanServ, lptr->nick,
-             ERR_CH_NOT_REGGED,
-             av[1]);
-      return;
-    }
+  {
+    notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
+    return;
+  }
 
   if (((cptr->flags & CS_PRIVATE) || (cptr->flags & (CS_FORBID | CS_FORGET)))
-      && !IsFounder(lptr, cptr)
+      && !IsFounder(lptr, cptr) && !HasAccess(cptr, lptr, CA_CMDINVITE)
 #ifdef EMPOWERADMINS
-      && !IsValidAdmin(lptr))
-#else
-
-     )
+      && !IsValidAdmin(lptr)
 #endif
+     )
     {
-      notice(n_ChanServ, lptr->nick,
-             "Channel [\002%s\002] is private",
-             cptr->name);
+      notice(n_ChanServ, lptr->nick, "Channel [\002%s\002] is private",
+          cptr->name);
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s INFO [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name);
+  RecordCommand("%s: %s!%s@%s INFO [%s]", n_ChanServ, lptr->nick,
+      lptr->username, lptr->hostname, cptr->name);
 
-  online = 0;
-  if ((ni = FindNick(cptr->founder))
-     )
-    if (ni->flags & NS_IDENTIFIED)
-      online = 1;
+  if ((ni = FindNick(cptr->successor)) && (ni->flags & NS_IDENTIFIED))
+      successor_online = 1;
+  if ((ni = FindNick(cptr->founder)) && (ni->flags & NS_IDENTIFIED))
+      founder_online = 1;
 
   notice(n_ChanServ, lptr->nick,
          "     Channel: %s",
          cptr->name);
+
   notice(n_ChanServ, lptr->nick,
-         "     Founder: %s %s",
-         cptr->founder ? cptr->founder : "",
-         online ? "<< ONLINE >>" : "");
-  notice(n_ChanServ, lptr->nick,
-         "  Registered: %s ago",
-         timeago(cptr->created, 1)
-        );
-  if (!FindChannel(cptr->name)
-     )
+    "     Founder: %s%s%s%s", cptr->founder ? cptr->founder : "",
+    founder_online ? " << ONLINE >>" :
+    (cptr->last_founder_active ? ", last seen: " : ""),
+    (founder_online || !cptr->last_founder_active) ? "" :
+    timeago(cptr->last_founder_active, 1),
+    (founder_online || !cptr->last_founder_active) ? "" : " ago");
+
+  if (cptr->successor)
+    notice(n_ChanServ, lptr->nick,
+    "     Successor: %s%s%s%s",
+    cptr->successor ? cptr->successor : "",
+    successor_online ? " << ONLINE >>" :
+    (cptr->last_successor_active ? ", last seen: " : ""),
+    (successor_online || !cptr->last_successor_active) ? "" :
+    timeago(cptr->last_successor_active, 1),
+    (successor_online || !cptr->last_successor_active) ? "" : " ago");
+ 
+  notice(n_ChanServ, lptr->nick, "  Registered: %s ago",
+      timeago(cptr->created, 1));
+
+  if (!FindChannel(cptr->name))
     notice(n_ChanServ, lptr->nick,
            "   Last Used: %s ago",
            timeago(cptr->lastused, 1));
@@ -6520,6 +6736,8 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(buf, "n");
       if (cptr->modes_off & MODE_T)
         strcat(buf, "t");
+      if (cptr->modes_off & MODE_C)
+        strcat(buf, "c");
       if (cptr->modes_off & MODE_M)
         strcat(buf, "m");
       if (cptr->modes_off & MODE_I)
@@ -6528,11 +6746,12 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(buf, "l");
       if (cptr->modes_off & MODE_K)
         strcat(buf, "k");
+      if (cptr->modes_off & MODE_F)
+        strcat(buf, "f");
     }
-  if (cptr->modes_on || cptr->limit || cptr->key)
+  if (cptr->modes_on || cptr->limit || cptr->key || cptr->forward)
     {
-      strcat(buf, "+")
-      ;
+      strcat(buf, "+");
       if (cptr->modes_on & MODE_S)
         strcat(buf, "s");
 #ifdef HYBRID7
@@ -6547,6 +6766,8 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(buf, "n");
       if (cptr->modes_on & MODE_T)
         strcat(buf, "t");
+      if (cptr->modes_on & MODE_C)
+        strcat(buf, "c");
       if (cptr->modes_on & MODE_M)
         strcat(buf, "m");
       if (cptr->modes_on & MODE_I)
@@ -6555,9 +6776,10 @@ c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(buf, "l");
       if (cptr->key)
         strcat(buf, "k");
+      if (cptr->forward)
+        strcat(buf, "f");
     }
-  if (buf[0]
-     )
+  if (buf[0])
     notice(n_ChanServ, lptr->nick,
            "   Mode Lock: %s",
            buf);
@@ -6775,6 +6997,8 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     strcat(modes, "n");
   if (chptr->modes & MODE_T)
     strcat(modes, "t");
+  if (chptr->modes & MODE_C)
+    strcat(modes, "c");
   if (chptr->modes & MODE_M)
     strcat(modes, "m");
   if (chptr->modes & MODE_I)
@@ -6786,11 +7010,13 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       strcat(modes, "k ");
       strcat(modes, chptr->key);
     }
+  if (chptr->forward)
+  {
+    strcat(modes, "f ");
+    strcat(modes, chptr->forward);
+  }
 
-  toserv(":%s MODE %s %s\n",
-         n_ChanServ,
-         chptr->name,
-         modes);
+  toserv(":%s MODE %s %s\n", n_ChanServ, chptr->name, modes);
 
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 } /* c_clear_modes() */

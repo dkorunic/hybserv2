@@ -974,7 +974,7 @@ AddUser(char *host, char *pass, char *nick, char *flags)
 
 {
   struct Userlist *ptr;
-  int ii;
+  unsigned int ii;
   char *tmp;
 
   ptr = (struct Userlist *) MyMalloc(sizeof(struct Userlist));

@@ -70,4 +70,6 @@ extern struct DccUser           *dccnext;
 
 #endif /* HIGHTRAFFIC_MODE */
 
+extern int read_socket_done;
+
 #endif /* INCLUDED_sock_h */

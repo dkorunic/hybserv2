@@ -16,6 +16,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -919,8 +922,8 @@ struct Command *
 
   {
     struct Command *cmdptr, *tmp;
-    int matches, /* number of matches we've had so far */
-    clength;
+    int matches; /* number of matches we've had so far */
+    unsigned clength;
 
     if (!cmdlist || !name)
       return (NULL);

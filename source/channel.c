@@ -34,6 +34,7 @@
 #include "match.h"
 #include "misc.h"
 #include "mystring.h"
+#include "nickserv.h"
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
@@ -153,8 +154,8 @@ void AddInviteException(char *who, struct Channel *cptr, char *mask)
 {
   struct InviteException *tempinvex;
 
-  tempinvex = (struct InviteException *)
-              MyMalloc(sizeof(struct InviteException));
+  tempinvex = (struct InviteException *)MyMalloc(sizeof(struct
+        InviteException));
   memset(tempinvex, 0, sizeof(struct InviteException));
 
   if (who)
@@ -357,144 +358,142 @@ so if nickcnt > 0, use the provided nick array, otherwise
 create one from the nicks in 'line'
 */
 
-struct Channel *
-      AddChannel(char **line, int nickcnt, char **nicks)
+struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
+{
+  char *names;
+  char **anames;
+  char *currnick;
+  char modes[MAXLINE];
+  struct Channel *chname, *cptr;
+  struct Channel *tempchan;
+  int ii, ncnt, acnt;
 
-  {
-    char *names;
-    char **anames;
-    char *currnick;
-    char modes[MAXLINE];
-    struct Channel *chname, *cptr;
-    struct Channel *tempchan;
-    int ii, ncnt, acnt;
+  ncnt = 5; /* default position for channel nicks, if no limit/key */
+  strcpy(modes, line[4]);
+  if (line[ncnt][0] != ':') /* names list *should* start w/ a :         */
+    {                      /* if it doesn't, theres a limit and/or key */
+      strcat(modes, " ");
+      strcat(modes, line[ncnt]);
+      ncnt++;
+      if (line[ncnt][0] != ':')
+        {
+          strcat(modes, " ");
+          strcat(modes, line[ncnt]);
+          ncnt++;
+        }
+    }
 
-    ncnt = 5; /* default position for channel nicks, if no limit/key */
-    strcpy(modes, line[4]);
-    if (line[ncnt][0] != ':') /* names list *should* start w/ a :         */
-      {                      /* if it doesn't, theres a limit and/or key */
-        strcat(modes, " ");
-        strcat(modes, line[ncnt]);
-        ncnt++;
-        if (line[ncnt][0] != ':')
-          {
-            strcat(modes, " ");
-            strcat(modes, line[ncnt]);
-            ncnt++;
-          }
-      }
+  if (nickcnt > 0)
+    {
+      acnt = nickcnt;
+      anames = nicks;
+    }
+  else
+    {
+      names = line[ncnt];
+      names++; /* point past the leading : */
 
-    if (nickcnt > 0)
-      {
-        acnt = nickcnt;
-        anames = nicks;
-      }
-    else
-      {
-        names = line[ncnt];
-        names++; /* point past the leading : */
+      ii = strlen(names);
 
-        ii = strlen(names);
+      /* kill the \n char on the end */
+      if (IsSpace(names[ii - 2]))
+        names[ii - 2] = '\0';
+      else if (IsSpace(names[ii - 1]))
+        names[ii - 1] = '\0';
 
-        /* kill the \n char on the end */
-        if (IsSpace(names[ii - 2]))
-          names[ii - 2] = '\0';
-        else if (IsSpace(names[ii - 1]))
-          names[ii - 1] = '\0';
+      acnt = SplitBuf(names, &anames);
+    }
 
-        acnt = SplitBuf(names, &anames);
-      }
-
-    if (!(cptr = FindChannel(line[3])))
-      {
+  if (!(cptr = FindChannel(line[3])))
+    {
 #ifdef BLOCK_ALLOCATION
 
-        tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
-        memset(tempchan, 0, sizeof(struct Channel));
-        strncpy(tempchan->name, line[3], CHANNELLEN);
+      tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
+      memset(tempchan, 0, sizeof(struct Channel));
+      strncpy(tempchan->name, line[3], CHANNELLEN);
 
 #else
 
-        tempchan = (struct Channel *) MyMalloc(sizeof(struct Channel));
-        memset(tempchan, 0, sizeof(struct Channel));
-        tempchan->name = MyStrdup(line[3]);
+      tempchan = (struct Channel *) MyMalloc(sizeof(struct Channel));
+      memset(tempchan, 0, sizeof(struct Channel));
+      tempchan->name = MyStrdup(line[3]);
 
 #endif /* BLOCK_ALLOCATION */
 
-        tempchan->since = atol(line[2]);
-        tempchan->numusers = acnt;
+      tempchan->since = atol(line[2]);
+      tempchan->numusers = acnt;
 
-        tempchan->next = ChannelList;
-        tempchan->prev = NULL;
-        if (tempchan->next)
-          tempchan->next->prev = tempchan;
+      tempchan->next = ChannelList;
+      tempchan->prev = NULL;
+      if (tempchan->next)
+        tempchan->next->prev = tempchan;
 
-        HashAddChan(tempchan);
+      HashAddChan(tempchan);
 
-        ChannelList = tempchan;
-        chname = ChannelList;
+      ChannelList = tempchan;
+      chname = ChannelList;
 
-        ++Network->TotalChannels;
+      ++Network->TotalChannels;
 #ifdef STATSERVICES
 
-        if (Network->TotalChannels > Network->MaxChannels)
-          {
-            Network->MaxChannels = Network->TotalChannels;
-            Network->MaxChannels_ts = current_ts;
+      if (Network->TotalChannels > Network->MaxChannels)
+        {
+          Network->MaxChannels = Network->TotalChannels;
+          Network->MaxChannels_ts = current_ts;
 
-            if ((Network->MaxChannels % 10) == 0)
-              {
-                /* notify +y people about new max channel count */
-                SendUmode(OPERUMODE_Y,
-                          "*** New Max Channel Count: %ld",
-                          Network->MaxChannels);
-              }
-          }
-        if (Network->TotalChannels > Network->MaxChannelsT)
-          {
-            Network->MaxChannelsT = Network->TotalChannels;
-            Network->MaxChannelsT_ts = current_ts;
-          }
+          if ((Network->MaxChannels % 10) == 0)
+            {
+              /* notify +y people about new max channel count */
+              SendUmode(OPERUMODE_Y,
+                        "*** New Max Channel Count: %ld",
+                        Network->MaxChannels);
+            }
+        }
+      if (Network->TotalChannels > Network->MaxChannelsT)
+        {
+          Network->MaxChannelsT = Network->TotalChannels;
+          Network->MaxChannelsT_ts = current_ts;
+        }
 #endif /* STATSERVICES */
 
-      }
-    else /* it's an existing channel, but someone has joined it */
-      {
-        cptr->numusers += acnt;
-        chname = cptr;
-      }
+    }
+  else /* it's an existing channel, but someone has joined it */
+    {
+      cptr->numusers += acnt;
+      chname = cptr;
+    }
 
-    /* Add the channel to each nick's channel list */
-    for (ii = 0; ii < acnt; ii++)
-      {
-        currnick = GetNick(anames[ii]);
-        if (!currnick)
-          continue;
+  /* Add the channel to each nick's channel list */
+  for (ii = 0; ii < acnt; ii++)
+    {
+      currnick = GetNick(anames[ii]);
+      if (!currnick)
+        continue;
 
-        if (!IsChannelMember(chname, FindClient(currnick)))
-          {
-            /*
-             * Use anames[ii] instead of currnick here so we get
-             * the @/+ flags
-             */
-            AddToChannel(chname, anames[ii]);
-          }
-        else
-          chname->numusers--;
-      }
+      if (!IsChannelMember(chname, FindClient(currnick)))
+        {
+          /*
+           * Use anames[ii] instead of currnick here so we get
+           * the @/+ flags
+           */
+          AddToChannel(chname, anames[ii]);
+        }
+      else
+        chname->numusers--;
+    }
 
-    /* finally, add the modes for the channel */
-    UpdateChanModes(0, line[0] + 1, chname, modes);
+  /* finally, add the modes for the channel */
+  UpdateChanModes(0, line[0] + 1, chname, modes);
 
-    /*
-     * Only free anames[] if there was no nick list
-     * given
-     */
-    if (!nickcnt)
-      MyFree(anames);
+  /*
+   * Only free anames[] if there was no nick list
+   * given
+   */
+  if (!nickcnt)
+    MyFree(anames);
 
-    return (chname);
-  } /* AddChannel() */
+  return (chname);
+} /* AddChannel() */
 
 /*
 AddToChannel()
@@ -659,6 +658,8 @@ DeleteChannel(struct Channel *cptr)
   MyFree(cptr->name);
   if (cptr->key)
     MyFree(cptr->key);
+  if (cptr->forward)
+    MyFree(cptr->forward);
 #endif /* BLOCK_ALLOCATION */
 
   if (cptr->prev)
@@ -726,22 +727,33 @@ void
 RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
 
 {
-  struct UserChannel *tempchan,
-        *prev = NULL;
-  struct ChannelUser *tempuser,
-        *prev2 = NULL;
+  struct UserChannel *tempchan, *prev = NULL;
+  struct ChannelUser *tempuser, *prev2 = NULL;
+  struct NickInfo *nptr;
+  struct ChanInfo *ciptr;
 
   if (!cptr || !lptr)
     return;
 
-  SendUmode(OPERUMODE_P,
-            "*** Channel part: %s (%s)",
-            lptr->nick,
-            cptr->name);
+  SendUmode(OPERUMODE_P, "*** Channel part: %s (%s)", lptr->nick,
+      cptr->name);
+
+  /* Is this the founder? */
+  if ((nptr = FindNick(lptr->nick)) && (ciptr = FindChan(cptr->name)))
+  {
+    if (nptr->flags & NS_IDENTIFIED)
+    {
+      if (ciptr->founder && irccmp(lptr->nick, ciptr->founder) == 0)
+        /* That's the founder joining. Update activity timer */
+        ciptr->last_founder_active = current_ts;
+      if (ciptr->successor && irccmp(lptr->nick, ciptr->successor) == 0)
+        ciptr->last_successor_active = current_ts;
+    }
+  }
 
   /* remove cptr from lptr's chan list */
   for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
-{
+  {
       if (cptr == tempchan->chptr)
         {
           if (prev)
@@ -753,7 +765,7 @@ RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
           break;
         }
       prev = tempchan;
-    }
+  }
 
   /* remove lptr from cptr's nick list */
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
@@ -791,11 +803,9 @@ NOTE: This is currently used only for o/v/h modes since the others
 */
 
 void
-SetChannelMode(struct Channel *cptr, int add
-                 , int type,
-                 struct Luser *lptr, char *arg)
-
-  {
+SetChannelMode(struct Channel *cptr, int add , int type, struct Luser
+    *lptr, char *arg)
+{
     struct UserChannel *tempc;
     struct ChannelUser *tempu;
 
@@ -808,8 +818,7 @@ SetChannelMode(struct Channel *cptr, int add
       {
         if (tempu && tempc)
           {
-            if (add
-               )
+            if (add)
               {
                 tempu->flags |= CH_OPPED;
                 tempc->flags |= CH_OPPED;
@@ -825,8 +834,7 @@ SetChannelMode(struct Channel *cptr, int add
       {
         if (tempu && tempc)
           {
-            if (add
-               )
+            if (add)
               {
                 tempu->flags |= CH_VOICED;
                 tempc->flags |= CH_VOICED;
@@ -844,8 +852,7 @@ SetChannelMode(struct Channel *cptr, int add
       {
         if (tempu && tempc)
           {
-            if (add
-               )
+            if (add)
               {
                 tempu->flags |= CH_HOPPED;
                 tempc->flags |= CH_HOPPED;
@@ -858,7 +865,7 @@ SetChannelMode(struct Channel *cptr, int add
           } /* if (tempu && tempc) */
       } /* (type == MODE_H) */
 #endif /* HYBRID7 */
-  } /* SetChannelMode() */
+} /* SetChannelMode() */
 
 /*
 UpdateChanModes()
@@ -869,13 +876,10 @@ UpdateChanModes()
   return: none
 */
 
-void
-UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
-                char *modes)
-
+void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
+    char *modes)
 {
-  int add
-    ;
+  int add;
   char *tmp;
   register char ch;
   struct Luser *userptr;
@@ -940,9 +944,8 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
    * sure OperServ and ChanServ remain opped
    */
 
-  add
-    = 0;
-  argidx = (-1);
+  add = 0;
+  argidx = -1;
 
   for (tmp = modes; *tmp; ++tmp)
     {
@@ -960,14 +963,12 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
         case '-':
           {
-            add
-              = 0;
+            add = 0;
             break;
           }
         case '+':
           {
-            add
-              = 1;
+            add = 1;
             break;
           }
 
@@ -992,17 +993,14 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             /* never mark ChanServ/OperServ as deopped -adx */
 #if defined CHANNELSERVICES
 
-            if (add
-                || (userptr != Me.csptr && userptr != Me.osptr))
+            if (add || (userptr != Me.csptr && userptr != Me.osptr))
 #else
-            if (add
-                || userptr != Me.osptr)
+            if (add || userptr != Me.osptr)
 #endif
               SetChannelMode(cptr, add
                                , MODE_O, userptr, 0);
 
-            if (add
-               )
+            if (add)
               {
 #ifdef STATSERVICES
                 if (lptr)
@@ -1061,12 +1059,8 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               } /* else if (!add) */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-            cs_CheckModes(lptr,
-                          FindChan(cptr->name),
-                          !add
-                          ,
-                          MODE_O,
-                          userptr);
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_O,
+                userptr);
 #endif
 
             break;
@@ -1084,11 +1078,9 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             if (!(userptr = FindClient(modeargs[argidx])))
               break;
 
-            SetChannelMode(cptr, add
-                             , MODE_V, userptr, 0);
+            SetChannelMode(cptr, add, MODE_V, userptr, 0);
 
-            if (add
-               )
+            if (add)
               {
 #ifdef STATSERVICES
                 if (lptr)
@@ -1106,12 +1098,8 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               } /* else if (!add) */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-            cs_CheckModes(lptr,
-                          FindChan(cptr->name),
-                          !add
-                          ,
-                          MODE_V,
-                          userptr);
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_V,
+                userptr);
 #endif
 
             break;
@@ -1128,11 +1116,9 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             if (!(userptr = FindClient(modeargs[argidx])))
               break;
 
-            SetChannelMode(cptr, add
-                             , MODE_H, userptr, 0);
+            SetChannelMode(cptr, add, MODE_H, userptr, 0);
 
-            if (add
-               )
+            if (add)
               {
 #ifdef STATSERVICES
                 if (lptr)
@@ -1150,8 +1136,8 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               } /* else if (!add) */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-            cs_CheckModes(lptr, FindChan(cptr->name), !add
-                          , MODE_H, userptr);
+            cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_H,
+                userptr);
 #endif
 
             break;
@@ -1203,8 +1189,7 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               MyFree(cptr->key);
 #endif
 
-            if (add
-               )
+            if (add)
               {
 #ifdef BLOCK_ALLOCATION
                 strncpy(cptr->key, modeargs[argidx], KEYLEN);
@@ -1227,16 +1212,46 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               }
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-            cs_CheckModes(lptr,
-                          FindChan(cptr->name),
-                          !add
-                          ,
-                          MODE_K,
-                          0);
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_K, 0);
 #endif
 
             break;
           } /* case 'k' */
+
+      /*
+       * Channel forwarding target
+       */
+      case 'f':
+      {
+        ++argidx;
+        if (argidx >= argcnt)
+          break;
+#ifndef BLOCK_ALLOCATION
+        if (cptr->forward)
+          MyFree(cptr->forward);
+      #endif
+        if (add)
+        {
+#ifdef BLOCK_ALLOCATION
+          strncpy(cptr->forward, modeargs[argidx], CHANNELLEN);
+          cptr->forward[CHANNELLEN] = '\0';
+#else
+          cptr->forward = MyStrdup(modeargs[argidx]);
+#endif /* BLOCK_ALLOCATION */
+        }
+        else
+        {
+#ifdef BLOCK_ALLOCATION
+          cptr->forward[0] = '\0';
+#else
+          cptr->forward = 0;
+#endif /* BLOCK_ALLOCATION */
+        }
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+        cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_F, 0);
+#endif
+        break;
+      } /* case 'f' */
 
           /*
            * Channel ban
@@ -1332,11 +1347,12 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             else if (ch == 'a')
               modeflag = MODE_A;
 #endif
+            else if (ch == 'c')
+              modeflag = MODE_C;
 
             if (modeflag)
               {
-                if (add
-                   )
+                if (add)
                   cptr->modes |= modeflag;
                 else
                   cptr->modes &= ~modeflag;

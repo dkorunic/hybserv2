@@ -1,3 +1,7 @@
+*** 20010429_4 by kreator
+- oops, used uninitialised helpstr in helpserv security fix
+
+
 *** 20010429_3 by kreator
 - more fixes for both unforbid()s - make it work as drop on fake
   nicknames/channels

@@ -1,3 +1,9 @@
+*** 20021203_1 by kreator
+- seenserv smaller fix
+- fix wrong hostmask[MAXLINE] handling without boundary checking (bad,
+  very bad)
+
+
 *** 20021201_1 by kreator
 - oh yeah, we're back with TONZ OF PATCHEZ, sir:
   * seen.diff from "rabble of helpers" (seen nick!ident@host | ident@host

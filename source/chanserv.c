@@ -390,9 +390,8 @@ cs_process(char *nick, char *command)
 
   if ((chptr = FindChan(acnt >= 2 ? arv[1] : (char *) NULL)))
   {
-    if ((chptr->flags & (CS_FORBID | CS_FORGET)) &&
-        /* Complain only if it not admin-level command -kre */
-        (cptr->level != LVL_ADMIN))
+    /* Complain only if it not admin-level command -kre */
+    if (!IsValidAdmin(lptr))
     {
       if (chptr->flags & CS_FORBID)
       {
@@ -400,6 +399,7 @@ cs_process(char *nick, char *command)
           "Cannot execute commands for forbidden channels");
       }
       else
+      if (chptr->flags & CS_FORGET)
       {
         notice(n_ChanServ, lptr->nick,
           "Cannot execute commands for forgotten channels");

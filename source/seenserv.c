@@ -310,20 +310,22 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       return ;
     }
 
+  memset(seenstring, 0, MAXLINE);
+
   if (strchr(av[1], '*') || strchr(av[1], '?') ||
       strchr(av[1], '@') || strchr(av[1], '!'))
     {
       if (match("*!*@*", av[1]))
-        strncpy(seenstring, av[1], MAXLINE);
+        strncpy(seenstring, av[1], MAXLINE - 1);
       else if (match("*!*", av[1]))
       {
-        strncpy(seenstring, av[1], MAXLINE - 2);
+        strncpy(seenstring, av[1], MAXLINE - 3);
         strcat(seenstring, "@*");
       }
       else if (match("*@*", av[1]))
       {
         strcpy(seenstring, "*!");
-        strncat(seenstring, av[1], MAXLINE - 2);
+        strncat(seenstring, av[1], MAXLINE - 3);
       }
       else
         strncpy(seenstring, av[1], MAXLINE);
@@ -365,8 +367,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
             for (i = 0; (i < 5) && (i < count); i++)
               {
                 saved = first;
-                last = 0;
-                for (; saved; saved = saved->seen)
+                for (last = 0; saved != NULL; saved = saved->seen)
                 {
                   if ((saved->time <= mytime) && (saved->time >= last))
                   {

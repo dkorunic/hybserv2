@@ -6,12 +6,17 @@ Today's MOTD
 
 Pending bugs:
 -------------
+*) set allowguardchannel 0 -> part all channels immediately
+*) segv:
+[19:54:37] <q> 1) register a channel
+[19:54:47] <q> 2) set guard on (dunno if this is necessary but probably so)
+[19:54:49] <q> 3) set verbose on
+[19:54:57] <q> 4) access #chan AAAAAAAA.....
+[19:55:04] <q> put about 500 A's
 *) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count
 *) clear modes doesn't clear limit
-*) fix lcnt issue in InsertLink() after reload command --> seems reload()
-   is very stupid
 *) check for OnAccessList() without master nick call - only when necessary
 *) remember to transfer access list in DeleteLink()
 *) seems it is possible that nickname stays ghosted more than necessary if
@@ -29,6 +34,9 @@ Pending bugs:
 
 Features (yet) to come:
 -----------------------
+*)PuNkSterQFeTus: Heres an idea
+  PuNkSterQFeTus: Instead of just /kill chan
+  PuNkSterQFeTus: how about adding /kline chan
 *) hide nick options..
 *) save auth users before restart/die with a small ts..
 *) blackbook for all operserv commands. searcheable, add, remove, list.

@@ -3413,7 +3413,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   char hostmask[MAXLINE];
-  struct NickInfo *nickptr;
+  struct NickInfo *nickptr = NULL;
   int level; /* lptr->nick's access level */
   int newlevel, founder;
 
@@ -3469,34 +3469,34 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
   }
 
-  nickptr = NULL;
-  hostmask[0] = '\0';
+  memset(hostmask, 0, MAXLINE);
+
   if (match("*!*@*", av[3]))
-    strcpy(hostmask, av[3]);
+    strncpy(hostmask, av[3], MAXLINE - 1);
   else if (match("*!*", av[3]))
-    {
-      strcpy(hostmask, av[3]);
-      strcat(hostmask, "@*");
-    }
+  {
+    strncpy(hostmask, av[3], MAXLINE - 3);
+    strcat(hostmask, "@*");
+  }
   else if (match("*@*", av[3]))
-    {
-      strcpy(hostmask, "*!");
-      strcat(hostmask, av[3]);
-    }
+  {
+    strcpy(hostmask, "*!");
+    strncat(hostmask, av[3], MAXLINE - 3);
+  }
   else if (match("*.*", av[3]))
-    {
-      strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[3]);
-    }
+  {
+    strcpy(hostmask, "*!*@");
+    strncat(hostmask, av[3], MAXLINE - 5);
+  }
   else
+  {
+    /* it must be a nickname */
+    if (!(nickptr = FindNick(av[3])))
     {
-      /* it must be a nickname */
-      if (!(nickptr = FindNick(av[3])))
-        {
-          strcpy(hostmask, av[3]);
-          strcat(hostmask, "!*@*");
-        }
+      strncpy(hostmask, av[3], MAXLINE - 5);
+      strcat(hostmask, "!*@*");
     }
+  }
 
   /* add hostmask (or nickptr) to the access list */
   if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel, current_ts, 0))
@@ -4083,26 +4083,28 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
   {
     char hostmask[MAXLINE];
+    memset(hostmask, 0, MAXLINE);
+
     if (match("*!*@*", av[3]))
-	  strcpy(hostmask, av[3]);
+      strncpy(hostmask, av[3], MAXLINE - 1);
     else if (match("*!*", av[3]))
-	  {
-      strcpy(hostmask, av[3]);
+    {
+      strncpy(hostmask, av[3], MAXLINE - 3);
       strcat(hostmask, "@*");
     }
     else if (match("*@*", av[3]))
     {
       strcpy(hostmask, "*!");
-      strcat(hostmask, av[3]);
+      strncat(hostmask, av[3], MAXLINE - 3);
     }
     else if (match("*.*", av[3]))
     {
       strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[3]);
+      strncat(hostmask, av[3], MAXLINE - 5);
     }
     else
     {
-      strcpy(hostmask, av[3]);
+      strncpy(hostmask, av[3], MAXLINE - 5);
       strcat(hostmask, "!*@*");
     }
 	  host = MyStrdup(hostmask);
@@ -6943,8 +6945,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   buf[0] = '\0';
   if (cptr->modes_off)
     {
-      strcat(buf, "-")
-      ;
+      strcat(buf, "-");
       if (cptr->modes_off & MODE_S)
         strcat(buf, "s");
 #ifdef HYBRID7

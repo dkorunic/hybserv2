@@ -1,3 +1,7 @@
+*** 20010408_4 by kreator
+Fixed blank sjoins, I hope. Should have read ReadHub() better.
+
+
 *** 20010408_3 by kreator
 Ugh! I'm dumb. Forgot av[mcnt][0]==':', and put av[mcnt]==':'.
 

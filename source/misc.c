@@ -362,7 +362,7 @@ HostToMask (char *username, char *hostname)
       len;
 
   if (!username || !hostname)
-    return ((char *) NULL);
+    return (NULL);
 
   ircsprintf(userhost, "%s@%s", username, hostname);
 
@@ -644,7 +644,7 @@ Substitute(char *nick, char *str, int sockfd)
           else if (lptr)
             tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
           else
-            tempuser = GetUser(1, nick, (char *) NULL, (char *) NULL);
+            tempuser = GetUser(1, nick, NULL, NULL);
 
           if ((CheckAccess(tempuser, flag)))
           {
@@ -691,7 +691,7 @@ Substitute(char *nick, char *str, int sockfd)
   else
   {
     MyFree(finalstr);
-    return ((char *) NULL);
+    return (NULL);
   }
 } /* Substitute() */
 

@@ -14,6 +14,8 @@
 /* match.c prototypes */
 
 int match(const char *, const char *);
+int irccmp(const char *, const char *);
+int ircncmp(const char *, const char *, int);
 
 /*
  * character macros

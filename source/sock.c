@@ -700,7 +700,7 @@ ReadSocketInfo(void)
 
 	#ifdef HAVE_SOLARIS_THREADS
 
-	  thr_create(NULL, 0, (void *)&ConnectClient, (void *)tempport,
+	  thr_create(NULL, 0, (void *) &ConnectClient, (void *) tempport,
 			  THR_DETACHED, &clientid);
 
 	#else
@@ -899,7 +899,7 @@ ReadHub()
       linech = spill;
       offset = 0;
       paramc = 0;
-      nextparam = (char *) NULL;
+      nextparam = NULL;
 
       /*
        * If the line ends in \r\n, then this algorithm would have only
@@ -949,7 +949,7 @@ ReadHub()
                * We've hit a colon, set nextparam to NULL, so we know not
                * to set any more spaces to \0
                */
-              nextparam = (char *) NULL;
+              nextparam = NULL;
 
               /*
                * Unfortunately, the first space has already been set to \0
@@ -961,7 +961,7 @@ ReadHub()
               nextparam = linech;
 
             if (paramc >= MAXPARAM)
-              nextparam = (char *) NULL;
+              nextparam = NULL;
           }
         }
       }

@@ -2,7 +2,7 @@
 # $Id$
 
 CC = @CC@
-CFLAGS = -pipe @CFLAGS@
+CFLAGS = -Wall -pipe @CFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDE = -I../include
 # DEFS =

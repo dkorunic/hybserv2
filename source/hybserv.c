@@ -134,8 +134,8 @@ int main(int argc, char *argv[])
    */
   if (LoadSettings(0) == 0)
   {
-    fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n",
-      SETPATH);
+    fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
+      "Check logfile %s\n", SETPATH, LogFile ? LogFile : "*unknown*");
     return (0);
   }
 
@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
     /* enter loop waiting for server info */
 #ifdef HAVE_SOLARIS_THREADS
     
-    thr_create(NULL, 0, (void *)&ReadSocketInfo, NULL,
+    thr_create(NULL, 0, (void *) &ReadSocketInfo, NULL,
                     THR_BOUND, &selectid);
     thr_join(selectid, NULL, NULL);
 
@@ -341,18 +341,15 @@ int main(int argc, char *argv[])
 #endif /* HAVE_SOLARIS_THREADS */
 
     if (Me.hub)
-      SendUmode(OPERUMODE_Y,
-        "*** Disconnected from %s",
-        Me.hub->name);
+      SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
     else
-      SendUmode(OPERUMODE_Y,
-        "*** Disconnected from hub server");
+      SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
 
     if (currenthub)
       if (currenthub->realname)
       {
         MyFree(currenthub->realname);
-        currenthub->realname = (char *) NULL;
+        currenthub->realname = NULL;
       }
 
     close(HubSock); /* There was an error */

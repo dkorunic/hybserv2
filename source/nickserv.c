@@ -1920,7 +1920,7 @@ n_help(struct Luser *lptr, int ac, char **av)
     GiveHelp(n_NickServ, lptr->nick, str, NODCC);
   }
   else
-    GiveHelp(n_NickServ, lptr->nick, (char *) NULL, NODCC);
+    GiveHelp(n_NickServ, lptr->nick, NULL, NODCC);
 } /* n_help() */
 
 /*
@@ -3891,7 +3891,7 @@ static void n_set_phone(struct Luser *lptr, int ac, char **av)
 void n_clearnoexp(struct Luser *lptr, int ac, char **av)
 {
   int ii;
-  struct NickInfo *nptr, *next;
+  struct NickInfo *nptr;
 
   if (ac < 2)
   {

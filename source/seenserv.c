@@ -143,7 +143,7 @@ es_loaddata()
   int ac, ret = 1, cnt, type = 0;
   aSeen *seen;
 
-  if ((fp = fopen(SeenServDB, "r")) == (FILE *) NULL)
+  if ((fp = fopen(SeenServDB, "r")) == NULL)
   {
     /* SeenServ data file doesn't exist */
     return (-1);
@@ -453,7 +453,7 @@ es_help(struct Luser *lptr, int ac, char **av)
     GiveHelp(n_SeenServ, lptr->nick, str, NODCC);
   }
   else
-    GiveHelp(n_SeenServ, lptr->nick, (char *) NULL, NODCC);
+    GiveHelp(n_SeenServ, lptr->nick, NULL, NODCC);
 } /* es_help() */
 
 /*

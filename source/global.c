@@ -241,7 +241,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   ops = 0;
   opers = 0;
   admins = 0;
-  message = 0;
+  message = NULL;
 
   for (cnt = 1; cnt < ac; ++cnt)
   {
@@ -345,6 +345,8 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     "Message sent (%d match%s)",
     cnt,
     (cnt == 1) ? "" : "es");
+
+  MyFree(message);
 } /* g_gnote() */
 
 /*
@@ -381,8 +383,8 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
     return;
   }
 
-  mask = 0;
-  message = 0;
+  mask = NULL;
+  message = NULL;
 
   for (cnt = 1; cnt < ac; ++cnt)
   {
@@ -460,6 +462,8 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
     "Channel message sent (%d match%s)",
     cnt,
     (cnt == 1) ? "" : "es");
+
+  MyFree(message);
 } /* g_gchannote() */
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
@@ -497,11 +501,11 @@ g_gmemo(struct Luser *lptr, int ac, char **av)
 		}
 	}
 
-	MyFree(text);
-
 	notice(n_Global, lptr->nick,
 		"Memo sent to %d nicknames",
 		cnt);
+
+	MyFree(text);
 } /* g_gmemo() */
 
 #ifdef CHANNELSERVICES
@@ -539,11 +543,11 @@ g_gcmemo(struct Luser *lptr, int ac, char **av)
 		}
 	}
 
-	MyFree(text);
-
 	notice(n_Global, lptr->nick,
 		"Memo sent to %d channels",
 		cnt);
+
+	MyFree(text);
 } /* g_gcmemo() */
 
 #endif /* CHANNELSERVICES */

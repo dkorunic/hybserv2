@@ -23,13 +23,14 @@
 #include "err.h"
 #include "hash.h"
 #include "helpserv.h"
+#include "match.h"
 #include "memoserv.h"
 #include "misc.h"
 #include "mystring.h"
 #include "nickserv.h"
 #include "settings.h"
-#include "timestr.h"
 #include "sprintf_irc.h"
+#include "timestr.h"
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
 

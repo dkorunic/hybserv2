@@ -474,7 +474,7 @@ DeleteClient(struct Luser *user)
 
 #ifdef ALLOW_FUCKOVER
   /* check if user was a target of o_fuckover() */
-  CheckFuckoverTarget(user, (char *) NULL);
+  CheckFuckoverTarget(user, NULL);
 #endif
 
   if (user->server)
@@ -572,7 +572,7 @@ GetNick(char *nickname)
   char *final;
 
   if (!nickname)
-    return ((char *) NULL);
+    return (NULL);
 
   final = nickname;
   if (IsNickPrefix(*final))

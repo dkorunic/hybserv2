@@ -147,7 +147,7 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
     if (ac >= 2)
       GiveHelp(n_HelpServ, lptr->nick, av[1], NODCC);
     else
-      GiveHelp(n_HelpServ, lptr->nick, (char *) NULL, NODCC);
+      GiveHelp(n_HelpServ, lptr->nick, NULL, NODCC);
   }
   else
   {
@@ -451,7 +451,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     else
     {
       ircsprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
-      if ((fp = fopen(sendstr, "r")) == (FILE *) NULL)
+      if ((fp = fopen(sendstr, "r")) == NULL)
         ircsprintf(sendstr, "%s/operserv/dcc/%s", HelpPath, helparg);
       else
         fclose(fp);
@@ -459,7 +459,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
     MyFree(cav);
 
-    if ((fp = fopen(sendstr, "r")) == (FILE *)NULL)
+    if ((fp = fopen(sendstr, "r")) == NULL)
     {
       ircsprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
       if (sockfd == NODCC)

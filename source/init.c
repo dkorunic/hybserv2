@@ -145,14 +145,14 @@ ProcessSignal(int sig)
          * Don't write databases on SIGSEGV, because there's
          * a good chance they could get corrupted
          */
-        /* DoShutdown((char *) NULL, "SIGSEGV Received"); */
+        /* DoShutdown(NULL, "SIGSEGV Received"); */
         exit(1);
       }
       else
       {
         SendUmode(OPERUMODE_Y,
           "*** Received SIGTERM, shutting down");
-        DoShutdown((char *) NULL, "SIGTERM Received");
+        DoShutdown(NULL, "SIGTERM Received");
       }
     }
   }

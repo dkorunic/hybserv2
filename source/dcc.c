@@ -84,7 +84,7 @@ SendMotd(int sockfd)
   char *final;
   FILE *fp;
 
-  if ((fp = fopen(DccMotdFile, "r")) == (FILE *) NULL)
+  if ((fp = fopen(DccMotdFile, "r")) == NULL)
   {
     writesocket(sockfd, "MOTD file missing\n");
     return;
@@ -92,7 +92,7 @@ SendMotd(int sockfd)
 
   while (fgets(line, MAXLINE - 1, fp))
   {
-    final = Substitute((char *) NULL, line, sockfd);
+    final = Substitute(NULL, line, sockfd);
     if (final && (final != (char *) -1))
     {
       writesocket(sockfd, final);
@@ -1354,7 +1354,7 @@ LinkBots()
       }
 
       if (goodlink)
-        ConnectToTCM((char *) NULL, bptr);
+        ConnectToTCM(NULL, bptr);
       else
         goodlink = 1;
     }
@@ -1634,7 +1634,7 @@ GoodTCM(struct DccUser *dccptr)
     return (NULL);
 
   if (dccptr->flags & SOCK_NEEDID)
-    user = (char *) NULL;
+    user = NULL;
   else
     user = dccptr->username;
 
@@ -1762,7 +1762,7 @@ DccGetUser(struct DccUser *dccptr)
      * get UserB's privileges.
      */
     if (irccmp(dccptr->nick, userptr->nick) != 0)
-      userptr = GetUser(1, dccptr->nick, (char *) NULL, (char *) NULL);
+      userptr = GetUser(1, dccptr->nick, NULL, NULL);
   }
 
   return (userptr);
@@ -2044,8 +2044,8 @@ BotProcess(struct DccUser *botptr, char *line)
          */
 
         mynick = strtok(line, " ");
-        tcmnick = strtok((char *) NULL, " ");
-        password = strtok((char *) NULL, "\r\n");
+        tcmnick = strtok(NULL, " ");
+        password = strtok(NULL, "\r\n");
 
         if (!mynick || (irccmp(mynick, n_OperServ) != 0))
         {

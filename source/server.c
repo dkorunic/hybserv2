@@ -2217,7 +2217,7 @@ s_motd(int ac, char **av)
       continue;
     }
 
-    final = Substitute((char *) NULL, line, NODCC);
+    final = Substitute(NULL, line, NODCC);
     if (final && (final != (char *) -1))
     {
       toserv(":%s 372 %s :- %s\n",

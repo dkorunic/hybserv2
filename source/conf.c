@@ -79,7 +79,7 @@ struct PortInfo *PortList = NULL;    /* list of ports to listen on */
 struct Userlist *GenericOper = NULL;
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
-struct cHost *cHostList=NULL;        /* list of autoconnecting hosts */
+struct cHost *cHostList = NULL;      /* list of autoconnecting hosts */
 #endif
 
 int HubCount = 0;                    /* number of S: lines in hybserv.conf */
@@ -742,7 +742,7 @@ getfield (char *newline)
   field = line;
   if ((end = strchr(line, ':')) == NULL)
   {
-    line = (char *) NULL;
+    line = NULL;
     if ((end = strchr(field, '\n')) == NULL)
       end = field + strlen(field);
   }
@@ -1276,10 +1276,10 @@ AddPort(int port, char *host, char *type)
     if (strlen(host))
       ptr->host = MyStrdup(host);
     else
-      ptr->host = (char *) NULL;
+      ptr->host = NULL;
   }
   else
-    ptr->host = (char *) NULL;
+    ptr->host = NULL;
 
   if (!type)
     ptr->type = PRT_USERS;

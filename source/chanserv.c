@@ -393,7 +393,7 @@ cs_process(char *nick, char *command)
     }
   } /* if (nptr) */
 
-  if ((chptr = FindChan(acnt >= 2 ? arv[1] : (char *) NULL)))
+  if ((chptr = FindChan(acnt >= 2 ? arv[1] : NULL)))
   {
     /* Complain only if it not admin-level command -kre */
     if (!IsValidAdmin(lptr))
@@ -2983,7 +2983,7 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     GiveHelp(n_ChanServ, lptr->nick, str, NODCC);
   }
   else
-    GiveHelp(n_ChanServ, lptr->nick, (char *) NULL, NODCC);
+    GiveHelp(n_ChanServ, lptr->nick, NULL, NODCC);
 
   return;
 } /* c_help() */
@@ -3749,19 +3749,13 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (AddAkick(cptr, lptr, hostmask, reason))
   {
     notice(n_ChanServ, lptr->nick,
-      "[\002%s\002] has been added to the autokick list for %s with reason [%s]",
-      hostmask,
-      cptr->name,
-      reason ? reason : "");
+      "[\002%s\002] has been added to the autokick "
+      "list for %s with reason [%s]",
+      hostmask, cptr->name, reason ? reason : "");
 
     RecordCommand("%s: %s!%s@%s AKICK [%s] ADD %s %s",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name,
-      hostmask,
-      reason ? reason : "");
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
+      hostmask, reason ? reason : "");
   }
   else
   {
@@ -3771,20 +3765,15 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       cptr->name);
 
     RecordCommand("%s: %s!%s@%s failed AKICK [%s] ADD %s %s",
-      n_ChanServ,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname,
-      cptr->name,
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
       av[3],
       reason ? reason : "");
-    if (reason)
-      MyFree(reason);
+
+    MyFree(reason);
     return;
   }
 
-  if (reason)
-    MyFree(reason);
+  MyFree(reason);
 } /* c_akick_add() */
 
 static void
@@ -4374,7 +4363,8 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       lptr->hostname);
   if (!OnAccessList(cptr, nmask, nptr))
   {
-    AddAccess(cptr, (struct Luser *) NULL, (char *) NULL, nptr, cptr->access_lvl[CA_SUPEROP]);
+    AddAccess(cptr, (struct Luser *) NULL, NULL, nptr,
+        cptr->access_lvl[CA_SUPEROP]);
     notice(n_ChanServ, lptr->nick,
       "You have been added to %s as a SuperOp",
       cptr->name);
@@ -5494,15 +5484,10 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       topic[TOPICLEN]=0;
 
   RecordCommand("%s: %s!%s@%s SET [%s] TOPIC %s",
-    n_ChanServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    cptr->name,
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
     topic);
 
-  if (cptr->topic)
-    MyFree(cptr->topic);
+  MyFree(cptr->topic);
 
   cptr->topic = topic;
 
@@ -5510,8 +5495,7 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   notice(n_ChanServ, lptr->nick,
     "The topic for %s has been set to [\002%s\002]",
-    cptr->name,
-    cptr->topic);
+    cptr->name, cptr->topic);
 } /* c_set_topic() */
 
 static void
@@ -5558,11 +5542,7 @@ c_set_entrymsg(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     emsg = GetString(ac - 3, av + 3);
 
   RecordCommand("%s: %s!%s@%s SET [%s] ENTRYMSG %s",
-    n_ChanServ,
-    lptr->nick,
-    lptr->username,
-    lptr->hostname,
-    cptr->name,
+    n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
     emsg);
 
   if (cptr->entrymsg)
@@ -6166,13 +6146,15 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if (arv[ii][0] == '-')
       {
-        dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) + strlen(arv[ii] + 1) + (2 * sizeof(char)));
+        dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
+            + strlen(arv[ii] + 1) + (2 * sizeof(char)));
         strcat(dnicks, arv[ii] + 1);
         strcat(dnicks, " ");
       }
       else
       {
-        vnicks = (char *) MyRealloc(vnicks, strlen(vnicks) + strlen(arv[ii]) + (2 * sizeof(char)));
+        vnicks = (char *) MyRealloc(vnicks, strlen(vnicks)
+            + strlen(arv[ii]) + (2 * sizeof(char)));
         strcat(vnicks, arv[ii]);
         strcat(vnicks, " ");
       }

@@ -166,7 +166,7 @@ ss_loaddata()
   char *keyword;
   int ac, ret = 1, cnt;
 
-  if ((fp = fopen(StatServDB, "r")) == (FILE *) NULL)
+  if ((fp = fopen(StatServDB, "r")) == NULL)
   {
     /* StatServ data file doesn't exist */
     return (-1);
@@ -446,7 +446,7 @@ GetDomain(char *hostname)
       }
     }
     if (!dotcnt)
-      return ((char *) NULL);
+      return (NULL);
     if (dotcnt == 1)
       done[cnt] = '\0';
     else
@@ -1182,7 +1182,7 @@ ss_help(struct Luser *lptr, int ac, char **av)
     GiveHelp(n_StatServ, lptr->nick, str, NODCC);
   }
   else
-    GiveHelp(n_StatServ, lptr->nick, (char *) NULL, NODCC);
+    GiveHelp(n_StatServ, lptr->nick, NULL, NODCC);
 } /* ss_help() */
 
 /*
@@ -1458,7 +1458,7 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
                    korectdat(atol(date), i*-1)
               );
 
-           if ((lf = fopen(grep_log_filename, "r")) == (FILE *) NULL)
+           if ((lf = fopen(grep_log_filename, "r")) == NULL)
            {
 		notice(n_StatServ,lptr->nick,
                         "No Log file detected :%s",
@@ -1607,7 +1607,7 @@ static void ss_splitinfo(struct Luser *lptr, int ac, char **av)
 static void ss_showadmins(struct Luser *lptr, int ac, char **av)
 {
   int iCnt = 0;
-  struct Luser *tempuser, *next;
+  struct Luser *tempuser;
 
   RecordCommand("%s: %s!%s@%s SHOWADMINS",
     n_StatServ, lptr->nick, lptr->username, lptr->hostname);
@@ -1631,7 +1631,7 @@ static void ss_showadmins(struct Luser *lptr, int ac, char **av)
 static void ss_showopers(struct Luser *lptr, int ac, char **av)
 {
   int iCnt = 0;
-  struct Luser *tempuser, *next;
+  struct Luser *tempuser;
 
   RecordCommand("%s: %s!%s@%s SHOWOPERS",
     n_StatServ, lptr->nick, lptr->username, lptr->hostname);

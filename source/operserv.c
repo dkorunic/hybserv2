@@ -1222,7 +1222,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     os_notice(lptr, sockfd, "          Running on: \002*unknown*\002");
 
-  mem = CalcMem((char *) NULL, NODCC);
+  mem = CalcMem(NULL, NODCC);
   os_notice(lptr, sockfd, "        Memory Usage: \002%0.2f\002 kb (\002%0.2f\002 mb)",
     mem / 1024,
     (mem / 1024) / 1024);
@@ -1315,17 +1315,11 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
   {
     /* The user is protected */
     os_notice(lptr, sockfd, "%s!%s@%s is protected", 
-      kptr->nick,
-      kptr->username,
-      kptr->hostname);
+      kptr->nick, kptr->username, kptr->hostname);
 
     putlog(LOG2,
       "%s!%s@%s attempted to KILL protected user %s [%s]",
-      onick,
-      ouser,
-      ohost,
-      av[1],
-      reason);
+      onick, ouser, ohost, av[1], reason);
 
     MyFree(reason);
     return;
@@ -1341,12 +1335,7 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
     reason);
 
   toserv(":%s KILL %s :%s!%s (%s (Requested by %s))\n",
-    n_OperServ,
-    av[1],
-    Me.name,
-    n_OperServ,
-    reason,
-    onick);
+    n_OperServ, av[1], Me.name, n_OperServ, reason, onick);
 
   /* remove the killed nick from list */
   DeleteClient(kptr);
@@ -1631,7 +1620,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
     key = strtok(line, ":");
     if ((*key == 'J') || (*key == 'j'))
     {
-      jhost = strtok((char *) NULL, ":"); 
+      jhost = strtok(NULL, ":"); 
       if (match(av[1], jhost) == 0)
         fputs(linetemp, fp);
       else
@@ -1844,7 +1833,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 
   if (!(hostname = strchr(hostmask, '@')))
   {
-    username = (char *) NULL;
+    username = NULL;
     hostname = hostmask;
   }
   else
@@ -1878,7 +1867,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     fp = fopen(ConfigFile, "a+");
 
-  if (fp == (FILE *) NULL)
+  if (fp == NULL)
   {
     os_notice(lptr, sockfd, "Unable to open config file");
     return;
@@ -2096,7 +2085,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     configname = ConfigFile;
 
-  if ((configfp = fopen(configname, "r")) == (FILE *) NULL)
+  if ((configfp = fopen(configname, "r")) == NULL)
   {
     os_notice(lptr, sockfd, "Unable to open config file");
     return;
@@ -2213,7 +2202,7 @@ o_join(struct Luser *lptr, int ac, char **av, int sockfd)
   os_notice(lptr, sockfd, "Now monitoring %s", 
     av[1]);
 
-  if ((fp = fopen(ConfigFile, "a")) == (FILE *) NULL)
+  if ((fp = fopen(ConfigFile, "a")) == NULL)
   {
     os_notice(lptr, sockfd, "Unable to open config file");
     return;
@@ -2318,7 +2307,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
     key = strtok(line, ":");
     if ((strcmp(key, "c") == 0) || (strcmp(key, "C") == 0))
     {
-      ptemp = strtok((char *) NULL, "\r\n");
+      ptemp = strtok(NULL, "\r\n");
       if (ircncmp(ptemp, av[1], strlen(av[1])) != 0)
         fputs(linetemp, fp);
     }
@@ -2358,7 +2347,7 @@ o_clones(struct Luser *lptr, int ac, char **av, int sockfd)
   clcnt = 0;
   for (ii = 0; ii < HASHCLIENTS; ii++)
   {
-    if (cloneTable[ii].list == (void *) NULL)
+    if (cloneTable[ii].list == NULL)
       continue;
 
     for (tempuser = cloneTable[ii].list; tempuser; tempuser = tempuser->cnext)
@@ -2740,7 +2729,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
     
   target = NULL;
   servptr = NULL;
-  realname = (char *) NULL;
+  realname = NULL;
   *msgbuf = '\0';
   ops = 0;
   showinfo = 0;
@@ -4059,7 +4048,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
       {
         char *strptr;
 
-        if ((*(char **) dptr->param[ii].ptr) != (char *) NULL)
+        if ((*(char **) dptr->param[ii].ptr) != NULL)
         {
           /*
            * make sure we free the old string before allocating
@@ -4519,7 +4508,7 @@ AddIgnore(char *hostmask, time_t expire)
 //  ptr->hostmask = MyStrdup(hostmask);
 
   ptr = (struct Ignore *) malloc(sizeof(struct Ignore));
-  ptr->hostmask = strdup(hostmask);
+  ptr->hostmask = MyStrdup(hostmask);
 
   if (!expire)
     ptr->expire = (time_t) 0; /* no expiration */
@@ -5323,7 +5312,7 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   }
 
   chptr = NULL;
-  reason = (char *) NULL;
+  reason = NULL;
   nonopers = 0;
   ops = 0;
   nonops = 0;
@@ -5425,7 +5414,8 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
         ii = 1;
       else
         ii = 0;
-      if (IsProtected(GetUser(ii, tempuser->lptr->nick, tempuser->lptr->username, tempuser->lptr->hostname)))
+      if (IsProtected(GetUser(ii, tempuser->lptr->nick,
+              tempuser->lptr->username, tempuser->lptr->hostname)))
         bad = 1;
     }
 
@@ -5481,14 +5471,9 @@ o_killhost(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     reason = GetString(ac - 2, av + 2);
 
-  o_RecordCommand(sockfd,
-    "KILLHOST %s [%s]",
-    av[1],
-    reason);
+  o_RecordCommand(sockfd, "KILLHOST %s [%s]", av[1], reason);
 
-  o_Wallops("KILLHOST %s [%s]",
-    av[1],
-    reason);
+  o_Wallops("KILLHOST %s [%s]", av[1], reason);
 
   if (!(host = strchr(av[1], '@')))
   {
@@ -5537,12 +5522,7 @@ o_killhost(struct Luser *lptr, int ac, char **av, int sockfd)
       }
 
       toserv(":%s KILL %s :%s!%s (%s (%s@%s))\n",
-        n_OperServ,
-        tempuser->nick,
-        Me.name,
-        n_OperServ,
-        reason,
-        onick,
+        n_OperServ, tempuser->nick, Me.name, n_OperServ, reason, onick,
         n_OperServ);
 
       DeleteClient(tempuser);
@@ -5984,10 +5964,9 @@ o_dump(struct Luser *lptr, int ac, char **av, int sockfd)
   toserv("%s\n", dstr);
 
   /*
-   * Technically, this av almost the same as the arv[]
-   * passed to ProcessInfo earlier, sending it through
-   * the whole routine again could cause problems -
-   * make a new one
+   * Technically, this av almost the same as the arv[] passed to
+   * ProcessInfo earlier, sending it through the whole routine again could
+   * cause problems - make a new one
    */
   strcpy(tempstr, dstr);
   newac = SplitBuf(tempstr, &newav);
@@ -6098,16 +6077,19 @@ TakeOver(struct Channel *cptr)
     else
       ii = 0;
 
-    tempuser = GetUser(ii, tempnick->lptr->nick, tempnick->lptr->username, tempnick->lptr->hostname);
+    tempuser = GetUser(ii, tempnick->lptr->nick, 
+        tempnick->lptr->username, tempnick->lptr->hostname);
     if (IsChannelOp(cptr, tempnick->lptr) && !IsFriend(tempuser))
     {
-      dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
+      dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks)
+          + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
       strcat(dopnicks, tempnick->lptr->nick);
       strcat(dopnicks, " ");
     }
     else if (!IsChannelOp(cptr, tempnick->lptr) && IsFriend(tempuser))
     {
-      opnicks = (char *) MyRealloc(opnicks, strlen(opnicks) + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
+      opnicks = (char *) MyRealloc(opnicks, strlen(opnicks)
+          + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
       strcat(opnicks, tempnick->lptr->nick);
       strcat(opnicks, " ");
     }

@@ -645,7 +645,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
       temp2 = cloneTable[hashv].list;
   }
 
-  if (cloneTable[hashv].list == (void *) NULL)
+  if (cloneTable[hashv].list == NULL)
   {
     lptr->cnext = (struct Luser *)cloneTable[hashv].list;
     cloneTable[hashv].list = (void *)lptr;
@@ -654,7 +654,7 @@ HashAddClient(struct Luser *lptr, int nickchange)
   if (MaxClones && foundclone)
   {
     int    clcnt = 2; /* number of clones */
-    char  *killmsg = (char *) NULL;
+    char  *killmsg = NULL;
     struct Luser  *prev = (struct Luser *) NULL;
 
     killmsg = (char *) MyMalloc(strlen(tempuser->nick) +

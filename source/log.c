@@ -25,10 +25,11 @@
 #include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
+#include "match.h"
+#include "misc.h"
 #include "operserv.h"
 #include "settings.h"
 #include "sprintf_irc.h"
-#include "misc.h"
 #include "sprintf_irc.h"
 
 /*
@@ -58,7 +59,7 @@ putlog(int level, char *format, ...)
   if (!LogFile)
     return;
 
-  if ((fp = fopen(LogFile, "a+")) == (FILE *) NULL)
+  if ((fp = fopen(LogFile, "a+")) == NULL)
   {
   #ifdef DEBUGMODE
     printf("Unable to open log file: %s\n", LogFile);
@@ -136,7 +137,7 @@ CheckLogs(time_t unixtime)
 
     lmatches = 0;
     olddate[0] = '\0';
-    currdate = (char *) NULL;
+    currdate = NULL;
 
     /*
      * Go through all the files in the directory and

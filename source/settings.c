@@ -361,13 +361,13 @@ ClearDirectives(int rehash)
       {
         case PARAM_STRING:
         {
-          *(char **) tmp->param[ii].ptr = (char *) NULL;
+          *(char **) tmp->param[ii].ptr = NULL;
           break;
         }
 
         case PARAM_TIME:
         {
-          *(long **) tmp->param[ii].ptr = (long *) NULL;
+          *(long **) tmp->param[ii].ptr = NULL;
           break;
         }
 
@@ -375,7 +375,7 @@ ClearDirectives(int rehash)
         case PARAM_SET:
         case PARAM_PORT:
         {
-          *(int *) tmp->param[ii].ptr = (int) NULL;
+          *(int *) tmp->param[ii].ptr = 0;
           break;
         }
 
@@ -665,7 +665,7 @@ dparse(char *line, int linenum, int rehash)
     {
       case PARAM_STRING:
       {
-        if ((*(char **) dptr->param[ii].ptr) != (char *) NULL)
+        if ((*(char **) dptr->param[ii].ptr) != NULL)
         {
           /*
            * If this is a rehash, make sure we free the old
@@ -800,7 +800,7 @@ LoadSettings(int rehash)
   int goodread;
   int cnt;
 
-  if ((fp = fopen(SETPATH, "r")) == (FILE *) NULL)
+  if ((fp = fopen(SETPATH, "r")) == NULL)
   {
     fprintf(stderr, "Unable to open SETPATH (%s)\n",
       SETPATH);

@@ -25,33 +25,32 @@
 #include "sprintf_irc.h"
 
 /*
-timeago()
-  Uses the TS "timestamp" to make a corresponding time string
-to the long format:
-  X years X weeks X days (Xh Xm Xs)
-or the short format:
-  Xy Xw Xd Xh Xm Xs
-depending on the flag parameter.
-
-Values for "flag":
- 0 - display (presenttime - timestamp) in short format
- 1 - display (presenttime - timestamp) in long format
- 2 - display (timestamp) in short format
- 3 - display (timestamp) in long format
- 4 - display (timestamp) in short format but with no spaces
-*/
-
-char *
-timeago(time_t timestamp, int flag)
-
+ * timeago()
+ *
+ * Uses the TS "timestamp" to make a corresponding time string to the long
+ * format:
+ * X years X weeks X days (Xh Xm Xs)
+ * or the short format:
+ * Xy Xw Xd Xh Xm Xs
+ * depending on the flag parameter.
+ *
+ * Values for "flag":
+ * 0 - display (presenttime - timestamp) in short format
+ * 1 - display (presenttime - timestamp) in long format
+ * 2 - display (timestamp) in short format
+ * 3 - display (timestamp) in long format
+ * 4 - display (timestamp) in short format but with no spaces
+ */
+char *timeago(time_t timestamp, int flag)
 {
   static char final[50];
   char temp[50];
   time_t delta;
   long years, weeks, days, hours, minutes, seconds;
   int longfmt;
-  int spaces; /* put spaces in the string? */
+  int spaces; 
 
+  /* put spaces in the string? */
   spaces = 1;
 
   switch (flag)
@@ -95,7 +94,7 @@ timeago(time_t timestamp, int flag)
     default:
     {
       /* shouldn't happen */
-      return ("");
+      return NULL;
     }
   } /* switch (flag) */
 
@@ -152,10 +151,8 @@ timeago(time_t timestamp, int flag)
     if (longfmt)
     {
       /*
-       * We don't want to have a string like:
-       * 1 week (0h 0m 0s)
-       * so make sure at least one of these values
-       * is non-zero
+       * We don't want to have a string like: 1 week (0h 0m 0s) so make
+       * sure at least one of these values is non-zero
        */
       if (hours || minutes || seconds)
       {
@@ -262,14 +259,12 @@ timeago(time_t timestamp, int flag)
 } /* timeago() */
 
 /*
-timestr()
- This function is similar to timeago(), but it takes an arguement
-string of the format "Xw Xd Xh Xm Xs", and converts it to seconds.
-*/
-
-long
-timestr(char *format)
-
+ * timestr()
+ *
+ * This function is similar to timeago(), but it takes an arguement
+ * string of the format "Xw Xd Xh Xm Xs", and converts it to seconds.
+ */
+long timestr(char *format)
 {
   long seconds;
   char digitbuf[MAXLINE];
@@ -306,9 +301,8 @@ timestr(char *format)
     else
     {
       /*
-       * We reached a non-digit character - increment seconds
-       * variable accordingly:
-       *
+       * We reached a non-digit character - increment seconds variable
+       * accordingly:
        *  w - week   (604800 seconds)
        *  d - day    (86400 seconds)
        *  h - hour   (3600 seconds)
@@ -363,14 +357,12 @@ timestr(char *format)
 } /* timestr() */
 
 /*
-GetTime()
- Attempt to get the current time in seconds/useconds using
-gettimeofday(). If that fails, get it in seconds/0.
-*/
-
-struct timeval *
-GetTime(struct timeval *timer)
-
+ * GetTime()
+ *
+ * Attempt to get the current time in seconds/useconds using
+ * gettimeofday(). If that fails, get it in seconds/0.
+ */
+struct timeval *GetTime(struct timeval *timer)
 {
   if (!timer)
     return (NULL);
@@ -390,13 +382,10 @@ GetTime(struct timeval *timer)
 } /* GetTime() */
 
 /*
-GetGMTOffset()
- Return the GMT offset from localtime (in seconds)
-*/
-
-long
-GetGMTOffset(time_t unixtime)
-
+ * GetGMTOffset()
+ * Return the GMT offset from localtime (in seconds)
+ */
+long GetGMTOffset(time_t unixtime)
 {
 #if 0
   struct tm *gmt,

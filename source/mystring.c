@@ -22,15 +22,13 @@
 #include "sprintf_irc.h"
 
 /*
-StrToupper()
-  args: char *str
-  purpose: convert the string 'str' to uppercase
-  return: the uppercase string
+ * StrToupper()
+ *
+ * args: char *str
+ * purpose: convert the string 'str' to uppercase
+ * return: the uppercase string
 */
-
-char *
-StrToupper(char *str)
-
+char *StrToupper(char *str)
 {
   int ii;
   static char retstr[MAXLINE];
@@ -48,21 +46,19 @@ StrToupper(char *str)
 } /* StrToupper() */
 
 /*
-StrTolower()
-  args: char *str
-  purpose: convert the string 'str' to lowercase
-  return: the lowercase string
-*/
-
-char *
-StrTolower(char *str)
-
+ * StrTolower()
+ *
+ * args: char *str
+ * purpose: convert the string 'str' to lowercase
+ * return: the lowercase string
+ */
+char *StrTolower(char *str)
 {
   int ii;
   static char retstr[MAXLINE];
 
   if (!str)
-    return ((char *) NULL);
+    return (NULL);
 
   retstr[0] = '\0';
   for (ii = 0; ii < strlen(str); ++ii)
@@ -74,15 +70,12 @@ StrTolower(char *str)
 } /* StrTolower() */
 
 /*
-GetString()
- Reverse the array av back into a normal string assuming there
-are 'ac' indices in the array. Space is allocated for the new
-string.
-*/
-
-char *
-GetString(int ac, char **av)
-
+ * GetString()
+ *
+ * Reverse the array av back into a normal string assuming there are 'ac'
+ * indices in the array. Space is allocated for the new string.
+ */
+char *GetString(int ac, char **av)
 {
   char *final;
   char temp[MAXLINE];
@@ -97,7 +90,7 @@ GetString(int ac, char **av)
     ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
 
     final = (char *) MyRealloc(final,
-                      strlen(final) + strlen(temp) + sizeof(char));
+      strlen(final) + strlen(temp) + sizeof(char));
     strcat(final, temp);
 
     ++ii;
@@ -127,8 +120,8 @@ int SplitBuf(char *buff, char ***array)
   int acnt, ii;
   char *temp1, *tempbuf;
 
-  /* Be safe. If something down fails, it will point to NULL anyway -kre
-   * */
+  /* Be safe. If something down fails, it will point 
+   * to NULL anyway -kre */
   *array = NULL;
 
   /* Perform this check -kre */

@@ -329,8 +329,8 @@ CreateDatabase(char *name, char *info)
   FILE *fptr;
   time_t currtime;
 
-  if ((fptr = fopen(name, "w")) == (FILE *) NULL)
-    return ((FILE *) NULL);
+  if ((fptr = fopen(name, "w")) == NULL)
+    return (NULL);
 
   /* change the mode to -rw------- */
   chmod(name, 0600);

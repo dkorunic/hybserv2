@@ -372,8 +372,7 @@ void cs_process(char *nick, char *command)
    */
   if ((cptr->level == LVL_ADMIN) && !(IsValidAdmin(lptr)))
     {
-      notice(n_ChanServ, lptr->nick, "Unknown command [%s]",
-             arv[0]);
+      notice(n_ChanServ, lptr->nick, "Unknown command [%s]", arv[0]);
       MyFree(arv);
       return;
     }
@@ -3009,7 +3008,10 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
                  lptr->hostname);
       if ((ca = OnAccessList(cptr, nmask, GetMaster(FindNick(lptr->nick)))))
         if (ca->level >= cptr->access_lvl[level])
+        {
+          cptr->lastused = ca->last_used = current_ts;
           return 1;
+        }
 
       return 0;
     }
@@ -7427,17 +7429,11 @@ c_status(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   notice(n_ChanServ, lptr->nick,
          "%s has an access level of [\002%d\002] on %s",
-         tmpuser->nick,
-         GetAccess(cptr, tmpuser),
-         cptr->name);
+         tmpuser->nick, GetAccess(cptr, tmpuser), cptr->name);
 
   RecordCommand("%s: %s!%s@%s STATUS [%s] %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                cptr->name,
-                tmpuser->nick);
+                n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+                cptr->name, tmpuser->nick);
 } /* c_status() */
 
 /*

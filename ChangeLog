@@ -1,3 +1,8 @@
+*** 20030124_1 by kreator
+- fix phread location for FreeBSD
+- smaller operserv stuff
+
+
 *** 20030120_2 by kreator
 - smaller ^M fix
 

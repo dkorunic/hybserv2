@@ -49,7 +49,8 @@ Some sort of TODO/planning program:
 Done so far:
 ------------
 
-*) let +h people use unban by default (if hyb7 is defined)
+*) fix order of checks for modes (+o/+h/+v), not (+o/+v/+h) (fl_)
+*) let +h people use unban by default (if hyb7 is defined) (fl_)
 *) safe write for settings.conf -> it can be truncated in some cases
 *) if there is AutoKillClones in settings.conf with value 0, it is setup
    to 1; if there isn't, it is setup to 0 as it should be

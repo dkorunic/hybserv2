@@ -1636,6 +1636,16 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
       modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
+#ifdef HYBRID7
+  /* Add autohalfop -Janos */
+  else if (!(tempuser->flags & CH_HOPPED) &&
+        HasAccess(cptr, tempuser->lptr, CA_AUTOHALFOP))
+  {
+    sprintf(modes, "+h %s", tempuser->lptr->nick);
+    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
+    UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
+  }
+#endif /* HYBRID7 */
   else if (!(tempuser->flags & CH_VOICED) &&
         HasAccess(cptr, tempuser->lptr, CA_AUTOVOICE))
   {
@@ -1647,16 +1657,6 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
       modes);
     UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
   }
-#ifdef HYBRID7
-  /* Add autohalfop -Janos */
-  else if (!(tempuser->flags & CH_HOPPED) &&
-        HasAccess(cptr, tempuser->lptr, CA_AUTOHALFOP))
-  {
-    sprintf(modes, "+h %s", tempuser->lptr->nick);
-    toserv(":%s MODE %s %s\n", n_ChanServ, chanptr->name, modes);
-    UpdateChanModes(Me.csptr, n_ChanServ, chanptr, modes);
-  }
-#endif /* HYBRID7 */
 } /* cs_CheckOp() */
 
 /*

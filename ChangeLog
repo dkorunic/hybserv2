@@ -1,3 +1,7 @@
+*** 20010818_5 by wcampbel
+#if 0'ed two variables that were unused
+
+
 *** 20010818_4 by kreator
 - add c0manche as contributor -> he tested O-line security and reported
   that bug i've fixed last

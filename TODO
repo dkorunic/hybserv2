@@ -7,7 +7,6 @@ Drew's Law of Highway Biology:
 
 Pending bugs:
 -------------
-*) ultra-buggy DeleteLink() for nicknames!
 *) trace possible leaks
     I've prepared some parts of code for trace -kre
 *) something quite _weird_ with CH_OPPED.. seems it isn't working in some
@@ -15,6 +14,8 @@ Pending bugs:
 *) nptr->nick == nptr->master->nick in NickServ, userdb. Probably problems
    with unlink link copying routine.
    NOTE: Quickfixed this. However, I need to look at this more closely!
+   NOTE2: traced problem to DeleteLink(), done some more fixes, till
+          weird
 *) fix stupid bug that services +o people who match() O line, but have not
    registered with OperServ
 *) OperServ does not completely support hybrid7 modes yet, (for example
@@ -57,8 +58,10 @@ New features:
 
 Done so far:
 ------------
+*) ultra-buggy DeleteLink() for nicknames! - some fixes, yet to test
+   throughly
 *) use snprintf instead of sprintf or possibly use irc_sprintf from
-    Hybrid
+   Hybrid
 *) lower usage of time() via global variable synched in dotimer()
 *) added fixts for channels and nicknames
 *) added deletion of cleartext password from memory if crypt is on

@@ -72,24 +72,10 @@ all: source tools
 	@echo "*** Done building HybServ version $(VERSION) ***"
 	@echo
 
-oldall: libString source tools
-	@echo '** Building libString library **'
-	@cd libString ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
-	@echo
-	@echo '** Building Hybserv binary **'
-	@cd source ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)" "VERSION=$(VERSION)"
-	@echo
-	@echo '** Building Hybserv tools **'
-	@cd tools ; $(MAKE) "CC=$(CC)" "CFLAGS=$(CFLAGS)"
-	@echo
-	@echo "*** Done building HybServ version $(VERSION) ***"
-	@echo
-
 build: all
 
 clean:
 	@echo '** Removing objects **'
-	@cd libString ; $(MAKE) clean
 	@cd source ; $(MAKE) clean
 	@cd tools ; $(MAKE) clean
 

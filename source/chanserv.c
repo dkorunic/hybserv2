@@ -1704,12 +1704,15 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
       return;
     }
 
+  /* XXX: isn't working as it should */
+#if 0
   if (HasAccess(cptr, tempuser->lptr, CA_AUTODEOP))
   {
     /* If user has autodeop access, do nothing
      * -- OnGeboren -- */
     return;
   }
+#endif
 
   if (HasAccess(cptr, tempuser->lptr, CA_AUTOOP))
     {

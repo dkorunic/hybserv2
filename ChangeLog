@@ -1,3 +1,7 @@
+*** 20010503_7 by kreator
+- add web for cvs snapshots that I provide (manually)
+
+
 *** 20010503_6 by kreator
 - add some more files to be cleaned in distclean, especially those left
   from CVS conflicts

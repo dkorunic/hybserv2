@@ -1,3 +1,7 @@
+*** 20010530_1 by kreator
+- fix small bug in data.c for saving forbidded nickname's passwords
+
+
 *** 20010529_1 by kreator
 - fix nickserv set documentation
 

@@ -60,8 +60,7 @@ static void m_purge(struct Luser *, struct NickInfo *, int, char **);
 
 static struct Command memocmds[] =
     {
-      { "SEND", m_send, LVL_IDENT
-      },
+      { "SEND", m_send, LVL_IDENT },
       { "LIST", m_list, LVL_IDENT },
       { "READ", m_read, LVL_IDENT },
       { "HELP", m_help, LVL_NONE },
@@ -70,8 +69,7 @@ static struct Command memocmds[] =
       { "FORWARD", m_forward, LVL_IDENT },
       { "REPLY", m_reply, LVL_IDENT },
       { "PURGE", m_purge, LVL_IDENT },
-
-      { (char *) 0, (void (*)()) 0, 0 }
+      { 0, 0, 0 }
     };
 
 /*
@@ -1085,10 +1083,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       notice(n_MemoServ, lptr->nick,
              "Syntax: READ [channel] <index|all>");
-      notice(n_MemoServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_MemoServ,
-             "READ");
+      notice(n_MemoServ, lptr->nick, ERR_MORE_INFO, n_MemoServ, "READ");
       return;
     }
 
@@ -1107,9 +1102,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if (!(ci = FindChan(av[1])))
         {
-          notice(n_MemoServ, lptr->nick,
-                 ERR_CH_NOT_REGGED,
-                 av[1]);
+          notice(n_MemoServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
           return;
         }
 
@@ -1158,12 +1151,13 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       if (!index || (memoptr->index == index))
         {
           notice(n_MemoServ, lptr->nick,
-                 "Memo #%d from %s (sent %s ago):",
+                 "Memo #%d from %s (sent %s ago) [%sread/%sreplied]:",
                  memoptr->index,
                  memoptr->sender,
-                 timeago(memoptr->sent, 1));
-          notice(n_MemoServ, lptr->nick,
-                 memoptr->text);
+                 timeago(memoptr->sent, 1),
+                 (memoptr->flags & MS_READ) ? "" : "not",
+                 (memoptr->flags & MS_REPLIED) ? "" : "not");
+          notice(n_MemoServ, lptr->nick, memoptr->text);
           if (ac < 3)
             {
               /* only mark nickname memos as read - not channel memos */
@@ -1182,14 +1176,11 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac >= 3)
     notice(n_MemoServ, lptr->nick,
            "To delete, type \002/msg %s DEL %s %s",
-           n_MemoServ,
-           av[1],
-           istr);
+           n_MemoServ, av[1], istr);
   else
     notice(n_MemoServ, lptr->nick,
            "To delete, type \002/msg %s DEL %s",
-           n_MemoServ,
-           istr);
+           n_MemoServ, istr);
 
 } /* m_read() */
 
@@ -1712,29 +1703,23 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     return;
 
   if (ac < 3)
-{
-      notice(n_MemoServ, lptr->nick,
-             "Syntax: REPLY <index> <text>");
-      notice(n_MemoServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_MemoServ,
-             "REPLY");
-      return;
-    }
+  {
+    notice(n_MemoServ, lptr->nick, "Syntax: REPLY <index> <text>");
+    notice(n_MemoServ, lptr->nick, ERR_MORE_INFO, n_MemoServ, "REPLY");
+    return;
+  }
 
   if (!(from = FindMemoList(nptr->nick)))
     {
-      notice(n_MemoServ, lptr->nick,
-             "You have no recorded memos");
+      notice(n_MemoServ, lptr->nick, "You have no recorded memos");
       return;
     }
 
   index = IsNum(av[1]);
-  if ((index < 0) || (index > from->memocnt))
+  if (!index || (index > from->memocnt))
     {
-      notice(n_MemoServ, lptr->nick,
-             "[\002%s\002] is an invalid index",
-             av[1]);
+      notice(n_MemoServ, lptr->nick, "[\002%s\002] is an invalid index",
+          av[1]);
       return;
     }
 
@@ -1745,9 +1730,7 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           if (!(realptr = FindNick(memoptr->sender)))
             {
-              notice(n_MemoServ, lptr->nick,
-                     ERR_NOT_REGGED,
-                     av[2]);
+              notice(n_MemoServ, lptr->nick, ERR_NOT_REGGED, av[2]);
               return;
             }
 
@@ -1769,22 +1752,17 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (!master || !realptr)
     return;
 
-  if (ac >= 3)
-    {
-      memotext = (char *) MyMalloc(strlen("[Re]: ") + strlen(av[2]) + 1);
-      ircsprintf(memotext, "[Re]: %s", av[2]);
-      ii = 3;
-      while (ii < ac)
-        {
-          memotext = (char *) MyRealloc(memotext, strlen(memotext) +
-                                        strlen(av[ii]) + (2 * sizeof(char)));
-          strcat(memotext, " ");
-          strcat(memotext, av[ii]);
-          ii++;
-        }
-    }
-  else
-    memotext = MyStrdup("");
+  memotext = (char *) MyMalloc(strlen("[Re]: ") + strlen(av[2]) + 1);
+  ircsprintf(memotext, "[Re]: %s", av[2]);
+  ii = 3;
+  while (ii < ac)
+  {
+    memotext = (char *) MyRealloc(memotext, strlen(memotext) +
+      strlen(av[ii]) + (2 * sizeof(char)));
+    strcat(memotext, " ");
+    strcat(memotext, av[ii]);
+    ii++;
+  }
 
   index = StoreMemo(master->nick, memotext, lptr);
 
@@ -1793,6 +1771,7 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       notice(n_MemoServ, lptr->nick,
              "Memo has been recorded for [\002%s\002]",
              master->nick);
+      memoptr->flags |= MS_REPLIED;
 
       /*
        * It was sent to a nickname - check if they are online
@@ -1804,12 +1783,10 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           notice(n_MemoServ, realptr->nick,
                  "You have a new memo from \002%s\002 (#%d)",
-                 lptr->nick,
-                 index);
+                 lptr->nick, index);
           notice(n_MemoServ, realptr->nick,
                  "Type \002/msg %s READ %d\002 to read it",
-                 n_MemoServ,
-                 index);
+                 n_MemoServ, index);
         }
     } /* if (index) */
 

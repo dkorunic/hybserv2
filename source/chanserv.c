@@ -3467,15 +3467,6 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
   
-  if (cptr->flags & CS_VERBOSE)
-  {
-    char line[MAXLINE];
-    ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %s",
-      lptr->nick, lptr->username, lptr->hostname, cptr->name,
-      (ac >= 4) ? av[3] : "", (ac >= 5) ? av[4] : "");
-    chanopsnotice(FindChannel(cptr->name), line);
-  }
-
   founder = IsFounder(lptr, cptr);
   newlevel = atoi(av[4]);
   level = GetAccess(cptr, lptr);
@@ -3617,15 +3608,6 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
       (ac >= 4) ? av[3] : "");
     return;
   }  
-
-  if (cptr->flags & CS_VERBOSE)
-  {
-    char line[MAXLINE];
-    ircsprintf(line, "%s!%s@%s ACCESS [%s] DEL %s",
-      lptr->nick, lptr->username, lptr->hostname, cptr->name,
-      (ac >= 4) ? av[3] : "");
-    chanopsnotice(FindChannel(cptr->name), line);
-  }
 
   host = NULL;
   nickptr = NULL;
@@ -3773,15 +3755,6 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
       (ac >= 4) ? av[3] : "");
     return;
   }  
-
-  if (cptr->flags & CS_VERBOSE)
-  {
-    char line[MAXLINE];
-    ircsprintf(line, "%s!%s@%s ACCESS [%s] LIST %s",
-      lptr->nick, lptr->username, lptr->hostname, cptr->name,
-      (ac >= 4) ? av[3] : "");
-    chanopsnotice(FindChannel(cptr->name), line);
-  }
 
   if (ac >= 4)
     mask = av[3];

@@ -363,7 +363,7 @@
  * choosing idents).
  * -ike
  */
-#define ADVFLOOD
+#undef ADVFLOOD
 #define ADVFLOOD_TABLE  60 
 #define ADVFLOOD_DELAY  10
 #define ADVFLOOD_COUNT  10 

@@ -1,3 +1,9 @@
+*** 20020922_1 by kreator
+- fixed double cs_verbose notice
+- added MS_REPLIED in memoptr->flags, display read/replied flags
+- backup ignore.db
+
+
 *** 20020920_2 by kreator
 - fix backup ignore.db
 

@@ -1,3 +1,7 @@
+*** 20010602_1 by janos
+- In line 5999 in chanserv it was HALFOF not HALFOP -> fixed
+
+
 *** 20010601_3 by kreator
 - fixed CH_OPPED stuff
 - more fixes for that pesky problem with master nicks and unlink

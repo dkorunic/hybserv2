@@ -9,9 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"

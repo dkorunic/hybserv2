@@ -9,13 +9,17 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"

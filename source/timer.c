@@ -9,9 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 #ifndef HAVE_CYGWIN
 #include <signal.h>
 #else
@@ -22,7 +27,6 @@
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "gline.h"
 #include "hybdefs.h"

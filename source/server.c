@@ -9,11 +9,16 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 #include <assert.h>
 
 #include "alloc.h"
@@ -23,7 +28,6 @@
 #include "conf.h"
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "global.h"
 #include "hash.h"

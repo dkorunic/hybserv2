@@ -1,3 +1,19 @@
+kre:
+(gdb) where
+#0  0xff2182c4 in _libc_kill () from /usr/lib/libc.so.1
+#1  0xff1b9470 in abort () from /usr/lib/libc.so.1
+#2  0x2c2d8 in ProcessSignal (sig=10) at init.c:142
+#3  <signal handler called>
+#4  DeleteClient (user=0x2be9d4) at client.c:485
+#5  0x43450 in s_quit (ac=0, av=0x7c124) at server.c:1304
+#6  0x423c0 in ProcessInfo (arc=3, arv=0x7c124) at server.c:147
+#7  0x46d88 in ReadHub () at sock.c:896
+#8  0x46a28 in ReadSocketInfo () at sock.c:674
+#9  0x2c0f8 in main (argc=331776, argv=0x51000) at hybserv.c:344
+frame #4 is weirdish a bit: realptr, user->firstchan, fnext are wrong, as
+well as other info; i've archieved the core and will come back with
+further analysis
+
 [10:53:31] #SideWnder# HUB 
 -- Listing current hubs --
 [Hub Name                      ] [# servers]

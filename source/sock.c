@@ -9,16 +9,20 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <assert.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -30,7 +34,6 @@
 #include "conf.h"
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"

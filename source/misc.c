@@ -9,6 +9,8 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -21,7 +23,6 @@
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hash.h"
 #include "hybdefs.h"
 #include "log.h"

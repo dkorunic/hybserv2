@@ -33,8 +33,5 @@
 /* Define if you have the strncpy function.  */
 #undef HAVE_STRNCPY
 
-/* Define if you have the <sys/time.h> header file.  */
-#undef HAVE_SYS_TIME_H
-
 /* Define if you have the cup library (-lcup).  */
 #undef HAVE_LIBCUP

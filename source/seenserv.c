@@ -10,6 +10,8 @@
  * Copyright (C) 2000 demond
  */
 
+#include "defs.h"
+
 #define NOSQUITSEEN
 #define MAXWILDSEEN	100
 
@@ -17,6 +19,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"

@@ -9,6 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
+#include <time.h>
+#include <stdio.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+
 #include "channel.h"
 #include "chanserv.h"
 #include "client.h"
@@ -29,9 +37,6 @@
 #include "gline.h"
 #endif /* ADVFLOOD_GLINE */
 #endif /* ADVFLOOD */
-
-#include <time.h>
-#include <stdio.h>
 
 /*
  * Certain functions, like SendUmode() could possibly

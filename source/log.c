@@ -9,20 +9,23 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "config.h"
 #include "dcc.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"

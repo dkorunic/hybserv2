@@ -9,17 +9,21 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include <sys/time.h>
 #include <sys/types.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#include <time.h>
 #include <sys/resource.h>
 #include <sys/utsname.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 #include <assert.h>
 #ifndef HAVE_CYGWIN
 #include <signal.h>
@@ -34,7 +38,6 @@
 #include "conf.h"
 #include "config.h"
 #include "data.h"
-#include "defs.h"
 #include "dcc.h"
 #include "err.h"
 #include "gline.h"

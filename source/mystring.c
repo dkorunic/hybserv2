@@ -9,13 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 
 #include "alloc.h"
 #include "config.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"

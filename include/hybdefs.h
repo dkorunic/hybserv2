@@ -142,7 +142,4 @@ extern time_t                    TimeStarted;
 extern long                      gmt_offset;
 extern time_t                    current_ts;
 
-/* rename() is not defined in sfio()-s <stdio.h> */
-extern int rename(const char *oldpath, const char *newpath);
-
 #endif /* INCLUDED_hybdefs_h */

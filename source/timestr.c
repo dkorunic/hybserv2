@@ -9,15 +9,18 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "config.h"
-#include "defs.h"
 #include "hybdefs.h"
 #include "match.h"
 #include "misc.h"

@@ -23,7 +23,12 @@
 #define INCLUDED_config_h
 #endif
 
-#define MyFree(x)     if ((x)) free((x))
+#define MyFree(x)       \
+{                       \
+  if ((x))              \
+    free((x));          \
+  x = NULL;             \
+}
 
 #ifdef BLOCK_ALLOCATION
 

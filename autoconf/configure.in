@@ -47,7 +47,6 @@ AC_SUBST(WHOAMI)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ2 **))
 AC_HEADER_TIME
 

@@ -723,22 +723,26 @@ AddFounderChannelToNick(struct NickInfo **nptr, struct ChanInfo *cptr)
 } /* AddFounderChannelToNick() */
 
 /*
-RemoveFounderChannelFromNick()
- Remove 'cptr' from 'nptr's founder channel list
+ * RemoveFounderChannelFromNick()
+ *
+ * Remove 'cptr' from 'nptr's founder channel list
 */
 
-void
-RemoveFounderChannelFromNick(struct NickInfo **nptr,
-                             struct ChanInfo *cptr)
-
+void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
+    *cptr)
 {
   struct aChannelPtr *tmp, *prev;
 
-   prev = NULL;
+  prev = NULL;
+
+  /* Iterate list of nick's founder channels */
   for (tmp = (*nptr)->FounderChannels; tmp; )
   {
+    /* We have a match! */
     if (tmp->cptr == cptr)
     {
+      /* Last time we didn't have a match, so we have a ptr before this
+       * one in case of list relinking */
       if (prev)
       {
         prev->next = tmp->next;
@@ -752,9 +756,10 @@ RemoveFounderChannelFromNick(struct NickInfo **nptr,
         tmp = NULL;
       }
 
-      /*
-       * We can break since there should always be only 1 match
-       */
+      /* KrisDuv's fix for decreasing number of registered channels */
+      --(*nptr)->fccnt;
+
+      /* We can break since there should always be only 1 match */
       break;
     }
 

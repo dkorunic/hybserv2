@@ -1,3 +1,7 @@
+*** 20030111_1 by kreator
+- added ags' ExpireAkick fix; good work ags!
+
+
 *** 20030101_1 by kreator
 - fix bug when services would load chan.db with akicks just to be expired,
   which would cause services to crash

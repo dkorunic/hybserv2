@@ -910,7 +910,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
   else
     {
       writesocket(sockfd, finstr);
-      writesocket(sockfd, "\r\n");
+      writesocket(sockfd, "\n");
     }
 } /* os_notice() */
 

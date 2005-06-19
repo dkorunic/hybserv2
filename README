@@ -2,28 +2,28 @@ $Id$
 
 NOTES:
 The former Hybserv development team has decided to spin off and
-focus its energies towards the HYBSERV2 project. Like the name
+focus its energies towards the Hybserv2 project. Like the name
 implies this new version will be even better then that last. If
-their is something you would like to see added to HYBSERV2 please
+their is something you would like to see added to Hybserv2 please
 let us know as we are always looking for new ideas.
 
 IMPORTANT NOTE:
-Per Sidewnder's (Cosine's) request - HYBSERV will no longer be
+Per Sidewnder's (Cosine's) request - Hybserv will no longer be
 supported. So if you have some questions or problems, please
-*upgrade* first to a version listed in the HYBSERV2 dir.
+*upgrade* first to a version listed in the Hybserv2 dir.
 
-HybServ was first coded by Patrick Alken (wnder@underworld.net)
+Hybserv was first coded by Patrick Alken (wnder@underworld.net)
 and is now maintained by the Hybserv2 Coding Team, unless
 otherwise mentioned in the code or the credits.
 
 
 HYBSERV STAFF:
 
-Lead developer of HybServ2
+Lead developer of Hybserv2
 
 kreator     Dinko Korunic        kreator@srce.hr
 
-The following people have contributed to this release of HybServ2
+The following people have contributed to this release of Hybserv2
 (in nick alphabetical order):
 
 adx         Piotr Nizynski       adx@crashnet.pl
@@ -48,7 +48,7 @@ rhodie      Julian Petrov        rhodie@irchelp.unibg.org
 sofit       Stanislav Zahariev   sofit@proshe.bg
 toot        Toby Verrall         to7@antipope.fsnet.co.uk
     
-HybServ was specifically designed to run with hybrid ircd, although it
+Hybserv was specifically designed to run with hybrid ircd, although it
 *should* work with CSr as well.  You may receive the hybrid irc daemon
 from ftp.blackened.com in /pub/irc/hybrid. These services (more or less
 same code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet /
@@ -61,7 +61,7 @@ published by the Free Software Foundation.
 
 DISTRIBUTION
 
-  You can get HybServ from:
+  You can get Hybserv from:
 
   #1:  Anonymous CVS:
        :pserver:cvs@hybserv.net:/home/cvs
@@ -108,10 +108,10 @@ The criteria for reporting bugs is somewhat specific.
 
 ################################################################
 # If you are interested in helping out with the development of #
-# HybServ feel free to join the HybServ Development List       #
+# Hybserv feel free to join the Hybserv Development List       #
 ################################################################
 
-Below are the official HybServ2 mailing lists:
+Below are the official Hybserv2 mailing lists:
 
 These are publicly postable lists.
 
@@ -119,14 +119,14 @@ Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
 sending email to:
 
-hybserv-request@hybserv.dyndns.org
+hybserv-request@hybserv.net
 
 (Please use a command from below in the body of the message and
  not in the subject)
 
 Available Lists 
 
-  hybserv         General HybServ2 talk, issues, bugs, etc.
+  hybserv         General Hybserv2 talk, issues, bugs, etc.
 
 
 Available List Manager (Ecartis) Commands:
@@ -175,7 +175,7 @@ end
 #########################################################
 
 Make sure that each hub server you have specified in your config
-file has C/N lines for HybServ matching the password in the first
+file has C/N lines for Hybserv matching the password in the first
 field of the S: line and the server name specified in the N:
 line.  Also, if you wish to enable jupes (#define ALLOW_JUPES),
 you *MUST* give services an H: line in ircd.conf.
@@ -220,7 +220,7 @@ In hybserv.conf configuration should be as follows:
   S:password:hub.server.somewhere:6667
   N:services.name:Hybrid services
 
-When you have compiled HybServ and edited the necessary files,
+When you have compiled Hybserv and edited the necessary files,
 simply type ./hybserv which should start daemon properly. If it
 is not in process list, check hybserv.log which should state
 reasons of failure. 
@@ -239,8 +239,8 @@ Most commands may also be done through DCC CHAT, and in fact more
 commands are available through DCC CHAT. Simply /dcc chat
 OperServ to connect, and .help
 
-I have tried to make HybServ fully compatible with TCM (linking
-wise). If you wish HybServ to be part of your TCM botnet,
+I have tried to make Hybserv fully compatible with TCM (linking
+wise). If you wish Hybserv to be part of your TCM botnet,
 read TCM-LINKING for instructions.  If you have no idea what a
 TCM bot is, don't worry about it :-).
 

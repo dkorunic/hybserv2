@@ -22,7 +22,7 @@ WHOAMI = @WHOAMI@
 ############ Don't change anything below here ############
 
 # HybServ2 Version
-VERSION_MAJOR = 1.9.0-rc3
+VERSION_MAJOR = 1.9.0
 VERSION = @VERSION@
 
 CC = @CC@

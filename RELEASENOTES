@@ -1,13 +1,10 @@
-01/29/2003  -  Dinko Korunic <kreator@srce.hr>
+06/19/2005  -  Dinko Korunic <kreator@srce.hr>
 
-  There has been almost 2 years since last HybServ2 release. It was
-  shocked to see how much time has passed since then :(
-  Anyway, let us stop blabbering and introduce some of the features:
-  -
-  -
-  -
+  Well, after all these years, I'm finally releasing 1.9.0 Hybserv. I'm
+  quite aware that it might well be several bugs left, but it's really
+  time for us to go on ;)
 
-Releases are now available from following sources:
+Releases are available from following sources:
 
-http://srce.hr/~kreator/projects/tarballs/
-http://www.2mbit.com/hybserv2/
+  http://kreator.esa.fer.hr/projects/tarballs/
+  http://hybserv.icsbg.net/

@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -19,111 +19,156 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 
 #define    MAXLINE    1024
 
+#define    FLAG_MD5   0x00000001
+#define    FLAG_DES   0x00000002
+
+
+extern int rename(const char *oldpath, const char *newpath);
 extern char *doencrypt(char *);
+extern char *doencrypt_md5(char *);
+void usage();
 
 int
 main(int argc, char *argv[])
 
 {
-	FILE *old, *new;
-	char newpath[MAXLINE],
-	     line[MAXLINE];
-	char *oldpass,
-	     *newpass,
-	     *ch;
-	char *userhost,
-	     *nick,
-	     *flags;
-	int ii;
+  FILE *old, *new;
+  char newpath[MAXLINE],
+  line[MAXLINE];
+  char *oldpass,
+  *newpass,
+  *ch;
+  char *userhost,
+  *nick,
+  *flags;
+  int ii = 1;
+  int c;
+  int flag = 0;
 
-	if (argc < 2)
-	{
-		fprintf(stderr,
-			"Usage: %s <conf1> [conf2 conf3 ...]\n",
-			argv[0]);
-		return 0;
-	}
+  if (argc < 2)
+    usage();
 
-	for (ii = 1; ii < argc; ii++)
-	{
-		sprintf(newpath, "%s.orig",
-			argv[ii]);
+  while ( (c=getopt(argc, argv, "h?d:m:")) != -1)
+    {
+      switch(c)
+        {
+        case 'm':
+          flag |= FLAG_MD5;
+          ii = 2;
+          break;
+        case 'd':
+          flag |= FLAG_DES;
+          ii = 2;
+          break;
+        case 'h':
+        case '?':
+          usage();
+          break;
+        default:
+          printf("Invalid Option: -%c\n", c);
+          break;
+        }
+    }
 
-		if (rename(argv[ii], newpath) < 0)
-		{
-			fprintf(stderr,
-				"Unable to rename %s to %s.orig: %s\n",
-				argv[ii],
-				argv[ii],
-				strerror(errno));
-			return 0;
-		}
+  for (; ii < argc; ii++)
+    {
+      sprintf(newpath, "%s.orig",
+              argv[ii]);
 
-		if (!(old = fopen(newpath, "r")))
-		{
-			fprintf(stderr,
-				"Unable to open %s: %s\n",
-				newpath,
-				strerror(errno));
-			return 0;
-		}
+      if (rename(argv[ii], newpath) < 0)
+        {
+          fprintf(stderr,
+                  "Unable to rename %s to %s.orig: %s\n",
+                  argv[ii],
+                  argv[ii],
+                  strerror(errno));
+          return 0;
+        }
 
-		if (!(new = fopen(argv[ii], "w")))
-		{
-			fprintf(stderr,
-				"Unable to open %s: %s\n",
-				argv[ii],
-				strerror(errno));
-			return 0;
-		}
+      if (!(old = fopen(newpath, "r")))
+        {
+          fprintf(stderr,
+                  "Unable to open %s: %s\n",
+                  newpath,
+                  strerror(errno));
+          return 0;
+        }
 
-		while (fgets(line, sizeof(line) - 1, old))
-		{
-			if ((*line == 'o') || (*line == 'O'))
-			{
-				/*
-				 * Ok, we got to an O: line - encrypt it and write
-				 * to the file
-				 */
-				userhost = strtok(line + 2, ":");
-				oldpass = strtok(NULL, ":");
-				nick = strtok(NULL, ":");
-				flags = strtok(NULL, ":");
+      if (!(new = fopen(argv[ii], "w")))
+        {
+          fprintf(stderr,
+                  "Unable to open %s: %s\n",
+                  argv[ii],
+                  strerror(errno));
+          return 0;
+        }
 
-				if (!userhost || !oldpass || !nick || !flags)
-					continue;
+      while (fgets(line, sizeof(line) - 1, old))
+        {
+          if ((*line == 'o') || (*line == 'O'))
+            {
+              /*
+               * Ok, we got to an O: line - encrypt it and write
+               * to the file
+               */
+              userhost = strtok(line + 2, ":");
+              oldpass = strtok(NULL, ":");
+              nick = strtok(NULL, ":");
+              flags = strtok(NULL, ":");
 
-				if ((ch = strchr(flags, '\n')))
-					*ch = '\0';
-				if ((ch = strchr(flags, '\r')))
-					*ch = '\0';
+              if (!userhost || !oldpass || !nick || !flags)
+                continue;
 
-				printf("oldpass = [%s]\n", oldpass);
-				newpass = doencrypt(oldpass);
-				fprintf(new, "O:%s:%s:%s:%s\n",
-					userhost,
-					newpass,
-					nick,
-					flags);
-			}
-			else
-			{
-				/*
-				 * Just print the line to the new file
-				 */
-				fprintf(new, "%s", line);
-			}
-		}
+              if ((ch = strchr(flags, '\n')))
+                *ch = '\0';
+              if ((ch = strchr(flags, '\r')))
+                *ch = '\0';
 
-		fclose(old);
-		fclose(new);
-	}
+              printf("oldpass = [%s]\n", oldpass);
 
-	return 0;
+              /*
+               * Encryption type: DES (default) or MD5
+               */
+              if (flag & FLAG_MD5)
+                newpass = doencrypt_md5(oldpass);
+              else
+                newpass = doencrypt(oldpass);
+              fprintf(new, "O:%s:%s:%s:%s\n",
+                      userhost,
+                      newpass,
+                      nick,
+                      flags);
+            }
+          else
+            {
+              /*
+               * Just print the line to the new file
+               */
+              fprintf(new, "%s", line);
+            }
+        }
+
+      fclose(old);
+      fclose(new);
+    }
+
+  return 0;
 } /* main() */
+
+
+void usage ()
+
+{
+  printf("Usage: encryptconf [-m|-d] <conf1> [conf2 conf3 ...]\n");
+  printf("         -m Use MD5 encyrption\n");
+  printf("         -d Use DES encyrption (default)\n");
+  printf("Example: encryptconf -m test\n");
+  exit(0);
+}

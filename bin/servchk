@@ -1,7 +1,6 @@
 #!/bin/sh
 #
 # HybServ restart cron file
-# Patrick Alken (wnder@underworld.net)
 #
 # Simply add the following line to your crontab file:
 # 0,10,20,30,40,50 * * * * /path/to/servchk >/dev/null 2>&1

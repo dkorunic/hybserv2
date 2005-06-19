@@ -1,0 +1,19 @@
+10/11/2001  -  Dinko Korunic <kreator@fly.srk.fer.hr>
+
+ This release is result of hard work during last several months. There are
+ a lot of bugs that got fixed, as well as we added a bunch of new
+ features. Now we support some of Hybrid7 features, ircd of new millenium
+ :-)
+
+Releases are now available from following sources:
+
+MageNet ftp server:
+ftp://ftp.magenet.net/pub/hybserv/
+
+SRK ftp server:
+ftp://gnjilux.srk.fer.hr/pub/hybserv/
+
+Web access:
+http://fly.srk.fer.hr/~kreator/projects/hybserv
+ or
+http://fly.srk.fer.hr/~kreator/projects/tarballs/

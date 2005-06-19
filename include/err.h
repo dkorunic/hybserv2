@@ -1,6 +1,6 @@
 /*
  * err.h
- * Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -14,6 +14,7 @@
 #define    ERR_NOT_YOUR_NICK  "This nickname is owned by someone else"
 #define    ERR_NEED_IDENTIFY  "If this is your nickname, type /msg %s \002IDENTIFY\002 <password>"
 #define    ERR_MUST_CHANGE    "If you do not \002IDENTIFY\002 within one minute, you will be disconnected"
+#define    ERR_MUST_CHANGE2   "If you do not \002IDENTIFY\002 within one minute, you nickname will be changed"
 #define    ERR_NOT_REGGED    "The nickname [\002%s\002] is not registered"
 #define    ERR_MORE_INFO      "Type: \002/msg %s HELP %s\002 for more information"
 #define    ERR_BAD_PASS      "Password Incorrect"

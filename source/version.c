@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -12,5 +12,5 @@
 #ifdef VERSION
 char  hVersion[] = VERSION;
 #else
-char  hVersion[] = "";
+char  hVersion[] = "*unknown*";
 #endif

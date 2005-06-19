@@ -1,6 +1,6 @@
 /*
  * alloc.h
- * Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -22,8 +22,6 @@
 #include "config.h"        /* BLOCK_ALLOCATION */
 #define INCLUDED_config_h
 #endif
-
-#define MyFree(x)     free(x)
 
 #ifdef BLOCK_ALLOCATION
 
@@ -83,8 +81,17 @@ void InitHeaps();
 void *MyMalloc(size_t bytes);
 void *MyRealloc(void *oldptr, size_t bytes);
 char *MyStrdup(const char *str);
-/* void MyFree(void *ptr); */
 void OutOfMem();
+
+/* MyFree - free an argument */
+#define MyFree(ptr) \
+{                   \
+  if (ptr != NULL)  \
+  {                 \
+    free(ptr);      \
+    ptr = NULL;     \
+  }                 \
+}
 
 /*
  * External declarations

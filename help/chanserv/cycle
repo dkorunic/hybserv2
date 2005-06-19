@@ -1,0 +1,3 @@
+Syntax: %bCYCLE <channel>%b
+
+Cycles specified <channel> and clears modes, key, etc.

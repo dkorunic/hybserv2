@@ -1,8 +1,32 @@
+dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(source/hybserv.c)
 
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CONFIG_HEADER(include/defs.h)
+
+dnl Set language and save it
+AC_LANG_C
+AC_LANG_SAVE
+
+dnl Get system type
+AC_CANONICAL_HOST
+MYHOST=$host_os
+case "$host_os" in
+*sunos*)
+  _SunOS=1
+  AC_DEFINE(HAVE_SOLARIS)
+  ;;
+*solaris*)
+  _SunOS=1
+  AC_DEFINE(HAVE_SOLARIS)
+  ;;
+*cygwin)
+  AC_DEFINE(HAVE_CYGWIN)
+esac
+
+dnl Standard installation path
+AC_PREFIX_DEFAULT(/usr/local)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -12,8 +36,6 @@ AC_PATH_PROG(LN, ln)
 AC_PATH_PROG(LS, ls)
 AC_PATH_PROG(CHMOD, chmod)
 AC_PATH_PROG(CHOWN, chown)
-AC_PATH_PROG(AR, ar)
-AC_PATH_PROG(RANLIB, ranlib)
 
 dnl Check for a suitable install program
 AC_PROG_INSTALL
@@ -23,60 +45,25 @@ AC_SUBST(WHOAMI)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-
-AC_CHECK_HEADERS(sys/time.h)
-
-AC_CHECK_HEADER(stdarg.h,, AC_MSG_ERROR(** You must have stdarg.h in order to compile HybServ **))
-
+AC_CHECK_HEADER(stdarg.h, , AC_MSG_ERROR(You must have stdarg.h))
 AC_HEADER_TIME
 
-dnl Check for solaris (got this from ircII-EPIC)
-
-AC_MSG_CHECKING(for Solaris/SunOS)
-
-if /bin/sun 2> /dev/null
-then
-  AC_MSG_RESULT(yes)
-  _SunOS=1
-else
-  AC_MSG_RESULT(no)
-fi
+dnl Add standard prefix to fix broken environments
+LIBS="${LIBS}"
+CFLAGS="${CFLAGS}"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strdup strerror)
-AC_CHECK_FUNCS(vprintf)
+AC_CHECK_FUNCS(strdup strerror strncpy)
+AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(crypt, crypt)
 
-AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),)
-
-AC_CHECK_LIB(nsl, gethostbyname, LIBS="$LIBS -lnsl",)
-AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket",)
-AC_CHECK_LIB(crypt, crypt, LIBS="$LIBS -lcrypt",)
-
-dnl Do not compile with pthread support if they give a
-dnl --disable-threads or --enable-threads=no to configure
-
-AC_ARG_ENABLE(threads, [  --enable-threads        Enable thread support [default=yes]])
-
-AC_SUBST(LIBP)
-
-dnl We will use Solaris native threads if Solaris is present
-if test ! "$enable_threads" = "no"; then
-
-  AC_CHECK_LIB(thread, thr_create,
-    AC_DEFINE(HAVE_SOLARIS_THREADS)
-    CFLAGS="$CFLAGS -D_REENTRANT"
-    LIBP="-lthread",
-    AC_MSG_WARN(No native Solaris threads - will try pthreads)
-      AC_CHECK_LIB(pthread, pthread_create,
-      AC_DEFINE(HAVE_PTHREADS)
-      if test -n "$_SunOS"; then
-        CFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS"
-      else
-        CFLAGS="$CFLAGS -D_REENTRANT"
-      fi
-      LIBP="-lpthread",
-      AC_MSG_WARN(Compiling without pthread support)))
+dnl Try dmalloc support
+AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable dmalloc support [default=no]])
+if test "x$enable_dmalloc" = "xyes"; then
+  AC_CHECK_LIB(dmalloc, malloc)
 fi
 
 dnl Use sed to grab the version from Makefile.in
@@ -90,27 +77,22 @@ AC_SUBST(VERSION)
 
 AC_OUTPUT(              \
 Makefile                \
-libString/Makefile      \
 source/Makefile         \
 tools/Makefile          \
-bin/settings.conf \
-include/config.h  \
+bin/settings.conf       \
+bin/cleandb             \
+include/config.h        \
 )
 
 echo "
+
 Configuration:
-
-  HybServ Version:                ${VERSION}
-  Install path:                   ${prefix}/hybserv
-  Compiler:                       ${CC}
-  Compiler Flags:                 ${CFLAGS}"
-
-if test -n "${LIBP}"; then
-  echo "  Thread support:                 enabled"
-  echo "  Thread library:                 ${LIBP}"
-else
-  echo "  Thread support:                 disabled"
-fi
+  Detected OS:      ${host_os}
+  HybServ2 Version: ${VERSION}
+  Install path:     ${prefix}/hybserv
+  Compiler:         ${CC}
+  Compiler flags:   ${CFLAGS}
+  Linker flags:     ${LIBS}"
 
 echo
 echo Please edit include/config.h to change the settings to match

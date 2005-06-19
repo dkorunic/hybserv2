@@ -1,3 +1,7 @@
 Syntax: %bSTATUS <channel> <nickname>%b
 
 Outputs the access level that <nickname> has on <channel>.
+
+Example:
+  %b/msg %C STATUS #channel joe%b
+Shows the current level of joe on #channel.

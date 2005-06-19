@@ -1,13 +1,15 @@
-# HybServ ./source Makefile (C) Patrick Alken 1998
+# HybServ ./source Makefile
 # $Id$
 
 CC = @CC@
-CFLAGS = @CFLAGS@
-LDFLAGS = -L../libString @LDFLAGS@
-INCLUDE = -I../include
+CFLAGS = -Wall -pipe @CFLAGS@
+LDFLAGS = @LDFLAGS@
+#LDFLAGS = -L../libString @LDFLAGS@
+INCLUDE = -I. -I../include
 # DEFS =
-LIBS = -lString @LIBS@ @LIBP@
-LIBDEPS = ../libString/libString.a
+LIBS = @LIBS@
+#LIBS = -lString @LIBS@ @LIBP@
+#LIBDEPS = ../libString/libString.a
 MKDEP = $(CC) -MM
 
 RM = @RM@ -f
@@ -22,6 +24,7 @@ SOURCES =                  \
   chanserv.c               \
   client.c                 \
   conf.c                   \
+  crypt.c                  \
   data.c                   \
   dcc.c                    \
   flood.c                  \
@@ -47,7 +50,8 @@ SOURCES =                  \
   sock.c                   \
   statserv.c               \
   timer.c                  \
-  timestr.c
+  timestr.c                \
+  sprintf_irc.c
 
 OBJECTS = ${SOURCES:.c=.o} version.o
 
@@ -74,12 +78,12 @@ distclean: clean
 .SUFFIXES: .c .o
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDE) -c $<
+	$(CC) $(INCLUDE) $(CFLAGS) -c $<
 
 ## Dependencies
 
 version.o: version.c
-	$(CC) $(CFLAGS) $(INCLUDE) -DVERSION=\"$(VERSION)\" -c $<
+	$(CC) $(INCLUDE) $(CFLAGS) -DVERSION=\"$(VERSION)\" -c $<
 
 include $(DEPENDFILE)
 

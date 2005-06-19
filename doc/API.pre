@@ -1,0 +1,151 @@
+Function name: MyMalloc()
+Location:      alloc.c
+Input:         something...  
+Output:        returns a pointer to allocated memory if successful,
+               otherwise calls OutOfMem()
+Effects:       attempt to malloc 'bytes' bytes of memor
+
+Function name: MyRealloc()
+Location:      alloc.c
+Input:         something... 
+Output:        returns pointer to allocated memory if successful, otherwise 
+               calls OutOfMem()
+Effects:       calls realloc() with 'oldptr' and 'newsize' 
+
+Function name: MyStrdup()
+Location:      alloc.c
+Input:         a string 'str'
+Output:        returns a pointer to the new string
+Effects:       duplicates the string 'str' and returns a pointer to the new
+               string
+
+Function name: MyFree() (removed now)
+Location:      alloc.c
+Input:         something
+Output:        Free memory pointed to by 'ptr'
+Effects:       NOTE: This is now a macro in hybdefs.h
+
+Function name: OutOfMem()
+Location:      alloc.c
+Input:         something
+Output:        a log entry :)
+Effects:       Called when a memory allocation attempt has failed - make a log 
+               entry and a core file to work with
+
+Function name: InitHeaps()
+Location:      alloc.c
+Input:         something
+Output:        heaps
+Effects:       Initialize client/channel heaps
+
+Function name: MakeBlock()
+Location:      alloc.c 
+Input:         something
+Output:        heapptr
+Effect:        Allocate a new sub block in the heap pointed to by 'heapptr'
+               If unsuccessful, the program will terminate with an out of 
+	       memory error
+
+
+Function name: HeapCreate()
+Location:      alloc.c 
+Input:         something
+Output:        something
+Effect:        Allocate a block of memory equal to (elementsize * numperblock)
+               from which smaller blocks can be suballocated.  This improves
+               efficiency by reducing multiple calls to malloc() during
+	       netjoins etc. Returns a pointer to new heap
+
+Function name: BlockSubAllocate()
+Location:      alloc.c 
+Input:         something
+Output:        return a poiter, if not creates a new sub block under heapptr
+Effect:        Determinate an unused chunk of memory to use for a structure,
+               in one of heapptr's sub blocks, and return a pointer to it
+	       If there are no free elements in the current sub blocks, 
+	       allocate a new block
+
+Function name: BlockSubFree()
+Location:      alloc.c 
+Input:         something
+Output:        something
+Effect:        Opposite of BlockSubAllocate(), instead of finding a free slot
+               to use for an element, take the given element and remove it 
+	       from the sub block
+
+Function name: IsHole()
+Location:      alloc.c
+Input:         something
+Output:        -1 if ptr is found
+                1 if ptr is not found
+Effect:        Determine if 'ptr' is a valid element in sub block 'sub' by
+               checking if it matches a pointer in sub->SlotHoles[] which
+	       represents deleted elements. Returns index in SlotHoles[] 
+	       if ptr is found to be deleted, otherwise -1
+
+Function name: AddBan ()
+Location: channel.c
+Input: char *who, struct Channel *cptr, char *ban
+Output: none
+Effect: purpose: add 'ban' set by 'who' to channel 'cptr'
+
+Function name: DeleteBan ()
+Location: channel.c
+Input: struct Channel *cptr, char *ban
+Output: none
+Effect: remove 'ban' from channel 'cptr'
+
+Function name: AddException ()
+Location: channel.c
+Input: char *who, struct Channel *cptr, char *mask
+Output: none
+Effect: purpose: add 'exception' set by 'who' to channel 'cptr'
+
+Function name: AddInviteException ()
+Location: channel.c
+Input: char *who, struct Channel *cptr, char *mask
+Output: none
+Effect: purpose: add 'invite exception' set by 'who' to channel 'cptr'
+
+Function name: DeleteException ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: none
+Effect: purpose: delete 'exception' from cptr's exception list
+
+Function name: AddDeleteException ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: none
+Effect: purpose: delete 'invite exception' from cptr's exception list
+
+Function name: MatchBan ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: struct tempban(pointer to ban)
+Effect: Same as FindBan() but use match() to compare bans to allow for wildcards
+
+Function name: FindBan ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: struct tempban(pointer to ban)
+Effect: determine if 'ban' is on 'cptr's ban list
+
+Function name: MatchException ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: struct tempe(pointer to exception)
+Effect: Same as FindException() but use match() to compare bans to allow for wildcards
+
+Function name: FindException ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: struct tempe(pointer to exception)
+Effect: Return a pointer to occurence of 'mask' on cptr's ban exception list
+
+Function name: FindInviteException ()
+Location: channel.c
+Input: struct Channel *cptr, char *mask
+Output: struct tempinvex(pointer to invite exception)
+Effect: Return a pointer to occurence of 'mask' on cptr's invite exception list
+

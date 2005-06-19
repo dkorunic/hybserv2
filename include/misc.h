@@ -1,6 +1,6 @@
 /*
  * misc.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -18,7 +18,7 @@ struct Userlist;
 struct Command
 {
   char *cmd;       /* holds command */
-  void (* func)(); /* corresponding function */
+  void (*func)(); /* corresponding function */
 
   /*
    * LVL_NONE if anyone can execute it
@@ -61,10 +61,21 @@ char* stripctrlsymbols( char * source );
 char* stripformatsymbols( char * source );
 int checkforproc( char* source );
 
+#ifdef CRYPT_PASSWORDS
+char *hybcrypt(char *, char *);
+char *make_des_salt(void);
+char *make_md5_salt(void);
+char *make_md5_salt_oldpasswd(char *);
+#endif /* CRYPT_PASSWORDS */
+
 /*
  * External declarations
  */
 
 extern  struct aService ServiceBots[];
+
+#ifdef CRYPT_PASSWORDS
+extern int UseMD5;
+#endif /* CRYPT_PASSWORDS */
 
 #endif /* INCLUDED_misc_h */

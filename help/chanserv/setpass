@@ -1,3 +1,7 @@
 Syntax: %bSETPASS <channel> <password>%b
 
 Changes the founder password for <channel> to <password>.
+
+Example:
+    %b/msg %C SETPASS #channel looper%b
+Changes the password for #channel to looper.

@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -9,12 +9,23 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <string.h>
+#include <unistd.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#ifndef HAVE_CYGWIN
+#include <signal.h>
+#else
+#include <sys/signal.h>
+#include <signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "alloc.h"
 #include "chanserv.h"
@@ -23,7 +34,6 @@
 #include "config.h"
 #include "data.h"
 #include "dcc.h"
-#include "defs.h"
 #include "flood.h"
 #include "hash.h"
 #include "hybdefs.h"
@@ -36,18 +46,10 @@
 #include "settings.h"
 #include "sock.h"
 #include "timer.h"
-
-#ifdef HAVE_SOLARIS_THREADS
-#include <thread.h>
-#include <synch.h>
-#else
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-#endif
+#include "sprintf_irc.h"
+#include "init.h"
 
 static struct Luser *introduce(char *, char *, char *);
-
 /*
 ProcessSignal()
   args: int sig
@@ -59,103 +61,67 @@ void
 ProcessSignal(int sig)
 
 {
+  InitSignals();
+  
   switch (sig)
-  {
-    /* rehash configuration file */
+    {
+      /* rehash configuration file */
     case SIGHUP:
-    {
-      SendUmode(OPERUMODE_Y,
-        "*** Received SIGHUP, rehashing configuration file and databases");
-      putlog(LOG1,
-        "Received signal SIGHUP, rehashing configuration file and databases");
+      {
+        SendUmode(OPERUMODE_Y,
+                  "*** Received SIGHUP, rehashing configuration file and databases");
+        putlog(LOG1,
+               "Received signal SIGHUP, rehashing configuration file and databases");
 
-      Rehash();
+        Rehash();
 
-      if (ReloadDbsOnHup)
-        ReloadData();
+        if (ReloadDbsOnHup)
+          ReloadData();
 
-      signal(SIGHUP, ProcessSignal); /* reset the signal */
-      break;
-    }
+        signal(SIGHUP, ProcessSignal); /* reset the signal */
+        break;
+      }
 
-    /* restart services */
-    case SIGINT:
-    {
-    #ifdef DEBUGMODE
-      DoShutdown("console", "Recieved SIGINT");
-      exit(1);
-    #else
-      SendUmode(OPERUMODE_Y,
-        "*** Received SIGINT, restarting services");
-      putlog(LOG1, "Received signal SIGINT, restarting");
-      ServReboot();
-      signal(SIGINT, ProcessSignal);
-    #endif
-      break;
-    }
+    case SIGUSR1:
+      {
+        SendUmode(OPERUMODE_Y,
+                  "*** Received SIGUSR1, restarting");
+        putlog(LOG1,
+               "Received signal SIGUSR1, restarting");
+        unlink(PidFile);
+        ServReboot();
+        execvp(myargv[0], myargv);
+      }
 
     case SIGPIPE:
-    {
-      putlog(LOG1, "Received signal SIGPIPE, ignoring");
-      /*abort();*/
-      break;
-    }
+      {
+        /* putlog(LOG1, "Received signal SIGPIPE, ignoring"); */
+        break;
+      }
 
-    /* 
-     * this is required to prevent a child process from becoming a
-     * zombie which just sits out there taking up fds
-     */
+      /*
+       * this is required to prevent a child process from becoming a
+       * zombie which just sits out there taking up fds
+       */
     case SIGCHLD:
-    {
-      wait(NULL);
-      signal(SIGCHLD, ProcessSignal);
-      break;
-    }
+      {
+        wait(NULL);
+        signal(SIGCHLD, ProcessSignal);
+        break;
+      }
 
-    /* something really died */
-    case SIGSEGV:
-    case SIGBUS:
+      /* something really died */
     case SIGTERM:
-    {
-      if (sig == SIGSEGV)
       {
-        toserv(":%s QUIT :%s\n:%s QUIT :%s\n",
-          n_OperServ,
-          "ACK! SIGSEGV!",
-          n_ChanServ,
-          "ACK! SIGSEGV!");
-        putlog(LOG1,
-          "Received signal SIGSEGV, shutting down (databases not saved)");
-      }
-      else
-        putlog(LOG1, "Received signal %s, shutting down",
-          (sig == SIGBUS) ? "SIGBUS" : "SIGTERM");
-
-      if (sig != SIGTERM)
-        abort(); /* make a core file to work with */
-
-      if (sig == SIGSEGV)
-      {
+        putlog(LOG1, "Received SIGTERM, shutting down");
         SendUmode(OPERUMODE_Y,
-          "*** Received SIGSEGV, shutting down");
-        /*
-         * Don't write databases on SIGSEGV, because there's
-         * a good chance they could get corrupted
-         */
-        /* DoShutdown((char *) NULL, "SIGSEGV Received"); */
-        exit(1);
-      }
-      else
-      {
-        SendUmode(OPERUMODE_Y,
-          "*** Received SIGTERM, shutting down");
-        DoShutdown((char *) NULL, "SIGTERM Received");
+                  "*** Received SIGTERM, shutting down");
+        DoShutdown(NULL, "SIGTERM Received");
       }
     }
-  }
 } /* ProcessSignal() */
 
-/* 
+/*
 InitListenPorts()
   args: none
   purpose: initialize ports for listening
@@ -189,13 +155,15 @@ InitLists()
 
   memset((void *) &nicklist, 0, sizeof(nicklist));
 
-  #ifdef CHANNELSERVICES
-    memset((void *) &chanlist, 0, sizeof(chanlist));
-  #endif
+#ifdef CHANNELSERVICES
 
-  #ifdef MEMOSERVICES
-    memset((void *) &memolist, 0, sizeof(memolist));
-  #endif
+  memset((void *) &chanlist, 0, sizeof(chanlist));
+#endif
+
+#ifdef MEMOSERVICES
+
+  memset((void *) &memolist, 0, sizeof(memolist));
+#endif
 
 #endif /* NICKSERVICES */
 
@@ -216,6 +184,7 @@ InitLists()
   GenericOper->flags = (PRIV_OPER | PRIV_JUPE | PRIV_GLINE);
 
 #ifdef RECORD_SPLIT_TS
+
   GenericOper->split_ts = GenericOper->whensplit = 0;
 #endif
 
@@ -230,35 +199,12 @@ void
 InitSignals()
 
 {
-#ifdef HAVE_SOLARIS_THREADS
-  thread_t signalid;
-
-  thr_create(NULL, 0, p_CheckSignals, NULL, THR_DETACHED, &signalid);
-
-#else
-#ifdef HAVE_PTHREADS
-  pthread_attr_t attr;
-  pthread_t signalid;
-
-  /* pthreads and signal() do not go well together */
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-  pthread_create(&signalid, &attr, p_CheckSignals, NULL);
-
-#else
-
   /* setup signal hooks */
   signal(SIGHUP, ProcessSignal);
-  signal(SIGSEGV, ProcessSignal);
-  signal(SIGBUS, ProcessSignal);
   signal(SIGTERM, ProcessSignal);
-  signal(SIGINT, ProcessSignal);
   signal(SIGCHLD, ProcessSignal);
-  signal(SIGPIPE, SIG_IGN);
-
-#endif /* HAVE_PTHREADS */
-#endif
-
+  signal(SIGPIPE, ProcessSignal);
+  signal(SIGUSR1, ProcessSignal);
 } /* InitSignals() */
 
 /*
@@ -280,25 +226,30 @@ PostCleanup()
 
   Me.nsptr = NULL;
 
-  #ifdef CHANNELSERVICES
-    Me.csptr = NULL;
-  #endif
+#ifdef CHANNELSERVICES
 
-  #ifdef MEMOSERVICES
-    Me.msptr = NULL;
-  #endif
+  Me.csptr = NULL;
+#endif
+
+#ifdef MEMOSERVICES
+
+  Me.msptr = NULL;
+#endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   Me.ssptr = NULL;
 #endif
 
 #ifdef HELPSERVICES
+
   Me.hsptr = NULL;
 #endif
 
 #ifdef SEENSERVICES
+
   Me.esptr = NULL;
 #endif
 
@@ -309,31 +260,23 @@ introduce()
   Introduce 'nick' to the network with 'info'
 */
 
-static struct Luser *
-introduce(char *nick, char *ident, char *info)
+static struct Luser *introduce(char *nick, char *ident, char *info)
+  {
+    char sendstr[MAXLINE];
+    time_t CurrTime = current_ts;
+    char **av;
+    struct Luser *lptr;
 
-{
-  char sendstr[MAXLINE];
-  time_t CurrTime = time(NULL);
-  char **av;
-  struct Luser *lptr;
-  
-  sprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\n", 
-       nick,
-       (long) CurrTime,
-       ServiceUmodes,
-       ident,
-       Me.name,
-       Me.name,
-       info);
-  toserv(sendstr);
+    ircsprintf(sendstr, "NICK %s 1 %ld %s %s %s %s :%s\r\n", nick, (long)
+               CurrTime, ServiceUmodes, ident, Me.name, Me.name, info);
+    toserv("%s", sendstr);
 
-  SplitBuf(sendstr, &av);
-  lptr = AddClient(av); /* Add 'nick' to user list */
-  MyFree(av);
+    SplitBuf(sendstr, &av);
+    lptr = AddClient(av); /* Add 'nick' to user list */
+    MyFree(av);
 
-  return (lptr);
-} /* introduce() */
+    return (lptr);
+  } /* introduce() */
 
 /*
 InitServs()
@@ -344,39 +287,34 @@ InitServs()
   return: none
 */
 
-void
-InitServs(struct Luser *servptr)
-
+void InitServs(struct Luser *servptr)
 {
   struct aService *sptr;
 
   if (servptr)
-  {
-    /*
-     * A service nick was killed, determine which one it was
-     * and re-introduce them. Now, the service will have
-     * been removed from the luser linked list already if
-     * it was a kill. However, s_kill() will have called
-     * GetService(), which returns a pointer to Me.*sptr,
-     * depending on which *Serv was killed. Therefore,
-     * 'servptr' will still correctly point to a Me.*sptr,
-     * even though it really points to garbage. So it is
-     * still safe to compare servptr to Me.*sptr's.
-     */
-
-    for (sptr = ServiceBots; sptr->name; ++sptr)
     {
-      if (servptr == *(sptr->lptr))
-      {
-        *(sptr->lptr) = introduce(*(sptr->name),
-                                  *(sptr->ident),
-                                  *(sptr->desc));
-        return; /* no need to keep searching */
-      }
-    }
+      /*
+       * A service nick was killed, determine which one it was and
+       * re-introduce them. Now, the service will have been removed from the
+       * luser linked list already if it was a kill. However, s_kill() will
+       * have called GetService(), which returns a pointer to Me.*sptr,
+       * depending on which *Serv was killed. Therefore, 'servptr' will
+       * still correctly point to a Me.*sptr, even though it really points
+       * to garbage. So it is still safe to compare servptr to Me.*sptr's.
+       */
 
-    return;
-  }
+      for (sptr = ServiceBots; sptr->name; ++sptr)
+        {
+          if (servptr == *(sptr->lptr))
+            {
+              *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+                                        *(sptr->desc));
+              return; /* no need to keep searching */
+            }
+        }
+
+      return;
+    }
 
   /*
    * Services probably just connected to the network,
@@ -384,9 +322,8 @@ InitServs(struct Luser *servptr)
    */
 
   for (sptr = ServiceBots; sptr->name; ++sptr)
-  {
-    *(sptr->lptr) = introduce(*(sptr->name),
-                              *(sptr->ident),
-                              *(sptr->desc));
-  }
+    {
+      *(sptr->lptr) = introduce(*(sptr->name), *(sptr->ident),
+                                *(sptr->desc));
+    }
 } /* InitServs() */

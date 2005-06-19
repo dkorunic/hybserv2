@@ -1,0 +1,4 @@
+Syntax: %bSET <channel> EXPIREBANS {ON|OFF}%b
+
+When EXPIREBANS is enabled, channel bans
+will expire after predefined time.

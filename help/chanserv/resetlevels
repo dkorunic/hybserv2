@@ -1,0 +1,4 @@
+Syntax: %bRESETLEVELS%b
+
+This command resets access levels on all
+channels to default access levels.

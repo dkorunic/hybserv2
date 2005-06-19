@@ -84,6 +84,7 @@ HPath              "@prefix@/hybserv"
 ConfigFile         "hybserv.conf"
 LogFile            "hybserv.log"
 PidFile            "hybserv.pid"
+PipeFile           "hybserv.pipe"
 HelpPath           "help"
 DccMotdFile        "motd.dcc"
 MotdFile           "motd.global"
@@ -116,6 +117,7 @@ ChanServDB         "chan.db"
 MemoServDB         "memo.db"
 StatServDB         "stat.db"
 OperServDB         "oper.db"
+OperServIgnoreDB   "ignore.db"
 SeenServDB         "seen.db"
 
 ################################################################
@@ -150,7 +152,7 @@ SeenServNick       "SeenServ"  "SeenServ"  "Seen Services"
 # to be IRC Operators to perform their tasks, so I left +o
 # out, but if you wish them to be operators, insert an "o".
 
-ServiceUmodes      "+i"
+ServiceUmodes      "+io"
 
 ################################################################
 #
@@ -246,6 +248,14 @@ MemoExpire         "3w"
 #  If you disable this, the data will never expire.
 
 StatExpire         "1w"
+
+# BanExpire <time> [OPTIONAL]
+#
+#  Set this to the amount of time after which ChanServ
+# will expire such ban on your channel. If you disable this,
+# bans will never expire (EXPIREBANS flag will be disabled).
+
+BanExpire         "3h"
 
 ################################################################
 #
@@ -789,3 +799,31 @@ MaxModes           2
 # This is how many Seen records seenserv will store
 
 SeenMaxRecs        4000
+
+# UseMD5 [OPTIONAL]
+#
+# This turns on support for MD5 capable crypt using MCF
+
+#UseMD5
+
+# MaxTSDelta <integer> [OPTIONAL]
+#
+#  Set this to maximal allowed TS delta value for nicknames and channels.
+# Functions like FIXTS in both ChanServ and NickServ will loop through
+# channels and nicknames searching for bogus TS'. If this is not defined,
+# default value of 8 weeks will be used.
+
+MaxTSDelta          "8w"
+
+# MaxServerCollides <integer> [OPTIONAL]
+#
+# Maximum server nicknames collides allowed before silent shutdown of
+# services (set this to a very high number, please).
+
+MaxServerCollides 10
+
+# MinServerCollidesDelta <integer> [OPTIONAL]
+#
+# Minimum delta between services' nicknames collides
+
+MinServerCollidesDelta "20s"

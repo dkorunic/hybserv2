@@ -1,6 +1,6 @@
 /*
  * memoserv.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -26,6 +26,7 @@ struct NickInfo;
 #define MS_READ         0x00000001 /* memo has been read */
 #define MS_DELETE       0x00000002 /* marked for deletion */
 #define MS_RDELETE      0x00000004 /* delete after a RELOAD */
+#define MS_REPLIED      0x00000008 /* has been replied */
 
 struct Memo
 {

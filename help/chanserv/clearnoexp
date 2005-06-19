@@ -1,0 +1,5 @@
+Syntax: %bCLEARNOEXP%b
+
+When NOEXPIRE is used on a channel, that channel will
+never expire. This command clears no-expire flags
+on all channels.

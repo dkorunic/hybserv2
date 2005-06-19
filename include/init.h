@@ -1,6 +1,6 @@
 /*
  * init.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -20,5 +20,7 @@ void InitLists();
 void InitSignals();
 void PostCleanup();
 void InitServs(struct Luser *servptr);
+
+extern int control_pipe;
 
 #endif /* INCLUDED_init_h */

@@ -1,6 +1,6 @@
 /*
  * operserv.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -40,13 +40,13 @@ struct Channel;
 /* OperServ Flag macros */
 
 #define IsServicesAdmin(x) ((x) ? (x)->flags & PRIV_SADMIN : 0)
-#define  IsAdmin(x)         ((x) ? (x)->flags & PRIV_ADMIN : 0)
-#define  IsOper(x)          ((x) ? (x)->flags & PRIV_OPER : 0)
-#define  IsProtected(x)     ((x) ? (x)->flags & PRIV_EXCEPTION : 0)
-#define  IsFriend(x)        ((x) ? (x)->flags & PRIV_FRIEND : 0)
-#define  CanJupe(x)         ((x) ? (x)->flags & PRIV_JUPE : 0)
-#define  CanGline(x)        ((x) ? (x)->flags & PRIV_GLINE : 0)
-#define  CanChat(x)         ((x) ? (x)->flags & PRIV_CHAT : 0)
+#define IsAdmin(x)         ((x) ? (x)->flags & PRIV_ADMIN : 0)
+#define IsOper(x)          ((x) ? (x)->flags & PRIV_OPER : 0)
+#define IsProtected(x)     ((x) ? (x)->flags & PRIV_EXCEPTION : 0)
+#define IsFriend(x)        ((x) ? (x)->flags & PRIV_FRIEND : 0)
+#define CanJupe(x)         ((x) ? (x)->flags & PRIV_JUPE : 0)
+#define CanGline(x)        ((x) ? (x)->flags & PRIV_GLINE : 0)
+#define CanChat(x)         ((x) ? (x)->flags & PRIV_CHAT : 0)
 
 #define ONEKIL  (1024.0)
 #define ONEMEG  (1024.0 * 1024.0)
@@ -108,5 +108,7 @@ void ReconnectCheck(time_t);
  */
 
 extern struct Ignore          *IgnoreList;
+extern char **myargv;
+extern int control_pipe;
 
 #endif /* INCLUDED_operserv_h */

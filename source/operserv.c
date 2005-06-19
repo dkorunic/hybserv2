@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -9,18 +9,27 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
-#include <sys/time.h>
 #include <sys/types.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
+#include <time.h>
 #include <sys/resource.h>
 #include <sys/utsname.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
+#ifndef HAVE_CYGWIN
 #include <signal.h>
-#include <time.h>
+#else
+#include <sys/signal.h>
+#endif /* HAVE_CYGWIN */
 
 #include "alloc.h"
 #include "channel.h"
@@ -29,7 +38,6 @@
 #include "conf.h"
 #include "config.h"
 #include "data.h"
-#include "defs.h"
 #include "dcc.h"
 #include "err.h"
 #include "gline.h"
@@ -48,8 +56,8 @@
 #include "settings.h"
 #include "sock.h"
 #include "statserv.h"
-#include "Strn.h"
 #include "timestr.h"
+#include "sprintf_irc.h"
 
 
 /*
@@ -77,7 +85,6 @@ static struct OperCommand *GetoCommand(struct OperCommand *, char *);
 static void o_identify(struct Luser *, int, char **, int);
 static void o_kill(struct Luser *, int, char **, int);
 static void o_rehash(struct Luser *, int, char **, int);
-static void o_restart(struct Luser *, int, char **, int);
 
 #ifdef ALLOW_JUPES
 static void o_jupe(struct Luser *, int, char **, int);
@@ -116,6 +123,7 @@ static void o_jump(struct Luser *, int, char **, int);
 
 static void o_save(struct Luser *, int, char **, int);
 static void o_reload(struct Luser *, int, char **, int);
+static void o_restart(struct Luser *, int, char **, int);
 
 static void o_ignore(struct Luser *, int, char **, int);
 static void o_ignore_add(struct Luser *, int, char **, int);
@@ -146,10 +154,11 @@ static void o_dump(struct Luser *, int, char **, int);
 
 static void o_set(struct Luser *, int, char **, int);
 
+static void o_kline(struct Luser *, int, char **, int);
+
 static void o_who(struct Luser *, int, char **, int);
 static void o_boot(struct Luser *, int, char **, int);
 static void o_quit(struct Luser *, int, char **, int);
-static void o_motd(struct Luser *, int, char **, int);
 static void o_link(struct Luser *, int, char **, int);
 static void o_unlink(struct Luser *, int, char **, int);
 
@@ -173,197 +182,224 @@ static void DisplaySettings(struct Luser *, int);
 
 static struct UmodeInfo *FindUmode(char);
 
-static struct OperCommand opercmds[] = {
-
-  /*
-   * Regular user commands
-   */
-
-  { "HELP", o_help, 0, 0 },
-  { "IDENTIFY", o_identify, 0, 0 },
-  { "REGISTER", o_identify, 0, 0 },
-
-  /*
-   * Operator commands
-   */
-
-  { "CLONES", o_clones, 0, 'o' },
-
-#ifdef HIGHTRAFFIC_MODE
-  { "HTM", o_htm, 0, 'o' },
+#ifdef GLOBALSERVICES
+static void o_motd(struct Luser *, int, char **, int);
+static void o_motd_display(struct Luser *, int, char **, int);
+static void o_motd_add(struct Luser *, int, char **, int);
+static void o_motd_delete(struct Luser *, int, char **, int);
+static void o_motd_append(struct Luser *, int, char **, int);
 #endif
 
-  { "HUB", o_hub, 0, 'o' },
-  { "KILL", o_kill, 0, 'o' },
-  { "STATS", o_stats, 0, 'o' },
-  { "STATUS", o_status, 0, 'o' },
-  { "UMODE", o_umode, 0, 'o' },
-  { "USERMODE", o_umode, 0, 'o' },
+static struct OperCommand opercmds[] =
+    {
 
-  /*
-   * Administrator commands
-   */
+      /*
+       * Regular user commands
+       */
 
-  { "CHANNEL", o_channel, 0, 'a' },
-  { "JOIN", o_join, 0, 'a' },
-  { "JUMP", o_jump, 0, 'a' },
+      { "HELP", o_help, 0, 0 },
+      { "IDENTIFY", o_identify, 0, 0 },
+      { "REGISTER", o_identify, 0, 0 },
 
-  { "IGNORE", o_ignore, 0, 'a' },
+      /*
+       * Operator commands
+       */
+
+      { "CLONES", o_clones, 0, 'o' },
+
+#ifdef HIGHTRAFFIC_MODE
+      { "HTM", o_htm, 0, 'o' },
+#endif
+
+      { "HUB", o_hub, 0, 'o' },
+      { "KILL", o_kill, 0, 'o' },
+      { "STATS", o_stats, 0, 'o' },
+      { "STATUS", o_status, 0, 'o' },
+      { "UMODE", o_umode, 0, 'o' },
+      { "USERMODE", o_umode, 0, 'o' },
+
+      /*
+       * Administrator commands
+       */
+
+      { "CHANNEL", o_channel, 0, 'a' },
+      { "JOIN", o_join, 0, 'a' },
+      { "JUMP", o_jump, 0, 'a' },
+
+      { "IGNORE", o_ignore, 0, 'a' },
 
 #ifdef ALLOW_KILLCHAN
-  { "KILLCHAN", o_killchan, 0, 'a' },
+      { "KILLCHAN", o_killchan, 0, 'a' },
 #endif
 
 #ifdef ALLOW_KILLHOST
-  { "KILLHOST", o_killhost, 0, 'a' },
+      { "KILLHOST", o_killhost, 0, 'a' },
 #endif
 
-  { "MODE", o_omode, 0, 'a' },
-  { "OMODE", o_omode, 0, 'a' },
-  { "PART", o_part, 0, 'a' },
-  { "REROUTE", o_jump, 0, 'a' },
-  { "SECURE", o_secure, 0, 'a' },
-  { "TAKEOVER", o_secure, 0, 'a' },
-  { "TRACE", o_trace, 0, 'a' },
-  { "USER", o_trace, 0, 'a' },
-  { "WHOIS", o_trace, 0, 'a' },
+      { "MODE", o_omode, 0, 'a' },
+      { "OMODE", o_omode, 0, 'a' },
+      { "PART", o_part, 0, 'a' },
+      { "REROUTE", o_jump, 0, 'a' },
+      { "SECURE", o_secure, 0, 'a' },
+      { "TAKEOVER", o_secure, 0, 'a' },
+      { "TRACE", o_trace, 0, 'a' },
+      { "USER", o_trace, 0, 'a' },
+      { "WHOIS", o_trace, 0, 'a' },
 
-  /*
-   * Services Administrator commands
-   */
+      /*
+       * Services Administrator commands
+       */
 
 #ifdef ALLOW_DIE
-  { "DIE", o_die, 0, 's' },
-#endif
+      { "DIE", o_die, 0, 's' },
+#endif /* ALLOW_DIE */
 
 #ifdef ALLOW_DUMP
-  { "DUMP", o_dump, 0, 's' },
-  { "QUOTE", o_dump, 0, 's' },
-  { "RAW", o_dump, 0, 's' },
+      { "DUMP", o_dump, 0, 's' },
+      { "QUOTE", o_dump, 0, 's' },
+      { "RAW", o_dump, 0, 's' },
 #endif /* ALLOW_DUMP */
 
-  { "DISABLE", o_off, 0, 's' },
-  { "ENABLE", o_on, 0, 's' },
+      { "DISABLE", o_off, 0, 's' },
+      { "ENABLE", o_on, 0, 's' },
 
-/*
- * After a lot of thinking, and a lot of input from "network gurus",
- * I've decided to disable this command, since it could be
- * considered a DoS attack.  The flood itself doesn't actually last
- * longer than 5 seconds at most, but it can be argued that during
- * that period, it could interfere with other internet activities
- * that the user is engaged in.  That is illegal.  Although
- * originally coded for use on ednet, a small group of friends, for
- * fun, if it were to be used on the wrong person, it could become
- * an excuse to sue and/or accuse the administrator of the services
- * of malicious DoS activities (especially if used often and without
- * good reason).
- *                   -Patrick Alken 10/21/1998
- */
+      /*
+       * After a lot of thinking, and a lot of input from "network gurus",
+       * I've decided to disable this command, since it could be
+       * considered a DoS attack.  The flood itself doesn't actually last
+       * longer than 5 seconds at most, but it can be argued that during
+       * that period, it could interfere with other internet activities
+       * that the user is engaged in.  That is illegal.  Although
+       * originally coded for use on ednet, a small group of friends, for
+       * fun, if it were to be used on the wrong person, it could become
+       * an excuse to sue and/or accuse the administrator of the services
+       * of malicious DoS activities (especially if used often and without
+       * good reason).
+       *                   -Patrick Alken 10/21/1998
+       */
 
- /*
-  * "fuckover" re-enabled under #define ALLOW_FUCKOVER due to
-  * user requests (undefined by default)
-  * 03/07/1999
-  */
+      /*
+       * "fuckover" re-enabled under #define ALLOW_FUCKOVER due to
+       * user requests (undefined by default)
+       * 03/07/1999
+       */
 
 #ifdef ALLOW_FUCKOVER
-  { "FUCKOVER", o_fuckover, 0, 's' },
+      { "FUCKOVER", o_fuckover, 0, 's' },
 #endif
 
-  { "OFF", o_off, 0, 's' },
-  { "ON", o_on, 0, 's' },
-  { "REHASH", o_rehash, 0, 's' },
-  { "RELOAD", o_reload, 0, 's' },
-  { "RESTART", o_restart, 0, 's' },
-  { "SAVE", o_save, 0, 's' },
-  { "SET", o_set, 0, 's' },
-  { "SHUTDOWN", o_off, 0, 's' },
+      { "OFF", o_off, 0, 's' },
+      { "ON", o_on, 0, 's' },
+      { "REHASH", o_rehash, 0, 's' },
+      { "RELOAD", o_reload, 0, 's' },
+      { "RESTART", o_restart, 0, 's' },
+      { "SAVE", o_save, 0, 's' },
+      { "SET", o_set, 0, 's' },
+      { "SHUTDOWN", o_off, 0, 's' },
 
-  /*
-   * Miscellaneous
-   */
+      /*
+       * Miscellaneous
+       */
 
 #ifdef ALLOW_JUPES
 #ifdef JUPEVOTES
-/* don't let people use it in msg at all.. */
-  { "JUPE", o_jupe, 1, 'j' },
+      /* don't let people use it in msg at all.. */
+      { "JUPE", o_jupe, 1, 'j' },
 #else
-  { "JUPE", o_jupe, 0, 'j' },
+      { "JUPE", o_jupe, 0, 'j' },
 #endif
-  { "UNJUPE", o_unjupe, 0, 'j' },
+      { "UNJUPE", o_unjupe, 0, 'j' },
 #endif
 
 #ifdef ALLOW_GLINES
-  { "GLINE", o_gline, 0, 'g' },
-  { "AKILL", o_gline, 0, 'g' },
-  { "UNGLINE", o_ungline, 0, 'g' },
+      { "GLINE", o_gline, 0, 'g' },
+      { "AKILL", o_gline, 0, 'g' },
+      { "UNGLINE", o_ungline, 0, 'g' },
 #endif
 
-  /*
-   * Dcc Only
-   */
+      { "KLINE", o_kline, 0, 'g' },
+#ifdef GLOBALSERVICES
+      { "MOTD", o_motd, 0, 'a' },
+#endif
+      /*
+       * Dcc Only
+       */
 
-  { "WHO", o_who, 1, 0 },
-  { "BOOT", o_boot, 1, 'a' },
-  { "QUIT", o_quit, 1, 0 },
-  { "MOTD", o_motd, 1, 0 },
-  { "LINK", o_link, 1, 'o' },
-  { "UNLINK", o_unlink, 1, 'o' },
+      { "WHO", o_who, 1, 0 },
+      { "BOOT", o_boot, 1, 'a' },
+      { "QUIT", o_quit, 1, 0 },
+      { "LINK", o_link, 1, 'o' },
+      { "UNLINK", o_unlink, 1, 'o' },
 
-  { 0, 0, 0, 0 }
-};
+      { 0, 0, 0, 0 }
+    };
 
 /* sub-commands for OperServ IGNORE */
-static struct OperCommand ignorecmds[] = {
-  { "ADD", o_ignore_add, 0, 0 },
-  { "DEL", o_ignore_del, 0, 0 },
-  { "LIST", o_ignore_list, 0, 0 },
-
-  { 0, 0, 0, 0 }
-};
+static struct OperCommand ignorecmds[] =
+    {
+      { "ADD", o_ignore_add, 0, 0 },
+      { "DEL", o_ignore_del, 0, 0 },
+      { "LIST", o_ignore_list, 0, 0 },
+      { 0, 0, 0, 0 }
+    };
 
 #ifdef HIGHTRAFFIC_MODE
 
 /* sub-commands for OperServ HTM */
-static struct OperCommand htmcmds[] = {
-  { "ON", o_htm_on, 0, 0 },
-  { "OFF", o_htm_off, 0, 0 },
-  { "MAX", o_htm_max, 0, 0 },
+static struct OperCommand htmcmds[] =
+    {
+      { "ON", o_htm_on, 0, 0
+      },
+      { "OFF", o_htm_off, 0, 0 },
+      { "MAX", o_htm_max, 0, 0 },
 
-  { 0, 0, 0, 0 }
-};
+      { 0, 0, 0, 0 }
+    };
 
 #endif /* HIGHTRAFFIC_MODE */
+
+#ifdef GLOBALSERVICES
+/* sub-commands for OperServ MOTD */
+static struct OperCommand motdcmds[] =
+    {
+      { "DISPLAY", o_motd_display, 0, 0 },
+      { "ADD", o_motd_add, 0, 0 },
+      { "APPEND", o_motd_append, 0, 0 },
+      { "DELETE", o_motd_delete, 0, 0 },
+      { 0, 0, 0, 0 }
+    };
+#endif
 
 /*
  * OperServ usermodes
  */
 static struct UmodeInfo
-{
-  char usermode;
-  int flag;
-} Usermodes[] = {
-  { 'b', OPERUMODE_B },     /* see tcm bot connect attempts etc */
-  { 'c', OPERUMODE_C },     /* see lone connections */
-  { 'C', OPERUMODE_CAPC },  /* see client connections */
-  { 'd', OPERUMODE_D },     /* debug information */
-  { 'e', OPERUMODE_E },     /* see clone exits */
-  { 'E', OPERUMODE_CAPE },  /* see lient exits */
-  { 'j', OPERUMODE_J },     /* see channel joins */
-  { 'k', OPERUMODE_K },     /* see channel kicks */
-  { 'l', OPERUMODE_L },     /* see netsplits/netjoins */
-  { 'm', OPERUMODE_M },     /* see channel modes */
-  { 'n', OPERUMODE_N },     /* see network activity */
-  { 'o', OPERUMODE_O },     /* see new operators */
-  { 'O', OPERUMODE_CAPO },  /* see operator kills */
-  { 'p', OPERUMODE_P },     /* see channel parts */
-  { 's', OPERUMODE_S },     /* see usages of service bots */
-  { 'S', OPERUMODE_CAPS },  /* see server kills */
-  { 't', OPERUMODE_T },     /* see channel topic changes */
-  { 'y', OPERUMODE_Y },     /* see various DoTimer() events */
+  {
+    char usermode;
+    int flag;
+  }
+Usermodes[] = {
+                { 'b', OPERUMODE_B },     /* see tcm bot connect attempts etc */
+                { 'c', OPERUMODE_C },     /* see lone connections */
+                { 'C', OPERUMODE_CAPC },  /* see client connections */
+                { 'd', OPERUMODE_D },     /* debug information */
+                { 'e', OPERUMODE_E },     /* see clone exits */
+                { 'E', OPERUMODE_CAPE },  /* see lient exits */
+                { 'j', OPERUMODE_J },     /* see channel joins */
+                { 'k', OPERUMODE_K },     /* see channel kicks */
+                { 'l', OPERUMODE_L },     /* see netsplits/netjoins */
+                { 'm', OPERUMODE_M },     /* see channel modes */
+                { 'n', OPERUMODE_N },     /* see network activity */
+                { 'o', OPERUMODE_O },     /* see new operators */
+                { 'O', OPERUMODE_CAPO },  /* see operator kills */
+                { 'p', OPERUMODE_P },     /* see channel parts */
+                { 's', OPERUMODE_S },     /* see usages of service bots */
+                { 'S', OPERUMODE_CAPS },  /* see server kills */
+                { 't', OPERUMODE_T },     /* see channel topic changes */
+                { 'y', OPERUMODE_Y },     /* see various DoTimer() events */
 
-  { 0, 0 }
-};
+                { 0, 0 }
+              };
 
 /*
 os_process()
@@ -375,29 +411,40 @@ os_process(char *nick, char *command, int sockfd)
 
 {
   struct DccUser *dccptr;
-  struct Luser *lptr;
+  struct Luser *lptr = NULL;
   int acnt;
   int bad;
   char **arv;
   struct OperCommand *cptr;
   struct Userlist *cmduser = NULL;
 
+#ifdef OPERNICKIDENT
+
+  struct NickInfo *nptr;
+#endif /* OPERNICKIDENT */
+
   if (!command)
     return;
 
-  lptr = NULL;
-  if ((sockfd == NODCC) && !(lptr = FindClient(nick)))
+  if (!(lptr = FindClient(nick)))
+#if 0
+    /* Quickfix. All further code relies on lptr, however the old code did
+     * not check case when lptr was not filled and sockfd == NODCC. In
+     * that case every lptr->blah lookup will cause segfault. -kre */
+    && (sockfd == NODCC))
+#endif
     return;
 
-  if ((Network->flags & NET_OFF) &&
-      (strncasecmp(command, "ON", 2) != 0) &&
-      (strncasecmp(command, "REGISTER", 8) != 0) &&
-      (strncasecmp(command, "IDENTIFY", 8) != 0))
-  {
-    os_notice(lptr, sockfd,
-      "Services are currently \002disabled\002");
-    return;
-  }
+    if ((Network->flags & NET_OFF)
+          &&
+          (ircncmp(command, "ON", 2) != 0) &&
+          (ircncmp(command, "REGISTER", 8) != 0) &&
+          (ircncmp(command, "IDENTIFY", 8) != 0))
+      {
+        os_notice(lptr, sockfd,
+                  "Services are currently \002disabled\002");
+        return;
+      }
 
   dccptr = IsDccSock(sockfd);
 
@@ -411,149 +458,165 @@ os_process(char *nick, char *command, int sockfd)
      * the oper's nickname - make sure that doesn't happen
      */
     cmduser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
-  }
+    }
 
   if (cmduser || dccptr)
   {
     onick = ouser = ohost = NULL;
 
     if (!dccptr)
-    {
-      /*
-       * As a last resort, check if there is a client on the network
-       * with the nick
-       */
-      if (lptr)
-      {
-        onick = MyStrdup(lptr->nick);
-        ouser = MyStrdup(lptr->username);
-        ohost = MyStrdup(lptr->hostname);
-      }
-    }
-    else
-    {
-      onick = MyStrdup(dccptr->nick);
-      ouser = MyStrdup(dccptr->username);
-      ohost = MyStrdup(dccptr->hostname);
-    }
-
-    if (!onick || !ouser || !ohost)
-      return;
-
-    if (dccptr)
-      cmduser = DccGetUser(dccptr);
-
-    if (!cmduser)
-    {
-      MyFree(onick);
-      MyFree(ouser);
-      MyFree(ohost);
-      /* Be a bit more verbose on denial. -kre */
-      os_notice(lptr, sockfd, "Access Denied - user not found");
-      return;
-    }
-
-    if (OpersHaveAccess)
-    {
-      /*
-       * GetUser() returned GenericOper, meaning this person
-       * is an operator, but does not have an O: line. Mark them
-       * as registered so they can perform Operator commands
-       * on OperServ
-       */
-      if (lptr && (cmduser == GenericOper))
-        lptr->flags |= L_OSREGISTERED;
-    } /* if (OpersHaveAccess) */
-
-    acnt = SplitBuf(command, &arv);
-    if (acnt == 0)
-    {
-      MyFree(arv);
-      MyFree(onick);
-      MyFree(ouser);
-      MyFree(ohost);
-      return;
-    }
-
-    cptr = GetoCommand(opercmds, arv[0]);
-
-    if (cptr == (struct OperCommand *) -1)
-    {
-      os_notice(lptr, sockfd, "Ambiguous command [%s]",
-        arv[0]);
-      MyFree(arv);
-      MyFree(onick);
-      MyFree(ouser);
-      MyFree(ohost);
-      return;
-    }
-
-    bad = 0;
-
-    if (!cptr)
-      bad = 1;
-    else
-    {
-      /* 
-        * check if the command is dcc only - if so, make sure it didn't
-        * come from a privmsg
-        */
-      if ((cptr->dcconly) && (sockfd == NODCC))
-        bad = 1;
-
-      if ((cptr->flag) &&
-          !IsRegistered(lptr, sockfd) &&
-          !IsValidAdmin(lptr))
-        bad = 1;
-    }
-
-    if (bad)
-    {
-      os_notice(lptr, sockfd, "Unknown command [%s]",
-        arv[0]);
-
-      if (sockfd == NODCC)
-      {
-        int    ii;
-
-        /* send the msg to the partyline */
-        BroadcastDcc(DCCOPS, "[%s!%s@%s]",
-          lptr->nick,
-          lptr->username,
-          lptr->hostname);
-        for (ii = 0; ii < acnt; ++ii)
-          BroadcastDcc(DCCOPS, " %s", arv[ii]);
-        BroadcastDcc(DCCOPS, "\n");
-      }
-    }
-    else
-    {
-      /* check if the user has authorization to exec command */
-      if (CheckAccess(cmduser, cptr->flag))
-      {
-        /* call cptr->func to execute command */
-        (*cptr->func)(lptr, acnt, arv, sockfd);
-        MyFree(arv);
-        MyFree(onick);
-        MyFree(ouser);
-        MyFree(ohost);
-        return;
-      }
+        {
+          /*
+           * As a last resort, check if there is a client on the network
+           * with the nick
+           */
+          if (lptr)
+            {
+              onick = MyStrdup(lptr->nick);
+              ouser = MyStrdup(lptr->username);
+              ohost = MyStrdup(lptr->hostname);
+            }
+        }
       else
-        os_notice(lptr, sockfd, ERR_NOPRIVS);
-    }
-    MyFree(arv);
-    MyFree(onick);
-    MyFree(ouser);
-    MyFree(ohost);
-    return;
-  } /* if (cmduser || dccptr) */
+        {
+          onick = MyStrdup(dccptr->nick);
+          ouser = MyStrdup(dccptr->username);
+          ohost = MyStrdup(dccptr->hostname);
+        }
+
+      if (!onick || !ouser || !ohost)
+        return;
+
+      if (dccptr)
+        cmduser = DccGetUser(dccptr);
+
+      if (!cmduser)
+        {
+          MyFree(onick);
+          MyFree(ouser);
+          MyFree(ohost);
+          /* Be a bit more verbose on denial. -kre */
+          os_notice(lptr, sockfd, "Access Denied - user not found");
+          return;
+        }
+
+      if (OpersHaveAccess)
+        {
+          /*
+           * GetUser() returned GenericOper, meaning this person is an
+           * operator, but does not have an O: line. Mark them as registered
+           * so they can perform Operator commands on OperServ
+           *
+           * If OPERNICKIDENT is defined, mark them as registered only if
+           * they idented to NickServ first. It's inexcusable to risk
+           * someone with just an oper's ircd password being able to badly
+           * mess things up via services. Force them to at least know one
+           * more password (NickServ). Ideally, an oper's ircd, nickserv and
+           * operserv passwords should be different. -ike
+           */
+
+#ifdef OPERNICKIDENT
+          nptr = FindNick(lptr->nick);
+          if (lptr && (cmduser == GenericOper)
+              && ((Network->flags & NET_OFF)
+                  || !nptr || nptr->flags & NS_IDENTIFIED))
+#else
+
+          if (lptr && (cmduser == GenericOper))
+#endif /* OPERNICKIDENT */
+
+            lptr->flags |= L_OSREGISTERED;
+        } /* if (OpersHaveAccess) */
+
+      acnt = SplitBuf(command, &arv);
+      if (acnt == 0)
+        {
+          MyFree(arv);
+          MyFree(onick);
+          MyFree(ouser);
+          MyFree(ohost);
+          return;
+        }
+
+      cptr = GetoCommand(opercmds, arv[0]);
+
+      if (cptr == (struct OperCommand *) -1)
+        {
+          os_notice(lptr, sockfd, "Ambiguous command [%s]",
+                    arv[0]);
+          MyFree(arv);
+          MyFree(onick);
+          MyFree(ouser);
+          MyFree(ohost);
+          return;
+        }
+
+      bad = 0;
+
+      if (!cptr)
+        bad = 1;
+      else
+        {
+          /*
+            * check if the command is dcc only - if so, make sure it didn't
+            * come from a privmsg
+            */
+          if ((cptr->dcconly) && (sockfd == NODCC))
+            bad = 1;
+
+          if ((cptr->flag) &&
+              !IsRegistered(lptr, sockfd) &&
+              !IsValidAdmin(lptr))
+            bad = 1;
+        }
+
+      if (bad)
+        {
+          os_notice(lptr, sockfd, "Unknown command [%s]",
+                    arv[0]);
+
+          if (sockfd == NODCC)
+            {
+              int    ii;
+
+              /* send the msg to the partyline */
+              BroadcastDcc(DCCOPS, "[%s!%s@%s]",
+                           lptr->nick,
+                           lptr->username,
+                           lptr->hostname);
+              for (ii = 0; ii < acnt; ++ii)
+                BroadcastDcc(DCCOPS, " %s", arv[ii]);
+              BroadcastDcc(DCCOPS, "\n");
+            }
+        }
+      else
+        {
+          /* check if the user has authorization to exec command */
+          if (CheckAccess(cmduser, cptr->flag))
+            {
+              /* call cptr->func to execute command */
+              (*cptr->func)(lptr, acnt, arv, sockfd);
+              MyFree(arv);
+              MyFree(onick);
+              MyFree(ouser);
+              MyFree(ohost);
+              return;
+            }
+          else
+            os_notice(lptr, sockfd, ERR_NOPRIVS);
+        }
+      MyFree(arv);
+      MyFree(onick);
+      MyFree(ouser);
+      MyFree(ohost);
+      return;
+    } /* if (cmduser || dccptr) */
   else
     /* Be more verbose. -kre */
     os_notice(lptr, NODCC, "Access Denied - no O-line");
 
-  return;
-} /* os_process() */
+    return;
+  } /* os_process() */
 
 /*
 os_loaddata()
@@ -568,16 +631,16 @@ os_loaddata()
   FILE *fp;
   char line[MAXLINE], **av;
   int ac,
-      ret = 1,
-      cnt,
-      found;
+  ret = 1,
+        cnt,
+        found;
   struct Userlist *tempuser;
 
   if (!(fp = fopen(OperServDB, "r")))
-  {
-    /* OperServ data file doesn't exist */
-    return (-1);
-  }
+    {
+      /* OperServ data file doesn't exist */
+      return (-1);
+    }
 
   /*
    * If this is being called from ReloadData(), make sure
@@ -589,85 +652,85 @@ os_loaddata()
 
   cnt = 0;
   while (fgets(line, MAXLINE - 1, fp))
-  {
-    cnt++;
-
-    ac = SplitBuf(line, &av);
-    if (!ac)
     {
-      /* blank line probably */
-      MyFree(av);
-      continue;
-    }
+      cnt++;
 
-    if (av[0][0] == ';')
-    {
-      /* its a comment */
-      MyFree(av);
-      continue;
-    }
+      ac = SplitBuf(line, &av);
+      if (!ac)
+        {
+          /* blank line probably */
+          MyFree(av);
+          continue;
+        }
 
-    /*
-     * OperServDB format should be:
-     * Nickname <umodes>
-     * where <umodes> is an integer number corresponding to
-     * the OPERUMODE_* flags
-     */
+      if (av[0][0] == ';')
+        {
+          /* its a comment */
+          MyFree(av);
+          continue;
+        }
 
-    if (ac < 2)
-    {
-      fatal(1, "%s:%d Invalid database format (FATAL)",
-        OperServDB,
-        cnt);
-      ret = (-2);
-      MyFree(av);
-      continue;
-    }
+      /*
+       * OperServDB format should be:
+       * Nickname <umodes>
+       * where <umodes> is an integer number corresponding to
+       * the OPERUMODE_* flags
+       */
 
-    /*
-     * Go through user list and try to find a matching nickname
-     * with av[0]
-     */
-    found = 0;
-    for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-    {
-      if (!strcasecmp(av[0], tempuser->nick))
-      {
-        found = 1;
-        if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
+      if (ac < 2)
+        {
+          fatal(1, "%s:%d Invalid database format (FATAL)",
+                OperServDB,
+                cnt);
+          ret = -2;
+          MyFree(av);
+          continue;
+        }
+
+      /*
+       * Go through user list and try to find a matching nickname
+       * with av[0]
+       */
+      found = 0;
+      for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+        {
+          if (!irccmp(av[0], tempuser->nick))
+            {
+              found = 1;
+              if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
+                {
+                  /*
+                   * we've already seen a line with this nickname in
+                   * OperServDB, so there must be multiple entries
+                   */
+                  fatal(1, "%s:%d OperServ entry [%s] has multiple occurences (using first)",
+                        OperServDB,
+                        cnt,
+                        tempuser->nick);
+                  if (ret > 0)
+                    ret = (-1);
+                  break;
+                }
+              else
+                tempuser->umodes = atol(av[1]);
+            } /* if (!irccmp(av[0], tempuser->nick)) */
+        } /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
+
+      if (!found)
         {
           /*
-           * we've already seen a line with this nickname in
-           * OperServDB, so there must be multiple entries
+           * No O: line found matching the nickname
            */
-          fatal(1, "%s:%d OperServ entry [%s] has multiple occurences (using first)",
-            OperServDB,
-            cnt,
-            tempuser->nick);
+          fatal(1, "%s:%d No O: line entry for nickname [%s] (ignoring)",
+                OperServDB,
+                cnt,
+                av[0]);
           if (ret > 0)
             ret = (-1);
-          break;
         }
-        else
-          tempuser->umodes = atol(av[1]);
-      } /* if (!strcasecmp(av[0], tempuser->nick)) */
-    } /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
 
-    if (!found)
-    {
-      /*
-       * No O: line found matching the nickname
-       */
-      fatal(1, "%s:%d No O: line entry for nickname [%s] (ignoring)",
-        OperServDB,
-        cnt,
-        av[0]);
-      if (ret > 0)
-        ret = (-1);
-    }
-
-    MyFree(av);
-  } /* while (fgets(line, MAXLINE - 1, fp)) */
+      MyFree(av);
+    } /* while (fgets(line, MAXLINE - 1, fp)) */
 
   fclose(fp);
 
@@ -678,13 +741,87 @@ os_loaddata()
    * default usermodes (+cby)
    */
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-  {
-    if (tempuser->umodes == OPERUMODE_INIT)
-      tempuser->umodes = (OPERUMODE_C | OPERUMODE_B | OPERUMODE_Y);
-  }
+    {
+      if (tempuser->umodes == OPERUMODE_INIT)
+        tempuser->umodes = (OPERUMODE_C | OPERUMODE_B | OPERUMODE_Y);
+    }
 
   return (ret);
 } /* os_loaddata() */
+
+/*
+ * Name:  ignore_loaddata()
+ * Action:  ignore ignores data from OperServIgnoreDB
+ * Return:  1 on success, -1 on recoverable failure, -2 on fatal failure
+ */
+int ignore_loaddata()
+{
+  FILE *fp;
+  char line[MAXLINE], **av;
+  int ac, cnt = 0, ret = 1, found;
+  time_t expire;
+  struct Ignore *temp;
+
+  if (!(fp = fopen(OperServIgnoreDB, "r")))
+    return (-1);
+
+  /* mark all ignores for expire. */
+  for (temp = IgnoreList; temp; temp = temp->next)
+    temp->expire = current_ts;
+
+  while (fgets(line, MAXLINE - 1, fp))
+  {
+    cnt++;
+    found = 0;
+    ac = SplitBuf(line, &av);
+    
+    /* blank line */
+    if (!ac)
+    {
+      MyFree(av);
+      continue;
+    }
+
+    /* comment */
+    if (av[0][0] == ';')
+    {
+      MyFree(av);
+      continue;
+    }
+
+    /* invalid format */
+    if (ac < 2)
+    {
+      fatal(1, "%s:%d Invalid database format (FATAL)",
+          OperServIgnoreDB, cnt);
+      ret = -2;
+      MyFree(av);
+      continue;
+    }
+
+    expire = atol(av[1]);
+  
+    for (temp = IgnoreList; temp; temp = temp->next)
+    {
+      if (!irccmp(av[0], temp->hostmask))
+      {
+        temp->expire = expire + current_ts;
+        MyFree(av);
+        found = 1;
+        break;
+      }
+    }
+
+    if (!found)
+    {
+      AddIgnore(av[0], expire);
+      MyFree(av);
+    }
+  }
+
+  fclose(fp);
+  return (ret);
+}
 
 /*
 GetoCommand()
@@ -695,52 +832,52 @@ matches found
 */
 
 static struct OperCommand *
-GetoCommand(struct OperCommand *cmdlist, char *name)
+      GetoCommand(struct OperCommand *cmdlist, char *name)
 
-{
-  struct OperCommand *cmdptr, *tmp;
-  int matches, /* number of matches we've had so far */
-      clength;
-
-  if (!cmdlist || !name)
-    return (NULL);
-
-  tmp = NULL;
-  matches = 0;
-  clength = strlen(name);
-  for (cmdptr = cmdlist; cmdptr->cmd; cmdptr++)
   {
-    if (!strncasecmp(name, cmdptr->cmd, clength))
-    {
-      if (clength == strlen(cmdptr->cmd))
+    struct OperCommand *cmdptr, *tmp;
+    int matches; /* number of matches we've had so far */
+    unsigned clength;
+
+    if (!cmdlist || !name)
+      return (NULL);
+
+    tmp = NULL;
+    matches = 0;
+    clength = strlen(name);
+    for (cmdptr = cmdlist; cmdptr->cmd; cmdptr++)
       {
-        /*
-         * name and cmdptr->cmd are the same length, so it
-         * must be an exact match, don't search any further
-         */
-        matches = 0;
-        break;
+        if (!ircncmp(name, cmdptr->cmd, clength))
+          {
+            if (clength == strlen(cmdptr->cmd))
+              {
+                /*
+                 * name and cmdptr->cmd are the same length, so it
+                 * must be an exact match, don't search any further
+                 */
+                matches = 0;
+                break;
+              }
+            tmp = cmdptr;
+            matches++;
+          }
       }
-      tmp = cmdptr;
-      matches++;
-    }
-  }
 
-  /*
-   * If matches > 1, name is an ambiguous command, so the
-   * user needs to be more specific
-   */
-  if ((matches == 1) && (tmp))
-    cmdptr = tmp;
+    /*
+     * If matches > 1, name is an ambiguous command, so the
+     * user needs to be more specific
+     */
+    if ((matches == 1) && (tmp))
+      cmdptr = tmp;
 
-  if (cmdptr->cmd)
-    return (cmdptr);
+    if (cmdptr->cmd)
+      return (cmdptr);
 
-  if (matches == 0)
-    return (NULL); /* no matches found */
-  else
-    return ((struct OperCommand *) -1); /* multiple matches found */
-} /* GetoCommand() */
+    if (matches == 0)
+      return (NULL); /* no matches found */
+    else
+      return ((struct OperCommand *) -1); /* multiple matches found */
+  } /* GetoCommand() */
 
 /*
 os_notice()
@@ -754,27 +891,32 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
 
 {
   va_list args;
-  char finstr[MAXLINE];
+  char finstr[MAXLINE * 2];
+  struct NickInfo *nptr;
 
   va_start(args, format);
-
-  vSnprintf(finstr, sizeof(finstr), format, args);
-
+  vsprintf_irc(finstr, format, args);
   va_end(args);
 
   if (sockfd == NODCC)
-  {
-    if (lptr)
-      toserv(":%s NOTICE %s :%s\n",
-        (ServerNotices) ? Me.name : n_OperServ,
-        lptr->nick,
-        finstr);
-  }
+    {
+      if (lptr)
+      {
+        nptr = GetLink(lptr->nick);
+        if (nptr && (nptr->flags & NS_PRIVMSG))
+          toserv(":%s PRIVMSG %s :%s\r\n",
+              n_OperServ, lptr->nick, finstr);
+        else
+          toserv(":%s NOTICE %s :%s\r\n",
+              (ServerNotices) ? Me.name : n_OperServ,
+              lptr->nick, finstr);
+      }
+    }
   else
-  {
-    writesocket(sockfd, finstr);
-    writesocket(sockfd, "\n");
-  }
+    {
+      writesocket(sockfd, finstr);
+      writesocket(sockfd, "\n");
+    }
 } /* os_notice() */
 
 /*
@@ -792,14 +934,11 @@ os_join(struct Channel *cptr)
   if (!cptr)
     return;
 
-  sprintf(sendstr,
-    ":%s SJOIN %ld %s + :@%s\n",
-    Me.name,
-    (long) cptr->since,
-    cptr->name,
-    n_OperServ);
+  ircsprintf(sendstr,
+             ":%s SJOIN %ld %s + :@%s\r\n",
+             Me.name, (long) cptr->since, cptr->name, n_OperServ);
 
-  toserv(sendstr);
+  toserv("%s", sendstr);
 
   SplitBuf(sendstr, &av);
 
@@ -826,14 +965,11 @@ os_join_ts_minus_1(struct Channel *cptr)
   if (!cptr)
     return;
 
-  sprintf(sendstr,
-    ":%s SJOIN %ld %s + :@%s\n",
-    Me.name,
-    (cptr->since != 0) ? (long) cptr->since - 1 : 0,
-    cptr->name,
-    n_OperServ);
+  ircsprintf(sendstr, ":%s SJOIN %ld %s + :@%s\r\n",
+     Me.name, (cptr->since != 0) ? (long) cptr->since - 1 : 0, cptr->name,
+     n_OperServ);
 
-  toserv(sendstr);
+  toserv("%s", sendstr);
   ac = SplitBuf(sendstr, &av);
   s_sjoin(ac, av);
   MyFree(av);
@@ -851,9 +987,7 @@ os_part(struct Channel *chptr)
   if (!chptr)
     return;
 
-  toserv(":%s PART %s\n",
-    n_OperServ,
-    chptr->name);
+  toserv(":%s PART %s\r\n", n_OperServ, chptr->name);
 
   RemoveFromChannel(chptr, Me.osptr);
 } /* os_part() */
@@ -869,49 +1003,39 @@ o_RecordCommand(int sockfd, char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   va_start(args, format);
-
-  vSnprintf(buffer, sizeof(buffer), format, args);
-
+  vsprintf_irc(buffer, format, args);
   va_end(args);
 
   /* log the command */
   putlog(LOG2,
-    "%s: %s!%s@%s %s",
-    n_OperServ,
-    onick,
-    ouser,
-    ohost,
-    buffer);
+         "%s: %s!%s@%s %s",
+         n_OperServ,
+         onick,
+         ouser,
+         ohost,
+         buffer);
 
   /* send it to opers with usermode +s */
   if (sockfd == NODCC)
-  {
-    /*
-     * If they're using the command via privmsg,
-     * use the format: OperServ: nick!user@host COMMAND ...
-     */
-    SendUmode(OPERUMODE_S,
-      "%s: %s!%s@%s %s",
-      n_OperServ,
-      onick,
-      ouser,
-      ohost,
-      buffer);
-  }
+    {
+      /*
+       * If they're using the command via privmsg,
+       * use the format: OperServ: nick!user@host COMMAND ...
+       */
+      SendUmode(OPERUMODE_S, "%s: %s!%s@%s %s", n_OperServ, onick, ouser,
+                ohost, buffer);
+    }
   else
-  {
-    /*
-     * If they're using the command via dcc chat,
-     * use the format: #nick# COMMAND ...
-     */
-    SendUmode(OPERUMODE_S,
-      "#%s# %s",
-      onick,
-      buffer);
-  }
+    {
+      /*
+       * If they're using the command via dcc chat,
+       * use the format: #nick# COMMAND ...
+       */
+      SendUmode(OPERUMODE_S, "#%s# %s", onick, buffer);
+    }
 } /* o_RecordCommand() */
 
 /*
@@ -924,36 +1048,17 @@ o_Wallops(char *format, ...)
 
 {
   va_list args;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE * 2];
 
   if (!DoWallops)
     return;
 
   va_start(args, format);
-
-  vSnprintf(buffer, sizeof(buffer), format, args);
-
+  vsprintf_irc(buffer, format, args);
   va_end(args);
-#if 0
-  if( onick == NULL || ouser == NULL || ohost == NULL ) 
-#endif
-  toserv(":%s WALLOPS :%s: %s\n",
-     Me.name,
-     n_OperServ,
-     buffer);
-  /* This commented out code is silly. Other functions in NickServ and co.
-   * do not care too much about onick and co. so they usually contain
-   * garbage. -kre */
-#if 0
-  else
-  toserv(":%s WALLOPS :%s: %s!%s@%s %s\n",
-    Me.name,
-    n_OperServ,
-    onick,
-    ouser,
-    ohost,
-    buffer);
-#endif
+
+  toserv(":%s OPERWALL :%s: %s\r\n", Me.name, n_OperServ, buffer);
+
 } /* o_Wallops() */
 
 /*
@@ -968,44 +1073,72 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 {
   struct Userlist *uptr;
 
+#ifdef OPERNICKIDENT
+
+  struct NickInfo *nptr;
+#endif /* OPERNICKIDENT */
+
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002IDENTIFY <password>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002IDENTIFY <password>\002");
+      return;
+    }
+
+#ifdef OPERNICKIDENT
+  nptr = FindNick (lptr->nick);
+  if (!(Network->flags & NET_OFF) &&
+      (!nptr || !(nptr->flags & NS_IDENTIFIED)))
+    {
+      os_notice(lptr, sockfd, "You must first identify to \002%s\002",
+                n_NickServ);
+      return;
+    }
+#endif /* OPERNICKIDENT */
 
   if (IsRegistered(lptr, sockfd))
-  {
-    os_notice(lptr, sockfd, "You are already identified");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "You are already identified");
+      return;
+    }
 
+  /* No need here to check ohost or ouser once again, since they are
+   * already checked in os_process() -kre */
   uptr = GetUser(1, onick, ouser, ohost);
   if (!uptr)
     return;
 
+ /* This checks if the user has the server operator status.  not the
+  * access is denied, no matter if the password is correct or not. -ddb */
+#ifdef IDENTIFOPER
+  if (operpwmatch(uptr->password, av[1]) && (lptr->umodes & UMODE_O))
+#else
   if (operpwmatch(uptr->password, av[1]))
-  {
-    struct DccUser *dccptr;
+#endif
+    {
+      struct DccUser *dccptr;
 
-    os_notice(lptr, sockfd, "You are now identified");
-    if (lptr)
-      lptr->flags |= L_OSREGISTERED;
+      os_notice(lptr, sockfd, "You are now identified");
+      if (lptr)
+        lptr->flags |= L_OSREGISTERED;
 
-    if ((dccptr = IsDccSock(sockfd)))
-      ClearDccPending(dccptr);
+      if ((dccptr = IsDccSock(sockfd)))
+        ClearDccPending(dccptr);
 
-    o_RecordCommand(sockfd,
-      "IDENTIFY");
-  }
-  else 
-  {
-    /* Be more verbose. -kre */
-    os_notice(lptr, sockfd, "Access Denied - wrong password");
+      o_RecordCommand(sockfd,
+                      "IDENTIFY");
+    }
+  else
+    {
+#ifdef IDENTIFOPER
+      os_notice(lptr, sockfd, "Access Denied");
+#else
+      /* Be more verbose. -kre */
+      os_notice(lptr, sockfd, "Access Denied - wrong password");
+#endif
 
-    o_RecordCommand(sockfd,
-      "failed IDENTIFY");
-  }
+      o_RecordCommand(sockfd,
+                      "failed IDENTIFY");
+    }
 } /* o_identify() */
 
 /*
@@ -1018,23 +1151,23 @@ o_rehash(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   if (Rehash() == 0)
-  {
-    os_notice(lptr, sockfd, "Rehash complete");
+    {
+      os_notice(lptr, sockfd, "Rehash complete");
 
-    o_RecordCommand(sockfd,
-      "REHASH");
+      o_RecordCommand(sockfd,
+                      "REHASH");
 
-    o_Wallops("REHASH");
-  }
+      o_Wallops("REHASH");
+    }
   else
-  {
-    os_notice(lptr, sockfd, "Rehash failed");
+    {
+      os_notice(lptr, sockfd, "Rehash failed");
 
-    o_RecordCommand(sockfd,
-      "REHASH (failed)");
+      o_RecordCommand(sockfd,
+                      "REHASH (failed)");
 
-    o_Wallops("REHASH (failed)");
-  }
+      o_Wallops("REHASH (failed)");
+    }
 } /* o_rehash() */
 
 /*
@@ -1042,20 +1175,24 @@ o_restart()
   Restart services
 */
 
-static void
-o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
-
+static void o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
 {
-  o_RecordCommand(sockfd,
-    "RESTART");
+  o_RecordCommand(sockfd, "RESTART");
 
   o_Wallops("RESTART");
- 
+
+  /* As found in Hyb6...this is needed to avoid breaking RESTART */
+  unlink(PidFile);
+
   /* Reinitialise all connections and memory */
   ServReboot();
 
   /* And cycle it. It seems that this was missing -kre */
-  CycleServers();
+  /* CycleServers(); */
+
+  /* Real restart -kre */
+  execvp(myargv[0], myargv);
+  
 } /* o_restart() */
 
 #ifdef ALLOW_DIE
@@ -1076,14 +1213,14 @@ o_die(struct Luser *lptr, int ac, char **av, int sockfd)
   else
     reason = GetString(ac - 1, av + 1);
 
-  o_RecordCommand(sockfd,
-    "DIE [%s]",
-    reason);
+  o_RecordCommand(sockfd, "DIE [%s]", reason);
 
-  o_Wallops("DIE [%s]",
-    reason);
+  o_Wallops("DIE [%s]", reason);
 
   os_notice(lptr, sockfd, "Shutting down");
+
+  /* -Joshua */
+  unlink (PidFile);
 
   DoShutdown(onick, reason);
 } /* o_die() */
@@ -1104,31 +1241,43 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   struct rusage rus;
 
   o_RecordCommand(sockfd,
-    "STATUS");
+                  "STATUS");
 
 #if defined(NICKSERVICES) || defined(STATSERVICES)
+
   os_notice(lptr, sockfd, "Expire settings");
 
 #ifdef NICKSERVICES
 
-  #ifdef CHANNELSERVICES
-    os_notice(lptr, sockfd, "            Channels: \002%s\002",
-      timeago(ChannelExpire, 3));
-  #endif
+#ifdef CHANNELSERVICES
+
+  os_notice(lptr, sockfd, "            Channels: \002%s\002",
+            timeago(ChannelExpire, 3));
+#endif
 
   os_notice(lptr, sockfd, "           Nicknames: \002%s\002",
-    timeago(NickNameExpire, 3));
+            timeago(NickNameExpire, 3));
 
-  #ifdef MEMOSERVICES
-    os_notice(lptr, sockfd, "               Memos: \002%s\002",
-      timeago(MemoExpire, 3));
-  #endif
+#ifdef MEMOSERVICES
+
+  os_notice(lptr, sockfd, "               Memos: \002%s\002",
+            timeago(MemoExpire, 3));
+#endif
+
+#if defined CHANNELSERVICES && defined GECOSBANS
+
+  if (BanExpire)
+    os_notice(lptr, sockfd, "                Bans: \002%s\002",
+  timeago(BanExpire, 3));
+
+#endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   os_notice(lptr, sockfd, "       StatServ data: \002%s\002",
-    timeago(StatExpire, 3));
+            timeago(StatExpire, 3));
 #endif
 
   os_notice(lptr, sockfd, "\002\002");
@@ -1140,17 +1289,18 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   os_notice(lptr, sockfd, "Databases");
 
   os_notice(lptr, sockfd, "       Save interval: \002%s\002",
-    timeago(DatabaseSync, 3));
+            timeago(DatabaseSync, 3));
 
   os_notice(lptr, sockfd, "           Next save: \002%s\002",
-    timeago((DatabaseSync - (time(NULL) % DatabaseSync)), 3));
+            timeago((DatabaseSync - (current_ts % DatabaseSync)), 3));
 
   os_notice(lptr, sockfd, " Password encryption: \002%s\002",
-  #ifdef CRYPT_PASSWORDS
-    "on");
-  #else
-    "off");
-  #endif
+#ifdef CRYPT_PASSWORDS
+            "on");
+#else
+            "off"
+           );
+#endif
 
   os_notice(lptr, sockfd, "\002\002");
 
@@ -1159,108 +1309,112 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   os_notice(lptr, sockfd, "Security settings");
 
   os_notice(lptr, sockfd, "  O: line encryption: \002%s\002",
-  #ifdef CRYPT_OPER_PASSWORDS
-    "on");
-  #else
-    "off");
-  #endif
+#ifdef CRYPT_OPER_PASSWORDS
+            "on");
+#else
+            "off");
+#endif
 
   os_notice(lptr, sockfd, "    Flood Protection: \002%s\002",
-    (FloodProtection) ? "on" : "off");
+            (FloodProtection) ? "on" : "off");
 
   if (FloodProtection)
-  {
-    os_notice(lptr, sockfd, "       Flood trigger: \002%d\002 messages in \002%s\002",
-      FloodCount,
-      timeago(FloodTime, 3));
+    {
+      os_notice(lptr, sockfd, "       Flood trigger: \002%d\002 messages in \002%s\002",
+                FloodCount,
+                timeago(FloodTime, 3))
+      ;
 
-    os_notice(lptr, sockfd, "         Ignore time: \002%s\002",
-      timeago(IgnoreTime, 3));
-  
-    os_notice(lptr, sockfd, "    Permanent Ignore: \002%d\002 offenses",
-      IgnoreOffenses);
-  }
+      os_notice(lptr, sockfd, "         Ignore time: \002%s\002",
+                timeago(IgnoreTime, 3));
+
+      os_notice(lptr, sockfd, "    Permanent Ignore: \002%d\002 offenses",
+                IgnoreOffenses);
+    }
 
 #ifdef NICKSERVICES
 
-  #ifdef CHANNELSERVICES
-    os_notice(lptr, sockfd, "   Maximum AutoKicks: \002%d\002 per channel",
-      MaxAkicks);
-  #endif
+#ifdef CHANNELSERVICES
+  os_notice(lptr, sockfd, "   Maximum AutoKicks: \002%d\002 per channel",
+            MaxAkicks);
+#endif
 
   os_notice(lptr, sockfd, "  Nicknames held for: \002%s\002",
-    timeago(NSReleaseTimeout, 3));
+            timeago(NSReleaseTimeout, 3));
 
 #endif /* NICKSERVICES */
 
   if (MaxClones)
-  {
-    os_notice(lptr, sockfd, "      Maximum clones: \002%d\002 (autokill: \002%s\002)",
-      MaxClones,
-      (AutoKillClones) ? "on" : "off");
-  } /* if (MaxClones) */
+    {
+      os_notice(lptr, sockfd, "      Maximum clones: \002%d\002 (autokill: \002%s\002)",
+                MaxClones,
+                (AutoKillClones) ? "on" : "off")
+      ;
+    } /* if (MaxClones) */
 
   os_notice(lptr, sockfd, "   High-Traffic Mode: \002%s\002",
-  #ifdef HIGHTRAFFIC_MODE
-    (HTM == 1) ? "on" : "off");
-  #else
-    "disabled");
-  #endif
+#ifdef HIGHTRAFFIC_MODE
+            (HTM == 1) ? "on" : "off");
+#else
+            "disabled");
+#endif
 
   os_notice(lptr, sockfd, "   Restricted Access: \002%s\002",
-    (RestrictedAccess) ? "on" : "off");
+            (RestrictedAccess) ? "on" : "off");
 
   os_notice(lptr, sockfd, "\002\002");
   os_notice(lptr, sockfd, "General Status");
 
   /* Returns -1 on failure, but _not_ 0 on success! -kre */
   if (uname(&un) != -1)
-  {
-    os_notice(lptr, sockfd, "          Running on: \002%s %s\002",
-      un.sysname,
-      un.release);
-  }
+    {
+      os_notice(lptr, sockfd, "          Running on: \002%s %s\002",
+                un.sysname,
+                un.release)
+      ;
+    }
   else
     os_notice(lptr, sockfd, "          Running on: \002*unknown*\002");
 
-  mem = CalcMem((char *) NULL, NODCC);
+  mem = CalcMem(NULL, NODCC);
   os_notice(lptr, sockfd, "        Memory Usage: \002%0.2f\002 kb (\002%0.2f\002 mb)",
-    mem / 1024,
-    (mem / 1024) / 1024);
+            mem / 1024,
+            (mem / 1024) / 1024);
 
   if (getrusage(RUSAGE_SELF, &rus) == -1)
     putlog(LOG1, "o_status: getrusage() error: %s",
-      strerror(errno));
+           strerror(errno));
   else
-  {
-    time_t seconds;
+    {
+      time_t seconds;
 
-    seconds = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;
-    if (seconds == 0)
-      seconds = 1;
-    os_notice(lptr, sockfd, "            Cpu Time: \002%02d:%02d\002 (mins:secs)",
-      seconds / 60,
-      seconds % 60);
-  }
+      seconds = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;
+      if (seconds == 0)
+        seconds = 1;
+      os_notice(lptr, sockfd, "            Cpu Time: \002%02d:%02d\002 (mins:secs)",
+                seconds / 60,
+                seconds % 60);
+    }
 
   if (HubSock != NOSOCKET)
-  {
-    os_notice(lptr, sockfd, "         Current Hub: \002%s\002 (connected for [\002%s\002])",
-      currenthub->realname ? currenthub->realname : currenthub->hostname,
-      timeago(currenthub->connect_ts, 0));
-  }
+    {
+      os_notice(lptr, sockfd, "         Current Hub: \002%s\002 (connected for [\002%s\002])",
+                currenthub->realname ? currenthub->realname : currenthub->hostname,
+                timeago(currenthub->connect_ts, 0))
+      ;
+    }
   else
     os_notice(lptr, sockfd, "         Current Hub: \002none\002");
 
   os_notice(lptr, sockfd, "Hub Connect Interval: \002%s\002",
-    timeago(ConnectFrequency, 3));
+            timeago(ConnectFrequency, 3));
 
   if (AutoLinkFreq)
     os_notice(lptr, sockfd, "   Tcm Link Interval: \002%s\002",
-      timeago(AutoLinkFreq, 3));
+              timeago(AutoLinkFreq, 3));
 
   os_notice(lptr, sockfd,   "         Compiled at: \002%s\002, \002%s\002", __DATE__,
-		  __TIME__);
+            __TIME__);
 } /* o_status() */
 
 /*
@@ -1275,31 +1429,32 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
   char *reason;
   int ii;
   struct Luser *kptr;
+  struct Userlist *tempuser = NULL;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002KILL <nick> [reason]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002KILL <nick> [reason]\002");
+      return;
+    }
 
   kptr = FindClient(av[1]);
 
   if (!kptr)
-  {
-    os_notice(lptr, sockfd,
-      "No such user: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "No such user: %s",
+                av[1]);
+      return;
+    }
 
   if (FindService(kptr))
-  {
-    os_notice(lptr, sockfd, "%s!%s@%s is a Service",
-      kptr->nick,
-      kptr->username,
-      kptr->hostname);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "%s!%s@%s is a Service",
+                kptr->nick,
+                kptr->username,
+                kptr->hostname);
+      return;
+    }
 
   if (ac < 3)
     reason = MyStrdup("");
@@ -1312,48 +1467,36 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
     ii = 0;
 
   /* Check if the user has an exception flag */
-  if (IsProtected(GetUser(ii, kptr->nick, kptr->username, kptr->hostname)))
-  {
-    /* The user is protected */
-    os_notice(lptr, sockfd, "%s!%s@%s is protected", 
-      kptr->nick,
-      kptr->username,
-      kptr->hostname);
+  tempuser = GetUser(ii, kptr->nick, kptr->username, kptr->hostname);
+  if (IsProtected(tempuser))
+    {
+      /* The user is protected */
+      os_notice(lptr, sockfd, "%s!%s@%s is protected",
+                kptr->nick, kptr->username, kptr->hostname);
 
-    putlog(LOG2,
-      "%s!%s@%s attempted to KILL protected user %s [%s]",
-      onick,
-      ouser,
-      ohost,
-      av[1],
-      reason);
+      putlog(LOG2,
+             "%s!%s@%s attempted to KILL protected user %s [%s]",
+             onick, ouser, ohost, av[1], reason);
 
-    MyFree(reason);
-    return;
-  }
+      MyFree(reason);
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "KILL %s [%s]",
-    kptr->nick,
-    reason);
+                  "KILL %s [%s]",
+                  kptr->nick,
+                  reason);
 
-  o_Wallops("KILL %s [%s]",
-    kptr->nick,
-    reason);
+  o_Wallops("KILL %s [%s]", kptr->nick, reason);
 
-  toserv(":%s KILL %s :%s!%s (%s (Requested by %s))\n",
-    n_OperServ,
-    av[1],
-    Me.name,
-    n_OperServ,
-    reason,
-    onick);
+  toserv(":%s KILL %s :%s!%s (%s (Requested by %s))\r\n",
+         n_OperServ, av[1], Me.name, n_OperServ, reason, onick);
 
   /* remove the killed nick from list */
   DeleteClient(kptr);
 
   os_notice(lptr, sockfd,
-    "%s has been killed [%s]", av[1], reason);
+            "%s has been killed [%s]", av[1], reason);
 
   MyFree(reason);
 
@@ -1362,6 +1505,7 @@ o_kill(struct Luser *lptr, int ac, char **av, int sockfd)
 
   Network->TotalOperKills++;
 #ifdef STATSERVICES
+
   if (Network->TotalOperKills > Network->OperKillsT)
     Network->OperKillsT = Network->TotalOperKills;
 #endif
@@ -1383,86 +1527,86 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
   char sendstr[MAXLINE], whostr[MAXLINE], **arv;
   struct Jupe *tempjupe;
   FILE *fp;
-  int ii,
-      nickjupe = 1;
+  unsigned int ii;
+  int nickjupe = 1;
   struct tm *jupe_tm;
   time_t CurrTime;
   struct Luser *jptr;
   int bogusnick,
-      bogusserv;
+  bogusserv;
   int dots;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002JUPE <server/nick> [reason]\002");
-    return;  
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002JUPE <server/nick> [reason]\002");
+      return;
+    }
 
   /*
    * Make sure we don't jupe our hub server
    * (thanks good!)
    */
   if (currenthub && currenthub->realname)
-  {
-    if (match(av[1], currenthub->realname))
     {
-      os_notice(lptr, sockfd,
-        "[\002%s\002] matches services' current hub server, cancelling jupe",
-        av[1]);
-      return;
+      if (match(av[1], currenthub->realname))
+        {
+          os_notice(lptr, sockfd,
+                    "[\002%s\002] matches services' current hub server, cancelling jupe",
+                    av[1]);
+          return;
+        }
     }
-  }
 
   bogusserv = 0;
   bogusnick = 0;
   dots = 0;
 
   for (ii = 0; ii < strlen(av[1]); ++ii)
-  {
-    if (IsWildChar(av[1][ii]))
-      nickjupe = 0;
+    {
+      if (IsKWildChar(av[1][ii]))
+        nickjupe = 0;
 
-    if (!IsServChar(av[1][ii]))
-      bogusserv = 1;
+      if (!IsServChar(av[1][ii]))
+        bogusserv = 1;
 
-    if (!IsNickChar(av[1][ii]))
-      bogusnick = 1;
+      if (!IsNickChar(av[1][ii]))
+        bogusnick = 1;
 
-    /*
-     * A server jupe must have at least 1 dot (".").
-     */
-    if (av[1][ii] == '.')
-      ++dots;
-  }
+      /*
+       * A server jupe must have at least 1 dot (".").
+       */
+      if (av[1][ii] == '.')
+        ++dots;
+    }
 
   if (nickjupe && bogusnick)
-  {
-    os_notice(lptr, sockfd,
-      "Invalid nickname: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Invalid nickname: %s",
+                av[1]);
+      return;
+    }
   else if (!nickjupe && (bogusserv || !dots))
-  {
-    os_notice(lptr, sockfd,
-      "Invalid server: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Invalid server: %s",
+                av[1]);
+      return;
+    }
 
   /* Check if jupe already exists */
   for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
-  {
-    if (match(av[1], tempjupe->name))
     {
-      os_notice(lptr, sockfd,
-        "A jupe already exists for %s [%s]",
-        tempjupe->name,
-        tempjupe->reason);
-      return;
+      if (match(av[1], tempjupe->name))
+        {
+          os_notice(lptr, sockfd,
+                    "A jupe already exists for %s [%s]",
+                    tempjupe->name,
+                    tempjupe->reason);
+          return;
+        }
     }
-  }
 
   if (JupeFile)
     fp = fopen(JupeFile, "a+");
@@ -1470,10 +1614,10 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
     fp = fopen(ConfigFile, "a+");
 
   if (!fp)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
 
 #ifdef JUPEVOTES
   if (!nickjupe)
@@ -1502,23 +1646,20 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 #endif
 
   if (ac < 3)
-  {
-    if (nickjupe)
-      reason = MyStrdup("Jupitered Nick");
-    else
-      reason = MyStrdup("Jupitered Server");
-  }
+    {
+      if (nickjupe)
+        reason = MyStrdup("Jupitered Nick");
+      else
+        reason = MyStrdup("Jupitered Server");
+    }
   else
     reason = GetString(ac - 2, av + 2);
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   jupe_tm = localtime(&CurrTime);
-  sprintf(whostr, "%d/%02d/%02d %s@%s",
-    1900 + jupe_tm->tm_year,
-    jupe_tm->tm_mon + 1,
-    jupe_tm->tm_mday,
-    onick,
-    n_OperServ);
+  ircsprintf(whostr, "%d/%02d/%02d %s@%s",
+             1900 + jupe_tm->tm_year, jupe_tm->tm_mon + 1, jupe_tm->tm_mday,
+             onick, n_OperServ);
 
   fprintf(fp, "J:%s:%s:%s\n", av[1], reason, whostr);
   fclose(fp);
@@ -1526,57 +1667,59 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
   AddJupe(av[1], reason, whostr); /* add jupe to list */
 
   os_notice(lptr, sockfd,
-    "Jupe for %s [%s] has been successfully added to config file",
-    av[1],
-    reason);
+            "Jupe for %s [%s] has been successfully added to config file",
+            av[1],
+            reason);
 
   o_RecordCommand(sockfd,
-    "JUPE %s [%s]",
-    av[1],
-    reason);
+                  "JUPE %s [%s]",
+                  av[1],
+                  reason);
 
-  o_Wallops("JUPE %s [%s]",
-    av[1],
-    reason);
+  o_Wallops("JUPE %s by %s [%s]",
+            av[1],
+            onick,
+            reason);
 
   if (!nickjupe)
     DoJupeSquit(av[1], reason, whostr);
   else
-  {
-    if ((jptr = FindClient(av[1])))
     {
-      /* kill the juped nick */
-      toserv(":%s KILL %s :%s!%s (%s)\n",
-        n_OperServ,
-        av[1],
-        Me.name,
-        n_OperServ,
-        reason);
-      DeleteClient(jptr);
+      if ((jptr = FindClient(av[1])))
+        {
+          /* kill the juped nick */
+          toserv(":%s KILL %s :%s!%s (%s)\r\n",
+                 n_OperServ, av[1], Me.name, n_OperServ, reason);
+          DeleteClient(jptr);
 
-      if (Me.sptr)
-        ++Me.sptr->numoperkills;
+          if (Me.sptr)
+            ++Me.sptr->numoperkills;
 
-      ++Network->TotalOperKills;
+          ++Network->TotalOperKills;
 
-    #ifdef STATSERVICES
-      if (Network->TotalOperKills > Network->OperKillsT)
-        Network->OperKillsT = Network->TotalOperKills;
-    #endif
-    } /* if ((jptr = FindClient(av[1]))) */
+#ifdef STATSERVICES
 
-    /* replace nick with a fake user */
-    sprintf(sendstr,
-      "NICK %s 1 %ld +i juped juped.com %s :%s\n",
-      av[1],
-      (long) CurrTime,
-      Me.name,
-      reason);
-    toserv(sendstr);
-    SplitBuf(sendstr, &arv);
-    AddClient(arv);
-  } /* else */
-  
+          if (Network->TotalOperKills > Network->OperKillsT)
+            Network->OperKillsT = Network->TotalOperKills;
+#endif
+
+        } /* if ((jptr = FindClient(av[1]))) */
+
+      /* replace nick with a fake user */
+#ifdef DANCER
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s %lu :%s\r\n", av[1],
+          (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+          0xffffffffUL, reason);
+#else
+      ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
+         av[1], (long) CurrTime, JUPED_USERNAME, JUPED_HOSTNAME, Me.name,
+         reason);
+#endif /* DANCER */
+      toserv("%s", sendstr);
+      SplitBuf(sendstr, &arv);
+      AddClient(arv);
+    } /* else */
+
   MyFree(reason);
 } /* o_jupe() */
 
@@ -1604,17 +1747,18 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
   FILE *fp;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002UNJUPE <server>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002UNJUPE <server>\002");
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "UNJUPE %s",
-    av[1]);
+                  "UNJUPE %s",
+                  av[1]);
 
-  o_Wallops("UNJUPE %s",
-    av[1]);
+  o_Wallops("UNJUPE %s by %s",
+            av[1],
+            onick);
 
   /* remove J: line from config file */
   if (JupeFile)
@@ -1623,81 +1767,84 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
     configname = ConfigFile;
 
   if ((configfp = fopen(configname, "r")) == NULL)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
 
-  sprintf(tmpfile, "%s.tmp",
-    configname);
+  ircsprintf(tmpfile, "%s.tmp", configname);
 
-  fp = fopen(tmpfile, "w"); 
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
+
   jcnt = 0;
   while (fgets(line, MAXLINE - 1, configfp))
-  {
-    strcpy(linetemp, line);
-    key = strtok(line, ":");
-    if ((*key == 'J') || (*key == 'j'))
     {
-      jhost = strtok((char *) NULL, ":"); 
-      if (match(av[1], jhost) == 0)
-        fputs(linetemp, fp);
+      strcpy(linetemp, line);
+      key = strtok(line, ":");
+      if ((*key == 'J') || (*key == 'j'))
+        {
+          jhost = strtok(NULL, ":");
+          if (match(av[1], jhost) == 0)
+            fputs(linetemp, fp);
+          else
+            ++jcnt;
+        }
       else
-        ++jcnt;
-    }
-    else
-      fputs(linetemp, fp);
-  } /* while () */
+        fputs(linetemp, fp);
+    } /* while () */
   fclose(configfp);
   fclose(fp);
 
   rename(tmpfile, configname);
 
   if (jcnt == 0)
-  {
-    os_notice(lptr, sockfd, "No jupes matching [%s] found", 
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No jupes matching [%s] found",
+                av[1]);
+      return;
+    }
 
   for (tempjupe = JupeList; tempjupe; )
-  {
-    if (match(av[1], tempjupe->name))
     {
-      if (tempjupe->isnick)
-      {
-        struct Luser *tempuser;
-        
-        /* if theres a psuedo client holding the nick, kill it */
-        if ((tempuser = FindClient(tempjupe->name)))
+      if (match(av[1], tempjupe->name))
         {
-          toserv(":%s QUIT :UnJuped\n",
-            tempuser->nick);
-          DeleteClient(tempuser);
-        }
-      }
+          if (tempjupe->isnick)
+            {
+              struct Luser *tempuser;
+
+              /* if theres a pseudo client holding the nick, kill it */
+              if ((tempuser = FindClient(tempjupe->name)))
+                {
+                  toserv(":%s QUIT :UnJuped\r\n", tempuser->nick);
+                  DeleteClient(tempuser);
+                }
+            }
+          else
+            {
+              /*
+               * squit all pseudo servers we created while they were juped
+               */
+              do_squit(tempjupe->name, "UnJuped");
+            }
+
+          next = tempjupe->next;
+
+          DeleteJupe(tempjupe); /* remove jupe from list */
+
+          tempjupe = next;
+        } /* if (match(av[1], tempjupe->name)) */
       else
-      {
-        /*
-         * squit all psuedo servers we created while they were juped
-         */
-        do_squit(tempjupe->name, "UnJuped");
-      }
-
-      next = tempjupe->next;
-
-      DeleteJupe(tempjupe); /* remove jupe from list */
-
-      tempjupe = next;
-    } /* if (match(av[1], tempjupe->name)) */
-    else
-      tempjupe = tempjupe->next;
-  }
+        tempjupe = tempjupe->next;
+    }
 
   os_notice(lptr, sockfd,
-    "Jupes matching [%s] removed (%d matches)", 
-    av[1], 
-    jcnt);
+            "Jupes matching [%s] removed (%d matches)",
+            av[1],
+            jcnt);
 } /* o_unjupe() */
 
 #endif /* ALLOW_JUPES */
@@ -1714,31 +1861,27 @@ o_omode(struct Luser *lptr, int ac, char **av, int sockfd)
   char *omodes;
   struct Channel *chptr;
 
-  if (ac < 3) 
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002OMODE <#channel> <modes>\002");
-    return;
-  }
+  if (ac < 3)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002OMODE <#channel> <modes>\002");
+      return;
+    }
 
   omodes = GetString(ac - 2, av + 2);
 
   o_RecordCommand(sockfd,
-    "OMODE %s %s",
-    av[1],
-    omodes);
+                  "OMODE from %s - %s %s",
+                  lptr->nick, av[1], omodes);
 
-  o_Wallops("OMODE %s %s",
-    av[1],
-    omodes);
+  o_Wallops("OMODE from %s - %s %s",
+            lptr->nick, av[1], omodes);
 
   if (!(chptr = FindChannel(av[1])))
-  {
-    os_notice(lptr, sockfd,
-      "No such channel: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No such channel: %s", av[1]);
+      return;
+    }
 
   /* set the modes */
   DoMode(chptr, omodes, 1);
@@ -1759,28 +1902,25 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Channel *cptr;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002SECURE <#channel>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002SECURE <#channel>\002");
+      return;
+    }
 
-  o_RecordCommand(sockfd,
-    "SECURE %s",
-    av[1]);
+  o_RecordCommand(sockfd, "SECURE %s", av[1]);
 
-  o_Wallops("SECURE %s",
-    av[1]);
+  o_Wallops("SECURE %s", av[1]);
 
   cptr = FindChannel(av[1]);
   if (cptr)
-  {
-    TakeOver(cptr);
-    os_notice(lptr, sockfd, "%s has been secured",
-      cptr->name);
-  }
+    {
+      TakeOver(cptr);
+      os_notice(lptr, sockfd, "%s has been secured",
+                cptr->name);
+    }
   else
     os_notice(lptr, sockfd, "No such channel: %s",
-      av[1]);
+              av[1]);
 } /* o_secure() */
 
 #ifdef ALLOW_GLINES
@@ -1798,7 +1938,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   char whostr[MAXLINE];
   char *reason, *hostmask;
   char *username,
-       *hostname;
+  *hostname;
   int ii, charcnt, sidx;
   FILE *fp;
   struct Luser *user, *prev;
@@ -1809,229 +1949,212 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
   char uhost[UHOSTLEN + 2];
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002GLINE [time] <user@host> [reason]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002GLINE [time] <user@host> [reason]\002");
+      return;
+    }
 
   /* It _has_ to be ac counter check here - if not, and time not specified
    * OperServ will crash instantly, trying to gline probably wrong stuff
    * from av[2] if _any_ digit is present in av[1] since timestr will then
    * return non-zero value. Also, it is necessary to check if `@' is
    * contained in av[2] -kre */
-  expires=timestr(av[1]);
-  if ((strchr(av[1], '@')==NULL) && (ac>2) && expires)
-  {
-    sidx = 3;
-    hostmask = av[2];
-  }
+  expires = timestr(av[1]);
+  if ((strchr(av[1], '@') == NULL) && (ac > 2) && expires)
+    {
+      if (expires < 0)
+      {
+        os_notice(lptr, sockfd,
+            "Expire time was too big, the gline is now permanent!");
+        expires = 0;
+      }              
+      sidx = 3;
+      hostmask = av[2];
+    }
   else
-  {
-    sidx = 2;
-    hostmask = av[1];
-  }
+    {
+      sidx = 2;
+      hostmask = av[1];
+    }
 
   if (NonStarChars)
-  {
-    /* Check if a valid user@host was given */
-    charcnt = 0;
-    for (ii = strlen(hostmask) - 1; ii > 0; ii--)
     {
-      if (IsWildChar(hostmask[ii]))
-        continue;
+      /* Check if a valid user@host was given */
+      charcnt = 0;
+      for (ii = strlen(hostmask) - 1; ii > 0; ii--)
+        {
+          if (IsKWildChar(hostmask[ii]))
+            continue;
 
-      charcnt++;
-    }
+          charcnt++;
+        }
 
-    if (NonStarChars > charcnt)
-    {
-      os_notice(lptr, sockfd,
-        "[%s] is too general, please include at least %d non (*,?,@,.) characters",
-        hostmask,
-        NonStarChars);
-      return;
-    }
-  } /* if (NonStarChars) */
+      if (NonStarChars > charcnt)
+        {
+          os_notice(lptr, sockfd,
+                    "[%s] is too general, please include "
+                    "at least %d non (*,?,@,.) characters",
+                    hostmask, NonStarChars);
+          return;
+        }
+    } /* if (NonStarChars) */
 
   if (!(hostname = strchr(hostmask, '@')))
-  {
-    username = (char *) NULL;
-    hostname = hostmask;
-  }
+    {
+      username = NULL;
+      hostname = hostmask;
+    }
   else
-  {
-    username = hostmask;
-    *hostname++ = '\0';
-  }
+    {
+      username = hostmask;
+      *hostname++ = '\0';
+    }
 
   /* Check if hostmask matches an exception user */
   if (IsProtectedHost(username, hostname))
-  {
-    os_notice(lptr, sockfd, "%s@%s matches a protected host, unable to gline", 
-      username ? username : "*",
-      hostname);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "%s@%s matches a protected host, unable to gline",
+                username ? username : "*", hostname);
+      return;
+    }
 
   /* Check if gline already exists */
   if ((gptr = IsGline(username ? username : "*", hostname)))
-  {
-    os_notice(lptr, sockfd,
-      "Gline already exists for %s@%s [%s]", 
-      gptr->username,
-      gptr->hostname, 
-      gptr->reason);
-    return;  
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Gline already exists for %s@%s [%s]",
+                gptr->username, gptr->hostname, gptr->reason);
+      return;
+    }
 
   if (GlineFile)
     fp = fopen(GlineFile, "a+");
   else
     fp = fopen(ConfigFile, "a+");
 
-  if (fp == (FILE *) NULL)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+  if (fp == NULL)
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
 
   if (ac < (sidx + 1))
     reason = MyStrdup("");
   else
     reason = GetString(ac - sidx, av + sidx);
 
-  CurrTime = time(NULL);
+  CurrTime = current_ts;
   gline_tm = localtime(&CurrTime);
-  sprintf(whostr, "%d/%02d/%02d %s@%s",
-    1900 + gline_tm->tm_year,
-    gline_tm->tm_mon + 1,
-    gline_tm->tm_mday,
-    onick,
-    n_OperServ);
+  ircsprintf(whostr, "%d/%02d/%02d %s@%s",
+             1900 + gline_tm->tm_year, gline_tm->tm_mon + 1,
+             gline_tm->tm_mday, onick, n_OperServ);
 
   /* don't add temp glines to the config file */
   if (!expires)
     fprintf(fp, "G:%s@%s:%s:%s\n",
-      username ? username : "*",
-      hostname,
-      reason,
-      whostr);
+            username ? username : "*",
+            hostname, reason, whostr);
 
   fclose(fp);
 
-  sprintf(uhost, "%s@%s",
-    username ? username : "*",
-    hostname);
+  ircsprintf(uhost, "%s@%s", username ? username : "*", hostname);
 
   /* add gline to list */
   AddGline(uhost, reason, whostr, expires);
 
   if (!expires)
-  {
-    os_notice(lptr, sockfd, "Gline for %s@%s [%s] has been activated", 
-      username ? username : "*",
-      hostname,
-      reason);
-  }
+    {
+      os_notice(lptr, sockfd, "Gline for %s@%s [%s] has been activated",
+                username ? username : "*", hostname, reason);
+    }
   else
-  {
-    os_notice(lptr, sockfd,
-      "Temporary gline [%s] for %s@%s [%s] activated",
-      av[1],
-      username ? username : "*",
-      hostname,
-      reason);
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Temporary gline [%s] for %s@%s [%s] activated",
+                av[1], username ? username : "*", hostname, reason);
+    }
 
   if (!expires)
-  {
-    o_RecordCommand(sockfd,
-      "GLINE %s@%s [%s]",
-      username ? username : "*",
-      hostname,
-      reason);
+    {
+      o_RecordCommand(sockfd,
+        "GLINE from %s for %s@%s [%s]",
+         lptr->nick, username ? username : "*", hostname, reason);
 
-    o_Wallops("GLINE %s@%s [%s]",
-      username ? username : "*",
-      hostname,
-      reason);
-  }
+      o_Wallops("GLINE from %s for %s@%s [%s]",
+         lptr->nick, username ? username : "*", hostname, reason);
+    }
   else
-  {
-    o_RecordCommand(sockfd,
-      "GLINE %s@%s [%s] (%s)",
-      username ? username : "*",
-      hostname,
-      reason,
-      av[1]);
+    {
+      o_RecordCommand(sockfd,
+                      "GLINE from %s for %s@%s [%s] (%s)",
+                      lptr->nick, username ? username : "*", hostname, reason, av[1]);
 
-    o_Wallops("GLINE %s@%s [%s] (%s)",
-      username ? username : "*",
-      hostname,
-      reason,
-      av[1]);
-  }
+      o_Wallops("GLINE from %s for %s@%s [%s] (%s)",
+                lptr->nick, username ? username : "*", hostname, reason, av[1]);
+    }
 
   /* Check if any users on the network match the new gline */
-  prev = (struct Luser *) NULL;
+  prev = NULL;
   for (user = ClientList; user; )
-  {
-    if (user->server == Me.sptr)
     {
-      user = user->next;
-      continue;
-    }
+      if (user->server == Me.sptr)
+        {
+          user = user->next;
+          continue;
+        }
 
-    if (username)
-      if (!match(username, user->username))
-      {
+      if (username)
+        if (!match(username, user->username))
+          {
+            user = user->next;
+            continue;
+          }
+
+      if (match(hostname, user->hostname))
+        {
+          toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
+                 n_OperServ, user->nick, Me.name, n_OperServ, reason,
+                 whostr);
+
+          if (Me.sptr)
+            Me.sptr->numoperkills++;
+
+          Network->TotalOperKills++;
+#ifdef STATSERVICES
+
+          if (Network->TotalOperKills > Network->OperKillsT)
+            Network->OperKillsT = Network->TotalOperKills;
+#endif
+
+          if (prev)
+            {
+              DeleteClient(user);
+              user = prev;
+            }
+          else
+            {
+              DeleteClient(user);
+              user = NULL;
+            }
+        }
+
+      prev = user;
+
+      if (user)
         user = user->next;
-        continue;
-      }
-
-    if (match(hostname, user->hostname))
-    {
-      toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\n",
-        n_OperServ,
-        user->nick,
-        Me.name,
-        n_OperServ,
-        reason,
-        whostr);
-
-      if (Me.sptr)
-        Me.sptr->numoperkills++;
-
-      Network->TotalOperKills++;
-    #ifdef STATSERVICES
-      if (Network->TotalOperKills > Network->OperKillsT)
-        Network->OperKillsT = Network->TotalOperKills;
-    #endif
-
-      if (prev)
-      {
-        DeleteClient(user);
-        user = prev;
-      }
       else
-      {
-        DeleteClient(user);
-        user = (struct Luser *) NULL;
-      }
+        user = ClientList;
     }
-
-    prev = user;
-
-    if (user)
-      user = user->next;
-    else
-      user = ClientList;
-  }
 
 #ifdef HYBRID_GLINES
   ExecuteGline(username, hostname, reason);
 #endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+
+  Execute7Gline(username, hostname, reason, expires);
+#endif /* HYBRID7_GLINES */
 
   MyFree(reason);
 } /* o_gline() */
@@ -2053,7 +2176,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
   char *key;
   char *ghost;
   char *user,
-       *host;
+  *host;
   struct Gline *gptr, *next;
   FILE *configfp;
   /*
@@ -2063,86 +2186,105 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
   FILE *fp;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002UNGLINE <user@host>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002UNGLINE <user@host>\002");
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "UNGLINE %s",
-    av[1]);
+                  "UNGLINE %s",
+                  av[1]);
 
   o_Wallops("UNGLINE %s",
-    av[1]);
+            av[1]);
 
   strcpy(chkstr, av[1]);
   if (!(host = strchr(av[1], '@')))
-  {
-    user = NULL;
-    host = av[1];
-  }
+    {
+      user = NULL;
+      host = av[1];
+    }
   else
-  {
-    user = av[1];
-    *host++ = '\0';
-  }
+    {
+      user = av[1];
+      *host++ = '\0';
+    }
 
   gcnt = 0;
   for (gptr = GlineList; gptr; gptr = next)
-  {
-    next = gptr->next;
-
-    if (user && !match(user, gptr->username))
-      continue;
-
-    if (match(host, gptr->hostname))
     {
-      ++gcnt;
+      next = gptr->next;
 
-      /*
-       * remove gline from list
-       */
-      DeleteGline(gptr);
+      if (user && !match(user, gptr->username))
+        continue;
+
+      if (match(host, gptr->hostname))
+        {
+          ++gcnt;
+          os_notice(lptr, sockfd, "Deleted gline %s@%s", gptr->username,
+                    gptr->hostname);
+
+          /* This will work ONLY on Hybrid7. It removes K-Lines from other
+           * servers using remote UNKLINE command.
+           *
+           * You -need- appropriate shared{} block for Hybrid7 and
+           * m_unkline.so module that includes that feature (from CARNet
+           * IRC Network).  -bane
+           *
+           * Prototype: :%s UNKLINE * %s %s
+           *            :OperServ UNKLINE * user host
+           */
+
+#ifdef HYBRID7_UNKLINE
+           toserv(":%s UNKLINE %s %s %s\r\n", n_OperServ, "*",
+                  gptr->username, gptr->hostname);
+#endif
+          
+          /* remove gline from list */
+          DeleteGline(gptr);
+        }
     }
-  }
 
   if (gcnt == 0)
-  {
-    os_notice(lptr, sockfd,
-      "No glines matching %s found", 
-      chkstr);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "No glines matching %s found",
+                chkstr);
+      return;
+    }
 
   if (GlineFile)
     configname = GlineFile;
   else
     configname = ConfigFile;
 
-  if ((configfp = fopen(configname, "r")) == (FILE *) NULL)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+  if ((configfp = fopen(configname, "r")) == NULL)
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
 
-  sprintf(tmpfile, "%s.tmp",
-    configname);
+  ircsprintf(tmpfile, "%s.tmp", configname);
 
-  fp = fopen(tmpfile, "w"); 
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
 
   while (fgets(line, MAXLINE - 1, configfp))
-  {
-    strcpy(linetemp, line);
-    key = strtok(line, ":");
-    if ((*key == 'g') || (*key == 'G'))
     {
-      ghost = strtok(NULL, ":");
-      if (match(chkstr, ghost) == 0)
+      strcpy(linetemp, line);
+      key = strtok(line, ":");
+      if ((*key == 'g') || (*key == 'G'))
+        {
+          ghost = strtok(NULL, ":");
+          if (match(chkstr, ghost) == 0)
+            fputs(linetemp, fp);
+        }
+      else
         fputs(linetemp, fp);
-    }
-    else
-      fputs(linetemp, fp);
-  } /* while () */
+    } /* while () */
 
   fclose(configfp);
   fclose(fp);
@@ -2150,9 +2292,9 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
   rename(tmpfile, configname);
 
   os_notice(lptr, sockfd,
-    "Glines for %s removed [%d matches]", 
-    chkstr, 
-    gcnt);
+            "Glines for %s removed [%d matches]",
+            chkstr,
+            gcnt);
 } /* o_ungline() */
 
 #endif /* ALLOW_GLINES */
@@ -2167,39 +2309,39 @@ o_help(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   if (ac >= 2)
-  {
-    struct OperCommand *cptr;
-
-    for (cptr = opercmds; cptr->cmd; ++cptr)
-      if (!strcasecmp(av[1], cptr->cmd))
-        break;
-
-    if (cptr->cmd && cptr->flag)
     {
-      if (!CheckAccess(GetUser(1, onick, ouser, ohost), cptr->flag) || 
-          !IsRegistered(lptr, sockfd))
-      {
-        os_notice(lptr, sockfd,
-          ERR_NO_HELP,
-          av[1],
-          "");
-        return;
-      }
+      struct OperCommand *cptr;
+
+      for (cptr = opercmds; cptr->cmd; ++cptr)
+        if (!irccmp(av[1], cptr->cmd))
+          break;
+
+      if (cptr->cmd && cptr->flag)
+        {
+          if (!CheckAccess(GetUser(1, onick, ouser, ohost), cptr->flag) ||
+              !IsRegistered(lptr, sockfd))
+            {
+              os_notice(lptr, sockfd,
+                        ERR_NO_HELP,
+                        av[1],
+                        "");
+              return;
+            }
+        }
+
+      o_RecordCommand(sockfd,
+                      "HELP %s",
+                      av[1]);
+
+      GiveHelp(n_OperServ, lptr ? lptr->nick : NULL, av[1], sockfd);
     }
-
-    o_RecordCommand(sockfd,
-      "HELP %s",
-      av[1]);
-
-    GiveHelp(n_OperServ, lptr ? lptr->nick : NULL, av[1], sockfd);
-  }
   else
-  {
-    o_RecordCommand(sockfd,
-      "HELP");
+    {
+      o_RecordCommand(sockfd,
+                      "HELP");
 
-    GiveHelp(n_OperServ, lptr ? lptr->nick : NULL, NULL, sockfd);
-  }
+      GiveHelp(n_OperServ, lptr ? lptr->nick : NULL, NULL, sockfd);
+    }
 } /* o_help() */
 
 /*
@@ -2215,33 +2357,33 @@ o_join(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Chanlist *tempchan;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002JOIN <#channel>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002JOIN <#channel>\002");
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "JOIN %s",
-    av[1]);
+                  "JOIN %s",
+                  av[1]);
 
   if ((tempchan = IsChannel(av[1])))
-  {
-    os_notice(lptr, sockfd, "%s is already being monitored",
-      tempchan->name);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "%s is already being monitored",
+                tempchan->name);
+      return;
+    }
 
   AddMyChan(av[1]);
   os_join(FindChannel(av[1]));
 
-  os_notice(lptr, sockfd, "Now monitoring %s", 
-    av[1]);
+  os_notice(lptr, sockfd, "Now monitoring %s",
+            av[1]);
 
-  if ((fp = fopen(ConfigFile, "a")) == (FILE *) NULL)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+  if ((fp = fopen(ConfigFile, "a")) == NULL)
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
   fprintf(fp, "C:%s\n", av[1]);
   fclose(fp);
 } /* o_join() */
@@ -2264,24 +2406,24 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Channel *chptr;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002PART <#channel>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002PART <#channel>\002");
+      return;
+    }
 
   chanptr = IsChannel(av[1]);
   chptr = FindChannel(av[1]);
 
   if (!chanptr || !chptr)
-  {
-    os_notice(lptr, sockfd, "%s is not being monitored", 
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "%s is not being monitored",
+                av[1]);
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "PART %s",
-    chanptr->name);
+                  "PART %s",
+                  chanptr->name);
 
   os_part(chptr);
 
@@ -2292,72 +2434,75 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
   prev = NULL;
 
   for (tempchan = ChanList; tempchan; )
-  {
-    if (tempchan == chanptr)
     {
-      MyFree(tempchan->name);
+      if (tempchan == chanptr)
+        {
+          MyFree(tempchan->name);
 
-      if (prev)
-      {
-        prev->next = tempchan->next;
-        MyFree(tempchan);
-        tempchan = prev;
-      }
+          if (prev)
+            {
+              prev->next = tempchan->next;
+              MyFree(tempchan);
+              tempchan = prev;
+            }
+          else
+            {
+              ChanList = tempchan->next;
+              MyFree(tempchan);
+              tempchan = NULL;
+            }
+
+          Network->MyChans--;
+
+          /*
+           * There should be only one match, so break
+           */
+          break;
+        }
+
+      prev = tempchan;
+
+      if (tempchan)
+        tempchan = tempchan->next;
       else
-      {
-        ChanList = tempchan->next;
-        MyFree(tempchan);
-        tempchan = NULL;
-      }
-
-      Network->MyChans--;
-
-      /*
-       * There should be only one match, so break
-       */
-      break;
+        tempchan = ChanList;
     }
-
-    prev = tempchan;
-
-    if (tempchan)
-      tempchan = tempchan->next;
-    else
-      tempchan = ChanList;
-  }
 
   /* Remove channel from config file */
   if ((configfp = fopen(ConfigFile, "r")) == NULL)
-  {
-    os_notice(lptr, sockfd, "Unable to open config file");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Unable to open config file");
+      return;
+    }
 
-  sprintf(tmpfile, "%s.tmp",
-    ConfigFile);
-  fp = fopen(tmpfile, "w"); 
+  ircsprintf(tmpfile, "%s.tmp", ConfigFile);
+  if (!(fp = fopen(tmpfile, "w")))
+    {
+      os_notice(lptr, sockfd, "Unable to open temporary config file");
+      return;
+    }
 
   while (fgets(line, MAXLINE - 1, configfp))
-  {
-    strcpy(linetemp, line);
-    key = strtok(line, ":");
-    if ((strcmp(key, "c") == 0) || (strcmp(key, "C") == 0))
     {
-      ptemp = strtok((char *) NULL, "\r\n");
-      if (strncasecmp(ptemp, av[1], strlen(av[1])) != 0)
+      strcpy(linetemp, line);
+      key = strtok(line, ":");
+      if (!irccmp(key, "c"))
+        {
+          ptemp = strtok(NULL, "\r\n");
+          if (ircncmp(ptemp, av[1], strlen(av[1])) != 0)
+            fputs(linetemp, fp);
+        }
+      else
         fputs(linetemp, fp);
-    }
-    else
-      fputs(linetemp, fp);
-  } /* while () */
+    } /* while () */
 
   fclose(fp);
   fclose(configfp);
 
   rename(tmpfile, ConfigFile);
 
-  os_notice(lptr, sockfd, "No longer monitoring %s", 
-    av[1]);
+  os_notice(lptr, sockfd, "No longer monitoring %s",
+            av[1]);
 } /* o_part() */
 
 /*
@@ -2370,97 +2515,118 @@ o_clones(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   int ii,
-      doneset,
-      cnt,
-      clcnt;
-  struct Luser *tempuser;
+  doneset,
+  cnt,
+  clcnt,
+  maxclone;
+  struct Luser *tempuser, *tempuser2;
 
   o_RecordCommand(sockfd,
-    "CLONES");
+                  "CLONES");
 
   os_notice(lptr, sockfd, "-- Processing --");
 
   clcnt = 0;
   for (ii = 0; ii < HASHCLIENTS; ii++)
-  {
-    if (cloneTable[ii].list == (void *) NULL)
-      continue;
-
-    for (tempuser = cloneTable[ii].list; tempuser; tempuser = tempuser->cnext)
     {
-      /* we know there must be at least 1 user in the list */
-      if (tempuser->cnext)
+      if (cloneTable[ii].list == NULL)
+        continue;
+
+      for (tempuser = cloneTable[ii].list; tempuser; tempuser =
+          tempuser->cnext)
       {
-        if (!CloneMatch(tempuser, tempuser->cnext))
-          continue;
 
-        doneset = 0;
-
-        cnt = 1;
-        while (1)
+        /* If MaxClones is defined, check of there is enough clones */
+        if (MaxClones && MaxClones > 2)
         {
-          if (!doneset)
+          maxclone = 1;
+          /* cycle all clones */
+          for (tempuser2 = tempuser->cnext; tempuser2; tempuser2 =
+              tempuser2->cnext)
           {
-            /*
-             * Only print out the heading (user@hostname) once per
-             * batch of clones. The next time we get here,
-             * doneset will be 1, so we won't print out the
-             * heading again
-             */
-            os_notice(lptr, sockfd, "%s@%s",
-              tempuser->username[0] == '~' ? tempuser->username + 1 : tempuser->username,
-              tempuser->hostname);
-            os_notice(lptr, sockfd, "  %d) %-10s [%s]", 
-              cnt++, 
-              tempuser->nick, 
-              tempuser->server ? tempuser->server->name : "*unknown*");
-            doneset = 1;
-
-            ++clcnt;
-          } /* if (!doneset) */
-
-          os_notice(lptr, sockfd, "  %d) %-10s [%s]", 
-            cnt++, 
-            tempuser->cnext->nick, 
-            tempuser->cnext->server ? tempuser->cnext->server->name : "*unknown*");
-          
-          ++clcnt;
-
-          if (tempuser->cnext->cnext)
-          {
-            if (CloneMatch(tempuser->cnext, tempuser->cnext->cnext))
-            {
-              /*
-               * We have yet another clone, continue the loop
-               */
-              tempuser = tempuser->cnext;
-            }
+            if (CloneMatch(tempuser, tempuser2))
+              ++maxclone;
             else
-            {
-              /*
-               * All clones are grouped one after another. Since
-               * we found two clients that do not match, there
-               * can be no more possible clones of tempuser,
-               * break out of loop
-               */
-              break;
-            }
-          } /* if (tempuser->cnext->cnext) */
-          else
-          {
-            /*
-             * next user is NULL, break out of while loop
-             */
-            break;
+              if (maxclone < MaxClones)
+                continue;
           }
-        } /* while (1) */
-      } /* if (tempuser->cnext) */
-    } /* for (tempuser = cloneTable[ii].list; tempuser; tempuser = tempuser->cnext) */
-  } /* for (ii = 0; ii < HASHCLIENTS; ii++) */
+          if (maxclone < MaxClones)
+            continue;
+        }
+          
+          /* we know there must be at least 1 user in the list */
+          if (tempuser->cnext)
+            {
+              if (!CloneMatch(tempuser, tempuser->cnext))
+                continue;
+
+              doneset = 0;
+
+              cnt = 1;
+              while (1)
+                {
+                  if (!doneset)
+                    {
+                      /*
+                       * Only print out the heading (user@hostname) once per
+                       * batch of clones. The next time we get here,
+                       * doneset will be 1, so we won't print out the
+                       * heading again
+                       */
+                      os_notice(lptr, sockfd, "%s@%s",
+                                tempuser->username[0] == '~' ? tempuser->username + 1 : tempuser->username,
+                                tempuser->hostname);
+                      os_notice(lptr, sockfd, "  %d) %-10s [%s]",
+                                cnt++,
+                                tempuser->nick,
+                                tempuser->server ? tempuser->server->name : "*unknown*");
+                      doneset = 1;
+
+                      ++clcnt;
+                    } /* if (!doneset) */
+
+                  os_notice(lptr, sockfd, "  %d) %-10s [%s]",
+                            cnt++,
+                            tempuser->cnext->nick,
+                            tempuser->cnext->server ? tempuser->cnext->server->name : "*unknown*");
+
+                  ++clcnt;
+
+                  if (tempuser->cnext->cnext)
+                    {
+                      if (CloneMatch(tempuser->cnext, tempuser->cnext->cnext))
+                        {
+                          /*
+                           * We have yet another clone, continue the loop
+                           */
+                          tempuser = tempuser->cnext;
+                        }
+                      else
+                        {
+                          /*
+                           * All clones are grouped one after another. Since
+                           * we found two clients that do not match, there
+                           * can be no more possible clones of tempuser,
+                           * break out of loop
+                           */
+                          break;
+                        }
+                    } /* if (tempuser->cnext->cnext) */
+                  else
+                    {
+                      /*
+                       * next user is NULL, break out of while loop
+                       */
+                      break;
+                    }
+                } /* while (1) */
+            } /* if (tempuser->cnext) */
+        } /* for (tempuser = cloneTable[ii].list; tempuser; tempuser = tempuser->cnext) */
+    } /* for (ii = 0; ii < HASHCLIENTS; ii++) */
 
   os_notice(lptr, sockfd,
-    "-- End of list (%d total clones found) --",
-    clcnt);
+            "-- End of list (%d total clones found) --",
+            clcnt);
 } /* o_clones() */
 
 #ifdef ALLOW_FUCKOVER
@@ -2480,33 +2646,29 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Process *ftmp;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002FUCKOVER <nickname>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002FUCKOVER <nickname>\002");
+      return;
+    }
 
   fptr = FindClient(av[1]);
   if (!fptr)
-  {
-    os_notice(lptr, sockfd, "No such nick [%s]",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No such nick [%s]", av[1]);
+      return;
+    }
 
-  o_RecordCommand(sockfd,
-    "FUCKOVER %s",
-    fptr->nick);
+  o_RecordCommand(sockfd, "FUCKOVER %s", fptr->nick);
 
-  o_Wallops("FUCKOVER %s",
-    fptr->nick);
+  o_Wallops("FUCKOVER %s", fptr->nick); 
 
   if (fptr->server == Me.sptr)
-  {
-    os_notice(lptr, sockfd,
-      "[%s] is a psuedo nickname, canceling flood",
-      fptr->nick);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "[%s] is a pseudo nickname, canceling flood",
+                fptr->nick);
+      return;
+    }
 
   if (fptr->flags & L_OSREGISTERED)
     ii = 1;
@@ -2515,41 +2677,31 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
 
   /* Check if the user has an exception flag */
   if (IsProtected(GetUser(ii, fptr->nick, fptr->username, fptr->hostname)))
-  {
-    /* The user is protected */
-    os_notice(lptr, sockfd, "%s!%s@%s is protected", 
-      fptr->nick,
-      fptr->username,
-      fptr->hostname);
+    {
+      /* The user is protected */
+      os_notice(lptr, sockfd, "%s!%s@%s is protected",
+                fptr->nick, fptr->username, fptr->hostname);
 
-    putlog(LOG2, "%s!%s@%s attempted to FUCKOVER protected user %s",
-      onick,
-      ouser,
-      ohost,
-      fptr->nick);
+      putlog(LOG2, "%s!%s@%s attempted to FUCKOVER protected user %s",
+             onick, ouser, ohost, fptr->nick);
 
-    return;
-  }
+      return;
+    }
 
   /* check if av[1] is already being flooded */
   for (ftmp = fprocs; ftmp; ftmp = ftmp->next)
-  {
-    if (!strcasecmp(av[1], ftmp->target))
     {
-      os_notice(lptr, sockfd,
-        "Server flood already in progress for %s[%s@%s]",
-        fptr->nick,
-        fptr->username,
-        fptr->hostname);
-      return;
+      if (!irccmp(av[1], ftmp->target))
+        {
+          os_notice(lptr, sockfd,
+                    "Server flood already in progress for %s[%s@%s]",
+                    fptr->nick, fptr->username, fptr->hostname);
+          return;
+        }
     }
-  }
 
-  os_notice(lptr, sockfd,
-  	"Initiating flood for %s[%s@%s]",
-  	fptr->nick,
-  	fptr->username,
-  	fptr->hostname);
+  os_notice(lptr, sockfd, "Initiating flood for %s[%s@%s]",
+            fptr->nick, fptr->username, fptr->hostname);
 
   /*
    * start the flood
@@ -2557,10 +2709,8 @@ o_fuckover(struct Luser *lptr, int ac, char **av, int sockfd)
   InitFuckoverProcess(onick, fptr->nick);
 
   SendUmode(OPERUMODE_Y,
-    "*** Server flood activated for %s[%s@%s]", 
-    fptr->nick,
-    fptr->username,
-    fptr->hostname);
+            "*** Server flood activated for %s[%s@%s]",
+            fptr->nick, fptr->username, fptr->hostname);
 } /* o_fuckover() */
 
 /*
@@ -2580,70 +2730,68 @@ InitFuckoverProcess(char *from, char *ftarget)
 
   pid = fork();
   switch (pid)
-  {
-    case -1: return;
-
-    /* 
-     * Child: flood the target
-     */
-    case 0:
     {
-      time_t fstart, timecheck;
-      int ii, stop = 0;
+    case -1:
+      return;
 
-      fstart = time(NULL);
-      while (!stop)
+      /*
+       * Child: flood the target
+       */
+    case 0:
       {
-        for (ii = 200; ii < 512; ++ii)
-        {
-          /*
-           * Stop flood after 20 secs in case the client can handle
-           * it - not likely, unless the target's server has an
-           * enormous sendQ
-           */
-          timecheck = time(NULL);
-          if ((timecheck - fstart) > 20)
-          {
-            SendUmode(OPERUMODE_Y,
-              "*** Time limit expired, canceling flood on [%s]",
-              ftarget);
+        time_t fstart, timecheck;
+        int ii, stop = 0;
 
-            stop = 1;
-            break;
+        fstart = current_ts;
+        while (!stop)
+          {
+            for (ii = 200; ii < 512; ++ii)
+              {
+                /*
+                 * Stop flood after 20 secs in case the client can handle
+                 * it - not likely, unless the target's server has an
+                 * enormous sendQ
+                 */
+                timecheck = current_ts;
+                if ((timecheck - fstart) > 20)
+                  {
+                    SendUmode(OPERUMODE_Y,
+                              "*** Time limit expired, canceling flood on [%s]",
+                              ftarget);
+
+                    stop = 1;
+                    break;
+                  }
+
+                /* send null string to target */
+                toserv(":%s %d %s :\r\n", Me.name, ii, ftarget);
+              }
           }
 
-          /* send null string to target */
-          toserv(":%s %d %s :\n", 
-            Me.name,
-            ii,
-            ftarget);
-        }
-      }
+        exit(EXIT_FAILURE);
+        break;
+      } /* case 0: */
 
-      exit(-1);
-      break;
-    } /* case 0: */
-
-    /* 
-     * Parent: add sub-process to fprocs list
-     */
+      /*
+       * Parent: add sub-process to fprocs list
+       */
     default:
-    {
-      struct Process *newproc;
+      {
+        struct Process *newproc;
 
-      newproc = (struct Process *) MyMalloc(sizeof(struct Process));
-      memset(newproc, 0, sizeof(struct Process));
+        newproc = (struct Process *) MyMalloc(sizeof(struct Process));
+        memset(newproc, 0, sizeof(struct Process));
 
-      newproc->who = MyStrdup(from);
-      newproc->target = MyStrdup(ftarget);
-      newproc->pid = pid;
+        newproc->who = MyStrdup(from);
+        newproc->target = MyStrdup(ftarget);
+        newproc->pid = pid;
 
-      newproc->next = fprocs;
-      fprocs = newproc;
+        newproc->next = fprocs;
+        fprocs = newproc;
 
-      break;
-    }
-  } /* switch (pid) */
+        break;
+      }
+    } /* switch (pid) */
 } /* InitFuckoverProcess() */
 
 /*
@@ -2665,53 +2813,53 @@ CheckFuckoverTarget(struct Luser *fptr, char *newnick)
 
   prev = NULL;
   for (ftmp = fprocs; ftmp; )
-  {
-    if (!strcasecmp(fptr->nick, ftmp->target))
     {
-      /* we have a match - kill the process id */
-      killret = kill(ftmp->pid, SIGKILL);
+      if (!irccmp(fptr->nick, ftmp->target))
+        {
+          /* we have a match - kill the process id */
+          killret = kill(ftmp->pid, SIGKILL);
 
-      /* if its a nick change, start flooding the new nick */
-      if (newnick)
-      {
-        SendUmode(OPERUMODE_Y,
-          "*** Redirecting flood from [%s] to [%s]",
-          ftmp->target,
-          newnick);
-        InitFuckoverProcess(ftmp->who, newnick);
-      }
-      else if (killret == 0)
-      {
-        SendUmode(OPERUMODE_Y,
-          "*** Flood on [%s] successful",
-          ftmp->target);
-      }
+          /* if its a nick change, start flooding the new nick */
+          if (newnick)
+            {
+              SendUmode(OPERUMODE_Y,
+                        "*** Redirecting flood from [%s] to [%s]",
+                        ftmp->target,
+                        newnick);
+              InitFuckoverProcess(ftmp->who, newnick);
+            }
+          else if (killret == 0)
+            {
+              SendUmode(OPERUMODE_Y,
+                        "*** Flood on [%s] successful",
+                        ftmp->target);
+            }
 
-      MyFree(ftmp->who);
-      MyFree(ftmp->target);
+          MyFree(ftmp->who);
+          MyFree(ftmp->target);
 
-      if (prev)
-      {
-        prev->next = ftmp->next;
-        MyFree(ftmp);
-        ftmp = prev;
-      }
+          if (prev)
+            {
+              prev->next = ftmp->next;
+              MyFree(ftmp);
+              ftmp = prev;
+            }
+          else
+            {
+              fprocs = ftmp->next;
+              MyFree(ftmp);
+              ftmp = NULL;
+            }
+
+          break;
+        }
+
+      prev = ftmp;
+      if (ftmp)
+        ftmp = ftmp->next;
       else
-      {
-        fprocs = ftmp->next;
-        MyFree(ftmp);
-        ftmp = NULL;
-      }
-
-      break;
+        ftmp = fprocs;
     }
-
-    prev = ftmp;
-    if (ftmp)
-      ftmp = ftmp->next;
-    else
-      ftmp = fprocs;
-  }
 } /* CheckFuckoverTarget() */
 
 #endif /* ALLOW_FUCKOVER */
@@ -2720,7 +2868,7 @@ CheckFuckoverTarget(struct Luser *fptr, char *newnick)
 o_trace()
   Displays user information on all users matching a certain
 pattern, as well as certain options, if specified
-
+ 
 Options:
   -ops      Limit matches to irc operators
   -nonops   Limit matches to non irc operators
@@ -2742,17 +2890,17 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
   char chkstr[MAXLINE];
   char *argbuf;
   int argmem,
-      alen;
+  alen;
   struct Luser *tempuser, *prev;
   int  cnt,
-      bad,
-      exactmatch; /* 1 if target is a user's nick, not a hostmask */
+  bad,
+  exactmatch; /* 1 if target is a user's nick, not a hostmask */
   int ops, /* 1 if -ops, 2 if -nonops */
-      showinfo, /* show statistics about matches */
-      clones, /* show only clones */
-      kill, /* kill matches */
-      showlong, /* show matches in long format */
-      nolimit; /* ignore MaxTrace limit */
+  showinfo, /* show statistics about matches */
+  clones, /* show only clones */
+  kill, /* kill matches */
+  showlong, /* show matches in long format */
+  nolimit; /* ignore MaxTrace limit */
   int showmatches;
 
   struct timeval TimeOut;
@@ -2762,10 +2910,10 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Server *servptr;
   char *realname;
   char msgbuf[MAXLINE];
-    
+
   target = NULL;
   servptr = NULL;
-  realname = (char *) NULL;
+  realname = NULL;
   *msgbuf = '\0';
   ops = 0;
   showinfo = 0;
@@ -2777,96 +2925,96 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
   showmatches = 1;
 
   for (cnt = 1; cnt < ac; ++cnt)
-  {
-    alen = strlen(av[cnt]);
-
-    if (!strncasecmp(av[cnt], "-ops", alen))
-      ops = 1;
-    else if (!strncasecmp(av[cnt], "-nonops", alen))
-      ops = 2;
-    else if (!strncasecmp(av[cnt], "-clones", alen))
-      clones = 1;
-    else if (!strncasecmp(av[cnt], "-kill", alen))
-      kill = 1;
-    else if (!strncasecmp(av[cnt], "-long", alen))
-      showlong = 1;
-    else if (!strncasecmp(av[cnt], "-nolimit", alen))
-      nolimit = 1;
-    else if (!strncasecmp(av[cnt], "-info", alen))
     {
-    #ifndef STATSERVICES
-      os_notice(lptr, sockfd, "Stat Services are not enabled");
-      return;
-    #endif
+      alen = strlen(av[cnt]);
 
-      showinfo = 1;
-    }
-    else if (!strncasecmp(av[cnt], "-realname", alen))
-    {
-      if (++cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No realname specified");
-        return;
-      }
-      realname = av[cnt];
-    }
-    else if (!strncasecmp(av[cnt], "-server", alen))
-    {
-      if (++cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No server specified");
-        return;
-      }
+      if (!ircncmp(av[cnt], "-ops", alen))
+        ops = 1;
+      else if (!ircncmp(av[cnt], "-nonops", alen))
+        ops = 2;
+      else if (!ircncmp(av[cnt], "-clones", alen))
+        clones = 1;
+      else if (!ircncmp(av[cnt], "-kill", alen))
+        kill = 1;
+      else if (!ircncmp(av[cnt], "-long", alen))
+        showlong = 1;
+      else if (!ircncmp(av[cnt], "-nolimit", alen))
+        nolimit = 1;
+      else if (!ircncmp(av[cnt], "-info", alen))
+        {
+#ifndef STATSERVICES
+          os_notice(lptr, sockfd, "Stat Services are not enabled");
+          return;
+#endif
 
-      if (!(servptr = FindServer(av[cnt])))
-      {
-        os_notice(lptr, sockfd, "No such server: %s",
-          av[cnt]);
-        return;
-      }
-    }
-    else if (!strncasecmp(av[cnt], "-msg", alen))
-    {
-      if (++cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No message specified");
-        return;
-      }
+          showinfo = 1;
+        }
+      else if (!ircncmp(av[cnt], "-realname", alen))
+        {
+          if (++cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No realname specified");
+              return;
+            }
+          realname = av[cnt];
+        }
+      else if (!ircncmp(av[cnt], "-server", alen))
+        {
+          if (++cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No server specified");
+              return;
+            }
 
-      while (cnt < ac)
-      {
-        strncat(msgbuf, av[cnt++], sizeof(msgbuf) - strlen(msgbuf) - 20);
-        strcat(msgbuf, " ");
-      }
-      msgbuf[strlen(msgbuf) - 1] = '\0';
+          if (!(servptr = FindServer(av[cnt])))
+            {
+              os_notice(lptr, sockfd, "No such server: %s",
+                        av[cnt]);
+              return;
+            }
+        }
+      else if (!ircncmp(av[cnt], "-msg", alen))
+        {
+          if (++cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No message specified");
+              return;
+            }
 
-      break;
+          while (cnt < ac)
+            {
+              strncat(msgbuf, av[cnt++], sizeof(msgbuf) - strlen(msgbuf) - 20);
+              strcat(msgbuf, " ");
+            }
+          msgbuf[strlen(msgbuf) - 1] = '\0';
+
+          break;
+        }
+      else
+        {
+          /*
+           * it wasn't an -option; assume it is the pattern they
+           * want to trace
+           */
+          if (!target)
+            target = av[cnt];
+        }
     }
-    else
-    {
-      /*
-       * it wasn't an -option; assume it is the pattern they
-       * want to trace
-       */
-      if (!target)
-        target = av[cnt];
-    }
-  }
 
   if (!target)
-  {
-    os_notice(lptr, sockfd, "No pattern specified");
-    os_notice(lptr, sockfd,
-      "Syntax: \002TRACE <pattern> [options]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No pattern specified");
+      os_notice(lptr, sockfd,
+                "Syntax: \002TRACE <pattern> [options]\002");
+      return;
+    }
 
   if (LimitTraceKills && nolimit && kill)
-  {
-    os_notice(lptr, sockfd,
-    	"You are not permitted to combine -nolimit and -kill");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "You are not permitted to combine -nolimit and -kill");
+      return;
+    }
 
   argmem = 200;
   if (realname)
@@ -2878,8 +3026,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
   argbuf = (char *) MyMalloc(argmem + 4);
 
-  sprintf(argbuf, "[%s] ",
-    target);
+  ircsprintf(argbuf, "[%s] ", target);
 
   if (showlong)
     strcat(argbuf, "-long ");
@@ -2899,48 +3046,48 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
     strcat(argbuf, "-info ");
 
   if (realname)
-  {
-    strcat(argbuf, "-realname ");
-    strcat(argbuf, realname);
-    strcat(argbuf, " ");
-  }
+    {
+      strcat(argbuf, "-realname ");
+      strcat(argbuf, realname);
+      strcat(argbuf, " ");
+    }
 
   if (servptr)
-  {
-    strcat(argbuf, "-server ");
-    strcat(argbuf, servptr->name);
-    strcat(argbuf, " ");
-  }
+    {
+      strcat(argbuf, "-server ");
+      strcat(argbuf, servptr->name);
+      strcat(argbuf, " ");
+    }
 
   if (kill)
     strcat(argbuf, "-kill ");
 
   if (*msgbuf)
-  {
-    strcat(argbuf, "-msg ");
-    strcat(argbuf, msgbuf);
-  }
+    {
+      strcat(argbuf, "-msg ");
+      strcat(argbuf, msgbuf);
+    }
 
   o_RecordCommand(sockfd,
-    "TRACE %s",
-    argbuf);
+                  "TRACE %s",
+                  argbuf);
 
   MyFree(argbuf);
 
   if (sockfd != NODCC)
-  {
-    /*
-     * If it is a telnet connection, use select() to determine
-     * if the socket is writeable. Otherwise, if they do
-     * a trace -nolimit, and error could possibly occur if
-     * we fill up the sendq buffer.
-     */
-    TimeOut.tv_sec = 1;
-    TimeOut.tv_usec = 0;
-    FD_ZERO(&writefds);
+    {
+      /*
+       * If it is a telnet connection, use select() to determine
+       * if the socket is writeable. Otherwise, if they do
+       * a trace -nolimit, and error could possibly occur if
+       * we fill up the sendq buffer.
+       */
+      TimeOut.tv_sec = 1;
+      TimeOut.tv_usec = 0;
+      FD_ZERO(&writefds);
 
-    FD_SET(sockfd, &writefds);
-  }
+      FD_SET(sockfd, &writefds);
+    }
 
   exactmatch = 0;
 
@@ -2955,186 +3102,175 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
     tempuser = ClientList;
 
   for ( ; tempuser; )
-  {
-    if ((ops == 1) && (!IsOperator(tempuser)))
-      bad = 1; /* -ops */
-    else if ((ops == 2) && (IsOperator(tempuser)))
-      bad = 1; /* -nonops */
-    else if ((servptr) && (tempuser->server) && (servptr != tempuser->server))
-      bad = 1; /* -server */
-    else if ((clones == 1) && !IsClone(tempuser))
-      bad = 1; /* -clones */
-    else if ((realname) && (tempuser->realname))
     {
-      if (match(realname, tempuser->realname) == 0)
-        bad = 1; /* -realname */
-    }
+      if ((ops == 1) && (!IsOperator(tempuser)))
+        bad = 1; /* -ops */
+      else if ((ops == 2) && (IsOperator(tempuser)))
+        bad = 1; /* -nonops */
+      else if ((servptr) && (tempuser->server) && (servptr != tempuser->server))
+        bad = 1; /* -server */
+      else if ((clones == 1) && !IsClone(tempuser))
+        bad = 1; /* -clones */
+      else if ((realname) && (tempuser->realname))
+        {
+          if (match(realname, tempuser->realname) == 0)
+            bad = 1; /* -realname */
+        }
 
-    if (bad)
-    {
-      /* this user is not a good match */
+      if (bad)
+        {
+          /* this user is not a good match */
+
+          if (exactmatch)
+            {
+              /*
+               * The given target was the nickname of a valid client,
+               * not a userhost mask - since the client didn't pass
+               * the [options] test, stop the loop
+               */
+              break;
+            }
+
+          bad = 0;
+          tempuser = tempuser->next;
+          continue;
+        }
+
+      ircsprintf(chkstr, "%s!%s@%s", tempuser->nick,
+                 tempuser->username, tempuser->hostname);
+
+      if (exactmatch || (match(target, chkstr)))
+        {
+          cnt++;
+          if (*msgbuf) /* -msg */
+            {
+              /*
+               * Make sure we don't send a message to a service
+               * nick - ircd would assume a ghost and issue a KILL
+               * if that were to happen
+               */
+              if (tempuser->server == Me.sptr)
+                {
+                  cnt--;
+
+                  if (exactmatch)
+                    break;
+
+                  tempuser = tempuser->next;
+                  continue;
+                }
+
+              if (!nolimit && (cnt > MaxTrace))
+                {
+                  os_notice(lptr, sockfd,
+                            "-- More than %d matches found, halting messages --",
+                            MaxTrace);
+                  showmatches = 0;
+                  break;
+                }
+
+              os_notice(lptr, sockfd, "** Noticing %s", tempuser->nick);
+
+              /* send 'msgbuf' to matches through a NOTICE */
+              os_notice(tempuser, sockfd, msgbuf);
+            }
+          else if (kill) /* -kill */
+            {
+              /* make sure we don't kill a service nick */
+              if (tempuser->server == Me.sptr)
+                {
+                  cnt--;
+
+                  if (exactmatch)
+                    break;
+
+                  tempuser = tempuser->next;
+                  continue;
+                }
+
+              if (!nolimit && (cnt > MaxKill))
+                {
+                  os_notice(lptr, sockfd,
+                            "-- More than %d matches found, halting kills --",
+                            MaxKill);
+                  showmatches = 0;
+                  break;
+                }
+
+              os_notice(lptr, sockfd,
+                        "** Killing %s",
+                        tempuser->nick);
+
+              toserv(":%s KILL %s :%s!%s (#%d (%s@%s))\r\n",
+                     n_OperServ, tempuser->nick, Me.name, n_OperServ, cnt,
+                     onick, n_OperServ);
+
+              DeleteClient(tempuser);
+
+              if (exactmatch)
+                break;
+
+              if (prev)
+                tempuser = prev;
+              else
+                {
+                  tempuser = ClientList;
+                  continue;
+                }
+            }
+          else
+            {
+              if (!nolimit && (cnt > MaxTrace))
+                {
+                  os_notice(lptr, sockfd,
+                            "-- More than %d matches found, truncating list --",
+                            MaxTrace);
+                  showmatches = 0;
+                  break;
+                }
+
+              if (sockfd != NODCC)
+                {
+                  selret = select(FD_SETSIZE, NULL, &writefds, NULL, &TimeOut);
+                  if (selret < 0)
+                    {
+                      os_notice(lptr, sockfd,
+                                "-- Error occurred during write: %s --",
+                                strerror(errno));
+                      break;
+                    }
+                }
+
+              os_notice(lptr, sockfd, "-----");
+
+              if (showinfo) /* -info */
+                {
+#ifdef STATSERVICES
+                  show_trace_info(lptr, tempuser, sockfd);
+#endif
+
+                }
+              else
+                {
+                  /* display normally */
+                  show_trace(lptr, tempuser, sockfd, showlong);
+                }
+            }
+        } /* if (match(target, chkstr)) */
 
       if (exactmatch)
-      {
-        /*
-         * The given target was the nickname of a valid client,
-         * not a userhost mask - since the client didn't pass
-         * the [options] test, stop the loop
-         */
         break;
-      }
 
-      bad = 0;
+      prev = tempuser;
       tempuser = tempuser->next;
-      continue;
-    }
-
-    sprintf(chkstr, "%s!%s@%s",
-      tempuser->nick,
-      tempuser->username,
-      tempuser->hostname);
-
-    if (exactmatch || (match(target, chkstr)))
-    {
-      cnt++;
-      if (*msgbuf) /* -msg */
-      {
-        /*
-         * Make sure we don't send a message to a service
-         * nick - ircd would assume a ghost and issue a KILL
-         * if that were to happen
-         */
-        if (tempuser->server == Me.sptr)
-        {
-          cnt--;
-
-          if (exactmatch)
-            break;
-
-          tempuser = tempuser->next;
-          continue;
-        }
-
-        if (!nolimit && (cnt > MaxTrace))
-        {
-          os_notice(lptr, sockfd,
-            "-- More than %d matches found, halting messages --", 
-            MaxTrace);
-          showmatches = 0;
-          break;
-        }
-
-        os_notice(lptr, sockfd,
-          "** Noticing %s",
-          tempuser->nick);
-
-        /* send 'msgbuf' to matches through a NOTICE */
-        toserv(":%s NOTICE %s :%s\n",
-          n_OperServ,
-          tempuser->nick,
-          msgbuf);
-      }
-      else if (kill) /* -kill */
-      {
-        /* make sure we don't kill a service nick */
-        if (tempuser->server == Me.sptr)
-        {
-          cnt--;
-
-          if (exactmatch)
-            break;
-
-          tempuser = tempuser->next;
-          continue;
-        }
-
-        if (!nolimit && (cnt > MaxKill))
-        {
-          os_notice(lptr, sockfd,
-            "-- More than %d matches found, halting kills --",
-            MaxKill);
-          showmatches = 0;
-          break;
-        }
-
-        os_notice(lptr, sockfd,
-          "** Killing %s",
-          tempuser->nick);
-
-        toserv(":%s KILL %s :%s!%s (#%d (%s@%s))\n",
-          n_OperServ,
-          tempuser->nick,
-          Me.name,
-          n_OperServ,
-          cnt,
-          onick,
-          n_OperServ);
-
-        DeleteClient(tempuser);
-
-        if (exactmatch)
-          break;
-
-        if (prev)
-          tempuser = prev;
-        else
-        {
-          tempuser = ClientList;
-          continue;
-        }
-      }
-      else
-      {
-        if (!nolimit && (cnt > MaxTrace))
-        {
-          os_notice(lptr, sockfd,
-            "-- More than %d matches found, truncating list --", 
-            MaxTrace);
-          showmatches = 0;
-          break;
-        }
-
-        if (sockfd != NODCC)
-        {
-          selret = select(FD_SETSIZE, NULL, &writefds, NULL, &TimeOut);
-          if (selret < 0)
-          {
-            os_notice(lptr, sockfd,
-              "-- Error occurred during write: %s --",
-              strerror(errno));
-            break;
-          }
-        }
-
-        os_notice(lptr, sockfd, "-----");
-
-        if (showinfo) /* -info */
-        {
-        #ifdef STATSERVICES
-          show_trace_info(lptr, tempuser, sockfd);
-        #endif
-        }
-        else
-        {
-          /* display normally */
-          show_trace(lptr, tempuser, sockfd, showlong);
-        }
-      }
-    } /* if (match(target, chkstr)) */
-
-    if (exactmatch)
-      break;
-
-    prev = tempuser;
-    tempuser = tempuser->next;
-  } /* for ( ; tempuser; ) */
+    } /* for ( ; tempuser; ) */
 
   if (showmatches)
-  {
-    os_notice(lptr, sockfd, "%d match%s found",
-      cnt,
-      (cnt == 1) ? "" : "es");
-  }
+    {
+      os_notice(lptr, sockfd, "%d match%s found",
+                cnt,
+                (cnt == 1) ? "" : "es");
+    }
 } /* o_trace() */
 
 /*
@@ -3153,31 +3289,31 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
     return;
 
   if (!showlong)
-  {
-    /*
-     * Display in short format: nick!user@host (realname) [server]
-     */
-    os_notice(lptr, sockfd,
-      "%s!%s@%s (%s) [%s]",
-      target->nick,
-      target->username,
-      target->hostname,
-      target->realname,
-      target->server ? target->server->name : "*unknown*");
-    return;
-  }
+    {
+      /*
+       * Display in short format: nick!user@host (realname) [server]
+       */
+      os_notice(lptr, sockfd,
+                "%s!%s@%s (%s) [%s]",
+                target->nick,
+                target->username,
+                target->hostname,
+                target->realname,
+                target->server ? target->server->name : "*unknown*");
+      return;
+    }
 
   os_notice(lptr, sockfd,
-    "User:      %s (%s@%s)",
-    target->nick,
-    target->username,
-    target->hostname);
+            "User:      %s (%s@%s)",
+            target->nick,
+            target->username,
+            target->hostname);
   os_notice(lptr, sockfd,
-    "Realname:  %s",
-    target->realname);
+            "Realname:  %s",
+            target->realname);
   os_notice(lptr, sockfd,
-    "Server:    %s",
-    target->server ? target->server->name : "*unknown*");
+            "Server:    %s",
+            target->server ? target->server->name : "*unknown*");
 
   strcpy(tmp, "+");
   if (target->umodes & UMODE_I)
@@ -3189,55 +3325,58 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
   if (target->umodes & UMODE_O)
     strcat(tmp, "o");
   os_notice(lptr, sockfd,
-    "Usermodes: %s",
-    tmp);
+            "Usermodes: %s",
+            tmp);
 
   strcpy(tmp, ctime((time_t *) &target->since));
   tmp[strlen(tmp) - 1] = '\0';
   os_notice(lptr, sockfd,
-    "Signon:    %s",
-    tmp);
+            "Signon:    %s",
+            tmp);
 
   if (target->firstchan)
-  {
-    if (sockfd == NODCC)
-      toserv(":%s NOTICE %s :Channels:  ",
-        (ServerNotices) ? Me.name : n_OperServ,
-        lptr->nick);
-    else
-      writesocket(sockfd, "Channels:  ");
-
-    for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next)
     {
-      if (tempchan->flags & CH_OPPED)
-      {
-        if (sockfd == NODCC)
-          toserv("@");
-        else
-          writesocket(sockfd, "@");
-      }
-      if (tempchan->flags & CH_VOICED)
-      {
-        if (sockfd == NODCC)
-          toserv("+");
-        else
-          writesocket(sockfd, "+");
-      }
       if (sockfd == NODCC)
-        toserv("%s ",
-          tempchan->chptr->name);
+        os_notice(lptr, sockfd, "Channels:  ");
+      /*
+        toserv(":%s NOTICE %s :Channels:  ",
+               (ServerNotices) ? Me.name : n_OperServ,
+               lptr->nick);
+       */
       else
-      {
-        writesocket(sockfd, tempchan->chptr->name);
-        writesocket(sockfd, " ");
-      }
-    } /* for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next) */
+        writesocket(sockfd, "Channels:  ");
 
-    if (sockfd == NODCC)
-      toserv("\n");
-    else
-      writesocket(sockfd, "\n");
-  }
+      for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next)
+        {
+          if (tempchan->flags & CH_OPPED)
+            {
+              if (sockfd == NODCC)
+                toserv("@");
+              else
+                writesocket(sockfd, "@");
+            }
+          if (tempchan->flags & CH_VOICED)
+            {
+              if (sockfd == NODCC)
+                toserv("+");
+              else
+                writesocket(sockfd, "+");
+            }
+          if (sockfd == NODCC)
+            toserv("%s ",
+                   tempchan->chptr->name);
+          else
+            {
+              writesocket(sockfd, tempchan->chptr->name);
+              writesocket(sockfd, " ");
+            }
+        } /* for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next) */
+
+      if (sockfd == NODCC)
+        toserv("\r\n");
+      else
+        writesocket(sockfd, "\n");
+    }
 } /* show_trace() */
 
 #ifdef STATSERVICES
@@ -3247,32 +3386,32 @@ show_trace_info(struct Luser *lptr, struct Luser *target, int sockfd)
 
 {
   os_notice(lptr, sockfd,
-    "User:         %s (%s@%s)",
-    target->nick,
-    target->username,
-    target->hostname);
+            "User:         %s (%s@%s)",
+            target->nick,
+            target->username,
+            target->hostname);
 
   os_notice(lptr, sockfd,
-    "Ops:          %ld",
-    target->numops);
+            "Ops:          %ld",
+            target->numops);
   os_notice(lptr, sockfd,
-    "DeOps:        %ld",
-    target->numdops);
+            "DeOps:        %ld",
+            target->numdops);
   os_notice(lptr, sockfd,
-    "Voices:       %ld",
-    target->numvoices);
+            "Voices:       %ld",
+            target->numvoices);
   os_notice(lptr, sockfd,
-    "DeVoices:     %ld",
-    target->numdvoices);
+            "DeVoices:     %ld",
+            target->numdvoices);
   os_notice(lptr, sockfd,
-    "Kicks:        %ld",
-    target->numkicks);
+            "Kicks:        %ld",
+            target->numkicks);
   os_notice(lptr, sockfd,
-    "Nick Changes: %ld",
-    target->numnicks);
+            "Nick Changes: %ld",
+            target->numnicks);
   os_notice(lptr, sockfd,
-    "Kills:        %ld",
-    target->numkills);
+            "Kills:        %ld",
+            target->numkills);
 } /* show_trace_info() */
 
 #endif /* STATSERVICES */
@@ -3281,7 +3420,7 @@ show_trace_info(struct Luser *lptr, struct Luser *target, int sockfd)
 o_channel() 
  Displays channel information on channels matching <pattern>
 and [options]
-
+ 
 Options:
  -minimum   - limit matches to channels with at least the given
               number of users
@@ -3301,23 +3440,23 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Channel *cptr;
   char argbuf[MAXLINE];
   int cnt, /* number of matches */
-      bad,
-      exactmatch;
+  bad,
+  exactmatch;
   char *target;
   int min, /* -min */
-      max; /* -max */
+  max; /* -max */
   char *banmatch, /* -banmatch */
-       *exmatch; /* -exmatch */
+  *exmatch; /* -exmatch */
   int nolimit; /* -nolimit */
   char temp[MAXLINE];
   int alen,
-      showmatches;
-    
+  showmatches;
+
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002CHANNEL <pattern> [options]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002CHANNEL <pattern> [options]\002");
+      return;
+    }
 
   target = NULL;
   min = 0;
@@ -3329,115 +3468,110 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   showmatches = 1;
 
   for (cnt = 1; cnt < ac; cnt++)
-  {
-    alen = strlen(av[cnt]);
-
-    if (!strncasecmp(av[cnt], "-nolimit", alen))
-      nolimit = 1;
-    if (!strncasecmp(av[cnt], "-minimum", alen))
     {
-      cnt++;
-      if (cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No minimum value specified");
-        return;
-      }
+      alen = strlen(av[cnt]);
 
-      min = atoi(av[cnt]);
-    }
-    else if (!strncasecmp(av[cnt], "-maximum", alen))
-    {
-      ++cnt;
-      if (cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No maximum value specified");
-        return;
-      }
+      if (!ircncmp(av[cnt], "-nolimit", alen))
+        nolimit = 1;
+      if (!ircncmp(av[cnt], "-minimum", alen))
+        {
+          cnt++;
+          if (cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No minimum value specified");
+              return;
+            }
 
-      max = atoi(av[cnt]);
-    }
-    else if (!strncasecmp(av[cnt], "-banmatch", alen))
-    {
-      cnt++;
-      if (cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No hostmask specified");
-        return;
-      }
+          min = atoi(av[cnt]);
+        }
+      else if (!ircncmp(av[cnt], "-maximum", alen))
+        {
+          ++cnt;
+          if (cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No maximum value specified");
+              return;
+            }
 
-      banmatch = av[cnt];
-    }
-    else if (!strncasecmp(av[cnt], "-exmatch", alen))
-    {
-      cnt++;
-      if (cnt >= ac)
-      {
-        os_notice(lptr, sockfd, "No hostmask specified");
-        return;
-      }
+          max = atoi(av[cnt]);
+        }
+      else if (!ircncmp(av[cnt], "-banmatch", alen))
+        {
+          cnt++;
+          if (cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No hostmask specified");
+              return;
+            }
 
-      exmatch = av[cnt];
+          banmatch = av[cnt];
+        }
+      else if (!ircncmp(av[cnt], "-exmatch", alen))
+        {
+          cnt++;
+          if (cnt >= ac)
+            {
+              os_notice(lptr, sockfd, "No hostmask specified");
+              return;
+            }
+
+          exmatch = av[cnt];
+        }
+      else
+        {
+          /*
+           * it wasn't an -option; assume it is the pattern they
+           * want to use
+           */
+          if (!target)
+            target = av[cnt];
+        }
     }
-    else
-    {
-      /*
-       * it wasn't an -option; assume it is the pattern they
-       * want to use
-       */
-      if (!target)
-        target = av[cnt];
-    }
-  }
 
   if (!target)
-  {
-    os_notice(lptr, sockfd, "No pattern specified");
-    os_notice(lptr, sockfd,
-      "Syntax: \002CHANNEL <pattern> [options]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No pattern specified");
+      os_notice(lptr, sockfd,
+                "Syntax: \002CHANNEL <pattern> [options]\002");
+      return;
+    }
 
-  sprintf(argbuf, "[%s] ",
-    target);
+  ircsprintf(argbuf, "[%s] ", target);
 
   if (nolimit)
     strcat(argbuf, "-nolimit ");
 
   if (min)
-  {
-    strcat(argbuf, "-minimum");
-    sprintf(temp, "%s %d ",
-      argbuf,
-      min);
-    strcpy(argbuf, temp);
-  }
+    {
+      strcat(argbuf, "-minimum");
+      ircsprintf(temp, "%s %d ", argbuf, min);
+      strcpy(argbuf, temp);
+    }
 
   if (max)
-  {
-    strcat(argbuf, "-maximum");
-    sprintf(temp, "%s %d ",
-      argbuf,
-      max);
-    strcpy(argbuf, temp);
-  }
+    {
+      strcat(argbuf, "-maximum");
+      ircsprintf(temp, "%s %d ", argbuf, max);
+      strcpy(argbuf, temp);
+    }
 
   if (banmatch)
-  {
-    strcat(argbuf, "-banmatch ");
-    strcat(argbuf, banmatch);
-    strcat(argbuf, " ");
-  }
+    {
+      strcat(argbuf, "-banmatch ");
+      strcat(argbuf, banmatch);
+      strcat(argbuf, " ");
+    }
 
   if (exmatch)
-  {
-    strcat(argbuf, "-exmatch ");
-    strcat(argbuf, exmatch);
-    strcat(argbuf, " ");
-  }
+    {
+      strcat(argbuf, "-exmatch ");
+      strcat(argbuf, exmatch);
+      strcat(argbuf, " ");
+    }
 
   o_RecordCommand(sockfd,
-    "CHANNEL %s",
-    argbuf);
+                  "CHANNEL %s",
+                  argbuf);
 
   cnt = 0;
   bad = 0;
@@ -3450,54 +3584,54 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
     cptr = ChannelList;
 
   for (; cptr; cptr = cptr->next)
-  {
-    if (exactmatch || (match(target, cptr->name)))
     {
-      if ((min) && (min > cptr->numusers)) /* -minimum */
-        bad = 1;
-      else if ((max) && (max < cptr->numusers)) /* -maximum */
-        bad = 1;
-      else if ((banmatch) && !MatchBan(cptr, banmatch)) /* -banmatch */
-        bad = 1;
-      else if ((exmatch) && !MatchException(cptr, exmatch)) /* -exmatch */
-        bad = 1;
+      if (exactmatch || (match(target, cptr->name)))
+        {
+          if ((min) && (min > cptr->numusers)) /* -minimum */
+            bad = 1;
+          else if ((max) && (max < cptr->numusers)) /* -maximum */
+            bad = 1;
+          else if ((banmatch) && !MatchBan(cptr, banmatch)) /* -banmatch */
+            bad = 1;
+          else if ((exmatch) && !MatchException(cptr, exmatch)) /* -exmatch */
+            bad = 1;
 
-      if (bad)
-      {
-        /*
-         * cptr did not pass the [options] screening
-         */
-        if (exactmatch)
-          break;
+          if (bad)
+            {
+              /*
+               * cptr did not pass the [options] screening
+               */
+              if (exactmatch)
+                break;
 
-        bad = 0;
-        continue;
-      }
+              bad = 0;
+              continue;
+            }
 
-      cnt++;
+          cnt++;
 
-      if (!nolimit && (cnt > MaxChannel))
-      {
-        os_notice(lptr, sockfd,
-          "--- More than %d matches found, truncating list ---", 
-          MaxChannel);
-        showmatches = 0;
+          if (!nolimit && (cnt > MaxChannel))
+            {
+              os_notice(lptr, sockfd,
+                        "--- More than %d matches found, truncating list ---",
+                        MaxChannel);
+              showmatches = 0;
+              break;
+            }
+
+          show_channel(lptr, cptr, sockfd);
+        } /* if (match(target, tempchan->name)) */
+
+      if (exactmatch)
         break;
-      }
-
-      show_channel(lptr, cptr, sockfd);
-    } /* if (match(target, tempchan->name)) */
-
-    if (exactmatch)
-      break;
-  } /* for (; cptr; cptr = cptr->next) */
+    } /* for (; cptr; cptr = cptr->next) */
 
   if (showmatches)
-  {
-    os_notice(lptr, sockfd, "%d match%s found",
-      cnt,
-      (cnt == 1) ? "" : "es");
-  }
+    {
+      os_notice(lptr, sockfd, "%d match%s found",
+                cnt,
+                (cnt == 1) ? "" : "es");
+    }
 } /* o_channel() */
 
 /*
@@ -3510,20 +3644,24 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 
 {
   struct ChannelBan *tempban;
-  struct ChannelGecosBan *tempgecosban;	
+#ifdef GECOSBANS
+
+  struct ChannelGecosBan *tempgecosban;
+#endif /* GECOSBANS */
+
   struct Exception *tempe;
   struct ChannelUser *tempuser;
   char *btime; /* time ban was set */
   char modes[MAXLINE]; /* channel modes */
   int bcnt = 0, /* ban count */
-      ecnt = 0, /* exception count */
-      ocnt = 0, /* chan ops */
-      vcnt = 0, /* chan voices */
-      icnt = 0, /* chan ircops */
-      ncnt = 0; /* nonops */
+             ecnt = 0, /* exception count */
+                    ocnt = 0, /* chan ops */
+                           vcnt = 0, /* chan voices */
+                                  icnt = 0, /* chan ircops */
+                                         ncnt = 0; /* nonops */
 
-  os_notice(lptr, sockfd, "Channel Information for %s:", 
-    cptr->name);
+  os_notice(lptr, sockfd, "Channel Information for %s:",
+            cptr->name);
   strcpy(modes, "+");
   if (cptr->modes & MODE_S)
     strcat(modes, "s");
@@ -3533,6 +3671,10 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "n");
   if (cptr->modes & MODE_T)
     strcat(modes, "t");
+#ifdef DANCER
+  if (cptr->modes & MODE_C)
+    strcat(modes, "c");
+#endif /* DANCER */
   if (cptr->modes & MODE_M)
     strcat(modes, "m");
   if (cptr->modes & MODE_I)
@@ -3541,144 +3683,163 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
     strcat(modes, "l");
   if (cptr->key && *cptr->key)
     strcat(modes, "k");
+#ifdef DANCER
+  if (cptr->forward && *cptr->forward)
+    strcat(modes, "f");
+#endif /* DANCER */
 
   if (cptr->limit)
-  {
-    char  temp[MAXLINE];
+    {
+      char  temp[MAXLINE];
 
-    sprintf(temp, "%s %d", modes, cptr->limit);
-    strcpy(modes, temp);
-  }
+      ircsprintf(temp, "%s %d", modes, cptr->limit);
+      strcpy(modes, temp);
+    }
 
   if (cptr->key && *cptr->key)
+    {
+      char  temp[MAXLINE];
+
+      ircsprintf(temp, "%s %s", modes, cptr->key);
+      strcpy(modes, temp);
+    }
+
+#ifdef DANCER
+  if (cptr->forward && *cptr->forward)
   {
     char  temp[MAXLINE];
-
-    sprintf(temp, "%s %s", modes, cptr->key);
+  
+    ircsprintf(temp, "%s %s", modes, cptr->forward);
     strcpy(modes, temp);
   }
+#endif /* DANCER */
 
-  os_notice(lptr, sockfd, 
-    "Modes:     %s",
-    modes);
+  os_notice(lptr, sockfd,
+            "Modes:     %s",
+            modes);
   strcpy(modes, ctime(&cptr->since));
   modes[strlen(modes) - 1] = '\0';
   os_notice(lptr, sockfd,
-    "Created:   %s",
-    modes);
+            "Created:   %s",
+            modes);
 
   ocnt = ncnt = vcnt = icnt = bcnt = 0;
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
-  {
-    if (tempuser->flags & CH_OPPED)
-      ocnt++;
-    else
-      ncnt++;
-    if (tempuser->flags & CH_VOICED)
-      vcnt++;
-    if (tempuser->lptr->umodes & UMODE_O)
-      icnt++;
-  }
+    {
+      if (tempuser->flags & CH_OPPED)
+        ocnt++;
+      else
+        ncnt++;
+      if (tempuser->flags & CH_VOICED)
+        vcnt++;
+      if (tempuser->lptr->umodes & UMODE_O)
+        icnt++;
+    }
 
-  os_notice(lptr, sockfd, 
-    "Ops:       %d",
-    ocnt);
   os_notice(lptr, sockfd,
-    "Voices:    %d",
-    vcnt);
+            "Ops:       %d",
+            ocnt);
   os_notice(lptr, sockfd,
-    "NonOps:    %d",
-    ncnt);
+            "Voices:    %d",
+            vcnt);
   os_notice(lptr, sockfd,
-    "IrcOps:    %d",
-    icnt);
+            "NonOps:    %d",
+            ncnt);
   os_notice(lptr, sockfd,
-    "Total:     %d",
-    cptr->numusers);
+            "IrcOps:    %d",
+            icnt);
+  os_notice(lptr, sockfd,
+            "Total:     %d",
+            cptr->numusers);
 
   if (sockfd == NODCC)
+    /*
     toserv(":%s NOTICE %s :Nicks:     ",
-      (ServerNotices) ? Me.name : n_OperServ,
-      lptr->nick);
+           (ServerNotices) ? Me.name : n_OperServ,
+           lptr->nick);
+     */
+    os_notice(lptr, sockfd, "Nicks:     ");
   else
     writesocket(sockfd, "Nicks:     ");
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
-  {
-    if (tempuser->flags & CH_OPPED)
     {
+      if (tempuser->flags & CH_OPPED)
+        {
+          if (sockfd == NODCC)
+            toserv("@");
+          else
+            writesocket(sockfd, "@");
+        }
+      if (tempuser->flags & CH_VOICED)
+        {
+          if (sockfd == NODCC)
+            toserv("+");
+          else
+            writesocket(sockfd, "+");
+        }
       if (sockfd == NODCC)
-        toserv("@");
+        toserv("%s ",
+               tempuser->lptr->nick);
       else
-        writesocket(sockfd, "@");
+        {
+          writesocket(sockfd, tempuser->lptr->nick);
+          writesocket(sockfd, " ");
+        }
     }
-    if (tempuser->flags & CH_VOICED)
-    {
-      if (sockfd == NODCC)
-        toserv("+");
-      else
-        writesocket(sockfd, "+");
-    }
-    if (sockfd == NODCC)
-      toserv("%s ",
-        tempuser->lptr->nick);
-    else
-    {
-      writesocket(sockfd, tempuser->lptr->nick);
-      writesocket(sockfd, " ");
-    }
-  }
   if (sockfd == NODCC)
-    toserv("\n");
+    toserv("\r\n");
   else
     writesocket(sockfd, "\n");
 
   if (cptr->firstban)
-  {
-    os_notice(lptr, sockfd, "Bans:");
-    for (tempban = cptr->firstban; tempban; tempban = tempban->next)
     {
-      bcnt++;
-      btime = (char *) ctime(&tempban->when);
-      btime[strlen(btime) - 1] = '\0';
-      os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-        bcnt,
-        tempban->mask,
-        tempban->who ? tempban->who : "unknown",
-        btime);
+      os_notice(lptr, sockfd, "Bans:");
+      for (tempban = cptr->firstban; tempban; tempban = tempban->next)
+        {
+          bcnt++;
+          btime = (char *) ctime(&tempban->when);
+          btime[strlen(btime) - 1] = '\0';
+          os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
+                    bcnt,
+                    tempban->mask,
+                    tempban->who ? tempban->who : "unknown",
+                    btime);
+        }
     }
-  }
 
- if (cptr->firstgecosban)
-  {
-    os_notice(lptr, sockfd, "Gecos field Bans:");
-    for (tempgecosban = cptr->firstgecosban; tempgecosban; tempgecosban = tempgecosban->next)
+#ifdef GECOSBANS
+  if (cptr->firstgecosban)
     {
-      bcnt++;
-      btime = (char *) ctime(&tempgecosban->when);
-      btime[strlen(btime) - 1] = '\0';
-      os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-        bcnt,
-        tempgecosban->mask,
-        tempgecosban->who ? tempgecosban->who : "unknown",
-        btime);
+      os_notice(lptr, sockfd, "Gecos field Bans:");
+      for (tempgecosban = cptr->firstgecosban;
+           tempgecosban; tempgecosban = tempgecosban->next)
+        {
+          bcnt++;
+          btime = (char *) ctime(&tempgecosban->when);
+          btime[strlen(btime) - 1] = '\0';
+          os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
+                    bcnt, tempgecosban->mask,
+                    tempgecosban->who ? tempgecosban->who : "unknown",
+                    btime);
+        }
     }
-  }
+#endif /* GECOSBANS */
 
   if (cptr->exceptlist)
-  {
-    os_notice(lptr, sockfd, "Ban Exceptions:");
-    for (tempe = cptr->exceptlist; tempe; tempe = tempe->next)
     {
-      ecnt++;
-      btime = (char *) ctime(&tempe->when);
-      btime[strlen(btime) - 1] = '\0';
-      os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-        ecnt,
-        tempe->mask,
-        tempe->who ? tempe->who : "unknown",
-        btime);
+      os_notice(lptr, sockfd, "Ban Exceptions:");
+      for (tempe = cptr->exceptlist; tempe; tempe = tempe->next)
+        {
+          ecnt++;
+          btime = (char *) ctime(&tempe->when);
+          btime[strlen(btime) - 1] = '\0';
+          os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
+                    ecnt,
+                    tempe->mask,
+                    tempe->who ? tempe->who : "unknown",
+                    btime);
+        }
     }
-  }
 } /* show_channel() */
 
 /*
@@ -3691,18 +3852,18 @@ o_on(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   if (!(Network->flags & NET_OFF))
-  {
-    os_notice(lptr, sockfd,
-      "Services are not disabled");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Services are not disabled");
+      return;
+    }
 
   Network->flags &= ~NET_OFF;
   os_notice(lptr, sockfd,
-    "Services have been \002reactivated\002");
+            "Services have been \002reactivated\002");
 
   o_RecordCommand(sockfd,
-    "ON");
+                  "ON");
 
   o_Wallops("ON");
 } /* o_on() */
@@ -3717,18 +3878,18 @@ o_off(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   if (Network->flags & NET_OFF)
-  {
-    os_notice(lptr, sockfd,
-      "Services are already disabled");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Services are already disabled");
+      return;
+    }
 
   Network->flags |= NET_OFF;
   os_notice(lptr, sockfd,
-    "Services have been \002disabled\002");
+            "Services have been \002disabled\002");
 
   o_RecordCommand(sockfd,
-    "OFF");
+                  "OFF");
 
   o_Wallops("OFF");
 } /* o_off() */
@@ -3746,96 +3907,84 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Servlist *temp;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002JUMP {server} [port]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002JUMP {server} [port]\002");
+      return;
+    }
 
   for (temp = ServList; temp; temp = temp->next)
     if (match(av[1], temp->hostname))
       break;
 
   if (!temp)
-  {
-    os_notice(lptr, sockfd,
-      "[\002%s\002] is an invalid hub server",
-      av[1]);
-    return;
-  }
-
-  if (ac >= 3)
-  {
-    if (!(port = IsNum(av[2])))
     {
-      os_notice(lptr, sockfd, "Invalid port [\002%s\002]",
-        av[2]);
+      os_notice(lptr, sockfd,
+                "[\002%s\002] is an invalid hub server",
+                av[1]);
       return;
     }
-  }
+
+  if (ac >= 3)
+    {
+      if (!(port = IsNum(av[2])))
+        {
+          os_notice(lptr, sockfd, "Invalid port [\002%s\002]",
+                    av[2]);
+          return;
+        }
+    }
   else
     port = temp->port;
 
   o_RecordCommand(sockfd,
-    "JUMP %s %d",
-    temp->hostname,
-    port);
+                  "JUMP %s %d",
+                  temp->hostname,
+                  port);
 
   o_Wallops("JUMP %s %d",
-    temp->hostname,
-    port);
+            temp->hostname,
+            port);
 
   /* Attempt connection to server */
-  if ((tempsock = ConnectHost(temp->hostname, port)) >= 0) 
-  {
+  if ((tempsock = ConnectHost(temp->hostname, port)) >= 0)
+    {
 
-  #ifdef HAVE_PTHREADS
-    /*
-     * Set this to 0, so p_CheckTimer won't call DoTimer()
-     * which might cycle the server list
-     */
-    /*GoodTimer = 0;*/
-  #endif
+      /* Do ERROR string instead of lame SQUIT -kre */
+      toserv(":%s ERROR :Rerouting\r\n", Me.name);
+      toserv(":%s QUIT\r\n", Me.name);
 
-    toserv("SQUIT %s :ReRouting\n",
-      currenthub->realname ? currenthub->realname : "*");
+      /* kill old connection and clear out user/chan lists etc */
+      close(HubSock);
+      ClearUsers();
+      ClearChans();
+      ClearServs();
 
-    /* kill old connection and clear out user/chan lists etc */
-    close(HubSock);
-    ClearUsers();
-    ClearChans();
-    ClearServs();
+      /*
+       * This has to come after ClearUsers(), or RECORD_SPLIT_TS
+       * will not work correctly
+       */
+      ClearHashes(0);
 
-    /*
-     * This has to come after ClearUsers(), or RECORD_SPLIT_TS
-     * will not work correctly
-     */
-    ClearHashes(0);
+      HubSock = tempsock;
 
-    HubSock = tempsock;
+      currenthub->connect_ts = 0;
+      temp->connect_ts = current_ts;
+      currenthub = temp;
 
-    currenthub->connect_ts = 0;
-    temp->connect_ts = time(NULL);
-    currenthub = temp;
-
-    /* send PASS/SERVER combo */
-    signon();
-
-  #ifdef HAVE_PTHREADS
-    /*GoodTimer = 1;*/
-  #endif
-
-  }
+      /* send PASS/SERVER combo */
+      signon();
+    }
   else
-  {
-    close(tempsock);
-    os_notice(lptr, sockfd,
-      "Unable to connect to port \002%d\002 of \002%s\002: %s",
-      port,
-      temp->hostname,
-      strerror(errno));
-    return;
-  }
+    {
+      close(tempsock);
+      os_notice(lptr, sockfd,
+                "Unable to connect to port \002%d\002 of \002%s\002: %s",
+                port,
+                temp->hostname,
+                strerror(errno));
+      return;
+    }
 } /* o_jump() */
 
 /*
@@ -3853,28 +4002,28 @@ o_save(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   int goodsave,
-      ii,
-      alen;
+  ii,
+  alen;
   int savesets, /* -sets */
-      savedbs; /* -dbs */
+  savedbs; /* -dbs */
   char argbuf[MAXLINE];
 
   savesets = 0;
   savedbs = 0;
 
   if (ac >= 2)
-  {
-    for (ii = 1; ii < ac; ii++)
     {
-      alen = strlen(av[ii]);
-      if (!strncasecmp(av[ii], "-dbs", alen))
-        savedbs = 1;
-      else if (!strncasecmp(av[ii], "-sets", alen))
-        savesets = 1;
-      else if (!strncasecmp(av[ii], "-all", alen))
-        savedbs = savesets = 1;
+      for (ii = 1; ii < ac; ii++)
+        {
+          alen = strlen(av[ii]);
+          if (!ircncmp(av[ii], "-dbs", alen))
+            savedbs = 1;
+          else if (!ircncmp(av[ii], "-sets", alen))
+            savesets = 1;
+          else if (!ircncmp(av[ii], "-all", alen))
+            savedbs = savesets = 1;
+        }
     }
-  }
   else
     savedbs = 1; /* default to database save */
 
@@ -3887,45 +4036,45 @@ o_save(struct Luser *lptr, int ac, char **av, int sockfd)
     strcat(argbuf, "-settings ");
 
   o_RecordCommand(sockfd,
-    "SAVE %s",
-    argbuf);
+                  "SAVE %s",
+                  argbuf);
 
   if (savedbs)
-  {
-    goodsave = WriteDatabases();
-
-    if (goodsave)
     {
-      os_notice(lptr, sockfd,
-        "Databases have been saved");
-    }
-    else
-    {
-      os_notice(lptr, sockfd,
-        "Database save failed");
+      goodsave = WriteDatabases();
 
-      /* 
-       * we don't need to log the failure, since WriteDatabases()
-       * would have done so
-       */
-    }
-  } /* if (savedbs) */
+      if (goodsave)
+        {
+          os_notice(lptr, sockfd,
+                    "Databases have been saved");
+        }
+      else
+        {
+          os_notice(lptr, sockfd,
+                    "Database save failed");
+
+          /*
+           * we don't need to log the failure, since WriteDatabases()
+           * would have done so
+           */
+        }
+    } /* if (savedbs) */
 
   if (savesets)
-  {
-    goodsave = SaveSettings();
+    {
+      goodsave = SaveSettings();
 
-    if (goodsave)
-    {
-      os_notice(lptr, sockfd,
-        "Settings have been saved");
-    }
-    else
-    {
-      os_notice(lptr, sockfd,
-        "Settings save failed");
-    }
-  } /* if (savesets) */
+      if (goodsave)
+        {
+          os_notice(lptr, sockfd,
+                    "Settings have been saved");
+        }
+      else
+        {
+          os_notice(lptr, sockfd,
+                    "Settings save failed");
+        }
+    } /* if (savesets) */
 } /* o_save() */
 
 /*
@@ -3942,14 +4091,17 @@ o_reload(struct Luser *lptr, int ac, char **av, int sockfd)
   goodreload = ReloadData();
 
   if (goodreload)
-    os_notice(lptr, sockfd, "Reload successful");
+    {
+      os_notice(lptr, sockfd, "Reload successful");
+      o_Wallops("RELOAD");
+    }
   else
     os_notice(lptr, sockfd,
-      "Reload contained errors, continuing to use old databases");
+              "Reload contained errors, continuing to use old databases");
 
   o_RecordCommand(sockfd,
-    "RELOAD %s",
-    goodreload ? "" : "(failed)");
+                  "RELOAD %s",
+                  goodreload ? "" : "(failed)");
 } /* o_reload() */
 
 /*
@@ -3964,96 +4116,95 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 {
   struct Directive *dptr;
   char sendstr[MAXLINE],
-       tmp[MAXLINE];
+  tmp[MAXLINE];
   int ii,
-      pcnt;
+  pcnt;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002SET <item | list> [value]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002SET <item | list> [value]\002");
+      return;
+    }
 
-  if (!strncasecmp(av[1], "list", strlen(av[1])))
-  {
-    o_RecordCommand(sockfd,
-      "SET LIST");
+  if (!ircncmp(av[1], "list", strlen(av[1])))
+    {
+      o_RecordCommand(sockfd,
+                      "SET LIST");
 
-    DisplaySettings(lptr, sockfd);
+      DisplaySettings(lptr, sockfd);
 
-    return;
-  }
+      return;
+    }
 
   if (!(dptr = FindDirective(av[1])))
-  {
-    os_notice(lptr, sockfd,
-      "Unknown setting: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Unknown setting: %s",
+                av[1]);
+      return;
+    }
 
   if (ac < 3)
-  {
-    /*
-     * They didn't give a new value, display the current one
-     */
-
-    sendstr[0] = '\0';
-    for (ii = 0; ii < PARAM_MAX; ++ii)
     {
-      if (!dptr->param[ii].type)
-        break;
+      /*
+       * They didn't give a new value, display the current one
+       */
 
-      switch (dptr->param[ii].type)
-      {
-        case PARAM_STRING:
+      sendstr[0] = '\0';
+      for (ii = 0; ii < PARAM_MAX; ++ii)
         {
-          sprintf(tmp, "\"%s\" ",
-            *(char **) dptr->param[ii].ptr);
-          strcat(sendstr, tmp);
-          break;
+          if (!dptr->param[ii].type)
+            break;
+
+          switch (dptr->param[ii].type)
+            {
+            case PARAM_STRING:
+              {
+                ircsprintf(tmp, "\"%s\" ",
+                           *(char **) dptr->param[ii].ptr);
+                strcat(sendstr, tmp);
+                break;
+              }
+
+            case PARAM_TIME:
+              {
+                ircsprintf(tmp, "%s ",
+                           timeago(*(long *) dptr->param[ii].ptr, 2));
+                strcat(sendstr, tmp);
+                break;
+              }
+
+            case PARAM_INT:
+            case PARAM_SET:
+            case PARAM_PORT:
+              {
+                ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
+                strcat(sendstr, tmp);
+                break;
+              }
+            } /* switch (dptr->param[ii].type) */
         }
 
-        case PARAM_TIME:
-        {
-          sprintf(tmp, "%s ",
-            timeago(*(long *) dptr->param[ii].ptr, 2));
-          strcat(sendstr, tmp);
-          break;
-        }
+      o_RecordCommand(sockfd,
+                      "SET [%s]",
+                      dptr->name);
 
-        case PARAM_INT:
-        case PARAM_SET:
-        case PARAM_PORT:
-        {
-          sprintf(tmp, "%d ",
-            *(int *) dptr->param[ii].ptr);
-          strcat(sendstr, tmp);
-          break;
-        }
-      } /* switch (dptr->param[ii].type) */
+      os_notice(lptr, sockfd,
+                "[\002%s\002] is set to: %s",
+                dptr->name,
+                sendstr);
+
+      return;
     }
-  
-    o_RecordCommand(sockfd,
-      "SET [%s]",
-      dptr->name);
-
-    os_notice(lptr, sockfd,
-      "[\002%s\002] is set to: %s",
-      dptr->name,
-      sendstr);
-
-    return;
-  }
 
   if (dptr->flag == D_NORUNTIME)
-  {
-    os_notice(lptr, sockfd,
-      "The directive [\002%s\002] is not run-time configurable",
-      dptr->name);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "The directive [\002%s\002] is not run-time configurable",
+                dptr->name);
+      return;
+    }
 
   /*
    * Starting position of our first arguement
@@ -4062,179 +4213,175 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
   sendstr[0] = '\0';
   for (ii = 0; ii < PARAM_MAX; ++ii, ++pcnt)
-  {
-    if (!dptr->param[ii].type)
-      break;
-
-    /*
-     * Now assign our variable (dptr->param[ii].ptr) to the
-     * corresponding av[] slot
-     */
-    if ((dptr->param[ii].type != PARAM_SET) && (pcnt >= ac))
     {
-      os_notice(lptr, sockfd,
-        "Not enough arguements to [%s] directive",
-        dptr->name);
-      return;
-    }
-
-    switch (dptr->param[ii].type)
-    {
-      case PARAM_STRING:
-      {
-        char *strptr;
-
-        if ((*(char **) dptr->param[ii].ptr) != (char *) NULL)
-        {
-          /*
-           * make sure we free the old string before allocating
-           * a new one.
-           */
-          MyFree(*(char **) dptr->param[ii].ptr);
-        }
-
-        if (*av[pcnt] == ':')
-          strptr = av[pcnt] + 1;
-        else
-          strptr = av[pcnt];
-
-        *(char **) dptr->param[ii].ptr = MyStrdup(strptr);
-
-        sprintf(tmp, "\"%s\" ",
-          strptr);
-        strcat(sendstr, tmp);
-
+      if (!dptr->param[ii].type)
         break;
-      }
 
-      case PARAM_INT:
-      {
-        int value;
-
-        value = IsNum(av[pcnt]);
-        if (!value)
+      /*
+       * Now assign our variable (dptr->param[ii].ptr) to the
+       * corresponding av[] slot
+       */
+      if ((dptr->param[ii].type != PARAM_SET) && (pcnt >= ac))
         {
           os_notice(lptr, sockfd,
-            "Invalid integer: %s",
-            av[pcnt]);
+                    "Not enough arguements to [%s] directive",
+                    dptr->name);
           return;
         }
 
-        /*
-         * We have to call atoi() anyway since IsNum() would
-         * have returned 1 if av[pcnt] was "0", but IsNum()
-         * is a good way of making sure we have a valid integer
-         */
-        value = atoi(av[pcnt]);
-        *(int *) dptr->param[ii].ptr = value;
-
-        sprintf(tmp, "%d ",
-          value);
-        strcat(sendstr, tmp);
-
-        break;
-      }
-
-      case PARAM_TIME:
-      {
-        long value;
-
-        value = timestr(av[pcnt]);
-        if (!value)
+      switch (dptr->param[ii].type)
         {
-          os_notice(lptr, sockfd,
-            "Invalid time format: %s",
-            av[pcnt]);
-          return;
-        }
+        case PARAM_STRING:
+          {
+            char *strptr;
 
-        *(long *) dptr->param[ii].ptr = value;
+            if ((*(char **) dptr->param[ii].ptr) != NULL)
+              {
+                /*
+                 * make sure we free the old string before allocating
+                 * a new one.
+                 */
+                MyFree(*(char **) dptr->param[ii].ptr);
+              }
 
-        sprintf(tmp, "%s ",
-          timeago(value, 2));
-        strcat(sendstr, tmp);
+            if (*av[pcnt] == ':')
+              strptr = av[pcnt] + 1;
+            else
+              strptr = av[pcnt];
 
-        break;
-      }
+            *(char **) dptr->param[ii].ptr = MyStrdup(strptr);
 
-      case PARAM_SET:
-      {
-        int value;
+            ircsprintf(tmp, "\"%s\" ", strptr);
+            strcat(sendstr, tmp);
 
-        value = IsNum(av[pcnt]);
-        if (!value)
-        {
-          os_notice(lptr, sockfd,
-            "Invalid integer (must be 1 or 0): %s",
-            av[pcnt]);
-          return;
-        }
+            break;
+          }
 
-        value = atoi(av[pcnt]);
+        case PARAM_INT:
+          {
+            int value;
 
-        if (value)
-        {
-          *(int *) dptr->param[ii].ptr = 1;
-          strcat(sendstr, "1 ");
-        }
-        else
-        {
-          *(int *) dptr->param[ii].ptr = 0;
-          strcat(sendstr, "0 ");
-        }
+            value = IsNum(av[pcnt]);
+            if (!value)
+              {
+                os_notice(lptr, sockfd,
+                          "Invalid integer: %s",
+                          av[pcnt]);
+                return;
+              }
 
-        break;
-      }
+            /*
+             * We have to call atoi() anyway since IsNum() would
+             * have returned 1 if av[pcnt] was "0", but IsNum()
+             * is a good way of making sure we have a valid integer
+             */
+            value = atoi(av[pcnt]);
+            *(int *) dptr->param[ii].ptr = value;
 
-      case PARAM_PORT:
-      {
-        int value;
+            ircsprintf(tmp, "%d ", value);
+            strcat(sendstr, tmp);
 
-        value = IsNum(av[pcnt]);
-        if (!value)
-        {
-          os_notice(lptr, sockfd,
-            "Invalid port number (must be between 1 and 65535): %s",
-            av[pcnt]);
-          return;
-        }
+            break;
+          }
 
-        value = atoi(av[pcnt]);
+        case PARAM_TIME:
+          {
+            long value;
 
-        if ((value < 1) || (value > 65535))
-        {
-          os_notice(lptr, sockfd,
-            "Invalid port number (must be between 1 and 65535): %s",
-            av[pcnt]);
-          return;
-        }
+            value = timestr(av[pcnt]);
+            if (!value)
+              {
+                os_notice(lptr, sockfd,
+                          "Invalid time format: %s",
+                          av[pcnt]);
+                return;
+              }
 
-        *(int *) dptr->param[ii].ptr = value;
+            *(long *) dptr->param[ii].ptr = value;
 
-        sprintf(tmp, "%d ",
-          value);
-        strcat(sendstr, tmp);
+            ircsprintf(tmp, "%s ", timeago(value, 2));
+            strcat(sendstr, tmp);
 
-        break;
-      }
+            break;
+          }
 
-      default:
-      {
-        /* we shouldn't get here */
-        break;
-      }
-    } /* switch (dptr->param[ii].type) */
-  } /* for (ii = 0; ii < PARAM_MAX; ii++, pcnt++) */
+        case PARAM_SET:
+          {
+            int value;
+
+            value = IsNum(av[pcnt]);
+            if (!value)
+              {
+                os_notice(lptr, sockfd,
+                          "Invalid integer (must be 1 or 0): %s",
+                          av[pcnt]);
+                return;
+              }
+
+            value = atoi(av[pcnt]);
+
+            if (value)
+              {
+                *(int *) dptr->param[ii].ptr = 1;
+                strcat(sendstr, "1 ");
+              }
+            else
+              {
+                *(int *) dptr->param[ii].ptr = 0;
+                strcat(sendstr, "0 ");
+              }
+
+            break;
+          }
+
+        case PARAM_PORT:
+          {
+            int value;
+
+            value = IsNum(av[pcnt]);
+            if (!value)
+              {
+                os_notice(lptr, sockfd,
+                          "Invalid port number (must be between 1 and 65535): %s",
+                          av[pcnt]);
+                return;
+              }
+
+            value = atoi(av[pcnt]);
+
+            if ((value < 1) || (value > 65535))
+              {
+                os_notice(lptr, sockfd,
+                          "Invalid port number (must be between 1 and 65535): %s",
+                          av[pcnt]);
+                return;
+              }
+
+            *(int *) dptr->param[ii].ptr = value;
+
+            ircsprintf(tmp, "%d ", value);
+            strcat(sendstr, tmp);
+
+            break;
+          }
+
+        default:
+          {
+            /* we shouldn't get here */
+            break;
+          }
+        } /* switch (dptr->param[ii].type) */
+    } /* for (ii = 0; ii < PARAM_MAX; ii++, pcnt++) */
 
   o_RecordCommand(sockfd,
-    "SET [%s] %s",
-    dptr->name,
-    sendstr);
+                  "SET [%s] %s",
+                  dptr->name,
+                  sendstr);
 
   os_notice(lptr, sockfd,
-    "The value of [\002%s\002] has been set to: %s",
-    dptr->name,
-    sendstr);
+            "The value of [\002%s\002] has been set to: %s",
+            dptr->name,
+            sendstr);
 } /* o_set() */
 
 /*
@@ -4248,61 +4395,65 @@ DisplaySettings(struct Luser *lptr, int sockfd)
 {
   struct Directive *dptr;
   int ii,
-      cnt;
+  cnt;
   char sendstr[MAXLINE],
-       tmp[MAXLINE];
+  tmp[MAXLINE];
 
   os_notice(lptr, sockfd,
-    "-- Listing settings --");
+            "-- Listing settings --");
 
   cnt = 0;
   for (dptr = directives; dptr->name; ++dptr, ++cnt)
-  {
-    sendstr[0] = '\0';
-    for (ii = 0; ii < PARAM_MAX; ii++)
     {
-      if (!dptr->param[ii].type)
-        break;
-
-      switch (dptr->param[ii].type)
-      {
-        case PARAM_STRING:
+      sendstr[0] = '\0';
+      for (ii = 0; ii < PARAM_MAX; ii++)
         {
-          sprintf(tmp, "\"%s\" ",
-            *(char **) dptr->param[ii].ptr);
-          strcat(sendstr, tmp);
-          break;
+          if (!dptr->param[ii].type)
+            break;
+
+          switch (dptr->param[ii].type)
+            {
+            case PARAM_STRING:
+              {
+                /* Try to write out string only if non-null, ie is set -kre */
+                if (*(char **)dptr->param[ii].ptr)
+                  {
+                    ircsprintf(tmp, "\"%s\" ",
+                               *(char **) dptr->param[ii].ptr);
+                    strcat(sendstr, tmp);
+                  }
+                break;
+              }
+
+            case PARAM_TIME:
+              {
+                ircsprintf(tmp, "%s ",
+                           timeago(*(long *) dptr->param[ii].ptr, 2));
+                strcat(sendstr, tmp);
+                break;
+              }
+
+            case PARAM_INT:
+            case PARAM_SET:
+            case PARAM_PORT:
+              {
+                ircsprintf(tmp, "%d ",
+                           *(int *) dptr->param[ii].ptr);
+                strcat(sendstr, tmp);
+                break;
+              }
+            } /* switch (dptr->param[ii].type) */
         }
 
-        case PARAM_TIME:
-        {
-          sprintf(tmp, "%s ",
-            timeago(*(long *) dptr->param[ii].ptr, 2));
-          strcat(sendstr, tmp);
-          break;
-        }
-
-        case PARAM_INT:
-        case PARAM_SET:
-        case PARAM_PORT:
-        {
-          sprintf(tmp, "%d ",
-            *(int *) dptr->param[ii].ptr);
-          strcat(sendstr, tmp);
-          break;
-        }
-      } /* switch (dptr->param[ii].type) */
+      os_notice(lptr, sockfd,
+                "%-20s %-30s",
+                dptr->name,
+                sendstr);
     }
 
-    os_notice(lptr, sockfd,
-      "%-20s %-30s",
-      dptr->name,
-      sendstr);
-  }
-
   os_notice(lptr, sockfd,
-    "-- End of list (%d settings) --",
-    cnt);
+            "-- End of list (%d settings) --",
+            cnt);
 } /* DisplaySettings() */
 
 /*
@@ -4317,29 +4468,29 @@ o_ignore(struct Luser *lptr, int ac, char **av, int sockfd)
   struct OperCommand *cptr;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002IGNORE {ADD|DEL|LIST} [nick|mask|index]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002IGNORE {ADD|DEL|LIST} [nick|mask|index]\002");
+      return;
+    }
 
   cptr = GetoCommand(ignorecmds, av[1]);
 
   if (cptr && (cptr != (struct OperCommand *) -1))
-  {
-    /* call cptr->func to execute command */
-    (*cptr->func)(lptr, ac, av, sockfd);
-  }
+    {
+      /* call cptr->func to execute command */
+      (*cptr->func)(lptr, ac, av, sockfd);
+    }
   else
-  {
-    /* the option they gave was not valid */
-    os_notice(lptr, sockfd,
-      "%s switch [\002%s\002]",
-      (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
-      av[1]);
-    os_notice(lptr, sockfd,
-      "Syntax: \002IGNORE {ADD|DEL|LIST} [mask|nickname|index]\002");
-  }
+    {
+      /* the option they gave was not valid */
+      os_notice(lptr, sockfd,
+                "%s switch [\002%s\002]",
+                (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
+                av[1]);
+      os_notice(lptr, sockfd,
+                "Syntax: \002IGNORE {ADD|DEL|LIST} [mask|nickname|index]\002");
+    }
 } /* o_ignore() */
 
 static void
@@ -4350,80 +4501,80 @@ o_ignore_add(struct Luser *lptr, int ac, char **av, int sockfd)
   time_t expire = (time_t) NULL;
 
   if (ac < 3)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002IGNORE ADD <nickname|hostmask> [time]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002IGNORE ADD <nickname|hostmask> [time]\002");
+      return;
+    }
 
   if (match("*!*@*", av[2]))
     strcpy(hostmask, av[2]);
   else if (match("*!*", av[2]))
-  {
-    strcpy(hostmask, av[2]);
-    strcat(hostmask, "@*");
-  }
-  else if (match("*@*", av[2]))
-  {
-    strcpy(hostmask, "*!");
-    strcat(hostmask, av[2]);
-  }
-  else if (match("*.*", av[2]))
-  {
-    strcpy(hostmask, "*!*@");
-    strcat(hostmask, av[2]);
-  }
-  else
-  {
-    struct Luser *ptr;
-    char *mask;
-
-    /* it must be a nickname - try to get hostmask */
-    if ((ptr = FindClient(av[2])))
-    {
-      mask = HostToMask(ptr->username, ptr->hostname);
-      strcpy(hostmask, "*!");
-      strcat(hostmask, mask);
-      MyFree(mask);
-    }
-    else
     {
       strcpy(hostmask, av[2]);
-      strcat(hostmask, "!*@*");
+      strcat(hostmask, "@*");
     }
-  }
+  else if (match("*@*", av[2]))
+    {
+      strcpy(hostmask, "*!");
+      strcat(hostmask, av[2]);
+    }
+  else if (match("*.*", av[2]))
+    {
+      strcpy(hostmask, "*!*@");
+      strcat(hostmask, av[2]);
+    }
+  else
+    {
+      struct Luser *ptr;
+      char *mask;
+
+      /* it must be a nickname - try to get hostmask */
+      if ((ptr = FindClient(av[2])))
+        {
+          mask = HostToMask(ptr->username, ptr->hostname);
+          strcpy(hostmask, "*!");
+          strcat(hostmask, mask);
+          MyFree(mask);
+        }
+      else
+        {
+          strcpy(hostmask, av[2]);
+          strcat(hostmask, "!*@*");
+        }
+    }
 
   if (OnIgnoreList(hostmask))
-  {
-    os_notice(lptr, sockfd,
-      "The hostmask [\002%s\002] is already on the ignorance list",
-      hostmask);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "The hostmask [\002%s\002] is already on the ignorance list",
+                hostmask);
+      return;
+    }
 
   if (ac >= 4)
     expire = timestr(av[3]);
 
   o_RecordCommand(sockfd,
-    "IGNORE ADD %s %s",
-    hostmask,
-    (ac < 4) ? "(perm)" : av[3]);
+                  "IGNORE ADD %s %s",
+                  hostmask,
+                  (ac < 4) ? "(perm)" : av[3]);
 
   AddIgnore(hostmask, expire);
 
   if (expire)
-  {
-    os_notice(lptr, sockfd,
-      "[\002%s\002] has been added to the ignorance list with an expire of %s",
-      hostmask,
-      timeago(expire, 3));
-  }
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] has been added to the ignorance list with an expire of %s",
+                hostmask,
+                timeago(expire, 3));
+    }
   else
-  {
-    os_notice(lptr, sockfd,
-      "[\002%s\002] has been added to the ignorance list with no expiration",
-      hostmask);
-  }
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] has been added to the ignorance list with no expiration",
+                hostmask);
+    }
 } /* o_ignore_add() */
 
 static void
@@ -4435,52 +4586,52 @@ o_ignore_del(struct Luser *lptr, int ac, char **av, int sockfd)
   int idx;
 
   if (ac < 3)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002IGNORE DEL <hostmask | index>\002");
-    return;
-  }
-
-  if ((idx = IsNum(av[2])))
-  {
-    int cnt = 0;
-
-    for (temp = IgnoreList; temp; temp = temp->next, ++cnt)
-    {
-      if (idx == (cnt + 1))
-      {
-        host = MyStrdup(temp->hostmask);
-        break;
-      }
-    }
-
-    if (!host)
     {
       os_notice(lptr, sockfd,
-        "[\002%d\002] is not a valid index",
-        idx);
+                "Syntax: \002IGNORE DEL <hostmask | index>\002");
       return;
     }
-  }
+
+  if ((idx = IsNum(av[2])))
+    {
+      int cnt = 0;
+
+      for (temp = IgnoreList; temp; temp = temp->next, ++cnt)
+        {
+          if (idx == (cnt + 1))
+            {
+              host = MyStrdup(temp->hostmask);
+              break;
+            }
+        }
+
+      if (!host)
+        {
+          os_notice(lptr, sockfd,
+                    "[\002%d\002] is not a valid index",
+                    idx);
+          return;
+        }
+    }
   else
     host = MyStrdup(av[2]);
 
   o_RecordCommand(sockfd,
-    "IGNORE DEL %s",
-    host);
+                  "IGNORE DEL %s",
+                  host);
 
   if (!DelIgnore(host))
-  {
-    os_notice(lptr, sockfd,
-      "[\002%s\002] was not found on the ignorance list",
-      host);
-    MyFree(host);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "[\002%s\002] was not found on the ignorance list",
+                host);
+      MyFree(host);
+      return;
+    }
 
   os_notice(lptr, sockfd,
-    "[\002%s\002] has been removed from the ignorance list",
-    host);
+            "[\002%s\002] has been removed from the ignorance list",
+            host);
 
   MyFree(host);
 } /* o_ignore_del() */
@@ -4492,41 +4643,41 @@ o_ignore_list(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Ignore *tmp;
   int idx;
   char *mask = NULL;
-  time_t currtime = time(NULL);
+  time_t currtime = current_ts;
 
   if (ac >= 3)
     mask = av[2];
 
   o_RecordCommand(sockfd,
-    "IGNORE LIST %s",
-    mask ? mask : "");
+                  "IGNORE LIST %s",
+                  mask ? mask : "");
 
   if (IgnoreList)
-  {
-    os_notice(lptr, sockfd,
-      "-- Ignorance List --");
-    os_notice(lptr, sockfd,
-      "Num Expire (min) Hostmask");
-    os_notice(lptr, sockfd,
-      "--- ------------ --------");
-    idx = 1;
-    for (tmp = IgnoreList; tmp; tmp = tmp->next, idx++)
     {
-      if (mask)
-        if (match(mask, tmp->hostmask) == 0)
-          continue;
       os_notice(lptr, sockfd,
-        "%-3d %-12.1f %-35s",
-        idx,
-        tmp->expire ? ((float)(tmp->expire - currtime) / 60) : (float)0,
-        tmp->hostmask);
+                "-- Ignorance List --");
+      os_notice(lptr, sockfd,
+                "Num Expire (min) Hostmask");
+      os_notice(lptr, sockfd,
+                "--- ------------ --------");
+      idx = 1;
+      for (tmp = IgnoreList; tmp; tmp = tmp->next, idx++)
+        {
+          if (mask)
+            if (match(mask, tmp->hostmask) == 0)
+              continue;
+          os_notice(lptr, sockfd,
+                    "%-3d %-12.1f %-35s",
+                    idx,
+                    tmp->expire ? ((float)(tmp->expire - currtime) / 60) : (float)0,
+                    tmp->hostmask);
+        }
+      os_notice(lptr, sockfd,
+                "-- End of list --");
     }
-    os_notice(lptr, sockfd,
-      "-- End of list --");
-  }
   else
     os_notice(lptr, sockfd,
-      "The ignorance list is empty");
+              "The ignorance list is empty");
 } /* o_ignore_list() */
 
 /*
@@ -4540,24 +4691,22 @@ AddIgnore(char *hostmask, time_t expire)
 {
   struct Ignore *ptr;
 
-//  ptr = (struct Ignore *) MyMalloc(sizeof(struct Ignore));
-//  ptr->hostmask = MyStrdup(hostmask);
-
-  ptr = (struct Ignore *) malloc(sizeof(struct Ignore));
-  ptr->hostmask = strdup(hostmask);
+  ptr = (struct Ignore *) MyMalloc(sizeof(struct Ignore));
+  ptr->hostmask = MyStrdup(hostmask);
 
   if (!expire)
     ptr->expire = (time_t) 0; /* no expiration */
   else
-    ptr->expire = (time(NULL) + expire);
+    ptr->expire = (current_ts + expire);
 
-	ptr->prev = NULL;
+  ptr->prev = NULL;
   ptr->next = IgnoreList;
   if (ptr->next)
-  	ptr->next->prev = ptr;
+    ptr->next->prev = ptr;
 
   IgnoreList = ptr;
-  putlog(LOG1, "Added to IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s", ptr, ptr->prev, ptr->next, ptr->hostmask);
+  putlog(LOG1, "Added to IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s",
+      ptr, ptr->prev, ptr->next, ptr->hostmask);
 } /* AddIgnore() */
 
 /*
@@ -4566,22 +4715,22 @@ OnIgnoreList()
 */
 
 struct Ignore *
-OnIgnoreList(char *mask)
+      OnIgnoreList(char *mask)
 
-{
-  struct Ignore *tmp;
-
-  if (!mask)
-    return (NULL);
-
-  for (tmp = IgnoreList; tmp; tmp = tmp->next)
   {
-    if (match(tmp->hostmask, mask))
-      return (tmp);
-  }
+    struct Ignore *tmp;
 
-  return (NULL);
-} /* OnIgnoreList() */
+    if (!mask)
+      return (NULL);
+
+    for (tmp = IgnoreList; tmp; tmp = tmp->next)
+      {
+        if (match(tmp->hostmask, mask))
+          return (tmp);
+      }
+
+    return (NULL);
+  } /* OnIgnoreList() */
 
 /*
 DelIgnore()
@@ -4604,15 +4753,15 @@ DelIgnore(char *mask)
   cnt = 0;
 
   for (temp = IgnoreList; temp; temp = next)
-  {
-  	next = temp->next;
-
-    if (match(mask, temp->hostmask))
     {
-    	++cnt;
-    	DeleteIgnore(temp);
+      next = temp->next;
+
+      if (match(mask, temp->hostmask))
+        {
+          ++cnt;
+          DeleteIgnore(temp);
+        }
     }
-  }
 
   return (cnt);
 } /* DelIgnore() */
@@ -4626,20 +4775,17 @@ static void
 DeleteIgnore(struct Ignore *iptr)
 
 {
-	if (iptr->next)
-		iptr->next->prev = iptr->prev;
-	if (iptr->prev)
-		iptr->prev->next = iptr->next;
-	else
-		IgnoreList = iptr->next;
+  if (iptr->next)
+    iptr->next->prev = iptr->prev;
+  if (iptr->prev)
+    iptr->prev->next = iptr->next;
+  else
+    IgnoreList = iptr->next;
 
-  putlog(LOG1, "Deleted from IGNORE LIST: ptr %d, prev %d, next %d, hostmask %s", iptr, iptr->prev, iptr->next, iptr->hostmask);
+  putlog(LOG1, "Deleted from IGNORE LIST: ptr %ld, prev %ld, next %ld, hostmask %s", iptr, iptr->prev, iptr->next, iptr->hostmask);
 
-//	MyFree(iptr->hostmask);
-//	MyFree(iptr);
-
-	free(iptr->hostmask);
-	free(iptr);
+  MyFree(iptr->hostmask);
+  MyFree(iptr);
 } /* DeleteIgnore() */
 
 /*
@@ -4655,18 +4801,18 @@ ExpireIgnores(time_t unixtime)
   struct Ignore *temp, *next;
 
   for (temp = IgnoreList; temp; temp = next)
-  {
-  	next = temp->next;
-
-    if (temp->expire && (unixtime >= temp->expire))
     {
-      SendUmode(OPERUMODE_Y,
-        "*** Expired ignore: %s",
-        temp->hostmask);
+      next = temp->next;
 
-			DeleteIgnore(temp);
-		}
-  }
+      if (temp->expire && (unixtime >= temp->expire))
+        {
+          SendUmode(OPERUMODE_Y,
+                    "*** Expired ignore: %s",
+                    temp->hostmask);
+
+          DeleteIgnore(temp);
+        }
+    }
 } /* ExpireIgnores() */
 
 /*
@@ -4686,80 +4832,79 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
   char uhost[UHOSTLEN + 2];
 
   o_RecordCommand(sockfd,
-    "WHO");
+                  "WHO");
 
   os_notice(lptr, sockfd,
-    "Current users: (%% = Services Admin, * = Admin, + = Oper)");
+            "Current users: (%% = Services Admin, * = Admin, + = Oper)");
 
   for (tempconn = connections; tempconn; tempconn = tempconn->next)
-  {
-    if (IsDccPending(tempconn) && !(tempconn->flags & SOCK_DCC))
-      continue;
-    
-    if (tempconn->flags & SOCK_NEEDID)
-      continue;
-
-    if (tempconn->flags & SOCK_TCMBOT)
     {
-      AreBots = 1;
-      continue;
-    }
-
-    tempuser = DccGetUser(tempconn);
-
-    if (IsServicesAdmin(tempuser))
-      prefix = '%';
-    else if (IsAdmin(tempuser))
-      prefix = '*';
-    else if (IsOper(tempuser))
-      prefix = '+';
-    else
-      prefix = ' ';
-
-    mins = ((time(NULL) - tempconn->idle) / 60) % 60;
-    if (mins >= 5)
-    {
-      strcpy(idle, "idle: ");
-      strcat(idle, timeago(tempconn->idle, 0));
-    }
-    else
-      idle[0] = '\0';
-
-    sprintf(uhost, "%s@%s",
-      tempconn->username,
-      tempconn->hostname);
-
-    os_notice(lptr, sockfd, "  %c%-10s %-25s %s",
-      prefix,
-      tempconn->nick,
-      uhost,
-      idle);
-  }
-
-  if (AreBots)
-  {
-    os_notice(lptr, sockfd, "\r\nBot connections:");
-    for (tempconn = connections; tempconn; tempconn = tempconn->next)
-    {
-      if (!(tempconn->flags & SOCK_TCMBOT))
+      if (IsDccPending(tempconn) && !(tempconn->flags & SOCK_DCC))
         continue;
 
-      if (tempconn->flags & SOCK_BOTHUB)
-      {
-        os_notice(lptr, sockfd, " -> %s [%s@%s]",
-          tempconn->nick,
-          tempconn->username,
-          tempconn->hostname);
-      }
+      if (tempconn->flags & SOCK_NEEDID)
+        continue;
+
+      if (tempconn->flags & SOCK_TCMBOT)
+        {
+          AreBots = 1;
+          continue;
+        }
+
+      tempuser = DccGetUser(tempconn);
+      assert(tempuser != NULL);
+
+      if (IsServicesAdmin(tempuser))
+        prefix = '%';
+      else if (IsAdmin(tempuser))
+        prefix = '*';
+      else if (IsOper(tempuser))
+        prefix = '+';
       else
-      {
-        os_notice(lptr, sockfd, " <- %s [%s@%s]",
-          tempconn->nick,
-          tempconn->username,
-          tempconn->hostname);
-      }
+        prefix = ' ';
+
+      mins = ((current_ts - tempconn->idle) / 60) % 60;
+      if (mins >= 5)
+        {
+          strcpy(idle, "idle: ");
+          strcat(idle, timeago(tempconn->idle, 0));
+        }
+      else
+        idle[0] = '\0';
+
+      ircsprintf(uhost, "%s@%s", tempconn->username, tempconn->hostname);
+
+      os_notice(lptr, sockfd, "  %c%-10s %-25s %s",
+                prefix,
+                tempconn->nick,
+                uhost,
+                idle);
     }
-  } /* if (AreBots) */
+
+  if (AreBots)
+    {
+      os_notice(lptr, sockfd, "Bot connections:");
+      for (tempconn = connections; tempconn; tempconn = tempconn->next)
+        {
+          if (!(tempconn->flags & SOCK_TCMBOT))
+            continue;
+
+          if (tempconn->flags & SOCK_BOTHUB)
+            {
+              os_notice(lptr, sockfd, " -> %s [%s@%s]",
+                        tempconn->nick,
+                        tempconn->username,
+                        tempconn->hostname);
+            }
+          else
+            {
+              os_notice(lptr, sockfd, " <- %s [%s@%s]",
+                        tempconn->nick,
+                        tempconn->username,
+                        tempconn->hostname);
+            }
+        }
+    } /* if (AreBots) */
 } /* o_who() */
 
 /*
@@ -4775,17 +4920,17 @@ o_boot(struct Luser *lptr, int ac, char **av, int sockfd)
   struct DccUser *dccptr;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002BOOT <nick> [reason]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002BOOT <nick> [reason]\002");
+      return;
+    }
 
   if (!(dccptr = IsOnDcc(av[1])))
-  {
-    os_notice(lptr, sockfd, "%s is not on the partyline\n", 
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "%s is not on the partyline",
+                av[1]);
+      return;
+    }
 
   if (ac < 3)
     reason = MyStrdup("");
@@ -4793,19 +4938,19 @@ o_boot(struct Luser *lptr, int ac, char **av, int sockfd)
     reason = GetString(ac - 2, av + 2);
 
   o_RecordCommand(sockfd,
-    "BOOT %s %s",
-    av[1],
-    reason);
+                  "BOOT %s %s",
+                  av[1],
+                  reason);
 
   BroadcastDcc(DCCALL, "%s has been booted by %s [%s]\n",
-    av[1],
-    onick,
-    reason);
+               av[1],
+               onick,
+               reason);
 
   os_notice(lptr, dccptr->socket,
-    "You have been booted by %s [%s]",
-    onick,
-    reason);
+            "You have been booted by %s [%s]",
+            onick,
+            reason);
 
   CloseConnection(dccptr);
 
@@ -4833,34 +4978,160 @@ o_quit(struct Luser *lptr, int ac, char **av, int sockfd)
     reason = GetString(ac - 1, av + 1);
 
 
-  os_notice(lptr, sockfd, "Closing connection: %s", 
-    reason);
+  os_notice(lptr, sockfd, "Closing connection: %s",
+            reason);
 
   BroadcastDcc(DCCALL, "%s (%s@%s) has left the partyline [%s]\n",
-    onick,
-    ouser,
-    ohost,
-    reason);
+               onick, ouser, ohost, reason);
 
   CloseConnection(dccptr);
 
   MyFree(reason);
 } /* o_quit() */
 
+#ifdef GLOBALSERVICES
 /*
-o_motd()
+  o_motd()
+  Modify or show motd.
+*/
+static void o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+  struct OperCommand *cptr;
+
+  if (ac < 2)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY|DELETE} [line]\002");
+      return;
+    }
+
+  cptr = GetoCommand(motdcmds, av[1]);
+
+  if (cptr && (cptr != (struct OperCommand *) -1))
+    {
+      /* call cptr->func to execute command */
+      (*cptr->func)(lptr, ac, av, sockfd);
+    }
+  else
+    {
+      /* the option they gave was not valid */
+      os_notice(lptr, sockfd,
+                "%s switch [\002%s\002]",
+                (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
+                av[1]);
+      os_notice(lptr, sockfd,
+                "Syntax: \002MOTD {ADD|APPEND|DISPLAY|DELETE} [line]\002");
+    }
+} /* o_motd() */
+
+/*
+o_motd_display()
   Display motd
 */
-
-static void
-o_motd(struct Luser *lptr, int ac, char **av, int sockfd)
-
+static void o_motd_display(struct Luser *lptr, int ac, char **av, int
+    sockfd)
 {
-  o_RecordCommand(sockfd,
-    "MOTD");
+  o_RecordCommand(sockfd, "MOTD DISPLAY");
 
-  SendMotd(sockfd);
-} /* o_motd() */
+  if (!Network->LogonNewsFile.Contents)
+    {
+      os_notice(lptr, sockfd,
+                "There is nothing in MOTD");
+      return;
+    }
+
+  SendMessageFile(lptr, &Network->LogonNewsFile);
+} /* o_motd_display() */
+
+/*
+  o_motd_add()
+  Delete current motd and add the line given (if any, else blank line)
+*/
+static void o_motd_add(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+  char *line = ((ac >= 3) ? GetString(ac - 2, av + 2) : NULL);
+
+  o_RecordCommand(sockfd, "MOTD ADD %s",
+                  line ? line : "");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "w")))
+    {
+      os_notice(lptr, sockfd,
+             "Cannot open MOTD file %s!",
+             Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fprintf(fp, "%s\n", line ? line : "");
+  fclose(fp);
+
+  /*
+   * it's better to reread the logon news file here with ReadMessageFile
+   * than to make operations with Network->LogonNewsFile believe me :)
+   */
+  ReadMessageFile(&Network->LogonNewsFile);
+
+  os_notice(lptr, sockfd,
+         "MOTD set to %s", line ? line : "a blank line");
+} /* o_motd_add() */
+
+/*
+  o_motd_append()
+  Adds the line given (if any, else blank line) to the current logon news
+*/
+static void o_motd_append(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+  char *line = ((ac >= 3) ? GetString(ac - 2, av + 2) : NULL);
+
+  RecordCommand("%s: %s!%s@%s MOTD APPEND %s",
+                n_Global, lptr->nick, lptr->username, lptr->hostname, line
+                ? line : "");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "a+")))
+    {
+      os_notice(lptr, sockfd,
+         "Cannot open MOTD file %s!", Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fprintf(fp, "%s\n", line ? line : "");
+  fclose(fp);
+
+  ReadMessageFile(&Network->LogonNewsFile);
+  os_notice(lptr, sockfd,
+         "Line appended to the current MOTD");
+} /* o_motd_append() */
+
+/*
+  o_motd_delete()
+  Delete current motd
+*/
+static void o_motd_delete(struct Luser *lptr, int ac, char **av, int
+    sockfd)
+{
+  FILE *fp;
+
+  o_RecordCommand(sockfd, "MOTD DELETE");
+
+  if (!(fp = fopen(Network->LogonNewsFile.filename, "w")))
+    {
+      os_notice(lptr, sockfd,
+             "Cannot open MOTD file %s!",
+             Network->LogonNewsFile.filename);
+      return;
+    }
+
+  fclose(fp);
+
+  ReadMessageFile(&Network->LogonNewsFile);
+
+  os_notice(lptr, sockfd, "MOTD deleted");
+} /* o_motd_delete() */
+#endif
 
 /*
 o_link()
@@ -4874,27 +5145,27 @@ o_link(struct Luser *lptr, int ac, char **av, int sockfd)
   struct Botlist *bptr;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002LINK <botnick>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002LINK <botnick>\002");
+      return;
+    }
 
   if (!(bptr = IsBot(av[1])))
-  {
-    os_notice(lptr, sockfd, "No such bot: %s", 
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No such bot: %s",
+                av[1]);
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "LINK %s",
-    bptr->name);
+                  "LINK %s",
+                  bptr->name);
 
-  os_notice(lptr, sockfd, "Attempting to link to %s", 
-    bptr->name);
+  os_notice(lptr, sockfd, "Attempting to link to %s",
+            bptr->name);
   os_notice(lptr, sockfd, "Making connection to %s:%d",
-    bptr->hostname,
-    bptr->port);
+            bptr->hostname,
+            bptr->port);
 
   ConnectToTCM(onick, bptr);
 } /* o_link() */
@@ -4906,25 +5177,24 @@ o_unlink()
 
 static void
 o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
-
 {
   char sendstr[MAXLINE];
   char *reason;
   struct DccUser *botptr, *tmp;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002UNLINK <bot name> [reason]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002UNLINK <bot name> [reason]\002");
+      return;
+    }
 
   if (!(botptr = GetBot(av[1])))
-  {
-    os_notice(lptr, sockfd, "No such bot: %s",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "No such bot: %s",
+                av[1]);
+      return;
+    }
 
   if (ac < 3)
     reason = MyStrdup("");
@@ -4932,47 +5202,41 @@ o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
     reason = GetString(ac - 2, av + 2);
 
   o_RecordCommand(sockfd,
-    "UNLINK %s %s",
-    botptr->nick,
-    reason);
+                  "UNLINK %s %s",
+                  botptr->nick,
+                  reason);
 
   if (reason[0] == '\0')
-  {
-    sprintf(sendstr, "(%s)",
-      onick);
-    MyFree(reason);
-    reason = MyStrdup(sendstr);
-  }
+    {
+      ircsprintf(sendstr, "(%s)", onick);
+      MyFree(reason);
+      reason = MyStrdup(sendstr);
+    }
   else
-  {
-    sprintf(sendstr, "(%s: %s)",
-      onick,
-      reason);
-    MyFree(reason);
-    reason = MyStrdup(sendstr);
-  }
+    {
+      ircsprintf(sendstr, "(%s: %s)", onick, reason);
+      MyFree(reason);
+      reason = MyStrdup(sendstr);
+    }
 
   for (tmp = connections; tmp; tmp = tmp->next)
-  {
-    if (tmp == botptr)
-      continue;
+    {
+      if (tmp == botptr)
+        continue;
 
-    if (tmp->flags & SOCK_TCMBOT)
-    {
-      sprintf(sendstr, "(%s) Unlinked from %s %s\n",
-        n_OperServ,
-        botptr->nick,
-        reason);
-      writesocket(tmp->socket, sendstr);
+      if (tmp->flags & SOCK_TCMBOT)
+        {
+          ircsprintf(sendstr, "(%s) Unlinked from %s %s\n",
+                     n_OperServ, botptr->nick, reason);
+          writesocket(tmp->socket, sendstr);
+        }
+      else
+        {
+          ircsprintf(sendstr, "*** Unlinked from %s %s\n",
+                     botptr->nick, reason);
+          writesocket(tmp->socket, sendstr);
+        }
     }
-    else
-    {
-      sprintf(sendstr, "*** Unlinked from %s %s\n",
-        botptr->nick,
-        reason);
-      writesocket(tmp->socket, sendstr);
-    }
-  }
 
   CloseConnection(botptr);
 
@@ -4982,7 +5246,7 @@ o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
 /*
 o_stats()
  Displays various stats depending on switch
-
+ 
 Switches:
    O : O:lines
    B : bot lines
@@ -5002,323 +5266,344 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002STATS <switch>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002STATS <switch>\002");
+      return;
+    }
 
   o_RecordCommand(sockfd,
-    "STATS %c",
-    ToUpper(*av[1]));
+                  "STATS %c",
+                  ToUpper(*av[1]));
 
   switch (av[1][0])
-  {
+    {
     case 'b':
     case 'B':
-    {
-      struct Botlist *tempbot;
-      char uh[UHOSTLEN + 2];
-    
-      if (BotList || RemoteBots)
       {
-        os_notice(lptr, sockfd, "-- TCM Bot Lines --");
-        os_notice(lptr, sockfd, "    [Nickname       ] [Hostname                 ] [Port ]");
+        struct Botlist *tempbot;
+        char uh[UHOSTLEN + 2];
 
-        for (tempbot = BotList; tempbot; tempbot = tempbot->next)
-        {
-          os_notice(lptr, sockfd, "[B] [%-15s] [%-25s] [%-5d]",
-            tempbot->name,
-            tempbot->hostname,
-            tempbot->port);
-        }
+        if (BotList || RemoteBots)
+          {
+            os_notice(lptr, sockfd, "-- TCM Bot Lines --");
+            os_notice(lptr, sockfd, "    [Nickname       ] [Hostname                 ] [Port ]");
 
-        for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
-        {
-          sprintf(uh, "%s@%s",
-            tempbot->username,
-            tempbot->hostname);
+            for (tempbot = BotList; tempbot; tempbot = tempbot->next)
+              {
+                os_notice(lptr, sockfd, "[B] [%-15s] [%-25s] [%-5d]",
+                          tempbot->name,
+                          tempbot->hostname,
+                          tempbot->port);
+              }
 
-          os_notice(lptr, sockfd, "[L] [%-15s] [%-25s]",
-            tempbot->name,
-            uh);
-        }
+            for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
+              {
+                ircsprintf(uh, "%s@%s", tempbot->username, tempbot->hostname);
 
-        os_notice(lptr, sockfd, "-- End of list --");
-      }
-      else
-        os_notice(lptr, sockfd, "No bot lines");
-      break;
-    } /* case 'B' */
+                os_notice(lptr, sockfd, "[L] [%-15s] [%-25s]",
+                          tempbot->name,
+                          uh);
+              }
+
+            os_notice(lptr, sockfd, "-- End of list --");
+          }
+        else
+          os_notice(lptr, sockfd, "No bot lines");
+        break;
+      } /* case 'B' */
 
     case 's':
     case 'S':
-    {
-      struct Servlist *tempserv;
-
-      os_notice(lptr, sockfd, "-- Server List --");
-      os_notice(lptr, sockfd,
-        "[Hostname                      ] [Port ]");
-      for (tempserv = ServList; tempserv; tempserv = tempserv->next)
       {
-        os_notice(lptr, sockfd, "[%-30s] [%-5d]",
-          tempserv->hostname,
-          tempserv->port);
-      }
-      os_notice(lptr, sockfd, "-- End of list --");
+        struct Servlist *tempserv;
 
-      break;
-    } /* case 'S' */
+        os_notice(lptr, sockfd, "-- Server List --");
+        os_notice(lptr, sockfd,
+                  "[Hostname                      ] [Port ]");
+        for (tempserv = ServList; tempserv; tempserv = tempserv->next)
+          {
+            os_notice(lptr, sockfd, "[%-30s] [%-5d]",
+                      tempserv->hostname,
+                      tempserv->port);
+          }
+        os_notice(lptr, sockfd, "-- End of list --");
+
+        break;
+      } /* case 'S' */
 
     case 'o':
     case 'O':
-    {
-      char flags[MAXLINE];
-      char uhost[UHOSTLEN + 2];
-      struct Userlist *tempuser;
-      int cnt = 0;
-
-      os_notice(lptr, sockfd, "-- Authorized Users --");
-      os_notice(lptr, sockfd,
-        "[Nickname      ] [Hostmask                 ] [Flags     ]");
-      for (tempuser = UserList; tempuser; tempuser = tempuser->next)
       {
-        cnt++;
+        char flags[MAXLINE];
+        char uhost[UHOSTLEN + 2];
+        struct Userlist *tempuser;
+        int cnt = 0;
 
-        flags[0] = '\0';
-        if (tempuser->flags & PRIV_ADMIN)
-          strcat(flags, "a");
-        if (tempuser->flags & PRIV_CHAT)
-          strcat(flags, "d");
-        if (tempuser->flags & PRIV_EXCEPTION)
-          strcat(flags, "e");
-        if (tempuser->flags & PRIV_FRIEND)
-          strcat(flags, "f");
-        if (tempuser->flags & PRIV_GLINE)
-          strcat(flags, "g");
-        if (tempuser->flags & PRIV_JUPE)
-          strcat(flags, "j");
-        if (tempuser->flags & PRIV_OPER)
-          strcat(flags, "o");
-        if (tempuser->flags & PRIV_SADMIN)
-          strcat(flags, "S");
+        os_notice(lptr, sockfd, "-- Authorized Users --");
+        os_notice(lptr, sockfd,
+                  "[Nickname      ] [Hostmask                 ] [Flags     ]");
+        for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+          {
+            cnt++;
 
-        sprintf(uhost, "%s@%s",
-          tempuser->username,
-          tempuser->hostname);
+            flags[0] = '\0';
+            if (tempuser->flags & PRIV_ADMIN)
+              strcat(flags, "a");
+            if (tempuser->flags & PRIV_CHAT)
+              strcat(flags, "d");
+            if (tempuser->flags & PRIV_EXCEPTION)
+              strcat(flags, "e");
+            if (tempuser->flags & PRIV_FRIEND)
+              strcat(flags, "f");
+            if (tempuser->flags & PRIV_GLINE)
+              strcat(flags, "g");
+            if (tempuser->flags & PRIV_JUPE)
+              strcat(flags, "j");
+            if (tempuser->flags & PRIV_OPER)
+              strcat(flags, "o");
+            if (tempuser->flags & PRIV_SADMIN)
+              strcat(flags, "S");
 
-        os_notice(lptr, sockfd, "[%-14s] [%-25s] [%-10s]",
-          tempuser->nick,
-          uhost,
-          flags);
+            ircsprintf(uhost, "%s@%s", tempuser->username,
+                       tempuser->hostname);
+
+            os_notice(lptr, sockfd, "[%-14s] [%-25s] [%-10s]",
+                      tempuser->nick,
+                      uhost,
+                      flags);
+          }
+
+        os_notice(lptr, sockfd,
+                  "-- End of list (%d users found) --",
+                  cnt);
+
+        break;
       }
-
-      os_notice(lptr, sockfd,
-        "-- End of list (%d users found) --",
-        cnt);
-
-      break;
-    }
     case 'u':
     case 'U':
-    {
-      os_notice(lptr, sockfd,
-        "%s has been up for %s",
-        Me.name,
-        timeago(TimeStarted, 1));
-      break;
-    } /* case 'U' */
+      {
+        os_notice(lptr, sockfd,
+                  "%s has been up for %s",
+                  Me.name,
+                  timeago(TimeStarted, 1));
+        break;
+      } /* case 'U' */
     case 'm':
     case 'M':
-    {
-      CalcMem(onick, sockfd);
-      break;
-    } /* case 'M' */
+      {
+        CalcMem(onick, sockfd);
+        break;
+      } /* case 'M' */
     case 'i':
     case 'I':
-    {
-      struct rHost *temphost;
-      char uhost[UHOSTLEN + 2];
-
-      os_notice(lptr, sockfd, "-- Restricted Hostmasks --");
-      os_notice(lptr, sockfd, "[Hostmask                 ] [Max connections]");
-      for (temphost = rHostList; temphost; temphost = temphost->next)
       {
-        sprintf(uhost, "%s@%s",
-          temphost->username,
-          temphost->hostname);
+        struct rHost *temphost;
+        char uhost[UHOSTLEN + 2];
 
-        os_notice(lptr, sockfd, "[%-25s] [%-15d]",
-          uhost,
-          temphost->hostnum);
-      }
+        os_notice(lptr, sockfd, "-- Restricted Hostmasks --");
+        os_notice(lptr, sockfd, "[Hostmask                 ] [Max connections]");
+        for (temphost = rHostList; temphost; temphost = temphost->next)
+          {
+            ircsprintf(uhost, "%s@%s", temphost->username,
+                       temphost->hostname);
 
-      os_notice(lptr, sockfd, "-- End of list --");
-      break;
-    } /* case 'I' */
+            os_notice(lptr, sockfd, "[%-25s] [%-15d]",
+                      uhost,
+                      temphost->hostnum);
+          }
+
+        os_notice(lptr, sockfd, "-- End of list --");
+        break;
+      } /* case 'I' */
 
     case 'g':
     case 'G':
-    {
-    #ifdef ALLOW_GLINES
-      struct Gline *gptr;
-      time_t currtime = time(NULL);
-      char expstr[MAXLINE];
-      char uh[UHOSTLEN + 2];
-
-      os_notice(lptr, sockfd, "-- Listing Glines --");
-       os_notice(lptr, sockfd,
-        "[Hostmask                 ] [Reason                   ] [Expire] [Who            ]");
-      for (gptr = GlineList; gptr; gptr = gptr->next)
       {
-        if (gptr->expires)
-        {
-          sprintf(expstr, "%-6.1f",
-            (((float) (gptr->expires - currtime)) / 60));
-        }
-        else
-          sprintf(expstr, "never ");
+#ifdef ALLOW_GLINES
+        struct Gline *gptr;
+        time_t currtime = current_ts;
+        char expstr[MAXLINE];
+        char uh[UHOSTLEN + 2];
+        char chkstr[MAXLINE];
+        char *user = NULL, *host = NULL;
 
-        sprintf(uh, "%s@%s",
-          gptr->username,
-          gptr->hostname);
-
+        os_notice(lptr, sockfd, "-- Listing Glines --");
         os_notice(lptr, sockfd,
-          "[%-25s] [%-25s] [%s] [%-15s]",
-          uh,
-          gptr->reason,
-          expstr,
-	  gptr->who);
-      }
+                  "[Hostmask                 ] [Reason                   ] [Expire] [Who            ]");
 
-      os_notice(lptr, sockfd, "-- End of list (%d gline%s) --",
-        Network->TotalGlines,
-        (Network->TotalGlines == 1) ? "" : "s");
-    #else
+        /* Test if we will do "stats g pattern" matching -kre */
+        if (ac > 2)
+          {
+            strcpy(chkstr, av[2]);
+            if (!(host = strchr(av[2], '@')))
+              {
+                user = NULL;
+                host = av[2];
+              }
+            else
+              {
+                user = av[2];
+                *host++ = 0;
+              }
+          }
 
-      os_notice(lptr, sockfd, "Glines are disabled");
+        for (gptr = GlineList; gptr; gptr = gptr->next)
+          {
+            /* Do username/hostname matching here! -kre */
+            if (ac > 2)
+              {
+                if (user && !match(user, gptr->username))
+                  continue;
+                if (!match(host, gptr->hostname))
+                  continue;
+              }
 
-    #endif /* ALLOW_GLINES */
+            if (gptr->expires)
+              {
+                ircsprintf(expstr, "%-6.1f",
+                           (((float) (gptr->expires - currtime)) / 60));
+              }
+            else
+              ircsprintf(expstr, "never ");
 
-      break;
-    } /* case 'G' */
+            ircsprintf(uh, "%s@%s", gptr->username, gptr->hostname);
+
+            os_notice(lptr, sockfd,
+                      "[%-25s] [%-25s] [%s] [%-15s]",
+                      uh, gptr->reason, expstr, gptr->who);
+          }
+
+        os_notice(lptr, sockfd, "-- End of list (from total %d gline%s) --",
+                  Network->TotalGlines,
+                  (Network->TotalGlines == 1) ? "" : "s");
+#else
+
+        os_notice(lptr, sockfd, "Glines are disabled");
+
+#endif /* ALLOW_GLINES */
+
+        break;
+      } /* case 'G' */
 
     case 'j':
     case 'J':
-    {
-    #ifdef ALLOW_JUPES
-      struct Jupe *tempjupe;
-
-    #ifdef JUPEVOTES
-    if (VoteList)
-    {
-      struct JupeVote *tempvote;
-      int i;
-
-      os_notice(lptr, sockfd, "-- Listing Jupe Votes --");
-      os_notice(lptr, sockfd,
-                "[Server              ] [Votes] [Who       ]");
-      for (tempvote = VoteList; tempvote; tempvote = tempvote->next)
       {
-        os_notice(lptr, sockfd, "[%-20s] [%-5d] [%-10s]",
-                  tempvote->name,
-                  tempvote->count,
-                  tempvote->who[0]);
-        for (i = 1; i < JUPEVOTES; i++)
+#ifdef ALLOW_JUPES
+        struct Jupe *tempjupe;
+
+#ifdef JUPEVOTES
+
+        if (VoteList)
           {
-           if (tempvote->who[i])
-            os_notice(lptr, sockfd, "                               [%-10s]",
-                      tempvote->who[i]);
-          }
-       }
-    }
-    #endif
-      os_notice(lptr, sockfd, "-- Listing Jupes --");
-      os_notice(lptr, sockfd,
-        "[Server/Nickname          ] [Reason                        ] [Who               ]");
-      for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
-      {
-        os_notice(lptr, sockfd, "[%-25s] [%-30s] [%-15s]",
-          tempjupe->name,
-          tempjupe->reason,
-	  tempjupe->who);
-      }
-      os_notice(lptr, sockfd, "-- End of list (%d jupe%s) --", 
-        Network->TotalJupes,
-        (Network->TotalJupes == 1) ? "" : "s");
-    #else
-      os_notice(lptr, sockfd, "Jupes are disabled");
-    #endif
+            struct JupeVote *tempvote;
+            int i;
 
-      break;
-    } /* case 'J' */
+            os_notice(lptr, sockfd, "-- Listing Jupe Votes --");
+            os_notice(lptr, sockfd,
+                      "[Server              ] [Votes] [Who       ]");
+            for (tempvote = VoteList; tempvote; tempvote = tempvote->next)
+              {
+                os_notice(lptr, sockfd, "[%-20s] [%-5d] [%-10s]",
+                          tempvote->name,
+                          tempvote->count,
+                          tempvote->who[0]);
+                for (i = 1; i < JUPEVOTES; i++)
+                  {
+                    if (tempvote->who[i])
+                      os_notice(lptr, sockfd, "                               [%-10s]",
+                                tempvote->who[i]);
+                  }
+              }
+          }
+#endif
+        os_notice(lptr, sockfd, "-- Listing Jupes --");
+        os_notice(lptr, sockfd,
+                  "[Server/Nickname          ] [Reason                        ] [Who               ]");
+        for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
+          {
+            os_notice(lptr, sockfd, "[%-25s] [%-30s] [%-15s]",
+                      tempjupe->name,
+                      tempjupe->reason,
+                      tempjupe->who);
+          }
+        os_notice(lptr, sockfd, "-- End of list (%d jupe%s) --",
+                  Network->TotalJupes,
+                  (Network->TotalJupes == 1) ? "" : "s");
+#else
+
+        os_notice(lptr, sockfd, "Jupes are disabled");
+#endif
+
+        break;
+      } /* case 'J' */
 
     case 'p':
     case 'P':
-    {
-      struct PortInfo *tempport;
-
-      os_notice(lptr, sockfd, "-- Port List --");
-      os_notice(lptr, sockfd,
-        "[Port #] [Type    ] [Hostmask                 ]");
-      for (tempport = PortList; tempport; tempport = tempport->next)
       {
-        os_notice(lptr, sockfd,
-          "[%-6d] [%-8s] [%-25s]",
-          tempport->port,
-          (tempport->type == PRT_TCM) ? "TCM" : "Users",
-          tempport->host ? tempport->host : "*.*");
-      }
-      os_notice(lptr, sockfd, "-- End of list --");
+        struct PortInfo *tempport;
 
-      break;
-    } /* case 'P' */
+        os_notice(lptr, sockfd, "-- Port List --");
+        os_notice(lptr, sockfd,
+                  "[Port #] [Type    ] [Hostmask                 ]");
+        for (tempport = PortList; tempport; tempport = tempport->next)
+          {
+            os_notice(lptr, sockfd,
+                      "[%-6d] [%-8s] [%-25s]",
+                      tempport->port,
+                      (tempport->type == PRT_TCM) ? "TCM" : "Users",
+                      tempport->host ? tempport->host : "*.*");
+          }
+        os_notice(lptr, sockfd, "-- End of list --");
+
+        break;
+      } /* case 'P' */
 
     case 'c':
     case 'C':
-    {
-      struct Chanlist *tempchan;
-
-      os_notice(lptr, sockfd, "-- Listing Channels --");
-      os_notice(lptr, sockfd,
-        "[Channel name             ]");
-      for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
       {
-        os_notice(lptr, sockfd, "[%-25s]", 
-          tempchan->name);
-      }
+        struct Chanlist *tempchan;
 
-      os_notice(lptr, sockfd, "-- End of list (%d channel%s) --", 
-        Network->MyChans,
-        (Network->MyChans == 1) ? "" : "s");
+        os_notice(lptr, sockfd, "-- Listing Channels --");
+        os_notice(lptr, sockfd,
+                  "[Channel name             ]");
+        for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
+          {
+            os_notice(lptr, sockfd, "[%-25s]",
+                      tempchan->name);
+          }
 
-      break;
-    } /* case 'C' */
-    
+        os_notice(lptr, sockfd, "-- End of list (%d channel%s) --",
+                  Network->MyChans,
+                  (Network->MyChans == 1) ? "" : "s");
+
+        break;
+      } /* case 'C' */
+
     case '?':
-    {
-      time_t uptime = time(NULL) - TimeStarted;
+      {
+        time_t uptime = current_ts - TimeStarted;
 
-      os_notice(lptr, sockfd,
-        "Total Sent %10.2f %s (%4.1f K/s)",
-        GMKBv((float)Network->SendB),
-        GMKBs((float)Network->SendB),
-        (float)((float)((float)Network->SendB / (float)1024.0) / (float)(uptime)));
-      os_notice(lptr, sockfd,
-        "Total Recv %10.2f %s (%4.1f K/s)",
-        GMKBv((float)Network->RecvB),
-        GMKBs((float)Network->RecvB),
-        (float)((float)((float)Network->RecvB / (float)1024.0) / (float)(uptime)));
+        os_notice(lptr, sockfd,
+                  "Total Sent %10.2f %s (%4.1f K/s)",
+                  GMKBv((float)Network->SendB),
+                  GMKBs((float)Network->SendB),
+                  (float)((float)((float)Network->SendB / (float)1024.0) / (float)(uptime)));
+        os_notice(lptr, sockfd,
+                  "Total Recv %10.2f %s (%4.1f K/s)",
+                  GMKBv((float)Network->RecvB),
+                  GMKBs((float)Network->RecvB),
+                  (float)((float)((float)Network->RecvB / (float)1024.0) / (float)(uptime)));
 
-      break;
-    } /* case '?' */
+        break;
+      } /* case '?' */
 
     default:
-    {
-      os_notice(lptr, sockfd, "Unknown switch [%c]",
-        av[1][0]);
-      break;
-    }
-  } /* switch (letter[0]) */
+      {
+        os_notice(lptr, sockfd, "Unknown switch [%c]",
+                  av[1][0]);
+        break;
+      }
+    } /* switch (letter[0]) */
 } /* o_stats() */
 
 #ifdef ALLOW_KILLCHAN
@@ -5327,14 +5612,14 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 o_killchan()
  Kills all members of a channel who meet the criteria given
 by [options]
-
+ 
 Valid options:
  -ops       - Limit matches to channel ops
  -nonops    - Limit matches to non channel ops
  -voices    - Limit matches to channel voices
  -nonvoices - Limit matches to non channel voices
  -nonopers  - Do not kill IRC Operators
-
+ 
 Does not affect Service Bots or O: line exception users
 */
 
@@ -5345,74 +5630,69 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   char *reason;
   struct Channel *chptr;
   struct ChannelUser *tempuser, *next;
-  int ii,
-      bad,
-      cnt;
+
+  int bad, cnt, iimatch, iitotal;
   int alen;
   int nonops, /* -nonops */
-      ops, /* -ops */
-      nonvoices, /* -nonvoices */
-      voices, /* -voices */
-      nonopers; /* -nonopers */
+  ops, /* -ops */
+  nonvoices, /* -nonvoices */
+  voices, /* -voices */
+  nonopers; /* -nonopers */
   char argbuf[MAXLINE];
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002KILLCHAN [options] <channel> [reason]\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002KILLCHAN [options] <channel> [reason]\002");
+      return;
+    }
 
   chptr = NULL;
-  reason = (char *) NULL;
-  nonopers = 0;
-  ops = 0;
-  nonops = 0;
-  voices = 0;
-  nonvoices = 0;
+  reason = NULL;
+  nonopers = ops = nonops = voices = nonvoices = iimatch = iitotal = 0;
 
   for (cnt = 1; cnt < ac; cnt++)
-  {
-    alen = strlen(av[cnt]);
-    if (!strncasecmp(av[cnt], "-nonopers", alen))
-      nonopers = 1;
-    else if (!strncasecmp(av[cnt], "-ops", alen))
-      ops = 1;
-    else if (!strncasecmp(av[cnt], "-nonops", alen))
-      nonops = 1;
-    else if (!strncasecmp(av[cnt], "-voices", alen))
-      voices = 1;
-    else if (!strncasecmp(av[cnt], "-nonvoices", alen))
-      nonvoices = 1;
-    else
     {
-      if (!(chptr = FindChannel(av[cnt++])))
-      {
-        os_notice(lptr, sockfd,
-          "Invalid channel: %s",
-          av[cnt - 1]);
-        return;
-      }
-
-      if (ac >= (cnt + 1))
-        reason = GetString(ac - cnt, av + cnt);
+      alen = strlen(av[cnt]);
+      if (!ircncmp(av[cnt], "-nonopers", alen))
+        nonopers = 1;
+      else if (!ircncmp(av[cnt], "-ops", alen))
+        ops = 1;
+      else if (!ircncmp(av[cnt], "-nonops", alen))
+        nonops = 1;
+      else if (!ircncmp(av[cnt], "-voices", alen))
+        voices = 1;
+      else if (!ircncmp(av[cnt], "-nonvoices", alen))
+        nonvoices = 1;
       else
-        reason = MyStrdup("");
+        {
+          if (!(chptr = FindChannel(av[cnt++])))
+            {
+              os_notice(lptr, sockfd,
+                        "Invalid channel: %s",
+                        av[cnt - 1]);
+              return;
+            }
 
-      break;
+          if (ac >= (cnt + 1))
+            reason = GetString(ac - cnt, av + cnt);
+          else
+            reason = MyStrdup("");
+
+          break;
+        }
     }
-  }
 
   if (!reason)
     reason = MyStrdup("");
 
   if (!chptr)
-  {
-    os_notice(lptr, sockfd,
-      "No channel specified");
-    MyFree(reason);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "No channel specified");
+      MyFree(reason);
+      return;
+    }
 
   argbuf[0] = '\0';
 
@@ -5432,61 +5712,56 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
     strcat(argbuf, "-nonvoices ");
 
   o_RecordCommand(sockfd,
-    "KILLCHAN %s %s[%s]",
-    chptr->name,
-    argbuf,
-    reason);
+                  "KILLCHAN %s %s[%s]",
+                  chptr->name,
+                  argbuf,
+                  reason);
 
   o_Wallops("KILLCHAN %s %s[%s]",
-    chptr->name,
-    argbuf,
-    reason);
+            chptr->name,
+            argbuf,
+            reason);
 
   for (tempuser = chptr->firstuser; tempuser; tempuser = next)
-  {
-    next = tempuser->next;
-
-    bad = 0;
-
-    if (FindService(tempuser->lptr))
-      bad = 1;
-    else if (nonopers && IsOperator(tempuser->lptr))
-      bad = 1;
-    else if (ops && !(tempuser->flags & CH_OPPED))
-      bad = 1;
-    else if (nonops && (tempuser->flags & CH_OPPED))
-      bad = 1;
-    else if (voices && !(tempuser->flags & CH_VOICED))
-      bad = 1;
-    else if (nonvoices && (tempuser->flags & CH_VOICED))
-      bad = 1;
-    else
     {
-      if (tempuser->lptr->flags & L_OSREGISTERED)
-        ii = 1;
-      else
-        ii = 0;
-      if (IsProtected(GetUser(ii, tempuser->lptr->nick, tempuser->lptr->username, tempuser->lptr->hostname)))
+      next = tempuser->next;
+      bad = 0;
+      ++iitotal;
+
+      if (FindService(tempuser->lptr))
         bad = 1;
+      else
+        if (nonopers && IsOperator(tempuser->lptr))
+          bad = 1;
+      else
+        if (ops && !(tempuser->flags & CH_OPPED))
+          bad = 1;
+      else
+        if (nonops && (tempuser->flags & CH_OPPED))
+          bad = 1;
+      else
+        if (voices && !(tempuser->flags & CH_VOICED))
+          bad = 1;
+      else
+        if (nonvoices && (tempuser->flags & CH_VOICED))
+          bad = 1;
+      else
+        if (tempuser->lptr->flags & L_OSREGISTERED)
+          bad = 1;
+
+      if (bad)
+        continue;
+
+      toserv(":%s KILL %s :%s!%s (%s (%s@%s))\r\n",
+             n_OperServ, tempuser->lptr->nick, Me.name, n_OperServ,
+             reason, onick, n_OperServ);
+
+      DeleteClient(tempuser->lptr);
+      ++iimatch;
     }
 
-    if (bad)
-      continue;
-
-    toserv(":%s KILL %s :%s!%s (%s (%s@%s))\n",
-      n_OperServ,
-      tempuser->lptr->nick,
-      Me.name,
-      n_OperServ,
-      reason,
-      onick,
-      n_OperServ);
-
-    DeleteClient(tempuser->lptr);
-  }
-
-  os_notice(lptr, sockfd, "Channel [%s] has been killed",
-    chptr->name);
+  os_notice(lptr, sockfd, "Channel [%s] has been killed with [%d/%d] match%s",
+            chptr->name, iimatch, iitotal, (iimatch == 1) ? "" : "es");
 
   MyFree(reason);
 } /* o_killchan() */
@@ -5509,96 +5784,86 @@ o_killhost(struct Luser *lptr, int ac, char **av, int sockfd)
   int ii;
   struct Luser *tempuser, *next;
   char *user,
-       *host;
+  *host;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd, "Syntax: \002KILLHOST <hostmask>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "Syntax: \002KILLHOST <hostmask>\002");
+      return;
+    }
 
   if (ac < 3)
     reason = MyStrdup("");
   else
     reason = GetString(ac - 2, av + 2);
 
-  o_RecordCommand(sockfd,
-    "KILLHOST %s [%s]",
-    av[1],
-    reason);
+  o_RecordCommand(sockfd, "KILLHOST %s [%s]", av[1], reason);
 
-  o_Wallops("KILLHOST %s [%s]",
-    av[1],
-    reason);
+  o_Wallops("KILLHOST %s [%s]", av[1], reason);
 
   if (!(host = strchr(av[1], '@')))
-  {
-    user = NULL;
-    host = av[1];
-  }
+    {
+      user = NULL;
+      host = av[1];
+    }
   else
-  {
-    user = av[1];
-    *host++ = '\0';
-  }
+    {
+      user = av[1];
+      *host++ = '\0';
+    }
 
   if (IsProtectedHost(user ? user : "*", host))
-  {
-    os_notice(lptr, sockfd,
-      "%s@%s matches a protected host, unable to kill",
-      user ? user : "*",
-      host);
-    MyFree(reason);
-    return;
-  }
-  
+    {
+      os_notice(lptr, sockfd,
+                "%s@%s matches a protected host, unable to kill",
+                user ? user : "*",
+                host);
+      MyFree(reason);
+      return;
+    }
+
   ii = 0;
   for (tempuser = ClientList; tempuser; tempuser = next)
-  {
-    next = tempuser->next;
-
-    if (FindService(tempuser))
-      continue;
-
-    if (user)
     {
-      if (!match(user, tempuser->username))
+      next = tempuser->next;
+
+      if (FindService(tempuser))
         continue;
+
+      if (user)
+        {
+          if (!match(user, tempuser->username))
+            continue;
+        }
+
+      if (match(host, tempuser->hostname))
+        {
+          ++ii;
+          if (ii > MaxKill)
+            {
+              os_notice(lptr, sockfd,
+                        "-- More than %d matches found, halting kills --",
+                        MaxKill);
+              break;
+            }
+
+          toserv(":%s KILL %s :%s!%s (%s (%s@%s))\r\n",
+                 n_OperServ, tempuser->nick, Me.name, n_OperServ, reason,
+                 onick, n_OperServ);
+
+          DeleteClient(tempuser);
+        }
     }
-
-    if (match(host, tempuser->hostname))
-    {
-      ++ii;
-      if (ii > MaxKill)
-      {
-        os_notice(lptr, sockfd,
-          "-- More than %d matches found, halting kills --",
-          MaxKill);
-        break;
-      }
-
-      toserv(":%s KILL %s :%s!%s (%s (%s@%s))\n",
-        n_OperServ,
-        tempuser->nick,
-        Me.name,
-        n_OperServ,
-        reason,
-        onick,
-        n_OperServ);
-
-      DeleteClient(tempuser);
-    }
-  }
 
   if (ii <= MaxKill)
-  {
-    os_notice(lptr, sockfd,
-      "%d match%s of [%s@%s] killed",
-      ii,
-      (ii == 1) ? "" : "es",
-      user ? user : "*",
-      host);
-  }
+    {
+      os_notice(lptr, sockfd,
+                "%d match%s of [%s@%s] killed",
+                ii,
+                (ii == 1) ? "" : "es",
+                user ? user : "*",
+                host);
+    }
 
   MyFree(reason);
 } /* o_killhost() */
@@ -5615,47 +5880,47 @@ o_htm(struct Luser *lptr, int ac, char **av, int sockfd)
   struct OperCommand *cptr;
 
   o_RecordCommand(sockfd,
-    "HTM %s %s",
-    (ac < 2) ? "" : StrToupper(av[1]),
-    (ac < 3) ? "" : av[2]);
+                  "HTM %s %s",
+                  (ac < 2) ? "" : StrToupper(av[1]),
+                  (ac < 3) ? "" : av[2]);
 
   o_Wallops("HTM %s %s",
-    (ac < 2) ? "" : StrToupper(av[1]),
-    (ac < 3) ? "" : av[2]);
+            (ac < 2) ? "" : StrToupper(av[1]),
+            (ac < 3) ? "" : av[2]);
 
   if (ac < 2)
-  {
-    currload = ((float) (Network->RecvB - Network->CheckRecvB) / 
-                (float) 1024) / (float) HTM_INTERVAL;
+    {
+      currload = ((float) (Network->RecvB - Network->CheckRecvB) /
+                  (float) 1024) / (float) HTM_INTERVAL;
 
-    os_notice(lptr, sockfd,
-      "High-Traffic mode is \002%s\002",
-      (HTM) ? "ON" : "OFF");
-    os_notice(lptr, sockfd,
-      "Maximum load: \002%d.00\002 K/s",
-      ReceiveLoad);
-    os_notice(lptr, sockfd,
-      "Current load: \002%0.2f\002 K/s",
-      currload);
+      os_notice(lptr, sockfd,
+                "High-Traffic mode is \002%s\002",
+                (HTM) ? "ON" : "OFF");
+      os_notice(lptr, sockfd,
+                "Maximum load: \002%d.00\002 K/s",
+                ReceiveLoad);
+      os_notice(lptr, sockfd,
+                "Current load: \002%0.2f\002 K/s",
+                currload);
 
-    return;
-  }
+      return;
+    }
 
   cptr = GetoCommand(htmcmds, av[1]);
 
   if (cptr && (cptr != (struct OperCommand *) -1))
-  {
-    /* call cptr->func to execute command */
-    (*cptr->func)(lptr, ac, av, sockfd);
-  }
+    {
+      /* call cptr->func to execute command */
+      (*cptr->func)(lptr, ac, av, sockfd);
+    }
   else
-  {
-    /* the option they gave was not valid */
-    os_notice(lptr, sockfd,
-      "%s switch [\002%s\002]",
-      (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
-      av[1]);
-  }
+    {
+      /* the option they gave was not valid */
+      os_notice(lptr, sockfd,
+                "%s switch [\002%s\002]",
+                (cptr == (struct OperCommand *) -1) ? "Ambiguous" : "Unknown",
+                av[1]);
+    }
 } /* o_htm() */
 
 static void
@@ -5665,30 +5930,27 @@ o_htm_on(struct Luser *lptr, int ac, char **av, int sockfd)
   float currload;
 
   if (HTM)
-  {
-    os_notice(lptr, sockfd, "High-Traffic mode is currently active");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "High-Traffic mode is currently active");
+      return;
+    }
 
-  currload = ((float) (Network->RecvB - Network->CheckRecvB) / 
+  currload = ((float) (Network->RecvB - Network->CheckRecvB) /
               (float) 1024) / (float) HTM_INTERVAL;
 
   HTM = 1;
-  HTM_ts = time(NULL);
+  HTM_ts = current_ts;
 
   putlog(LOG1,
-    "Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s",
-    currload,
-    onick,
-    ouser,
-    ohost);
+         "Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s",
+         currload,
+         onick,
+         ouser,
+         ohost);
 
   SendUmode(OPERUMODE_Y,
-    "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s\n",
-    currload,
-    onick,
-    ouser,
-    ohost);
+    "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s\r\n",
+    currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now ON");
 } /* o_htm_on() */
@@ -5700,29 +5962,23 @@ o_htm_off(struct Luser *lptr, int ac, char **av, int sockfd)
   float currload;
 
   if (!HTM)
-  {
-    os_notice(lptr, sockfd, "High-Traffic mode is currently inactive");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd, "High-Traffic mode is currently inactive");
+      return;
+    }
 
-  currload = ((float) (Network->RecvB - Network->CheckRecvB) / 
+  currload = ((float) (Network->RecvB - Network->CheckRecvB) /
               (float) 1024) / (float) HTM_INTERVAL;
 
   HTM = HTM_ts = 0;
 
   putlog(LOG1,
-    "Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s",
-    currload,
-    onick,
-    ouser,
-    ohost);
+         "Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s",
+         currload, onick, ouser, ohost);
 
   SendUmode(OPERUMODE_Y,
-    "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s\n",
-    currload,
-    onick,
-    ouser,
-    ohost);
+ "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s\r\n",
+            currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now OFF");
 } /* o_htm_off() */
@@ -5734,38 +5990,35 @@ o_htm_max(struct Luser *lptr, int ac, char **av, int sockfd)
   int newmax;
 
   if (ac < 3)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: HTM MAX <new rate>");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: HTM MAX <new rate>");
+      return;
+    }
 
   if (!(newmax = IsNum(av[2])))
-  {
-    os_notice(lptr, sockfd,
-      "[%s] is an invalid number",
-      av[2]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "[%s] is an invalid number",
+                av[2]);
+      return;
+    }
 
   ReceiveLoad = newmax;
 
   putlog(LOG1, "HTM rate changed to %d K/s by %s!%s@%s",
-    newmax,
-    onick,
-    ouser,
-    ohost);
+         newmax,
+         onick,
+         ouser,
+         ohost);
 
   SendUmode(OPERUMODE_Y,
-    "*** New HTM Rate: %d K/s (forced by %s!%s@%s)\n",
-    newmax,
-    onick,
-    ouser,
-    ohost);
+            "*** New HTM Rate: %d K/s (forced by %s!%s@%s)\r\n",
+            newmax, onick, ouser, ohost);
 
   os_notice(lptr, sockfd,
-    "The HTM Rate has been set to: %d K/s",
-    newmax);
+            "The HTM Rate has been set to: %d K/s",
+            newmax);
 } /* o_htm_max() */
 
 #endif /* HIGHTRAFFIC_MODE */
@@ -5784,61 +6037,61 @@ o_hub(struct Luser *lptr, int ac, char **av, int sockfd)
   int cnt;
 
   o_RecordCommand(sockfd,
-    "HUB %s",
-    (ac < 2) ? "" : av[1]);
+                  "HUB %s",
+                  (ac < 2) ? "" : av[1]);
 
   if (ac < 2)
-  {
-    /*
-     * They didn't give a hub name..list all hubs
-     */
-
-    os_notice(lptr, sockfd,
-      "-- Listing current hubs --");
-    os_notice(lptr, sockfd,
-      "[Hub Name                      ] [# servers]");
-
-    cnt = 0;
-    for (tmpserv = ServerList; tmpserv; tmpserv = tmpserv->next)
     {
-      if (tmpserv->numservs > 1)
-      {
-        cnt++;
-        os_notice(lptr, sockfd,
-          "[%-30s] [%-9ld]",
-          tmpserv->name,
-          tmpserv->numservs);
-      }
+      /*
+       * They didn't give a hub name..list all hubs
+       */
+
+      os_notice(lptr, sockfd,
+                "-- Listing current hubs --");
+      os_notice(lptr, sockfd,
+                "[Hub Name                      ] [# servers]");
+
+      cnt = 0;
+      for (tmpserv = ServerList; tmpserv; tmpserv = tmpserv->next)
+        {
+          if (tmpserv->numservs > 1)
+            {
+              cnt++;
+              os_notice(lptr, sockfd,
+                        "[%-30s] [%-9ld]",
+                        tmpserv->name,
+                        tmpserv->numservs);
+            }
+        }
+
+      os_notice(lptr, sockfd,
+                "-- End of list (%d hub%s found) --",
+                cnt,
+                (cnt == 1) ? "" : "s");
+
+      return;
     }
 
-    os_notice(lptr, sockfd,
-      "-- End of list (%d hub%s found) --",
-      cnt,
-      (cnt == 1) ? "" : "s");
-
-    return;
-  }
-
   if (!(hubptr = FindServer(av[1])))
-  {
-    os_notice(lptr, sockfd,
-      "No such server: \002%s\002",
-      av[1]);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "No such server: \002%s\002",
+                av[1]);
+      return;
+    }
 
   if (hubptr->numservs <= 1)
-  {
-    os_notice(lptr, sockfd,
-      "\002%s\002 appears to be a leaf",
-      hubptr->name);
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "\002%s\002 appears to be a leaf",
+                hubptr->name);
+      return;
+    }
 
   os_notice(lptr, sockfd, "-- \002%s\002 --",
-    hubptr->name);
+            hubptr->name);
   os_notice(lptr, sockfd,
-    "[Leaf Name                     ] [Time Connected      ]");
+            "[Leaf Name                     ] [Time Connected      ]");
 
   /*
    * go through server list and try to find servers who's uplink
@@ -5846,27 +6099,27 @@ o_hub(struct Luser *lptr, int ac, char **av, int sockfd)
    */
   cnt = 0;
   for (tmpserv = ServerList; tmpserv; tmpserv = tmpserv->next)
-  {
-    if (tmpserv->uplink == hubptr)
     {
-      ++cnt;
-      os_notice(lptr, sockfd,
-        "[%-30s] [%-20s]",
-        tmpserv->name,
-        timeago(tmpserv->connect_ts, 0));
+      if (tmpserv->uplink == hubptr)
+        {
+          ++cnt;
+          os_notice(lptr, sockfd,
+                    "[%-30s] [%-20s]",
+                    tmpserv->name,
+                    timeago(tmpserv->connect_ts, 0));
+        }
     }
-  }
 
   os_notice(lptr, sockfd,
-    "-- End of list (%d lea%s found) --",
-    cnt,
-    (cnt == 1) ? "f" : "ves");
+            "-- End of list (%d lea%s found) --",
+            cnt,
+            (cnt == 1) ? "f" : "ves");
 } /* o_hub() */
 
 /*
 o_umode()
  Configure various user modes for operator lptr->nick.
-
+ 
 Possible Usermodes:
   b - show all tcm bot link attempts, invalid connections attempts
       etc
@@ -5903,12 +6156,12 @@ o_umode(struct Luser *lptr, int ac, char **av, int sockfd)
   char str[MAXLINE];
   char *tmpstr;
   int minus,
-      ii;
+  ii;
   long newmodes;
 
   o_RecordCommand(sockfd,
-    "UMODE %s",
-    (ac < 2) ? "" : av[1]);
+                  "UMODE %s",
+                  (ac < 2) ? "" : av[1]);
 
   if (sockfd != NOSOCKET)
     userptr = DccGetUser(IsDccSock(sockfd));
@@ -5919,52 +6172,52 @@ o_umode(struct Luser *lptr, int ac, char **av, int sockfd)
     return;
 
   if (ac < 2)
-  {
-    /*
-     * They didn't give an arguement - simply display their
-     * current usermodes
-     */
-    ii = 0;
-    for (umodeptr = Usermodes; umodeptr->usermode; ++umodeptr)
     {
-      if (userptr->umodes & umodeptr->flag)
-        str[ii++] = umodeptr->usermode;
+      /*
+       * They didn't give an arguement - simply display their
+       * current usermodes
+       */
+      ii = 0;
+      for (umodeptr = Usermodes; umodeptr->usermode; ++umodeptr)
+        {
+          if (userptr->umodes & umodeptr->flag)
+            str[ii++] = umodeptr->usermode;
+        }
+      str[ii] = '\0';
+
+      os_notice(lptr, sockfd,
+                "Your usermodes are currently [\002+%s\002]",
+                str);
+
+      return;
     }
-    str[ii] = '\0';
-
-    os_notice(lptr, sockfd,
-      "Your usermodes are currently [\002+%s\002]",
-      str);
-
-    return;
-  }
 
   /*
    * Parse the given usermodes
    */
   minus = 0;
   for (tmpstr = av[1]; *tmpstr; tmpstr++)
-  {
-    if (*tmpstr == '+')
-      minus = 0;
-    else if (*tmpstr == '-')
-      minus = 1;
-    else
     {
-      /* try to find the usermode in Usermodes[] */
-      if ((umodeptr = FindUmode(*tmpstr)))
-      {
-        /*
-         * its a usermode, if minus is 1, remove the usermode,
-         * otherwise add it to userptr->umodes
-         */
-        if (minus)
-          userptr->umodes &= ~umodeptr->flag;
-        else
-          userptr->umodes |= umodeptr->flag;
-      }
+      if (*tmpstr == '+')
+        minus = 0;
+      else if (*tmpstr == '-')
+        minus = 1;
+      else
+        {
+          /* try to find the usermode in Usermodes[] */
+          if ((umodeptr = FindUmode(*tmpstr)))
+            {
+              /*
+               * its a usermode, if minus is 1, remove the usermode,
+               * otherwise add it to userptr->umodes
+               */
+              if (minus)
+                userptr->umodes &= ~umodeptr->flag;
+              else
+                userptr->umodes |= umodeptr->flag;
+            }
+        }
     }
-  }
 
   /*
    * Now go through UserList, and find all structs that have
@@ -5972,25 +6225,25 @@ o_umode(struct Luser *lptr, int ac, char **av, int sockfd)
    */
   newmodes = userptr->umodes;
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-  {
-    if (!strcasecmp(userptr->nick, tempuser->nick))
-      tempuser->umodes = newmodes;
-  }
+    {
+      if (!irccmp(userptr->nick, tempuser->nick))
+        tempuser->umodes = newmodes;
+    }
 
   /*
    * Show them their new usermodes
    */
   ii = 0;
   for (umodeptr = Usermodes; umodeptr->usermode; ++umodeptr)
-  {
-    if (userptr->umodes & umodeptr->flag)
-      str[ii++] = umodeptr->usermode;
-  }
+    {
+      if (userptr->umodes & umodeptr->flag)
+        str[ii++] = umodeptr->usermode;
+    }
   str[ii] = '\0';
 
   os_notice(lptr, sockfd,
-    "Your usermodes are now [\002+%s\002]",
-    str);
+            "Your usermodes are now [\002+%s\002]",
+            str);
 } /* o_umode() */
 
 #ifdef ALLOW_DUMP
@@ -6010,25 +6263,24 @@ o_dump(struct Luser *lptr, int ac, char **av, int sockfd)
   int newac;
 
   if (ac < 2)
-  {
-    os_notice(lptr, sockfd,
-      "Syntax: \002DUMP <string>\002");
-    return;
-  }
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002DUMP <string>\002");
+      return;
+    }
 
   dstr = GetString(ac - 1, av + 1);
 
   o_RecordCommand(sockfd,
-    "DUMP [%s]",
-    dstr);
+                  "DUMP [%s]",
+                  dstr);
 
-  toserv("%s\n", dstr);
+  toserv("%s\r\n", dstr);
 
   /*
-   * Technically, this av almost the same as the arv[]
-   * passed to ProcessInfo earlier, sending it through
-   * the whole routine again could cause problems -
-   * make a new one
+   * Technically, this av almost the same as the arv[] passed to
+   * ProcessInfo earlier, sending it through the whole routine again could
+   * cause problems - make a new one
    */
   strcpy(tempstr, dstr);
   newac = SplitBuf(tempstr, &newav);
@@ -6047,19 +6299,19 @@ Return a pointer to the corresponding index
 */
 
 static struct UmodeInfo *
-FindUmode(char usermode)
+      FindUmode(char usermode)
 
-{
-  struct  UmodeInfo  *umodeptr;
-
-  for (umodeptr = Usermodes; umodeptr->usermode; ++umodeptr)
   {
-    if (umodeptr->usermode == usermode)
-      return (umodeptr);
-  }
+    struct  UmodeInfo  *umodeptr;
 
-  return (NULL);
-} /* FindUmode() */
+    for (umodeptr = Usermodes; umodeptr->usermode; ++umodeptr)
+      {
+        if (umodeptr->usermode == usermode)
+          return (umodeptr);
+      }
+
+    return (NULL);
+  } /* FindUmode() */
 
 /*
 modestr()
@@ -6101,10 +6353,10 @@ static void
 TakeOver(struct Channel *cptr)
 
 {
-  int ii, acnt, mcnt;
-  char sendstr[MAXLINE], done[MAXLINE];
+  int ii, acnt;
+  char done[MAXLINE];
   char *opnicks, *dopnicks;
-  char **av, *abans, *mtmp;
+  char **av, *abans;
   struct ChannelBan *tempban;
   struct Userlist *tempuser;
   struct ChannelUser *tempnick;
@@ -6130,136 +6382,91 @@ TakeOver(struct Channel *cptr)
   dopnicks = (char *) MyMalloc(sizeof(char));
   dopnicks[0] = '\0';
   for (tempnick = cptr->firstuser; tempnick; tempnick = tempnick->next)
-  {
-    if (FindService(tempnick->lptr))
-      continue;
-
-    if (tempnick->lptr->flags & L_OSREGISTERED)
-      ii = 1;
-    else
-      ii = 0;
-
-    tempuser = GetUser(ii, tempnick->lptr->nick, tempnick->lptr->username, tempnick->lptr->hostname);
-    if (IsChannelOp(cptr, tempnick->lptr) && !IsFriend(tempuser))
     {
-      dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
-      strcat(dopnicks, tempnick->lptr->nick);
-      strcat(dopnicks, " ");
-    }
-    else if (!IsChannelOp(cptr, tempnick->lptr) && IsFriend(tempuser))
-    {
-      opnicks = (char *) MyRealloc(opnicks, strlen(opnicks) + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
-      strcat(opnicks, tempnick->lptr->nick);
-      strcat(opnicks, " ");
-    }
-  } /* for (tempnick ..) */
-  
+      if (FindService(tempnick->lptr))
+        continue;
+
+      if (tempnick->lptr->flags & L_OSREGISTERED)
+        ii = 1;
+      else
+        ii = 0;
+
+      tempuser = GetUser(ii, tempnick->lptr->nick,
+                         tempnick->lptr->username, tempnick->lptr->hostname);
+      if (IsChannelOp(cptr, tempnick->lptr) && !IsFriend(tempuser))
+        {
+          dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks)
+                                        + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
+          strcat(dopnicks, tempnick->lptr->nick);
+          strcat(dopnicks, " ");
+        }
+      else if (!IsChannelOp(cptr, tempnick->lptr) && (IsFriend(tempuser)
+#ifdef EMPOWERADMINS
+            || IsValidAdmin(tempnick->lptr)
+#endif
+            ))
+        {
+          opnicks = (char *) MyRealloc(opnicks, strlen(opnicks)
+                                       + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
+          strcat(opnicks, tempnick->lptr->nick);
+          strcat(opnicks, " ");
+        }
+    } /* for (tempnick ..) */
+
 #ifdef SAVE_TS
 
   if (IsChannel(cptr->name) || (cptr->since == 0))
-  {
-    /*
-     * if OperServ is monitoring the channel, then it didn't join with
-     * TS-1 and noone deoped, therefore we must manually deop
-     * non "f" flag users - likewise if the channel's TS is 0,
-     * join_ts_minus_1() would not deop anyone
-     */
+    {
+      /*
+       * if OperServ is monitoring the channel, then it didn't join with
+       * TS-1 and noone deoped, therefore we must manually deop
+       * non "f" flag users - likewise if the channel's TS is 0,
+       * join_ts_minus_1() would not deop anyone
+       */
 
 #else
 
   if (1)
-  {
+    {
 
 #endif /* !SAVE_TS */
 
-    acnt = SplitBuf(dopnicks, &av);
-    memset(&done, 0, MAXLINE);
-    mcnt = 1;
-    for (ii = 0; ii < acnt; ++ii)
-    {
-      strcat(done, av[ii]);
-      strcat(done, " ");
-      if (mcnt == MaxModes)
-      {
-        mcnt = 0;
-        mtmp = modestr(MaxModes, 'o');
-        sprintf(sendstr, "-%s %s", mtmp, done);
-        DoMode(cptr, sendstr, 0);
-        MyFree(mtmp);
-        memset(&done, 0, MAXLINE);
-      }
-      mcnt++;
+      SetModes(n_OperServ, 0, '0', cptr, dopnicks);
     }
-    if (done[0] != '\0')
-    {
-      mtmp = modestr(mcnt - 1, 'o');
-      sprintf(sendstr, "-%s %s", mtmp, done);
-      DoMode(cptr, sendstr, 0);
-      MyFree(mtmp);
-    }
-    MyFree(av);
-  }
   else
-  {
-    if (cptr->since == 0)
     {
-      /* if the channel's TS is 0, we can't join with TS-1, so kick all
-         the users */
+      if (cptr->since == 0)
+        {
+          /* if the channel's TS is 0, we can't join with TS-1, so kick all
+             the users */
 
-      acnt = SplitBuf(dopnicks, &av);
-      for (ii = 0; ii < acnt; ii++)
-      {
-        toserv(":%s KICK %s %s :\n",
-          n_OperServ,
-          cptr->name,
-          av[ii]);
-        RemoveFromChannel(cptr, FindClient(av[ii]));
-      }
-      MyFree(av);
+          acnt = SplitBuf(dopnicks, &av);
+          for (ii = 0; ii < acnt; ii++)
+            {
+              toserv(":%s KICK %s %s :\r\n",
+                     n_OperServ, cptr->name, av[ii]);
+              RemoveFromChannel(cptr, FindClient(av[ii]));
+            }
+          MyFree(av);
+        }
     }
-  }
   MyFree(dopnicks);
 
   /* clear bans matching an administrator */
   abans = (char *) MyMalloc(sizeof(char));
   abans[0] = '\0';
   for (tempban = cptr->firstban; tempban; tempban = tempban->next)
-  {
-    if (MatchesAdmin(tempban->mask) == 1)
     {
-      abans = (char *) MyRealloc(abans, strlen(abans) + strlen(tempban->mask) + (2 * sizeof(char)));
-      strcat(abans, tempban->mask);
-      strcat(abans, " ");
+      if (MatchesAdmin(tempban->mask) == 1)
+        {
+          abans = (char *) MyRealloc(abans, strlen(abans) + strlen(tempban->mask) + (2 * sizeof(char)));
+          strcat(abans, tempban->mask);
+          strcat(abans, " ");
+        }
     }
-  }
 
-  memset(&done, 0, MAXLINE);
-  acnt = SplitBuf(abans, &av);
-  mcnt = 1;
-  for (ii = 0; ii < acnt; ++ii)
-  {
-    strcat(done, av[ii]);
-    strcat(done, " ");
-    if (mcnt == MaxModes)
-    {
-      mcnt = 0;
-      mtmp = modestr(MaxModes, 'b');
-      sprintf(sendstr, "-%s %s", mtmp, done);
-      DoMode(cptr, sendstr, 0);
-      MyFree(mtmp);
-      memset(&done, 0, MAXLINE);
-    }
-    mcnt++;
-  }
-  if (done[0] != '\0')
-  {
-    mtmp = modestr(mcnt - 1, 'b');
-    sprintf(sendstr, "-%s %s", mtmp, done);
-    DoMode(cptr, sendstr, 0);
-    MyFree(mtmp);
-  }
+  SetModes(n_OperServ, 0, 'b', cptr, abans);
   MyFree(abans);
-  MyFree(av);
 
   /* clear all bad modes (smilk) */
   memset(&done, 0, MAXLINE);
@@ -6273,43 +6480,27 @@ TakeOver(struct Channel *cptr)
   if (cptr->limit)
     strcat(done, "l");
   if (cptr->key)
+    {
+      strcat(done, "k ");
+      strcat(done, cptr->key);
+    }
+
+#ifdef DANCER
+  if (cptr->forward)
   {
-    strcat(done, "k ");
-    strcat(done, cptr->key);
+    strcat(done, "f ");
+    strcat(done, cptr->forward);
   }
+#endif /* DANCER */
 
   DoMode(cptr, done, 0);
 
   /* op "f" flag users */
-  memset(&done, 0, MAXLINE);
-  acnt = SplitBuf(opnicks, &av);
-  mcnt = 1;
-  for (ii = 0; ii < acnt; ++ii)
-  {
-    strcat(done, av[ii]);
-    strcat(done, " ");
-    if (mcnt == MaxModes)
-    {
-      mcnt = 0;
-      mtmp = modestr(MaxModes, 'o');
-      sprintf(sendstr, "+%s %s", mtmp, done);
-      DoMode(cptr, sendstr, 0);
-      MyFree(mtmp);
-      memset(&done, 0, MAXLINE);
-    }
-    ++mcnt;
-  }
-  if (done[0] != '\0')
-  {
-    mtmp = modestr(mcnt - 1, 'o');
-    sprintf(sendstr, "+%s %s", mtmp, done);
-    DoMode(cptr, sendstr, 0);
-    MyFree(mtmp);
-  }
+  SetModes(n_OperServ, 1, '0', cptr, opnicks);
   MyFree(opnicks);
-  MyFree(av);
 
 #ifdef SAVE_TS
+
   if (!IsChannel(cptr->name))
     os_part(cptr);
 #endif
@@ -6328,15 +6519,21 @@ CalcMem(char *nick, int socket)
   struct Luser *tempuser;
   struct UserChannel *userc;
   struct ChannelUser *chanu;
+  struct Luser *lptr = NULL;
+#ifdef GECOSBANS
+
   struct ChannelGecosBan *tempgecosban;
+#endif /* GECOSBANS */
 
   struct Channel *tempchan;
   struct ChannelBan *tempban;
   struct Exception *tempe;
 
 #ifndef BLOCK_ALLOCATION
+
   struct Server *tempserv;
 #endif
+
   struct Userlist *tempuserlist;
   struct Servlist *tempservlist;
   struct Chanlist *tempchanlist;
@@ -6345,31 +6542,38 @@ CalcMem(char *nick, int socket)
   struct PortInfo *tempprt;
 
 #ifdef ALLOW_JUPES
+
   struct Jupe *tempjupe;
 #endif
 
 #ifdef ALLOW_GLINES
+
   struct Gline *gptr;
 #endif
 
 #ifdef NICKSERVICES
+
   struct NickInfo *nptr;
 
 #ifdef CHANNELSERVICES
+
   struct ChanInfo *cptr;
 #endif
 
 #ifdef MEMOSERVICES
+
   struct MemoInfo *mptr;
 #endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   struct HostHash *hosth;
 #endif
 
 #if defined(NICKSERVICES) || defined(STATSERVICES)
+
   int ii;
 #endif
 
@@ -6383,7 +6587,11 @@ CalcMem(char *nick, int socket)
   float servm;            /* memory used by servers */
   float chanm;            /* memory used by channels */
   float chanbanm;         /* memory used by channel bans */
+#ifdef GECOSBANS
+
   float changecosbanm;    /* memory used by gecos bans */
+#endif /* GECOSBANS */
+
   float chanexceptm;      /* memory used by channel exceptions */
   float confm;            /* total memory used by conf lines */
   float connm;            /* memory used by dcc connections */
@@ -6392,24 +6600,32 @@ CalcMem(char *nick, int socket)
   float hashcl;           /* clone hash */
   float hashs;            /* server hash */
   unsigned long chanbanc; /* number of channel bans */
+#ifdef GECOSBANS
+
   unsigned long changecosbanc; /* number of gecos bans */
+#endif /* GECOSBANS */
+
   unsigned long chanexceptc; /* number of channel exceptions */
   unsigned long confc;    /* total number of conf lines */
 
 #ifdef NICKSERVICES
+
   float nsm; /* mem used by NickServ */
 
 #ifdef CHANNELSERVICES
+
   float csm; /* mem used by ChanServ */
 #endif
 
 #ifdef MEMOSERVICES
+
   float msm; /* mem used by MemoServ */
 #endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   float ssm; /* mem used by StatServ */
 #endif
 
@@ -6417,6 +6633,7 @@ CalcMem(char *nick, int socket)
   unsigned long igc; /* number of ignore entries */
 
 #ifdef BLOCK_ALLOCATION
+
   Heap *heapptr;
   SubBlock *sub;
 #endif
@@ -6424,17 +6641,23 @@ CalcMem(char *nick, int socket)
   float total; /* total memory */
 
   clientm = 0;
-  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
-  {
-  #ifndef BLOCK_ALLOCATION
-    clientm += (strlen(tempuser->nick) + strlen(tempuser->username) +
-                strlen(tempuser->hostname) + strlen(tempuser->realname) +
-                sizeof(struct Luser));
-  #endif
 
-    for (userc = tempuser->firstchan; userc; userc = userc->next)
-      clientm += sizeof(struct UserChannel);
-  }
+  if (nick)
+    lptr = FindClient(nick);
+  if (!lptr)
+    nick = NULL;
+  
+  for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
+    {
+#ifndef BLOCK_ALLOCATION
+      clientm += (strlen(tempuser->nick) + strlen(tempuser->username) +
+                  strlen(tempuser->hostname) + strlen(tempuser->realname) +
+                  sizeof(struct Luser));
+#endif
+
+      for (userc = tempuser->firstchan; userc; userc = userc->next)
+        clientm += sizeof(struct UserChannel);
+    }
 
 #ifdef BLOCK_ALLOCATION
 
@@ -6448,49 +6671,67 @@ CalcMem(char *nick, int socket)
 
   chanm = 0;
   chanbanm = 0;
+#ifdef GECOSBANS
+
   changecosbanm = 0;
+#endif /* GECOSBANS */
+
   chanexceptm = 0;
   chanbanc = 0;
+#ifdef GECOSBANS
+
   changecosbanc = 0;
+#endif /* GECOSBANS */
+
   chanexceptc = 0;
   for (tempchan = ChannelList; tempchan; tempchan = tempchan->next)
-  {
-  #ifndef BLOCK_ALLOCATION
-    int   keylen = 0;
-
-    if (tempchan->key)
-      keylen = strlen(tempchan->key);
-
-    chanm += (strlen(tempchan->name) + keylen + sizeof(struct Channel));
-  #endif /* BLOCK_ALLOCATION */
-
-    for (chanu = tempchan->firstuser; chanu; chanu = chanu->next)
-      chanm += sizeof(struct ChannelUser);
-
-    for (tempban = tempchan->firstban; tempban; tempban = tempban->next)
     {
-      chanbanc++;
-      chanbanm += (strlen(tempban->mask) + sizeof(struct ChannelBan));
-      if (tempban->who)
-        chanbanm += strlen(tempban->who);
-    }
+#ifndef BLOCK_ALLOCATION
+      int   keylen = 0;
 
-    for (tempgecosban = tempchan->firstgecosban; tempgecosban; tempgecosban = tempgecosban->next)
-    {
-      changecosbanc++;
-      changecosbanm += (strlen(tempgecosban->mask) + sizeof(struct ChannelGecosBan));
-      if (tempgecosban->who)
-        changecosbanm += strlen(tempgecosban->who);
-    }
+      if (tempchan->key)
+        keylen = strlen(tempchan->key);
 
-    for (tempe = tempchan->exceptlist; tempe; tempe = tempe->next)
-    {
-      ++chanexceptc;
-      chanexceptm += (strlen(tempe->mask) + sizeof(struct Exception));
-      if (tempe->who)
-        chanexceptm += strlen(tempe->who);
+      chanm += (strlen(tempchan->name) + keylen + sizeof(struct Channel));
+
+#ifdef DANCER
+      if (tempchan->forward)
+        keylen = strlen(tempchan->forward);
+      chanm += keylen;
+#endif /* DANCER */
+#endif /* BLOCK_ALLOCATION */
+
+      for (chanu = tempchan->firstuser; chanu; chanu = chanu->next)
+        chanm += sizeof(struct ChannelUser);
+
+      for (tempban = tempchan->firstban; tempban; tempban = tempban->next)
+        {
+          chanbanc++;
+          chanbanm += (strlen(tempban->mask) + sizeof(struct ChannelBan));
+          if (tempban->who)
+            chanbanm += strlen(tempban->who);
+        }
+
+#ifdef GECOSBANS
+      for (tempgecosban = tempchan->firstgecosban; tempgecosban;
+           tempgecosban = tempgecosban->next)
+        {
+          changecosbanc++;
+          changecosbanm += (strlen(tempgecosban->mask) +
+                            sizeof(struct ChannelGecosBan));
+          if (tempgecosban->who)
+            changecosbanm += strlen(tempgecosban->who);
+        }
+#endif /* GECOSBANS */
+
+      for (tempe = tempchan->exceptlist; tempe; tempe = tempe->next)
+        {
+          ++chanexceptc;
+          chanexceptm += (strlen(tempe->mask) + sizeof(struct Exception));
+          if (tempe->who)
+            chanexceptm += strlen(tempe->who);
+        }
     }
-  }
 
 #ifdef BLOCK_ALLOCATION
 
@@ -6505,12 +6746,14 @@ CalcMem(char *nick, int socket)
   servm = 0;
 
 #ifdef BLOCK_ALLOCATION
+
   servm += sizeof(Heap);
   heapptr = ServerHeap;
   for (sub = heapptr->base; sub; sub = sub->next)
     servm += ((heapptr->ElementsPerBlock * heapptr->ElementSize) +
               sizeof(SubBlock));
 #else
+
   for (tempserv = ServerList; tempserv; tempserv = tempserv->next)
     servm += (strlen(tempserv->name) + sizeof(struct Server));
 #endif /* BLOCK_ALLOCATION */
@@ -6519,68 +6762,68 @@ CalcMem(char *nick, int socket)
   confc = 2;
 
   for (tempuserlist = UserList; tempuserlist; tempuserlist = tempuserlist->next)
-  {
-    confm += (strlen(tempuserlist->username) +
-              strlen(tempuserlist->hostname) +
-              strlen(tempuserlist->password) +
-              sizeof(struct Userlist));
-    confc++;
-  }
-  
+    {
+      confm += (strlen(tempuserlist->username) +
+                strlen(tempuserlist->hostname) +
+                strlen(tempuserlist->password) +
+                sizeof(struct Userlist));
+      confc++;
+    }
+
   for (tempservlist = ServList; tempservlist; tempservlist = tempservlist->next)
-  {
-    confm += (strlen(tempservlist->hostname) +
-              strlen(tempservlist->password) +
-              sizeof(struct Servlist));
+    {
+      confm += (strlen(tempservlist->hostname) +
+                strlen(tempservlist->password) +
+                sizeof(struct Servlist));
 
-    if (tempservlist->realname)
-      confm += strlen(tempservlist->realname);
+      if (tempservlist->realname)
+        confm += strlen(tempservlist->realname);
 
-    confc++;
-  }
+      confc++;
+    }
 
   for (tempchanlist = ChanList; tempchanlist; tempchanlist = tempchanlist->next)
-  {
-    confm += (strlen(tempchanlist->name) + sizeof(struct Chanlist));
-    confc++;
-  }
+    {
+      confm += (strlen(tempchanlist->name) + sizeof(struct Chanlist));
+      confc++;
+    }
 
   for (tempbot = BotList; tempbot; tempbot = tempbot->next)
-  {
-    confm += (strlen(tempbot->name) +
-              strlen(tempbot->hostname) +
-              strlen(tempbot->password) +
-              sizeof(struct Botlist));
-    if (tempbot->username)
-      confm += strlen(tempbot->username);
-    confc++;
-  }
+    {
+      confm += (strlen(tempbot->name) +
+                strlen(tempbot->hostname) +
+                strlen(tempbot->password) +
+                sizeof(struct Botlist));
+      if (tempbot->username)
+        confm += strlen(tempbot->username);
+      confc++;
+    }
 
   for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
-  {
-    confm += (strlen(tempbot->name) +
-              strlen(tempbot->username) +
-              strlen(tempbot->hostname) +
-              strlen(tempbot->password) +
-              sizeof(struct Botlist));
-    confc++;
-  }
+    {
+      confm += (strlen(tempbot->name) +
+                strlen(tempbot->username) +
+                strlen(tempbot->hostname) +
+                strlen(tempbot->password) +
+                sizeof(struct Botlist));
+      confc++;
+    }
 
   for (temprhost = rHostList; temprhost; temprhost = temprhost->next)
-  {
-    confm += (strlen(temprhost->username) +
-              strlen(temprhost->hostname) +
-              sizeof(struct rHost));
-    confc++;
-  }
+    {
+      confm += (strlen(temprhost->username) +
+                strlen(temprhost->hostname) +
+                sizeof(struct rHost));
+      confc++;
+    }
 
   for (tempprt = PortList; tempprt; tempprt = tempprt->next)
-  {
-    confm += sizeof(struct PortInfo);
-    if (tempprt->host)
-      confm += strlen(tempprt->host);
-    confc++;
-  }
+    {
+      confm += sizeof(struct PortInfo);
+      if (tempprt->host)
+        confm += strlen(tempprt->host);
+      confc++;
+    }
 
 #ifdef ALLOW_JUPES
   for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
@@ -6592,115 +6835,122 @@ CalcMem(char *nick, int socket)
 #endif
 
 #ifdef ALLOW_GLINES
+
   for (gptr = GlineList; gptr; gptr = gptr->next)
-  {
-    confm += (strlen(gptr->username) +
-              strlen(gptr->hostname) +
-              strlen(gptr->reason) +
-              strlen(gptr->who) +
-              sizeof(struct Gline));
-    /* 
-     * make sure the gline isn't temporary because it wouldn't have
-     * a conf line
-     */
-    if (!(gptr->expires))
-      confc++;
-  }
+    {
+      confm += (strlen(gptr->username) +
+                strlen(gptr->hostname) +
+                strlen(gptr->reason) +
+                strlen(gptr->who) +
+                sizeof(struct Gline));
+      /*
+       * make sure the gline isn't temporary because it wouldn't have
+       * a conf line
+       */
+      if (!(gptr->expires))
+        confc++;
+    }
 #endif
 
   igc = 0;
   igm = 0;
   for (tmpig = IgnoreList; tmpig; tmpig = tmpig->next)
-  {
-    igc++;
-    igm += (strlen(tmpig->hostmask) + sizeof(struct Ignore));
-  }
+    {
+      igc++;
+      igm += (strlen(tmpig->hostmask) + sizeof(struct Ignore));
+    }
 
   connm = 0;
   for (tmpconn = connections; tmpconn; tmpconn = tmpconn->next)
-  {
-    connm += sizeof(struct DccUser);
-    if (tmpconn->nick)
-      connm += strlen(tmpconn->nick);
-    if (tmpconn->username)
-      connm += strlen(tmpconn->username);
-    if (tmpconn->hostname)
-      connm += strlen(tmpconn->hostname);
-  }
+    {
+      connm += sizeof(struct DccUser);
+      if (tmpconn->nick)
+        connm += strlen(tmpconn->nick);
+      if (tmpconn->username)
+        connm += strlen(tmpconn->username);
+      if (tmpconn->hostname)
+        connm += strlen(tmpconn->hostname);
+    }
 
 #ifdef NICKSERVICES
 
   nsm = sizeof(nicklist);
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
-  {
-    if (nicklist[ii])
     {
-      struct NickHost *hptr;
+      if (nicklist[ii])
+        {
+          struct NickHost *hptr;
 
-      for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
-      {
-        nsm += (strlen(nptr->nick) + sizeof(struct NickInfo));
-        if (nptr->password)
-          nsm += strlen(nptr->password);
-        if (nptr->email)
-          nsm += strlen(nptr->email);
-        if (nptr->url)
-          nsm += strlen(nptr->url);
+          for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
+            {
+              nsm += (strlen(nptr->nick) + sizeof(struct NickInfo));
+              if (nptr->password)
+                nsm += strlen(nptr->password);
+              if (nptr->email)
+                nsm += strlen(nptr->email);
+              if (nptr->url)
+                nsm += strlen(nptr->url);
 
-        if (nptr->lastu)
-          nsm += strlen(nptr->lastu);
-        if (nptr->lasth)
-          nsm += strlen(nptr->lasth);
-        if (nptr->lastqmsg)
-          nsm += strlen(nptr->lastqmsg);
+              if (nptr->lastu)
+                nsm += strlen(nptr->lastu);
+              if (nptr->lasth)
+                nsm += strlen(nptr->lasth);
+              if (nptr->lastqmsg)
+                nsm += strlen(nptr->lastqmsg);
 
-        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
-          nsm += (strlen(hptr->hostmask) + sizeof(struct NickHost));
-      }
-    }
-  } /* for (ii = 0; ii < NICKLIST_MAX; ii++) */
-  
+              for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+                nsm += (strlen(hptr->hostmask) + sizeof(struct NickHost));
+            }
+        }
+    } /* for (ii = 0; ii < NICKLIST_MAX; ii++) */
+
 #ifdef CHANNELSERVICES
 
   csm = sizeof(chanlist);
   for (ii = 0; ii < CHANLIST_MAX; ++ii)
-  {
-    struct AutoKick *ak;
-    struct ChanAccess *ca;
-
-    for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
     {
-      csm += (strlen(cptr->name) + sizeof(struct ChanInfo));
-      if (cptr->password)
-        csm += strlen(cptr->password);
-      if (cptr->founder)
-        csm += strlen(cptr->founder);
-      if (cptr->successor)
-        csm += strlen(cptr->successor);
-      if (cptr->topic)
-        csm += strlen(cptr->topic);
-      if (cptr->key)
-        csm += strlen(cptr->key);
-      if (cptr->entrymsg)
-        csm += strlen(cptr->entrymsg);
-      if (cptr->email)
-        csm += strlen(cptr->email);
-      if (cptr->url)
-        csm += strlen(cptr->url);
-      for (ak = cptr->akick; ak; ak = ak->next)
-      {
-        csm += (strlen(ak->hostmask) + sizeof(struct AutoKick));
-        if (ak->reason)
-          csm += strlen(ak->reason);
-      }
-      for (ca = cptr->access; ca; ca = ca->next)
-      {
-        csm += sizeof(struct ChanAccess);
-        if (ca->hostmask)
-          csm += strlen(ca->hostmask);
-      }
-    }
-  } /* for (ii = 0; ii < CHANLIST_MAX; ii++) */
+      struct AutoKick *ak;
+      struct ChanAccess *ca;
+
+      for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
+        {
+          csm += (strlen(cptr->name) + sizeof(struct ChanInfo));
+          if (cptr->password)
+            csm += strlen(cptr->password);
+          if (cptr->founder)
+            csm += strlen(cptr->founder);
+          if (cptr->successor)
+            csm += strlen(cptr->successor);
+          if (cptr->topic)
+            csm += strlen(cptr->topic);
+          if (cptr->key)
+            csm += strlen(cptr->key);
+#ifdef DANCER
+          if (cptr->forward)
+            csm += strlen(cptr->forward);
+#endif /* DANCER */
+          if (cptr->entrymsg)
+            csm += strlen(cptr->entrymsg);
+          if (cptr->email)
+            csm += strlen(cptr->email);
+          if (cptr->url)
+            csm += strlen(cptr->url);
+          if (cptr->comment)
+            csm += strlen(cptr->comment);
+          for (ak = cptr->akick; ak; ak = ak->next)
+            {
+              csm += (strlen(ak->hostmask) + sizeof(struct AutoKick));
+              if (ak->reason)
+                csm += strlen(ak->reason);
+            }
+          for (ca = cptr->access; ca; ca = ca->next)
+            {
+              csm += sizeof(struct ChanAccess);
+              if (ca->hostmask)
+                csm += strlen(ca->hostmask);
+            }
+        }
+    } /* for (ii = 0; ii < CHANLIST_MAX; ii++) */
 
 #endif /* CHANNELSERVICES */
 
@@ -6708,16 +6958,16 @@ CalcMem(char *nick, int socket)
 
   msm = sizeof(memolist);
   for (ii = 0; ii < MEMOLIST_MAX; ++ii)
-  {
-    struct Memo *memoptr;
-
-    for (mptr = memolist[ii]; mptr; mptr = mptr->next)
     {
-      msm += (strlen(mptr->name) + sizeof(struct MemoInfo));
-      for (memoptr = mptr->memos; memoptr; memoptr = memoptr->next)
-        msm += (strlen(memoptr->sender) + strlen(memoptr->text) + sizeof(struct Memo));
-    }
-  } /* for (ii = 0; ii < MEMOLIST_MAX; ii++) */
+      struct Memo *memoptr;
+
+      for (mptr = memolist[ii]; mptr; mptr = mptr->next)
+        {
+          msm += (strlen(mptr->name) + sizeof(struct MemoInfo));
+          for (memoptr = mptr->memos; memoptr; memoptr = memoptr->next)
+            msm += (strlen(memoptr->sender) + strlen(memoptr->text) + sizeof(struct Memo));
+        }
+    } /* for (ii = 0; ii < MEMOLIST_MAX; ii++) */
 
 #endif /* MEMOSERVICES */
 
@@ -6727,16 +6977,16 @@ CalcMem(char *nick, int socket)
 
   ssm = 0;
   for (ii = 0; ii < HASHCLIENTS; ++ii)
-  {
-    if (hostTable[ii].list)
     {
-      for (hosth = hostTable[ii].list; hosth; hosth = hosth->hnext)
-        ssm += (strlen(hosth->hostname) + sizeof(struct HostHash) + sizeof(aHashEntry));
+      if (hostTable[ii].list)
+        {
+          for (hosth = hostTable[ii].list; hosth; hosth = hosth->hnext)
+            ssm += (strlen(hosth->hostname) + sizeof(struct HostHash) + sizeof(aHashEntry));
+        }
+      else
+        ssm += sizeof(aHashEntry);
     }
-    else
-      ssm += sizeof(aHashEntry);
-  }
-  
+
 #endif /* STATSERVICES */
 
   hashc = HASHCLIENTS * sizeof(aHashEntry);
@@ -6747,7 +6997,9 @@ CalcMem(char *nick, int socket)
   total = clientm +
           chanm +
           chanbanm +
+#ifdef GECOSBANS
           changecosbanm +
+#endif /* GECOSBANS */
           chanexceptm +
           servm +
           confm +
@@ -6758,251 +7010,191 @@ CalcMem(char *nick, int socket)
           hashs;
 
 #ifdef NICKSERVICES
+
   total += nsm;
 
 #ifdef CHANNELSERVICES
+
   total += csm;
 #endif
 
 #ifdef MEMOSERVICES
+
   total += msm;
 #endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
+
   total += ssm;
 #endif
 
   total += igm;
 
   if ((nick) || (socket != NODCC))
-  {
-    /* User structures usage */
-    sprintf(sendstr,
-      "Clients:    %5.0f (%10.0fb) (%10.2fkb)\n",
-      Network->TotalUsers,
-      clientm,
-      clientm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+    {
+      /* User structures usage */
+      ircsprintf(sendstr,
+                 "Clients:    %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalUsers, clientm, clientm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    /* Server structures usage */
-    sprintf(sendstr,
-      "Servers:    %5.0f (%10.0fb) (%10.2fkb)\n",
-      Network->TotalServers,
-      servm,
-      servm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      /* Server structures usage */
+      ircsprintf(sendstr,
+                 "Servers:    %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalServers, servm, servm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    /* Channel structures usage */
-    sprintf(sendstr,
-      "Channels:   %5.0f (%10.0fb) (%10.2fkb)\n",
-      Network->TotalChannels,
-      chanm,
-      chanm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      /* Channel structures usage */
+      ircsprintf(sendstr,
+                 "Channels:   %5.0f (%10.0fb) (%10.2fkb)",
+                 Network->TotalChannels, chanm, chanm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    /* Channel ban mem usage */
-    sprintf(sendstr,
-      "Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
-      chanbanc,
-      chanbanm,
-      chanbanm / 1024);
-   /* Channel gecos ban mem usage */
-    sprintf(sendstr,
-      "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)\n",
-      changecosbanc,
-      changecosbanm,
-      changecosbanm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      /* Channel ban mem usage */
+      ircsprintf(sendstr,
+                 "Bans:       %5ld (%10.0fb) (%10.2fkb)",
+                 chanbanc, chanbanm, chanbanm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    /* Channel exception memory usage */
-    sprintf(sendstr,
-      "Exceptions: %5ld (%10.0fb) (%10.2fkb)\n",
-      chanexceptc,
-      chanexceptm,
-      chanexceptm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+#ifdef GECOSBANS
+      /* Channel gecos ban mem usage */
+      ircsprintf(sendstr,
+                 "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)",
+                 changecosbanc, changecosbanm, changecosbanm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+#endif /* GECOSBANS */
 
-    sprintf(sendstr,
-      "Conf lines: %5ld (%10.0fb) (%10.2fkb)\n",
-      confc,
-      confm,
-      confm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      /* Channel exception memory usage */
+      ircsprintf(sendstr,
+                 "Exceptions: %5ld (%10.0fb) (%10.2fkb)",
+                 chanexceptc, chanexceptm, chanexceptm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    sprintf(sendstr,
-      "Ignores: %8ld (%10.0fb) (%10.2fkb)\n",
-      igc,
-      igm,
-      igm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      ircsprintf(sendstr,
+                 "Conf lines: %5ld (%10.0fb) (%10.2fkb)",
+                 confc, confm, confm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-    sprintf(sendstr,
-      "Partyline: %6d (%10.0fb) (%10.2fkb)\n",
-      Network->TotalConns,
-      connm,
-      connm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      ircsprintf(sendstr,
+                 "Ignores: %8ld (%10.0fb) (%10.2fkb)",
+                 igc, igm, igm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-  #ifdef NICKSERVICES
-    sprintf(sendstr,
-      "NickServ:         (%10.0fb) (%10.2fkb)\n",
-      nsm,
-      nsm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      ircsprintf(sendstr,
+                 "Partyline: %6d (%10.0fb) (%10.2fkb)",
+                 Network->TotalConns, connm, connm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-  #ifdef CHANNELSERVICES
-    sprintf(sendstr,
-      "ChanServ:         (%10.0fb) (%10.2fkb)\n",
-      csm,
-      csm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
-  #endif
+#ifdef NICKSERVICES
 
-  #ifdef MEMOSERVICES
-    sprintf(sendstr,
-      "MemoServ:         (%10.0fb) (%10.2fkb)\n",
-      msm,
-      msm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
-  #endif
+      ircsprintf(sendstr,
+                 "NickServ:         (%10.0fb) (%10.2fkb)",
+                 nsm, nsm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
 
-  #endif /* NICKSERVICES */
+#ifdef CHANNELSERVICES
 
-  #ifdef STATSERVICES
-    sprintf(sendstr,
-      "StatServ:         (%10.0fb) (%10.2fkb)\n",
-      ssm,
-      ssm / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
-  #endif /* STATSERVICES */
+      ircsprintf(sendstr,
+                 "ChanServ:         (%10.0fb) (%10.2fkb)",
+                 csm, csm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+#endif
 
-    /* Client Hash */
-    sprintf(sendstr,
-      "Client Hash:      (%10.0fb) (%10.2fkb)\n",
-      hashc,
-      hashc / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+#ifdef MEMOSERVICES
 
-    /* Channel Hash */
-    sprintf(sendstr,
-      "Channel Hash:     (%10.0fb) (%10.2fkb)\n",
-      hashch,
-      hashch / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+      ircsprintf(sendstr,
+                 "MemoServ:         (%10.0fb) (%10.2fkb)",
+                 msm, msm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+#endif
 
-    /* Clone Hash */
-    sprintf(sendstr,
-      "Clone Hash:       (%10.0fb) (%10.2fkb)\n",
-      hashcl,
-      hashcl / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
+#endif /* NICKSERVICES */
 
-    /* Total memory used */
-    sprintf(sendstr,
-      "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)\n",
-      total,
-      total / 1024,
-      (total / 1024) / 1024);
-    if (socket == NODCC)
-      toserv(":%s NOTICE %s :%s",
-        n_OperServ,
-        nick,
-        sendstr);
-    else
-      writesocket(socket, sendstr);
-  } /* if (nick || (socket != NODCC)) */
+#ifdef STATSERVICES
+
+      ircsprintf(sendstr,
+                 "StatServ:         (%10.0fb) (%10.2fkb)",
+                 ssm, ssm / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+#endif /* STATSERVICES */
+
+      /* Client Hash */
+      ircsprintf(sendstr,
+                 "Client Hash:      (%10.0fb) (%10.2fkb)",
+                 hashc, hashc / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+
+      /* Channel Hash */
+      ircsprintf(sendstr,
+                 "Channel Hash:     (%10.0fb) (%10.2fkb)",
+                 hashch, hashch / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+
+      /* Clone Hash */
+      ircsprintf(sendstr,
+                 "Clone Hash:       (%10.0fb) (%10.2fkb)",
+                 hashcl, hashcl / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+
+      /* Total memory used */
+      ircsprintf(sendstr,
+                 "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)",
+                 total, total / 1024, (total / 1024) / 1024);
+      if (socket == NODCC)
+        os_notice(lptr, socket, sendstr);
+      else
+        writesocket(socket, sendstr);
+    } /* if (nick || (socket != NODCC)) */
 
   return (total);
 } /* CalcMem() */
@@ -7018,25 +7210,95 @@ void ReconnectCheck(time_t expire)
    * because we don't know their split_ts. I'm sure this can be done
    * better -kre */
   for (temphost=cHostList; temphost; temphost=temphost->next)
-  {
-    if (!(temphub=FindServer(temphost->hub)))
-      continue;
-    if (!(templeaf=FindServer(temphost->leaf)))
-      continue;
-    /* Check if hub is connected, and if it is, check difference between
-     * split_ts time and current time */
-    if (temphub->uplink && !templeaf->uplink &&
-        expire-templeaf->split_ts>temphost->re_time)
     {
-      toserv(":%s CONNECT %s %d :%s\n", Me.name, temphost->leaf,
-          temphost->port, temphost->hub);
+      if (!(temphub=FindServer(temphost->hub)))
+        continue;
+      if (!(templeaf=FindServer(temphost->leaf)))
+        continue;
+      /* Check if hub is connected, and if it is, check difference between
+       * split_ts time and current time */
+      if (temphub->uplink && !templeaf->uplink &&
+          expire-templeaf->split_ts>temphost->re_time)
+        {
+          toserv(":%s CONNECT %s %d :%s\r\n", Me.name, temphost->leaf,
+                 temphost->port, temphost->hub);
 #ifdef DEBUG
-      fprintf(stderr, "CONNECTing %s to %s:%d after %s time\n",
-          temphost->leaf, temphost->hub, temphost->port,
-          timeago(temphost->re_time, 0));
+
+          fprintf(stderr, "CONNECTing %s to %s:%d after %s time\n",
+                  temphost->leaf, temphost->hub, temphost->port,
+                  timeago(temphost->re_time, 0));
 #endif
-      return; /* We don't want to lag DoTimer much, don't we? */
+
+          return; /* We don't want to lag DoTimer much, don't we? */
+        }
     }
-  }
-}  
+}
 #endif
+
+/*
+ * o_kline()
+ * Side effects: will kline user, locally or globally, depends on U or
+ * share lines.
+ *
+ * You -need- appropriate shared{} block for Hybrid7.
+ * -kre
+ */
+static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+
+#ifdef HYBRID7
+  struct Luser *klptr = NULL;
+  char *user, *host, *reason, *tkline;
+  int i = 1;
+#else
+  char *klinestr;
+#endif
+
+  /* At least we need two arguments */
+  if (ac < 2)
+    {
+      os_notice(lptr, sockfd,
+                "Syntax: \002KLINE\002 [time] <nick|user@host> [:reason]");
+      return;
+    }
+
+#ifdef HYBRID7
+  if (atoi(av[i]))
+    tkline = av[i++];
+  else
+    tkline = NULL;
+
+  if (!strchr(av[i], '@'))
+  {
+    klptr = FindClient(av[i]);
+    if (!klptr)
+    {
+      os_notice(lptr, sockfd, "KLINE %s: no such nickname", av[i]);
+      return;
+    }
+    user = klptr->username;
+    host = klptr->hostname;
+  }
+  else
+  {
+    user = strtok(av[i++], "@");
+    host = strtok(NULL, "@");
+  }
+
+  if (i < ac)
+    reason = av[i];
+  else
+    reason = NULL;
+
+  /* Prototype: :%s KLINE %s %lu %s %s :%s */
+  /* :OperServ KLINE * 0 prvi drugi :treci */
+  /* sourcenick, targetserver, tkline_time, user, host, reason */
+  toserv(":%s KLINE %s %s %s %s %s\r\n", n_OperServ, "*",
+      tkline ? tkline : "0", user, host,
+      reason ? reason : ":HybServ remote kline");
+#else
+  klinestr = GetString(ac - 1, av + 1);
+  toserv(":%s KLINE %s %s\r\n", Me.name, n_OperServ, klinestr);
+  MyFree(klinestr);
+#endif
+}

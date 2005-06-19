@@ -1,12 +1,17 @@
 /*
  * dcc.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
 
 #ifndef INCLUDED_dcc_h
 #define INCLUDED_dcc_h
+
+#ifndef INCLUDED_hybdefs_h
+#include "hybdefs.h"         /* MAXLINE needed -kre */
+#define INCLUDED_hybdefs_h
+#endif
 
 #ifndef INCLUDED_sys_time_h
 #include <sys/time.h>         /* time_t */
@@ -53,6 +58,8 @@ struct DccUser
   char *username;   /* username */
   char *hostname;   /* hostname */
   int flags;        /* socket flags */
+  char spill[MAXLINE * 2];
+  int offset;
 
   /*
    * time of their last message - for telnet clients who haven't
@@ -89,7 +96,7 @@ struct DccUser *GetBot(char *nick);
 struct DccUser *IsDccSock(int socket);
 struct DccUser *IsOnDcc(char *nick);
 void DccProcess(struct DccUser *dccptr, char *line);
-void BotProcess(struct DccUser *bptr, char *line);
+int BotProcess(struct DccUser *bptr, char *line);
 void SendMotd(int socket);
 void ServReboot();
 
@@ -98,5 +105,9 @@ void ServReboot();
  */
 
 extern struct DccUser *connections;
+
+#ifdef ADMININFO
+extern struct Luser *ClientList;
+#endif /* ADMININFO */
 
 #endif /* INCLUDED_dcc_h */

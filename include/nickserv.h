@@ -1,6 +1,6 @@
 /*
  * nickserv.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -33,7 +33,7 @@
 /* NickServ flags */
 #define NS_IDENTIFIED   0x00000001 /* nick has IDENTIFY'd */
 #define NS_PROTECTED    0x00000002 /* kill to regain nick */
-#define NS_OPERATOR     0x00000004 /* owned by oper - doesn't expire */
+#define NS_NOEXPIRE     0x00000004 /* nickname which doesn't expire */
 #define NS_AUTOMASK     0x00000008 /* auto-add new hostmasks */
 #define NS_PRIVATE      0x00000010 /* nick won't show up in a LIST */
 #define NS_COLLIDE      0x00000020 /* stole a nick - kill them */
@@ -53,6 +53,8 @@
 #define NS_KILLIMMED    0x00080000 /* kill immediately to regain nick */
 #define NS_NOREGISTER   0x00100000 /* cannot register channels */
 #define NS_NOCHANOPS    0x00200000 /* not allowed to be opped */
+#define NS_NUMERIC      0x00400000 /* ignores 432 numeric */
+#define NS_PRIVMSG      0x00800000 /* PRIVMSG or NOTICE */
 
 struct NickHost
 {
@@ -88,6 +90,10 @@ struct NickInfo
 
   char *email;               /* email address */
   char *url;                 /* url */
+
+  char *gsm;                 /* GSM number */
+  char *phone;               /* Phone */
+  char *UIN;                 /* ICQ UIN */
 
   char *lastu;               /* last seen username */
   char *lasth;               /* last seen hostname */
@@ -144,7 +150,7 @@ struct NickInfo
  * Prototypes
  */
 
-void ns_process(char *nick, char *command);
+void ns_process(const char *nick, char *command);
 int CheckNick(char *nick);
 void CheckOper(char *nick);
 void ExpireNicknames(time_t unixtime);

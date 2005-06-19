@@ -1,0 +1,4 @@
+Syntax: %bSET NOEXPIRE {ON|OFF}%b
+
+If %bNOEXPIRE%b is ON, your nickname will never expire.  You
+must be an IRC Operator when you set this option.

@@ -1,6 +1,6 @@
 /*
  * server.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -106,5 +106,6 @@ void ClearChans();
  */
 
 extern struct Server      *ServerList;
+extern int burst_complete;
 
 #endif /* INCLUDED_server_h */

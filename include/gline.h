@@ -1,6 +1,6 @@
 /*
  * gline.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -44,6 +44,10 @@ void CheckGlined(struct Luser *lptr);
 
 #ifdef HYBRID_GLINES
 void ExecuteGline(char *user, char *host, char *reason);
+#endif
+
+#ifdef HYBRID7_GLINES
+void Execute7Gline(char *user, char *host, char *reason, time_t);
 #endif
 
 void ExpireGlines(time_t unixtime);

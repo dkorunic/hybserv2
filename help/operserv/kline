@@ -1,0 +1,4 @@
+Syntax: %bKLINE [time] <nick|user@host> [reason]%b
+
+Bans all users matching <user@host> from network with [reason].
+Services will pass this to ircd, and it will hopefully work.

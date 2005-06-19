@@ -1,6 +1,6 @@
 /*
  * settings.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -52,6 +52,7 @@ extern  char      *HPath;
 extern  char      *ConfigFile;
 extern  char      *LogFile;
 extern  char      *PidFile;
+extern  char      *PipeFile;
 extern  char      *HelpPath;
 extern  char      *MotdFile;
 extern  char      *DccMotdFile;
@@ -66,6 +67,7 @@ extern  char      *ChanServDB;
 extern  char      *MemoServDB;
 extern  char      *StatServDB;
 extern  char      *OperServDB;
+extern  char      *OperServIgnoreDB;
 extern  char      *SeenServDB;
 
 extern  char      *n_OperServ;
@@ -106,6 +108,7 @@ extern  long      NickNameExpire;
 extern  long      ChannelExpire;
 extern  long      MemoExpire;
 extern  long      StatExpire;
+extern  long      BanExpire;
 extern  long      NSReleaseTimeout;
 
 extern  int       FloodProtection;
@@ -165,7 +168,7 @@ extern  long      NickRegDelay;
 extern  int       MaxLinks;
 extern  int       AllowKillProtection;
 extern  int       AllowKillImmed;
-extern	int	  AllowGuardChannel;
+extern	int	      AllowGuardChannel;
 
 extern  int       MaxChansPerUser;
 extern  int       MaxAkicks;
@@ -182,5 +185,10 @@ extern  long      MaxPing;
 
 extern  int       GlobalNotices;
 extern  int       SeenMaxRecs;
+
+extern  int       MaxServerCollides;
+extern  long      MinServerCollidesDelta;
+
+extern  long      MaxTSDelta;
 
 #endif /* INCLUDED_settings_h */

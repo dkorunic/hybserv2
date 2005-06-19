@@ -6,7 +6,7 @@ Configures various nickname options.
     KILL       Turn kill protection on or off
     AUTOMASK   Auto add new hostmasks on %bIDENTIFY%b
     PASSWORD   Reset your nickname password
-    OPER       Turn nickname expiration on or off
+    NOEXPIRE   Turn nickname expiration on or off
     SECURE     Turn nickname security on or off
     UNSECURE   Set nickname security very low
     PRIVATE    Hide nickname information from %bLIST%bs
@@ -16,7 +16,11 @@ Configures various nickname options.
     EMAIL      Associate an email address with your nick
     URL        Associate a url with your nick
     HIDE       Hide information in your %bINFO%b reply
+    UIN        Set ICQ UIN for this user
+    GSM        Set number of mobile phone for this user
+    PHONE      Set the phone for this user
     MASTER     Reset the master nickname for your link
+    PRIVMSG    Services will either privmsg or notice you
 
 Type %b/msg %N HELP SET option%b for more information
 on a specific option.

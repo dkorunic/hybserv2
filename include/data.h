@@ -1,6 +1,6 @@
 /*
  * data.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -18,6 +18,11 @@
 #define INCLUDED_sys_types_h
 #endif
 
+#ifndef INCLUDED_operserv_h
+#include "operserv.h"
+#define INCLUDED_operserv_h
+#endif
+
 /*
  * Prototypes
  */
@@ -28,6 +33,7 @@ FILE *CreateDatabase(char *name, char *info);
 
 int WriteDatabases();
 int WriteOpers();
+int WriteIgnores();
 int WriteStats();
 int WriteNicks();
 int WriteChans();
@@ -43,6 +49,7 @@ int cs_loaddata();
 int ms_loaddata();
 int ss_loaddata();
 int os_loaddata();
+int ignore_loaddata();
 
 #ifdef SEENSERVICES
 int es_loaddata();

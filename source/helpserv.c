@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -8,6 +8,8 @@
  *
  * $Id$
  */
+
+#include "defs.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -30,39 +32,42 @@
 #include "sock.h"
 #include "statserv.h"
 #include "seenserv.h"
+#include "sprintf_irc.h"
 
 #ifdef HELPSERVICES
 
 static void hs_givehelp(struct Luser *, int, char **);
 
-static struct Command helpcmds[] = {
-  { "HELP", hs_givehelp, LVL_NONE },
-  { "OPERSERV", hs_givehelp, LVL_NONE },
+static struct Command helpcmds[] =
+    {
+      { "HELP", hs_givehelp, LVL_NONE
+      },
+      { "OPERSERV", hs_givehelp, LVL_NONE },
 
 #ifdef NICKSERVICES
 
-  { "NICKSERV", hs_givehelp, LVL_NONE },
+      { "NICKSERV", hs_givehelp, LVL_NONE },
 
-  #ifdef CHANNELSERVICES
-  { "CHANSERV", hs_givehelp, LVL_NONE },
-  #endif
+#ifdef CHANNELSERVICES
+      { "CHANSERV", hs_givehelp, LVL_NONE },
+#endif
 
-  #ifdef MEMOSERVICES
-  { "MEMOSERV", hs_givehelp, LVL_NONE },
-  #endif
+#ifdef MEMOSERVICES
+      { "MEMOSERV", hs_givehelp, LVL_NONE },
+#endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
-  { "STATSERV", hs_givehelp, LVL_NONE },
+      { "STATSERV", hs_givehelp, LVL_NONE },
 #endif
 
 #ifdef SEENSERVICES
-  { "SEENSERV", hs_givehelp, LVL_NONE },
+      { "SEENSERV", hs_givehelp, LVL_NONE },
 #endif
 
-  { 0, 0, 0 }
-};
+      { 0, 0, 0 }
+    };
 
 /*
 hs_process()
@@ -82,30 +87,30 @@ hs_process(char *nick, char *command)
     return;
 
   if (Network->flags & NET_OFF)
-  {
-    notice(n_HelpServ, lptr->nick,
-      "Services are currently \002disabled\002");
-    return;
-  }
+    {
+      notice(n_HelpServ, lptr->nick,
+             "Services are currently \002disabled\002");
+      return;
+    }
 
   acnt = SplitBuf(command, &arv);
   if (acnt == 0)
-  {
-    MyFree(arv);
-    return;
-  }
+    {
+      MyFree(arv);
+      return;
+    }
 
   hptr = GetCommand(helpcmds, arv[0]);
 
   if (!hptr || (hptr == (struct Command *) -1))
-  {
-    notice(n_HelpServ, lptr->nick,
-      "%s command [%s]",
-      (hptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
-      arv[0]);
-    MyFree(arv);
-    return;
-  }
+    {
+      notice(n_HelpServ, lptr->nick,
+             "%s command [%s]",
+             (hptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
+             arv[0]);
+      MyFree(arv);
+      return;
+    }
 
   /*
    * Check if the command is for admins only - if so,
@@ -114,12 +119,12 @@ hs_process(char *nick, char *command)
    * if so, allow the command
    */
   if ((hptr->level == LVL_ADMIN) && !(IsValidAdmin(lptr)))
-  {
-    notice(n_HelpServ, lptr->nick, "Unknown command [%s]",
-      arv[0]);
-    MyFree(arv);
-    return;
-  }
+    {
+      notice(n_HelpServ, lptr->nick, "Unknown command [%s]",
+             arv[0]);
+      MyFree(arv);
+      return;
+    }
 
   /* call hptr->func to execute command */
   (*hptr->func)(lptr, acnt, arv);
@@ -141,79 +146,78 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
 {
   struct Luser *serviceptr;
 
-  if (!strcasecmp(av[0], "HELP"))
-  {
-    if (ac >= 2)
-      GiveHelp(n_HelpServ, lptr->nick, av[1], NODCC);
-    else
-      GiveHelp(n_HelpServ, lptr->nick, (char *) NULL, NODCC);
-  }
+  if (!irccmp(av[0], "HELP"))
+    {
+      if (ac >= 2)
+        GiveHelp(n_HelpServ, lptr->nick, av[1], NODCC);
+      else
+        GiveHelp(n_HelpServ, lptr->nick, NULL, NODCC);
+    }
   else
-  {
-    char  str[MAXLINE];
-
-    if (!(serviceptr = GetService(av[0])))
     {
-      /*
-       * this shouldn't happen unless they entered a partial
-       * service nick, and the abbreviation code allowed it
-       * to go through
-       */
-      notice(n_HelpServ, lptr->nick,
-        "[\002%s\002] is an invalid service nickname",
-        av[0]);
-      return;
-    }
+      char  str[MAXLINE];
 
-    if (ac < 2)
-      strcpy(str, "HELP");
-    else if (ac >= 3)
-    {
-      sprintf(str, "HELP %s %s",
-        av[1],
-        av[2]);
-    }
-    else
-    {
-      sprintf(str, "HELP %s",
-        av[1]);
-    }
+      if (!(serviceptr = GetService(av[0])))
+        {
+          /*
+           * this shouldn't happen unless they entered a partial
+           * service nick, and the abbreviation code allowed it
+           * to go through
+           */
+          notice(n_HelpServ, lptr->nick,
+                 "[\002%s\002] is an invalid service nickname",
+                 av[0]);
+          return;
+        }
 
-    if (serviceptr == Me.osptr)
-      os_process(lptr->nick, str, NODCC);
+      if (ac < 2)
+        strcpy(str, "HELP");
+      else if (ac >= 3)
+        {
+          ircsprintf(str, "HELP %s %s", av[1], av[2]);
+        }
+      else
+        {
+          ircsprintf(str, "HELP %s", av[1]);
+        }
 
-  #ifdef NICKSERVICES
+      if (serviceptr == Me.osptr)
+        os_process(lptr->nick, str, NODCC);
 
-    if (serviceptr == Me.nsptr)
-      ns_process(lptr->nick, str);
+#ifdef NICKSERVICES
 
-    #ifdef CHANNELSERVICES
+      if (serviceptr == Me.nsptr)
+        ns_process(lptr->nick, str);
+
+#ifdef CHANNELSERVICES
+
       if (serviceptr == Me.csptr)
         cs_process(lptr->nick, str);
-    #endif
+#endif
 
-    #ifdef MEMOSERVICES
+#ifdef MEMOSERVICES
+
       if (serviceptr == Me.msptr)
         ms_process(lptr->nick, str);
-    #endif
+#endif
 
-  #endif /* NICKSERVICES */
+#endif /* NICKSERVICES */
 
-  #ifdef STATSERVICES
+#ifdef STATSERVICES
 
-    if (serviceptr == Me.ssptr)
-      ss_process(lptr->nick, str);
-      
-  #endif /* STATSERVICES */
+      if (serviceptr == Me.ssptr)
+        ss_process(lptr->nick, str);
 
-  #ifdef SEENSERVICES
+#endif /* STATSERVICES */
 
-    if (serviceptr == Me.esptr)
-      es_process(lptr->nick, str);
+#ifdef SEENSERVICES
 
-  #endif /* SEENSERVICES */
+      if (serviceptr == Me.esptr)
+        es_process(lptr->nick, str);
 
-  } /* else */
+#endif /* SEENSERVICES */
+
+    } /* else */
 } /* hs_givehelp() */
 
 #endif /* HELPSERVICES */
@@ -240,239 +244,269 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     return;
 
   if (!command) /* they want general help */
-  {
-    if (sockfd == NODCC) /* they want /msg commands */
     {
-      sendstr[0] = '\0';
-      if (servptr == Me.osptr)
-        sprintf(sendstr, "%s/operserv/index", HelpPath);
-
-    #ifdef NICKSERVICES
-
-      else if (servptr == Me.nsptr)
-        sprintf(sendstr, "%s/nickserv/index", HelpPath);
-
-      #ifdef CHANNELSERVICES
-        else if (servptr == Me.csptr)
-          sprintf(sendstr, "%s/chanserv/index", HelpPath);
-      #endif
-
-      #ifdef MEMOSERVICES
-        else if (servptr == Me.msptr)
-          sprintf(sendstr, "%s/memoserv/index", HelpPath);
-      #endif
-
-    #endif /* NICKSERVICES */
-
-    #ifdef STATSERVICES
-      else if (servptr == Me.ssptr)
-        sprintf(sendstr, "%s/statserv/index", HelpPath);
-    #endif /* STATSERVICES */
-
-    #ifdef HELPSERVICES
-      else if (servptr == Me.hsptr)
-        sprintf(sendstr, "%s/helpserv/index", HelpPath);
-    #endif /* HELPSERVICES */
-
-    #ifdef GLOBALSERVICES
-      else if (servptr == Me.gsptr)
-        sprintf(sendstr, "%s/global/index", HelpPath);
-    #endif /* GLOBALSERVICES */
-
-    #ifdef SEENSERVICES
-      else if (servptr == Me.esptr)
-          sprintf(sendstr, "%s/seenserv/index", HelpPath );
-    #endif /* SEENSERVICES */
-
-      if (sendstr[0])
-      {
-        if ((fp = fopen(sendstr, "r")) == NULL)
+      if (sockfd == NODCC) /* they want /msg commands */
         {
-          notice(Serv, helpnick, "Unable to open help file");
-          return;
+          sendstr[0] = '\0';
+          if (servptr == Me.osptr)
+            ircsprintf(sendstr, "%s/operserv/index", HelpPath);
+
+#ifdef NICKSERVICES
+
+          else if (servptr == Me.nsptr)
+            ircsprintf(sendstr, "%s/nickserv/index", HelpPath);
+
+#ifdef CHANNELSERVICES
+
+          else if (servptr == Me.csptr)
+            ircsprintf(sendstr, "%s/chanserv/index", HelpPath);
+#endif
+
+#ifdef MEMOSERVICES
+
+          else if (servptr == Me.msptr)
+            ircsprintf(sendstr, "%s/memoserv/index", HelpPath);
+#endif
+
+#endif /* NICKSERVICES */
+
+#ifdef STATSERVICES
+
+          else if (servptr == Me.ssptr)
+            ircsprintf(sendstr, "%s/statserv/index", HelpPath);
+#endif /* STATSERVICES */
+
+#ifdef HELPSERVICES
+
+          else if (servptr == Me.hsptr)
+            ircsprintf(sendstr, "%s/helpserv/index", HelpPath);
+#endif /* HELPSERVICES */
+
+#ifdef GLOBALSERVICES
+
+          else if (servptr == Me.gsptr)
+            ircsprintf(sendstr, "%s/global/index", HelpPath);
+#endif /* GLOBALSERVICES */
+
+#ifdef SEENSERVICES
+
+          else if (servptr == Me.esptr)
+            ircsprintf(sendstr, "%s/seenserv/index", HelpPath );
+#endif /* SEENSERVICES */
+
+          if (sendstr[0])
+            {
+              if ((fp = fopen(sendstr, "r")) == NULL)
+                {
+                  notice(Serv, helpnick, "Unable to open help file");
+                  return;
+                }
+            }
+          else
+            return; /* something got messed up =/ */
         }
-      }
-      else
-        return; /* something got messed up =/ */
-    }
-    else /* they want dcc commands (OperServ only) */
-    {
-      if (servptr == Me.osptr)
-      {
-        sprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
-        if ((fp = fopen(sendstr, "r")) == NULL)
+      else /* they want dcc commands (OperServ only) */
         {
-          writesocket(sockfd, "Unable to open help file\n");
-          return;
+          if (servptr == Me.osptr)
+            {
+              ircsprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
+              if ((fp = fopen(sendstr, "r")) == NULL)
+                {
+                  writesocket(sockfd, "Unable to open help file\r\n");
+                  return;
+                }
+            }
+          else
+            return; /* no other *Serv's allow dcc chat */
         }
-      }
-      else
-        return; /* no other *Serv's allow dcc chat */
+
+      while (fgets(line, MAXLINE - 1, fp))
+        {
+          if (IsEOL(*line))
+            {
+              if (sockfd != NODCC)
+                writesocket(sockfd, "\r\n");
+              else
+                notice(Serv, helpnick, "\002\002");
+
+              continue;
+            }
+
+          final = Substitute(helpnick, line, sockfd);
+          if (final && (final != (char *) -1))
+            {
+              if (sockfd == NODCC)
+                notice(Serv, helpnick, final);
+              else
+                writesocket(sockfd, final);
+            }
+          if (final != (char *) -1)
+            MyFree(final);
+        }
+      fclose(fp);
     }
-
-    while (fgets(line, MAXLINE - 1, fp))
-    {
-      if (IsEOL(*line))
-      {
-        if (sockfd != NODCC)
-          writesocket(sockfd, "\r\n");
-        else
-          notice(Serv, helpnick, "\002\002");
-
-        continue;
-      }
-
-      final = Substitute(helpnick, line, sockfd);
-      if (final && (final != (char *) -1))
-      {
-        if (sockfd == NODCC)
-          notice(Serv, helpnick, final);
-        else
-          writesocket(sockfd, final);
-      }
-      if (final != (char *) -1)
-        MyFree(final);
-    }
-    fclose(fp);
-  }
   else /* they want help on a specific command */
-  {
-    int cac;
-    char **cav;
-    char helparg[MAXLINE], arg2[MAXLINE];
-
-    arg2[0] = '\0';
-    cac = SplitBuf(command, &cav);
-    strcpy(helparg, StrTolower(cav[0]));
-
-    if (cac > 1)
-      strcpy(arg2, StrTolower(cav[1]));
-
-    if (sockfd == NODCC)
     {
-      if (servptr == Me.osptr)
-        sprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
+      int cac;
+      char **cav;
+      char helparg[MAXLINE], arg2[MAXLINE];
 
-    #ifdef NICKSERVICES
+      arg2[0] = '\0';
 
-      else if (servptr == Me.nsptr)
-      {
-        if (arg2[0])
-          sprintf(sendstr, "%s/nickserv/%s/%s",
-            HelpPath,
-            helparg,
-            arg2);
-        else
-          sprintf(sendstr, "%s/nickserv/%s", HelpPath, helparg);
-      }
-
-      #ifdef CHANNELSERVICES
-        else if (servptr == Me.csptr)
+      /* Bug found by larne and binder -kre */
+      if (strchr(command, '/') || strstr(command, ".."))
         {
-          if (arg2[0])
-            sprintf(sendstr, "%s/chanserv/%s/%s",
-              HelpPath,
-              helparg,
-              arg2);
+          ircsprintf(sendstr, "Invalid help string");
+          if (sockfd == NODCC)
+            notice(Serv, helpnick, sendstr);
           else
-            sprintf(sendstr, "%s/chanserv/%s", HelpPath, helparg);
+            {
+              writesocket(sockfd, sendstr);
+              writesocket(sockfd, "\r\n");
+            }
+          return;
         }
-      #endif /* CHANNELSERVICES */
 
-      #ifdef MEMOSERVICES
-        else if (servptr == Me.msptr)
+      /* Proceed with splitting -kre */
+      cac = SplitBuf(command, &cav);
+      strcpy(helparg, StrTolower(cav[0]));
+
+      if (cac > 1)
+        strcpy(arg2, StrTolower(cav[1]));
+
+      if (sockfd == NODCC)
         {
-          if (arg2[0])
-            sprintf(sendstr, "%s/memoserv/%s/%s",
-              HelpPath,
-              helparg,
-              arg2);
-          else
-            sprintf(sendstr, "%s/memoserv/%s", HelpPath, helparg);
+          if (servptr == Me.osptr)
+            ircsprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
+
+#ifdef NICKSERVICES
+
+          else if (servptr == Me.nsptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/nickserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/nickserv/%s", HelpPath, helparg);
+            }
+
+#ifdef CHANNELSERVICES
+          else if (servptr == Me.csptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/chanserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/chanserv/%s", HelpPath, helparg);
+            }
+#endif /* CHANNELSERVICES */
+
+#ifdef MEMOSERVICES
+          else if (servptr == Me.msptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/memoserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/memoserv/%s", HelpPath, helparg);
+            }
+#endif /* MEMOSERVICES */
+
+#endif /* NICKSERVICES */
+
+#ifdef STATSERVICES
+          else if (servptr == Me.ssptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/statserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/statserv/%s", HelpPath, helparg);
+            }
+#endif /* STATSERVICES */
+
+#ifdef HELPSERVICES
+          else if (servptr == Me.hsptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/helpserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/helpserv/%s", HelpPath, helparg);
+            }
+#endif /* HELPSERVICES */
+
+#ifdef GLOBALSERVICES
+          else if (servptr == Me.gsptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/global/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/global/%s", HelpPath, helparg);
+            }
+#endif /* GLOBALSERVICES */
+
         }
-      #endif /* MEMOSERVICES */
-
-    #endif /* NICKSERVICES */
-
-    #ifdef STATSERVICES
-      else if (servptr == Me.ssptr)
-      {
-        if (arg2[0])
-          sprintf(sendstr, "%s/statserv/%s/%s",
-            HelpPath,
-            helparg,
-            arg2);
-        else
-          sprintf(sendstr, "%s/statserv/%s", HelpPath, helparg);
-      }
-    #endif /* STATSERVICES */
-
-    #ifdef HELPSERVICES
-      else if (servptr == Me.hsptr)
-      {
-        if (arg2[0])
-          sprintf(sendstr, "%s/helpserv/%s/%s",
-            HelpPath,
-            helparg,
-            arg2);
-        else
-          sprintf(sendstr, "%s/helpserv/%s", HelpPath, helparg);
-      }
-    #endif /* HELPSERVICES */
-
-    #ifdef GLOBALSERVICES
-      else if (servptr == Me.gsptr)
-      {
-        if (arg2[0])
-          sprintf(sendstr, "%s/global/%s/%s",
-            HelpPath,
-            helparg,
-            arg2);
-        else
-          sprintf(sendstr, "%s/global/%s", HelpPath, helparg);
-      }
-    #endif /* GLOBALSERVICES */
-
-    }
-    else
-    {
-      sprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
-      if ((fp = fopen(sendstr, "r")) == (FILE *) NULL)
-        sprintf(sendstr, "%s/operserv/dcc/%s", HelpPath, helparg);
       else
-        fclose(fp);
-    }
+        {
+          ircsprintf(sendstr, "%s/operserv/%s", HelpPath, helparg);
+          if ((fp = fopen(sendstr, "r")) == NULL)
+            ircsprintf(sendstr, "%s/operserv/dcc/%s", HelpPath, helparg);
+          else
+            fclose(fp);
+        }
 
-    MyFree(cav);
+      MyFree(cav);
 
-    if ((fp = fopen(sendstr, "r")) == (FILE *)NULL)
-    {
-      sprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
-      if (sockfd == NODCC)
-        notice(Serv, helpnick, sendstr);
-      else
-      {
-        writesocket(sockfd, sendstr);
-        writesocket(sockfd, "\n");
-      }
-      return;
-    }
-    while (fgets(line, MAXLINE - 1, fp))
-    {
-      final = Substitute(helpnick, line, sockfd);
-      if (sockfd == NODCC)
-      {
-        if (!(final == (char *) -1))
-          notice(Serv, helpnick, final ? final : "\002\002");
-      }
-      else
-      {
-        writesocket(sockfd, final ? final : "");
-        /*writesocket(sockfd, "\n");*/
-      }
-      if (final && (final != (char *) -1))
-        MyFree(final);
-    }
-    fclose(fp);
-  }  /* else */
+      if ((fp = fopen(sendstr, "r")) == NULL)
+        {
+          ircsprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
+          if (sockfd == NODCC)
+            notice(Serv, helpnick, sendstr);
+          else
+            {
+              writesocket(sockfd, sendstr);
+              writesocket(sockfd, "\r\n");
+            }
+          return;
+        }
+
+      while (fgets(line, MAXLINE - 1, fp))
+        {
+          if (IsEOL(*line))
+            {
+              if (sockfd != NODCC)
+                writesocket(sockfd, "\r\n");
+              else
+                notice(Serv, helpnick, "\002\002");
+
+              continue;
+            }
+
+          final = Substitute(helpnick, line, sockfd);
+          if (final && (final != (char *) -1))
+            {
+              if (sockfd == NODCC)
+                notice(Serv, helpnick, final);
+              else
+                writesocket(sockfd, final);
+            }
+          if (final != (char *) -1)
+            MyFree(final);
+        }
+      fclose(fp);
+    }  /* else */
 } /* GiveHelp() */

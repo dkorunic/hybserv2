@@ -1,6 +1,9 @@
 #!/bin/sh
-# Copyright (C) 1998 Patrick Alken <wnder@underworld.net>
 # $Id$
+
+echo
+echo "Starting configuration with default values"
+echo
 
 ./configure
 make
@@ -9,7 +12,7 @@ echo
 echo "You need root to install HybServ in system wide directories"
 echo
 
-su root -c "make install ; make install-help"
+su root -c "make install"
 
 echo
 echo "HybServ has been successfully installed!"

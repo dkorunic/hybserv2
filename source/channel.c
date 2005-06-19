@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -9,12 +9,16 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
+#endif
 #include <string.h>
 #include <assert.h>
-#include <time.h>
 
 #include "alloc.h"
 #include "channel.h"
@@ -30,10 +34,13 @@
 #include "match.h"
 #include "misc.h"
 #include "mystring.h"
+#include "nickserv.h"
 #include "operserv.h"
 #include "settings.h"
 #include "sock.h"
-#include "Strn.h"
+#include "sprintf_irc.h"
+
+#ifdef CHANNELSERVICES
 
 /*
  * Global - linked list of channels
@@ -51,7 +58,7 @@ void
 AddBan(char *who, struct Channel *cptr, char *ban)
 
 {
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   struct ChannelBan *tempban;
 
   tempban = (struct ChannelBan *) MyMalloc(sizeof(struct ChannelBan));
@@ -93,13 +100,13 @@ DeleteBan(struct Channel *cptr, char *ban)
   if (bptr->prev)
     bptr->prev->next = bptr->next;
   else
-  {
-    /*
-     * We're deleting the first ban in the list, reset
-     * cptr->firstban
-     */
-    cptr->firstban = bptr->next;
-  }
+    {
+      /*
+       * We're deleting the first ban in the list, reset
+       * cptr->firstban
+       */
+      cptr->firstban = bptr->next;
+    }
 
   if (bptr->next)
     bptr->next->prev = bptr->prev;
@@ -125,7 +132,7 @@ AddException(char *who, struct Channel *cptr, char *mask)
     tempe->who = MyStrdup(who);
 
   tempe->mask = MyStrdup(mask);
-  tempe->when = time(NULL);
+  tempe->when = current_ts;
 
   tempe->next = cptr->exceptlist;
   tempe->prev = NULL;
@@ -134,6 +141,39 @@ AddException(char *who, struct Channel *cptr, char *mask)
 
   cptr->exceptlist = tempe;
 } /* AddException() */
+
+#ifdef HYBRID7
+/*
+ * AddInviteException()
+ * Add hostmask 'mask' set by 'who' to channel invite exception list
+ * -Janos
+ *
+ * XXX: This code is all from AddException(). They have to be merged into
+ * single function that has an additional argument which will differ
+ * exceptions -kre 
+ */
+void AddInviteException(char *who, struct Channel *cptr, char *mask)
+{
+  struct InviteException *tempinvex;
+
+  tempinvex = (struct InviteException *)MyMalloc(sizeof(struct
+        InviteException));
+  memset(tempinvex, 0, sizeof(struct InviteException));
+
+  if (who)
+    tempinvex->who = MyStrdup(who);
+
+  tempinvex->mask = MyStrdup(mask);
+  tempinvex->when = current_ts;
+
+  tempinvex->next = cptr->inviteexceptlist;
+  tempinvex->prev = NULL;
+  if (tempinvex->next)
+    tempinvex->next->prev = tempinvex;
+
+  cptr->inviteexceptlist = tempinvex;
+} /* AddInviteException() */
+#endif /* HYBRID7 */
 
 /*
 DeleteException()
@@ -164,6 +204,38 @@ DeleteException(struct Channel *cptr, char *mask)
   MyFree(tempe);
 } /* DeleteException() */
 
+#ifdef HYBRID7
+/*
+ * DeleteInviteException()
+ * Remove hostmask 'mask' from cptr's invite exception list
+ * -Janos
+ * 
+ * XXX: Same as the above - they _have_ to go in _same_ function, this way
+ * we accumulate useless repeating code. -kre
+*/
+void DeleteInviteException(struct Channel *cptr, char *mask)
+{
+  struct InviteException *tempinvex;
+
+  if (!(tempinvex = FindInviteException(cptr, mask)))
+    return;
+
+  MyFree(tempinvex->mask);
+  if (tempinvex->who)
+    MyFree(tempinvex->who);
+
+  if (tempinvex->prev)
+    tempinvex->prev->next = tempinvex->next;
+  else
+    cptr->inviteexceptlist = tempinvex->next;
+
+  if (tempinvex->next)
+    tempinvex->next->prev = tempinvex->prev;
+
+  MyFree(tempinvex);
+} /* DeleteInviteException() */
+#endif /* HYBRID7 */
+
 /*
 MatchBan()
  Same as FindBan() but use match() to compare bans to allow
@@ -171,17 +243,17 @@ for wildcards
 */
 
 struct ChannelBan *
-MatchBan(struct Channel *cptr, char *ban)
+      MatchBan(struct Channel *cptr, char *ban)
 
-{
-  struct ChannelBan *tempban;
+  {
+    struct ChannelBan *tempban;
 
-  tempban = cptr->firstban;
-  while (tempban && (match(ban, tempban->mask) == 0))
-    tempban = tempban->next;
+    tempban = cptr->firstban;
+    while (tempban && (match(ban, tempban->mask) == 0))
+      tempban = tempban->next;
 
-  return (tempban);
-} /* MatchBan() */
+    return (tempban);
+  } /* MatchBan() */
 
 /*
 FindBan()
@@ -191,20 +263,20 @@ FindBan()
 */
 
 struct ChannelBan *
-FindBan(struct Channel *cptr, char *ban)
+      FindBan(struct Channel *cptr, char *ban)
 
-{
-  struct ChannelBan *tempban;
+  {
+    struct ChannelBan *tempban;
 
-  if (!cptr || !ban)
-    return (NULL);
+    if (!cptr || !ban)
+      return (NULL);
 
-  tempban = cptr->firstban;
-  while (tempban && (strcasecmp(tempban->mask, ban) != 0))
-    tempban = tempban->next;
+    tempban = cptr->firstban;
+    while (tempban && (irccmp(tempban->mask, ban) != 0))
+      tempban = tempban->next;
 
-  return (tempban);
-} /* FindBan() */
+    return (tempban);
+  } /* FindBan() */
 
 /*
 MatchException()
@@ -213,17 +285,17 @@ for wildcards
 */
 
 struct Exception *
-MatchException(struct Channel *cptr, char *ban)
+      MatchException(struct Channel *cptr, char *ban)
 
-{
-  struct Exception *tempe;
+  {
+    struct Exception *tempe;
 
-  tempe = cptr->exceptlist;
-  while (tempe && (match(ban, tempe->mask) == 0))
-    tempe = tempe->next;
+    tempe = cptr->exceptlist;
+    while (tempe && (match(ban, tempe->mask) == 0))
+      tempe = tempe->next;
 
-  return (tempe);
-} /* MatchException() */
+    return (tempe);
+  } /* MatchException() */
 
 /*
 FindException()
@@ -232,40 +304,63 @@ list
 */
 
 struct Exception *
-FindException(struct Channel *cptr, char *mask)
+      FindException(struct Channel *cptr, char *mask)
 
-{
-  struct Exception *tempe;
+  {
+    struct Exception *tempe;
 
-  if (!cptr || !mask)
-    return ((struct Exception *) NULL);
+    if (!cptr || !mask)
+      return ((struct Exception *) NULL);
 
-  tempe = cptr->exceptlist;
-  while (tempe && (strcasecmp(tempe->mask, mask) != 0))
-    tempe = tempe->next;
+    tempe = cptr->exceptlist;
+    while (tempe && (irccmp(tempe->mask, mask) != 0))
+      tempe = tempe->next;
 
-  return (tempe);
-} /* FindException() */
+    return (tempe);
+  } /* FindException() */
+
+#ifdef HYBRID7
+
+/*
+ * FindInviteException()
+ * Return a pointer to occurence of 'mask' on cptr's invite exception list
+ * -Janos
+ *
+ * XXX: merge into FindException() -kre
+ */
+struct InviteException *FindInviteException(struct Channel *cptr, char
+          *mask)
+  {
+    struct InviteException *tempinvex;
+
+    if (!cptr || !mask)
+      return NULL;
+
+    tempinvex = cptr->inviteexceptlist;
+    while (tempinvex && (irccmp(tempinvex->mask, mask) != 0))
+      tempinvex = tempinvex->next;
+
+    return (tempinvex);
+  } /* FindInviteException() */
+#endif /* HYBRID7 */
 
 /*
 AddChannel()
   args: char **line, int nickcnt, char **nicks
   purpose: add channel info in 'line' to channel list
   return: pointer to channel structure
-
+ 
     line[2] = channel origin
     line[3] = channel name
     line[4] = channel modes
     line[5] = nicks in channel (or new nick who's joining)
-
+ 
 s_sjoin() already splits the nicknames up into a nice array,
 so if nickcnt > 0, use the provided nick array, otherwise
 create one from the nicks in 'line'
 */
 
-struct Channel *
-AddChannel(char **line, int nickcnt, char **nicks)
-
+struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
 {
   char *names;
   char **anames;
@@ -277,116 +372,118 @@ AddChannel(char **line, int nickcnt, char **nicks)
 
   ncnt = 5; /* default position for channel nicks, if no limit/key */
   strcpy(modes, line[4]);
-  if (line[5][0] != ':') /* names list *should* start w/ a :         */
-  {                      /* if it doesn't, theres a limit and/or key */
-    strcat(modes, " ");
-    strcat(modes, line[5]);
-    ncnt++;
-    if (line[6][0] != ':')
-    {
+  if (line[ncnt][0] != ':') /* names list *should* start w/ a :         */
+    {                      /* if it doesn't, theres a limit and/or key */
       strcat(modes, " ");
-      strcat(modes, line[6]);
+      strcat(modes, line[ncnt]);
       ncnt++;
+      if (line[ncnt][0] != ':')
+        {
+          strcat(modes, " ");
+          strcat(modes, line[ncnt]);
+          ncnt++;
+        }
     }
-  }
 
   if (nickcnt > 0)
-  {
-    acnt = nickcnt;
-    anames = nicks;
-  }
+    {
+      acnt = nickcnt;
+      anames = nicks;
+    }
   else
-  {
-    names = line[ncnt];
-    names++; /* point past the leading : */
+    {
+      names = line[ncnt];
+      names++; /* point past the leading : */
 
-    ii = strlen(names);
+      ii = strlen(names);
 
-    /* kill the \n char on the end */
-    if (IsSpace(names[ii - 2]))
-      names[ii - 2] = '\0';
-    else if (IsSpace(names[ii - 1]))
-      names[ii - 1] = '\0';
+      /* kill the \n char on the end */
+      if (IsSpace(names[ii - 2]))
+        names[ii - 2] = '\0';
+      else if (IsSpace(names[ii - 1]))
+        names[ii - 1] = '\0';
 
-    acnt = SplitBuf(names, &anames);
-  }
+      acnt = SplitBuf(names, &anames);
+    }
 
   if (!(cptr = FindChannel(line[3])))
-  {
-  #ifdef BLOCK_ALLOCATION
-
-    tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
-    memset(tempchan, 0, sizeof(struct Channel));
-    Strncpy(tempchan->name, line[3], CHANNELLEN);
-
-  #else
-
-    tempchan = (struct Channel *) MyMalloc(sizeof(struct Channel));
-    memset(tempchan, 0, sizeof(struct Channel));
-    tempchan->name = MyStrdup(line[3]);
-
-  #endif /* BLOCK_ALLOCATION */
-
-    tempchan->since = atol(line[2]);
-    tempchan->numusers = acnt;
-
-    tempchan->next = ChannelList;
-    tempchan->prev = NULL;
-    if (tempchan->next)
-      tempchan->next->prev = tempchan;
-
-    HashAddChan(tempchan);
-
-    ChannelList = tempchan;
-    chname = ChannelList;
-
-    ++Network->TotalChannels;
-  #ifdef STATSERVICES
-    if (Network->TotalChannels > Network->MaxChannels)
     {
-      Network->MaxChannels = Network->TotalChannels;
-      Network->MaxChannels_ts = time(NULL);
+#ifdef BLOCK_ALLOCATION
 
-      if ((Network->MaxChannels % 10) == 0)
-      {
-        /* notify +y people about new max channel count */
-        SendUmode(OPERUMODE_Y,
-          "*** New Max Channel Count: %ld",
-          Network->MaxChannels);
-      }
+      tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
+      memset(tempchan, 0, sizeof(struct Channel));
+      strncpy(tempchan->name, line[3], CHANNELLEN);
+
+#else
+
+      tempchan = (struct Channel *) MyMalloc(sizeof(struct Channel));
+      memset(tempchan, 0, sizeof(struct Channel));
+      tempchan->name = MyStrdup(line[3]);
+
+#endif /* BLOCK_ALLOCATION */
+
+      tempchan->since = atol(line[2]);
+      tempchan->numusers = acnt;
+
+      tempchan->next = ChannelList;
+      tempchan->prev = NULL;
+      if (tempchan->next)
+        tempchan->next->prev = tempchan;
+
+      HashAddChan(tempchan);
+
+      ChannelList = tempchan;
+      chname = ChannelList;
+
+      ++Network->TotalChannels;
+#ifdef STATSERVICES
+
+      if (Network->TotalChannels > Network->MaxChannels)
+        {
+          Network->MaxChannels = Network->TotalChannels;
+          Network->MaxChannels_ts = current_ts;
+
+          if ((Network->MaxChannels % 10) == 0)
+            {
+              /* notify +y people about new max channel count */
+              SendUmode(OPERUMODE_Y,
+                        "*** New Max Channel Count: %ld",
+                        Network->MaxChannels);
+            }
+        }
+      if (Network->TotalChannels > Network->MaxChannelsT)
+        {
+          Network->MaxChannelsT = Network->TotalChannels;
+          Network->MaxChannelsT_ts = current_ts;
+        }
+#endif /* STATSERVICES */
+
     }
-    if (Network->TotalChannels > Network->MaxChannelsT)
-    {
-      Network->MaxChannelsT = Network->TotalChannels;
-      Network->MaxChannelsT_ts = time(NULL);
-    }
-  #endif /* STATSERVICES */
-  }
   else /* it's an existing channel, but someone has joined it */
-  {
-    cptr->numusers += acnt;
-    chname = cptr;
-  }
+    {
+      cptr->numusers += acnt;
+      chname = cptr;
+    }
 
   /* Add the channel to each nick's channel list */
   for (ii = 0; ii < acnt; ii++)
-  {
-    currnick = GetNick(anames[ii]);
-    if (!currnick)
-      continue;
-
-    if (!IsChannelMember(chname, FindClient(currnick)))
     {
-      /*
-       * Use anames[ii] instead of currnick here so we get
-       * the @/+ flags
-       */
-      AddToChannel(chname, anames[ii]);
+      currnick = GetNick(anames[ii]);
+      if (!currnick)
+        continue;
+
+      if (!IsChannelMember(chname, FindClient(currnick)))
+        {
+          /*
+           * Use anames[ii] instead of currnick here so we get
+           * the @/+ flags
+           */
+          AddToChannel(chname, anames[ii]);
+        }
+      else
+        chname->numusers--;
     }
-    else
-      chname->numusers--;
-  }
-  
+
   /* finally, add the modes for the channel */
   UpdateChanModes(0, line[0] + 1, chname, modes);
 
@@ -434,6 +531,11 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr->flags |= CH_OPPED;
+#ifdef HYBRID7
+  /* Add halfopped feature - Janos */
+  if ((nick[0] == '%') || (nick[1] == '%'))
+    ptr->flags |= CH_HOPPED;
+#endif
 
   ptr->next = lptr->firstchan;
   lptr->firstchan = ptr;
@@ -445,6 +547,12 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr2->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr2->flags |= CH_OPPED;
+#ifdef HYBRID7
+  /* Add halfopped feature - Janos */
+  if ((nick[0] == '%') || (nick[1] == '%'))
+    ptr2->flags |= CH_HOPPED;
+#endif
+
   ptr2->next = cptr->firstuser;
   cptr->firstuser = ptr2;
 } /* AddToChannel() */
@@ -463,7 +571,14 @@ DeleteChannel(struct Channel *cptr)
   struct ChannelUser *cnext;
   struct ChannelBan *bnext;
   struct Exception *enext;
+#ifdef GECOSBANS
+
   struct ChannelGecosBan *gnext;
+#endif /* GECOSBANS */
+#ifdef HYBRID7
+
+  struct InviteException *inext;
+#endif /* HYBRID7 */
 
   if (!cptr)
     return;
@@ -483,54 +598,72 @@ DeleteChannel(struct Channel *cptr)
    * of it.
    */
   while (cptr->firstuser)
-  {
-    cnext = cptr->firstuser->next;
-    MyFree(cptr->firstuser);
-    cptr->firstuser = cnext;
-  }
+    {
+      cnext = cptr->firstuser->next;
+      MyFree(cptr->firstuser);
+      cptr->firstuser = cnext;
+    }
 
   /*
    * clear channel bans
    */
   while (cptr->firstban)
-  {
-    bnext = cptr->firstban->next;
-    if (cptr->firstban->who)
-      MyFree(cptr->firstban->who);
-    MyFree(cptr->firstban->mask);
-    MyFree(cptr->firstban);
-    cptr->firstban = bnext;
-  }
+    {
+      bnext = cptr->firstban->next;
+      if (cptr->firstban->who)
+        MyFree(cptr->firstban->who);
+      MyFree(cptr->firstban->mask);
+      MyFree(cptr->firstban);
+      cptr->firstban = bnext;
+    }
 
+#ifdef GECOSBANS
   /*
    * clear channel denies
    */
   while (cptr->firstgecosban)
-  {
-    gnext = cptr->firstgecosban->next;
-    if (cptr->firstgecosban->who)
-      MyFree(cptr->firstgecosban->who);
-    MyFree(cptr->firstgecosban->mask);
-    MyFree(cptr->firstgecosban);
-    cptr->firstgecosban = gnext;
-  }
+    {
+      gnext = cptr->firstgecosban->next;
+      if (cptr->firstgecosban->who)
+        MyFree(cptr->firstgecosban->who);
+      MyFree(cptr->firstgecosban->mask);
+      MyFree(cptr->firstgecosban);
+      cptr->firstgecosban = gnext;
+    }
+#endif /* GECOSBANS */
 
   /*
    * clear channel exceptions
    */
   while (cptr->exceptlist)
-  {
-    enext = cptr->exceptlist->next;
-    MyFree(cptr->exceptlist->who);
-    MyFree(cptr->exceptlist->mask);
-    MyFree(cptr->exceptlist);
-    cptr->exceptlist = enext;
-  }
+    {
+      enext = cptr->exceptlist->next;
+      MyFree(cptr->exceptlist->who);
+      MyFree(cptr->exceptlist->mask);
+      MyFree(cptr->exceptlist);
+      cptr->exceptlist = enext;
+    }
+
+#ifdef HYBRID7
+  /* Clear channel invite exceptions -Janos */
+  while (cptr->inviteexceptlist)
+    {
+      inext = cptr->inviteexceptlist->next;
+      MyFree(cptr->inviteexceptlist->who);
+      MyFree(cptr->inviteexceptlist->mask);
+      MyFree(cptr->inviteexceptlist);
+      cptr->inviteexceptlist = inext;
+    }
+#endif /* HYBRID7 */
 
 #ifndef BLOCK_ALLOCATION
   MyFree(cptr->name);
   if (cptr->key)
     MyFree(cptr->key);
+#ifdef DANCER
+  if (cptr->forward)
+    MyFree(cptr->forward);
+#endif /* DANCER */
 #endif /* BLOCK_ALLOCATION */
 
   if (cptr->prev)
@@ -571,10 +704,10 @@ RemoveNickFromChannel(char *channel, char *nickname)
   tmp = channel;
 
   if (IsNickPrefix(*tmp))
-  {
-    if (IsNickPrefix(*(++tmp)))
-      ++tmp;
-  }
+    {
+      if (IsNickPrefix(*(++tmp)))
+        ++tmp;
+    }
 
   if (!(cptr = FindChannel(tmp)))
     return;
@@ -598,51 +731,62 @@ void
 RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
 
 {
-  struct UserChannel *tempchan,
-                     *prev = NULL;
-  struct ChannelUser *tempuser,
-                     *prev2 = NULL;
+  struct UserChannel *tempchan, *prev = NULL;
+  struct ChannelUser *tempuser, *prev2 = NULL;
+  struct NickInfo *nptr;
+  struct ChanInfo *ciptr;
 
   if (!cptr || !lptr)
     return;
 
-  SendUmode(OPERUMODE_P,
-    "*** Channel part: %s (%s)",
-    lptr->nick,
-    cptr->name);
+  SendUmode(OPERUMODE_P, "*** Channel part: %s (%s)", lptr->nick,
+      cptr->name);
+
+  /* Is this the founder? */
+  if ((nptr = FindNick(lptr->nick)) && (ciptr = FindChan(cptr->name)))
+  {
+    if (nptr->flags & NS_IDENTIFIED)
+    {
+      if (ciptr->founder && irccmp(lptr->nick, ciptr->founder) == 0)
+        /* That's the founder joining. Update activity timer */
+        ciptr->last_founder_active = current_ts;
+      if (ciptr->successor && irccmp(lptr->nick, ciptr->successor) == 0)
+        ciptr->last_successor_active = current_ts;
+    }
+  }
 
   /* remove cptr from lptr's chan list */
   for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
   {
-    if (cptr == tempchan->chptr)
-    {
-      if (prev)
-        prev->next = tempchan->next;
-      else
-        lptr->firstchan = tempchan->next;
-      MyFree(tempchan);
-      tempchan = NULL;
-      break;
-    }
-    prev = tempchan;
+      if (cptr == tempchan->chptr)
+        {
+          if (prev)
+            prev->next = tempchan->next;
+          else
+            lptr->firstchan = tempchan->next;
+          MyFree(tempchan);
+          tempchan = NULL;
+          break;
+        }
+      prev = tempchan;
   }
 
   /* remove lptr from cptr's nick list */
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
-  {
-    if (lptr == tempuser->lptr)
     {
-      if (prev2)
-        prev2->next = tempuser->next;
-      else
-        cptr->firstuser = tempuser->next;
-      MyFree(tempuser);
-      tempuser = NULL;
-      --cptr->numusers;
-      break;
+      if (lptr == tempuser->lptr)
+        {
+          if (prev2)
+            prev2->next = tempuser->next;
+          else
+            cptr->firstuser = tempuser->next;
+          MyFree(tempuser);
+          tempuser = NULL;
+          --cptr->numusers;
+          break;
+        }
+      prev2 = tempuser;
     }
-    prev2 = tempuser;
-  }
 
   if (cptr->numusers == 0)
     DeleteChannel(cptr); /* the last nick left the chan, erase it */
@@ -651,68 +795,80 @@ RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
 /*
 SetChannelMode()
  Set modes on a channel
-
+ 
 Inputs: cptr    - channel
         add     - 1 if add the mode (+) 0 if subtract mode (-)
         type    - mode
-        lptr    - optional user for o/v modes
+        lptr    - optional user for o/v/h modes
         arg     - optional string for b/e modes
-
-NOTE: This is currently used only for o/v modes since the others
+ 
+NOTE: This is currently used only for o/v/h modes since the others
       are simplistic enough to handle in UpdateChanModes()
 */
 
 void
-SetChannelMode(struct Channel *cptr, int add, int type,
-               struct Luser *lptr, char *arg)
-
+SetChannelMode(struct Channel *cptr, int add , int type, struct Luser
+    *lptr, char *arg)
 {
-  assert(cptr != 0);
-
-  if (type == MODE_O)
-  {
     struct UserChannel *tempc;
     struct ChannelUser *tempu;
 
     tempu = FindUserByChannel(cptr, lptr);
     tempc = FindChannelByUser(lptr, cptr);
 
-    if (tempu && tempc)
-    {
-      if (add)
-      {
-        tempu->flags |= CH_OPPED;
-        tempc->flags |= CH_OPPED;
-      }
-      else
-      {
-        tempu->flags &= ~CH_OPPED;
-        tempc->flags &= ~CH_OPPED;
-      }
-    } /* if (tempu && tempc) */
-  }
-  else if (type == MODE_V)
-  {
-    struct UserChannel *tempc;
-    struct ChannelUser *tempu;
+    assert(cptr != 0);
 
-    tempu = FindUserByChannel(cptr, lptr);
-    tempc = FindChannelByUser(lptr, cptr);
-
-    if (tempu && tempc)
-    {
-      if (add)
+    if (type == MODE_O)
       {
-        tempu->flags |= CH_VOICED;
-        tempc->flags |= CH_VOICED;
+        if (tempu && tempc)
+          {
+            if (add)
+              {
+                tempu->flags |= CH_OPPED;
+                tempc->flags |= CH_OPPED;
+              }
+            else
+              {
+                tempu->flags &= ~CH_OPPED;
+                tempc->flags &= ~CH_OPPED;
+              }
+          } /* if (tempu && tempc) */
       }
-      else
+    else if (type == MODE_V)
       {
-        tempu->flags &= ~CH_VOICED;
-        tempc->flags &= ~CH_VOICED;
+        if (tempu && tempc)
+          {
+            if (add)
+              {
+                tempu->flags |= CH_VOICED;
+                tempc->flags |= CH_VOICED;
+              }
+            else
+              {
+                tempu->flags &= ~CH_VOICED;
+                tempc->flags &= ~CH_VOICED;
+              }
+          }
       }
-    }
-  }
+#ifdef HYBRID7
+    /* Halfop mode setup - Janos */
+    else if (type == MODE_H)
+      {
+        if (tempu && tempc)
+          {
+            if (add)
+              {
+                tempu->flags |= CH_HOPPED;
+                tempc->flags |= CH_HOPPED;
+              }
+            else
+              {
+                tempu->flags &= ~CH_HOPPED;
+                tempc->flags &= ~CH_HOPPED;
+              }
+          } /* if (tempu && tempc) */
+      } /* (type == MODE_H) */
+#endif /* HYBRID7 */
 } /* SetChannelMode() */
 
 /*
@@ -724,16 +880,15 @@ UpdateChanModes()
   return: none
 */
 
-void
-UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
-                char *modes)
-
+void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
+    char *modes)
 {
   int add;
   char *tmp;
   register char ch;
   struct Luser *userptr;
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+
   int cs_deoped = 0; /* was chanserv deoped? */
 #endif
 
@@ -742,47 +897,43 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
   int argcnt; /* number of arguements */
   int argidx; /* current index in modeargs[] */
 
-#ifndef SAVE_TS
-  char sendstr[MAXLINE];
-#endif
-
   if (!cptr)
     return;
 
   assert(lptr || who);
 
   if (lptr)
-  {
-    SendUmode(OPERUMODE_M,
-      "*** %s: Mode [%s] by %s!%s@%s",
-      cptr->name,
-      modes,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
+    {
+      SendUmode(OPERUMODE_M,
+                "*** %s: Mode [%s] by %s!%s@%s",
+                cptr->name,
+                modes,
+                lptr->nick,
+                lptr->username,
+                lptr->hostname);
 
-    putlog(LOG3,
-      "%s: mode change \"%s\" by %s!%s@%s",
-      cptr->name,
-      modes,
-      lptr->nick,
-      lptr->username,
-      lptr->hostname);
-  }
+      putlog(LOG3,
+             "%s: mode change \"%s\" by %s!%s@%s",
+             cptr->name,
+             modes,
+             lptr->nick,
+             lptr->username,
+             lptr->hostname);
+    }
   else
-  {
-    SendUmode(OPERUMODE_M,
-      "*** %s: Mode [%s] by %s",
-      cptr->name,
-      modes,
-      who);
+    {
+      SendUmode(OPERUMODE_M,
+                "*** %s: Mode [%s] by %s",
+                cptr->name,
+                modes,
+                who);
 
-    putlog(LOG3,
-      "%s: mode change \"%s\" by %s",
-      cptr->name,
-      modes,
-      who);
-  }
+      putlog(LOG3,
+             "%s: mode change \"%s\" by %s",
+             cptr->name,
+             modes,
+             who);
+    }
 
   if ((tmp = strchr(modes, ' ')))
     strcpy(tempargs, *(tmp + 1) ? tmp + 1 : "");
@@ -798,346 +949,459 @@ UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
    */
 
   add = 0;
-  argidx = (-1);
+  argidx = -1;
 
   for (tmp = modes; *tmp; ++tmp)
-  {
-    ch = *tmp;
-
-    if (IsSpace(ch))
-      break;
-
-    switch (ch)
     {
-      case ' ':
-      case '\n':
-      case '\r': break;
+      ch = *tmp;
 
-      case '-':
-      {
-        add = 0;
+      if (IsSpace(ch))
         break;
-      }
-      case '+':
-      {
-        add = 1;
-        break;
-      }
 
-      /*
-       * Op/DeOp
-       */
-      case 'o':
-      {
-        ++argidx;
-        if (argidx >= argcnt)
+      switch (ch)
         {
-          /*
-           * there are more 'o' flags than there are nicknames,
-           * just break
-           */
-          break;
-        }
-
-        if (!(userptr = FindClient(modeargs[argidx])))
+        case ' ':
+        case '\n':
+        case '\r':
           break;
 
-        SetChannelMode(cptr, add, MODE_O, userptr, 0);
-
-        if (add)
-        {
-        #ifdef STATSERVICES
-          if (lptr)
-            ++lptr->numops;
-        #endif
-        } /* if (add) */
-        else
-        {
-          if (userptr == Me.osptr)
+        case '-':
           {
-            if (!FloodCheck(cptr, lptr, Me.osptr, 0))
-            {
-              #ifdef SAVE_TS
-                os_part(cptr);
-                os_join(cptr);
-              #else
-                toserv(":%s MODE %s +o %s\n",
-                  Me.name,
-                  cptr->name,
-                  n_OperServ);
-              #endif
-            }
-
-            if (!lptr)
-            {
-              putlog(LOG1, "%s: %s attempted to deop %s",
-                cptr->name,
-                who,
-                n_OperServ);
-            }
-            else
-            {
-              putlog(LOG1, "%s: %s!%s@%s attempted to deop %s",
-                cptr->name,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                n_OperServ);
-            }
-          }
-        #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-          else if (userptr == Me.csptr)
-          {
-            cs_deoped = 1;
-          }
-        #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
-
-        #ifdef STATSERVICES
-          if (lptr)
-            ++lptr->numdops;
-        #endif
-        } /* else if (!add) */
-
-        #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-          cs_CheckModes(lptr,
-            FindChan(cptr->name),
-            !add,
-            MODE_O,
-            userptr);
-        #endif
-
-        break;
-      } /* case 'o' */
-
-      /*
-       * Voice/DeVoice
-       */
-      case 'v':
-      {
-        ++argidx;
-        if (argidx >= argcnt)
-          break;
-
-        if (!(userptr = FindClient(modeargs[argidx])))
-          break;
-
-        SetChannelMode(cptr, add, MODE_V, userptr, 0);
-
-        if (add)
-        {
-        #ifdef STATSERVICES
-          if (lptr)
-            ++lptr->numvoices;
-        #endif
-        }
-        else
-        {
-        #ifdef STATSERVICES
-          if (lptr)
-            ++lptr->numdvoices;
-        #endif
-        } /* else if (!add) */
-
-      #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-        cs_CheckModes(lptr,
-          FindChan(cptr->name),
-          !add,
-          MODE_V,
-          userptr);
-      #endif
-
-        break;
-      } /* case 'v' */
-
-      /*
-       * Channel limit
-       */
-      case 'l':
-      {
-        if (add)
-        {
-          ++argidx;
-          if (argidx >= argcnt)
+            add = 0;
             break;
+          }
+        case '+':
+          {
+            add = 1;
+            break;
+          }
 
-          cptr->limit = atoi(modeargs[argidx]);
-        }
-        else
-          cptr->limit = 0;
+          /*
+           * Op/DeOp
+           */
+        case 'o':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              {
+                /*
+                 * there are more 'o' flags than there are nicknames,
+                 * just break
+                 */
+                break;
+              }
 
-      #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-        cs_CheckModes(lptr,
-          FindChan(cptr->name),
-          !add,
-          MODE_L,
-          0);
-      #endif
+            if (!(userptr = FindClient(modeargs[argidx])))
+              break;
 
-        break;
-      } /* case 'l' */
+            /* never mark ChanServ/OperServ as deopped -adx */
+#if defined CHANNELSERVICES
 
+            if (add || (userptr != Me.csptr && userptr != Me.osptr))
+#else
+            if (add || userptr != Me.osptr)
+#endif
+              SetChannelMode(cptr, add
+                               , MODE_O, userptr, 0);
+
+            if (add)
+              {
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numops;
+#endif
+
+              } /* if (add) */
+            else
+              {
+                if (userptr == Me.osptr)
+                  {
+                    if (!FloodCheck(cptr, lptr, Me.osptr, 0))
+                      {
+#ifdef SAVE_TS
+                        os_part(cptr);
+                        os_join(cptr);
+#else
+
+                        toserv(":%s MODE %s +o %s\r\n", Me.name,
+                            cptr->name, n_OperServ);
+#endif
+
+                      }
+
+                    if (!lptr)
+                      {
+                        putlog(LOG1, "%s: %s attempted to deop %s",
+                               cptr->name,
+                               who,
+                               n_OperServ);
+                      }
+                    else
+                      {
+                        putlog(LOG1, "%s: %s!%s@%s attempted to deop %s",
+                               cptr->name,
+                               lptr->nick,
+                               lptr->username,
+                               lptr->hostname,
+                               n_OperServ);
+                      }
+                  }
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+                else if (userptr == Me.csptr)
+                  {
+                    cs_deoped = 1;
+                  }
+#endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
+
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numdops;
+#endif
+
+              } /* else if (!add) */
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_O,
+                userptr);
+#endif
+
+            break;
+          } /* case 'o' */
+
+          /*
+           * Voice/DeVoice
+           */
+        case 'v':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
+
+            if (!(userptr = FindClient(modeargs[argidx])))
+              break;
+
+            SetChannelMode(cptr, add, MODE_V, userptr, 0);
+
+            if (add)
+              {
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numvoices;
+#endif
+
+              }
+            else
+              {
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numdvoices;
+#endif
+
+              } /* else if (!add) */
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_V,
+                userptr);
+#endif
+
+            break;
+          } /* case 'v' */
+
+#ifdef HYBRID7
+          /* HalfOp/DeHalfOp -Janos */
+        case 'h':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
+
+            if (!(userptr = FindClient(modeargs[argidx])))
+              break;
+
+            SetChannelMode(cptr, add, MODE_H, userptr, 0);
+
+            if (add)
+              {
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numhops;
+#endif
+
+              }
+            else
+              {
+#ifdef STATSERVICES
+                if (lptr)
+                  ++lptr->numdhops;
+#endif
+
+              } /* else if (!add) */
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+            cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_H,
+                userptr);
+#endif
+
+            break;
+          } /* case 'h'*/
+#endif /* HYBRID7 */
+
+          /*
+           * Channel limit
+           */
+        case 'l':
+          {
+            if (add
+               )
+              {
+                ++argidx;
+                if (argidx >= argcnt)
+                  break;
+
+                cptr->limit = atoi(modeargs[argidx]);
+              }
+            else
+              cptr->limit = 0;
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+
+            cs_CheckModes(lptr,
+                          FindChan(cptr->name),
+                          !add
+                          ,
+                          MODE_L,
+                          0);
+#endif
+
+            break;
+          } /* case 'l' */
+
+          /*
+           * Channel key
+           */
+        case 'k':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
+
+#ifndef BLOCK_ALLOCATION
+
+            if (cptr->key)
+              MyFree(cptr->key);
+#endif
+
+            if (add)
+              {
+#ifdef BLOCK_ALLOCATION
+                strncpy(cptr->key, modeargs[argidx], KEYLEN);
+                cptr->key[KEYLEN] = '\0';
+#else
+
+                cptr->key = MyStrdup(modeargs[argidx]);
+#endif /* BLOCK_ALLOCATION */
+
+              }
+            else
+              {
+#ifdef BLOCK_ALLOCATION
+                cptr->key[0] = '\0';
+#else
+
+                cptr->key = 0;
+#endif /* BLOCK_ALLOCATION */
+
+              }
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+            cs_CheckModes(lptr, FindChan(cptr->name), !add , MODE_K, 0);
+#endif
+
+            break;
+          } /* case 'k' */
+
+#ifdef DANCER
       /*
-       * Channel key
+       * Channel forwarding target
        */
-      case 'k':
+      case 'f':
       {
         ++argidx;
         if (argidx >= argcnt)
           break;
-
-      #ifndef BLOCK_ALLOCATION
-        if (cptr->key)
-          MyFree(cptr->key);
+#ifndef BLOCK_ALLOCATION
+        if (cptr->forward)
+          MyFree(cptr->forward);
       #endif
-
         if (add)
         {
-        #ifdef BLOCK_ALLOCATION
-          Strncpy(cptr->key, modeargs[argidx], KEYLEN);
-          cptr->key[KEYLEN] = '\0';
-        #else
-          cptr->key = MyStrdup(modeargs[argidx]);
-        #endif /* BLOCK_ALLOCATION */
+#ifdef BLOCK_ALLOCATION
+          strncpy(cptr->forward, modeargs[argidx], CHANNELLEN);
+          cptr->forward[CHANNELLEN] = '\0';
+#else
+          cptr->forward = MyStrdup(modeargs[argidx]);
+#endif /* BLOCK_ALLOCATION */
         }
         else
         {
-        #ifdef BLOCK_ALLOCATION
-          cptr->key[0] = '\0';
-        #else
-          cptr->key = 0;
-        #endif /* BLOCK_ALLOCATION */
+#ifdef BLOCK_ALLOCATION
+          cptr->forward[0] = '\0';
+#else
+          cptr->forward = 0;
+#endif /* BLOCK_ALLOCATION */
         }
-
-      #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-        cs_CheckModes(lptr,
-          FindChan(cptr->name),
-          !add,
-          MODE_K,
-          0);
-      #endif
-
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+        cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_F, 0);
+#endif
         break;
-      } /* case 'k' */
+      } /* case 'f' */
+#endif /* DANCER */
 
-      /*
-       * Channel ban
-       */
-      case 'b':
-      {
-        ++argidx;
-        if (argidx >= argcnt)
-          break;
+          /*
+           * Channel ban
+           */
+        case 'b':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
 
-        if (add)
-          AddBan(who, cptr, modeargs[argidx]);
-        else
-          DeleteBan(cptr, modeargs[argidx]);
+            if (add
+               )
+              AddBan(who, cptr, modeargs[argidx]);
+            else
+              DeleteBan(cptr, modeargs[argidx]);
 
-        break;
-      } /* case 'b' */
+            break;
+          } /* case 'b' */
 
-      /*
-       * Channel deny
-       */
-      case 'd':
-      {
-        ++argidx;
-        if (argidx >= argcnt)
-          break;
+#ifdef GECOSBANS
+          /*
+           * Channel deny
+           */
+        case 'd':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
 
-        if (add)
-          AddGecosBan(who, cptr, modeargs[argidx]);
-        else
-          DeleteGecosBan(cptr, modeargs[argidx]);
+            if (add
+               )
+              AddGecosBan(who, cptr, modeargs[argidx]);
+            else
+              DeleteGecosBan(cptr, modeargs[argidx]);
 
-        break;
-      } /* case 'd' */
+            break;
+          } /* case 'd' */
+#endif /* GECOSBANS */
 
-      /*
-       * Channel exception
-       */
-      case 'e':
-      {
-        ++argidx;
-        if (argidx >= argcnt)
-          break;
+          /*
+           * Channel exception
+           */
+        case 'e':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
 
-        if (add)
-          AddException(who, cptr, modeargs[argidx]);
-        else
-          DeleteException(cptr, modeargs[argidx]);
+            if (add
+               )
+              AddException(who, cptr, modeargs[argidx]);
+            else
+              DeleteException(cptr, modeargs[argidx]);
 
-        break;
-      } /* case 'e' */
+            break;
+          } /* case 'e' */
 
-      default:
-      {
-        int modeflag = 0;
+#ifdef HYBRID7
+          /* Channel invite exception -Janos */
+        case 'I':
+          {
+            ++argidx;
+            if (argidx >= argcnt)
+              break;
 
-        if (ch == 's')
-          modeflag = MODE_S;
-        else if (ch == 'p')
-          modeflag = MODE_P;
-        else if (ch == 'n')
-          modeflag = MODE_N;
-        else if (ch == 't')
-          modeflag = MODE_T;
-        else if (ch == 'm')
-          modeflag = MODE_M;
-        else if (ch == 'i')
-          modeflag = MODE_I;
+            if (add
+               )
+              AddInviteException(who, cptr, modeargs[argidx]);
+            else
+              DeleteInviteException(cptr, modeargs[argidx]);
+            break;
+          } /* case 'I' */
+#endif /* HYBRID7 */
 
-        if (modeflag)
-        {
-          if (add)
-            cptr->modes |= modeflag;
-          else
-            cptr->modes &= ~modeflag;
-        }
+        default:
+          {
+            int modeflag = 0;
 
-      #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-        if (modeflag)
-          cs_CheckModes(lptr,
-            FindChan(cptr->name),
-            !add,
-            modeflag,
-            0);
-      #endif
+            if (ch == 's')
+              modeflag = MODE_S;
+            else if (ch == 'p')
+              modeflag = MODE_P;
+            else if (ch == 'n')
+              modeflag = MODE_N;
+            else if (ch == 't')
+              modeflag = MODE_T;
+            else if (ch == 'm')
+              modeflag = MODE_M;
+            else if (ch == 'i')
+              modeflag = MODE_I;
+#ifdef HYBRID7
 
-        break;
-      } /* default: */
-    } /* switch (*tmp) */
-  } /* for (tmp = modes; *tmp; ++tmp) */
+            else if (ch == 'a')
+              modeflag = MODE_A;
+#endif /* HYBRID7 */
+#ifdef DANCER
+            else if (ch == 'c')
+              modeflag = MODE_C;
+#endif /* DANCER */
+
+            if (modeflag)
+              {
+                if (add)
+                  cptr->modes |= modeflag;
+                else
+                  cptr->modes &= ~modeflag;
+              }
+
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+            if (modeflag)
+              cs_CheckModes(lptr,
+                            FindChan(cptr->name),
+                            !add
+                            ,
+                            modeflag,
+                            0);
+#endif
+
+            break;
+          } /* default: */
+        } /* switch (*tmp) */
+    } /* for (tmp = modes; *tmp; ++tmp) */
 
   MyFree(modeargs);
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+
   if ((cs_deoped) && (!FloodCheck(cptr, lptr, Me.csptr, 0)))
-  {
-    /* reop ChanServ */
-    #ifdef SAVE_TS
+    {
+      /* reop ChanServ */
+#ifdef SAVE_TS
       cs_part(cptr);
       cs_join(FindChan(cptr->name));
-    #else
-      toserv(":%s MODE %s +o %s\n",
-        Me.name,
-        cptr->name,
-        n_ChanServ);
-    #endif
+#else
 
-    if (!lptr)
-      putlog(LOG1, "%s: %s attempted to deop %s",
-        cptr->name,
-        who,
-        n_ChanServ);
-    else
-      putlog(LOG1, "%s: %s!%s@%s attempted to deop %s",
-        cptr->name,
-        lptr->nick,
-        lptr->username,
-        lptr->hostname,
-        n_ChanServ);
-  }
+      toserv(":%s MODE %s +o %s\r\n", Me.name, cptr->name, n_ChanServ);
+#endif
+
+      if (!lptr)
+        putlog(LOG1, "%s: %s attempted to deop %s", cptr->name, who,
+            n_ChanServ);
+      else
+        putlog(LOG1, "%s: %s!%s@%s attempted to deop %s", cptr->name,
+            lptr->nick, lptr->username, lptr->hostname,
+               n_ChanServ);
+    }
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
 
 } /* UpdateChanModes() */
@@ -1148,20 +1412,20 @@ FindChannelByUser()
 */
 
 struct UserChannel *
-FindChannelByUser(struct Luser *lptr, struct Channel *chptr)
+      FindChannelByUser(struct Luser *lptr, struct Channel *chptr)
 
-{
-  struct UserChannel *tempchan;
+  {
+    struct UserChannel *tempchan;
 
-  if (!lptr || !chptr)
-    return ((struct UserChannel *) NULL);
+    if (!lptr || !chptr)
+      return ((struct UserChannel *) NULL);
 
-  for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
-    if (tempchan->chptr == chptr)
-      return (tempchan);
+    for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
+      if (tempchan->chptr == chptr)
+        return (tempchan);
 
-  return (NULL);
-} /* FindChannelByUser() */
+    return (NULL);
+  } /* FindChannelByUser() */
 
 /*
 FindUserByChannel()
@@ -1169,20 +1433,20 @@ FindUserByChannel()
 */
 
 struct ChannelUser *
-FindUserByChannel(struct Channel *chptr, struct Luser *lptr)
+      FindUserByChannel(struct Channel *chptr, struct Luser *lptr)
 
-{
-  struct ChannelUser *tempuser;
+  {
+    struct ChannelUser *tempuser;
 
-  if (!chptr || !lptr)
-    return ((struct ChannelUser *) NULL);
+    if (!chptr || !lptr)
+      return ((struct ChannelUser *) NULL);
 
-  for (tempuser = chptr->firstuser; tempuser; tempuser = tempuser->next)
-    if (tempuser->lptr == lptr)
-      return (tempuser);
+    for (tempuser = chptr->firstuser; tempuser; tempuser = tempuser->next)
+      if (tempuser->lptr == lptr)
+        return (tempuser);
 
-  return (NULL);
-} /* FindUserByChannel() */
+    return (NULL);
+  } /* FindUserByChannel() */
 
 /*
 IsChannelVoice()
@@ -1231,6 +1495,31 @@ IsChannelOp(struct Channel *chptr, struct Luser *lptr)
 } /* IsChannelOp() */
 
 /*
+ * IsChannelHOp()
+ *  args: char *channel, char *nick
+ *  purpose: determine if 'nick' is currently halfoped on 'channel'
+ *  return: 1 if oped, 0 if not
+ *  -Janos
+ *
+ *  XXX: possibly merge this into IsChannelOp() -kre
+ */
+#ifdef HYBRID7
+int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
+{
+  struct UserChannel *tempchan;
+
+  if (!chptr || !lptr)
+    return 0;
+
+  for (tempchan = lptr->firstchan; tempchan; tempchan = tempchan->next)
+    if (tempchan->chptr == chptr)
+      return (tempchan->flags & CH_HOPPED);
+
+  return 0;
+} /* IsChannelHOp() */
+#endif /* HYBRID7 */
+
+/*
 DoMode()
   Set 'modes' on 'chptr'
   if 'joinpart' is != 1, do not join/part because the channel is being
@@ -1256,10 +1545,7 @@ DoMode(struct Channel *chptr, char *modes, int joinpart)
     /* make sure its not already a monitored channel */
     os_join(chptr);
 
-  toserv(":%s MODE %s %s\n",
-    n_OperServ,
-    chptr->name,
-    modes);
+  toserv(":%s MODE %s %s\r\n", n_OperServ, chptr->name, modes);
   UpdateChanModes(Me.osptr, n_OperServ, chptr, modes);
 
   if (joinpart && !chanptr)
@@ -1267,10 +1553,7 @@ DoMode(struct Channel *chptr, char *modes, int joinpart)
 
 #else
 
-  toserv(":%s MODE %s %s\n",
-    Me.name,
-    chptr->name,
-    modes);
+  toserv(":%s MODE %s %s\r\n", Me.name, chptr->name, modes);
   UpdateChanModes(0, Me.name, chptr, modes);
 
 #endif /* SAVE_TS */
@@ -1293,10 +1576,10 @@ IsChannelMember(struct Channel *cptr, struct Luser *lptr)
     return 0;
 
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
-  {
-    if (tempuser->lptr == lptr)
-      return 1;
-  }
+    {
+      if (tempuser->lptr == lptr)
+        return 1;
+    }
 
   return 0;
 } /* IsChannelMember() */
@@ -1322,42 +1605,33 @@ SetModes(char *source, int plus, char mode, struct Channel *chptr, char *args)
   memset(&done, 0, MAXLINE);
   mcnt = 1;
   for (ii = 0; ii < acnt; ii++)
-  {
-    strcat(done, av[ii]);
-    strcat(done, " ");
-    if (mcnt == MaxModes)
     {
-      mcnt = 0;
-      mtmp = modestr(MaxModes, mode);
-      sprintf(sendstr, "%s%s %s",
-        plus ? "+" : "-",
-        mtmp,
-        done);
-      toserv(":%s MODE %s %s\n",
-        source,
-        chptr->name,
-        sendstr);
-      UpdateChanModes(0, source, chptr, sendstr);
-      MyFree(mtmp);
-      memset(&done, 0, MAXLINE);
+      strcat(done, av[ii]);
+      /* Rewrote this to fix that nasty " " at the end of done[] -kre */
+      if (mcnt != MaxModes)
+        strcat(done, " ");
+      else
+        {
+          mcnt = 0;
+          mtmp = modestr(MaxModes, mode);
+          ircsprintf(sendstr, "%s%s %s",
+                     plus ? "+" : "-", mtmp, done);
+          toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
+          UpdateChanModes(0, source, chptr, sendstr);
+          MyFree(mtmp);
+          memset(&done, 0, MAXLINE);
+        }
+      mcnt++;
     }
-    mcnt++;
-  }
 
   if (done[0] != '\0')
-  {
-    mtmp = modestr(mcnt - 1, mode);
-    sprintf(sendstr, "%s%s %s",
-      plus ? "+" : "-",
-      mtmp,
-      done);
-    toserv(":%s MODE %s %s\n",
-      source,
-      chptr->name,
-      sendstr);
-    UpdateChanModes(0, source, chptr, sendstr);
-    MyFree(mtmp);
-  }
+    {
+      mtmp = modestr(mcnt - 1, mode);
+      ircsprintf(sendstr, "%s%s %s", plus ? "+" : "-", mtmp, done);
+      toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
+      UpdateChanModes(0, source, chptr, sendstr);
+      MyFree(mtmp);
+    }
   MyFree(temp);
   MyFree(av);
 } /* SetModes() */
@@ -1383,54 +1657,50 @@ KickBan(int ban, char *source, struct Channel *channel, char *nicks, char *reaso
   ac = SplitBuf(tempnix, &av);
 
   if (ban)
-  {
-    bans = (char *) MyMalloc(sizeof(char));
-    bans[0] = '\0';
-    for (ii = 0; ii < ac; ii++)
     {
-      if (!(lptr = FindClient(av[ii])))
-        continue;
-      mask = HostToMask(lptr->username, lptr->hostname);
-      sprintf(temp, "*!%s", mask);
-      bans = (char *) MyRealloc(bans, strlen(bans) + strlen(temp) + (2 * sizeof(char)));
-      strcat(bans, temp);
-      strcat(bans, " ");
-      MyFree(mask);
+      bans = (char *) MyMalloc(sizeof(char));
+      bans[0] = '\0';
+      for (ii = 0; ii < ac; ii++)
+        {
+          if (!(lptr = FindClient(av[ii])))
+            continue;
+          mask = HostToMask(lptr->username, lptr->hostname);
+          ircsprintf(temp, "*!%s", mask);
+          bans = (char *) MyRealloc(bans, strlen(bans)
+                                    + strlen(temp) + (2 * sizeof(char)));
+          strcat(bans, temp);
+          strcat(bans, " ");
+          MyFree(mask);
+        }
+
+      SetModes(source, 1, 'b', channel, bans);
+      MyFree(bans);
     }
 
-    SetModes(source, 1, 'b', channel, bans);
-    MyFree(bans);
-  }
-
   for (ii = 0; ii < ac; ii++)
-  {
-    toserv(":%s KICK %s %s :%s\n",
-      source,
-      channel->name,
-      av[ii],
-      reason ? reason : "");
-    RemoveFromChannel(channel, FindClient(av[ii]));
-  }
+    {
+      toserv(":%s KICK %s %s :%s\r\n", source, channel->name, av[ii],
+          reason ? reason : "");
+      RemoveFromChannel(channel, FindClient(av[ii]));
+    }
 
   MyFree(tempnix);
   MyFree(av);
 } /* KickBan() */
 
+#ifdef GECOSBANS
 /*
 AddGecosBan()
   args: char *who, struct Channel *cptr, char *ban
   purpose: add gecos 'ban' set by 'who' to channel 'cptr'
   return: none
 */
-
-void
-AddGecosBan(char *who, struct Channel *cptr, char *ban)
-
+void AddGecosBan(char *who, struct Channel *cptr, char *ban)
 {
-  time_t CurrTime = time(NULL);
+  time_t CurrTime = current_ts;
   struct ChannelGecosBan *tempban;
 
-  tempban = (struct ChannelGecosBan *) MyMalloc(sizeof(struct ChannelGecosBan));
+  tempban = (struct ChannelGecosBan *)MyMalloc(sizeof(struct ChannelGecosBan));
   memset(tempban, 0, sizeof(struct ChannelGecosBan));
 
   if (who)
@@ -1444,7 +1714,7 @@ AddGecosBan(char *who, struct Channel *cptr, char *ban)
   if (tempban->next)
     tempban->next->prev = tempban;
   cptr->firstgecosban = tempban;
-} /* AddBan() */
+} /* AddGecosBan() */
 
 /*
 DeleteGecosBan()
@@ -1452,10 +1722,7 @@ DeleteGecosBan()
   purpose: remove gecos 'ban' from channel 'cptr'
   return: none
 */
-
-void
-DeleteGecosBan(struct Channel *cptr, char *ban)
-
+void DeleteGecosBan(struct Channel *cptr, char *ban)
 {
   struct ChannelGecosBan *bptr;
 
@@ -1469,13 +1736,13 @@ DeleteGecosBan(struct Channel *cptr, char *ban)
   if (bptr->prev)
     bptr->prev->next = bptr->next;
   else
-  {
-    /*
-     * We're deleting the first ban in the list, reset
-     * cptr->firstgecosban
-     */
-    cptr->firstgecosban = bptr->next;
-  }
+    {
+      /*
+       * We're deleting the first ban in the list, reset
+       * cptr->firstgecosban
+       */
+      cptr->firstgecosban = bptr->next;
+    }
 
   if (bptr->next)
     bptr->next->prev = bptr->prev;
@@ -1489,38 +1756,35 @@ FindGecosBan()
   purpose: determine if 'ban' is on 'cptr's ban list
   return: pointer to ban
 */
+struct ChannelGecosBan * FindGecosBan(struct Channel *cptr, char *ban)
+  {
+    struct ChannelGecosBan *tempban;
 
-struct ChannelGecosBan *
-FindGecosBan(struct Channel *cptr, char *ban)
+    if (!cptr || !ban)
+      return (NULL);
 
-{
-  struct ChannelGecosBan *tempban;
+    tempban = cptr->firstgecosban;
+    while (tempban && (irccmp(tempban->mask, ban) != 0))
+      tempban = tempban->next;
 
-  if (!cptr || !ban)
-    return (NULL);
-
-  tempban = cptr->firstgecosban;
-  while (tempban && (strcasecmp(tempban->mask, ban) != 0))
-    tempban = tempban->next;
-
-  return (tempban);
-} /* FindBan() */
+    return (tempban);
+  } /* FindGecosBan() */
 
 /*
 MatchGecosBan()
  Same as FindBan() but use match() to compare bans to allow
 for wildcards
 */
+struct ChannelGecosBan * MatchGecosBan(struct Channel *cptr, char *ban)
+  {
+    struct ChannelGecosBan *tempban;
 
-struct ChannelGecosBan *
-MatchGecosBan(struct Channel *cptr, char *ban)
+    tempban = cptr->firstgecosban;
+    while (tempban && (match(ban, tempban->mask) == 0))
+      tempban = tempban->next;
 
-{
-  struct ChannelGecosBan *tempban;
+    return (tempban);
+  } /* MatchGecosBan() */
+#endif /* GECOSBANS */
 
-  tempban = cptr->firstgecosban;
-  while (tempban && (match(ban, tempban->mask) == 0))
-    tempban = tempban->next;
-
-  return (tempban);
-} /* MatchBan() */
+#endif /* CHANNELSERVICES */

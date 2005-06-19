@@ -1,0 +1,10 @@
+Syntax: %bUNFORBID <channel>%b
+
+When a channel is forbidden, noone will be allowed in
+(If someone tries to join, they will be kickbanned).
+This command reverses the action of FORBID command, so
+channel is available again with all flags restored.
+
+Example:
+  %b/msg %C UNFORBID #channel%b
+Reverses the action of FORBID for #channel.

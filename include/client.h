@@ -1,6 +1,6 @@
 /*
  * client.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -26,6 +26,9 @@
 #define UMODE_I          0x0002 /* Invisible */
 #define UMODE_W          0x0004 /* Wallops */
 #define UMODE_S          0x0008 /* Server Notices */
+#ifdef DANCER
+# define UMODE_E         0x0010 /* Identified umode */
+#endif /* DANCER */
 
 struct UserChannel
 {
@@ -109,6 +112,8 @@ struct Luser
   long  numnicks;    /* how many times they've changed their nickname */
   long  numkicks;    /* how many times they've kicked someone */
   long  numkills;    /* how many times they've killed someone */
+  long  numhops;     /* how many times they +h'd someone */
+  long  numdhops;    /* how many times they -h'd someone */
 
 #endif /* STATSERVICES */
 

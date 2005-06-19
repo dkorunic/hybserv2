@@ -1,6 +1,6 @@
 /*
  * sock.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -66,7 +66,10 @@ extern struct sockaddr_in       LocalAddr;
 extern int                      HTM;
 extern time_t                   HTM_ts;
 extern int                      ReceiveLoad;
+extern struct DccUser           *dccnext;
 
 #endif /* HIGHTRAFFIC_MODE */
+
+extern int read_socket_done;
 
 #endif /* INCLUDED_sock_h */

@@ -1,0 +1,12 @@
+Syntax: %bSET PHONE <PHONE number|->%b
+
+Sets the your PHONE number to <GSM number>. When users perform 
+an %bINFO%b on your nickname, they will be informed of 
+your PHONE number, unless you set %bHIDE%b ON. 
+To clear your PHONE number use a "-" as the parameter.
+Examples:
+         %b/msg %N SET PHONE +385 1 1234567%b
+           Sets your PHONE to "+385 1 1234567".
+
+         %b/msg %N SET PHONE -%b
+           Clears your PHONE number.

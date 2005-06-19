@@ -1,6 +1,6 @@
 /*
  * flood.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -13,8 +13,28 @@
 #define INCLUDED_sys_types_h
 #endif
 
+#ifndef INCLUDED_hybdefs_h
+#include "hybdefs.h"		/* USERLEN, HOSTLEN */
+#define INCLUDE_hybdefs_h
+#endif
+
+#ifndef INCLUDED_config_h
+#include "config.h"		/* ADVFLOOD */
+#define INCLUDED_config_h
+#endif
+
 struct Luser;
 struct Channel;
+
+#ifdef ADVFLOOD
+struct connectInfo
+{
+  char user[USERLEN];
+  char host[HOSTLEN]; 
+  time_t last;
+  int frequency;
+};
+#endif /* ADVFLOOD */
 
 /*
  * Function prototypes
@@ -23,6 +43,10 @@ struct Channel;
 int FloodCheck(struct Channel *chptr, struct Luser *lptr,
                struct Luser *servptr, int kick);
 int IsFlood();
+
+#ifdef ADVFLOOD
+void updateConnectTable(char *user, char *host);
+#endif /* ADVFLOOD */
 
 /*
  * External declarations

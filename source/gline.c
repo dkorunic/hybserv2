@@ -1,5 +1,5 @@
 /*
- * HybServ TS Services, Copyright (C) 1998-1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -9,9 +9,14 @@
  * $Id$
  */
 
+#include "defs.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#endif
 
 #include "alloc.h"
 #include "client.h"
@@ -33,7 +38,7 @@
  */
 struct Gline       *GlineList = NULL;
 
-/* 
+/*
 AddGline() 
   Add gline 'host' to list with 'reason'
 */
@@ -48,16 +53,16 @@ AddGline(char *host, char *reason, char *who, long when)
   tempgline = (struct Gline *) MyMalloc(sizeof(struct Gline));
 
   if ((tmp = strchr(host, '@')))
-  {
-    *tmp++ = '\0';
-    tempgline->username = MyStrdup(host);
-    tempgline->hostname = MyStrdup(tmp);
-  }
+    {
+      *tmp++ = '\0';
+      tempgline->username = MyStrdup(host);
+      tempgline->hostname = MyStrdup(tmp);
+    }
   else
-  {
-    tempgline->username = MyStrdup("*");
-    tempgline->hostname = MyStrdup(host);
-  }
+    {
+      tempgline->username = MyStrdup("*");
+      tempgline->hostname = MyStrdup(host);
+    }
 
   if (reason)
     tempgline->reason = MyStrdup(reason);
@@ -70,7 +75,7 @@ AddGline(char *host, char *reason, char *who, long when)
   if (!when)
     tempgline->expires = 0;
   else
-    tempgline->expires = time(NULL) + when;
+    tempgline->expires = current_ts + when;
 
   tempgline->next = GlineList;
   tempgline->prev = NULL;
@@ -118,23 +123,23 @@ username and hostname, if any
 */
 
 struct Gline *
-IsGline(char *username, char *hostname)
+      IsGline(char *username, char *hostname)
 
-{
-  struct Gline *temp;
-
-  if (!username || !hostname)
-    return (NULL);
-
-  for (temp = GlineList; temp; temp = temp->next)
   {
-    if (match(temp->username, username) &&
-        match(temp->hostname, hostname))
-      return (temp);
-  }
+    struct Gline *temp;
 
-  return (NULL);
-} /* IsGline() */
+    if (!username || !hostname)
+      return (NULL);
+
+    for (temp = GlineList; temp; temp = temp->next)
+      {
+        if (match(temp->username, username) &&
+            match(temp->hostname, hostname))
+          return (temp);
+      }
+
+    return (NULL);
+  } /* IsGline() */
 
 /*
 CheckGlined()
@@ -161,32 +166,37 @@ CheckGlined(struct Luser *lptr)
     return;
 
   if ((tempgline = IsGline(lptr->username, lptr->hostname)))
-  {
-    toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\n",
-      n_OperServ,
-      lptr->nick,
-      Me.name,
-      n_OperServ,
-      tempgline->reason,
-      tempgline->who);
+    {
+      toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
+             n_OperServ, lptr->nick, Me.name, n_OperServ,
+             tempgline->reason, tempgline->who);
 
-    DeleteClient(lptr);
+      DeleteClient(lptr);
 
-    if (Me.sptr)
-      Me.sptr->numoperkills++;
-    Network->TotalOperKills++;
+      if (Me.sptr)
+        Me.sptr->numoperkills++;
+      Network->TotalOperKills++;
 
-  #ifdef STATSERVICES
-    if (Network->TotalOperKills > Network->OperKillsT)
-      Network->OperKillsT = Network->TotalOperKills;
-  #endif
+#ifdef STATSERVICES
 
-  #ifdef HYBRID_GLINES
-    ExecuteGline(tempgline->username,
-                 tempgline->hostname,
-                 tempgline->reason);
-  #endif /* HYBRID_GLINES */
-  }
+      if (Network->TotalOperKills > Network->OperKillsT)
+        Network->OperKillsT = Network->TotalOperKills;
+#endif
+
+#ifdef HYBRID_GLINES
+
+      ExecuteGline(tempgline->username, tempgline->hostname,
+          tempgline->reason);
+#endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+
+      Execute7Gline(tempgline->username, tempgline->hostname,
+          tempgline->reason,
+          tempgline->expires ? (tempgline->expires - current_ts) : 0);
+#endif /* HYBRID7_GLINES */
+
+    }
 } /* CheckGlined */
 
 #ifdef HYBRID_GLINES
@@ -194,7 +204,7 @@ CheckGlined(struct Luser *lptr)
 /*
 ExecuteGline()
  Attempt to send a global gline with the given parameters.
-
+ 
  Now, ircd-hybrid's gline implentation requires three
 different opers on three different servers to request
 the same gline in order to activate it. As of 08/14/1999,
@@ -207,26 +217,34 @@ void
 ExecuteGline(char *username, char *hostname, char *reason)
 
 {
-  toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\n",
-    Me.name,
-    username ? username : "*",
-    hostname,
-    reason);
+  toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\n",
-    Me.name,
-    username ? username : "*",
-    hostname,
-    reason);
+  toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\n",
-    Me.name,
-    username ? username : "*",
-    hostname,
-    reason);
+  toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\r\n",
+         Me.name, username ? username : "*", hostname, reason);
 } /* ExecuteGline() */
 
 #endif /* HYBRID_GLINES */
+
+#ifdef HYBRID7_GLINES
+/*
+ * Execute7Gline()
+ * Send a KLINE user host on * :reason (effectively a gline)
+ * 
+ * :SERVER kline OPERNICK TARGET_SERVER DURATION USER HOST REASON
+ */
+void Execute7Gline(char *username, char *hostname, char *reason, time_t
+    time)
+{
+  toserv(":%s KLINE %s %lu %s %s :%s\r\n",
+         n_OperServ, "*", time, username ? username : "*", hostname,
+         reason);
+} /* Execute7Gline() */
+
+#endif /* HYBRID7_GLINES */
 
 /*
 ExpireGlines()
@@ -241,36 +259,36 @@ ExpireGlines(time_t unixtime)
 
   prev = NULL;
   for (tempgline = GlineList; tempgline; )
-  {
-    if ((tempgline->expires) && (tempgline->expires <= unixtime))
     {
-      SendUmode(OPERUMODE_Y,
-        "*** Expired gline: %s@%s [%s]",
-        tempgline->username,
-        tempgline->hostname,
-        tempgline->reason);
+      if ((tempgline->expires) && (tempgline->expires <= unixtime))
+        {
+          SendUmode(OPERUMODE_Y,
+                    "*** Expired gline: %s@%s [%s]",
+                    tempgline->username,
+                    tempgline->hostname,
+                    tempgline->reason);
 
-      if (prev)
-      {
-        prev->next = tempgline->next;
-        DeleteGline(tempgline);
-        tempgline = prev;
-      }
+          if (prev)
+            {
+              prev->next = tempgline->next;
+              DeleteGline(tempgline);
+              tempgline = prev;
+            }
+          else
+            {
+              GlineList = tempgline->next;
+              DeleteGline(tempgline);
+              tempgline = NULL;
+            }
+        }
+
+      prev = tempgline;
+
+      if (tempgline)
+        tempgline = tempgline->next;
       else
-      {
-        GlineList = tempgline->next;
-        DeleteGline(tempgline);
-        tempgline = NULL;
-      }
+        tempgline = GlineList;
     }
-
-    prev = tempgline;
-
-    if (tempgline)
-      tempgline = tempgline->next;
-    else
-      tempgline = GlineList;
-  }
 } /* ExpireGlines() */
 
 #endif /* ALLOW_GLINES */

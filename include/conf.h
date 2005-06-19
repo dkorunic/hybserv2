@@ -1,6 +1,6 @@
 /*
  * conf.h
- * Copyright (C) 1999 Patrick Alken
+ * HybServ2 Services by HybServ2 team
  *
  * $Id$
  */
@@ -24,11 +24,11 @@ struct Server;
 /* userlist privileges/flags */
 
 #define PRIV_ADMIN      0x0001  /* can use administrator commands */
-#define  PRIV_OPER        0x0002  /* can use operator commands */
-#define PRIV_JUPE        0x0004  /* can use jupe/unjupe commands */
-#define  PRIV_GLINE      0x0008  /* can use gline/ungline commands */
-#define PRIV_CHAT        0x0010  /* can use dcc chat service */
-#define PRIV_FRIEND      0x0020  /* has "friend" privileges */
+#define PRIV_OPER       0x0002  /* can use operator commands */
+#define PRIV_JUPE       0x0004  /* can use jupe/unjupe commands */
+#define PRIV_GLINE      0x0008  /* can use gline/ungline commands */
+#define PRIV_CHAT       0x0010  /* can use dcc chat service */
+#define PRIV_FRIEND     0x0020  /* has "friend" privileges */
 #define PRIV_EXCEPTION  0x0040  /* protected user */
 #define PRIV_SADMIN     0x0080  /* services administrator */
 
@@ -44,8 +44,8 @@ struct Server;
 #define ClearHubConnect(x)  ((x)->flags &= ~SL_CONNECT)
 
 /* Port flags */
-#define PRT_TCM          1 /* accept only tcm bot connections */
-#define PRT_USERS        2 /* accept only user connections */
+#define PRT_TCM         1 /* accept only tcm bot connections */
+#define PRT_USERS       2 /* accept only user connections */
 #define PRT_DELETE      3 /* marked for deletion in a rehash */
 
 struct MyInfo
@@ -149,6 +149,9 @@ struct rHost
   char *username; /* username of restricted hostmask */
   char *hostname; /* hostname of restricted hostmask */
   int hostnum;    /* number of connections allowed from hostmask */
+#ifdef ADVFLOOD
+  int banhost;
+#endif /* ADVFLOOD */
 };
 
 /* Stores P: line info from hybserv.conf */

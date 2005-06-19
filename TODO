@@ -1,28 +1,115 @@
-kreator
--------
-1) crashing on /reload
-   -  done(?) - seems another Solaris goddamn bug.
-2) linked tree problems
-   - people report it has gone after 1.7.3
-3) bcflood issue
-   - done.
-4) add cidr & ranged ip's (if listening on port add tcpwrap capatibilities)
-5) trace possible leaks
-6) use btree&mmap (additionally use adns and glib)
-7) improve block allocator
-8) check older KNOWNBUGS
-   - some.
-9) get rid of proxy ch. code (or make it better :) )
-   - done. ripped out -> use tcm-hybrid for that
-10) add support for solaris threads
-    - done.
-11) trace weird SIGPIPE-s
-    - done (probably)
-12) weird level redefine on all channels 
-13) umode command (in msg)
-    - done.
-14) insert support for solaris threads
-    - done.
-16) split and autorouting
-    - done -> testing in progress.
+$Id$
 
+Today's MOTD
+------------
+Paranoid schizophrenics outnumber their enemies at least two to one.
+
+
+Pending bugs:
+-------------
+*) From Jared:
+  If a channel is set to restricted with guard off, when a user gets
+  banned from the channel chanserv hops in (and is suppoesd to stay in a
+  for a few minutes to enforce the ban) but he stays in there forever and
+  never leaves even if restricted is turned off..   
+*) From Jared:
+  if a user adds a linked nickname then deletes that linked nickname
+  several times they start getting the too many nicks error.. it looks
+  like the numlinks is being incremented several times every time someone
+  adds a link and not being decremented at the same rate...
+*) secure doesn't clear ban for admin [why?]
+*) does not want to unforbid sometimes (??)
+*) fix *LOCK functions
+*) temp ignores rotate (possible overflow)
+*) forcenick
+*) 20 nicknames problem
+*) > I plan on just setting the nickflood level higher in config.h, but
+   could there be a configurable option via a operserv set command?
+   Also, are there docs on what each operserv set variable is? Some of them
+   are obvious, and then again, some aren't...
+*) [21:15] :: monolith: trace is showing a blank field for channels
+   [21:15] :: monolith: when using -long
+*) [23:18] :: monolith: hey buddy, i noticed that the OPERWALL/WALLOPS
+   thing wasn't in your latest cvs
+*) (11:00:00) andrew: /msg chanserv halfop #channel nick does not work...it
+   gives an error -ChanServ- Unknown command [halfop]
+*) oper can't setup anything with other nicks
+*) check dccprocess with similar bug as botprocess..
+*) o_match - fix to add *! and similar stuff
+*) set allowguardchannel 0 -> part all channels immediately
+*) nickserv and chanserv have to be always enabled - fix this.
+*) channel modes don't always get synced on restart
+*) fix invalid gnote count
+*) clear modes doesn't clear limit
+*) check for OnAccessList() without master nick call - only when necessary
+*) remember to transfer access list in DeleteLink()
+*) seems it is possible that nickname stays ghosted more than necessary if
+   nick QUITs
+*) send all mlock modes on channel creation
+*) OperServ does not completely support hybrid7 modes yet, (for example
+   .channel command or SECURE)
+*) sed helpfiles so that they have proper time values
+   NOTE: this should be done via %v or %t.. something like it
+*) add flag for keeping other people's channel/nick status when
+   reconnecting - i find it annonying to look at forced synching
+
+
+Features yet to come:
+---------------------
+*) global change: notice -> privmsg via /msg operserv set
+*) (13:37:00) padde: Any chance there could be coded an option, that would
+   allow to specify a range of ports to be used to DCC services?
+   (13:37:00) padde: would be usefull if the services is behind firewall
+*) (23:37:25) andrew: hello
+   (23:37:47) andrew: i'm just wondering if hybserv can be configured to
+   block nicks that contain explicit words?
+*)PuNkSterQFeTus: Heres an idea
+  PuNkSterQFeTus: Instead of just /kill chan
+  PuNkSterQFeTus: how about adding /kline chan
+*) hide nick options..
+*) save auth users before restart/die with a small ts..
+*) blackbook for all operserv commands. searcheable, add, remove, list.
+*) adx wishlist:
+  1)
+  <adx> for example, to create a new operserv's command
+  <adx> "RESTRICT"
+  <adx> you pass the mask, for example *!*@you.are.a.bad.guy
+  <adx> then you can set some restrictions
+  <adx> for example
+  <adx> -nonickreg
+  <adx> -max 5 (connections)
+  <adx> -nolink
+  <adx> etc...
+  3)
+  put operserv glines in oper.db
+*) force nick change - via plain old hacks
+*) rewrite documentation
+   ----> work in progress (Hwy)
+*) add SVSNICK, SWHOIS, etc. for other IRCDs
+*) modularisation (_very_ unlikely to happen)
+*) completely document API
+   ----> work in progress (Janos)
+*) localisation
+*) misc stuff:
+   private notes on channel and user records, available only to staff
+   PGP/GPG keys per user
+   multiple URL's, multiple email addresses (with limits)
+   geek code
+*) use btree&mmap (additionally use adns and glib)
+*) improve block allocator
+*) add cidr & ranged ip's
+*) add tcpwrap capatibilities
+*) ziplinks (perhaps use servlink?)
+*) ideas by "John Binder" <jbinder@kgazd.bme.hu>:
+   flood ctrl for services itself
+   flood ctrl for channels: public flood, join-part flood, kick flood,
+    deop flood, nick flood -> however, for some features it is obvious
+    that chanserv/operserv will have to reside on channels, which I
+    dislike (-kre)
+   ----> work in progress (KrisDuv)
+   ----> work in progress (ike)
+*) implement modes flood trigger (and below)
+*) add some features from http://www.appwatch.com/Linux/App/879/data.html
+*) be compatibile with other ircds (!!)
+   ----> work in progress (me)
+*) umode +g ACCEPT list (BR's idea)

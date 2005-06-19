@@ -1,347 +1,522 @@
-#ifndef INCLUDED_config_h
-#define INCLUDED_config_h
+/* ------------------- Start of configurable section ------------ */
+
+/*
+ *                             BASIC FEATURES
+ */
 
 /*
  * This will automagically transform into correct SETPATH. Don't change
  * it. -kre
  */
-
-#define         SETPATH                 "@prefix@/hybserv/settings.conf"
+#define   SETPATH   "@prefix@/hybserv/settings.conf"
 
 /*
  * Define this to enable NickServ (Nickname Services)
  */
-
-#define         NICKSERVICES
+#define   NICKSERVICES
 
 /*
  * Define this to enable ChanServ (Channel Services)
- * --NOTE: ChanServ requires NICKSERVICES, so if NickServ is
- *         disabled, ChanServ will be disabled as well (NickServ
- *         can function perfectly without ChanServ however)
+ * --NOTE: ChanServ requires NICKSERVICES, so if NickServ is disabled,
+ *         ChanServ will be disabled as well (NickServ can function
+ *         perfectly without ChanServ however)
+ * At this moment we require CHANNELSERVICES too. -kre
  */
-
-#define         CHANNELSERVICES
+#define   CHANNELSERVICES
 
 /*
  * Define this to enable MemoServ (Memo Services)
- * --NOTE: MemoServ requires NICKSERVICES, so if NickServ is
- *         disabled, MemoServ will be disabled as well (NickServ
- *         can function perfectly without MemoServ however)
+ * --NOTE: MemoServ requires NICKSERVICES, so if NickServ is disabled,
+ *         MemoServ will be disabled as well (NickServ can function
+ *         perfectly without MemoServ however)
  */
-
-#define         MEMOSERVICES
+#define   MEMOSERVICES
 
 /*
  * Define this to enable StatServ (Statistic Services)
+ * --NOTE: StatServ requires NICKSERVICES, so if NickServ is disabled,
+ *         StatServ will be disabled as well (NickServ can function
+ *         perfectly without StatServ however)
  */
-
-#define         STATSERVICES
+#define   STATSERVICES
 
 /*
  * Define this to enable HelpServ (Help Services)
  */
-
-#define         HELPSERVICES
+#define   HELPSERVICES
 
 /*
  * Define this to enable Global (Global Services)
  */
+#define   GLOBALSERVICES
 
-#define         GLOBALSERVICES
-
- /*
+/*
  * Define this to enable SeenServ (Seen Services)
  */
-
-#define         SEENSERVICES
+#define   SEENSERVICES
 
 /*
  * If EMPOWERADMINS is defined, admins will be able to use SETPASS,
  * FORBID, DROP etc.
  */
-
-#define         EMPOWERADMINS
+#define   EMPOWERADMINS
 
 /*
  * If EMPOWERADMINS_MORE is defined, administrators will have founder
- * access for any channel, thus being able to modify the access
- * lists, change channel SETs etc.  This allows administrators TOTAL
- * access to ANY channel, so you may want to #undef it.
+ * access for any channel, thus being able to modify the access lists,
+ * change channel SETs etc.  This allows administrators TOTAL access to
+ * ANY channel, so you may want to undef it.
+ */
+#define   EMPOWERADMINS_MORE
+
+
+/* 
+ *                           ADVANCED FEATURES
  */
 
-#define          EMPOWERADMINS_MORE
-
-
-
-#ifdef          NICKSERVICES
-
 /*
- * Define this to allow users to link their nickname to another,
- * thus being able to use multiple nicknames, without having
- * configure each one. All nicknames in the same link will
- * share a common access list, memos, and set options.
- * Also, if a nickname has access to a certain channel, all
- * nicknames in it's link list will have the same access.
- * Furthermore, when a nickname identifies, he/she will be
- * identified for every nickname in their link.
+ * Define this to allow users to link their nickname to another, thus
+ * being able to use multiple nicknames, without having configure each
+ * one. All nicknames in the same link will share a common access list,
+ * memos, and set options. Also, if a nickname has access to a certain
+ * channel, all nicknames in it's link list will have the same access.
+ * Furthermore, when a nickname identifies, he/she will be identified for
+ * every nickname in their link.
  */
-
-#define         LINKED_NICKNAMES
-
-#endif /* NICKSERVICES */
+#define   LINKED_NICKNAMES
 
 /*
- * Define this if you want NickServ to record the TS of users who
- * split so that when they rejoin they don't need to re-IDENTIFY
- * if their TS matches. Also, OperServ will record the TS of
- * users who have identified so they don't need to do it
- * over again.
+ * << STRONGLY RECOMMENDED >> If OPERNICKIDENT is defined, opers
+ * IDENTIFYing to OperServ will be required to IDENTIFY to NickServ first.
+ * As the two passwords should *always* be different, this adds another
+ * layer of security. -ike 
  */
-
-#define         RECORD_SPLIT_TS
+#define   OPERNICKIDENT
 
 /*
- * Define this ONLY if every server on your network is
- * running some form of hybrid ircd. The advantage of
- * this feature is ChanServ will not have to sit in
- * every registered channel, since hybrid allows ChanServ
- * to set modes without having to be in the channel. CSr
- * servers do not allow this, so make sure NO servers
- * on your network are running CSr.
+ * If IDENTIFOPER is defined, opers IDENTIFYing to OperServ will be
+ * required to become first server operators (and SET NOEXPIRE) or else
+ * they wont be able to identify even if their password and nick/hostname
+ * are correct.(Security reasons). You also must define OPERNICKIDENT for
+ * this to work -ddb
  */
-
-#define         HYBRID_ONLY
+#undef   IDENTIFOPER
 
 /*
- * If this is defined, commands that involve HybServ setting modes,
- * such as .secure and .omode, will not break channel TS.  Instead,
- * the program will have OPERSERV_NICK join the channel to set the modes
- * instead of having the actual server set the modes.  A significant
- * problem with this, is if OPERSERV_NICK gets kicked before it has a 
- * chance to complete its job, where if the server set the modes, that
- * is not a concern.  Thus, there's a tradeoff between efficiency and
- * saving TS.
+ * Define this if you want NickServ to record the TS of users who split so
+ * that when they rejoin they don't need to re-IDENTIFY if their TS
+ * matches. Also, OperServ will record the TS of users who have identified
+ * so they don't need to do it over again.
  */
-
-#define         SAVE_TS
+#define   RECORD_SPLIT_TS
 
 /*
- * Define this to allocate memory for clients/channels/servers
- * in large chunks rather than doing it individually
+ * Define this ONLY if every server on your network is running some form
+ * of hybrid ircd. The advantage of this feature is ChanServ will not have
+ * to sit in every registered channel, since hybrid allows ChanServ to set
+ * modes without having to be in the channel. CSr servers do not allow
+ * this, so make sure NO servers on your network are running CSr.
+ */
+#define   HYBRID_ONLY
+
+/* 
+ * Define this if you plan to use services on Hybrid7 server. It will make
+ * HybServ use Hybrid7 features like glines/klines, etc. -kre
+ * This includes still experimental +h, +a and +I support -Janos
+ */
+#undef    HYBRID7
+
+/*
+ * Defining this will turn on IRCNet daemon compatibility. Undergoing a
+ * lot of changes, so don't use it, since it is unuseable. -kre
+ */
+#undef    IRCNET
+
+/*
+ * Define this if you want DANCER ircd compatibility. It has +c and
+ * +f modes for channels, as well as +e umode for users. -kre
+ */
+#undef    DANCER
+
+/*
+ * If this is defined, commands that involve HybServ setting modes, such
+ * as .secure and .omode, will not break channel TS.  Instead, the program
+ * will have OPERSERV_NICK join the channel to set the modes instead of
+ * having the actual server set the modes.  A significant problem with
+ * this, is if OPERSERV_NICK gets kicked before it has a chance to
+ * complete its job, where if the server set the modes, that is not a
+ * concern.  Thus, there's a tradeoff between efficiency and saving TS.
+ */
+#define   SAVE_TS
+
+/*
+ * Define this to allocate memory for clients/channels/servers in large
+ * chunks rather than doing it individually
  * Advantages:
- *    CPU load will be minimized during netsplits/netjoins
- *   because instead of malloc()/free()'ing every client or channel,
- *   we will already have the space allocated ahead of time
+ *   CPU load will be minimized during netsplits/netjoins because instead
+ *   of malloc()/free()'ing every client or channel, we will already have
+ *   the space allocated ahead of time
  * Disadvantages:
- *    Slightly more memory is used if a portion of the heap is
- *   unused.
+ *    Slightly more memory is used if a portion of the heap is unused.
  *
- * Undefining this can be very dangerous, since bound
- * checking is not performed on new clients' usernames
- * and hostnames. It relies on ircd to make sure the
- * client has a valid hostname. Thus, it is much much
- * safer to leave this defined.
+ * Undefining this can be very dangerous, since bound checking is not
+ * performed on new clients' usernames and hostnames. It relies on ircd to
+ * make sure the client has a valid hostname. Thus, it is much much safer
+ * to leave this defined.
  */
-
-#define         BLOCK_ALLOCATION
-
-#ifdef BLOCK_ALLOCATION
+#define   BLOCK_ALLOCATION
 
 /*
- * Set this to the number of client structures to allocate at
- * one time - on really small nets, you may want to make this
- * even lower
+ * Set this to the number of client structures to allocate at one time -
+ * on really small nets, you may want to make this even lower
  */
-
-#define         CLIENT_ALLOCATE         256
+#define   CLIENT_ALLOCATE   256
 
 /*
- * Set this to the number of channel structures to allocate at
- * one time
+ * Set this to the number of channel structures to allocate at one time
  */
-
-#define         CHANNEL_ALLOCATE        256
+#define   CHANNEL_ALLOCATE    256
 
 /*
- * Set this to the number of server structures to allocate at
- * one time
+ * Set this to the number of server structures to allocate at one time
  */
-
-#define         SERVER_ALLOCATE         5
-
-#endif /* BLOCK_ALLOCATION */
+#define   SERVER_ALLOCATE   5
 
 /*
- * Define this to switch to high-traffic mode if the traffic
- * load exceeds RECVLOAD (defined below). Once in high-traffic
- * mode, the hub server will be given priority over all other
- * dcc/telnet clients etc.
+ * Define this to switch to high-traffic mode if the traffic load exceeds
+ * RECVLOAD (defined below). Once in high-traffic mode, the hub server
+ * will be given priority over all other dcc/telnet clients etc.
  */
-
-#define         HIGHTRAFFIC_MODE
-
-#ifdef HIGHTRAFFIC_MODE
+#define   HIGHTRAFFIC_MODE
 
 /*
- * Set this to the minimum number of Kilobytes/second we
- * need from our hub to switch to high-traffic mode.
+ * Set this to the minimum number of Kilobytes/second we need from our hub
+ * to switch to high-traffic mode.
  */
-
-#define         RECVLOAD                25
+#define   RECVLOAD    25
 
 /*
- * Set this to the number of seconds to stay in high-traffic mode
- * once activated.  If, at the end of HTM_TIMEOUT seconds, the
- * traffic load is still greater than RECVLOAD, high-traffic mode
- * will continue for another HTM_TIMEOUT seconds.
+ * Set this to the number of seconds to stay in high-traffic mode once
+ * activated.  If, at the end of HTM_TIMEOUT seconds, the traffic load is
+ * still greater than RECVLOAD, high-traffic mode will continue for
+ * another HTM_TIMEOUT seconds.
  */
-
-#define         HTM_TIMEOUT             30
+#define   HTM_TIMEOUT   30
 
 /*
- * Set this to the time interval (in seconds) to measure bytes
- * received, in order to calculate if high-traffic mode should
- * be activated.  If the current bytes received minus the bytes
- * received HTM_INTERVAL seconds ago exceeds RECVLOAD K/s,
- * high-traffic mode will be activated
- * The lower this is, the more accurate it can detect the current
- * load
+ * Set this to the time interval (in seconds) to measure bytes received,
+ * in order to calculate if high-traffic mode should be activated.  If the
+ * current bytes received minus the bytes received HTM_INTERVAL seconds
+ * ago exceeds RECVLOAD K/s, high-traffic mode will be activated The lower
+ * this is, the more accurate it can detect the current load.
  *
- * I've noticed that this can cause services to drop into HTM mode on
- * the very beginning. In fact, it seems that on large networks where some
+ * I've noticed that this can cause services to drop into HTM mode on the
+ * very beginning. In fact, it seems that on large networks where some
  * users have scripted IDENTIFY-ing it can cause almost immediate HTM
- * switching. So let it be 5 secs by default. -kre
+ * switching. So let it be 10 secs by default. -kre
  */
-
-#define         HTM_INTERVAL            5
+#define HTM_INTERVAL 5
 
 /*
- * Set this to how many times we read the hub server's file descriptor
- * in ratio to other descriptors while in HTM.  For example, if
- * HTM_RATIO is 3, the hub's fd will be read in a ratio of 3:1 to
- * other fds (dcc/telnet/tcms etc)
+ * Set this to how many times we read the hub server's file descriptor in
+ * ratio to other descriptors while in HTM.  For example, if HTM_RATIO is
+ * 3, the hub's fd will be read in a ratio of 3:1 to other fds
+ * (dcc/telnet/tcms etc)
  */
-
-#define         HTM_RATIO               3
-
-#endif /* HIGHTRAFFIC_MODE */
+#define   HTM_RATIO   3
 
 /*
- * Define this to use encrypted nickname/channel passwords for
- * your databases
- * << STRONGLY RECOMMENDED >>
- * --NOTE: If you change from using encryption to not using it,
- *         or vice versa, your database files will not work (you'll
- *         have to create new ones)
+ * << STRONGLY RECOMMENDED >> Define this to use encrypted
+ * nickname/channel passwords for your databases
+ * --NOTE: If you change from using encryption to not using it, or vice
+ *         versa, your database files will not work (you'll have to create
+ *         new ones)
  */
-
-#define         CRYPT_PASSWORDS
+#define   CRYPT_PASSWORDS
 
 /*
- * Define this to use encrypted passwords in O: lines in
- * hybserv.conf
- * << STRONGLY RECOMMENDED >>
+ * << STRONGLY RECOMMENDED >> Define this to use encrypted passwords in O:
+ * lines in hybserv.conf
  */
+#define   CRYPT_OPER_PASSWORDS
 
-#define         CRYPT_OPER_PASSWORDS
+/*
+ * Define this if you are paranoid and want every cleartext password to be
+ * manually erased from memory before free()-ing. This could affect
+ * performance a bit, so it is undefined by default. -kre
+ */
+#undef    BORKPASSWD
 
 /* Define this if you wish to allow admins to use the .die command */
-
-#define         ALLOW_DIE
+#define   ALLOW_DIE
 
 /* 
  * Define these if you wish to enable glines and/or jupes 
- * --NOTE: In order for ALLOW_JUPES to work correctly, you must
- *         give services an H: line in ircd.conf because it must
- *         create a fake server to take the place of the juped one
+ * --NOTE: In order for ALLOW_JUPES to work correctly, you must give
+ *         services an H: line in ircd.conf because it must create a fake
+ *         server to take the place of the juped one
  */
-
-#undef         ALLOW_GLINES
-#define         ALLOW_JUPES
-
-#ifdef ALLOW_GLINES
+#define   ALLOW_GLINES
+#define   ALLOW_JUPES
 
 /*
- * Define this if you want services to create 3 psuedo operators
- * and servers to vote for the gline. This is the ircd-hybrid
- * gline implementation, so it will not work on other ircds.
+ * Define this if you want services to create 3 pseudo operators and
+ * servers to vote for the gline. This is the ircd-hybrid gline
+ * implementation, so it will not work on other ircds.
+ * NOTE: These are Hybrid5/6 only glines -kre
+ */
+#define   HYBRID_GLINES
+
+/*
+ * Define this if you want services to create a gline the Hybrid7 way by
+ * sending a mass-kline to all servers. This will ONLY work on hyb7, and
+ * for it to work, every server must have a shared block as previously
+ * described.
+ */
+#undef   HYBRID7_UNKLINE
+
+/*
+ * Define this if you want services to be able to remove glines after a
+ * specified period of time. This will ONLY work on hyb7, and for it to
+ * work, every server must have a shared block and loaded m_unkline.so
+ * which is provided in contrib/ directory as follows if your services
+ * were named services.eu
  * 
- * I'm afraid this won't work with Hybrid7 glines. According to Dianora,
- * this should be banned forever! :-) -kre
+ * shared {
+ *     name="services.eu";
+ * };
  */
+#define   HYBRID7_GLINES
 
-#define         HYBRID_GLINES
-
-#endif /* ALLOW_GLINES */
-
-#ifdef ALLOW_JUPES
-
-/* Define this if you don't like the idea of one person being able to
- * jupe servers.  If you don't want it, #undef JUPEVOTES.  If you do want
- * it #define JUPEVOTES <how many votes required>
+/*
+ * Define this if you don't like the idea of one person being able to jupe
+ * servers.  If you don't want it, #undef JUPEVOTES.  If you do want it
+ * #define JUPEVOTES <how many votes required> (usually 3).
  */
+#undef    JUPEVOTES
 
-#undef JUPEVOTES 3
-
-#endif /* ALLOW_JUPES */
+/*
+ * Define these to the username and the hostname that you want juped
+ * nicks to be introduced with.  This may be extended later to just be
+ * the defaults, and be able to specify the user@host on the .jupe line.
+ */
+#define   JUPED_USERNAME "juped"
+#define   JUPED_HOSTNAME "juped.com"
 
 /*
  * Define these if you wish to have the .killchan and .killhost commands
  * available
  */
-
-#define         ALLOW_KILLCHAN
-#define         ALLOW_KILLHOST
-
-/*
- * Define this if you wish to allow administrators the use
- * of the "dump" command.
- */
-
-#undef         ALLOW_DUMP
+#define   ALLOW_KILLCHAN
+#define   ALLOW_KILLHOST
 
 /*
- * Define this to allow administrators the use of the "fuckover"
- * command.
- * NOTE: This command has previously been disabled entirely
- *       because of it's possible use as a DoS attack. I will
- *       accept absolutely no responsibility for damages, lag
- *       or hurt feelings as a result of this command. Please use
- *       this feature wisely.
- *
- * I'm thinking of disabling this function entirely. It is _lame_ and
- * unfair. -kre
+ * Define this if you wish to allow administrators the use of the "dump"
+ * command for raw IRC messages (inter-server).
+ * BIG FAT WARNING: This stuff is serious. It can core your ircd, cause
+ *                  desync, etc. This is not to be used in any kind of
+ *                  "normal" IRC network. -kre
  */
+#undef    ALLOW_DUMP
 
-#undef         ALLOW_FUCKOVER
+/* 
+ * Define this for debugging purposes. It will setup coresize
+ * appropriately, and startup daemon in console mode for easier debugging.
+ * Also, you might want to enable GDB_DEBUG to have HybServ wait for Gdb
+ * to attach it - and then you can set GDBAttached=1 to have it continue.
+ * -kre
+ */
+#undef    DEBUGMODE
+#undef    GDB_DEBUG
 
-/* Define this for debugging purposes. It will setup coresize
- * appropriately, and startup daemon in console mode for easier
- * debugging. -kre */
+/*
+ * Use this option wisely, as last resort. It will dump very large amounts
+ * of debug information, causing actual daemon to lag. -kre
+ */
+#undef    EXTREMEDEBUG
 
-#undef         DEBUGMODE
+/*
+ * This is feature that should give some information on netsplits - what
+ * servers are split, for how long, etc. -kre
+ * Extra - sends notices to all +l operators about netsplits -kre
+ */
+#define   SPLIT_INFO
+#define   EXTRA_SPLIT_INFO
 
-/* Use this option wisely, as last resort. It will dump very large amounts
- * of debug information, causing actual daemon to lag. -kre */
+/* 
+ * Using this and M: lines can make your HybServ send CONNECT commands
+ * when split time expires for leaf/hub in M: line -kre
+ */
+#undef   AUTO_ROUTING
 
-#undef         EXTREMEDEBUG
 
-/* This is feature that should give some information on netsplits - what
- * servers are split, for how long, etc. */
-#define        SPLIT_INFO
+/*
+ * Defining this will produce "Active operators .." output in VERSION
+ * reply of any of the services. This could be a little performance hit on
+ * large O line configuration files.. -kre
+ */
+#define ADMININFO
 
-/* Sends notices to all +l operators about netsplits -kre */
-#define        EXTRA_SPLIT_INFO
+/*
+ * Turn this on to support gecos bans for Hybrid5/6.
+ * NOTE: This _has_ to be turned off for Hybrid7, since it does not
+ *       support +d style modes. -Janos
+ */
+#define GECOSBANS
 
-/* Still highly experimental feature. Using this and M: lines can make
- * your HybServ send CONNECT commands when split time expires for leaf/hub
- * in M: line */
-#define        AUTO_ROUTING
+/*
+ * Defining ADVFLOOD enables advanced flood protection. Every client
+ * connect or nick change is stored in a table of size ADVFLOOD_TABLE. The
+ * table size should be whatever you expect the maximum number of
+ * different users (unique user || host) flooding simultaneously + ~10. If
+ * more than ADVFLOOD_COUNT reconnects and/or nick changes are detected
+ * from the same user@host in less than ADVFLOOD_DELAY seconds, advanced
+ * flood protection will fire off. If ADVFLOOD_NOTIFY is defined, +y opers
+ * on OperServ will be notified of the flood. If ADVFLOOD_NOTIFY_ALL is
+ * defined, notices regarding floods will be sent out to all opers that
+ * idented to OperServ. If ADVFLOOD_GLINE is defined, offenders will be
+ * auto-glined with reason ADVFLOOD_GLINE_REASON with a GLINE expiring
+ * after ADVFLOOD_GLINE_TIME. It is possible to define both
+ * ADVFLOOD_NOTIFY and ADVFLOOD_GLINE, but not both ADVFLOOD_NOTIFY and
+ * ADVFLOOD_NOTIFY_ALL. If ADVFLOOD_NOIDENT_GLINEHOST is defined, if a
+ * flood is detected from a non-idented user, the entire host will be
+ * glined, not just the user (since it's probably a script randomly
+ * choosing idents).
+ * -ike
+ */
+#undef ADVFLOOD
+#define ADVFLOOD_TABLE  60 
+#define ADVFLOOD_DELAY  10
+#define ADVFLOOD_COUNT  10 
+#define ADVFLOOD_NOTIFY
+#undef ADVFLOOD_NOTIFY_ALL
+#define ADVFLOOD_GLINE
+#define ADVFLOOD_GLINE_REASON "Reconnect / NICK flooding."
+#define ADVFLOOD_GLINE_TIME   "1h"
+#define ADVFLOOD_NOIDENT_GLINEHOST
 
-/* Turn off assertions by default if not debugging -kre */
-#ifndef DEBUG
- #define NDEBUG /* #undef this if you still want assertions */
+/*
+ * Defining this will make services capable of detecting so called
+ * "services fight", unpleasant situation when two or more services are
+ * fighting over their nicknames and causing HTM. -kre
+ */
+#define SERVICES_FIGHT_FIX
+
+/*
+ * <<STRONGLY RECOMMENDED>> Forces nick change instead of disconnecting
+ * the user (when kill protection is set). If users client has not changed
+ * its nickname after predefined timeout, kill him as usual -harly
+ */
+#define FORCE_NICK_CHANGE
+
+/*
+ * Schedule nick kill instead of immediate killing for user-triggered
+ * ghost command. Turn this on on very large networks to have smoother
+ * operation. Beware that nick kills resolution is only every 30 seconds.
+ * -kre
+ */
+#define SCHEDULE_COLLIDE
+
+/* ------------------- End of configurable section -------------- */
+
+#if defined ADVFLOOD && defined ADVFLOOD_NOTIFY && defined ADVFLOOD_NOTIFY_ALL
+# undef ADVFLOOD_NOTIFY_ALL
 #endif
 
-#endif /* INCLUDED_config_h */
+#if defined HYBRID7
+# undef GECOSBANS
+#endif
+
+#if defined HYBRID7
+# undef DANCER
+#endif
+
+#if defined HYBRID7 && !defined HYBRID_ONLY 
+# define HYBRID_ONLY
+#endif
+
+#define NICKSERVICES
+#define CHANNELSERVICES
+
+#if defined BLOCK_ALLOCATION && !defined CLIENT_ALLOCATE
+# define CLIENT_ALLOCATE 256
+#endif
+
+#if defined BLOCK_ALLOCATION && !defined CHANNEL_ALLOCATE
+# define CHANNEL_ALLOCATE 256
+#endif
+
+#if defined BLOCK_ALLOCATION && !defined SERVER_ALLOCATE
+# define SERVER_ALLOCATE 5
+#endif
+
+#if defined HIGHTRAFFIC_MODE && !defined RECVLOAD
+# define RECVLOAD 25
+#endif
+
+#if defined HIGHTRAFFIC_MODE && !defined HTM_TIMEOUT
+# define HTM_TIMEOUT 30
+#endif
+
+#if defined HIGHTRAFFIC_MODE && !defined HTM_INTERVAL
+# define HTM_INTERVAL 5
+#endif
+
+#if defined HIGHTRAFFIC_MODE && !defined HTM_RATIO
+# define HTM_RATIO 3
+#endif
+
+#if !defined CRYPT_OPER_PASSWORDS && !defined CRYPT_PASSWORDS
+# undef BORKPASSWD
+#endif
+
+#if defined ALLOW_GLINES
+# if defined HYBRID7
+#  undef HYBRID_GLINES
+# else
+#  undef HYBRID7_GLINES
+#  undef HYBRID7_UNKLINE
+# endif
+#endif
+
+#if !defined ALLOW_JUPES
+# undef JUPEVOTES
+#else
+# if !defined JUPED_USERNAME 
+#  define JUPED_USERNAME "juped" 
+# endif
+# if !defined JUPED_HOSTNAME
+#  define JUPED_HOSTNAME "juped.com"
+# endif
+#endif
+
+/*
+ * Turn off assertions by default if not debugging. Undefine this if you
+ * still want assertions, and DEBUG is not defined -kre
+ */
+#define NDEBUG
+
+/*
+ * Define this if you want to make sure core will be properly dumped if
+ * something goes wrong, whether your global/local corelimit is 0 or not.
+ * If you define DEBUG, it will be automatically used. -kre
+ */
+#define   GIMMECORE
+
+/*
+ * This will give MUCH CPU overhead, and usually should not be enabled.
+ * This code makes double-checks for duplicate nicks in nick.db which
+ * shouldn't happen otherwise, but as a result of sloppy coding in
+ * previous hybserv releases. No, not my fault. I'm shipping it this way,
+ * so that all databases will be checked and fixed. If you know what are
+ * you doing, you can disable it. -kre
+ */
+#undef STRICT_DATA_CHECK
+
+/*
+ * DJB's daemontools compatibility stuff. Won't fork() into background, nor
+ * setsid(), which makes it possible to be run under svscan. -kre
+ */
+#undef DAEMONTOOLS
+
+#define INCLUDED_config_h

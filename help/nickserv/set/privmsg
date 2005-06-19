@@ -1,0 +1,5 @@
+Syntax: %bSET PRIVMSG {ON|OFF}%b
+
+ This toggles private messages from IRC services ON/OFF.
+If it is OFF, services will use NOTICE, if ON services
+will use PRIVMSG instead.

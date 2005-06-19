@@ -1,4 +1,4 @@
-Syntax: %bSET <channel> SUCCESSOR <nickname>%b
+Syntax: %bSET <channel> SUCCESSOR <nickname|->%b
 
 Sets the channel successor to <nickname>.  If the founder's
 nickname ever expires, services will promote the

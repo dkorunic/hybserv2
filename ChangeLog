@@ -1,3 +1,7 @@
+*** 20050623_1 by kreator
+- don't log all the records for failed SET, that way passwords won't get
+  logged in cleartext [thanks Brian Brazil]
+
 *** 20050619_1 by kreator
 - smaller changes for 1.9.0 release
 

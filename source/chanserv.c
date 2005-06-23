@@ -4745,10 +4745,9 @@ c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       strncpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
       tmp[sizeof(tmp) - 1] = '\0';
 
-      RecordCommand("%s: %s!%s@%s failed SET [%s] %s %s",
+      RecordCommand("%s: %s!%s@%s failed SET [%s] %s",
                     n_ChanServ, lptr->nick, lptr->username,
-                    lptr->hostname, cptr->name, tmp,
-                    (ac < 4) ? "" : StrToupper(av[3]));
+                    lptr->hostname, cptr->name, tmp);
 
       return;
     }

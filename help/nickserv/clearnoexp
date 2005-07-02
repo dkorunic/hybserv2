@@ -1,0 +1,8 @@
+SYNTAX: %bCLEARNOEXP%b
+
+Clears the noexpire flags on ALL registered nicknames, undoing all
+previous %bSET OPER ON%b and %bNOEXPIRE%b commands.
+
+Example:
+        CLEARNOEXP
+        Clears all noexpire flags

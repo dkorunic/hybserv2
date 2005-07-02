@@ -31,8 +31,6 @@ Pending bugs:
    [21:15] :: monolith: when using -long
 *) [23:18] :: monolith: hey buddy, i noticed that the OPERWALL/WALLOPS
    thing wasn't in your latest cvs
-*) (11:00:00) andrew: /msg chanserv halfop #channel nick does not work...it
-   gives an error -ChanServ- Unknown command [halfop]
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff

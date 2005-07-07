@@ -1,3 +1,6 @@
+*** 20050707_3 by kreator
+- update m_forcenick.c and m_svsnick.c to be used with recent Hybrid7
+
 *** 20050707_2 by kreator
 - fix for ChanServ comment [thanks bane!]
 

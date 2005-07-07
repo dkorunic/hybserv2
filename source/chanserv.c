@@ -809,7 +809,7 @@ cs_loaddata()
           else if (!ircncmp("COMMENT", keyword, 8))
             {
               if (!cptr->comment)
-                cptr->comment = MyStrdup(av[1]);
+                cptr->comment = MyStrdup(av[1] + 1);
               else
                 {
                   fatal(1, "%s:%d ChanServ entry for [%s] has multiple COMMENT lines (using first)",

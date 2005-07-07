@@ -32,7 +32,7 @@ static int clean_nick_name(char *);
 
 struct Message svsnick_msgtab = {
   "SVSNICK", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_ignore, ms_svsnick, m_ignore}
+  {m_unregistered, m_not_oper, ms_svsnick, m_ignore, ms_svsnick, m_ignore}
 };
 
 #ifndef STATIC_MODULES

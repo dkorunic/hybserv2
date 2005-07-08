@@ -75,9 +75,9 @@ char **myargv;
 
 int main(int argc, char *argv[])
 {
-#ifndef DEBUGMODE
+#if !defined DEBUGMODE && !defined DAEMONTOOLS
   pid_t pid; /* pid of this process */
-#endif /* DEBUGMODE */
+#endif /* !DEBUGMODE && !DAEMONTOOLS */
 
 #ifdef GDB_DEBUG
 

@@ -5038,6 +5038,11 @@ n_collide(struct Luser *lptr, int ac, char **av)
           notice(n_NickServ, lptr->nick,
                  "The nickname [\002%s\002] has been marked for collision",
                  nptr->nick);
+#if defined FORCE_NICK_CHANGE || defined SVSNICK || defined FORCENICK
+          notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE2);
+#else
+          notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
+#endif
         }
       else /* setnow */
         {

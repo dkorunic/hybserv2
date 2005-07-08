@@ -7,6 +7,8 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 
 Pending bugs:
 -------------
+*) several from Ales - check at the end of file.
+*) get rid of bashisms in cleandb
 *) From Jared:
   If a channel is set to restricted with guard off, when a user gets
   banned from the channel chanserv hops in (and is suppoesd to stay in a
@@ -21,7 +23,6 @@ Pending bugs:
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions
 *) temp ignores rotate (possible overflow)
-*) forcenick
 *) 20 nicknames problem
 *) > I plan on just setting the nickflood level higher in config.h, but
    could there be a configurable option via a operserv set command?
@@ -111,3 +112,87 @@ Features yet to come:
 *) be compatibile with other ircds (!!)
    ----> work in progress (me)
 *) umode +g ACCEPT list (BR's idea)
+
+-----
+From Ales Tokic:
+
+1) Jedan manji bug:
+Wed Apr 20 21:02:43 2005 SeenServ: TheOne!alpha@platon.pseudo.org SEENSTAT
+Wed Apr 20 21:02:58 2005 SeenServ: TheOne!alpha@platon.pseudo.org UNSEEN [*]
+Wed Apr 20 21:03:00 2005 SeenServ: TheOne!alpha@platon.pseudo.org SEENSTAT
+Wed Apr 20 21:03:05 2005 NickServ: JoeKuboj!~kuboj@kobajagrande.com IDENTIFY
+Wed Apr 20 21:06:14 2005 HybServ2 TS services version 1.9.0-rc3_20050209_1 started
+ 
+SEENSTAT je pokazao 15000 seen-ova (max), koje sam UNSEEN-ovao. To je sve ok.
+Medjutim, nakon "NickServ: JoeKuboj!~kuboj@kobajagrande.com IDENTIFY" komande
+servisi su se jednostavno crashovali (ugasili). Pretpostavljam da se radi o >mem free-up< bugu.
+Na zalost nemam debug enablovan tako da ne mogu pokazati nista vise iz logova.
+ 
+2) Druga stvar sto se tice servisa je izlistavanje nickova/kanala.
+-NickServ- -- End of list (255/255 matches shown) --
+Servisi prikazu max 255 nickova/kanala. Ukoliko je registrovano vise od tog broja, mislim da ne
+postoji nacin da se izlistaju preko komande (izuzev gledanja u baze rucno).
+Moj predlog je da to koliko ce nickova/kanala izlistati bude konfigurativna opcija u settings.conf
+ili pak da admini po defaultu mogu izlistati sve nicks/chans iz baza.
+ 
+3) Dok sam kod nickova, jos jedan koristan predlog bi bio da je moguce izlistati nickove prema
+podesavanjima: npr. sve forbiddovane nickove, sve private nickove, sve sa KILL ON itd.
+To bi dosta olaksalo trazenje nickova (cesto mi trebaju svi forbiddovani nickovi koje treba unforbiddovati...).
+ 
+4) I najzad, u vezi nickserva, ponekad se desi da flagovan user moze dobiti op iako ima flag -nochanops.
+Zadnji primer kad sam to video je da je uradio /msg chanserv op all i bio opovan...
+hybserv.log.20050705:Mon Jul  4 22:16:03 2005 ChanServ: kUdtiHaEX!~metal4eve@i.see.fragged.people ACCESS [#es] ADD metatron 48
+hybserv.log.20050705:Mon Jul  4 22:16:46 2005 NickServ: TheOne!alpha@0:0:0:0:0:0:0:1 FLAG [metatron] -nochanops -noregister
+hybserv.log.20050706:Tue Jul  5 02:29:56 2005 NickServ: metatron!blabla@smin-ppp-6238.yubc.net IDENTIFY
+hybserv.log.20050706:Tue Jul  5 22:04:56 2005 NickServ: metatron!~metal4eve@i.see.fragged.people IDENTIFY
+hybserv.log.20050706:Tue Jul  5 22:05:12 2005 ChanServ: metatron!~metal4eve@i.see.fragged.people OP ALL
+->ovde je dobio op...
+hybserv.log.20050706:Tue Jul  5 22:32:46 2005 NickServ: TheOne!alpha@bofh.balcan.net FLAG [metatron]
+->potvrdjeno imao -nochanops flag.
+Nickovi "metatron" i "kUdtiHaEX" nisu linkovani, i jedan i drugi imaju iste flagove (-nochanops -noregister)
+i radi se o istoj osobi koja je samo promenila nick.
+ 
+5) U vezi IGNORE naredbe... IGNORE maska moze biti samo user@host kao kod GLINE-a. Mislim da bi bilo
+dobro da je ukljucen i nick, znaci nick!user@host, ako nista drugo, bar daje dodatne mogucnosti.
+U par navrata, kada -nochanops flag nije bio u potpunosti pouzdan mogao sam staviti samo nick!*@* na ignore listu.
+ 
+6) SECURE naredba sada prakticno nista ne radi osim sto OperServ/servisi setuju +ntp na kanalu o poskida +ikl.
+Niti poskida opove svima koji nemaju +f flag na servisima, niti ukloni ban(ove) adminu, niti opuje +f korisnike.
+ 
+--- TheOne sets ban on *!*alpha@*.balcan.net
+--- TheOne gives channel operator status to alexius
+--- TheOne removes channel operator status from TheOne
+--- alexius sets mode +i #test
+--- alexius sets channel limit to 2
+>OperServ< secure #test
+-services.balcan.net/Wallops- OPERWALL - OperServ: SECURE #test
+--- OperServ sets mode +n #test
+--- OperServ sets mode +t #test
+--- OperServ sets mode +p #test
+--- OperServ sets mode -i #test
+--- OperServ removes user limit
+-OperServ- #test has been secured
+ 
+"TheOne" i "mofo" su identifikovani admini, alexius je regular user. Primer govori za sebe. Ista situacija je
+i ako je admin van kanala. Ranije (u prethodnim hybserv verzijama) je cini mi se jedini problem bio
+neuklanjanje banova adminima.
+ 
+7) Zadnja stvar :)
+Count za bans/exempts/invex nije pravilan, tj. nije potpun. Naime, kod netsplitova nakon povratka servera svaki server
+posalje modes (bans, exempts, invex, chan modes...) i servisi takodje sve to prime. Problem se javi kada se
+vise puta desi netsplit jer se tabele u hybservu pune ne proveravajuci duplikate. Primer:
+ 
+...
+<OperServ> Ban Exceptions:
+<OperServ>  [ 1] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Wed Jul  6 14:22:57 2005]
+<OperServ>  [ 2] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Wed Jul  6 00:56:57 2005]
+<OperServ>  [ 3] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.teleklik.net] [Tue Jul  5 23:53:07 2005]
+<OperServ>  [ 4] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.teleklik.net] [Tue Jul  5 23:50:52 2005]
+<OperServ>  [ 5] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Mon Jul  4 20:50:39 2005]
+<OperServ>  [ 6] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [OperServ  ] [Mon Jul  4 03:19:52 2005]
+<OperServ> 1 match found
+ 
+Dakle, servisi dupliraju te stvari. Jedna check funkcija bi to resila,
+da se ne dupliraju identicni modovi (bans/exempts/invex) - ovo ne ukljucuje channel modes.
+Kada uradis /msg chanserv clear #chan bans desi se da CS skine ban toliko puta koliko ga ima u tabeli
+(iako se radi o jednom banu vise puta dupliranom).

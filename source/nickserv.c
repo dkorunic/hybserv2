@@ -51,7 +51,7 @@
  */
 struct NickInfo *nicklist[NICKLIST_MAX];
 
-#ifdef SVSNICK
+#if defined SVSNICK || defined FORCENICK
 static long nicknum;
 #endif
 
@@ -1177,7 +1177,7 @@ CheckNick(char *nickname)
                    * they logon, whether they come from a known host or not.
                    * Give them one minute to identify.
                    */
-#if defined FORCE_NICK_CHANGE || defined SVSNICK
+#if defined FORCE_NICK_CHANGE || defined SVSNICK || defined FORCENICK
                   notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE2);
 #else
                   notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
@@ -1392,10 +1392,12 @@ collide(char *nick)
 {
   struct Luser *lptr;
   struct NickInfo *nptr;
-  char **av, sendstr[MAXLINE];
-#ifdef SVSNICK
+  char sendstr[MAXLINE];
+#if defined SVSNICK || defined FORCENICK
   char newnick[NICKLEN];
   nicknum = random();
+#else
+  char **av;
 #endif
 
   if(!SafeConnect)
@@ -1416,6 +1418,9 @@ collide(char *nick)
 #ifdef SVSNICK
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
+#elif defined FORCENICK
+  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
+  toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #else
   /*
    * Sending a server kill will be quieter than an oper
@@ -1508,7 +1513,7 @@ CollisionCheck(time_t unixtime)
                        * Try first sending him 432, if not sucessful then
                        * kill him -harly
                        */
-#ifdef FORCE_NICK_CHANGE
+#if defined FORCE_NICK_CHANGE && !defined SVSNICK && !defined FORCENICK
                       if (!(nptr->flags & NS_NUMERIC))
                       {
                         putlog(LOG1,

@@ -1,3 +1,6 @@
+*** 20050708_4 by kreator
+- remove a warning when #define DAEMONTOOLS
+
 *** 20050708_3 by kreator
 - when manually adding nicknames to collision list, notify them with
   proper messaging

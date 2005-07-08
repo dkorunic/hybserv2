@@ -1,3 +1,7 @@
+*** 20050708_3 by kreator
+- when manually adding nicknames to collision list, notify them with
+  proper messaging
+
 *** 20050708_2 by kreator
 - spell error in ERR_MUST_CHANGE2
 

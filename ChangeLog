@@ -1,3 +1,9 @@
+*** 20050708_1 by kreator
+- add Ales Tokic's bug report
+- add FORCENICK
+- add SVSNICK
+- update config.h defaults to Hybrid7 [yay, at last!]
+
 *** 20050707_3 by kreator
 - update m_forcenick.c and m_svsnick.c to be used with recent Hybrid7
 

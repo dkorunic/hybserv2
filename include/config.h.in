@@ -415,8 +415,13 @@
  * recent Hybrid7 server, with module contrib/m_forcenick.c compiled and
  * installed. I generally find FORCENICK rather useful, instead of mass
  * killing -kre
+ *
+ * Additionally, there is FORCENICK_LEN which can be used to specify how
+ * many characters you want to fill in as random numbers. When undefined,
+ * it pads as much numbers as in can get to fill the nickname length -kre
  */
 #undef FORCENICK
+#define FORCENICK_LEN 4
 #undef SVSNICK
 
 /*

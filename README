@@ -7,6 +7,8 @@ implies this new version will be even better then that last. If
 their is something you would like to see added to Hybserv2 please
 let us know as we are always looking for new ideas.
 
+#########################################################
+
 IMPORTANT NOTE:
 Per Sidewnder's (Cosine's) request - Hybserv will no longer be
 supported. So if you have some questions or problems, please
@@ -16,16 +18,14 @@ Hybserv was first coded by Patrick Alken (wnder@underworld.net)
 and is now maintained by the Hybserv2 Coding Team, unless
 otherwise mentioned in the code or the credits.
 
+#########################################################
 
 HYBSERV STAFF:
-
 Lead developer of Hybserv2
-
 kreator     Dinko Korunic        kreator@srce.hr
 
 The following people have contributed to this release of Hybserv2
 (in nick alphabetical order):
-
 adx         Piotr Nizynski       adx@crashnet.pl
 args        Antoniu-George Savu  antoniu-george.savu@fr.tiscali.com
 asuffield   Andrew Suffield      asuffield@users.sourceforge.net
@@ -59,8 +59,9 @@ License (see COPYING).  Should you choose to use and/or modify any of
 code, please do so under the terms of the GNU General Public License,
 published by the Free Software Foundation.
 
-DISTRIBUTION
+#########################################################
 
+DISTRIBUTION:
   You can get Hybserv from:
 
   #1:  Anonymous CVS:
@@ -80,100 +81,12 @@ DISTRIBUTION
 NOTE: CVS is usually more current than the release.
 
 
-INSTALLATION
+INSTALLATION:
+Please read the INSTALL file. NOW.
 
-  Read the INSTALL file :-).
-
-#########################################################################
-# BUGS -  PLEASE PLEASE PLEASE mail any bugs you find to                #
-#                                                                       #
-#          kreator@srce.hr                                              #
-#                                                                       #
-#########################################################################
+#########################################################
  
-We can't fix bugs if no one reports them!
-
-The criteria for reporting bugs is somewhat specific. 
-
-1. We need to know exactly how to reproduce the bugs. Use
-   #define DEBUG in include/config.h to make sure server
-   will produce corefile.
-
-2. If you do not know how to reproduce the bug at will, please
-   do the following: #define EXTREMEDEBUG in config.h, which will
-   cause the file "hybserv.hubinfo" to be created. If the bug
-   occurs again, email to kreator@srce.hr the hybserv.hubinfo
-   file, and it will give us a starting point.
-
-
-################################################################
-# If you are interested in helping out with the development of #
-# Hybserv feel free to join the Hybserv Development List       #
-################################################################
-
-Below are the official Hybserv2 mailing lists:
-
-These are publicly postable lists.
-
-Here we can discuss anything we need and make sure problems get fixed.
-Please feel free to give out this address, and you may subscribe by
-sending email to:
-
-hybserv-request@hybserv.net
-
-(Please use a command from below in the body of the message and
- not in the subject)
-
-Available Lists 
-
-  hybserv         General Hybserv2 talk, issues, bugs, etc.
-
-
-Available List Manager (Ecartis) Commands:
-------------------------------------------
-
-subscribe
-        Syntax: subscribe [<list>] [<user>]
-        Subscribe to a list                                                   
-
-unsubscribe
-        Syntax: unsubscribe [<list>] [<user>]
-        Unsubscribe from a list      
-
-which
-        Syntax: which
-        Display lists to which you are subscribed
-        
-who
-        Syntax: who [<list>]
-        Display membership for a list
-
-info
-        Syntax: info [<list>]
-        Retrieves the info for a list.
-
-lists
-        Syntax: lists
-        Send list of mailing lists available on this site.
-
-help
-        Syntax: help
-        Send user the helpfile
-
-commands
-        Syntax: commands
-        Send list of available commands, providing a 'cheat sheet' for
-        users.  This takes into account any local plugins. 
-
-end
-        Syntax: end
-        Ends processing of list server commands       
-
-
-#########################################################
-# Running Hybserv                                       #
-#########################################################
-
+RUNNING HYBSERV:
 Make sure that each hub server you have specified in your config
 file has C/N lines for Hybserv matching the password in the first
 field of the S: line and the server name specified in the N:
@@ -272,18 +185,99 @@ these lines:
     nick = "OperServ";
   };
 
-##########################################################################
-# Legal Stuff:                                                           #
-##########################################################################
 
+#########################################################################
+# BUGS -  PLEASE mail any bugs you find to                              #
+#          kreator@srce.hr                                              #
+#########################################################################
+ 
+We can't fix bugs if no one reports them!
+
+The criteria for reporting bugs is somewhat specific. 
+
+1. We need to know exactly how to reproduce the bugs. Use
+   #define DEBUG in include/config.h to make sure server
+   will produce corefile.
+
+2. If you do not know how to reproduce the bug at will, please
+   do the following: #define EXTREMEDEBUG in config.h, which will
+   cause the file "hybserv.hubinfo" to be created. If the bug
+   occurs again, email to kreator@srce.hr the hybserv.hubinfo
+   file, and it will give us a starting point.
+
+
+################################################################
+# If you are interested in helping out with the development of #
+# Hybserv feel free to join the Hybserv Development List       #
+################################################################
+
+Below are the official Hybserv2 mailing lists:
+
+These are publicly postable lists.
+
+Here we can discuss anything we need and make sure problems get fixed.
+Please feel free to give out this address, and you may subscribe by
+sending email to:
+
+hybserv-request@hybserv.net
+
+(Please use a command from below in the body of the message and
+ not in the subject)
+
+Available Lists 
+
+  hybserv         General Hybserv2 talk, issues, bugs, etc.
+
+Available List Manager (Ecartis) Commands:
+------------------------------------------
+
+subscribe
+        Syntax: subscribe [<list>] [<user>]
+        Subscribe to a list                                                   
+
+unsubscribe
+        Syntax: unsubscribe [<list>] [<user>]
+        Unsubscribe from a list      
+
+which
+        Syntax: which
+        Display lists to which you are subscribed
+        
+who
+        Syntax: who [<list>]
+        Display membership for a list
+
+info
+        Syntax: info [<list>]
+        Retrieves the info for a list.
+
+lists
+        Syntax: lists
+        Send list of mailing lists available on this site.
+
+help
+        Syntax: help
+        Send user the helpfile
+
+commands
+        Syntax: commands
+        Send list of available commands, providing a 'cheat sheet' for
+        users.  This takes into account any local plugins. 
+
+end
+        Syntax: end
+        Ends processing of list server commands       
+
+################################################################
+
+LEGAL STUFF:
 This package has absolutely no warranty.  Use at your own risk.
 The author will accept no responsibility for any damage,
 whatsoever, caused by this program.
 
-##########################################################################
-# Credits:                                                               #
-##########################################################################
+################################################################
 
+CREDITS:
 Functions used from other GPL'd sources:
      match()        -- from ircd-hybrid source
      HashNick()     -- from ircd-hybrid source
@@ -300,4 +294,3 @@ The ideas for a settings.conf and the shownicks/showchans
 programs were inspired from this package as well. 
 
 See also the beginning of this file.
-

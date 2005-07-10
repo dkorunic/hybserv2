@@ -1419,7 +1419,11 @@ collide(char *nick)
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #elif defined FORCENICK
+#ifdef FORCENICK_LEN
+  snprintf(newnick, 5 + FORCENICK_LEN, "User%ld", nicknum);
+#else
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
+#endif /* FORCENICK_LEN */
   toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #else
   /*

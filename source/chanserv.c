@@ -2204,15 +2204,14 @@ CheckEmptyChans()
 
   if (Me.csptr)
     {
-      for (tempc = Me.csptr->firstchan; tempc; )
+      for (tempc = Me.csptr->firstchan; tempc != NULL; )
         {
-          if (tempc->chptr->numusers == 1)
+          if ((tempc->chptr->numusers == 1) ||
+              !cs_ShouldBeOnChan(FindChan(tempc->chptr->name)))
             {
               /* ChanServ is the only client on the channel, part */
-              SendUmode(OPERUMODE_Y,
-                        "%s: Parting empty channel [%s]",
-                        n_ChanServ,
-                        tempc->chptr->name);
+              SendUmode(OPERUMODE_Y, "%s: Parting channel [%s]",
+                n_ChanServ, tempc->chptr->name);
 
               temp = tempc->next;
               cs_part(tempc->chptr);

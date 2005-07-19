@@ -2015,13 +2015,6 @@ n_register(struct Luser *lptr, int ac, char **av)
   if (NSSetHideQuit)
     nptr->flags |= NS_HIDEQUIT;
 
-#if 0
-  /* Don't do this. Period. If it's meant to be NOEXPIRE, an admin can
-   * NOEXPIRE it */
-  if (IsOperator(lptr))
-    nptr->flags |= NS_NOEXPIRE;
-#endif
-
   mask = HostToMask(lptr->username, lptr->hostname);
 
   AddHostToNick(mask, nptr);
@@ -3951,26 +3944,32 @@ static void n_set_phone(struct Luser *lptr, int ac, char **av)
  * modified. -kre */
 void n_clearnoexp(struct Luser *lptr, int ac, char **av)
 {
-  int ii;
+  int ii, mcnt = 0;
   struct NickInfo *nptr;
 
   if (ac < 2)
     {
-      notice(n_NickServ, lptr->nick, "Syntax: CLEARNOEXP");
-      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
-             "CLEARNOEXP");
+      notice(n_NickServ, lptr->nick,
+          "Syntax: \002CLEARNOEXP <pattern>\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO,
+          n_NickServ, "CLEARNOEXP");
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s CLEARNOEXP",
-                n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+  RecordCommand("%s: %s!%s@%s CLEARNOEXP %s",
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
 
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
     for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
-      nptr->flags &= ~NS_NOEXPIRE;
+    {
+      if (match(av[1], nptr->nick))
+      {
+        ++mcnt;
+        nptr->flags &= ~NS_NOEXPIRE;
+      }
+    }
 
-  notice(n_NickServ, lptr->nick,
-         "All noexpire flags for nicks have been cleared.");
+  notice(n_NickServ, lptr->nick, "Cleared %d noexpire flags.", mcnt);
 
 } /* n_clearnoexp() */
 

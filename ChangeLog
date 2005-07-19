@@ -1,3 +1,9 @@
+*** 20050719_3 by kreator
+- updates for NickServ's list command:
+  - implement various options
+  - remove display limits
+  - update documentation
+
 *** 20050719_2 by kreator
 - remove unseen doc
 

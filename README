@@ -64,13 +64,10 @@ published by the Free Software Foundation.
 DISTRIBUTION:
   You can get Hybserv from:
 
-  #1:  Anonymous CVS:
-       :pserver:cvs@hybserv.net:/home/cvs
-       cvs login
-       <press enter, no password>
-       cvs checkout hybserv
+  #1:  Anonymous SVN (HEAD):
+       svn co svn://hybserv.net/trunk hybserv
 
-  #2:  CVS Web:
+  #2:  SVN Web access:
        http://hybserv.net/
 
   #3:  Mirrors:
@@ -78,7 +75,7 @@ DISTRIBUTION:
        http://hybserv.icsbg.net/
        /* OUTDATED */ http://www.2mbit.com/hybserv2/
 
-NOTE: CVS is usually more current than the release.
+NOTE: SVN is usually more current than the release.
 
 
 INSTALLATION:

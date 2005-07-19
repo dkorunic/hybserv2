@@ -116,18 +116,6 @@ Features yet to come:
 -----
 From Ales Tokic:
 
-1) Jedan manji bug:
-Wed Apr 20 21:02:43 2005 SeenServ: TheOne!alpha@platon.pseudo.org SEENSTAT
-Wed Apr 20 21:02:58 2005 SeenServ: TheOne!alpha@platon.pseudo.org UNSEEN [*]
-Wed Apr 20 21:03:00 2005 SeenServ: TheOne!alpha@platon.pseudo.org SEENSTAT
-Wed Apr 20 21:03:05 2005 NickServ: JoeKuboj!~kuboj@kobajagrande.com IDENTIFY
-Wed Apr 20 21:06:14 2005 HybServ2 TS services version 1.9.0-rc3_20050209_1 started
- 
-SEENSTAT je pokazao 15000 seen-ova (max), koje sam UNSEEN-ovao. To je sve ok.
-Medjutim, nakon "NickServ: JoeKuboj!~kuboj@kobajagrande.com IDENTIFY" komande
-servisi su se jednostavno crashovali (ugasili). Pretpostavljam da se radi o >mem free-up< bugu.
-Na zalost nemam debug enablovan tako da ne mogu pokazati nista vise iz logova.
- 
 2) Druga stvar sto se tice servisa je izlistavanje nickova/kanala.
 -NickServ- -- End of list (255/255 matches shown) --
 Servisi prikazu max 255 nickova/kanala. Ukoliko je registrovano vise od tog broja, mislim da ne

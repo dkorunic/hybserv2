@@ -50,7 +50,6 @@ aSeen *seenp = NULL, *seenb = NULL;
 static void es_seen(struct Luser *, int, char **);
 static void es_seennick(struct Luser *, int, char **);
 static void es_help(struct Luser *, int, char **);
-static void es_unseen(struct Luser *, int, char **);
 static void es_seenstat(struct Luser *, int, char **);
 static void FreeSeen();
 
@@ -59,7 +58,6 @@ static struct Command seencmds[] =
       { "SEEN", es_seen, LVL_NONE },
       { "SEENNICK", es_seennick, LVL_NONE },
       { "HELP", es_help, LVL_NONE },
-      { "UNSEEN", es_unseen, LVL_ADMIN },
       { "SEENSTAT", es_seenstat, LVL_ADMIN },
       { 0, 0, 0 }
     };
@@ -517,62 +515,6 @@ static void es_help(struct Luser *lptr, int ac, char **av)
   else
     GiveHelp(n_SeenServ, lptr->nick, NULL, NODCC);
 } /* es_help() */
-
-/*
- * es_unseen()
- *
- * Removes all wild matches of av[1] from seen list 
- */
-static void es_unseen(struct Luser *lptr, int ac, char **av)
-{
-  aSeen *saved, *seen = seenp;
-  char nuhost[NICKLEN + USERLEN + HOSTLEN + 3];
-
-  if (ac < 2)
-    {
-      notice(n_SeenServ, lptr->nick,
-             "Syntax: UNSEEN <mask>");
-      notice(n_SeenServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_SeenServ,
-             "UNSEEN");
-      return ;
-    }
-
-  RecordCommand("%s: %s!%s@%s UNSEEN [%s]",
-                n_SeenServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1]);
-
-  while (seen)
-    {
-      saved = seen->prev;
-      memset(nuhost, 0, sizeof(nuhost));
-      strncpy(nuhost, seen->nick, NICKLEN);
-      strcat(nuhost, "!");
-      strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
-      if (match(av[1], nuhost))
-        {
-          if (seen->prev)
-            seen->prev->next = seen->next;
-          if (seen->next)
-            seen->next->prev = seen->prev;
-          if (seenp == seen)
-            seenp = seen->prev;
-          if (seenb == seen)
-            seenb = seen->next;
-          MyFree(seen->userhost);
-          MyFree(seen->msg);
-          MyFree(seen);
-        }
-      seen = saved;
-    }
-
-  notice(n_SeenServ, lptr->nick, "Done.");
-
-} /* es_unseen() */
 
 /*
  * es_seenstat()

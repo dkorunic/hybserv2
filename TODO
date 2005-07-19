@@ -116,17 +116,6 @@ Features yet to come:
 -----
 From Ales Tokic:
 
-2) Druga stvar sto se tice servisa je izlistavanje nickova/kanala.
--NickServ- -- End of list (255/255 matches shown) --
-Servisi prikazu max 255 nickova/kanala. Ukoliko je registrovano vise od tog broja, mislim da ne
-postoji nacin da se izlistaju preko komande (izuzev gledanja u baze rucno).
-Moj predlog je da to koliko ce nickova/kanala izlistati bude konfigurativna opcija u settings.conf
-ili pak da admini po defaultu mogu izlistati sve nicks/chans iz baza.
- 
-3) Dok sam kod nickova, jos jedan koristan predlog bi bio da je moguce izlistati nickove prema
-podesavanjima: npr. sve forbiddovane nickove, sve private nickove, sve sa KILL ON itd.
-To bi dosta olaksalo trazenje nickova (cesto mi trebaju svi forbiddovani nickovi koje treba unforbiddovati...).
- 
 4) I najzad, u vezi nickserva, ponekad se desi da flagovan user moze dobiti op iako ima flag -nochanops.
 Zadnji primer kad sam to video je da je uradio /msg chanserv op all i bio opovan...
 hybserv.log.20050705:Mon Jul  4 22:16:03 2005 ChanServ: kUdtiHaEX!~metal4eve@i.see.fragged.people ACCESS [#es] ADD metatron 48

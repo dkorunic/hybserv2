@@ -141,8 +141,8 @@ static struct Command nickcmds[] =
       { "GHOST", n_ghost, LVL_NONE },
       { "ACCESS", n_access, LVL_IDENT },
       { "SET", n_set, LVL_IDENT },
-      { "LIST", n_list, LVL_NONE },
-      { "INFO", n_info, LVL_NONE },
+      { "LIST", n_list, LVL_IDENT },
+      { "INFO", n_info, LVL_IDENT },
 
 #ifdef LINKED_NICKNAMES
       { "LINK", n_link, LVL_IDENT },
@@ -4074,9 +4074,10 @@ n_list(struct Luser *lptr, int ac, char **av)
 {
   struct NickInfo *temp;
   int IsAnAdmin;
-  int ii,
-  mcnt, /* total matches found */
-  acnt; /* total matches - private nicks */
+  int ii, cnt,
+    match_flags = 0, /* flags to match */
+    mcnt, /* total matches found */
+    acnt; /* total matches - private nicks */
 
   if (ac < 2)
     {
@@ -4088,16 +4089,26 @@ n_list(struct Luser *lptr, int ac, char **av)
     }
 
   RecordCommand("%s: %s!%s@%s LIST %s",
-                n_NickServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1]);
+    n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
 
   if (IsValidAdmin(lptr))
     IsAnAdmin = 1;
   else
     IsAnAdmin = 0;
+
+  for (cnt = 2; cnt < ac; cnt++)
+    {
+      if (!ircncmp(av[cnt], "-forbid", strlen(av[cnt])))
+        match_flags |= NS_FORBID;
+      else if (!ircncmp(av[cnt], "-online", strlen(av[cnt])))
+        match_flags |= NS_IDENTIFIED;
+      else if (!ircncmp(av[cnt], "-private", strlen(av[cnt])))
+        match_flags |= NS_PRIVATE;
+      else if (!ircncmp(av[cnt], "-protect", strlen(av[cnt])))
+        match_flags |= NS_PROTECTED;
+      else if (!ircncmp(av[cnt], "-noexpire", strlen(av[cnt])))
+        match_flags |= NS_NOEXPIRE;
+    }
 
   acnt = mcnt = 0;
   notice(n_NickServ, lptr->nick,
@@ -4107,7 +4118,8 @@ n_list(struct Luser *lptr, int ac, char **av)
     {
       for (temp = nicklist[ii]; temp; temp = temp->next)
         {
-          if (match(av[1], temp->nick) && mcnt < 255 )
+          if (match(av[1], temp->nick) &&
+              (match_flags && (temp->flags & match_flags)))
             {
               ++mcnt;
 
@@ -4122,14 +4134,16 @@ n_list(struct Luser *lptr, int ac, char **av)
                     strcpy(str, "<< ONLINE >>");
                   else if (temp->flags & NS_PRIVATE)
                     strcpy(str, "<< PRIVATE >>");
+                  else if (temp->flags & NS_PROTECTED)
+                    strcpy(str, "<< PROTECTED >>");
+                  else if (temp->flags & NS_NOEXPIRE)
+                    strcpy(str, "<< NOEXPIRE >>");
                   else
                     str[0] = '\0';
 
                   notice(n_NickServ, lptr->nick,
                          "%-10s %15s created %s ago",
-                         temp->nick,
-                         str,
-                         timeago(temp->created, 1));
+                         temp->nick, str, timeago(temp->created, 1));
                 }
             } /* if (match(av[1], temp->nick)) */
         } /* for (temp = nicklist[ii]; temp; temp = temp->next) */

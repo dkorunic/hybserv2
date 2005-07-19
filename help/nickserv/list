@@ -1,8 +1,17 @@
-Syntax: %bLIST <pattern>%b
+Syntax: %bLIST <pattern> [options]%b
 
 Lists all registered nicknames that match %b<pattern>%b.
 Nicknames that have %bSET PRIVATE%b ON, will not be
-displayed.
+displayed. Valid options are:
+
+  %b-forbid%b    - List all forbidden nicknames
+  %b-online%b    - List all identified nicknames
+  %b-private%b   - List all private nicknames
+  %b-protect%b   - List all protected nicknames
+  %b-noexpire%b  - List all noexpire nicknames
+
 
 Example: %bLIST *nick*%b
            Lists all nicknames that contain %bnick%b
+         %bLIST *nick* -forbid -noexpire%b
+           Lists all nicknames which are forbidden and noexpire

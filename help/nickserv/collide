@@ -2,7 +2,7 @@ Syntax: %bCOLLIDE <pattern> [options]%b
 
 Performs various operations on the specified pattern,
 depending on which options are specified. If no
-options are given, defaults to -set.  Valid options
+options are given, defaults to -set. Valid options
 are as follows:
 
   %b-list%b   - List all matches marked for collision

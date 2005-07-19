@@ -4113,13 +4113,16 @@ n_list(struct Luser *lptr, int ac, char **av)
   notice(n_NickServ, lptr->nick,
          "-- Listing nicknames matching [\002%s\002] --",
          av[1]);
+
   for (ii = 0; ii < NICKLIST_MAX; ++ii)
     {
       for (temp = nicklist[ii]; temp; temp = temp->next)
         {
-          if (match(av[1], temp->nick) &&
-              (match_flags && (temp->flags & match_flags)))
+          if (match(av[1], temp->nick))
             {
+              if (match_flags && !(temp->flags & match_flags))
+                continue;
+
               ++mcnt;
 
               if ((IsAnAdmin) || !(temp->flags & NS_PRIVATE))

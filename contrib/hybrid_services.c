@@ -170,7 +170,7 @@ _moddeinit(void)
   mod_del_cmd(&ms_msgtab);
 }
 
-char *_version = "$Revision$";
+char *_version = "$Revision: 1051 $";
 #endif
 
 /*

@@ -66,15 +66,6 @@ if test "x$enable_dmalloc" = "xyes"; then
   AC_CHECK_LIB(dmalloc, malloc)
 fi
 
-dnl Use sed to grab the version from Makefile.in
-VERSION_MAJOR=`sed -n -e 's/VERSION_MAJOR = *\(.*\)$/\1/p' Makefile.in`
-
-dnl And awk to process CVS serial no.
-VERSION=$VERSION_MAJOR"_"`awk '{print $3}' include/serno.h| tr -d '"'`
-
-dnl And subst-it.
-AC_SUBST(VERSION)
-
 AC_OUTPUT(              \
 Makefile                \
 source/Makefile         \

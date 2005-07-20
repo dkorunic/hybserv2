@@ -1710,12 +1710,6 @@ fi
 
 fi
 
-VERSION_MAJOR=`sed -n -e 's/VERSION_MAJOR = *\(.*\)$/\1/p' Makefile.in`
-
-VERSION=$VERSION_MAJOR"_"`awk '{print $3}' include/serno.h| tr -d '"'`
-
-
-
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -1873,7 +1867,6 @@ s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@WHOAMI@%$WHOAMI%g
 s%@CPP@%$CPP%g
-s%@VERSION@%$VERSION%g
 
 CEOF
 EOF

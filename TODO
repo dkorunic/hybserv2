@@ -7,6 +7,33 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 
 Pending bugs:
 -------------
+*) bunch of *old* stuff I've found around:
+  - make it harder to accidentally drop the wrong nick (DONE)
+    - /ns drop <password> should be required anytime, even if identified
+  - changing case in nick (DONE)
+  - don't allow GHOST/RECOVER on self (DONE)
+  - allow GHOST/RECOVER/RELEASE on linked nick without password?
+  - use dancer's casemapping instead of the standard rfc1459 one (DONE)
+  - /ns register nickname password registers the nickname with itself as
+    password, fix this (DONE)
+  - restrict /seenserv seen with wildcards (DONE)
+  - sethost bugs (most fixed)
+  - removing cloak is impossible in general, remove? (slightly improved but
+    cannot be perfectly done)
+  - take IP bans into account (DONE)
+  - don't add duplicate bans (DONE)
+  - keep track of +q too (CAPAB QU), mainly for /cs clear bans
+  - deny /cs unban if user has a +e (DONE)
+  - don't autorem if user has a +e (DONE)
+  - generally change or remove autorem
+  - deny /cs invite if the invite would not be stored (chan is not +i)
+    (notice removed, that will help quite a bit)
+  - add /cs getkey (returns channel key), for same accesslvl as /cs invite (DONE)
+  - operserv admins don't seem to get autovoice/autoop when the level is set to
+    0, while regular users would (DONE)
+  - disallow /cs op and /cs voice on other users?
+  - /cs info on private channel should require 1, not CMDINVITE (DONE)
+  - ChanInfo.alternate can be dropped and reregistered, allowing takeovers
 *) several from Ales - check at the end of file.
 *) get rid of bashisms in cleandb
 *) From Jared:

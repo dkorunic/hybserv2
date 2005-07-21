@@ -1,0 +1,25 @@
+Hybserv: Thu, 21 Jul 2005 20:06:04 +0200
+
+	* since I've migrated to Subversion, we've lost automatic ChangeLog, so
+		I'll be manually writing the changes every now and then
+	* fix ghost to use instant collide, instead of KILL
+	* don't allow ghosting self
+	* don't allow op all if NOCHANOPS
+	* fix clearnoexp, add pattern matching
+	* updates for NickServ's list command:
+		* implement matching flags
+		* remove display limits
+		* update documentation
+	* rip off unseen - it was buggy and ugly anyway, and I'm not fond of
+		repairing the broken code
+	* regularly part channels which ChanServ shouldn't be on
+	* code FORCENICK_LEN
+	* when manually adding nicknames to collision list, notify them with
+		proper messaging
+	* add FORCENICK
+	* add SVSNICK
+	* update config.h defaults to Hybrid7 [yay, at last!]
+
+ -- Dinko Korunic <dinko.korunic@gmail.com>
+
+# vim: ft=changelog

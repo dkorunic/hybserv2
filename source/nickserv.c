@@ -1936,18 +1936,16 @@ n_register(struct Luser *lptr, int ac, char **av)
   if (ac < 2)
     {
       notice(n_NickServ, lptr->nick, "Syntax: \002REGISTER\002 <password>");
-      notice(n_NickServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_NickServ,
-             "REGISTER");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+          "REGISTER");
       return;
     }
 
   if ((nptr = FindNick(lptr->nick)))
     {
       notice(n_NickServ, lptr->nick,
-             "The nickname [\002%s\002] is already registered",
-             nptr->nick);
+        "The nickname [\002%s\002] is already registered",
+        nptr->nick);
       return;
     }
 
@@ -1957,8 +1955,8 @@ n_register(struct Luser *lptr, int ac, char **av)
       (currtime < (lptr->nickreg_ts + NickRegDelay)))
     {
       notice(n_NickServ, lptr->nick,
-             "Please wait %ld seconds before using REGISTER again",
-             NickRegDelay);
+        "Please wait %ld seconds before using REGISTER again",
+        NickRegDelay);
       return;
     }
 
@@ -1967,13 +1965,9 @@ n_register(struct Luser *lptr, int ac, char **av)
 
   if (!ChangePass(nptr, av[1]))
     {
-      notice(n_NickServ, lptr->nick,
-             "Register failed");
-      putlog(LOG1, "%s: failed to register %s!%s@%s",
-             n_NickServ,
-             lptr->nick,
-             lptr->username,
-             lptr->hostname);
+      notice(n_NickServ, lptr->nick, "Register failed");
+      putlog(LOG1, "%s: failed to register %s!%s@%s", n_NickServ,
+          lptr->nick, lptr->username, lptr->hostname);
       MyFree(nptr->nick);
       MyFree(nptr);
       return;
@@ -2056,9 +2050,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
 
   if (!(ni = FindNick(lptr->nick)))
     {
-      notice(n_NickServ, lptr->nick,
-             ERR_NOT_REGGED,
-             lptr->nick);
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
       return;
     }
 
@@ -2073,10 +2065,8 @@ n_drop(struct Luser *lptr, int ac, char **av)
       if (ac < 2)
         {
           notice(n_NickServ, lptr->nick, "Syntax: \002DROP\002 [password]");
-          notice(n_NickServ, lptr->nick,
-                 ERR_MORE_INFO,
-                 n_NickServ,
-                 "DROP");
+          notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+              "DROP");
           return;
         }
       else
@@ -2084,11 +2074,8 @@ n_drop(struct Luser *lptr, int ac, char **av)
           if (!pwmatch(ni->password, av[1]))
             {
               notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
-              RecordCommand("%s: %s!%s@%s failed DROP",
-                            n_NickServ,
-                            lptr->nick,
-                            lptr->username,
-                            lptr->hostname);
+              RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ,
+                  lptr->nick, lptr->username, lptr->hostname);
               return;
             }
         }
@@ -2107,45 +2094,32 @@ n_drop(struct Luser *lptr, int ac, char **av)
           notice(n_NickServ, lptr->nick,
                  ERR_BAD_PASS);
           RecordCommand("%s: (Unregistered) Administrator %s!%s@%s failed DROP [%s]",
-                        n_NickServ,
-                        lptr->nick,
-                        lptr->username,
-                        lptr->hostname,
-                        av[1]);
+            n_NickServ, lptr->nick, lptr->username,
+            lptr->hostname, av[1]);
           return;
         }
 
       if (!(ni = FindNick(av[1])))
         {
-          notice(n_NickServ, lptr->nick,
-                 ERR_NOT_REGGED,
-                 av[1]);
+          notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
           return;
         }
 
       dnick = av[1];
 
-      RecordCommand("%s: Administrator %s!%s@%s DROP [%s]",
-                    n_NickServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    dnick);
+      RecordCommand("%s: Administrator %s!%s@%s DROP [%s]", n_NickServ,
+          lptr->nick, lptr->username, lptr->hostname, dnick);
 
-      o_Wallops("DROP from %s!%s@%s for nick [%s]",
-                lptr->nick, lptr->username, lptr->hostname,
-                av[1] );
+      o_Wallops("DROP from %s!%s@%s for nick [%s]", lptr->nick,
+          lptr->username, lptr->hostname, av[1] );
 #endif
 
     }
   else
     {
       /* just a regular user dropping their nick */
-      RecordCommand("%s: %s!%s@%s DROP",
-                    n_NickServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname);
+      RecordCommand("%s: %s!%s@%s DROP", n_NickServ, lptr->nick,
+          lptr->username, lptr->hostname);
     }
 
   /* remove the nick from the nicklist table */
@@ -2522,20 +2496,21 @@ n_ghost(struct Luser *lptr, int ac, char **av)
     {
       notice(n_NickServ, lptr->nick,
              "Syntax: \002GHOST <nickname> [password]\002");
-      notice(n_NickServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_NickServ,
-             "GHOST");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "GHOST");
       return;
     }
 
   if (!(ni = FindNick(av[1])))
     {
-      notice(n_NickServ, lptr->nick,
-             ERR_NOT_REGGED,
-             av[1]);
+      notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
       return;
     }
+
+  /* Don't allow ghosting self */
+  if (!irccmp(lptr->nick, ni->nick))
+  {
+    return;
+  }
 
   /*
    * Check if lptr's userhost is on ni's access list - if so check
@@ -2576,33 +2551,20 @@ n_ghost(struct Luser *lptr, int ac, char **av)
           return;
         }
 
-      toserv(":%s KILL %s :%s!%s (Ghost: %s!%s@%s)\r\n",
-             n_NickServ, av[1], Me.name, n_NickServ, lptr->nick,
-             lptr->username, lptr->hostname);
-
+      collide(gptr->nick);
       DeleteClient(gptr);
 
-      notice(n_NickServ, lptr->nick,
-             "[\002%s\002] has been killed",
-             av[1]);
+      notice(n_NickServ, lptr->nick, "[\002%s\002] has been killed",
+          av[1]);
 
-      RecordCommand("%s: %s!%s@%s GHOST [%s]",
-                    n_NickServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    av[1]);
+      RecordCommand("%s: %s!%s@%s GHOST [%s]", n_NickServ, lptr->nick,
+          lptr->username, lptr->hostname, av[1]);
     }
   else
     {
-      notice(n_NickServ, lptr->nick,
-             ERR_BAD_PASS);
-      RecordCommand("%s: %s!%s@%s failed GHOST [%s]",
-                    n_NickServ,
-                    lptr->nick,
-                    lptr->username,
-                    lptr->hostname,
-                    av[1]);
+      notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+      RecordCommand("%s: %s!%s@%s failed GHOST [%s]", n_NickServ,
+          lptr->nick, lptr->username, lptr->hostname, av[1]);
     }
 } /* n_ghost() */
 

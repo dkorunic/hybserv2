@@ -8,21 +8,9 @@ Paranoid schizophrenics outnumber their enemies at least two to one.
 Pending bugs:
 -------------
 *) bunch of *old* stuff I've found around:
-  - make it harder to accidentally drop the wrong nick (DONE)
-    - /ns drop <password> should be required anytime, even if identified
-  - changing case in nick (DONE)
-  - don't allow GHOST/RECOVER on self (DONE)
   - allow GHOST/RECOVER/RELEASE on linked nick without password?
-  - use dancer's casemapping instead of the standard rfc1459 one (DONE)
-  - /ns register nickname password registers the nickname with itself as
-    password, fix this (DONE)
-  - restrict /seenserv seen with wildcards (DONE)
-  - sethost bugs (most fixed)
-  - removing cloak is impossible in general, remove? (slightly improved but
-    cannot be perfectly done)
   - take IP bans into account (DONE)
   - don't add duplicate bans (DONE)
-  - keep track of +q too (CAPAB QU), mainly for /cs clear bans
   - deny /cs unban if user has a +e (DONE)
   - don't autorem if user has a +e (DONE)
   - generally change or remove autorem
@@ -31,9 +19,7 @@ Pending bugs:
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite (DONE)
   - operserv admins don't seem to get autovoice/autoop when the level is set to
     0, while regular users would (DONE)
-  - disallow /cs op and /cs voice on other users?
   - /cs info on private channel should require 1, not CMDINVITE (DONE)
-  - ChanInfo.alternate can be dropped and reregistered, allowing takeovers
 *) several from Ales - check at the end of file.
 *) get rid of bashisms in cleandb
 *) From Jared:
@@ -82,7 +68,6 @@ Pending bugs:
 
 Features yet to come:
 ---------------------
-*) global change: notice -> privmsg via /msg operserv set
 *) (13:37:00) padde: Any chance there could be coded an option, that would
    allow to specify a range of ports to be used to DCC services?
    (13:37:00) padde: would be usefull if the services is behind firewall
@@ -108,13 +93,10 @@ Features yet to come:
   <adx> etc...
   3)
   put operserv glines in oper.db
-*) force nick change - via plain old hacks
 *) rewrite documentation
-   ----> work in progress (Hwy)
 *) add SVSNICK, SWHOIS, etc. for other IRCDs
 *) modularisation (_very_ unlikely to happen)
 *) completely document API
-   ----> work in progress (Janos)
 *) localisation
 *) misc stuff:
    private notes on channel and user records, available only to staff
@@ -132,33 +114,13 @@ Features yet to come:
     deop flood, nick flood -> however, for some features it is obvious
     that chanserv/operserv will have to reside on channels, which I
     dislike (-kre)
-   ----> work in progress (KrisDuv)
-   ----> work in progress (ike)
 *) implement modes flood trigger (and below)
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
-   ----> work in progress (me)
 *) umode +g ACCEPT list (BR's idea)
 
 -----
 From Ales Tokic:
-
-4) I najzad, u vezi nickserva, ponekad se desi da flagovan user moze dobiti op iako ima flag -nochanops.
-Zadnji primer kad sam to video je da je uradio /msg chanserv op all i bio opovan...
-hybserv.log.20050705:Mon Jul  4 22:16:03 2005 ChanServ: kUdtiHaEX!~metal4eve@i.see.fragged.people ACCESS [#es] ADD metatron 48
-hybserv.log.20050705:Mon Jul  4 22:16:46 2005 NickServ: TheOne!alpha@0:0:0:0:0:0:0:1 FLAG [metatron] -nochanops -noregister
-hybserv.log.20050706:Tue Jul  5 02:29:56 2005 NickServ: metatron!blabla@smin-ppp-6238.yubc.net IDENTIFY
-hybserv.log.20050706:Tue Jul  5 22:04:56 2005 NickServ: metatron!~metal4eve@i.see.fragged.people IDENTIFY
-hybserv.log.20050706:Tue Jul  5 22:05:12 2005 ChanServ: metatron!~metal4eve@i.see.fragged.people OP ALL
-->ovde je dobio op...
-hybserv.log.20050706:Tue Jul  5 22:32:46 2005 NickServ: TheOne!alpha@bofh.balcan.net FLAG [metatron]
-->potvrdjeno imao -nochanops flag.
-Nickovi "metatron" i "kUdtiHaEX" nisu linkovani, i jedan i drugi imaju iste flagove (-nochanops -noregister)
-i radi se o istoj osobi koja je samo promenila nick.
- 
-5) U vezi IGNORE naredbe... IGNORE maska moze biti samo user@host kao kod GLINE-a. Mislim da bi bilo
-dobro da je ukljucen i nick, znaci nick!user@host, ako nista drugo, bar daje dodatne mogucnosti.
-U par navrata, kada -nochanops flag nije bio u potpunosti pouzdan mogao sam staviti samo nick!*@* na ignore listu.
  
 6) SECURE naredba sada prakticno nista ne radi osim sto OperServ/servisi setuju +ntp na kanalu o poskida +ikl.
 Niti poskida opove svima koji nemaju +f flag na servisima, niti ukloni ban(ove) adminu, niti opuje +f korisnike.

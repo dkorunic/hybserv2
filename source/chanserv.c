@@ -6412,11 +6412,12 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     cptr = NULL;
   else if (!(cptr = FindChan(av[1])))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_CH_NOT_REGGED,
-             av[1]);
+      notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
       return;
     }
+
+  if (HasFlag(lptr->nick, NS_NOCHANOPS))
+    return;
 
   if (!cptr)
     {

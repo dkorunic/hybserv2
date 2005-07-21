@@ -1907,20 +1907,16 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  o_RecordCommand(sockfd, "SECURE %s", av[1]);
-
-  o_Wallops("SECURE %s", av[1]);
-
   cptr = FindChannel(av[1]);
   if (cptr)
     {
+      o_RecordCommand(sockfd, "SECURE %s", av[1]);
+      o_Wallops("SECURE %s", av[1]);
       TakeOver(cptr);
-      os_notice(lptr, sockfd, "%s has been secured",
-                cptr->name);
+      os_notice(lptr, sockfd, "%s has been secured", cptr->name);
     }
   else
-    os_notice(lptr, sockfd, "No such channel: %s",
-              av[1]);
+    os_notice(lptr, sockfd, "No such channel: %s", av[1]);
 } /* o_secure() */
 
 #ifdef ALLOW_GLINES

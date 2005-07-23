@@ -1911,26 +1911,48 @@ s_sjoin(int ac, char **av)
 
           /* clear all bans */
           while (cptr->firstban)
-            {
-              nextban = cptr->firstban->next;
-              if (cptr->firstban->who)
-                MyFree(cptr->firstban->who);
-              MyFree(cptr->firstban->mask);
-              MyFree(cptr->firstban);
-              cptr->firstban = nextban;
-            }
+          {
+            nextban = cptr->firstban->next;
+            if (cptr->firstban->who)
+              MyFree(cptr->firstban->who);
+            MyFree(cptr->firstban->mask);
+            MyFree(cptr->firstban);
+            cptr->firstban = nextban;
+          }
+
+          /* clear all exceptions */
+          while (cptr->exceptlist)
+          {
+            nextban = cptr->exceptlist->next;
+            if (cptr->exceptlist->who)
+              MyFree(cptr->exceptlist->who);
+            MyFree(cptr->exceptlist->mask);
+            MyFree(cptr->exceptlist);
+            cptr->exceptlist = nextban;
+          }
+
+          /* clear all inviteexceptions */
+          while (cptr->inviteexceptlist)
+          {
+            nextban = cptr->inviteexceptlist->next;
+            if (cptr->inviteexceptlist->who)
+              MyFree(cptr->inviteexceptlist->who);
+            MyFree(cptr->inviteexceptlist->mask);
+            MyFree(cptr->inviteexceptlist);
+            cptr->inviteexceptlist = nextban;
+          }
 
 #ifdef GECOSBANS
           /* clear all gecos bans */
           while (cptr->firstgecosban)
-            {
-              nextgecosban = cptr->firstgecosban->next;
-              if (cptr->firstgecosban->who)
-                MyFree(cptr->firstgecosban->who);
-              MyFree(cptr->firstgecosban->mask);
-              MyFree(cptr->firstgecosban);
-              cptr->firstgecosban = nextgecosban;
-            }
+          {
+            nextgecosban = cptr->firstgecosban->next;
+            if (cptr->firstgecosban->who)
+              MyFree(cptr->firstgecosban->who);
+            MyFree(cptr->firstgecosban->mask);
+            MyFree(cptr->firstgecosban);
+            cptr->firstgecosban = nextgecosban;
+          }
 #endif /* GECOSBANS */
 
           for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)

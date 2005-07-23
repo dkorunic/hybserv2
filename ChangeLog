@@ -1,5 +1,7 @@
 Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
 
+  * fix SJOIN event to remove invite and ban exceptions properly, dump old
+    data as required
   * rip off TakeOver() and rewrite o_secure() - idea is to use as much as
     possible of already written ChanServ code; new code will autoop Admins
     only if AutoOpAdmins is set.. and will do stuff is should have been

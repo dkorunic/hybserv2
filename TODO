@@ -20,7 +20,6 @@ Pending bugs:
   - operserv admins don't seem to get autovoice/autoop when the level is set to
     0, while regular users would (DONE)
   - /cs info on private channel should require 1, not CMDINVITE (DONE)
-*) several from Ales - check at the end of file.
 *) get rid of bashisms in cleandb
 *) From Jared:
   If a channel is set to restricted with guard off, when a user gets
@@ -118,47 +117,3 @@ Features yet to come:
 *) add some features from http://www.appwatch.com/Linux/App/879/data.html
 *) be compatibile with other ircds (!!)
 *) umode +g ACCEPT list (BR's idea)
-
------
-From Ales Tokic:
- 
-6) SECURE naredba sada prakticno nista ne radi osim sto OperServ/servisi setuju +ntp na kanalu o poskida +ikl.
-Niti poskida opove svima koji nemaju +f flag na servisima, niti ukloni ban(ove) adminu, niti opuje +f korisnike.
- 
---- TheOne sets ban on *!*alpha@*.balcan.net
---- TheOne gives channel operator status to alexius
---- TheOne removes channel operator status from TheOne
---- alexius sets mode +i #test
---- alexius sets channel limit to 2
->OperServ< secure #test
--services.balcan.net/Wallops- OPERWALL - OperServ: SECURE #test
---- OperServ sets mode +n #test
---- OperServ sets mode +t #test
---- OperServ sets mode +p #test
---- OperServ sets mode -i #test
---- OperServ removes user limit
--OperServ- #test has been secured
- 
-"TheOne" i "mofo" su identifikovani admini, alexius je regular user. Primer govori za sebe. Ista situacija je
-i ako je admin van kanala. Ranije (u prethodnim hybserv verzijama) je cini mi se jedini problem bio
-neuklanjanje banova adminima.
- 
-7) Zadnja stvar :)
-Count za bans/exempts/invex nije pravilan, tj. nije potpun. Naime, kod netsplitova nakon povratka servera svaki server
-posalje modes (bans, exempts, invex, chan modes...) i servisi takodje sve to prime. Problem se javi kada se
-vise puta desi netsplit jer se tabele u hybservu pune ne proveravajuci duplikate. Primer:
- 
-...
-<OperServ> Ban Exceptions:
-<OperServ>  [ 1] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Wed Jul  6 14:22:57 2005]
-<OperServ>  [ 2] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Wed Jul  6 00:56:57 2005]
-<OperServ>  [ 3] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.teleklik.net] [Tue Jul  5 23:53:07 2005]
-<OperServ>  [ 4] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.teleklik.net] [Tue Jul  5 23:50:52 2005]
-<OperServ>  [ 5] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [irc.exex.org] [Mon Jul  4 20:50:39 2005]
-<OperServ>  [ 6] [*!sasa@the.more.people.smoke.herb.the.more.babylon.fall] [OperServ  ] [Mon Jul  4 03:19:52 2005]
-<OperServ> 1 match found
- 
-Dakle, servisi dupliraju te stvari. Jedna check funkcija bi to resila,
-da se ne dupliraju identicni modovi (bans/exempts/invex) - ovo ne ukljucuje channel modes.
-Kada uradis /msg chanserv clear #chan bans desi se da CS skine ban toliko puta koliko ga ima u tabeli
-(iako se radi o jednom banu vise puta dupliranom).

@@ -193,7 +193,6 @@ struct Botlist *IsBot(char *name);
 
 void AddMyChan(char *channel);
 
-int MatchesAdmin(char *mask);
 int IsProtectedHost(char *username, char *hostname);
 struct Userlist *GetUser(int nickonly, char *nick, char *user, char *host);
 int CheckAccess(struct Userlist *user, char flag);

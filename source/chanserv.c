@@ -63,7 +63,7 @@ static int DelAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *);
 static int AddAkick(struct ChanInfo *, struct Luser *, char *, char *, long);
 static int DelAkick(struct ChanInfo *, char *);
-static int IsFounder(struct Luser *, struct ChanInfo *);
+/* static int IsFounder(struct Luser *, struct ChanInfo *); */
 static int GetAccess(struct ChanInfo *, struct Luser *);
 static struct ChanAccess *OnAccessList(struct ChanInfo *, char *,
                                              struct NickInfo *);
@@ -158,7 +158,7 @@ static void c_clear_gecos_bans(struct Luser *, struct NickInfo *, int, char **);
 #endif /* GECOSBANS */
 static void c_clear_bans(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_users(struct Luser *, struct NickInfo *, int, char **);
-static void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
+/* static void c_clear_all(struct Luser *, struct NickInfo *, int, char **); */
 
 #ifdef EMPOWERADMINS
 static void c_forbid(struct Luser *, struct NickInfo *, int, char **);
@@ -2849,7 +2849,7 @@ IsFounder()
   Determine if lptr->nick has identified as a founder for 'cptr'
 */
 
-static int
+int
 IsFounder(struct Luser *lptr, struct ChanInfo *cptr)
 
 {
@@ -6851,38 +6851,39 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
-             lptr->hostname);
+    ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
+               lptr->hostname);
 
-  if (ac >= 3)
-    if (!irccmp(av[2], "ALL"))
+    if (ac >= 3)
+      if (!irccmp(av[2], "ALL"))
+        {
+          if (!HasAccess(cptr, lptr, CA_SUPEROP))
+            {
+              notice(n_ChanServ, lptr->nick,
+                "SuperOp privileges are required to unban \002ALL\002 on %s",
+                cptr->name);
+              return;
+            }
+          else
+            all = 1;
+        }
+
+    if (!(chptr = FindChannel(cptr->name)))
       {
-        if (!HasAccess(cptr, lptr, CA_SUPEROP))
-          {
-            notice(n_ChanServ, lptr->nick,
-                   "SuperOp privileges are required to unban \002ALL\002 on %s",
-                   cptr->name);
-            return;
-          }
-        else
-          all = 1;
+        notice(n_ChanServ, lptr->nick,
+               "The channel [\002%s\002] is not active",
+               cptr->name);
+        return;
       }
 
-  if (!(chptr = FindChannel(cptr->name)))
-    {
-      notice(n_ChanServ, lptr->nick,
-             "The channel [\002%s\002] is not active",
-             cptr->name);
-      return;
-    }
-
-  bans = (char *) MyMalloc(sizeof(char));
-  bans[0] = '\0';
-  for (bptr = chptr->firstban; bptr; bptr = bptr->next)
-    {
-      if (all || match(bptr->mask, chkstr))
+    bans = (char *) MyMalloc(sizeof(char));
+    bans[0] = '\0';
+    for (bptr = chptr->firstban; bptr; bptr = bptr->next)
+      {
+        if (all || match(bptr->mask, chkstr))
         {
-          bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) + (2 * sizeof(char)));
+          bans = (char *) MyRealloc(bans, strlen(bans) +
+              strlen(bptr->mask) + (2 * sizeof(char)));
           strcat(bans, bptr->mask);
           strcat(bans, " ");
         }
@@ -7382,7 +7383,8 @@ c_clear_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   for (bptr = chptr->firstban; bptr; bptr = bptr->next)
     {
-      bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) + (2 * sizeof(char)));
+      bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) +
+          (2 * sizeof(char)));
       strcat(bans, bptr->mask);
       strcat(bans, " ");
     }
@@ -7448,7 +7450,7 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, "-i");
 } /* c_clear_users() */
 
-static void
+void
 c_clear_all(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {

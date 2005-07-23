@@ -1693,31 +1693,6 @@ IsProtectedHost(char *username, char *hostname)
   return 0;
 } /* IsProtectedHost() */
 
-int
-MatchesAdmin(char *mask)
-
-{
-  struct Userlist *tempuser;
-  char tempstr[MAXLINE];
-
-  if (!mask)
-    return (0);
-
-  for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-    {
-      if (IsAdmin(tempuser))
-        {
-          ircsprintf(tempstr, "*!%s@%s", tempuser->username,
-                     tempuser->hostname);
-
-          if (match(mask, tempstr))
-            return (1);
-        }
-    }
-
-  return (0);
-} /* MatchesAdmin() */
-
 /*
 GetUser()
   Find O: line entry containing nickname.  If 'user' and 'host' are

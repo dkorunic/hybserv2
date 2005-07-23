@@ -164,7 +164,6 @@ static void o_unlink(struct Luser *, int, char **, int);
 
 static void DeleteIgnore(struct Ignore *iptr);
 
-static void TakeOver(struct Channel *cptr);
 static float CalcMem(char *, int socket);
 
 #ifdef ALLOW_FUCKOVER
@@ -241,7 +240,6 @@ static struct OperCommand opercmds[] =
       { "PART", o_part, 0, 'a' },
       { "REROUTE", o_jump, 0, 'a' },
       { "SECURE", o_secure, 0, 'a' },
-      { "TAKEOVER", o_secure, 0, 'a' },
       { "TRACE", o_trace, 0, 'a' },
       { "USER", o_trace, 0, 'a' },
       { "WHOIS", o_trace, 0, 'a' },
@@ -1900,6 +1898,8 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   struct Channel *cptr;
+  struct NickInfo *nptr;
+  struct ChannelUser *tempuser;
 
   if (ac < 2)
     {
@@ -1908,15 +1908,34 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
   cptr = FindChannel(av[1]);
-  if (cptr)
-    {
-      o_RecordCommand(sockfd, "SECURE %s", av[1]);
-      o_Wallops("SECURE %s", av[1]);
-      TakeOver(cptr);
-      os_notice(lptr, sockfd, "%s has been secured", cptr->name);
-    }
-  else
+  nptr = FindNick(lptr->nick);
+
+  if (!cptr)
+  {
     os_notice(lptr, sockfd, "No such channel: %s", av[1]);
+    return;
+  }
+      
+  o_RecordCommand(sockfd, "SECURE %s", av[1]);
+  o_Wallops("SECURE %s", av[1]);
+
+  /* SetDefaultALVL(cptr); */
+  c_clear_all(lptr, nptr, ac, av);
+
+  for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
+  {
+    if (
+#ifdef EMPOWERADMINS_MORE
+        (AutoOpAdmins && IsValidAdmin(tempuser->lptr)) ||
+#endif
+        IsFounder(tempuser, cptr))
+    {
+      toserv(":%s MODE %s +o %s\r\n", n_ChanServ,
+          cptr->name, tempuser->lptr->nick);
+    }
+  }
+
+  os_notice(lptr, sockfd, "%s has been secured", cptr->name);
 } /* o_secure() */
 
 #ifdef ALLOW_GLINES
@@ -6335,172 +6354,6 @@ modestr(int num, char mode)
 
   return done;
 } /* modestr() */
-
-/*
-TakeOver
- args: struct Channel *cptr
- purpose: join 'cptr->name', deop all users who don't match "f",
-          op those who do, clear all conflicting modes (imslk),
-          and clear all bans matching an admin
- return: none
-*/
-
-static void
-TakeOver(struct Channel *cptr)
-
-{
-  int ii, acnt;
-  char done[MAXLINE];
-  char *opnicks, *dopnicks;
-  char **av, *abans;
-  struct ChannelBan *tempban;
-  struct Userlist *tempuser;
-  struct ChannelUser *tempnick;
-
-  if (!cptr)
-    return;
-
-#ifdef SAVE_TS
-
-  if (!IsChannel(cptr->name))
-    os_join_ts_minus_1(cptr);
-
-#endif /* SAVE_TS */
-
-  /*
-   * we don't need to deop anyone if we join with TS - 1, since its
-   * already done for us
-   */
-
-  /* deop non "f" flag users, op "f" flag users */
-  opnicks = (char *) MyMalloc(sizeof(char));
-  opnicks[0] = '\0';
-  dopnicks = (char *) MyMalloc(sizeof(char));
-  dopnicks[0] = '\0';
-  for (tempnick = cptr->firstuser; tempnick; tempnick = tempnick->next)
-    {
-      if (FindService(tempnick->lptr))
-        continue;
-
-      if (tempnick->lptr->flags & L_OSREGISTERED)
-        ii = 1;
-      else
-        ii = 0;
-
-      tempuser = GetUser(ii, tempnick->lptr->nick,
-                         tempnick->lptr->username, tempnick->lptr->hostname);
-      if (IsChannelOp(cptr, tempnick->lptr) && !IsFriend(tempuser))
-        {
-          dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks)
-                                        + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
-          strcat(dopnicks, tempnick->lptr->nick);
-          strcat(dopnicks, " ");
-        }
-      else if (!IsChannelOp(cptr, tempnick->lptr) && (IsFriend(tempuser)
-#ifdef EMPOWERADMINS
-            || IsValidAdmin(tempnick->lptr)
-#endif
-            ))
-        {
-          opnicks = (char *) MyRealloc(opnicks, strlen(opnicks)
-                                       + strlen(tempnick->lptr->nick) + (2 * sizeof(char)));
-          strcat(opnicks, tempnick->lptr->nick);
-          strcat(opnicks, " ");
-        }
-    } /* for (tempnick ..) */
-
-#ifdef SAVE_TS
-
-  if (IsChannel(cptr->name) || (cptr->since == 0))
-    {
-      /*
-       * if OperServ is monitoring the channel, then it didn't join with
-       * TS-1 and noone deoped, therefore we must manually deop
-       * non "f" flag users - likewise if the channel's TS is 0,
-       * join_ts_minus_1() would not deop anyone
-       */
-
-#else
-
-  if (1)
-    {
-
-#endif /* !SAVE_TS */
-
-      SetModes(n_OperServ, 0, '0', cptr, dopnicks);
-    }
-  else
-    {
-      if (cptr->since == 0)
-        {
-          /* if the channel's TS is 0, we can't join with TS-1, so kick all
-             the users */
-
-          acnt = SplitBuf(dopnicks, &av);
-          for (ii = 0; ii < acnt; ii++)
-            {
-              toserv(":%s KICK %s %s :\r\n",
-                     n_OperServ, cptr->name, av[ii]);
-              RemoveFromChannel(cptr, FindClient(av[ii]));
-            }
-          MyFree(av);
-        }
-    }
-  MyFree(dopnicks);
-
-  /* clear bans matching an administrator */
-  abans = (char *) MyMalloc(sizeof(char));
-  abans[0] = '\0';
-  for (tempban = cptr->firstban; tempban; tempban = tempban->next)
-    {
-      if (MatchesAdmin(tempban->mask) == 1)
-        {
-          abans = (char *) MyRealloc(abans, strlen(abans) + strlen(tempban->mask) + (2 * sizeof(char)));
-          strcat(abans, tempban->mask);
-          strcat(abans, " ");
-        }
-    }
-
-  SetModes(n_OperServ, 0, 'b', cptr, abans);
-  MyFree(abans);
-
-  /* clear all bad modes (smilk) */
-  memset(&done, 0, MAXLINE);
-  strcpy(done, "+ntp-");
-  if (cptr->modes & MODE_S)
-    strcat(done, "s");
-  if (cptr->modes & MODE_M)
-    strcat(done, "m");
-  if (cptr->modes & MODE_I)
-    strcat(done, "i");
-  if (cptr->limit)
-    strcat(done, "l");
-  if (cptr->key)
-    {
-      strcat(done, "k ");
-      strcat(done, cptr->key);
-    }
-
-#ifdef DANCER
-  if (cptr->forward)
-  {
-    strcat(done, "f ");
-    strcat(done, cptr->forward);
-  }
-#endif /* DANCER */
-
-  DoMode(cptr, done, 0);
-
-  /* op "f" flag users */
-  SetModes(n_OperServ, 1, '0', cptr, opnicks);
-  MyFree(opnicks);
-
-#ifdef SAVE_TS
-
-  if (!IsChannel(cptr->name))
-    os_part(cptr);
-#endif
-} /* TakeOver() */
 
 /*
 CalcMem()

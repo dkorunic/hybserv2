@@ -184,6 +184,8 @@ void RemFounder(struct Luser *lptr, struct ChanInfo *cptr);
 void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr);
 int HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level);
 void SetDefaultALVL(struct ChanInfo *cptr);
+void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
+int IsFounder(struct Luser *, struct ChanInfo *);
 
 /*
  * Extern declarations

@@ -1892,6 +1892,9 @@ s_sjoin(int ac, char **av)
           struct ChannelUser *tempuser;
           struct UserChannel *tempchan;
           struct ChannelBan *nextban;
+          struct InviteException *nextinvex;
+          struct Exception *nextex;
+
 #ifdef GECOSBANS
 
           struct ChannelGecosBan *nextgecosban;
@@ -1923,23 +1926,23 @@ s_sjoin(int ac, char **av)
           /* clear all exceptions */
           while (cptr->exceptlist)
           {
-            nextban = cptr->exceptlist->next;
+            nextex = cptr->exceptlist->next;
             if (cptr->exceptlist->who)
               MyFree(cptr->exceptlist->who);
             MyFree(cptr->exceptlist->mask);
             MyFree(cptr->exceptlist);
-            cptr->exceptlist = nextban;
+            cptr->exceptlist = nextex;
           }
 
           /* clear all inviteexceptions */
           while (cptr->inviteexceptlist)
           {
-            nextban = cptr->inviteexceptlist->next;
+            nextinvex = cptr->inviteexceptlist->next;
             if (cptr->inviteexceptlist->who)
               MyFree(cptr->inviteexceptlist->who);
             MyFree(cptr->inviteexceptlist->mask);
             MyFree(cptr->inviteexceptlist);
-            cptr->inviteexceptlist = nextban;
+            cptr->inviteexceptlist = nextinvex;
           }
 
 #ifdef GECOSBANS

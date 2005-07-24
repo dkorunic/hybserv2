@@ -2,36 +2,32 @@ $Id$
 
 Today's MOTD
 ------------
-Paranoid schizophrenics outnumber their enemies at least two to one.
+May you have warm words on a cold evening,
+a full mooon on a dark night,
+and a smooth road all the way to your door.
 
 
 Pending bugs:
 -------------
 *) bunch of *old* stuff I've found around:
   - allow GHOST/RECOVER/RELEASE on linked nick without password?
-  - take IP bans into account (DONE)
-  - don't add duplicate bans (DONE)
-  - deny /cs unban if user has a +e (DONE)
-  - don't autorem if user has a +e (DONE)
+  - take IP bans into account
+  - don't add duplicate bans
+  - deny /cs unban if user has a +e
+  - don't autorem if user has a +e
   - generally change or remove autorem
   - deny /cs invite if the invite would not be stored (chan is not +i)
     (notice removed, that will help quite a bit)
-  - add /cs getkey (returns channel key), for same accesslvl as /cs invite (DONE)
+  - add /cs getkey (returns channel key), for same accesslvl as /cs invite
   - operserv admins don't seem to get autovoice/autoop when the level is set to
-    0, while regular users would (DONE)
-  - /cs info on private channel should require 1, not CMDINVITE (DONE)
+    0, while regular users would
+  - /cs info on private channel should require 1, not CMDINVITE
 *) get rid of bashisms in cleandb
-*) From Jared:
-  If a channel is set to restricted with guard off, when a user gets
-  banned from the channel chanserv hops in (and is suppoesd to stay in a
-  for a few minutes to enforce the ban) but he stays in there forever and
-  never leaves even if restricted is turned off..   
 *) From Jared:
   if a user adds a linked nickname then deletes that linked nickname
   several times they start getting the too many nicks error.. it looks
   like the numlinks is being incremented several times every time someone
   adds a link and not being decremented at the same rate...
-*) secure doesn't clear ban for admin [why?]
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions
 *) temp ignores rotate (possible overflow)
@@ -93,7 +89,6 @@ Features yet to come:
   3)
   put operserv glines in oper.db
 *) rewrite documentation
-*) add SVSNICK, SWHOIS, etc. for other IRCDs
 *) modularisation (_very_ unlikely to happen)
 *) completely document API
 *) localisation

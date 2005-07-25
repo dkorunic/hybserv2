@@ -6299,11 +6299,9 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 2)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002INVITE <channel>\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "INVITE");
+          "Syntax: \002INVITE <channel>\002");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
+          n_ChanServ, "INVITE");
       return;
     }
 
@@ -6340,6 +6338,8 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
+  chptr = FindChannel(cptr->name);
+
   /*
    * Everything checks out - invite
    *
@@ -6347,8 +6347,16 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
    * to invite - have ChanServ join and part
    */
 
-  if ((chptr = FindChannel(cptr->name)))
+  if (chptr)
     {
+      /* no need to give invites if channel is +i */
+      if (!(chptr->modes & MODE_I))
+      {
+        notice(n_ChanServ, lptr->nick,
+          "The channel [\002%s\002] isn't +i", cptr->name);
+        return;
+      }
+
       /* it only needs to join if it's not guarding - toot */
       if (!(cptr->flags & CS_GUARD))
         {
@@ -6371,9 +6379,7 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       /* It will PART also if AllowGuardChannel is not set -kre */
       if (!(cptr->flags & CS_GUARD) || !AllowGuardChannel)
         {
-          toserv(":%s PART %s\r\n",
-                 n_ChanServ,
-                 cptr->name);
+          toserv(":%s PART %s\r\n", n_ChanServ, cptr->name);
         }
     }
   else

@@ -1,5 +1,6 @@
 Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
 
+  * fix cs_invite() not to invite if channel isn't +i
   * fix SJOIN event to remove invite and ban exceptions properly, dump old
     data as required
   * rip off TakeOver() and rewrite o_secure() - idea is to use as much as

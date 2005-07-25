@@ -10,14 +10,7 @@ and a smooth road all the way to your door.
 Pending bugs:
 -------------
 *) bunch of *old* stuff I've found around:
-  - allow GHOST/RECOVER/RELEASE on linked nick without password?
   - take IP bans into account
-  - don't add duplicate bans
-  - deny /cs unban if user has a +e
-  - don't autorem if user has a +e
-  - generally change or remove autorem
-  - deny /cs invite if the invite would not be stored (chan is not +i)
-    (notice removed, that will help quite a bit)
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite
   - operserv admins don't seem to get autovoice/autoop when the level is set to
     0, while regular users would

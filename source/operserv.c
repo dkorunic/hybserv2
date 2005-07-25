@@ -1898,6 +1898,7 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   struct Channel *cptr;
+  struct ChanInfo *chptr;
   struct NickInfo *nptr;
   struct ChannelUser *tempuser;
 
@@ -1907,6 +1908,7 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
+  chptr = FindChan(av[1]);
   cptr = FindChannel(av[1]);
   nptr = FindNick(lptr->nick);
 
@@ -1919,7 +1921,6 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
   o_RecordCommand(sockfd, "SECURE %s", av[1]);
   o_Wallops("SECURE %s", av[1]);
 
-  /* SetDefaultALVL(cptr); */
   c_clear_all(lptr, nptr, ac, av);
 
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
@@ -1928,7 +1929,7 @@ o_secure(struct Luser *lptr, int ac, char **av, int sockfd)
 #ifdef EMPOWERADMINS_MORE
         (AutoOpAdmins && IsValidAdmin(tempuser->lptr)) ||
 #endif
-        IsFounder(tempuser, cptr))
+        (chptr && IsFounder(tempuser->lptr, chptr)))
     {
       toserv(":%s MODE %s +o %s\r\n", n_ChanServ,
           cptr->name, tempuser->lptr->nick);

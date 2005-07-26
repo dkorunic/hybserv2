@@ -1892,7 +1892,9 @@ s_sjoin(int ac, char **av)
           struct ChannelUser *tempuser;
           struct UserChannel *tempchan;
           struct ChannelBan *nextban;
+#ifdef HYBRID7
           struct InviteException *nextinvex;
+#endif /* HYBRID7 */
           struct Exception *nextex;
 
 #ifdef GECOSBANS

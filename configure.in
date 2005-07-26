@@ -2,7 +2,6 @@ dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(source/hybserv.c)
 
-AC_CONFIG_AUX_DIR(autoconf)
 AC_CONFIG_HEADER(include/defs.h)
 
 dnl Set language and save it

@@ -122,7 +122,8 @@
 /* 
  * Define this if you plan to use services on Hybrid7 server. It will make
  * HybServ use Hybrid7 features like glines/klines, etc.  This includes
- * still experimental +h, +a and +I support.
+ * +h and +I support, as well as some other stuff available through
+ * #define HYBRID7_*..
  */
 #define    HYBRID7
 

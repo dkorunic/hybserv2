@@ -45,7 +45,6 @@ struct UserChannel;
 #ifdef HYBRID7_HALFOPS
 # define CH_HOPPED       0x001000 /* user is halfopped - Janos */
 # define MODE_H          0x002000 /* someone was +h - Janos */
-# define MODE_A          0x004000 /* channel is +a - Janos */
 #endif /* HYBRID7_HALFOPS */
 
 #ifdef GECOSBANS

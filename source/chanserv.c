@@ -1192,13 +1192,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_on & MODE_S) &&
           !(chptr->modes & MODE_S))
         strcat(modes, "s");
-#ifdef HYBRID7
-      /* Add parse for mode_a -Janos*/
-      if ((cptr->modes_on & MODE_A) &&
-          !(chptr->modes & MODE_A))
-        strcat(modes, "a");
-#endif /* HYBRID7 */
-
       if ((cptr->modes_on & MODE_P) &&
           !(chptr->modes & MODE_P))
         strcat(modes, "p");
@@ -1269,13 +1262,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       if ((cptr->modes_off & MODE_S) &&
           (chptr->modes & MODE_S))
         strcat(modes, "s");
-#ifdef HYBRID7
-      /* Add parse for mode_a -Janos*/
-      if ((cptr->modes_off & MODE_A) &&
-          (chptr->modes & MODE_A))
-        strcat(modes, "a");
-#endif /* HYBRID7 */
-
       if ((cptr->modes_off & MODE_P) &&
           (chptr->modes & MODE_P))
         strcat(modes, "p");
@@ -1516,13 +1502,6 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_N) &&
           (cptr->modes_on & MODE_N))
         ircsprintf(modes, "+n");
-#ifdef HYBRID7
-      /* -Janos */
-      if ((mode == MODE_A) &&
-          (cptr->modes_on & MODE_A))
-        ircsprintf(modes, "+a");
-#endif /* HYBRID7 */
-
       if ((mode == MODE_T) &&
           (cptr->modes_on & MODE_T))
         ircsprintf(modes, "+t");
@@ -1591,13 +1570,6 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
       if ((mode == MODE_N) &&
           (cptr->modes_off & MODE_N))
         ircsprintf(modes, "-n");
-#ifdef HYBRID7
-      /* -Janos */
-      if ((mode == MODE_A) &&
-          (cptr->modes_off & MODE_S))
-        ircsprintf(modes, "-a");
-#endif /* HYBRID7 */
-
       if ((mode == MODE_T) &&
           (cptr->modes_off & MODE_T))
         ircsprintf(modes, "-t");
@@ -5560,19 +5532,6 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             break;
           }
 
-#ifdef HYBRID7
-          /* Add mode a removal -Janos */
-        case 'a':
-        case 'A':
-          {
-            if (minus)
-              cptr->modes_off |= MODE_A;
-            else
-              cptr->modes_on |= MODE_A;
-            break;
-          }
-#endif /* HYBRID7 */
-
         case 't':
         case 'T':
           {
@@ -5723,11 +5682,6 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         strcat(modes, "l");
       if (cptr->modes_off & MODE_K)
         strcat(modes, "k");
-#ifdef HYBRID7
-      /* Mode A removal -Janos */
-      if (cptr->modes_off & MODE_A)
-        strcat(modes, "a");
-#endif /* HYBRID7 */
 #ifdef DANCER
       if (cptr->modes_off & MODE_F)
         strcat(modes, "f");
@@ -5743,12 +5697,6 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       strcat(modes, "+");
       if (cptr->modes_on & MODE_S)
         strcat(modes, "s");
-#ifdef HYBRID7
-      /* Add mode a -Janos */
-      if (cptr->modes_on & MODE_A)
-        strcat(modes, "a");
-#endif /* HYBRID7 */
-
       if (cptr->modes_on & MODE_P)
         strcat(modes, "p");
       if (cptr->modes_on & MODE_N)
@@ -7054,12 +7002,6 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
       strcat(buf, "-");
       if (cptr->modes_off & MODE_S)
         strcat(buf, "s");
-#ifdef HYBRID7
-      /* Mode A removal -Janos */
-      if (cptr->modes_off & MODE_A)
-        strcat(buf, "a");
-#endif /* HYBRID7 */
-
       if (cptr->modes_off & MODE_P)
         strcat(buf, "p");
       if (cptr->modes_off & MODE_N)
@@ -7092,12 +7034,6 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
       strcat(buf, "+");
       if (cptr->modes_on & MODE_S)
         strcat(buf, "s");
-#ifdef HYBRID7
-      /* Add mode A -Janos */
-      if (cptr->modes_on & MODE_A)
-        strcat(buf, "a");
-#endif /* HYBRID7 */
-
       if (cptr->modes_on & MODE_P)
         strcat(buf, "p");
       if (cptr->modes_on & MODE_N)
@@ -7327,12 +7263,6 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (chptr->modes & MODE_S)
     strcat(modes, "s");
-#ifdef HYBRID7
-  /* Support mode A -Janos */
-  if (chptr->modes & MODE_A)
-    strcat(modes, "a");
-#endif /* HYBRID7 */
-
   if (chptr->modes & MODE_P)
     strcat(modes, "p");
   if (chptr->modes & MODE_N)

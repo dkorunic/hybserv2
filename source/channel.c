@@ -1342,11 +1342,6 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
               modeflag = MODE_M;
             else if (ch == 'i')
               modeflag = MODE_I;
-#ifdef HYBRID7
-
-            else if (ch == 'a')
-              modeflag = MODE_A;
-#endif /* HYBRID7 */
 #ifdef DANCER
             else if (ch == 'c')
               modeflag = MODE_C;

@@ -125,8 +125,10 @@ struct Channel
   struct ChannelGecosBan *firstgecosban; /* pointer to first gecos field ban*/
 #endif /* GECOSBANS */
   struct Exception *exceptlist; /* pointer to first ban exception */
+#ifdef HYBRID7
   struct InviteException *inviteexceptlist; /* ptr to first invite
                                                exception - Janos */
+#endif /* HYBRID7 */
 
   /*
    * flood_ts[0] is the TS of the first time a *Serv was kicked;

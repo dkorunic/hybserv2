@@ -320,7 +320,6 @@ struct Exception *
   } /* FindException() */
 
 #ifdef HYBRID7
-
 /*
  * FindInviteException()
  * Return a pointer to occurence of 'mask' on cptr's invite exception list
@@ -572,11 +571,9 @@ DeleteChannel(struct Channel *cptr)
   struct ChannelBan *bnext;
   struct Exception *enext;
 #ifdef GECOSBANS
-
   struct ChannelGecosBan *gnext;
 #endif /* GECOSBANS */
 #ifdef HYBRID7
-
   struct InviteException *inext;
 #endif /* HYBRID7 */
 
@@ -1321,8 +1318,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             if (argidx >= argcnt)
               break;
 
-            if (add
-               )
+            if (add)
               AddInviteException(who, cptr, modeargs[argidx]);
             else
               DeleteInviteException(cptr, modeargs[argidx]);

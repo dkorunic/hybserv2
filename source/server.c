@@ -1934,6 +1934,7 @@ s_sjoin(int ac, char **av)
             cptr->exceptlist = nextex;
           }
 
+#ifdef HYBRID7
           /* clear all inviteexceptions */
           while (cptr->inviteexceptlist)
           {
@@ -1944,6 +1945,7 @@ s_sjoin(int ac, char **av)
             MyFree(cptr->inviteexceptlist);
             cptr->inviteexceptlist = nextinvex;
           }
+#endif /* HYBRID7 */
 
 #ifdef GECOSBANS
           /* clear all gecos bans */

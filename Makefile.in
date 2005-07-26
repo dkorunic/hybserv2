@@ -57,7 +57,7 @@ HPATHFIX = settings.conf
 SUBDIRS = source tools
 
 # Rest of standard Makefile
-all: source tools
+all: depend source tools
 	@echo "*** Begin building HybServ2 version $(VERSION) ***"
 	@echo
 	@for i in $(SUBDIRS); do \
@@ -98,7 +98,7 @@ depend:
 	@if [ ! -f source/.depend ]; then \
 		touch source/.depend; \
 	fi
-	@cd source ; $(MAKE) depend
+	@cd source; $(MAKE) depend
 
 install: all install-binary install-help
 	@echo "*** Done installing HybServ2 $(VERSION) ***"

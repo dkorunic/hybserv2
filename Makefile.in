@@ -95,6 +95,7 @@ distclean: clean
 mrproper: distclean
 
 depend:
+	@echo '*** Making dependancies ***'
 	@if [ ! -f source/.depend ]; then \
 		touch source/.depend; \
 	fi

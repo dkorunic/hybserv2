@@ -165,7 +165,9 @@ install-help:
 	@echo
 
 autoconf:
-	autoconf autoconf/configure.in > configure
-	autoheader -l autoconf
+	#autoconf
+	#autoheader
+	autoreconf
+	rm -rf autom4te.cache
 
 # End of Makefile

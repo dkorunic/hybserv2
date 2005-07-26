@@ -1981,7 +1981,7 @@ s_sjoin(int ac, char **av)
                     }
                 }
 #endif
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
               /* Yeps, do same for halfops -Janus */
               if (tempuser->flags & CH_HOPPED)
                 {
@@ -1990,7 +1990,7 @@ s_sjoin(int ac, char **av)
                   if (tempchan)
                     tempchan->flags &= ~CH_HOPPED;
                 }
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
               if (tempuser->flags & CH_VOICED)
                 {
                   tempuser->flags &= ~CH_VOICED;

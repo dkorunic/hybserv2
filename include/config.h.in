@@ -6,7 +6,7 @@
 
 /*
  * This will automagically transform into correct SETPATH. Don't change
- * it. -kre
+ * it.
  */
 #define   SETPATH   "@prefix@/hybserv/settings.conf"
 
@@ -20,7 +20,7 @@
  * --NOTE: ChanServ requires NICKSERVICES, so if NickServ is disabled,
  *         ChanServ will be disabled as well (NickServ can function
  *         perfectly without ChanServ however)
- * At this moment we require CHANNELSERVICES too. -kre
+ * At this moment we require CHANNELSERVICES too.
  */
 #define   CHANNELSERVICES
 
@@ -89,7 +89,7 @@
  * << STRONGLY RECOMMENDED >> If OPERNICKIDENT is defined, opers
  * IDENTIFYing to OperServ will be required to IDENTIFY to NickServ first.
  * As the two passwords should *always* be different, this adds another
- * layer of security. -ike 
+ * layer of security.
  */
 #define   OPERNICKIDENT
 
@@ -121,20 +121,20 @@
 
 /* 
  * Define this if you plan to use services on Hybrid7 server. It will make
- * HybServ use Hybrid7 features like glines/klines, etc. -kre
- * This includes still experimental +h, +a and +I support -Janos
+ * HybServ use Hybrid7 features like glines/klines, etc.  This includes
+ * still experimental +h, +a and +I support.
  */
 #define    HYBRID7
 
 /*
  * Defining this will turn on IRCNet daemon compatibility. Undergoing a
- * lot of changes, so don't use it, since it is unuseable. -kre
+ * lot of changes, so don't use it, since it is unuseable.
  */
 #undef    IRCNET
 
 /*
  * Define this if you want DANCER ircd compatibility. It has +c and
- * +f modes for channels, as well as +e umode for users. -kre
+ * +f modes for channels, as well as +e umode for users.
  */
 #undef    DANCER
 
@@ -213,7 +213,7 @@
  * I've noticed that this can cause services to drop into HTM mode on the
  * very beginning. In fact, it seems that on large networks where some
  * users have scripted IDENTIFY-ing it can cause almost immediate HTM
- * switching. So let it be 10 secs by default. -kre
+ * switching. So let it be 10 secs by default.
  */
 #define HTM_INTERVAL 5
 
@@ -243,7 +243,7 @@
 /*
  * Define this if you are paranoid and want every cleartext password to be
  * manually erased from memory before free()-ing. This could affect
- * performance a bit, so it is undefined by default. -kre
+ * performance a bit, so it is undefined by default.
  */
 #undef    BORKPASSWD
 
@@ -263,7 +263,7 @@
  * Define this if you want services to create 3 pseudo operators and
  * servers to vote for the gline. This is the ircd-hybrid gline
  * implementation, so it will not work on other ircds.
- * NOTE: These are Hybrid5/6 only glines -kre
+ * NOTE: These are Hybrid5/6 only glines.
  */
 #define   HYBRID_GLINES
 
@@ -287,6 +287,14 @@
  * };
  */
 #define   HYBRID7_GLINES
+
+/*
+ * Define this if you want halfops (+h) support for Hybrid7. Generally
+ * this depends if halfop support is enabled in Hybrid7 IRC daemon
+ * (compiled with --enable-halfops); by default it is enabled if you're
+ * using Hybrid7.
+ */
+#define HYBRID7_HALFOPS
 
 /*
  * Define this if you don't like the idea of one person being able to jupe
@@ -315,7 +323,7 @@
  * command for raw IRC messages (inter-server).
  * BIG FAT WARNING: This stuff is serious. It can core your ircd, cause
  *                  desync, etc. This is not to be used in any kind of
- *                  "normal" IRC network. -kre
+ *                  "normal" IRC network.
  */
 #undef    ALLOW_DUMP
 
@@ -324,28 +332,27 @@
  * appropriately, and startup daemon in console mode for easier debugging.
  * Also, you might want to enable GDB_DEBUG to have HybServ wait for Gdb
  * to attach it - and then you can set GDBAttached=1 to have it continue.
- * -kre
  */
 #undef    DEBUGMODE
 #undef    GDB_DEBUG
 
 /*
  * Use this option wisely, as last resort. It will dump very large amounts
- * of debug information, causing actual daemon to lag. -kre
+ * of debug information, causing actual daemon to lag.
  */
 #undef    EXTREMEDEBUG
 
 /*
  * This is feature that should give some information on netsplits - what
- * servers are split, for how long, etc. -kre
- * Extra - sends notices to all +l operators about netsplits -kre
+ * servers are split, for how long, etc.
+ * Extra - sends notices to all +l operators about netsplits.
  */
 #define   SPLIT_INFO
 #define   EXTRA_SPLIT_INFO
 
 /* 
  * Using this and M: lines can make your HybServ send CONNECT commands
- * when split time expires for leaf/hub in M: line -kre
+ * when split time expires for leaf/hub in M: line.
  */
 #undef   AUTO_ROUTING
 
@@ -353,14 +360,14 @@
 /*
  * Defining this will produce "Active operators .." output in VERSION
  * reply of any of the services. This could be a little performance hit on
- * large O line configuration files.. -kre
+ * large O line configuration files..
  */
 #define ADMININFO
 
 /*
  * Turn this on to support gecos bans for Hybrid5/6.
  * NOTE: This _has_ to be turned off for Hybrid7, since it does not
- *       support +d style modes. -Janos
+ *       support +d style modes.
  */
 #define GECOSBANS
 
@@ -371,18 +378,18 @@
  * different users (unique user || host) flooding simultaneously + ~10. If
  * more than ADVFLOOD_COUNT reconnects and/or nick changes are detected
  * from the same user@host in less than ADVFLOOD_DELAY seconds, advanced
- * flood protection will fire off. If ADVFLOOD_NOTIFY is defined, +y opers
- * on OperServ will be notified of the flood. If ADVFLOOD_NOTIFY_ALL is
- * defined, notices regarding floods will be sent out to all opers that
- * idented to OperServ. If ADVFLOOD_GLINE is defined, offenders will be
- * auto-glined with reason ADVFLOOD_GLINE_REASON with a GLINE expiring
- * after ADVFLOOD_GLINE_TIME. It is possible to define both
- * ADVFLOOD_NOTIFY and ADVFLOOD_GLINE, but not both ADVFLOOD_NOTIFY and
- * ADVFLOOD_NOTIFY_ALL. If ADVFLOOD_NOIDENT_GLINEHOST is defined, if a
- * flood is detected from a non-idented user, the entire host will be
- * glined, not just the user (since it's probably a script randomly
- * choosing idents).
- * -ike
+ * flood protection will fire off.
+ * - If ADVFLOOD_NOTIFY is defined, +y opers on OperServ will be notified
+ *   of the flood. If ADVFLOOD_NOTIFY_ALL is defined, notices regarding
+ *   floods will be sent out to all opers that idented to OperServ.
+ * - If ADVFLOOD_GLINE is defined, offenders will be auto-glined with
+ *   reason ADVFLOOD_GLINE_REASON with a GLINE expiring after
+ *   ADVFLOOD_GLINE_TIME.
+ * - It is possible to define both ADVFLOOD_NOTIFY and ADVFLOOD_GLINE, but
+ *   not both ADVFLOOD_NOTIFY and ADVFLOOD_NOTIFY_ALL.
+ * - If ADVFLOOD_NOIDENT_GLINEHOST is defined, if a flood is detected from
+ *   a non-idented user, the entire host will be glined, not just the user
+ *   (since it's probably a script randomly choosing idents).
  */
 #undef ADVFLOOD
 #define ADVFLOOD_TABLE  60 
@@ -398,14 +405,14 @@
 /*
  * Defining this will make services capable of detecting so called
  * "services fight", unpleasant situation when two or more services are
- * fighting over their nicknames and causing HTM. -kre
+ * fighting over their nicknames and causing HTM.
  */
 #define SERVICES_FIGHT_FIX
 
 /*
  * <<STRONGLY RECOMMENDED>> Forces nick change instead of disconnecting
  * the user (when kill protection is set). If users client has not changed
- * its nickname after predefined timeout, kill him as usual -harly
+ * its nickname after predefined timeout, kill him as usual.
  */
 #define FORCE_NICK_CHANGE
 
@@ -414,11 +421,10 @@
  * ratbox, but haven't tried] and FORCENICK. The later should work on any
  * recent Hybrid7 server, with module contrib/m_forcenick.c compiled and
  * installed. I generally find FORCENICK rather useful, instead of mass
- * killing -kre
- *
+ * killing.
  * Additionally, there is FORCENICK_LEN which can be used to specify how
  * many characters you want to fill in as random numbers. When undefined,
- * it pads as much numbers as in can get to fill the nickname length -kre
+ * it pads as much numbers as in can get to fill the nickname length.
  */
 #undef FORCENICK
 #define FORCENICK_LEN 4
@@ -428,7 +434,6 @@
  * Schedule nick kill instead of immediate killing for user-triggered
  * ghost command. Turn this on on very large networks to have smoother
  * operation. Beware that nick kills resolution is only every 30 seconds.
- * -kre
  */
 #define SCHEDULE_COLLIDE
 
@@ -487,19 +492,13 @@
 
 #if !defined HYBRID7
 # undef FORCENICK
+# undef HYBRID7_GLINES
+# undef HYBRID7_UNKLINE
+# undef HYBRID7_HALFOPS
 #endif
 
 #if defined SVSNICK
 # error "We haven't implemented SVSNICK yet, sorry"
-#endif
-
-#if defined ALLOW_GLINES
-# if defined HYBRID7
-#  undef HYBRID_GLINES
-# else
-#  undef HYBRID7_GLINES
-#  undef HYBRID7_UNKLINE
-# endif
 #endif
 
 #if !defined ALLOW_JUPES
@@ -517,14 +516,14 @@
 
 /*
  * Turn off assertions by default if not debugging. Undefine this if you
- * still want assertions, and DEBUG is not defined -kre
+ * still want assertions, and DEBUG is not defined.
  */
 #define NDEBUG
 
 /*
  * Define this if you want to make sure core will be properly dumped if
  * something goes wrong, whether your global/local corelimit is 0 or not.
- * If you define DEBUG, it will be automatically used. -kre
+ * If you define DEBUG, it will be automatically used.
  */
 #define   GIMMECORE
 
@@ -534,13 +533,13 @@
  * shouldn't happen otherwise, but as a result of sloppy coding in
  * previous hybserv releases. No, not my fault. I'm shipping it this way,
  * so that all databases will be checked and fixed. If you know what are
- * you doing, you can disable it. -kre
+ * you doing, you can disable it.
  */
 #undef STRICT_DATA_CHECK
 
 /*
  * DJB's daemontools compatibility stuff. Won't fork() into background, nor
- * setsid(), which makes it possible to be run under svscan. -kre
+ * setsid(), which makes it possible to be run under svscan.
  */
 #undef DAEMONTOOLS
 

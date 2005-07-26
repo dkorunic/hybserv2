@@ -56,8 +56,10 @@ struct Channel;
 # define CA_CMDVOICE     2
 # define CA_ACCESS       3
 # define CA_CMDINVITE    4
+#ifdef HYBRID7_HALFOPS
 # define CA_AUTOHALFOP   5
 # define CA_CMDHALFOP    6
+#endif /* HYBRID7_HALFOPS */
 # define CA_AUTOOP       7
 # define CA_CMDOP        8
 # define CA_CMDUNBAN     9

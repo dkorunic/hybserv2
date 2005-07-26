@@ -4,14 +4,10 @@
 CC = @CC@
 CFLAGS = -Wall -pipe @CFLAGS@
 LDFLAGS = @LDFLAGS@
-#LDFLAGS = -L../libString @LDFLAGS@
 INCLUDE = -I. -I../include
-# DEFS =
+DEFS =
 LIBS = @LIBS@
-#LIBS = -lString @LIBS@ @LIBP@
-#LIBDEPS = ../libString/libString.a
 MKDEP = $(CC) -MM
-
 RM = @RM@ -f
 
 IDIR = ../include
@@ -81,7 +77,6 @@ distclean: clean
 	$(CC) $(INCLUDE) $(CFLAGS) -c $<
 
 ## Dependencies
-
 version.o: version.c
 	$(CC) $(INCLUDE) $(CFLAGS) -DVERSION=\"$(VERSION)\" -c $<
 

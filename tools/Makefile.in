@@ -5,9 +5,8 @@ CC = @CC@
 CFLAGS = -Wall -pipe @CFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDE = -I../include
-# DEFS =
+DEFS =
 LIBS = @LIBS@
-
 RM = @RM@ -f
 
 COMMON = \
@@ -47,6 +46,5 @@ distclean: clean
 	$(CC) $(CFLAGS) $(INCLUDE) -c $<
 
 ## Dependencies
-
 mkpasswd.o: mkpasswd.c
 doencrypt.o: doencrypt.c

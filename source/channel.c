@@ -531,11 +531,11 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr->flags |= CH_OPPED;
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
   /* Add halfopped feature - Janos */
   if ((nick[0] == '%') || (nick[1] == '%'))
     ptr->flags |= CH_HOPPED;
-#endif
+#endif /* HYBRID7_HALFOPS */
 
   ptr->next = lptr->firstchan;
   lptr->firstchan = ptr;
@@ -547,11 +547,11 @@ AddToChannel(struct Channel *cptr, char *nick)
     ptr2->flags |= CH_VOICED;
   if ((nick[0] == '@') || (nick[1] == '@'))
     ptr2->flags |= CH_OPPED;
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
   /* Add halfopped feature - Janos */
   if ((nick[0] == '%') || (nick[1] == '%'))
     ptr2->flags |= CH_HOPPED;
-#endif
+#endif /* HYBRID7_HALFOPS */
 
   ptr2->next = cptr->firstuser;
   cptr->firstuser = ptr2;
@@ -850,7 +850,7 @@ SetChannelMode(struct Channel *cptr, int add , int type, struct Luser
               }
           }
       }
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
     /* Halfop mode setup - Janos */
     else if (type == MODE_H)
       {
@@ -868,7 +868,7 @@ SetChannelMode(struct Channel *cptr, int add , int type, struct Luser
               }
           } /* if (tempu && tempc) */
       } /* (type == MODE_H) */
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
 } /* SetChannelMode() */
 
 /*
@@ -1107,7 +1107,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
             break;
           } /* case 'v' */
 
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
           /* HalfOp/DeHalfOp -Janos */
         case 'h':
           {
@@ -1144,7 +1144,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
             break;
           } /* case 'h'*/
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
 
           /*
            * Channel limit
@@ -1503,7 +1503,7 @@ IsChannelOp(struct Channel *chptr, struct Luser *lptr)
  *
  *  XXX: possibly merge this into IsChannelOp() -kre
  */
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
 int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
 {
   struct UserChannel *tempchan;
@@ -1517,7 +1517,7 @@ int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
 
   return 0;
 } /* IsChannelHOp() */
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
 
 /*
 DoMode()

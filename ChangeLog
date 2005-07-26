@@ -1,5 +1,7 @@
 Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
 
+  * move autoconf stuff from autoconf/ to root .
+  * halfops support is now under #define HYBRID7_HALFOPS
   * fix cs_invite() not to invite if channel isn't +i
   * fix SJOIN event to remove invite and ban exceptions properly, dump old
     data as required

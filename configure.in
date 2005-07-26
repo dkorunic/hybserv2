@@ -78,7 +78,6 @@ echo "
 
 Configuration:
   Detected OS:      ${host_os}
-  HybServ2 Version: ${VERSION}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}

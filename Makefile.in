@@ -26,10 +26,8 @@ VERSION = 1.9.0-svn
 
 CC = @CC@
 CFLAGS = @CFLAGS@ -Wall -pipe
-
 # Debugging CFLAGS
 #CFLAGS = @CFLAGS@ -Wall -g -D_REENTRANT -pipe
-
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 RM = @RM@ -f
@@ -40,7 +38,6 @@ LN = @LN@ -sf
 CHMOD = @CHMOD@
 CHOWN = @CHOWN@ -R
 LS = @LS@ -l
-
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_BIN = ${INSTALL} -m 755
@@ -49,19 +46,17 @@ INSTALL_SECURE = ${INSTALL} -m 600
 # Executable programs
 BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
 					 finddupe
-
 # Secure configuration files (mode 600)
 SECUREFILES = hybserv.conf settings.conf
-
 # General configuration files
 CONFFILES = motd.dcc motd.global
-
 # File containing HPath variable
 HPATHFIX = settings.conf
 
 # Subdirs for make
 SUBDIRS = source tools
 
+# Rest of standard Makefile
 all: source tools
 	@echo "*** Begin building HybServ2 version $(VERSION) ***"
 	@echo
@@ -163,6 +158,27 @@ install-help:
 	@echo Changing ownership of $(HELPDIR) to $(WHOAMI)
 	@$(CHOWN) $(WHOAMI) $(HELPDIR)
 	@echo
+
+# Autoconf stuff
+configure: aclocal.m4
+	autoconf
+
+config.h.in: stamp-h.in
+
+stamp-h.in: aclocal.m4
+	autoheader
+	echo timestamp > include/stamp-h.in
+
+config.h: stamp-h
+
+stamp-h: config.h.in config.status
+	./config.status
+
+Makefile: Makefile.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck
 
 autoconf:
 	#autoconf

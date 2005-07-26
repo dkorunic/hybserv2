@@ -139,18 +139,18 @@ static void c_modes(struct Luser *, struct NickInfo *, int, char **);
 static void c_cycle(struct Luser *, struct NickInfo *, int, char **);
 static void c_invite(struct Luser *, struct NickInfo *, int, char **);
 static void c_op(struct Luser *, struct NickInfo *, int, char **);
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
 static void c_hop(struct Luser *, struct NickInfo *, int, char **);
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
 static void c_voice(struct Luser *, struct NickInfo *, int, char **);
 static void c_unban(struct Luser *, struct NickInfo *, int, char **);
 static void c_info(struct Luser *, struct NickInfo *, int, char **);
 
 static void c_clear(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_ops(struct Luser *, struct NickInfo *, int, char **);
-#ifdef HYBRID7
+#ifdef HYBRID7_HALFOPS
 static void c_clear_hops(struct Luser *, struct NickInfo *, int, char **);
-#endif /* HYBRID7 */
+#endif /* HYBRID7_HALFOPS */
 static void c_clear_voices(struct Luser *, struct NickInfo *, int, char **);
 static void c_clear_modes(struct Luser *, struct NickInfo *, int, char **);
 #ifdef GECOSBANS

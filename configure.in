@@ -75,7 +75,6 @@ include/config.h        \
 )
 
 echo "
-
 Configuration:
   Detected OS:      ${host_os}
   Install path:     ${prefix}/hybserv

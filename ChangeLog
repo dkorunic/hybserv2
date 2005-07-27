@@ -1,6 +1,6 @@
 Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
 
-  * Makefile and other smaller changes
+  * Makefile and configure script changes
   * totally rip out mode +a support, since there is no anonops in recent
     Hybrid7
   * move autoconf stuff from autoconf/ to root .

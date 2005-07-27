@@ -1379,13 +1379,6 @@ ss_showstats(struct Luser *lptr, int ac, char **av)
 /* markgreplog */
 
 /*
- * Now, here is a functions for log browsing,
- * dunno how they are threadsafe, but may be will be better
- * if i use only static variables for future
- *  - decho, 28.03.2000
- */
-
-/*
  * static void ss_greplog() 
  * 
  * just proccess user request for grep of logs and start thread for grep

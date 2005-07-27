@@ -1,6 +1,7 @@
 dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
+AC_PREREQ(2.50)
 AC_INIT(source/hybserv.c)
 AC_CONFIG_HEADER(include/defs.h)
 
@@ -20,16 +21,11 @@ dnl Get system type
 AC_CANONICAL_HOST
 MYHOST=$host_os
 case "$host_os" in
-*sunos*)
-  _SunOS=1
-  AC_DEFINE(HAVE_SOLARIS)
-  ;;
-*solaris*)
-  _SunOS=1
-  AC_DEFINE(HAVE_SOLARIS)
+*sunos*|*solaris*)
+  AC_DEFINE_UNQUOTED(HAVE_SOLARIS,,[Define to 1 if you have Solaris OS])
   ;;
 *cygwin)
-  AC_DEFINE(HAVE_CYGWIN)
+  AC_DEFINE_UNQUOTED(HAVE_CYGWIN,,[Define to 1 if you have CygWin environment])
 esac
 
 dnl Standard installation path
@@ -62,8 +58,7 @@ CFLAGS="${CFLAGS}"
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strdup strerror strncpy)
-AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY))
+AC_CHECK_FUNCS(strdup strerror strncpy gettimeofday)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(crypt, crypt)

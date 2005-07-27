@@ -1405,7 +1405,6 @@ LinkDccClient(struct DccUser *dccptr)
     dccptr->next->prev = dccptr;
   connections = dccptr;
 
-  /* thread race condition :( -kre */
   Network->TotalConns++;
 } /* LinkDccClient() */
 

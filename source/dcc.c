@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -794,7 +794,7 @@ TelnetGreet(struct DccUser *dccptr)
 
   SetDccPending(dccptr);
 
-  ircsprintf(ver, "\nHybServ2 (TS Services version %s)\n", hVersion);
+  ircsprintf(ver, "\nHybserv2 (TS Services version %s)\n", hVersion);
   writesocket(dccptr->socket, ver);
 
   writesocket(dccptr->socket, "\nEnter nickname\n");
@@ -923,7 +923,7 @@ GreetDccUser(struct DccUser *dccptr)
     }
 
   motd_tm = localtime(&CurrTime);
-  ircsprintf(sendstr, "HybServ2 %s (%d/%d/%d %d:%02d)\n",
+  ircsprintf(sendstr, "Hybserv2 %s (%d/%d/%d %d:%02d)\n",
              hVersion, 1900 + motd_tm->tm_year, motd_tm->tm_mon + 1,
              motd_tm->tm_mday, motd_tm->tm_hour, motd_tm->tm_min);
   writesocket(dccptr->socket, sendstr);
@@ -1012,7 +1012,7 @@ onctcp(char *nick, char *target, char *msg)
 #endif /* ADMININFO */
 
       notice(target, nick,
-             "\001VERSION HybServ2 TS Services version %s\001",
+             "\001VERSION Hybserv2 TS Services version %s\001",
              hVersion);
       notice(target, nick,
              "\001VERSION Administrator: %s\001",
@@ -1695,7 +1695,7 @@ struct Userlist *
          * There are two O: lines:
          *        UserA *@a.com
          *        UserB *@b.com
-         * Now, UserA connects to HybServ (telnet) from *@b.com,
+         * Now, UserA connects to Hybserv (telnet) from *@b.com,
          * so the above call to GetUser() would have returned
          * UserB's structure, since hostnames are a higher
          * priority than nicknames. However, since this is a

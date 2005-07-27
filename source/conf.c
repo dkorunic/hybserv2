@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -565,7 +565,7 @@ ParseConf(char *filename, int rehash)
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
           /* This includes routines for auto-connecting in case of split -
-           * HybServ will send required CONNECT string and try to connect
+           * Hybserv will send required CONNECT string and try to connect
            * server if splitted. Usually this is not necessary because of
            * auto-connecting ports, but what if you want to make sure they
            * will be reconnected after some time if admin is not present, ant

@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -660,7 +660,7 @@ dparse(char *line, int linenum, int rehash)
 #if 0
       /*
        * There should be code which check for too many arguments for
-       * PARAM_SET - because of bugs in previous HybServ1 code I am leaving
+       * PARAM_SET - because of bugs in previous Hybserv1 code I am leaving
        * this code under undef, but it _should_ go into distribution once.
        * However, I don't wont to break old `save -conf' files. -kre
        */

@@ -1,3 +1,13 @@
+/*
+ * config.h
+ * Hybserv2 Services by Hybserv2 team
+ *
+ * $Id$
+ */
+
+#ifndef INCLUDED_config_h
+#define INCLUDED_config_h
+
 /* ------------------- Start of configurable section ------------ */
 
 /*
@@ -121,7 +131,7 @@
 
 /* 
  * Define this if you plan to use services on Hybrid7 server. It will make
- * HybServ use Hybrid7 features like glines/klines, etc.  This includes
+ * Hybserv use Hybrid7 features like glines/klines, etc.  This includes
  * +h and +I support, as well as some other stuff available through
  * #define HYBRID7_*..
  */
@@ -140,7 +150,7 @@
 #undef    DANCER
 
 /*
- * If this is defined, commands that involve HybServ setting modes, such
+ * If this is defined, commands that involve Hybserv setting modes, such
  * as .secure and .omode, will not break channel TS.  Instead, the program
  * will have OPERSERV_NICK join the channel to set the modes instead of
  * having the actual server set the modes.  A significant problem with
@@ -331,7 +341,7 @@
 /* 
  * Define this for debugging purposes. It will setup coresize
  * appropriately, and startup daemon in console mode for easier debugging.
- * Also, you might want to enable GDB_DEBUG to have HybServ wait for Gdb
+ * Also, you might want to enable GDB_DEBUG to have Hybserv wait for Gdb
  * to attach it - and then you can set GDBAttached=1 to have it continue.
  */
 #undef    DEBUGMODE
@@ -352,7 +362,7 @@
 #define   EXTRA_SPLIT_INFO
 
 /* 
- * Using this and M: lines can make your HybServ send CONNECT commands
+ * Using this and M: lines can make your Hybserv send CONNECT commands
  * when split time expires for leaf/hub in M: line.
  */
 #undef   AUTO_ROUTING
@@ -544,4 +554,4 @@
  */
 #undef DAEMONTOOLS
 
-#define INCLUDED_config_h
+#endif /* INCLUDED_config_h */

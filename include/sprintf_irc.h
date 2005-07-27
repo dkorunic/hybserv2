@@ -2,8 +2,8 @@
  * $Id$ 
  */
 
-#ifndef SPRINTF_IRC
-#define SPRINTF_IRC
+#ifndef INCLUDED_sprintf_irc_h
+#define INCLUDED_sprintf_irc_h
 
 #include <stdarg.h>
 
@@ -13,4 +13,4 @@ extern int vsprintf_irc(register char *str, register const char *format,
     va_list);
 extern int ircsprintf(register char *str, register const char *format, ...);
 
-#endif /* SPRINTF_IRC */
+#endif /* INCLUDED_sprintf_irc_h */

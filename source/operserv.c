@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -1197,7 +1197,7 @@ static void o_restart(struct Luser *lptr, int ac, char **av, int sockfd)
 
 /*
 o_die()
-  Terminates HybServ
+  Terminates Hybserv
 */
 
 static void
@@ -6358,7 +6358,7 @@ modestr(int num, char mode)
 
 /*
 CalcMem()
-  Determine memory usage of HybServ and send the info to 'socket'
+  Determine memory usage of Hybserv and send the info to 'socket'
 or 'nick'
 */
 
@@ -7145,7 +7145,7 @@ static void o_kline(struct Luser *lptr, int ac, char **av, int sockfd)
   /* sourcenick, targetserver, tkline_time, user, host, reason */
   toserv(":%s KLINE %s %s %s %s %s\r\n", n_OperServ, "*",
       tkline ? tkline : "0", user, host,
-      reason ? reason : ":HybServ remote kline");
+      reason ? reason : ":Hybserv remote kline");
 #else
   klinestr = GetString(ac - 1, av + 1);
   toserv(":%s KLINE %s %s\r\n", Me.name, n_OperServ, klinestr);

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $Id$
-# HybServ2 Services by HybServ2 team
+# Hybserv2 Services by Hybserv2 team
 #
 # This script will remove all backup directories created
 # from past months. Directories created in the current month

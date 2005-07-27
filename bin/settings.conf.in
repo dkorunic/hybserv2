@@ -1,5 +1,5 @@
 # This file contains many run-time configurable options
-# for HybServ services.
+# for Hybserv services.
 #
 # The format for this file is as follows:
 #
@@ -98,9 +98,9 @@ LogonNews          "logon.news"
 #
 # Services Database Files [REQUIRED]
 #
-# HybServ will attempt to locate these files in the directory
+# Hybserv will attempt to locate these files in the directory
 # specified above by HPath. If the files do not exist, they
-# will be created the next time HybServ saves its databases
+# will be created the next time Hybserv saves its databases
 # (see DatabaseSync).
 #
 # NickServDB - NickServ database
@@ -666,7 +666,7 @@ IdentTimeout       "30s"
 # MaxBinds <value> [REQUIRED (if BindAttemptFreq enabled)]
 #
 #  Set BindAttemptFreq to the amount of time between attempts
-# to bind P: lined ports. HybServ will give up the attempt
+# to bind P: lined ports. Hybserv will give up the attempt
 # to bind the port after MaxBinds unsuccessful tries.
 
 BindAttemptFreq    "2m"

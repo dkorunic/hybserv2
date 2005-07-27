@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -348,7 +348,7 @@ CreateDatabase(char *name, char *info)
   chmod(name, 0600);
 
   currtime = current_ts;
-  fprintf(fptr, "; HybServ2 %s - %s - created %s",
+  fprintf(fptr, "; Hybserv2 %s - %s - created %s",
           hVersion, info, ctime(&currtime));
 
   return (fptr);

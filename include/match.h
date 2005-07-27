@@ -1,6 +1,6 @@
 /*
  * match.h
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  *
  * This code is originally from the ircd-hybrid project,
  * which is released under the Gnu Public License.

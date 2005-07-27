@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
   TimeStarted = current_ts = time(NULL);
 
   fprintf(stderr,
-          "HybServ2 TS services version %s by HybServ2 team\n"
+          "Hybserv2 TS services version %s by Hybserv2 team\n"
 #if defined __DATE__ && defined __TIME__
           "Compiled at %s, %s\n",
 #endif
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  putlog(LOG1, "HybServ2 TS services version %s started", hVersion);
+  putlog(LOG1, "Hybserv2 TS services version %s started", hVersion);
 
   /*
    * Get the offset from GMT (London time)
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
       currenthub->connect_ts = 0;
 
       /*
-       * whenever HybServ connects/reconnects to a server, clear
+       * whenever Hybserv connects/reconnects to a server, clear
        * users, servers, and chans
        */
       ClearUsers();

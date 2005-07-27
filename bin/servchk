@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# HybServ restart cron file
+# Hybserv restart cron file
 #
 # Simply add the following line to your crontab file:
 # 0,10,20,30,40,50 * * * * /path/to/servchk >/dev/null 2>&1
@@ -23,7 +23,7 @@ if test -r $hpath/$hpidfile; then
 fi
 
 echo ""
-echo "Restarting HybServ..."
+echo "Restarting Hybserv..."
 
 if test -x $hpath/hybserv; then
 	$hpath/hybserv $conffile

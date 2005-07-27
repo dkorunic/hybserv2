@@ -6,9 +6,9 @@ encryptdb       - Encrypts plaintext nickname/channel databases
 finddouble      - Find double nicknames in nick.db (usually not needed)
 fixlevel        - Fixes broken chan.db access levels (after upgrade)
 hybserv         - Binary executable
-hybserv.conf    - Configuration file for HybServ
+hybserv.conf    - Configuration file for Hybserv
 mkpasswd        - Encrypted password generating utility
 motd.dcc        - Motd file for dcc/telnet clients
 motd.global     - Motd file for global clients
-servchk         - Crontab script to restart HybServ
-settings.conf   - Configuration settings for HybServ
+servchk         - Crontab script to restart Hybserv
+settings.conf   - Configuration settings for Hybserv

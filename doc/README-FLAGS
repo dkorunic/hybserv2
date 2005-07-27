@@ -13,7 +13,7 @@ d    -     Allows user to use DCC CHAT service.  If OpersOnlyDcc
            they won't be allowed to use DCC CHAT.
 
 e    -     Exception flag - Any user with this flag will not
-           be KILLed or GLINEd by HybServ if someone attempts 
+           be KILLed or GLINEd by Hybserv if someone attempts 
            to do so.
 
 f    -     "Friend" - when an administrator SECUREs a channel,

@@ -1,4 +1,4 @@
-# HybServ Makefile by HybServ2 team
+# Hybserv Makefile by Hybserv2 team
 # $Id$
 
 # This is installation prefix. It can be overrided by passing PREFIX
@@ -21,7 +21,7 @@ WHOAMI = @WHOAMI@
 
 ############ Don't change anything below here ############
 
-# HybServ2 Version
+# Hybserv2 Version
 REVISION = @REVISION@
 VERSION = 1.9.0-SVN-${REVISION}
 
@@ -59,7 +59,7 @@ SUBDIRS = source tools
 
 # Rest of standard Makefile
 all: depend source tools
-	@echo "*** Begin building HybServ2 version $(VERSION) ***"
+	@echo "*** Begin building Hybserv2 version $(VERSION) ***"
 	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Building $$i ***"; \
@@ -68,7 +68,7 @@ all: depend source tools
 		cd ..; \
 		echo; \
 	done
-	@echo "*** Done building HybServ2 version $(VERSION) ***"
+	@echo "*** Done building Hybserv2 version $(VERSION) ***"
 
 build: all
 
@@ -103,7 +103,7 @@ depend:
 	@cd source; $(MAKE) depend
 
 install: all install-binary install-help
-	@echo "*** Done installing HybServ2 $(VERSION) ***"
+	@echo "*** Done installing Hybserv2 $(VERSION) ***"
 
 install-binary:
 	@if test ! -d $(BINDIR); then \
@@ -114,7 +114,7 @@ install-binary:
 		echo Creating $(CONFDIR); \
 		mkdir $(CONFDIR) 2>/dev/null; \
 	fi
-	@echo '** Installing HybServ2 in $(BINDIR) **'
+	@echo '** Installing Hybserv2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
 	@for file in $(BINPROGS); do \
 		echo "** Installing $$file in $(BINDIR) **"; \

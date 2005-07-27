@@ -1,7 +1,7 @@
 /*
  *   IRC - Internet Relay Chat, contrib/hybrid_services.c
  *   hybrid_services.c: /nickserv, /chanserv, /memoserv, etc. commands, 
- *                      used for hybrid services (HybServ2) on 
+ *                      used for hybrid services (Hybserv2) on 
  *                      idolNET IRC Network.
  *
  *   Copyright (C) 2002, 2003, 2004, 2005 by Dragan 'bane' Dosen and the

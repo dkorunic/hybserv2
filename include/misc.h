@@ -1,6 +1,6 @@
 /*
  * misc.h
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  *
  * $Id$
  */

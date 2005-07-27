@@ -1,5 +1,5 @@
 /*
- * HybServ2 Services by HybServ2 team
+ * Hybserv2 Services by Hybserv2 team
  * This program comes with absolutely NO WARRANTY
  *
  * Should you choose to use and/or modify this source code, please
@@ -2287,7 +2287,7 @@ s_version(int ac, char **av)
             "*** Remote version query requested by %s",
             who);
 
-  toserv(":%s 351 %s HybServ2-%s. %s :TS3\r\n",
+  toserv(":%s 351 %s Hybserv2-%s. %s :TS3\r\n",
          Me.name, who, hVersion, Me.name);
 } /* s_version() */
 

@@ -1,4 +1,4 @@
-# HybServ ./tools Makefile
+# Hybserv ./tools Makefile
 # $Id$
 
 CC = @CC@

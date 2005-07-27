@@ -5038,6 +5038,7 @@ fi
 
 echo "
 Configuration:
+  Source revision:  ${REVISION}
   Detected OS:      ${host_os}
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}

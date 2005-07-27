@@ -23,7 +23,7 @@ WHOAMI = @WHOAMI@
 
 # HybServ2 Version
 REVISION = @REVISION@
-VERSION = 1.9.0-svn-${REVISION}
+VERSION = 1.9.0-SVN-${REVISION}
 
 CC = @CC@
 CFLAGS = @CFLAGS@ -Wall -pipe

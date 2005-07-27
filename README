@@ -14,7 +14,7 @@ Per Sidewnder's (Cosine's) request - Hybserv will no longer be
 supported. So if you have some questions or problems, please
 *upgrade* first to a version listed in the Hybserv2 dir.
 
-Hybserv was first coded by Patrick Alken (wnder@underworld.net)
+Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net)
 and is now maintained by the Hybserv2 Coding Team, unless
 otherwise mentioned in the code or the credits.
 
@@ -22,40 +22,40 @@ otherwise mentioned in the code or the credits.
 
 HYBSERV STAFF:
 Lead developer of Hybserv2
-kreator     Dinko Korunic        kreator@srce.hr
+kreator     Dinko Korunic        kreator|AT|srce|hr
 
 The following people have contributed to this release of Hybserv2
 (in nick alphabetical order):
-adx         Piotr Nizynski       adx@crashnet.pl
-args        Antoniu-George Savu  antoniu-george.savu@fr.tiscali.com
-asuffield   Andrew Suffield      asuffield@users.sourceforge.net
-bane        Dragan Dosen         ddosen@ffzg.hr
-Bruns       Brian Bruns          bruns@magenet.net
-MOLI        Olivier Molinete     olivier@molinete.org
-cosine      Patrick Alken        wnder@uwns.underworld.net
-ddb         Ivan Petrov          ddb@xplovdiv.com
-decho       Nedelcho Stanev      decho@iname.com
-fl_         Lee Hardy            lee@leeh.co.uk
-harly       Tomislav Novak       harly@bofhlet.net
-Hwy101      Wendy Campbell       wcampbel@botbay.net
-ike         Ivan Krstic          ike@gnjilux.srk.fer.hr 
-Janos       John Binder          jbinder@kgazd.bme.hu
-John-Work   F. John Rowan        john@tdkt.org
-kreator     Dinko Korunic        kreator@srce.hr
-KrisDuv     Christophe Duverger  krisduv2000@yahoo.fr
-mend0za     Vladimir Shahov      mend0za@nsys.by
-rhodie      Julian Petrov        rhodie@irchelp.unibg.org
-sofit       Stanislav Zahariev   sofit@proshe.bg
-toot        Toby Verrall         to7@antipope.fsnet.co.uk
+adx         Piotr Nizynski       adx|AT|crashnet|pl
+args        Antoniu-George Savu  antoniu-george|savu|AT|fr|tiscali|com
+asuffield   Andrew Suffield      asuffield|AT|users|sourceforge|net
+bane        Dragan Dosen         ddosen|AT|ffzg|hr
+Bruns       Brian Bruns          bruns|AT|magenet|net
+MOLI        Olivier Molinete     olivier|AT|molinete|org
+cosine      Patrick Alken        wnder|AT|uwns|underworld|net
+ddb         Ivan Petrov          ddb|AT|xplovdiv|com
+decho       Nedelcho Stanev      decho|AT|iname|com
+fl_         Lee Hardy            lee|AT|leeh|co|uk
+harly       Tomislav Novak       harly|AT|bofhlet|net
+Hwy101      Wendy Campbell       wcampbel|AT|botbay|net
+ike         Ivan Krstic          ike|AT|gnjilux|srk|fer|hr 
+Janos       John Binder          jbinder|AT|kgazd|bme|hu
+John-Work   F| John Rowan        john|AT|tdkt|org
+kreator     Dinko Korunic        kreator|AT|srce|hr
+KrisDuv     Christophe Duverger  krisduv2000|AT|yahoo|fr
+mend0za     Vladimir Shahov      mend0za|AT|nsys|by
+rhodie      Julian Petrov        rhodie|AT|irchelp|unibg|org
+sofit       Stanislav Zahariev   sofit|AT|proshe|bg
+toot        Toby Verrall         to7|AT|antipope|fsnet|co|uk
     
-Hybserv was specifically designed to run with hybrid ircd, although it
-*should* work with CSr as well.  You may receive the hybrid irc daemon
-from ftp.blackened.com in /pub/irc/hybrid. These services (more or less
-same code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet /
-EFNow / Openprojects Network.
+Hybserv was specifically designed to run with Hybrid ircd, although it
+*should* work with CSr as well.  You may receive the Hybrid irc daemon
+from http://ircd-hybrid.com/. These services (more or less same code) are
+currently used by EFNet / DalNet / ICQ / WFNet / HybNet / EFNow /
+OpenProjects Network.
 
 This software is released under the terms of the GNU General Public
-License (see COPYING).  Should you choose to use and/or modify any of
+License (see COPYING). Should you choose to use and/or modify any of
 code, please do so under the terms of the GNU General Public License,
 published by the Free Software Foundation.
 
@@ -185,7 +185,7 @@ these lines:
 
 #########################################################################
 # BUGS -  PLEASE mail any bugs you find to                              #
-#          kreator@srce.hr                                              #
+#          kreator|AT|srce|hr                                           #
 #########################################################################
  
 We can't fix bugs if no one reports them!
@@ -199,8 +199,8 @@ The criteria for reporting bugs is somewhat specific.
 2. If you do not know how to reproduce the bug at will, please
    do the following: #define EXTREMEDEBUG in config.h, which will
    cause the file "hybserv.hubinfo" to be created. If the bug
-   occurs again, email to kreator@srce.hr the hybserv.hubinfo
-   file, and it will give us a starting point.
+   occurs again, email to us the hybserv.hubinfo file, and it\
+   will give us a starting point.
 
 
 ################################################################
@@ -216,7 +216,7 @@ Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
 sending email to:
 
-hybserv-request@hybserv.net
+hybserv-request|AT|hybserv|net
 
 (Please use a command from below in the body of the message and
  not in the subject)
@@ -281,7 +281,7 @@ Functions used from other GPL'd sources:
      HashChannel()  -- from ircd-hybrid source
 
 tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
-<minar@reed.edu>, W. Campbell, and Hybrid7 team.
+<minar|AT|reed|edu>, W. Campbell, and Hybrid7 team.
 
 Some help files were used from EsperNet's service package:
 

@@ -15,25 +15,31 @@ AC_SUBST(REVISION)
 
 dnl Set language and save it
 AC_LANG_C
-AC_LANG_SAVE
 
 dnl Get system type
 AC_CANONICAL_HOST
 MYHOST=$host_os
 case "$host_os" in
 *sunos*|*solaris*)
-  AC_DEFINE_UNQUOTED(HAVE_SOLARIS,,[Define to 1 if you have Solaris OS])
+  AC_DEFINE_UNQUOTED(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
   ;;
 *cygwin)
-  AC_DEFINE_UNQUOTED(HAVE_CYGWIN,,[Define to 1 if you have CygWin environment])
+  AC_DEFINE_UNQUOTED(HAVE_CYGWIN, , [Define to 1 if you have Cygwin environment])
 esac
 
 dnl Standard installation path
 AC_PREFIX_DEFAULT(/usr/local)
 
-dnl Checks for programs.
+dnl Compiler environment
 AC_PROG_CC
 AC_ISC_POSIX
+AC_C_INLINE
+AC_C_CONST
+AC_SYS_LARGEFILE
+
+dnl Checks for programs.
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(LN, ln)
@@ -41,9 +47,7 @@ AC_PATH_PROG(LS, ls)
 AC_PATH_PROG(CHMOD, chmod)
 AC_PATH_PROG(CHOWN, chown)
 
-dnl Check for a suitable install program
-AC_PROG_INSTALL
-
+dnl Who am i
 WHOAMI=`whoami`
 AC_SUBST(WHOAMI)
 
@@ -69,14 +73,8 @@ if test "x$enable_dmalloc" = "xyes"; then
   AC_CHECK_LIB(dmalloc, malloc)
 fi
 
-AC_OUTPUT(              \
-Makefile                \
-source/Makefile         \
-tools/Makefile          \
-bin/settings.conf       \
-bin/cleandb             \
-include/config.h        \
-)
+AC_OUTPUT(Makefile source/Makefile tools/Makefile
+  bin/settings.conf bin/cleandb include/config.h)
 
 echo "
 Configuration:
@@ -85,9 +83,7 @@ Configuration:
   Install path:     ${prefix}/hybserv
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LIBS}"
+  Linker flags:     ${LIBS}
 
-echo
-echo Please edit include/config.h to change the settings to match
-echo your network before running make
-echo
+NOTE: Please edit include/config.h to change the settings
+to match your network before running make\!"

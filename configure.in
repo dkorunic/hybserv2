@@ -1,8 +1,16 @@
 dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(source/hybserv.c)
 
+AC_INIT(source/hybserv.c)
 AC_CONFIG_HEADER(include/defs.h)
+
+dnl Get revision number
+if test -f "$srcdir./.svn/entries" ; then
+  REVISION=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+else
+  REVISION="unknown"
+fi
+AC_SUBST(REVISION)
 
 dnl Set language and save it
 AC_LANG_C
@@ -29,6 +37,7 @@ AC_PREFIX_DEFAULT(/usr/local)
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_ISC_POSIX
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(LN, ln)

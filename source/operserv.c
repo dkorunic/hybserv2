@@ -3743,7 +3743,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
           os_notice(lptr, sockfd, temp);
         else
           {
-            strcat(tmp, "\r\n");
+            strcat(temp, "\r\n");
             writesocket(sockfd, temp);
           }
     }

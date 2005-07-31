@@ -913,7 +913,7 @@ os_notice(struct Luser *lptr, int sockfd, char *format, ...)
   else
     {
       writesocket(sockfd, finstr);
-      writesocket(sockfd, "\n");
+      writesocket(sockfd, "\r\n");
     }
 } /* os_notice() */
 
@@ -3268,7 +3268,6 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 #ifdef STATSERVICES
                   show_trace_info(lptr, tempuser, sockfd);
 #endif
-
                 }
               else
                 {
@@ -3357,45 +3356,26 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
   if (target->firstchan)
     {
       if (sockfd == NODCC)
-        os_notice(lptr, sockfd, "Channels:  ");
-      /*
-        toserv(":%s NOTICE %s :Channels:  ",
-               (ServerNotices) ? Me.name : n_OperServ,
-               lptr->nick);
-       */
+        os_notice(lptr, sockfd, "Channels:");
       else
-        writesocket(sockfd, "Channels:  ");
+        writesocket(sockfd, "Channels:\r\n");
 
       for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next)
         {
-          if (tempchan->flags & CH_OPPED)
-            {
-              if (sockfd == NODCC)
-                toserv("@");
-              else
-                writesocket(sockfd, "@");
-            }
-          if (tempchan->flags & CH_VOICED)
-            {
-              if (sockfd == NODCC)
-                toserv("+");
-              else
-                writesocket(sockfd, "+");
-            }
           if (sockfd == NODCC)
-            toserv("%s ",
-                   tempchan->chptr->name);
+            os_notice(lptr, sockfs, "     %s%s%s",
+                (tempchan->flags & CH_OPPED) ? "@" : "",
+                (tempchan->flags & CH_VOICED) ? "+" : "",
+                tempchan->chptr->name);
           else
             {
-              writesocket(sockfd, tempchan->chptr->name);
-              writesocket(sockfd, " ");
+              writesocket(sockfd, "     %s%s%s\r\n",
+                (tempchan->flags & CH_OPPED) ? "@" : "",
+                (tempchan->flags & CH_VOICED) ? "+" : "",
+                tempchan->chptr->name);
             }
-        } /* for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next) */
-
-      if (sockfd == NODCC)
-        toserv("\r\n");
-      else
-        writesocket(sockfd, "\n");
+        } /* for (tempchan = target->firstchan; tempchan; tempchan =
+             tempchan->next) */
     }
 } /* show_trace() */
 
@@ -3809,7 +3789,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   if (sockfd == NODCC)
     toserv("\r\n");
   else
-    writesocket(sockfd, "\n");
+    writesocket(sockfd, "\r\n");
 
   if (cptr->firstban)
     {

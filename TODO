@@ -26,8 +26,6 @@ Pending bugs:
    could there be a configurable option via a operserv set command?
    Also, are there docs on what each operserv set variable is? Some of them
    are obvious, and then again, some aren't...
-*) [21:15] :: monolith: trace is showing a blank field for channels
-   [21:15] :: monolith: when using -long
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff

@@ -87,10 +87,6 @@ int* get_tg( int year, int *days );
 int gnw[] = {31,28,31,30,31,30,31,31,30,31,30,31,31};
 int gw[] = {31,29,31,30,31,30,31,31,30,31,30,31,31};
 
-/* This is _wrong_! We do have LogFile, so I've corrected mistakes in code
- * that is down, too -kre */
-/* char log_filename[] = "hybserv.log"; */
-
 /*
 ss_process()
   Process command coming from 'nick' directed towards n_StatServ

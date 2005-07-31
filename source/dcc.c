@@ -507,7 +507,7 @@ ConnectClient(struct PortInfo *portptr)
   if (MaxConnections && (Network->TotalConns >= MaxConnections))
     {
       /* maximum users reached */
-      writesocket(fd, "Maximum connections reached, try again later\n");
+      writesocket(fd, "Maximum connections reached, try again later\r\n");
       close(fd);
       return;
     }
@@ -797,7 +797,7 @@ TelnetGreet(struct DccUser *dccptr)
   ircsprintf(ver, "\nHybserv2 (TS Services version %s)\n", hVersion);
   writesocket(dccptr->socket, ver);
 
-  writesocket(dccptr->socket, "\nEnter nickname\n");
+  writesocket(dccptr->socket, "\r\nEnter nickname\r\n");
 } /* TelnetGreet() */
 
 /*
@@ -1460,7 +1460,7 @@ ExpireIdent(time_t unixtime)
           /* reset idle time for TelnetTimeout */
           dccptr->idle = current_ts;
 
-          writesocket(dccptr->socket, "\nIdent-request timed out\n");
+          writesocket(dccptr->socket, "\r\nIdent-request timed out\r\n");
           if (!(dccptr->flags & SOCK_TCMBOT))
             TelnetGreet(dccptr);
         }
@@ -1873,7 +1873,7 @@ DccProcess(struct DccUser *dccptr, char *command)
             strcpy(prefix, "User");
 
           /* turn ECHO back on */
-          writesocket(dccptr->socket, "\377\374\001\n");
+          writesocket(dccptr->socket, "\377\374\001\r\n");
 
           /* send them the motd */
           SendMotd(dccptr->socket);
@@ -1920,7 +1920,7 @@ DccProcess(struct DccUser *dccptr, char *command)
           (!ircncmp(command, "HELP", clength)))
         os_process(dccptr->nick, command, dccptr->socket);
       else
-        writesocket(dccptr->socket, "You must identify first\n");
+        writesocket(dccptr->socket, "You must identify first\r\n");
 
     }
   else

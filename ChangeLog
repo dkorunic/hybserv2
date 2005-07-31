@@ -1,5 +1,6 @@
 Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
 
+  * fix trace to show channels when using -long parameters
   * Makefile and configure script changes
   * totally rip out mode +a support, since there is no anonops in recent
     Hybrid7

@@ -493,7 +493,6 @@ os_process(char *nick, char *command, int sockfd)
           MyFree(onick);
           MyFree(ouser);
           MyFree(ohost);
-          /* Be a bit more verbose on denial. -kre */
           os_notice(lptr, sockfd, "Access Denied - user not found");
           return;
         }
@@ -540,8 +539,7 @@ os_process(char *nick, char *command, int sockfd)
 
       if (cptr == (struct OperCommand *) -1)
         {
-          os_notice(lptr, sockfd, "Ambiguous command [%s]",
-                    arv[0]);
+          os_notice(lptr, sockfd, "Ambiguous command [%s]", arv[0]);
           MyFree(arv);
           MyFree(onick);
           MyFree(ouser);
@@ -570,8 +568,7 @@ os_process(char *nick, char *command, int sockfd)
 
       if (bad)
         {
-          os_notice(lptr, sockfd, "Unknown command [%s]",
-                    arv[0]);
+          os_notice(lptr, sockfd, "Unknown command [%s]", arv[0]);
 
           if (sockfd == NODCC)
             {
@@ -3349,33 +3346,30 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
 
   strcpy(tmp, ctime((time_t *) &target->since));
   tmp[strlen(tmp) - 1] = '\0';
-  os_notice(lptr, sockfd,
-            "Signon:    %s",
-            tmp);
+  os_notice(lptr, sockfd, "Signon:    %s", tmp);
 
   if (target->firstchan)
     {
       if (sockfd == NODCC)
         os_notice(lptr, sockfd, "Channels:");
       else
-        writesocket(sockfd, "Channels:\r\n");
+        writesocket(sockfd, "Channels:");
 
       for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next)
         {
-          if (sockfd == NODCC)
-            os_notice(lptr, sockfs, "     %s%s%s",
+          ircsprintf(tmp, "     %s%s%s",
                 (tempchan->flags & CH_OPPED) ? "@" : "",
                 (tempchan->flags & CH_VOICED) ? "+" : "",
                 tempchan->chptr->name);
+
+          if (sockfd == NODCC)
+            os_notice(lptr, sockfd, tmp);
           else
             {
-              writesocket(sockfd, "     %s%s%s\r\n",
-                (tempchan->flags & CH_OPPED) ? "@" : "",
-                (tempchan->flags & CH_VOICED) ? "+" : "",
-                tempchan->chptr->name);
+              strcat(tmp, "\r\n");
+              writesocket(sockfd, tmp);
             }
-        } /* for (tempchan = target->firstchan; tempchan; tempchan =
-             tempchan->next) */
+        }
     }
 } /* show_trace() */
 
@@ -3653,12 +3647,13 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   struct ChannelUser *tempuser;
   char *btime; /* time ban was set */
   char modes[MAXLINE]; /* channel modes */
+  char  temp[MAXLINE];
   int bcnt = 0, /* ban count */
-             ecnt = 0, /* exception count */
-                    ocnt = 0, /* chan ops */
-                           vcnt = 0, /* chan voices */
-                                  icnt = 0, /* chan ircops */
-                                         ncnt = 0; /* nonops */
+      ecnt = 0, /* exception count */
+      ocnt = 0, /* chan ops */
+      vcnt = 0, /* chan voices */
+      icnt = 0, /* chan ircops */
+      ncnt = 0; /* nonops */
 
   os_notice(lptr, sockfd, "Channel Information for %s:",
             cptr->name);
@@ -3690,16 +3685,12 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 
   if (cptr->limit)
     {
-      char  temp[MAXLINE];
-
       ircsprintf(temp, "%s %d", modes, cptr->limit);
       strcpy(modes, temp);
     }
 
   if (cptr->key && *cptr->key)
     {
-      char  temp[MAXLINE];
-
       ircsprintf(temp, "%s %s", modes, cptr->key);
       strcpy(modes, temp);
     }
@@ -3707,21 +3698,15 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 #ifdef DANCER
   if (cptr->forward && *cptr->forward)
   {
-    char  temp[MAXLINE];
-  
     ircsprintf(temp, "%s %s", modes, cptr->forward);
     strcpy(modes, temp);
   }
 #endif /* DANCER */
 
-  os_notice(lptr, sockfd,
-            "Modes:     %s",
-            modes);
+  os_notice(lptr, sockfd, "Modes:     %s", modes);
   strcpy(modes, ctime(&cptr->since));
   modes[strlen(modes) - 1] = '\0';
-  os_notice(lptr, sockfd,
-            "Created:   %s",
-            modes);
+  os_notice(lptr, sockfd, "Created:   %s", modes);
 
   ocnt = ncnt = vcnt = icnt = bcnt = 0;
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
@@ -3736,60 +3721,32 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
         icnt++;
     }
 
-  os_notice(lptr, sockfd,
-            "Ops:       %d",
-            ocnt);
-  os_notice(lptr, sockfd,
-            "Voices:    %d",
-            vcnt);
-  os_notice(lptr, sockfd,
-            "NonOps:    %d",
-            ncnt);
-  os_notice(lptr, sockfd,
-            "IrcOps:    %d",
-            icnt);
-  os_notice(lptr, sockfd,
-            "Total:     %d",
-            cptr->numusers);
+  os_notice(lptr, sockfd, "Ops:       %d", ocnt);
+  os_notice(lptr, sockfd, "Voices:    %d", vcnt);
+  os_notice(lptr, sockfd, "NonOps:    %d", ncnt);
+  os_notice(lptr, sockfd, "IrcOps:    %d", icnt);
+  os_notice(lptr, sockfd, "Total:     %d", cptr->numusers);
 
   if (sockfd == NODCC)
-    /*
-    toserv(":%s NOTICE %s :Nicks:     ",
-           (ServerNotices) ? Me.name : n_OperServ,
-           lptr->nick);
-     */
-    os_notice(lptr, sockfd, "Nicks:     ");
+    os_notice(lptr, sockfd, "Nicks:");
   else
-    writesocket(sockfd, "Nicks:     ");
+    writesocket(sockfd, "Nicks:");
+
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
     {
-      if (tempuser->flags & CH_OPPED)
-        {
-          if (sockfd == NODCC)
-            toserv("@");
-          else
-            writesocket(sockfd, "@");
-        }
-      if (tempuser->flags & CH_VOICED)
-        {
-          if (sockfd == NODCC)
-            toserv("+");
-          else
-            writesocket(sockfd, "+");
-        }
-      if (sockfd == NODCC)
-        toserv("%s ",
-               tempuser->lptr->nick);
-      else
-        {
-          writesocket(sockfd, tempuser->lptr->nick);
-          writesocket(sockfd, " ");
-        }
+      ircsprintf(tmp, "     %s%s%s",
+            (tempuser->flags & CH_OPPED) ? "@" : "",
+            (tempuser->flags & CH_VOICED) ? "+" : "",
+            tempuser->lptr->nick);
+
+        if (sockfd == NODCC)
+          os_notice(lptr, sockfd, tmp);
+        else
+          {
+            strcat(tmp, "\r\n");
+            writesocket(sockfd, tmp);
+          }
     }
-  if (sockfd == NODCC)
-    toserv("\r\n");
-  else
-    writesocket(sockfd, "\r\n");
 
   if (cptr->firstban)
     {
@@ -3800,8 +3757,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
           btime = (char *) ctime(&tempban->when);
           btime[strlen(btime) - 1] = '\0';
           os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-                    bcnt,
-                    tempban->mask,
+                    bcnt, tempban->mask,
                     tempban->who ? tempban->who : "unknown",
                     btime);
         }
@@ -3834,8 +3790,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
           btime = (char *) ctime(&tempe->when);
           btime[strlen(btime) - 1] = '\0';
           os_notice(lptr, sockfd, " [%2d] [%-10s] [%-10s] [%-15s]",
-                    ecnt,
-                    tempe->mask,
+                    ecnt, tempe->mask,
                     tempe->who ? tempe->who : "unknown",
                     btime);
         }

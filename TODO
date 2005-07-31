@@ -2,10 +2,7 @@ $Id$
 
 Today's MOTD
 ------------
-May you have warm words on a cold evening,
-a full mooon on a dark night,
-and a smooth road all the way to your door.
-
+As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
@@ -15,14 +12,14 @@ Pending bugs:
   - operserv admins don't seem to get autovoice/autoop when the level is set to
     0, while regular users would
   - /cs info on private channel should require 1, not CMDINVITE
-*) get rid of bashisms in cleandb
+*) get rid of bashisms in cleandb [fixing...]
 *) From Jared:
   if a user adds a linked nickname then deletes that linked nickname
   several times they start getting the too many nicks error.. it looks
   like the numlinks is being incremented several times every time someone
   adds a link and not being decremented at the same rate...
 *) does not want to unforbid sometimes (??)
-*) fix *LOCK functions
+*) fix *LOCK functions (topic and mode lock)
 *) temp ignores rotate (possible overflow)
 *) 20 nicknames problem
 *) > I plan on just setting the nickflood level higher in config.h, but
@@ -31,12 +28,9 @@ Pending bugs:
    are obvious, and then again, some aren't...
 *) [21:15] :: monolith: trace is showing a blank field for channels
    [21:15] :: monolith: when using -long
-*) [23:18] :: monolith: hey buddy, i noticed that the OPERWALL/WALLOPS
-   thing wasn't in your latest cvs
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
 *) o_match - fix to add *! and similar stuff
-*) set allowguardchannel 0 -> part all channels immediately
 *) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count

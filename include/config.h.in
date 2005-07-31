@@ -11,10 +11,6 @@
 /* ------------------- Start of configurable section ------------ */
 
 /*
- *                             BASIC FEATURES
- */
-
-/*
  * This will automagically transform into correct SETPATH. Don't change
  * it.
  */
@@ -79,19 +75,14 @@
  */
 #define   EMPOWERADMINS_MORE
 
-
-/* 
- *                           ADVANCED FEATURES
- */
-
 /*
- * Define this to allow users to link their nickname to another, thus
- * being able to use multiple nicknames, without having configure each
- * one. All nicknames in the same link will share a common access list,
- * memos, and set options. Also, if a nickname has access to a certain
- * channel, all nicknames in it's link list will have the same access.
- * Furthermore, when a nickname identifies, he/she will be identified for
- * every nickname in their link.
+ * << STRONGLY RECOMMENDED >> Define this to allow users to link their
+ * nickname to another, thus being able to use multiple nicknames, without
+ * having configure each one. All nicknames in the same link will share a
+ * common access list, memos, and set options. Also, if a nickname has
+ * access to a certain channel, all nicknames in it's link list will have
+ * the same access.  Furthermore, when a nickname identifies, he/she will
+ * be identified for every nickname in their link.
  */
 #define   LINKED_NICKNAMES
 
@@ -160,6 +151,12 @@
  */
 #define   SAVE_TS
 
+/* Define this if you want to use OPERWALL instead of WALLOPS for
+ * system-wide messages. Enabled by default.
+ */
+
+#define   OPERWALL
+
 /*
  * Define this to allocate memory for clients/channels/servers in large
  * chunks rather than doing it individually
@@ -226,7 +223,7 @@
  * users have scripted IDENTIFY-ing it can cause almost immediate HTM
  * switching. So let it be 10 secs by default.
  */
-#define HTM_INTERVAL 5
+#define   HTM_INTERVAL 5
 
 /*
  * Set this to how many times we read the hub server's file descriptor in
@@ -305,7 +302,7 @@
  * (compiled with --enable-halfops); by default it is enabled if you're
  * using Hybrid7.
  */
-#define HYBRID7_HALFOPS
+#define   HYBRID7_HALFOPS
 
 /*
  * Define this if you don't like the idea of one person being able to jupe
@@ -373,14 +370,14 @@
  * reply of any of the services. This could be a little performance hit on
  * large O line configuration files..
  */
-#define ADMININFO
+#define   ADMININFO
 
 /*
  * Turn this on to support gecos bans for Hybrid5/6.
  * NOTE: This _has_ to be turned off for Hybrid7, since it does not
  *       support +d style modes.
  */
-#define GECOSBANS
+#define   GECOSBANS
 
 /*
  * Defining ADVFLOOD enables advanced flood protection. Every client
@@ -402,30 +399,30 @@
  *   a non-idented user, the entire host will be glined, not just the user
  *   (since it's probably a script randomly choosing idents).
  */
-#undef ADVFLOOD
-#define ADVFLOOD_TABLE  60 
-#define ADVFLOOD_DELAY  10
-#define ADVFLOOD_COUNT  10 
-#define ADVFLOOD_NOTIFY
-#undef ADVFLOOD_NOTIFY_ALL
-#define ADVFLOOD_GLINE
-#define ADVFLOOD_GLINE_REASON "Reconnect / NICK flooding."
-#define ADVFLOOD_GLINE_TIME   "1h"
-#define ADVFLOOD_NOIDENT_GLINEHOST
+#undef    ADVFLOOD
+#define   ADVFLOOD_TABLE  60 
+#define   ADVFLOOD_DELAY  10
+#define   ADVFLOOD_COUNT  10 
+#define   ADVFLOOD_NOTIFY
+#undef    ADVFLOOD_NOTIFY_ALL
+#define   ADVFLOOD_GLINE
+#define   ADVFLOOD_GLINE_REASON "Reconnect / NICK flooding."
+#define   ADVFLOOD_GLINE_TIME   "1h"
+#define   ADVFLOOD_NOIDENT_GLINEHOST
 
 /*
  * Defining this will make services capable of detecting so called
  * "services fight", unpleasant situation when two or more services are
  * fighting over their nicknames and causing HTM.
  */
-#define SERVICES_FIGHT_FIX
+#define   SERVICES_FIGHT_FIX
 
 /*
  * <<STRONGLY RECOMMENDED>> Forces nick change instead of disconnecting
  * the user (when kill protection is set). If users client has not changed
  * its nickname after predefined timeout, kill him as usual.
  */
-#define FORCE_NICK_CHANGE
+#define   FORCE_NICK_CHANGE
 
 /*
  * Alternative nick changing methods - SVSNICK [could be working on
@@ -437,16 +434,16 @@
  * many characters you want to fill in as random numbers. When undefined,
  * it pads as much numbers as in can get to fill the nickname length.
  */
-#undef FORCENICK
-#define FORCENICK_LEN 4
-#undef SVSNICK
+#undef    FORCENICK
+#define   FORCENICK_LEN 4
+#undef    SVSNICK
 
 /*
  * Schedule nick kill instead of immediate killing for user-triggered
  * ghost command. Turn this on on very large networks to have smoother
  * operation. Beware that nick kills resolution is only every 30 seconds.
  */
-#define SCHEDULE_COLLIDE
+#define   SCHEDULE_COLLIDE
 
 /* ------------------- End of configurable section -------------- */
 
@@ -529,7 +526,7 @@
  * Turn off assertions by default if not debugging. Undefine this if you
  * still want assertions, and DEBUG is not defined.
  */
-#define NDEBUG
+#define   NDEBUG
 
 /*
  * Define this if you want to make sure core will be properly dumped if
@@ -546,12 +543,12 @@
  * so that all databases will be checked and fixed. If you know what are
  * you doing, you can disable it.
  */
-#undef STRICT_DATA_CHECK
+#undef    STRICT_DATA_CHECK
 
 /*
  * DJB's daemontools compatibility stuff. Won't fork() into background, nor
  * setsid(), which makes it possible to be run under svscan.
  */
-#undef DAEMONTOOLS
+#undef    DAEMONTOOLS
 
 #endif /* INCLUDED_config_h */

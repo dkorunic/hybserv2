@@ -1055,7 +1055,11 @@ o_Wallops(char *format, ...)
   vsprintf_irc(buffer, format, args);
   va_end(args);
 
+#ifdef OPERWALL
   toserv(":%s OPERWALL :%s: %s\r\n", Me.name, n_OperServ, buffer);
+#else
+  toserv(":%s WALLOPS :%s: %s\r\n", Me.name, n_OperServ, buffer);
+#endif /* OPERWALL */
 
 } /* o_Wallops() */
 

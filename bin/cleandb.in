@@ -9,7 +9,8 @@
 # directory looking neat, instead of having hundreds of
 # different directories with similar database backups :-)
 #
-# Usage: ./cleandb [--help | --confirm] [backup-directory]
+# Usage: ./cleandb [[ -h | --help ] | [[ -c | --confirm]
+# [backup-directory]]]
 #
 # The --confirm option will cause the script to ask for
 # confirmation for each directory being deleted.
@@ -25,11 +26,11 @@ datecheck="$(date '+%Y%m')"
 default="y"
 count=0
 
-if [ ! "x$1" = "x" ]; then
+if [ "x$1" != "x" ]; then
   case "$1" in
-    -c | --confirm | --confir | --confi | --conf | --con | --co | --c)
+    -c | --confirm)
       confirm="yes"
-      if [ ! "x$2" = "x" ]; then
+      if [ "x$2" != "x" ]; then
         BackupDir="$2"
       fi
     ;;
@@ -55,14 +56,14 @@ cd "$BackupDir"
 # Use echo here to take the \n characters out of the ls output
 # and replace them with spaces. This probably isn't the best
 # way to do it :-/
-directories="`echo *`"
+directories=`echo *`
 
 for backdir in $directories; do
 
   # If the length of $backdir is not 8, it does not satisfy
   # the YYYYMMDD form, assume we are in the wrong directory and
   # exit because we don't want to delete something important, etc
-  if [ ! "${#backdir}" = "8" ]; then
+  if [ "${#backdir}" != "8" ]; then
     echo "$BackupDir: $backdir is an invalid backup directory, exiting"
     exit 1
   fi
@@ -82,13 +83,13 @@ for backdir in $directories; do
 
   # If the YYYYMM of the current directory does not match
   # the current year/month ($datecheck) delete the directory
-  if [ ! "$tmp" = "$datecheck" ]; then
-    if [ "$confirm" = "yes" ]; then
+  if [ "$tmp" != "$datecheck" ]; then
+    if [ "x$confirm" = "xyes" ]; then
       gotyn=0
       while [ $gotyn -eq 0 ]; do
         echo -n "Remove $backdir? [$default] "
         read Input
-        if [ ! "x$Input" = "x" ]; then
+        if [ "x$Input" != "x" ]; then
           Input="$default"
         fi
 

@@ -45,21 +45,14 @@ struct Channel;
 #define CS_EXPIREBANS   0x00002000 /* expire bans after EXPIRETIME */
 
 /* access_lvl[] indices */
-/* We will happily FUBAR old databases by changing this. However, it had
- * to be done -kre && Janos
- * PS, I have added upgrade-chan target in Makefile for fixing this
- * properly - it relies on awk and DefaultAccess as well as ALVL in
- * chan.db -kre */
-#ifdef HYBRID7
+#if defined HYBRID7 && defined HYBRID7_HALFOPS
 # define CA_AUTODEOP     0
 # define CA_AUTOVOICE    1
 # define CA_CMDVOICE     2
 # define CA_ACCESS       3
 # define CA_CMDINVITE    4
-#ifdef HYBRID7_HALFOPS
 # define CA_AUTOHALFOP   5
 # define CA_CMDHALFOP    6
-#endif /* HYBRID7_HALFOPS */
 # define CA_AUTOOP       7
 # define CA_CMDOP        8
 # define CA_CMDUNBAN     9
@@ -84,7 +77,7 @@ struct Channel;
 # define CA_SUPEROP      11
 # define CA_FOUNDER      12
 # define CA_SIZE         13 /* number of indices */
-#endif /* HYBRID7 */
+#endif /* HYBRID7 && HYBRID7_HALFOPS */
 
 struct ChanAccess
 {

@@ -3734,17 +3734,17 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
     {
-      ircsprintf(tmp, "     %s%s%s",
+      ircsprintf(temp, "     %s%s%s",
             (tempuser->flags & CH_OPPED) ? "@" : "",
             (tempuser->flags & CH_VOICED) ? "+" : "",
             tempuser->lptr->nick);
 
         if (sockfd == NODCC)
-          os_notice(lptr, sockfd, tmp);
+          os_notice(lptr, sockfd, temp);
         else
           {
             strcat(tmp, "\r\n");
-            writesocket(sockfd, tmp);
+            writesocket(sockfd, temp);
           }
     }
 

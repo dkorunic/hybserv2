@@ -24,16 +24,16 @@ INSTALLATION:
     3) Run 'make' in the hybserv tree to compile the package. When make
        finishes, you'll probably want to: 'strip bin/hybserv' to remove
        debugging symbols from the file, since the author is the only one
-       who really uses it.  It also decreases the file size greatly.
+       who really uses it. It also decreases the file size greatly.
 
     4) Finally, become root if necessary, and run 'make install' to
-       install Hybserv2 on your system.  The default install directory is
-       /usr/local/hybserv.  This will automatically chown the install
+       install Hybserv2 on your system. The default install directory is
+       /usr/local/hybserv. This will automatically chown the install
        directory to the same user who ran the configure script, so it
-       won't run as root.  You can change the user by editing Makefile.
+       won't run as root. You can change the user by editing Makefile.
 
     5) You may wish to remove any objects/binaries created during
-       installation.  You can do this via 'make clean'.  If you wish to
+       installation. You can do this via 'make clean'. If you wish to
        remove any configure generated files as well, use 'make distclean'.
 
 	 ** Note: if you want to install Hybserv2 in a directory other than
@@ -51,13 +51,13 @@ INSTALLATION:
   Hybserv2 is known to compile cleanly on the following operating systems,
   and may compile on others.
 
-    Linux 2.4.x (and older)
-    FreeBSD 4.4 (and older)
-    OpenBSD 2.7 (and older)
-    Solaris 8 (and older)
+    Linux 2.6.x (and older) with most distributions
+    FreeBSD 5.x (and older)
+    OpenBSD 2.x (and older)
+    Solaris 10 (and older)
     Digital Unix 4.0
     Cygwin 1.1.3 (and newer)
 
  If you are unable to compile Hybserv, please let me know at
- kreator@srce.hr.  Bug reports/suggestions may be sent to the same
- address.  Now, go back to the README.
+ kreator|AT|srce|hr. Bug reports/suggestions may be sent to the same
+ address. Now, go back to the README.

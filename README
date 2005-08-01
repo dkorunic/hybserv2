@@ -62,18 +62,18 @@ published by the Free Software Foundation.
 #########################################################
 
 DISTRIBUTION:
-  You can get Hybserv from:
+  You can get Hybserv2 from:
 
-  #1:  Anonymous SVN (HEAD):
-       svn co svn://hybserv.net/trunk hybserv
+  #1:  Anonymous SVN (current version - HEAD):
+       svn co svn://svn.hybserv.net/trunk hybserv
 
   #2:  SVN Web access:
-       http://hybserv.net/
+       http://svn.hybserv.net/
 
   #3:  Mirrors:
+       http://www.hybserv.net/downloads/
        http://kreator.esa.fer.hr/projects/tarballs/
        http://hybserv.icsbg.net/
-       /* OUTDATED */ http://www.2mbit.com/hybserv2/
 
 NOTE: SVN is usually more current than the release.
 

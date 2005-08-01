@@ -4,6 +4,7 @@ Today's MOTD
 ------------
 As long as the answer is right, who cares if the question is wrong?
 
+
 Pending bugs:
 -------------
 *) bunch of *old* stuff I've found around:
@@ -12,7 +13,6 @@ Pending bugs:
   - operserv admins don't seem to get autovoice/autoop when the level is set to
     0, while regular users would
   - /cs info on private channel should require 1, not CMDINVITE
-*) get rid of bashisms in cleandb [fixing...]
 *) From Jared:
   if a user adds a linked nickname then deletes that linked nickname
   several times they start getting the too many nicks error.. it looks
@@ -21,18 +21,15 @@ Pending bugs:
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions (topic and mode lock)
 *) temp ignores rotate (possible overflow)
-*) 20 nicknames problem
 *) > I plan on just setting the nickflood level higher in config.h, but
    could there be a configurable option via a operserv set command?
    Also, are there docs on what each operserv set variable is? Some of them
    are obvious, and then again, some aren't...
 *) oper can't setup anything with other nicks
 *) check dccprocess with similar bug as botprocess..
-*) o_match - fix to add *! and similar stuff
 *) nickserv and chanserv have to be always enabled - fix this.
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count
-*) clear modes doesn't clear limit
 *) check for OnAccessList() without master nick call - only when necessary
 *) remember to transfer access list in DeleteLink()
 *) seems it is possible that nickname stays ghosted more than necessary if

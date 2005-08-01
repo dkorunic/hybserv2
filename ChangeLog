@@ -1,4 +1,4 @@
-Hybserv: Sun, 24 Jul 2005 00:09:05 +0200
+Hybserv: Sun, 31 Jul 2005 16:09:51 +0200
 
   * fix trace to show channels when using -long parameters
   * Makefile and configure script changes

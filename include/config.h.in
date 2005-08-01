@@ -23,26 +23,26 @@
 
 /*
  * Define this to enable ChanServ (Channel Services)
- * --NOTE: ChanServ requires NICKSERVICES, so if NickServ is disabled,
- *         ChanServ will be disabled as well (NickServ can function
- *         perfectly without ChanServ however)
+ * NOTE: ChanServ requires NICKSERVICES, so if NickServ is disabled,
+ *       ChanServ will be disabled as well (NickServ can function
+ *       perfectly without ChanServ however)
  * At this moment we require CHANNELSERVICES too.
  */
 #define   CHANNELSERVICES
 
 /*
  * Define this to enable MemoServ (Memo Services)
- * --NOTE: MemoServ requires NICKSERVICES, so if NickServ is disabled,
- *         MemoServ will be disabled as well (NickServ can function
- *         perfectly without MemoServ however)
+ * NOTE: MemoServ requires NICKSERVICES, so if NickServ is disabled,
+ *       MemoServ will be disabled as well (NickServ can function
+ *       perfectly without MemoServ however)
  */
 #define   MEMOSERVICES
 
 /*
  * Define this to enable StatServ (Statistic Services)
- * --NOTE: StatServ requires NICKSERVICES, so if NickServ is disabled,
- *         StatServ will be disabled as well (NickServ can function
- *         perfectly without StatServ however)
+ * NOTE: StatServ requires NICKSERVICES, so if NickServ is disabled,
+ *       StatServ will be disabled as well (NickServ can function
+ *       perfectly without StatServ however)
  */
 #define   STATSERVICES
 
@@ -236,9 +236,9 @@
 /*
  * << STRONGLY RECOMMENDED >> Define this to use encrypted
  * nickname/channel passwords for your databases
- * --NOTE: If you change from using encryption to not using it, or vice
- *         versa, your database files will not work (you'll have to create
- *         new ones)
+ * NOTE: If you change from using encryption to not using it, or vice
+ *       versa, your database files will not work (you'll have to create
+ *       new ones)
  */
 #define   CRYPT_PASSWORDS
 
@@ -260,9 +260,9 @@
 
 /* 
  * Define these if you wish to enable glines and/or jupes 
- * --NOTE: In order for ALLOW_JUPES to work correctly, you must give
- *         services an H: line in ircd.conf because it must create a fake
- *         server to take the place of the juped one
+ * NOTE: In order for ALLOW_JUPES to work correctly, you must give
+ *       services an H: line in ircd.conf because it must create a fake
+ *       server to take the place of the juped one
  */
 #define   ALLOW_GLINES
 #define   ALLOW_JUPES

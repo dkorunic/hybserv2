@@ -43,8 +43,7 @@ char *strchr(), *strrchr();
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
-# include <string.h>
-#else
+#  include <string.h>
 #endif
 
 #if HAVE_STRINGS_H

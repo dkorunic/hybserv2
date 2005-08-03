@@ -1,9 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <time.h>
+/*
+ * Hybserv2 Services by Hybserv2 team
+ * This program comes with absolutely NO WARRANTY
+ *
+ * Should you choose to use and/or modify this source code, please
+ * do so under the terms of the GNU General Public License under which
+ * this program is distributed.
+ *
+ * $Id$
+ */
 
-#include "defs.h"
+#include "stdinc.h"
 
 static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 

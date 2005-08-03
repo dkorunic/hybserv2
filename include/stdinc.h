@@ -81,4 +81,16 @@ char *strchr(), *strrchr();
 # include <netinet/in.h>
 #endif
 
+#if HAVE_ERRNO_H
+# include <errno.h>
+#endif
+
+#if HAVE_LIBDMALLOC
+# include <dmalloc.h>
+#endif
+
+#if HAVE_ASSERT_H
+# include <assert.h>
+#endif
+
 #endif /* INCLUDED_stdinc_h */

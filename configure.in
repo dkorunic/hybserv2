@@ -54,8 +54,7 @@ AC_SUBST(WHOAMI)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/socket.h)
-AC_CHECK_HEADERS(netinet/in.h)
+AC_CHECK_HEADERS(errno.h assert.h sys/socket.h netinet/in.h)
 
 dnl Add standard prefix to fix broken environments
 LIBS="${LIBS}"

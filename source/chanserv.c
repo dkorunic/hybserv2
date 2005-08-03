@@ -9,18 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <assert.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "channel.h"
 #include "chanserv.h"
@@ -45,7 +34,7 @@
 #include "timestr.h"
 #include "sprintf_irc.h"
 
-#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+#if defined NICKSERVICES && defined CHANNELSERVICES
 
 /* hash table of registered channels */
 struct ChanInfo *chanlist[CHANLIST_MAX];

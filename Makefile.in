@@ -55,10 +55,10 @@ CONFFILES = motd.dcc motd.global
 HPATHFIX = settings.conf
 
 # Subdirs for make
-SUBDIRS = source tools
+SUBDIRS = src tools
 
 # Rest of standard Makefile
-all: depend source tools
+all: depend src tools
 	@echo "*** Begin building Hybserv2 version $(VERSION) ***"
 	@echo
 	@for i in $(SUBDIRS); do \
@@ -86,7 +86,7 @@ clean:
 distclean: clean
 	@echo '*** Removing objects and misc files ***'
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
-		include/config.h bin/settings.conf bin/cleandb source/.depend \
+		include/config.h bin/settings.conf bin/cleandb src/.depend \
 		config.status tags config.cache config.log ~* core \
 		hybserv.core `find . -type f -size 0 -print`
 	$(RM) `find . -type f \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
@@ -97,10 +97,10 @@ mrproper: distclean
 
 depend:
 	@echo '*** Making dependancies ***'
-	@if [ ! -f source/.depend ]; then \
-		touch source/.depend; \
+	@if [ ! -f src/.depend ]; then \
+		touch src/.depend; \
 	fi
-	@cd source; $(MAKE) depend
+	@cd src; $(MAKE) depend
 
 install: all install-binary install-help
 	@echo "*** Done installing Hybserv2 $(VERSION) ***"

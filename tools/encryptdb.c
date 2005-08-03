@@ -18,11 +18,7 @@
  * Usage: ./encryptdb *.db
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
+#include "stdinc.h"
 
 #define    MAXLINE    1024
 
@@ -32,12 +28,10 @@
 
 extern char *doencrypt(char *);
 extern char *doencrypt_md5(char *);
-extern int rename(const char *oldpath, const char *newpath);
-void usage();
+extern int rename(const char *, const char *);
+void usage(void);
 
-int
-main(int argc, char *argv[])
-
+int main(int argc, char *argv[])
 {
   FILE *old, *new;
   char newpath[MAXLINE],
@@ -150,7 +144,6 @@ main(int argc, char *argv[])
 
 
 void usage ()
-
 {
   printf("Usage: encryptdb [-m|-d] <database1> "
          "[database2 database3 ...]\n");

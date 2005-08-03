@@ -18,26 +18,19 @@
  * Usage: ./encryptconf *.conf
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include "stdinc.h"
 
 #define    MAXLINE    1024
 
 #define    FLAG_MD5   0x00000001
 #define    FLAG_DES   0x00000002
 
-
-extern int rename(const char *oldpath, const char *newpath);
+extern int rename(const char *, const char *);
 extern char *doencrypt(char *);
 extern char *doencrypt_md5(char *);
-void usage();
+void usage(void);
 
-int
-main(int argc, char *argv[])
-
+int main(int argc, char *argv[])
 {
   FILE *old, *new;
   char newpath[MAXLINE],

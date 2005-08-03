@@ -9,12 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdlib.h>
-#include <sys/types.h>
-#include <string.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "channel.h"
 #include "client.h"
@@ -22,10 +17,6 @@
 #include "log.h"
 #include "misc.h"
 #include "server.h"
-
-#ifdef LIBDMALLOC
-#include <dmalloc.h>
-#endif
 
 #ifdef BLOCK_ALLOCATION
 

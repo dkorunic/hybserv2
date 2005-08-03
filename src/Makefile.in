@@ -1,0 +1,85 @@
+# Hybserv ./source Makefile
+# $Id$
+
+CC = @CC@
+CFLAGS = -Wall -pipe @CFLAGS@
+LDFLAGS = @LDFLAGS@
+INCLUDE = -I. -I../include
+DEFS =
+LIBS = @LIBS@
+MKDEP = $(CC) -MM
+RM = @RM@ -f
+
+IDIR = ../include
+
+DEPENDFILE = .depend
+
+SOURCES =                  \
+  alloc.c                  \
+  channel.c                \
+  chanserv.c               \
+  client.c                 \
+  conf.c                   \
+  crypt.c                  \
+  data.c                   \
+  dcc.c                    \
+  flood.c                  \
+  gline.c                  \
+  global.c                 \
+  hash.c                   \
+  helpserv.c               \
+  hybserv.c                \
+  init.c                   \
+  jupe.c                   \
+  log.c                    \
+  match.c                  \
+  memoserv.c               \
+  misc.c                   \
+  motd.c                   \
+  mystring.c               \
+  nickserv.c               \
+  operserv.c               \
+  seenserv.c               \
+  server.c                 \
+  settings.c               \
+  show.c                   \
+  sock.c                   \
+  statserv.c               \
+  timer.c                  \
+  timestr.c                \
+  sprintf_irc.c
+
+OBJECTS = ${SOURCES:.c=.o} version.o
+
+# Binaries
+
+HYBSERV = ../bin/hybserv
+
+all: $(HYBSERV)
+
+$(HYBSERV): $(OBJECTS) $(LIBDEPS)
+	$(CC) -o $(HYBSERV) $(OBJECTS) $(LDFLAGS) $(LIBS)
+
+depend:
+	$(MKDEP) $(INCLUDE) $(SOURCES) > $(DEPENDFILE)
+
+clean:
+	$(RM) $(HYBSERV) $(OBJECTS)
+
+distclean: clean
+	$(RM) Makefile
+
+# $(DEPENDFILE): depend
+
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(INCLUDE) $(CFLAGS) -c $<
+
+## Dependencies
+version.o: version.c
+	$(CC) $(INCLUDE) $(CFLAGS) -DVERSION=\"$(VERSION)\" -c $<
+
+include $(DEPENDFILE)
+
+# End of source/Makefile

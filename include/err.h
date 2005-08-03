@@ -8,6 +8,9 @@
 #ifndef INCLUDED_err_h
 #define INCLUDED_err_h
 
+#include "stdinc.h"
+#include "config.h"
+
 #define ERR_NOPRIVS "No privileges"
 
 /* NickServ error messages */

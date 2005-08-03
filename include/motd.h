@@ -8,14 +8,13 @@
 #ifndef INCLUDED_motd_h
 #define INCLUDED_motd_h
 
+#include "stdinc.h"
+#include "config.h"
+
 #define MESSAGELINELEN 89
 #define MAX_DATESTRING 32
 
 struct Luser;
-
-/*
- * This idea of caching motd file entries is from ircd-hybrid
- */
 
 struct MessageFileLine
 {
@@ -30,12 +29,8 @@ struct MessageFile
   char DateLastChanged[MAX_DATESTRING + 1];
 };
 
-/*
- * Prototypes
- */
-
-void InitMessageFile(struct MessageFile *mptr);
-int ReadMessageFile(struct MessageFile *mptr);
-void SendMessageFile(struct Luser *lptr, struct MessageFile *mptr);
+void InitMessageFile(struct MessageFile *);
+int ReadMessageFile(struct MessageFile *);
+void SendMessageFile(struct Luser *, struct MessageFile *);
 
 #endif /* INCLUDED_motd_h */

@@ -8,25 +8,11 @@
 #ifndef INCLUDED_chanserv_h
 #define INCLUDED_chanserv_h
 
-#ifndef INCLUDED_sys_types_h
-#include <sys/types.h>        /* time_t */
-#define INCLUDED_sys_types_h
-#endif
-
-#ifndef INCLUDED_config_h
-#include "config.h"       /* CHANNELSERVICES, HYBRID_ONLY */
-#define INCLUDED_config_h
-#endif
-
-#ifndef INCLUDED_hash_h
-#include "hash.h"         /* CHANLIST_MAX */
-#define INCLUDED_hash_h
-#endif
+#include "stdinc.h"
+#include "config.h"
+#include "hash.h"
 
 #ifdef CHANNELSERVICES
-
-struct Luser;
-struct Channel;
 
 /* ChanServ flags */
 #define CS_PRIVATE      0x00000001 /* channel won't show up in LIST */
@@ -79,6 +65,9 @@ struct Channel;
 # define CA_SIZE         13 /* number of indices */
 #endif /* HYBRID7 && HYBRID7_HALFOPS */
 
+struct Luser;
+struct Channel;
+
 struct ChanAccess
 {
   struct ChanAccess *next, *prev;
@@ -89,8 +78,8 @@ struct ChanAccess
   /*
    * pointer to corresponding AccessChannel structure on nptr's
    * AccessChannels list - this way, when we delete a ChanAccess
-   * structure, we don't have to loop through all of nptr's
-   * access channels to find the corresponding pointer.
+   * structure, we don't have to loop through all of nptr's access
+   * channels to find the corresponding pointer.
    */
   struct AccessChannel *acptr;
   time_t created; /* time when this entry was added */
@@ -121,8 +110,8 @@ struct ChanInfo
 #ifdef DANCER
   char *forward;                /* NULL if no forward target */
 #endif /* DANCER */
-  int modes_on,                 /* modes to enforce */
-      modes_off;                /* modes to enforce off */
+  int modes_on;                 /* modes to enforce */
+  int modes_off;                /* modes to enforce off */
   struct ChanAccess *access;    /* access list */
   int akickcnt;                 /* number of akicks */
   struct AutoKick *akick;       /* autokick list */
@@ -145,46 +134,36 @@ struct ChanInfo
   long flags;                   /* channel flags */
 };
 
-/*
- * Prototypes
- */
-
-void cs_process(char *nick, char *command);
-void cs_join(struct ChanInfo *cptr);
-void cs_join_ts_minus_1(struct ChanInfo *cptr);
-void cs_part(struct Channel *chptr);
-void cs_CheckOp(struct Channel *chptr, struct ChanInfo *cptr,
-                char *nick);
-void cs_CheckJoin(struct Channel *chptr, struct ChanInfo *cptr,
-                  char *nick);
-void cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
-                   int nickcnt, char **nicks, int newchan);
-void cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
-                   int isminus, int mode, struct Luser *lptr);
-void cs_CheckTopic(char *who, char *channel);
-int cs_ShouldBeOnChan(struct ChanInfo *cptr);
-void cs_RejoinChannels();
-void PromoteSuccessor(struct ChanInfo *cptr);
-void ExpireChannels(time_t unixtime);
-void ExpireBans(time_t unixtime);
-void ExpireAkicks(time_t unixtime);
+void cs_process(char *, char *);
+void cs_join(struct ChanInfo *);
+void cs_join_ts_minus_1(struct ChanInfo *);
+void cs_part(struct Channel *);
+void cs_CheckOp(struct Channel *, struct ChanInfo *, char *);
+void cs_CheckJoin(struct Channel *, struct ChanInfo *, char *);
+void cs_CheckSjoin(struct Channel *, struct ChanInfo *, int, char **,
+    int);
+void cs_CheckModes(struct Luser *, struct ChanInfo *, int, int, struct
+    Luser *);
+void cs_CheckTopic(char *, char *);
+int cs_ShouldBeOnChan(struct ChanInfo *);
+void cs_RejoinChannels(void);
+void PromoteSuccessor(struct ChanInfo *);
+void ExpireChannels(time_t);
+void ExpireBans(time_t);
+void ExpireAkicks(time_t);
 
 #ifndef HYBRID_ONLY
 void CheckEmptyChans();
 #endif /* !HYBRID_ONLY */
 
-struct ChanInfo *FindChan(char *channel);
-void DeleteChan(struct ChanInfo *cptr);
-void RemFounder(struct Luser *lptr, struct ChanInfo *cptr);
-void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr);
-int HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level);
-void SetDefaultALVL(struct ChanInfo *cptr);
+struct ChanInfo *FindChan(char *);
+void DeleteChan(struct ChanInfo *);
+void RemFounder(struct Luser *, struct ChanInfo *);
+void DeleteAccess(struct ChanInfo *, struct ChanAccess *);
+int HasAccess(struct ChanInfo *, struct Luser *, int);
+void SetDefaultALVL(struct ChanInfo *);
 void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 int IsFounder(struct Luser *, struct ChanInfo *);
-
-/*
- * Extern declarations
- */
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;

@@ -1,5 +1,7 @@
-Hybserv: Sun, 31 Jul 2005 16:09:51 +0200
+Hybserv: Wed,  3 Aug 2005 21:53:14 +0200
 
+  * massive rewrite of includes and better detection of system
+    headers/functions
   * fix trace to show channels when using -long parameters
   * Makefile and configure script changes
   * totally rip out mode +a support, since there is no anonops in recent

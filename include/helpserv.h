@@ -8,17 +8,13 @@
 #ifndef INCLUDED_helpserv_h
 #define INCLUDED_helpserv_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* HELPSERVICES */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "config.h"
 
 #ifdef HELPSERVICES
-
-void hs_process(char *nick, char *command);
-
+void hs_process(char *, char *);
 #endif /* HELPSERVICES */
 
-void GiveHelp(char *serv, char *nick, char *command, int sockfd);
+void GiveHelp(char *, char *, char *, int);
 
 #endif /* INCLUDED_helpserv_h */

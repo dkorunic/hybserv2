@@ -8,23 +8,12 @@
 #ifndef INCLUDED_dcc_h
 #define INCLUDED_dcc_h
 
-#ifndef INCLUDED_hybdefs_h
-#include "hybdefs.h"         /* MAXLINE needed -kre */
-#define INCLUDED_hybdefs_h
-#endif
-
-#ifndef INCLUDED_sys_time_h
-#include <sys/time.h>         /* time_t */
-#define INCLUDED_sys_time_h
-#endif
-
-struct Luser;
-struct PortInfo;
-struct Botlist;
+#include "stdinc.h"
+#include "config.h"
+#include "hybdefs.h"
 
 /* socket flags */
-#define NOSOCKET (-2) /* unused socket in portlist */
-
+#define NOSOCKET     (-2) /* unused socket in portlist */
 #define SOCK_UNUSED  (1 << 0) /* unused socket */
 #define SOCK_TCMBOT  (1 << 1) /* socket is a tcm bot connection */
 #define SOCK_BOTHUB  (1 << 2) /* tcm bot is the hub */
@@ -35,17 +24,16 @@ struct Botlist;
 #define SOCK_WRID    (1 << 7) /* need to request ident */
 #define SOCK_CONNECT (1 << 8) /* connection has been activated */
 
-/*
- * DccUser flag macros
- */
-
+/* DccUser flag macros */
 #define SetDccConnect(x)   ((x)->flags |= SOCK_CONNECT)
 #define IsDccConnect(x)    ((x)->flags &  SOCK_CONNECT)
 #define ClearDccConnect(x) ((x)->flags &= ~SOCK_CONNECT)
-
 #define SetDccPending(x)   ((x)->flags |= SOCK_PENDING)
 #define IsDccPending(x)    ((x)->flags &  SOCK_PENDING)
 #define ClearDccPending(x) ((x)->flags &= ~SOCK_PENDING)
+
+struct PortInfo;
+struct Botlist;
 
 /* info for dcc/tcm connections */
 struct DccUser
@@ -61,51 +49,39 @@ struct DccUser
   char spill[MAXLINE * 2];
   int offset;
 
-  /*
-   * time of their last message - for telnet clients who haven't
-   * entered their password yet, time that they connected
-   */
+  /* time of their last message - for telnet clients who haven't entered
+   * their password yet, time that they connected */
   time_t idle;
 };
 
-/*
- * Prototypes
- */
-
 void BroadcastDcc(int, char *, ...);
 void SendUmode(int, char *, ...);
-
-void SendDccMessage(struct DccUser *dccptr, char *msg);
-void ConnectClient(struct PortInfo *portptr);
-int GreetDccUser(struct DccUser *dccptr);
-void TelnetGreet(struct DccUser *dccptr);
-void ExpireIdent(time_t unixtime);
-void ExpireTelnet(time_t unixtime);
-void CheckEOF();
-struct Userlist *DccGetUser(struct DccUser *dccptr);
+void SendDccMessage(struct DccUser *, char *);
+void ConnectClient(struct PortInfo *);
+int GreetDccUser(struct DccUser *);
+void TelnetGreet(struct DccUser *);
+void ExpireIdent(time_t);
+void ExpireTelnet(time_t);
+void CheckEOF(void);
+struct Userlist *DccGetUser(struct DccUser *);
 int telnet_check(int, char *);
-void readauth(struct DccUser *dccptr);
-void writeauth(struct DccUser *dccptr);
+void readauth(struct DccUser *);
+void writeauth(struct DccUser *);
 void onctcp(char *, char *, char *);
-int ConnectToTCM(char *, struct Botlist *bptr);
-void LinkBots();
-void CloseConnection(struct DccUser *dccptr);
-void DeleteDccClient(struct DccUser *dccptr);
-struct Botlist *GoodTCM(struct DccUser *ptr);
-struct DccUser *GetBot(char *nick);
-struct DccUser *IsDccSock(int socket);
-struct DccUser *IsOnDcc(char *nick);
-void DccProcess(struct DccUser *dccptr, char *line);
-int BotProcess(struct DccUser *bptr, char *line);
-void SendMotd(int socket);
-void ServReboot();
-
-/*
- * External declarations
- */
+int ConnectToTCM(char *, struct Botlist *);
+void LinkBots(void);
+void CloseConnection(struct DccUser *);
+void DeleteDccClient(struct DccUser *);
+struct Botlist *GoodTCM(struct DccUser *);
+struct DccUser *GetBot(char *);
+struct DccUser *IsDccSock(int);
+struct DccUser *IsOnDcc(char *);
+void DccProcess(struct DccUser *, char *);
+int BotProcess(struct DccUser *, char *);
+void SendMotd(int);
+void ServReboot(void);
 
 extern struct DccUser *connections;
-
 #ifdef ADMININFO
 extern struct Luser *ClientList;
 #endif /* ADMININFO */

@@ -5,12 +5,10 @@
 #ifndef INCLUDED_sprintf_irc_h
 #define INCLUDED_sprintf_irc_h
 
-#include <stdarg.h>
+#include "stdinc.h"
+#include "config.h"
 
-/* Prototypes */
-
-extern int vsprintf_irc(register char *str, register const char *format,
-    va_list);
-extern int ircsprintf(register char *str, register const char *format, ...);
+extern int vsprintf_irc(register char *, register const char *, va_list);
+extern int ircsprintf(register char *, register const char *, ...);
 
 #endif /* INCLUDED_sprintf_irc_h */

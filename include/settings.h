@@ -8,6 +8,9 @@
 #ifndef INCLUDED_settings_h
 #define INCLUDED_settings_h
 
+#include "stdinc.h"
+#include "config.h"
+
 /* Parameter types */
 #define   PARAM_STRING      1 /* parameter is a string */
 #define   PARAM_INT         2 /* parameter is an integer */
@@ -34,161 +37,132 @@ struct Directive
   } param[PARAM_MAX];
 };
 
-/*
- * Prototypes
- */
-
 struct Directive *FindDirective(char *);
-int LoadSettings(int rehash);
-int SaveSettings();
-
-/*
- * External declarations
- */
+int LoadSettings(int);
+int SaveSettings(void);
 
 extern  struct Directive directives[];
-
-extern  char      *HPath;
-extern  char      *ConfigFile;
-extern  char      *LogFile;
-extern  char      *PidFile;
-extern  char      *PipeFile;
-extern  char      *HelpPath;
-extern  char      *MotdFile;
-extern  char      *DccMotdFile;
-
-extern  char      *GlineFile;
-extern  char      *JupeFile;
-
-extern  char      *LogonNews;
-
-extern  char      *NickServDB;
+extern	int	      AllowGuardChannel;
 extern  char      *ChanServDB;
+extern  char      *ConfigFile;
+extern  char      *DccMotdFile;
+extern  char      *GlineFile;
+extern  char      *HPath;
+extern  char      *HelpPath;
+extern  char      *JupeFile;
+extern  char      *LogFile;
+extern  char      *LogonNews;
+extern  char      *MaxClonesWarning;
 extern  char      *MemoServDB;
-extern  char      *StatServDB;
+extern  char      *MotdFile;
+extern  char      *NickServDB;
 extern  char      *OperServDB;
 extern  char      *OperServIgnoreDB;
+extern  char      *PidFile;
+extern  char      *PipeFile;
 extern  char      *SeenServDB;
-
-extern  char      *n_OperServ;
-extern  char      *n_NickServ;
-extern  char      *n_ChanServ;
-extern  char      *n_MemoServ;
-extern  char      *n_StatServ;
-extern  char      *n_HelpServ;
-extern  char      *n_Global;
-extern  char      *n_SeenServ;
-
-extern  char      *id_OperServ;
-extern  char      *id_NickServ;
-extern  char      *id_ChanServ;
-extern  char      *id_MemoServ;
-extern  char      *id_StatServ;
-extern  char      *id_HelpServ;
-extern  char      *id_Global;
-extern  char      *id_SeenServ;
-
-extern  char      *desc_OperServ;
-extern  char      *desc_NickServ;
-extern  char      *desc_ChanServ;
-extern  char      *desc_MemoServ;
-extern  char      *desc_StatServ;
-extern  char      *desc_HelpServ;
-extern  char      *desc_Global;
-extern  char      *desc_SeenServ;
-
 extern  char      *ServiceUmodes;
-
-extern  int       RestrictedAccess;
-extern  int       AutoOpAdmins;
-extern  int       OpersHaveAccess;
-extern  int       SmartMasking;
-
-extern  long      NickNameExpire;
-extern  long      ChannelExpire;
-extern  long      MemoExpire;
-extern  long      StatExpire;
-extern  long      BanExpire;
-extern  long      NSReleaseTimeout;
-
-extern  int       FloodProtection;
-extern  int       FloodCount;
-extern  long      FloodTime;
-extern  long      IgnoreTime;
-extern  int       IgnoreOffenses;
-
-extern  int       MaxClones;
-extern  char      *MaxClonesWarning;
+extern  char      *StatServDB;
+extern  char      *desc_ChanServ;
+extern  char      *desc_Global;
+extern  char      *desc_HelpServ;
+extern  char      *desc_MemoServ;
+extern  char      *desc_NickServ;
+extern  char      *desc_OperServ;
+extern  char      *desc_SeenServ;
+extern  char      *desc_StatServ;
+extern  char      *id_ChanServ;
+extern  char      *id_Global;
+extern  char      *id_HelpServ;
+extern  char      *id_MemoServ;
+extern  char      *id_NickServ;
+extern  char      *id_OperServ;
+extern  char      *id_SeenServ;
+extern  char      *id_StatServ;
+extern  char      *n_ChanServ;
+extern  char      *n_Global;
+extern  char      *n_HelpServ;
+extern  char      *n_MemoServ;
+extern  char      *n_NickServ;
+extern  char      *n_OperServ;
+extern  char      *n_SeenServ;
+extern  char      *n_StatServ;
+extern  int       AllowAccessIfSOp;
+extern  int       AllowKillImmed;
+extern  int       AllowKillProtection;
 extern  int       AutoKillClones;
-
-extern  long      ConnectFrequency;
-extern  long      ConnectBurst;
-extern  int       MaxProxies;
-extern  long      AutoLinkFreq;
-extern  long      TelnetTimeout;
-extern  long      IdentTimeout;
-extern  long      BindAttemptFreq;
-extern  int       MaxBinds;
-extern  int       MaxConnections;
-extern  int       OpersOnlyDcc;
-extern  long      DatabaseSync;
-extern  long      BackupFreq;
-extern  int       ReloadDbsOnHup;
-extern  int       NonStarChars;
+extern  int       AutoOpAdmins;
+extern  int       BCFloodCount;
 extern  int       DefaultHubPort;
 extern  int       DefaultTcmPort;
-extern  int       LogLevel;
-extern  int       MaxLogs;
-extern  int       MaxModes;
-
-extern  int       MaxTrace;
-extern  int       MaxChannel;
-extern  int       MaxKill;
-extern  int       LimitTraceKills;
-extern  int       ServerNotices;
 extern  int       DoWallops;
-extern  int       BCFloodCount;
-extern  long      BCFloodTime;
-
-extern  int       NSSetKill;
+extern  int       FloodCount;
+extern  int       FloodProtection;
+extern  int       GiveNotice;
+extern  int       GlobalNotices;
+extern  int       IgnoreOffenses;
+extern  int       LagDetect;
+extern  int       LastSeenInfo;
+extern  int       LimitTraceKills;
+extern  int       LogLevel;
+extern  int       MaxAkicks;
+extern  int       MaxBinds;
+extern  int       MaxChannel;
+extern  int       MaxChansPerUser;
+extern  int       MaxClones;
+extern  int       MaxConnections;
+extern  int       MaxKill;
+extern  int       MaxLinks;
+extern  int       MaxLogs;
+extern  int       MaxMemos;
+extern  int       MaxModes;
+extern  int       MaxProxies;
+extern  int       MaxServerCollides;
+extern  int       MaxTrace;
+extern  int       NSSetAllowMemos;
 extern  int       NSSetAutoMask;
+extern  int       NSSetHide;
+extern  int       NSSetHideEmail;
+extern  int       NSSetHideQuit;
+extern  int       NSSetHideUrl;
+extern  int       NSSetKill;
+extern  int       NSSetMemoNotify;
+extern  int       NSSetMemoSignon;
 extern  int       NSSetPrivate;
 extern  int       NSSetSecure;
 extern  int       NSSetUnSecure;
-extern  int       NSSetAllowMemos;
-extern  int       NSSetMemoSignon;
-extern  int       NSSetMemoNotify;
-extern  int       NSSetHide;
-extern  int       NSSetHideEmail;
-extern  int       NSSetHideUrl;
-extern  int       NSSetHideQuit;
-extern  int       LastSeenInfo;
 extern  int       NicknameWarn;
-extern  long      NickRegDelay;
-extern  int       MaxLinks;
-extern  int       AllowKillProtection;
-extern  int       AllowKillImmed;
-extern	int	      AllowGuardChannel;
-
-extern  int       MaxChansPerUser;
-extern  int       MaxAkicks;
-extern  long      InhabitTimeout;
-extern  int       AllowAccessIfSOp;
+extern  int       NonStarChars;
+extern  int       OpersHaveAccess;
+extern  int       OpersOnlyDcc;
+extern  int       ReloadDbsOnHup;
 extern  int       RestrictRegister;
-extern  int       GiveNotice;
-
-extern  int       MaxMemos;
-extern  long      MemoPurgeFreq;
-
-extern  int       LagDetect;
-extern  long      MaxPing;
-
-extern  int       GlobalNotices;
+extern  int       RestrictedAccess;
 extern  int       SeenMaxRecs;
-
-extern  int       MaxServerCollides;
-extern  long      MinServerCollidesDelta;
-
+extern  int       ServerNotices;
+extern  int       SmartMasking;
+extern  long      AutoLinkFreq;
+extern  long      BCFloodTime;
+extern  long      BackupFreq;
+extern  long      BanExpire;
+extern  long      BindAttemptFreq;
+extern  long      ChannelExpire;
+extern  long      ConnectBurst;
+extern  long      ConnectFrequency;
+extern  long      DatabaseSync;
+extern  long      FloodTime;
+extern  long      IdentTimeout;
+extern  long      IgnoreTime;
+extern  long      InhabitTimeout;
+extern  long      MaxPing;
 extern  long      MaxTSDelta;
+extern  long      MemoExpire;
+extern  long      MemoPurgeFreq;
+extern  long      MinServerCollidesDelta;
+extern  long      NSReleaseTimeout;
+extern  long      NickNameExpire;
+extern  long      NickRegDelay;
+extern  long      StatExpire;
+extern  long      TelnetTimeout;
 
 #endif /* INCLUDED_settings_h */

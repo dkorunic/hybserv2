@@ -60,7 +60,7 @@ InitData()
     }
 
   InitLists();
-  LoadConfig(ConfigFile);
+  LoadConfig();
   LoadData();
 } /* InitData() */
 

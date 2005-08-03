@@ -8,67 +8,38 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* NICKSERVICES ... */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "config.h"
+
+#define HASHCLIENTS     8192  /* size of client hash table */
+#define HASHCHANNELS    4096  /* size of channel hash table */
+#define HASHSERVERS     16    /* size of server hash table */
+#define NICKLIST_MAX    256   /* size of NickServ hash table */
+#define CHANLIST_MAX    256   /* size of ChanServ hash table */
+#define MEMOLIST_MAX    256   /* size of MemoServ hash table */
 
 struct Luser;
 struct Channel;
 struct Server;
 
-/*
- * size of client hash table
- */
-#define HASHCLIENTS     8192
-
-/*
- * size of channel hash table
- */
-#define HASHCHANNELS    4096
-
-/*
- * size of server hash table
- */
-#define HASHSERVERS     16
-
-/*
- * size of NickServ hash table
- */
-#define NICKLIST_MAX    256
-
-/*
- * size of ChanServ hash table
- */
-#define CHANLIST_MAX    256
-
-/*
- * size of MemoServ hash table
- */
-#define MEMOLIST_MAX    256
-
-typedef  struct hashentry
+typedef struct hashentry
 {
   void *list; /* pointer to first element in the bucket */
 } aHashEntry;
 
-/*
- * Function prototypes
- */
-
-struct Luser *FindClient(const char *name);
-void ClearHashes(int rehash);
-int HashUhost(char *userhost);
-int CloneMatch(struct Luser *lptr1, struct Luser *lptr2);
-int IsClone(struct Luser *lptr);
-struct Luser *HashAddClient(struct Luser *lptr, int nickchange);
-int HashDelClient(struct Luser *lptr, int nickchange);
-struct Channel *FindChannel(const char *name);
-int HashAddChan(struct Channel *chptr);
-int HashDelChan(struct Channel *chptr);
-struct Server *FindServer(const char *name);
-int HashAddServer(struct Server *sptr);
-int HashDelServer(struct Server *sptr);
+struct Luser *FindClient(const char *);
+void ClearHashes(int);
+int HashUhost(char *);
+int CloneMatch(struct Luser *, struct Luser *);
+int IsClone(struct Luser *);
+struct Luser *HashAddClient(struct Luser *, int);
+int HashDelClient(struct Luser *, int);
+struct Channel *FindChannel(const char *);
+int HashAddChan(struct Channel *);
+int HashDelChan(struct Channel *);
+struct Server *FindServer(const char *);
+int HashAddServer(struct Server *);
+int HashDelServer(struct Server *);
 
 #ifdef NICKSERVICES
 
@@ -83,10 +54,6 @@ unsigned int MSHashMemo(const char *);
 #endif
 
 #endif /* NICKSERVICES */
-
-/*
- * Extern declarations
- */
 
 extern aHashEntry cloneTable[HASHCLIENTS];
 

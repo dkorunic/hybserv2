@@ -8,19 +8,13 @@
 #ifndef INCLUDED_show_h
 #define INCLUDED_show_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* NICKSERVICES, CHANNELSERVICES */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "config.h"
 
 #define  SHOW_HELP        0x000001 /* -h/-? */
 #define  SHOW_TOTALCOUNT  0x000002 /* -n */
 #define  SHOW_FILE        0x000004 /* -f file */
 #define  SHOW_DETAIL      0x000008 /* display specific nickname(s) */
-
-/*
- * Prototypes
- */
 
 #ifdef NICKSERVICES
 

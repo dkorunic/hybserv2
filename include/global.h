@@ -8,19 +8,11 @@
 #ifndef INCLUDED_global_h
 #define INCLUDED_global_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* GLOBALSERVICES */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "config.h"
 
 #ifdef GLOBALSERVICES
-
-/*
- * Prototypes
- */
-
-void gs_process(char *nick, char *command);
-
+void gs_process(char *, char *);
 #endif /* GLOBALSERVICES */
 
 #endif /* INCLUDED_global_h */

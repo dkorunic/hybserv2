@@ -8,15 +8,9 @@
 #ifndef INCLUDED_client_h
 #define INCLUDED_client_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"         /* NICKSERVICES, CHANNELSERVICES */
-#define INCLUDED_config_h
-#endif
-
-#ifndef INCLUDED_hybdefs_h
-#include "hybdefs.h"         /* USERLEN ... */
-#define INCLUDED_hybdefs_h
-#endif
+#include "stdinc.h"
+#include "config.h"
+#include "hybdefs.h"
 
 /* Luser flags */
 #define L_OSREGISTERED  0x0001 /* user is identified with OperServ */
@@ -37,7 +31,7 @@ struct UserChannel
   struct Channel *chptr; /* pointer to channel */
 };
 
-#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+#if defined NICKSERVICES && defined CHANNELSERVICES
 
 struct aChannelPtr
 {
@@ -45,33 +39,27 @@ struct aChannelPtr
   struct ChanInfo *cptr;
 };
 
-#endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
+#endif /* NICKSERVICES && CHANNELSERVICES */
 
 /* User structure */
 struct Luser
-
 {
   struct Luser *next, *prev, *hnext, *cnext;
 
 #ifdef BLOCK_ALLOCATION
-
   /*
-   * When BLOCK_ALLOCATION is enabled, we don't want to have to
-   * malloc() space for nick,userhost,realname etc, so have it
-   * preallocated
+   * When BLOCK_ALLOCATION is enabled, we don't want to have to malloc()
+   * space for nick,userhost,realname etc, so have it preallocated
    */
   char nick[NICKLEN + 1];     /* nickname */
   char username[USERLEN + 1]; /* username */
   char hostname[HOSTLEN + 1]; /* hostname */
   char realname[REALLEN + 1]; /* realname */
-
 #else
-
   char *nick;
   char *username;
   char *hostname;
   char *realname;
-
 #endif /* BLOCK_ALLOCATION */
 
   int umodes;                    /* global usermodes they have */
@@ -80,17 +68,12 @@ struct Luser
   time_t since;                  /* when they connected to the network */
 
 #ifdef NICKSERVICES
-
   time_t nick_ts;      /* time of their last nick change */
   time_t nickreg_ts;   /* time they last registered a nickname */
-
-  #ifdef CHANNELSERVICES
-
-    /* list of channels user has identified for */
-    struct aChannelPtr *founder_channels;
-
-  #endif
-
+#ifdef CHANNELSERVICES
+  /* list of channels user has identified for */
+  struct aChannelPtr *founder_channels;
+#endif /* CHANNELSERVICES */
 #endif /* NICKSERVICES */
 
   /*
@@ -104,7 +87,6 @@ struct Luser
   int flags;
 
 #ifdef STATSERVICES
-
   long  numops;      /* how many times they +o'd someone */
   long  numdops;     /* how many times they -o'd someone */
   long  numvoices;   /* how many times they +v'd someone */
@@ -114,27 +96,17 @@ struct Luser
   long  numkills;    /* how many times they've killed someone */
   long  numhops;     /* how many times they +h'd someone */
   long  numdhops;    /* how many times they -h'd someone */
-
 #endif /* STATSERVICES */
-
 };
 
-/*
- * Prototypes
- */
-
-void UpdateUserModes(struct Luser *lptr, char *modes);
-struct Luser *AddClient(char **av);
-void DeleteClient(struct Luser *lptr);
-char *GetNick(char *nickname);
-int IsRegistered(struct Luser *lptr, int sockfd);
-int IsOperator(struct Luser *lptr);
-int IsValidAdmin(struct Luser *lptr);
-int IsNickCollide(struct Luser *servptr, char **av);
-
-/*
- * External declarations
- */
+void UpdateUserModes(struct Luser *, char *);
+struct Luser *AddClient(char **);
+void DeleteClient(struct Luser *);
+char *GetNick(char *);
+int IsRegistered(struct Luser *, int);
+int IsOperator(struct Luser *);
+int IsValidAdmin(struct Luser *);
+int IsNickCollide(struct Luser *, char **);
 
 extern struct Luser *ClientList;
 

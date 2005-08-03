@@ -11,22 +11,16 @@
 #ifndef INCLUDED_match_h
 #define INCLUDED_match_h
 
-/* match.c prototypes */
-
 int match(const char *, const char *);
 int irccmp(const char *, const char *);
 int ircncmp(const char *, const char *, int);
 
-/*
- * character macros
- */
 extern const unsigned char ToLowerTab[];
-#define ToLower(c) (ToLowerTab[(unsigned char)(c)])
-
 extern const unsigned char ToUpperTab[];
-#define ToUpper(c) (ToUpperTab[(unsigned char)(c)])
-
 extern const unsigned int CharAttrs[];
+
+#define ToLower(c) (ToLowerTab[(unsigned char)(c)])
+#define ToUpper(c) (ToUpperTab[(unsigned char)(c)])
 
 #define PRINT_C   0x001
 #define CNTRL_C   0x002

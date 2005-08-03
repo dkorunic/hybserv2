@@ -8,8 +8,9 @@
 #ifndef INCLUDED_timer_h
 #define INCLUDED_timer_h
 
-/* timer.c prototypes */
+#include "stdinc.h"
+#include "config.h"
 
-void DoTimer(time_t unixtime);
+void DoTimer(time_t);
 
 #endif /* INCLUDED_timer_h */

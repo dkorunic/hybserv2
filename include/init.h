@@ -8,18 +8,17 @@
 #ifndef INCLUDED_init_h
 #define INCLUDED_init_h
 
+#include "stdinc.h"
+#include "config.h"
+
 struct Luser;
 
-/*
- * Prototypes
- */
-
-void ProcessSignal(int signal);
-void InitListenPorts();
-void InitLists();
-void InitSignals();
-void PostCleanup();
-void InitServs(struct Luser *servptr);
+void ProcessSignal(int);
+void InitListenPorts(void);
+void InitLists(void);
+void InitSignals(void);
+void PostCleanup(void);
+void InitServs(struct Luser *);
 
 extern int control_pipe;
 

@@ -8,13 +8,9 @@
 #ifndef INCLUDED_operserv_h
 #define INCLUDED_operserv_h
 
-#ifndef INCLUDED_conf_h
-#include "conf.h"        /* PRIV_* */
-#define INCLUDED_conf_h
-#endif
-
-struct Luser;
-struct Channel;
+#include "stdinc.h"
+#include "config.h"
+#include "conf.h"
 
 /* OperServ usermodes */
 #define OPERUMODE_INIT  (1 << 0)  /* umodes not initialized yet */
@@ -38,7 +34,6 @@ struct Channel;
 #define OPERUMODE_D     (1 << 18) /* +d */
 
 /* OperServ Flag macros */
-
 #define IsServicesAdmin(x) ((x) ? (x)->flags & PRIV_SADMIN : 0)
 #define IsAdmin(x)         ((x) ? (x)->flags & PRIV_ADMIN : 0)
 #define IsOper(x)          ((x) ? (x)->flags & PRIV_OPER : 0)
@@ -52,13 +47,16 @@ struct Channel;
 #define ONEMEG  (1024.0 * 1024.0)
 #define ONEGIG  (1024.0 * 1024.0 * 1024.0)
 #define ONETER  (1024.0 * 1024.0 * 1024.0 * 1024.0)
-#define GMKBs(x)  ( ((x) > ONETER) ? "Terabytes" : (((x) > ONEGIG) ? "Gigabytes" : (((x) > ONEMEG) ? "Megabytes" : (((x) > ONEKIL) ? "Kilobytes" : "Bytes"))))
-#define  GMKBv(x)  ( ((x) > ONETER) ? (float)((x) / ONETER) : (((x) > ONEGIG) ? (float)((x) / ONEGIG) : (((x) > ONEMEG) ? (float)((x) / ONEMEG) : (((x) > ONEKIL) ? (float)((x) / ONEKIL) : (float)(x)))))
+#define GMKBs(x)  (((x) > ONETER) ? "Terabytes" : (((x) > ONEGIG) ? "Gigabytes" : (((x) > ONEMEG) ? "Megabytes" : (((x) > ONEKIL) ? "Kilobytes" : "Bytes"))))
+#define GMKBv(x)  (((x) > ONETER) ? (float)((x) / ONETER) : (((x) > ONEGIG) ? (float)((x) / ONEGIG) : (((x) > ONEMEG) ? (float)((x) / ONEMEG) : (((x) > ONEKIL) ? (float)((x) / ONEKIL) : (float)(x)))))
+
+struct Channel;
+struct Luser;
 
 struct OperCommand
 {
   char *cmd; /* holds command */
-  void (* func)(); /* function to call depending on 'cmd' */
+  void (*func)(); /* function to call depending on 'cmd' */
   int dcconly; /* dcc chat command only? 1 if yes, 0 if not */
   char flag; /* flag needed to use the command */
 };
@@ -70,9 +68,7 @@ struct Ignore
   char *hostmask;  /* hostmask to ignore */
 };
 
-/*
- * Information for fuckover processes
- */
+/* Information for fuckover processes */
 struct Process
 {
   struct Process *next;
@@ -81,33 +77,22 @@ struct Process
   char *target;   /* target of fuckover */
 };
 
-/*
- * Prototypes
- */
-
-void os_process(char *nick, char *command, int sockfd);
-void os_join(struct Channel *chptr);
-void os_join_ts_minus_1(struct Channel *chptr);
-void os_part(struct Channel *chptr);
-void CheckFuckoverTarget(struct Luser *fptr, char *newnick);
-char *modestr(int num, char mode);
-
-struct Ignore *OnIgnoreList(char *hostmask);
-void AddIgnore(char *hostmask, time_t expire);
-int DelIgnore(char *hostmask);
-void ExpireIgnores(time_t unixtime);
-
+void os_process(char *, char *, int);
+void os_join(struct Channel *);
+void os_join_ts_minus_1(struct Channel *);
+void os_part(struct Channel *);
+void CheckFuckoverTarget(struct Luser *, char *);
+char *modestr(int, char);
+struct Ignore *OnIgnoreList(char *);
+void AddIgnore(char *, time_t);
+int DelIgnore(char *);
+void ExpireIgnores(time_t);
 void o_Wallops(char *format, ...);
-
 #if defined AUTO_ROUTING && defined SPLIT_INFO
 void ReconnectCheck(time_t);
 #endif
 
-/*
- * External declarations
- */
-
-extern struct Ignore          *IgnoreList;
+extern struct Ignore *IgnoreList;
 extern char **myargv;
 extern int control_pipe;
 

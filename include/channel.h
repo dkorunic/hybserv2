@@ -8,22 +8,11 @@
 #ifndef INCLUDED_channel_h
 #define INCLUDED_channel_h
 
-#ifndef INCLUDED_sys_time_h
-#include <sys/time.h>        /* time_t */
-#define INCLUDED_sys_time_h
-#endif
+#include "stdinc.h"
+#include "config.h"
+#include "hybdefs.h"
 
-#ifndef INCLUDED_hybdefs_h
-#include "hybdefs.h"         /* CHANNELLEN ... */
-#define INCLUDED_hybdefs_h
-#endif
-
-struct Luser;
-struct UserChannel;
-
-/*
- * Channel flags
- */
+/* Channel flags */
 #define CH_VOICED       0x000001 /* user is voiced */
 #define CH_OPPED        0x000002 /* user is opped */
 #define MODE_O          0x000004 /* someone was +o'd */
@@ -43,9 +32,11 @@ struct UserChannel;
 #endif /* DANCER */
 
 #ifdef HYBRID7_HALFOPS
-# define CH_HOPPED       0x001000 /* user is halfopped - Janos */
-# define MODE_H          0x002000 /* someone was +h - Janos */
+# define CH_HOPPED      0x001000 /* user is halfopped - Janos */
+# define MODE_H         0x002000 /* someone was +h - Janos */
 #endif /* HYBRID7_HALFOPS */
+
+struct Luser;
 
 #ifdef GECOSBANS
 struct ChannelGecosBan
@@ -92,26 +83,21 @@ struct ChannelUser
 
 /* Stores info for network channels */
 struct Channel
-
 {
   struct Channel *next, *prev, *hnext;
 
 #ifdef BLOCK_ALLOCATION
-
   char name[CHANNELLEN + 1]; /* channel name */
   char key[KEYLEN + 1];
 #ifdef DANCER
   char forward[CHANNELLEN + 1];
 #endif /* DANCER */
-
 #else
-
   char *name;             /* channel name */
   char *key;              /* NULL if no key */
 #ifdef DANCER
   char *forward;          /* NULL if no forwarding */
 #endif /* DANCER */
-
 #endif /* BLOCK_ALLOCATION */
 
   int numusers;           /* number of users in the channel */
@@ -137,10 +123,6 @@ struct Channel
   int floodcnt;           /* how many times a *Serv was kicked/deoped */
 };
 
-/*
- * Prototypes
- */
-
 #ifdef GECOSBANS
 void AddGecosBan(char *, struct Channel *, char *);
 void DeleteGecosBan(struct Channel *, char *);
@@ -161,21 +143,16 @@ void DeleteChannel(struct Channel *);
 void AddToChannel(struct Channel *, char *);
 void RemoveNickFromChannel(char *, char *);
 void RemoveFromChannel(struct Channel *, struct Luser *);
-void UpdateChanModes(struct Luser *lptr, char *source,
-                     struct Channel *chptr, char *modes);
-struct UserChannel *FindChannelByUser(struct Luser *lptr,
-                                      struct Channel *chptr);
-struct ChannelUser *FindUserByChannel(struct Channel *chptr,
-                                      struct Luser *lptr);
+void UpdateChanModes(struct Luser *, char *, struct Channel *, char *);
+struct UserChannel *FindChannelByUser(struct Luser *, struct Channel *);
+struct ChannelUser *FindUserByChannel(struct Channel *, struct Luser *);
 void DoMode(struct Channel *, char *, int);
-void SetModes(char *source, int plus, char mode,
-              struct Channel *chptr, char *args);
+void SetModes(char *, int, char, struct Channel *, char *);
 void KickBan(int, char *, struct Channel *, char *, char *);
-struct Channel *IsChan(char *channel);
-int IsChannelMember(struct Channel *chptr, struct Luser *lptr);
-int IsChannelVoice(struct Channel *chptr, struct Luser *lptr);
-int IsChannelOp(struct Channel *chptr, struct Luser *lptr);
-
+struct Channel *IsChan(char *);
+int IsChannelMember(struct Channel *, struct Luser *);
+int IsChannelVoice(struct Channel *, struct Luser *);
+int IsChannelOp(struct Channel *, struct Luser *);
 #ifdef HYBRID7
 int IsChannelHOp(struct Channel *chptr, struct Luser *lptr);
 #endif /* HYBRID7 */
@@ -184,7 +161,6 @@ struct ChannelBan *MatchBan(struct Channel *, char *);
 struct ChannelBan *FindBan(struct Channel *, char *);
 struct Exception *MatchException(struct Channel *, char *);
 struct Exception *FindException(struct Channel *, char *);
-
 #ifdef HYBRID7
 struct InviteException *MatchInviteException(struct Channel *, char *);
 struct InviteException *FindInviteException(struct Channel *, char *);
@@ -194,10 +170,6 @@ struct InviteException *FindInviteException(struct Channel *, char *);
 struct ChannelGecosBan *MatchGecosBan(struct Channel *, char *);
 struct ChannelGecosBan *FindGecosBan(struct Channel *, char *);
 #endif /* GECOSBANS */
-
-/*
- * External declarations
- */
 
 extern struct Channel *ChannelList;
 

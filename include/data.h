@@ -8,51 +8,33 @@
 #ifndef INCLUDED_data_h
 #define INCLUDED_data_h
 
-#ifndef INCLUDED_stdio_h
-#include <stdio.h>        /* FILE * */
-#define INCLUDED_stdio_h
-#endif
-
-#ifndef INCLUDED_sys_types_h
-#include <sys/types.h>        /* time_t */
-#define INCLUDED_sys_types_h
-#endif
-
-#ifndef INCLUDED_operserv_h
+#include "stdinc.h"
+#include "config.h"
 #include "operserv.h"
-#define INCLUDED_operserv_h
-#endif
 
-/*
- * Prototypes
- */
+void BackupDatabases(time_t);
+int ReloadData(void);
+FILE *CreateDatabase(char *, char *);
 
-void BackupDatabases(time_t unixtime);
-int ReloadData();
-FILE *CreateDatabase(char *name, char *info);
-
-int WriteDatabases();
-int WriteOpers();
-int WriteIgnores();
-int WriteStats();
-int WriteNicks();
-int WriteChans();
-int WriteMemos();
+int WriteDatabases(void);
+int WriteOpers(void);
+int WriteIgnores(void);
+int WriteStats(void);
+int WriteNicks(void);
+int WriteChans(void);
+int WriteMemos(void);
 
 #ifdef SEENSERVICES
-int WriteSeen();
-#endif
+int WriteSeen(void);
+int es_loaddata(void);
+#endif /* SEENSERVICES */
 
-void LoadData();
-int ns_loaddata();
-int cs_loaddata();
-int ms_loaddata();
-int ss_loaddata();
-int os_loaddata();
-int ignore_loaddata();
-
-#ifdef SEENSERVICES
-int es_loaddata();
-#endif
+void LoadData(void);
+int ns_loaddata(void);
+int cs_loaddata(void);
+int ms_loaddata(void);
+int ss_loaddata(void);
+int os_loaddata(void);
+int ignore_loaddata(void);
 
 #endif /* INCLUDED_data_h */

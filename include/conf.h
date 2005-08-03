@@ -8,21 +8,10 @@
 #ifndef INCLUDED_conf_h
 #define INCLUDED_conf_h
 
-#ifndef INCLUDED_sys_types_h
-#include <sys/types.h>         /* time_t */
-#define INCLUDED_sys_types_h
-#endif
-
-#ifndef INCLUDED_config_h
+#include "stdinc.h"
 #include "config.h"
-#define INCLUDED_config_h
-#endif
-
-struct Luser;
-struct Server;
 
 /* userlist privileges/flags */
-
 #define PRIV_ADMIN      0x0001  /* can use administrator commands */
 #define PRIV_OPER       0x0002  /* can use operator commands */
 #define PRIV_JUPE       0x0004  /* can use jupe/unjupe commands */
@@ -48,6 +37,9 @@ struct Server;
 #define PRT_USERS       2 /* accept only user connections */
 #define PRT_DELETE      3 /* marked for deletion in a rehash */
 
+struct Luser;
+struct Server;
+
 struct MyInfo
 {
   char *name;     /* services' server name */
@@ -55,39 +47,29 @@ struct MyInfo
   char *admin;    /* administrative info */
   struct Server *sptr; /* pointer to services entry in server list */
   struct Server *hub;  /* pointer to services' current hub server */
-  
   struct Luser *osptr;   /* pointer to OperServ client structure */
 
 #ifdef NICKSERVICES
-
   struct Luser *nsptr;   /* pointer to NickServ */
-
-# ifdef CHANNELSERVICES
+#ifdef CHANNELSERVICES
   struct Luser *csptr;   /* pointer to ChanServ */
-# endif /* CHANNELSERVICES */
-
-# ifdef MEMOSERVICES
+#endif /* CHANNELSERVICES */
+#ifdef MEMOSERVICES
   struct Luser *msptr;   /* pointer to MemoServ */
-# endif /* MEMOSERVICES */
-
+#endif /* MEMOSERVICES */
 #endif /* NICKSERVICES */
-
 #ifdef STATSERVICES
   struct Luser *ssptr;   /* pointer to StatServ */
 #endif /* STATSERVICES */
-
 #ifdef HELPSERVICES
   struct Luser *hsptr;   /* pointer to HelpServ */
 #endif /* HELPSERVICES */
-
 #ifdef GLOBALSERVICES
   struct Luser *gsptr;   /* pointer to Global(Serv) */
 #endif /* GLOBALSERVICES */
-
 #ifdef SEENSERVICES
   struct Luser *esptr;   /* pointer to SeenServ */
 #endif /* SEENSERVICES */
-
 };
 
 /* Stores server S: lines from hybserv.conf */
@@ -177,43 +159,29 @@ struct cHost
 };
 #endif
 
-/*
- * Prototypes
- */
-
-int Rehash();
-void ParseConf(char *filename, int rehash);
-void LoadConfig();
-
-struct Chanlist *IsChannel(char *channel);
-struct Servlist *IsServLine(char *name, char *port);
-struct PortInfo *IsListening(int port);
-struct PortInfo *IsPort(int port);
-struct Botlist *IsBot(char *name);
-
-void AddMyChan(char *channel);
-
-int IsProtectedHost(char *username, char *hostname);
-struct Userlist *GetUser(int nickonly, char *nick, char *user, char *host);
-int CheckAccess(struct Userlist *user, char flag);
-struct rHost *IsRestrictedHost(char *user, char *host);
-
-/*
- * External declarations
- */
-
-extern struct Userlist            *UserList;
-extern struct Servlist            *ServList;
-extern struct Chanlist            *ChanList;
-extern struct Botlist             *BotList;
-extern struct Botlist             *RemoteBots;
-extern struct PortInfo            *PortList;
-extern struct rHost               *rHostList;
-
-extern struct Userlist            *GenericOper;
-extern struct Servlist            *currenthub;
-extern struct cHost               *cHostList;
-
-extern int                        HubCount;
+int Rehash(void);
+void ParseConf(char *, int);
+void LoadConfig(void);
+struct Chanlist *IsChannel(char *);
+struct Servlist *IsServLine(char *, char *);
+struct PortInfo *IsListening(int);
+struct PortInfo *IsPort(int);
+struct Botlist *IsBot(char *);
+void AddMyChan(char *);
+int IsProtectedHost(char *, char *);
+struct Userlist *GetUser(int, char *, char *, char *);
+int CheckAccess(struct Userlist *, char);
+struct rHost *IsRestrictedHost(char *, char *);
+extern struct Userlist *UserList;
+extern struct Servlist *ServList;
+extern struct Chanlist *ChanList;
+extern struct Botlist *BotList;
+extern struct Botlist *RemoteBots;
+extern struct PortInfo *PortList;
+extern struct rHost *rHostList;
+extern struct Userlist *GenericOper;
+extern struct Servlist *currenthub;
+extern struct cHost *cHostList;
+extern int HubCount;
 
 #endif /* INCLUDED_conf_h */

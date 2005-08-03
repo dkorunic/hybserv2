@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
   InitLists();
 
   /* load server, jupe, gline, user, admin info */
-  LoadConfig(ConfigFile);
+  LoadConfig();
 
   /* load nick/chan/memo/stat databases */
   LoadData();

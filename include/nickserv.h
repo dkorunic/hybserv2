@@ -8,25 +8,10 @@
 #ifndef INCLUDED_nickserv_h
 #define INCLUDED_nickserv_h
 
-#ifndef INCLUDED_sys_time_h
-#include <sys/time.h>        /* time_t */
-#define INCLUDED_sys_time_h
-#endif
-
-#ifndef INCLUDED_client_h
-#include "client.h"        /* struct aChannelPtr */
-#define INCLUDED_client_h
-#endif
-
-#ifndef INCLUDED_config_h
-#include "config.h"        /* NICKSERVICES, LINKED_NICKNAMES */
-#define INCLUDED_config_h
-#endif
-
-#ifndef INCLUDED_hash_h
-#include "hash.h"        /* NICKLIST_MAX */
-#define INCLUDED_hash_h
-#endif
+#include "stdinc.h"
+#include "config.h"
+#include "client.h"
+#include "hash.h"
 
 #ifdef NICKSERVICES
 
@@ -56,6 +41,9 @@
 #define NS_NUMERIC      0x00400000 /* ignores 432 numeric */
 #define NS_PRIVMSG      0x00800000 /* PRIVMSG or NOTICE */
 
+struct ChanInfo;
+struct ChanAccess;
+
 struct NickHost
 {
   struct NickHost *next;
@@ -64,10 +52,8 @@ struct NickHost
 
 #ifdef CHANNELSERVICES
 
-/*
- * Each nickname has a list of pointers to channels they have
- * access on
- */
+/* Each nickname has a list of pointers to channels they have
+ * access on */
 struct AccessChannel
 {
   struct AccessChannel *next, *prev;
@@ -87,102 +73,71 @@ struct NickInfo
   time_t created;            /* timestamp when it was registered */
   time_t lastseen;           /* for expiration purposes */
   long flags;                /* nick flags */
-
   char *email;               /* email address */
   char *url;                 /* url */
-
   char *gsm;                 /* GSM number */
   char *phone;               /* Phone */
   char *UIN;                 /* ICQ UIN */
-
   char *lastu;               /* last seen username */
   char *lasth;               /* last seen hostname */
   char *lastqmsg;            /* last quit message */
-
   time_t collide_ts;         /* TS of when to collide them */
 
 #ifdef RECORD_SPLIT_TS
-  /*
-   * if they split, record their TS, so if they rejoin, we can
-   * check if their TS's match up and don't make them re-IDENTIFY
-   */
+  /* If they split, record their TS, so if they rejoin, we can
+   * check if their TS's match up and don't make them re-IDENTIFY */
   time_t split_ts;
   time_t whensplit;          /* for expiration purposes */
 #endif /* RECORD_SPLIT_TS */
 
 #ifdef LINKED_NICKNAMES
-  /*
-   * Pointer to next nick in the nickname link list
-   */
+  /* Pointer to next nick in the nickname link list */
   struct NickInfo *nextlink;
 
-  /*
-   * If this is the "hub" nickname for a list of linked nicknames,
+  /* If this is the "hub" nickname for a list of linked nicknames,
    * master will be NULL. If this nickname is a leaf, master will
-   * point to the "hub" nickname of this list
-   */
+   * point to the "hub" nickname of this list */
   struct NickInfo *master;
 
-  /*
-   * Number of links in the list this nickname is a part of.
-   * This is only non-zero if this nickname is a master
-   */
+  /* Number of links in the list this nickname is a part of.
+   * This is only non-zero if this nickname is a master */
   int numlinks;
 #endif /* LINKED_NICKNAMES */
 
 #ifdef CHANNELSERVICES
-  /*
-   * List of channels for which this nickname is a founder
-   */
+  /* List of channels for which this nickname is a founder */
   struct aChannelPtr *FounderChannels;
   int fccnt; /* number of channels registered */
 
-  /*
-   * List of channels this nickname has access on
-   */
+  /* List of channels this nickname has access on */
   struct AccessChannel *AccessChannels;
   int accnt; /* number of channels they have access to */
 #endif /* CHANNELSERVICES */
-
 };
 
-/*
- * Prototypes
- */
-
-void ns_process(const char *nick, char *command);
-int CheckNick(char *nick);
-void CheckOper(char *nick);
-void ExpireNicknames(time_t unixtime);
-void AddFounderChannelToNick(struct NickInfo **nptr,
-                             struct ChanInfo *cptr);
-void RemoveFounderChannelFromNick(struct NickInfo **nptr,
-                                  struct ChanInfo *cptr);
-struct AccessChannel *AddAccessChannel(struct NickInfo *nptr,
-                                       struct ChanInfo *chanptr,
-                                       struct ChanAccess *accessptr);
-void DeleteAccessChannel(struct NickInfo *nptr,
-                         struct AccessChannel *acptr);
-
-struct NickInfo *FindNick(char *nick);
-struct NickInfo *GetLink(char *nick);
-void DelNick(struct NickInfo *nptr);
-void DeleteNick(struct NickInfo *nptr);
-int HasFlag(char *nick, int flag);
-
-void collide(char *nick);
-void release(char *nick);
-void CollisionCheck(time_t unixtime);
+void ns_process(const char *, char *);
+int CheckNick(char *);
+void CheckOper(char *);
+void ExpireNicknames(time_t);
+void AddFounderChannelToNick(struct NickInfo **, struct ChanInfo *);
+void RemoveFounderChannelFromNick(struct NickInfo **, struct ChanInfo *);
+struct AccessChannel *AddAccessChannel(struct NickInfo *, struct ChanInfo
+    *, struct ChanAccess *);
+void DeleteAccessChannel(struct NickInfo *, struct AccessChannel *);
+struct NickInfo *FindNick(char *);
+struct NickInfo *GetLink(char *);
+void DelNick(struct NickInfo *);
+void DeleteNick(struct NickInfo *);
+int HasFlag(char *, int);
+void collide(char *);
+void release(char *);
+void CollisionCheck(time_t);
 
 #ifdef LINKED_NICKNAMES
-int IsLinked(struct NickInfo *nick1, struct NickInfo *nick2);
+int IsLinked(struct NickInfo *, struct NickInfo *);
 #endif /* LINKED_NICKNAMES */
 
-struct NickInfo *GetMaster(struct NickInfo *nptr);
-
-/*
- * Extern declarations
- */
+struct NickInfo *GetMaster(struct NickInfo *);
 
 extern struct NickInfo *nicklist[NICKLIST_MAX];
 

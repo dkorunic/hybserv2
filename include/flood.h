@@ -8,20 +8,9 @@
 #ifndef INCLUDED_flood_h
 #define INCLUDED_flood_h
 
-#ifndef INCLUDED_sys_types_h
-#include <sys/types.h>         /* time_t */
-#define INCLUDED_sys_types_h
-#endif
-
-#ifndef INCLUDED_hybdefs_h
-#include "hybdefs.h"		/* USERLEN, HOSTLEN */
-#define INCLUDE_hybdefs_h
-#endif
-
-#ifndef INCLUDED_config_h
-#include "config.h"		/* ADVFLOOD */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "hybdefs.h"
+#include "config.h"
 
 struct Luser;
 struct Channel;
@@ -36,24 +25,14 @@ struct connectInfo
 };
 #endif /* ADVFLOOD */
 
-/*
- * Function prototypes
- */
-
-int FloodCheck(struct Channel *chptr, struct Luser *lptr,
-               struct Luser *servptr, int kick);
-int IsFlood();
-
+int FloodCheck(struct Channel *, struct Luser *, struct Luser *, int);
+int IsFlood(void);
 #ifdef ADVFLOOD
-void updateConnectTable(char *user, char *host);
+void updateConnectTable(char *, char *);
 #endif /* ADVFLOOD */
 
-/*
- * External declarations
- */
-
-extern time_t     FloodTable[2];
-extern int        FloodHits;
-extern int        ActiveFlood;
+extern time_t FloodTable[2];
+extern int FloodHits;
+extern int ActiveFlood;
 
 #endif /* INCLUDED_flood_h */

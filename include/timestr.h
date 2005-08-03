@@ -8,18 +8,13 @@
 #ifndef INCLUDED_timestr_h
 #define INCLUDED_timestr_h
 
-#ifndef INCLUDED_sys_time_h
-#include <sys/time.h>        /* struct timeval */
-#define INCLUDED_sys_time_h
-#endif
 
-/*
- * Prototypes
- */
+#include "stdinc.h"
+#include "config.h"
 
-char *timeago(time_t timestamp, int flag);
-long timestr(char *format);
-struct timeval *GetTime(struct timeval *timer);
-long GetGMTOffset(time_t unixtime);
+char *timeago(time_t, int);
+long timestr(char *);
+struct timeval *GetTime(struct timeval *);
+long GetGMTOffset(time_t);
 
 #endif /* INCLUDED_timestr_h */

@@ -8,15 +8,8 @@
 #ifndef INCLUDED_jupe_h
 #define INCLUDED_jupe_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* ALLOW_JUPES */
-#define INCLUDED_config_h
-#endif
-
-#ifndef INCLUDED_sys_types_h
-#include <sys/types.h>        /* time_t */
-#define INCLUDED_sys_types_h
-#endif
+#include "stdinc.h"
+#include "config.h"
 
 #ifdef ALLOW_JUPES
 
@@ -29,7 +22,7 @@ struct JupeVote
   int count;             /* how many times it's been voted */
   time_t lasttime;       /* unixtime that it was last voted for */
 };
-#endif
+#endif /* JUPEVOTES */
 
 struct Jupe
 {
@@ -40,34 +33,26 @@ struct Jupe
   int isnick;        /* 1 if juped nick, 0 if server */
 };
 
-/*
- * Prototypes
- */
-
 void AddJupe(char *, char *, char *);
 void DeleteJupe(struct Jupe *);
-
-void CheckJupes();
+void CheckJupes(void);
 void DoJupeSquit(char *, char *, char *);
 int CheckJuped(char *);
 struct Jupe *IsJupe(char *);
-void InitJupes();
+void InitJupes(void);
 
 #ifdef JUPEVOTES
 int AddVote(char *, char *);
 int CountVotes(char *);
 void DeleteVote(char *);
 void ExpireVotes(time_t);
-#endif
+#endif /* JUPEVOTES */
 
-/*
- * External declarations
- */
+extern struct Jupe *JupeList;
 
-extern struct Jupe       *JupeList;
 #ifdef JUPEVOTES
-extern struct JupeVote   *VoteList;
-#endif
+extern struct JupeVote *VoteList;
+#endif /* JUPEVOTES */
 
 #endif /* ALLOW_JUPES */
 

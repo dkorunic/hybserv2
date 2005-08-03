@@ -7,14 +7,13 @@
 #ifndef INCLUDED_seenserv_h
 #define INCLUDED_seenserv_h
 
-#ifndef INCLUDED_config_h
-#include "config.h"        /* SEENSERVICES */
-#define INCLUDED_config_h
-#endif
+#include "stdinc.h"
+#include "config.h"
 
 #ifdef SEENSERVICES
 
-struct Seen {
+struct Seen
+{
   struct Seen *prev, *next, *seen;
   int type;                /* 1 - QUIT, 2 - NICK */
   char nick[NICKLEN + 1];
@@ -24,11 +23,11 @@ struct Seen {
 
 typedef struct Seen aSeen;
 
+void es_process(char *, char *);
+void es_add(char *, char *, char *, char *, time_t, int);
+
 extern int seenc;
 extern aSeen *seenp, *seenb; 
-
-void es_process(char *nick, char *command);
-void es_add(char *nick, char *user, char *host, char *msg, time_t time, int type);
 
 #endif /* SEENSERVICES */
 

@@ -9,21 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
+#include "stdinc.h"
 #include "config.h"
 #include "dcc.h"
 #include "hybdefs.h"

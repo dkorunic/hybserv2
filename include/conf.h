@@ -37,6 +37,11 @@
 #define PRT_USERS       2 /* accept only user connections */
 #define PRT_DELETE      3 /* marked for deletion in a rehash */
 
+/* Solaris does not provide this by default. */
+#ifndef INADDR_NONE
+# define INADDR_NONE ((unsigned long)-1)
+#endif
+
 struct Luser;
 struct Server;
 

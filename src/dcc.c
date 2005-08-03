@@ -9,26 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <fcntl.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "client.h"
 #include "conf.h"

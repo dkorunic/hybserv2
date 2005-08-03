@@ -9,28 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-#include <time.h>
-#include <sys/resource.h>
-#include <sys/utsname.h>
-#include <string.h>
-#include <errno.h>
-#include <assert.h>
-#ifndef HAVE_CYGWIN
-#include <signal.h>
-#else
-#include <sys/signal.h>
-#endif /* HAVE_CYGWIN */
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "channel.h"
 #include "chanserv.h"
@@ -1236,7 +1215,6 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   float mem;
-  struct utsname un;
   struct rusage rus;
 
   o_RecordCommand(sockfd,
@@ -1363,17 +1341,6 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 
   os_notice(lptr, sockfd, "\002\002");
   os_notice(lptr, sockfd, "General Status");
-
-  /* Returns -1 on failure, but _not_ 0 on success! -kre */
-  if (uname(&un) != -1)
-    {
-      os_notice(lptr, sockfd, "          Running on: \002%s %s\002",
-                un.sysname,
-                un.release)
-      ;
-    }
-  else
-    os_notice(lptr, sockfd, "          Running on: \002*unknown*\002");
 
   mem = CalcMem(NULL, NODCC);
   os_notice(lptr, sockfd, "        Memory Usage: \002%0.2f\002 kb (\002%0.2f\002 mb)",

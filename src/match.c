@@ -28,10 +28,7 @@
  *
  * $Id$
  */
-#include <assert.h>
-#include <string.h> /* strrchr */
-#include <ctype.h>
-#include <stdlib.h>
+#include "stdinc.h"
 #include "config.h"
 #include "match.h"
 

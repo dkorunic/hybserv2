@@ -13,7 +13,7 @@
 
 struct Luser;
 
-void ProcessSignal(int);
+RETSIGTYPE ProcessSignal(int);
 void InitListenPorts(void);
 void InitLists(void);
 void InitSignals(void);

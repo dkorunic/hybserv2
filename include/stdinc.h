@@ -24,6 +24,7 @@
 # include <stdlib.h>
 # include <stddef.h>
 # include <stdarg.h>
+# include <ctype.h>
 #else
 # if HAVE_STDLIB_H
 #  include <stdlib.h>
@@ -91,6 +92,59 @@ char *strchr(), *strrchr();
 
 #if HAVE_ASSERT_H
 # include <assert.h>
+#endif
+
+#if HAVE_NETDB_H
+# include <netdb.h>
+#endif
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
+#if HAVE_SIGNAL_H
+# include <signal.h>
+#endif
+
+#if HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
+
+#if HAVE_SYS_RESOURCE_H
+# include <sys/resource.h>
+#endif
+
+#if HAVE_SYS_SIGNAL_H
+# include <sys/signal.h>
+#endif
+
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif
+
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
+
+#if HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# if HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# if HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# if HAVE_NDIR_H
+#  include <ndir.h>
+# endif
 #endif
 
 #endif /* INCLUDED_stdinc_h */

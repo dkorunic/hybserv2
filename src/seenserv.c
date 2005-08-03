@@ -8,21 +8,10 @@
  *
  * seenserv.c
  * Copyright (C) 2000 demond
+ * Later changes by Hybserv2 team
  */
 
-#include "defs.h"
-
-#define NOSQUITSEEN
-#define MAXWILDSEEN	100
-
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "client.h"
 #include "channel.h"
@@ -43,6 +32,9 @@
 #include "sprintf_irc.h"
 
 #ifdef SEENSERVICES
+
+#define NOSQUITSEEN
+#define MAXWILDSEEN	100
 
 int seenc = 0;
 aSeen *seenp = NULL, *seenb = NULL;

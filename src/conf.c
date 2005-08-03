@@ -9,15 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <assert.h>
-#include <netdb.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "channel.h"
 #include "client.h"
@@ -37,13 +29,6 @@
 #include "sock.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
-
-/* Solaris does not provide this by default. Anyway this is wrong approach,
-   since -1 is 255.255.255.255 addres which is _valid_! Obviously
-   inet_aton() should be used instead. I'll fix that later. -kre */
-#ifndef INADDR_NONE
-# define INADDR_NONE ((unsigned long)-1)
-#endif
 
 static char *getfield (char *newline);
 

@@ -1,4 +1,4 @@
-# Hybserv ./source Makefile
+# Hybserv ./src Makefile
 # $Id$
 
 CC = @CC@
@@ -82,4 +82,4 @@ version.o: version.c
 
 include $(DEPENDFILE)
 
-# End of source/Makefile
+# End of src/Makefile

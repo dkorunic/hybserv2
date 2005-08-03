@@ -9,31 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/resource.h>
-#include <unistd.h>
-#include <time.h>
-#include <errno.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
-#ifndef HAVE_CYGWIN
-#include <signal.h>
-#else
-#include <sys/signal.h>
-#endif /* HAVE_CYGWIN */
-
-#include <sys/utsname.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "config.h"
 #include "data.h"
@@ -51,6 +27,10 @@
 #include "timestr.h"
 #include "misc.h"
 #include "sprintf_irc.h"
+
+#if !HAVE_SYS_RESOURCE_H
+# undef GIMMECORE
+#endif
 
 /* unixtime of when services was started */
 time_t                       TimeStarted;
@@ -85,14 +65,12 @@ int main(int argc, char *argv[])
 #endif /* GDB_DEBUG */
 
 #if defined GIMMECORE || defined DEBUGMODE
-
   struct rlimit rlim; /* resource limits -kre */
 #endif /* GIMMECORE || DEBUGMODE */
 
   FILE *pidfile; /* to write our pid */
-  uid_t uid, /* real user id */
-  euid; /* effective user id */
-  struct utsname un;
+  uid_t uid; /* real user id */
+  uid_t euid; /* effective user id */
 
   myargv = argv;
 
@@ -109,15 +87,6 @@ int main(int argc, char *argv[])
           , __DATE__, __TIME__
 #endif
          );
-
-  if (uname(&un) != -1)
-    {
-      fprintf(stderr, "Running on: %s %s\n", un.sysname,
-              un.release);
-    }
-  else
-    /* Blah. It ignored uname(), then pretend to be funny :-) -kre */
-    fprintf(stderr, "Running on: computer, probably :-)\n");
 
 #ifdef GDB_DEBUG
 

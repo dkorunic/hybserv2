@@ -9,15 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <time.h>
-#include <stdio.h>
-#include <string.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-
+#include "stdinc.h"
 #include "channel.h"
 #include "chanserv.h"
 #include "client.h"

@@ -9,24 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <unistd.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-#ifndef HAVE_CYGWIN
-#include <signal.h>
-#else
-#include <sys/signal.h>
-#include <signal.h>
-#endif /* HAVE_CYGWIN */
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "chanserv.h"
 #include "client.h"
@@ -57,9 +40,7 @@ ProcessSignal()
   return: none
 */
 
-void
-ProcessSignal(int sig)
-
+RETSIGTYPE ProcessSignal(int sig)
 {
   InitSignals();
   

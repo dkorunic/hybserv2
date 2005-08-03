@@ -9,12 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "config.h"
 #include "hybdefs.h"

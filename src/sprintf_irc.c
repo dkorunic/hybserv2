@@ -22,8 +22,8 @@
  *   $Id$
  */
 
+#include "stdinc.h"
 #include "sprintf_irc.h"
-#include <stdio.h>
 
 const char atoi_tab[4000] =
   {

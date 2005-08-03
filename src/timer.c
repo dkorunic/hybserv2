@@ -9,20 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <unistd.h>
-#include <sys/types.h>
-#include <time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <sys/time.h>
-#endif
-#ifndef HAVE_CYGWIN
-#include <signal.h>
-#else
-#include <sys/signal.h>
-#endif /* HAVE_CYGWIN */
-
+#include "stdinc.h"
 #include "chanserv.h"
 #include "config.h"
 #include "data.h"

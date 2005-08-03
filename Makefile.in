@@ -86,7 +86,7 @@ clean:
 distclean: clean
 	@echo '*** Removing objects and misc files ***'
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
-		include/config.h bin/settings.conf bin/cleandb src/.depend \
+		include/config.h bin/settings.conf bin/cleandb \
 		config.status tags config.cache config.log ~* core \
 		hybserv.core `find . -type f -size 0 -print`
 	$(RM) `find . -type f \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
@@ -101,6 +101,7 @@ depend:
 		touch src/.depend; \
 	fi
 	@cd src; $(MAKE) depend
+	@echo '*** Done making dependancies ***'
 
 install: all install-binary install-help
 	@echo "*** Done installing Hybserv2 $(VERSION) ***"
@@ -163,9 +164,7 @@ install-help:
 
 # Autoconf stuff
 autoconf:
-	#autoconf
-	#autoheader
 	autoreconf
-	rm -rf autom4te.cache
 
 # End of Makefile
+# vim: set noexpandtab

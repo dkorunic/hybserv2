@@ -9,12 +9,7 @@
  * $Id$
  */
 
-#include "defs.h"
-
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-
+#include "stdinc.h"
 #include "alloc.h"
 #include "channel.h"
 #include "chanserv.h"

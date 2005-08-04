@@ -4463,9 +4463,6 @@ fi
 done
 
 
-LIBS="${LIBS}"
-CFLAGS="${CFLAGS}"
-
 echo "$as_me:$LINENO: checking return type of signal handlers" >&5
 echo $ECHO_N "checking return type of signal handlers... $ECHO_C" >&6
 if test "${ac_cv_type_signal+set}" = set; then
@@ -6084,12 +6081,15 @@ fi
 
 echo "
 Configuration:
-  Source revision:  ${REVISION}
-  Detected OS:      ${host_os}
-  Install path:     ${prefix}/hybserv
-  Compiler:         ${CC}
-  Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LIBS}
+  Source revision:    ${REVISION}
+  Detected OS:        ${host_os}
+  Install path:       ${prefix}/hybserv
+  Compiler:           ${CC}
+  Compiler flags:     ${CFLAGS}
+  Preprocessor:       ${CPP}
+  Preprocessor flags: ${CPPFLAGS}
+  Linker flags:       ${LDFLAGS}
+  Libraries to link:  ${LIBS}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

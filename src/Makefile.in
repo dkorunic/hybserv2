@@ -3,14 +3,15 @@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-INCLUDE = -I. -I../include
+IDIR = ../include
+INCLUDE = -I. -I$(IDIR) $(CPPFLAGS)
 DEFS =
 LIBS = @LIBS@
 MKDEP = $(CC) -MM
 RM = @RM@ -f
-
-IDIR = ../include
 
 DEPENDFILE = .depend
 

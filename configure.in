@@ -60,10 +60,6 @@ AC_HEADER_STAT
 AC_CHECK_HEADERS(errno.h assert.h netdb.h fcntl.h signal.h \
   arpa/inet.h sys/socket.h netinet/in.h sys/resource.h sys/signal.h)
 
-dnl Add standard prefix to fix broken environments
-LIBS="${LIBS}"
-CFLAGS="${CFLAGS}"
-
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(strchr memcpy strdup strerror strncpy gettimeofday)
@@ -82,12 +78,15 @@ AC_OUTPUT(Makefile src/Makefile tools/Makefile \
 
 echo "
 Configuration:
-  Source revision:  ${REVISION}
-  Detected OS:      ${host_os}
-  Install path:     ${prefix}/hybserv
-  Compiler:         ${CC}
-  Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LIBS}
+  Source revision:    ${REVISION}
+  Detected OS:        ${host_os}
+  Install path:       ${prefix}/hybserv
+  Compiler:           ${CC}
+  Compiler flags:     ${CFLAGS}
+  Preprocessor:       ${CPP}
+  Preprocessor flags: ${CPPFLAGS}
+  Linker flags:       ${LDFLAGS}
+  Libraries to link:  ${LIBS}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

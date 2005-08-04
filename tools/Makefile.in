@@ -3,25 +3,29 @@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-INCLUDE = -I../include
+IDIR = ../include
+INCLUDE = -I. -I$(IDIR) $(CPPFLAGS)
 DEFS =
 LIBS = @LIBS@
+MKDEP = $(CC) -MM
 RM = @RM@ -f
 
 COMMON = \
- doencrypt.o
+	doencrypt.o
 
 OBJECTS = \
- doencrypt.o\
- encryptconf.o\
- encryptdb.o\
- mkpasswd.o
+	doencrypt.o\
+	encryptconf.o\
+	encryptdb.o\
+	mkpasswd.o
 
 PROGS = \
- ../bin/encryptconf\
- ../bin/encryptdb\
- ../bin/mkpasswd
+	../bin/encryptconf\
+	../bin/encryptdb\
+	../bin/mkpasswd
 
 all: $(PROGS)
 

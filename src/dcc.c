@@ -622,7 +622,7 @@ void readauth(struct DccUser *dccptr)
   length = recv(dccptr->authfd, buffer, sizeof(buffer), 0);
   if (length > 0)
     {
-      u_short remport = 0, locport = 0;
+      unsigned short remport = 0, locport = 0;
       int num;
 
       num = sscanf(buffer, "%hd , %hd : USERID : %*[^:]: %10s",

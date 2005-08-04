@@ -8,21 +8,6 @@ As long as the answer is right, who cares if the question is wrong?
 Pending bugs:
 -------------
 
-channel.o(.text+0xab6): In function `SetChannelMode':
-/home/kreator/work/cvs/hybserv/src/channel.c:806: warning: warning: your code still has assertions enabled!
-sprintf_irc.o(.text+0x2fc): In function `vsprintf_irc':
-/home/kreator/work/cvs/hybserv/src/sprintf_irc.c:438: warning: warning: Avoid *sprintf; use *snprintf. It is more secure.
-/usr/lib/diet/lib-i386/libc.a(stderr.o)(.text+0x7): In function `__fflush_stderr':
-: warning: warning: your code uses stdio (7+k bloat).
-dcc.o(.text+0x4f3): In function `ConnectClient':
-/home/kreator/work/cvs/hybserv/src/dcc.c:496: warning: warning: gethostbyaddr() leaks memory.  Use gethostbyaddr_r instead!
-sock.o(.text+0x142): In function `SetupVirtualHost':
-/home/kreator/work/cvs/hybserv/src/sock.c:196: warning: warning: gethostbyname() leaks memory.  Use gethostbyname_r instead!
-/usr/lib/diet/lib-i386/libc.a(vfprintf.o)(.text+0x36): In function `vfprintf':
-: warning: warning: the printf functions add several kilobytes of bloat.
-/usr/lib/diet/lib-i386/libc.a(vsscanf.o)(.text+0x5b): In function `vsscanf':
-: warning: warning: the scanf functions add several kilobytes of bloat.
-
 *) fix absolutely ugly code formatting! [progress..]
 *) bunch of *old* stuff I've found around:
   - take IP bans into account

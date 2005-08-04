@@ -90,8 +90,10 @@ char *strchr(), *strrchr();
 # include <dmalloc.h>
 #endif
 
-#if HAVE_ASSERT_H
+#if HAVE_ASSERT_H && !defined NDEBUG
 # include <assert.h>
+#else
+# define assert(x)
 #endif
 
 #if HAVE_NETDB_H

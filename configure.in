@@ -43,13 +43,6 @@ AC_PROG_INSTALL
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(LN, ln)
-AC_PATH_PROG(LS, ls)
-AC_PATH_PROG(CHMOD, chmod)
-AC_PATH_PROG(CHOWN, chown)
-
-dnl Who am i
-WHOAMI=`whoami`
-AC_SUBST(WHOAMI)
 
 dnl Checks for header files.
 AC_HEADER_STDC

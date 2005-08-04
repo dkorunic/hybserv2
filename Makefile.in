@@ -15,30 +15,18 @@ CONFDIR = $(PREFIX)/hybserv
 # (should match HelpPath in settings.conf)
 HELPDIR = $(PREFIX)/hybserv/help
 
-# Set this to the user who will own BINDIR
-WHOAMI = @WHOAMI@
-
-
 ############ Don't change anything below here ############
 
 # Hybserv2 Version
 REVISION = @REVISION@
 VERSION = 1.9.0-SVN-${REVISION}
 
-CC = @CC@
-CFLAGS = @CFLAGS@ -Wall -pipe
-# Debugging CFLAGS
-#CFLAGS = @CFLAGS@ -Wall -g -D_REENTRANT -pipe
-LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@
+# Programs and params
 RM = @RM@ -f
 RMR = @RM@ -rf
 CP = @CP@
 CPR = @CP@ -R
 LN = @LN@ -sf
-CHMOD = @CHMOD@
-CHOWN = @CHOWN@ -R
-LS = @LS@ -l
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_BIN = ${INSTALL} -m 755
@@ -58,7 +46,7 @@ HPATHFIX = settings.conf
 SUBDIRS = src tools
 
 # Rest of standard Makefile
-all: depend src tools
+all: src tools
 	@echo "*** Begin building Hybserv2 version $(VERSION) ***"
 	@echo
 	@for i in $(SUBDIRS); do \
@@ -97,7 +85,7 @@ mrproper: distclean
 
 depend:
 	@echo '*** Making dependancies ***'
-	@if [ ! -f src/.depend ]; then \
+	@if test ! -f src/.depend; then \
 		touch src/.depend; \
 	fi
 	@cd src; $(MAKE) depend
@@ -139,13 +127,6 @@ install-binary:
 	@echo '** Creating $(BINDIR)/showchans **'
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/showchans
 	@echo
-	@echo '** Changing ownership of $(BINDIR) to $(WHOAMI) **'
-	@$(CHOWN) $(WHOAMI) $(BINDIR)
-	@if test $(BINDIR) != $(CONFDIR); then \
-		echo '** Changing ownership of $(CONFDIR) to $(WHOAMI) **'; \
-		$(CHOWN) $(WHOAMI) $(CONFDIR); \
-	fi
-	@echo
 
 install-help:
 	@if test ! -d $(HELPDIR); then \
@@ -158,8 +139,6 @@ install-help:
 	fi
 	@echo Installing help files in $(HELPDIR)
 	@$(CPR) help/* $(HELPDIR)
-	@echo Changing ownership of $(HELPDIR) to $(WHOAMI)
-	@$(CHOWN) $(WHOAMI) $(HELPDIR)
 	@echo
 
 # Autoconf stuff

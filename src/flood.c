@@ -279,11 +279,10 @@ void updateConnectTable(char *user, char *host)
   int tmp, banhost = 0, found = 0;
   static int last = 0;
   static struct connectInfo table[ADVFLOOD_TABLE];
+  struct rHost *rhostptr = NULL;
 
 #ifdef ADVFLOOD_GLINE
-
   char togline[UHOSTLEN];
-  struct rHost *rhostptr = NULL;
   struct Gline *gptr;
 #endif /* ADVFLOOD_GLINE */
 

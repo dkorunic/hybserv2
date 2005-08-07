@@ -1,5 +1,9 @@
-Hybserv: Wed,  3 Aug 2005 21:53:14 +0200
+Hybserv: Sun,  7 Aug 2005 23:23:12 +0200
 
+  * fix for invalid link count [fix from sofit]
+  * fix for autovoice/autoop for operserv admins, problem with
+    EMPOWERADMINS_MORE [fix from sofit]
+  * global code and style cleanups
   * massive rewrite of includes and better detection of system
     headers/functions
   * fix trace to show channels when using -long parameters

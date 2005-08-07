@@ -1616,33 +1616,6 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
     if (tmp == leaf)
       return(-1);
 
-  /* find out number of linked nicknames in a list */
-  if (master->numlinks)
-    lcnt = master->numlinks;
-  else
-    lcnt = 1; /* master is a standalone nickname */
-
-  /* XXX this code sucks anyway. */
-  /* leaf is in linked list, add linked_count_leaf to linked_count_hub */
-  if (leaf->master)
-    {
-      if (leaf->master->numlinks)
-        lcnt += leaf->master->numlinks;
-      else
-        ++lcnt;
-    }
-  else
-    {
-      if (leaf->numlinks)
-        lcnt += leaf->numlinks;
-      else
-        ++lcnt;
-    }
-
-  /* seems there are too many links, so die instantly */
-  if (MaxLinks && (lcnt > MaxLinks))
-    return (-2);
-
   /* setup leaf master */
   if (leaf->master)
     {
@@ -1652,10 +1625,22 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
   else
     leafmaster = leaf;
 
-  ++master->numlinks;
+  /* find out number of linked nicknames in a list */
+  if (master->numlinks)
+    lcnt += master->numlinks;
+  else
+    ++lcnt; /* master is a standalone nickname */
 
-  if (!master->nextlink)
-    ++master->numlinks;
+  /* XXX this code sucks anyway. */
+  /* leaf is in linked list, add linked_count_leaf to linked_count_hub */
+  if (leafmaster->numlinks)
+    lcnt += leafmaster->numlinks;
+  else
+    ++lcnt;
+
+  /* seems there are too many links, so die instantly */
+  if (MaxLinks && (lcnt > MaxLinks))
+    return (-2);
 
 #ifdef CHANNELSERVICES
 
@@ -1684,7 +1669,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
           AddFounderChannelToNick(&master,tmpchan->cptr);
 
           tmpchan->cptr->founder = MyStrdup(master->nick);
-	}
+        }
     }
 
   if (leafmaster->AccessChannels)
@@ -1714,14 +1699,14 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
   /* setup masters in whole list */
   for (tmp = leafmaster; tmp->nextlink; tmp = tmp->nextlink)
-    {
       tmp->master = master;
-      ++master->numlinks;
-    }
 
   /* do last master, insert hub's list at the end of leaf's list */
   tmp->master = master;
   tmp->nextlink = hub->nextlink;
+
+  /* we've counted this already */
+  master->numlinks = lcnt;
 
   /* and start list at the leaf's master */
   hub->nextlink = leafmaster;
@@ -1773,7 +1758,6 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
 
       /* and make a master from nptr */
       nptr->master = nptr->nextlink = NULL;
-      nptr->numlinks = 0;
 
       if (copyhosts)
         /* make hosts list for nptr since it is alone now */
@@ -1810,6 +1794,9 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
       /* and yes, declare nptr as nickname which is alone */
       nptr->nextlink = NULL;
     }
+
+  /* also set numlinks to 0 (this is a standalone nickname now) */
+  nptr->numlinks = 0;
 
   --master->numlinks;
   if (master->numlinks == 1)

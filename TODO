@@ -12,14 +12,7 @@ Pending bugs:
 *) bunch of *old* stuff I've found around:
   - take IP bans into account
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite
-  - operserv admins don't seem to get autovoice/autoop when the level is set to
-    0, while regular users would
   - /cs info on private channel should require 1, not CMDINVITE
-*) From Jared:
-  if a user adds a linked nickname then deletes that linked nickname
-  several times they start getting the too many nicks error.. it looks
-  like the numlinks is being incremented several times every time someone
-  adds a link and not being decremented at the same rate...
 *) does not want to unforbid sometimes (??)
 *) fix *LOCK functions (topic and mode lock)
 *) temp ignores rotate (possible overflow)

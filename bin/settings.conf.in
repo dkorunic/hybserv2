@@ -173,6 +173,10 @@ ServiceUmodes      "+io"
 #  Enable this to give channel operator status to administrators
 # who enter any ChanServ-monitored channel. This feature
 # will only work if EMPOWERADMINS is defined in config.h.
+#
+# Note: This option does not apply to EMPOWERADMINS_MORE (config.h).
+#       EMPOWERADMINS_MORE gives founder access to every admin,
+#       and thus allowing them to have op in every channel.
 
 AutoOpAdmins
 

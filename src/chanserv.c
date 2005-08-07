@@ -2968,7 +2968,7 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
         return 0;
     }
 
-#ifdef EMPOWERADMINS_MORE
+#ifdef EMPOWERADMINS
   /*
    * If AutoOpAdmins is disabled, check if lptr is an admin and if level
    * is AUTOOP (or AUTOVOICE) - if so, check if they are on the channel's
@@ -2976,29 +2976,15 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
    * to get opped/voiced (return 1), otherwise return 0. This extra check
    * is needed because GetAccess() will return true if lptr is an admin,
    * regardless of AutoOpAdmins being enabled.
+   * 
+   * Correction: AutoOpAdmins is for EMPOWERADMINS, not for EMPOWERADMINS_MORE.
+   * EMPOWERADMINS_MORE as a definition gives founder access to every admin,
+   * regardless of AutoOpAdmins being enabled or disabled. 
+   * But AutoOpAdmins works _only_ for EMPOWERADMINS.
    */
-  if (!AutoOpAdmins && IsValidAdmin(lptr) && ((level == CA_AUTOOP) ||
-      /* check CA_AUTOHALFOP level only if hybrid7 -kre */
-#ifdef HYBRID7_HALFOPS
-      (level == CA_AUTOHALFOP) ||
-#endif /* HYBRID7_HALFOPS */
-      (level == CA_AUTOVOICE)))
-    {
-      struct ChanAccess *ca;
-      char nmask[MAXLINE];
-
-      ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
-                 lptr->hostname);
-      if ((ca = OnAccessList(cptr, nmask, GetMaster(FindNick(lptr->nick)))))
-        if (ca->level >= cptr->access_lvl[level])
-        {
-          cptr->lastused = ca->last_used = current_ts;
-          return 1;
-        }
-
-      return 0;
-    }
-#endif /* EMPOWERADMINS_MORE */
+  if (AutoOpAdmins && IsValidAdmin(lptr))
+    return 1;
+#endif /* EMPOWERADMINS */
 
   if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
     return 1;

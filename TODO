@@ -7,8 +7,8 @@ As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
-
 *) fix absolutely ugly code formatting! [progress..]
+*) remove ocasions of ugly strcpy
 *) bunch of *old* stuff I've found around:
   - take IP bans into account
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite

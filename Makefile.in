@@ -18,7 +18,7 @@ HELPDIR = $(PREFIX)/hybserv/help
 ############ Don't change anything below here ############
 
 # Hybserv2 Version
-REVISION = @REVISION@
+REVISION = @ac_cv_revision@
 VERSION = 1.9.0-SVN-${REVISION}
 
 # Programs and params

@@ -57,7 +57,7 @@ m4trace:configure.in:8: -1- AH_OUTPUT([_GNU_SOURCE], [/* Enable GNU extensions o
 # undef _GNU_SOURCE
 #endif])
 m4trace:configure.in:8: -1- AC_DEFINE_TRACE_LITERAL([_GNU_SOURCE])
-m4trace:configure.in:16: -1- AC_SUBST([REVISION])
+m4trace:configure.in:16: -1- AC_SUBST([ac_cv_revision])
 m4trace:configure.in:19: -1- _m4_warn([obsolete], [The macro `AC_LANG_C' is obsolete.
 You should run autoupdate.], [autoconf/c.m4:71: AC_LANG_C is expanded from...
 configure.in:19: the top level])
@@ -74,7 +74,7 @@ m4trace:configure.in:26: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SOLARIS])
 m4trace:configure.in:26: -1- AH_OUTPUT([HAVE_SOLARIS], [/* Define to 1 if you have Solaris OS */
 #undef HAVE_SOLARIS])
 m4trace:configure.in:29: -1- AC_DEFINE_TRACE_LITERAL([HAVE_CYGWIN])
-m4trace:configure.in:29: -1- AH_OUTPUT([HAVE_CYGWIN], [/* Define to 1 if you have Cygwin environment */
+m4trace:configure.in:29: -1- AH_OUTPUT([HAVE_CYGWIN], [/* Define to 1 if you have CygWin environment */
 #undef HAVE_CYGWIN])
 m4trace:configure.in:36: -1- AC_PROG_CC
 m4trace:configure.in:36: -1- AC_SUBST([CC])
@@ -198,13 +198,15 @@ m4trace:configure.in:59: -1- AH_OUTPUT([HAVE_STDINT_H], [/* Define to 1 if you h
 m4trace:configure.in:59: -1- AH_OUTPUT([HAVE_UNISTD_H], [/* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H])
 m4trace:configure.in:66: -1- AC_DEFINE_TRACE_LITERAL([socklen_t])
-m4trace:configure.in:66: -1- AH_OUTPUT([socklen_t], [/* If we don\'t have a real socklen_t, unsigned int is good enough. */
+m4trace:configure.in:66: -1- AH_OUTPUT([socklen_t], [/* If we don\'t have a real socklen_t, unsigned int is good enough */
 #undef socklen_t])
 m4trace:configure.in:69: -1- AC_TYPE_SIGNAL
 m4trace:configure.in:69: -1- AC_DEFINE_TRACE_LITERAL([RETSIGTYPE])
 m4trace:configure.in:69: -1- AH_OUTPUT([RETSIGTYPE], [/* Define as the return type of signal handlers (`int\' or `void\'). */
 #undef RETSIGTYPE])
-m4trace:configure.in:70: -1- AC_CHECK_FUNCS([strchr memcpy strdup strerror strncpy gettimeofday])
+m4trace:configure.in:70: -1- AC_CHECK_FUNCS([select strchr memcpy strdup strerror strncpy gettimeofday])
+m4trace:configure.in:70: -1- AH_OUTPUT([HAVE_SELECT], [/* Define to 1 if you have the `select\' function. */
+#undef HAVE_SELECT])
 m4trace:configure.in:70: -1- AH_OUTPUT([HAVE_STRCHR], [/* Define to 1 if you have the `strchr\' function. */
 #undef HAVE_STRCHR])
 m4trace:configure.in:70: -1- AH_OUTPUT([HAVE_MEMCPY], [/* Define to 1 if you have the `memcpy\' function. */
@@ -217,13 +219,22 @@ m4trace:configure.in:70: -1- AH_OUTPUT([HAVE_STRNCPY], [/* Define to 1 if you ha
 #undef HAVE_STRNCPY])
 m4trace:configure.in:70: -1- AH_OUTPUT([HAVE_GETTIMEOFDAY], [/* Define to 1 if you have the `gettimeofday\' function. */
 #undef HAVE_GETTIMEOFDAY])
-m4trace:configure.in:80: -1- AC_CHECK_LIB([dmalloc], [malloc])
-m4trace:configure.in:80: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
+m4trace:configure.in:85: -1- AC_CHECK_LIB([dmalloc], [malloc])
+m4trace:configure.in:85: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
 #undef HAVE_LIBDMALLOC])
-m4trace:configure.in:80: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
-m4trace:configure.in:84: -1- AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:85: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
+m4trace:configure.in:95: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
+m4trace:configure.in:95: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
+#undef NICKLEN])
+m4trace:configure.in:100: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
+m4trace:configure.in:100: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
+#undef CHANNELLEN])
+m4trace:configure.in:105: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
+m4trace:configure.in:105: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
+#undef TOPICLEN])
+m4trace:configure.in:121: -1- AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile \
   bin/settings.conf bin/cleandb include/config.h])
-m4trace:configure.in:84: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:121: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:84: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:84: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:121: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:121: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

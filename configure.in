@@ -8,12 +8,12 @@ AC_CONFIG_HEADER(include/defs.h)
 AC_GNU_SOURCE
 
 dnl Get revision number
-if test -f "$srcdir/.svn/entries" ; then
-  REVISION=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+if test -f "$srcdir/.svn/entries"; then
+  ac_cv_revision=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
 else
-  REVISION="unknown"
+  ac_cv_revision="unknown"
 fi
-AC_SUBST(REVISION)
+AC_SUBST(ac_cv_revision)
 
 dnl Set language and save it
 AC_LANG_C
@@ -26,7 +26,7 @@ case "$host_os" in
   AC_DEFINE_UNQUOTED(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
   ;;
 *cygwin)
-  AC_DEFINE_UNQUOTED(HAVE_CYGWIN, , [Define to 1 if you have Cygwin environment])
+  AC_DEFINE_UNQUOTED(HAVE_CYGWIN, , [Define to 1 if you have CygWin environment])
 esac
 
 dnl Standard installation path
@@ -40,7 +40,7 @@ AC_C_CONST
 AC_SYS_LARGEFILE
 AC_C_BIGENDIAN
 
-dnl Checks for programs.
+dnl Checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PATH_PROG(RM, rm)
@@ -49,7 +49,7 @@ AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(LN, ln)
 AC_PATH_PROG(TOUCH, touch)
 
-dnl Checks for header files.
+dnl Checks for header files
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
@@ -58,26 +58,63 @@ AC_HEADER_STAT
 AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
   arpa/inet.h sys/socket.h netinet/in.h sys/resource.h sys/signal.h])
 
-dnl Checks for types.
+dnl Checks for types
 AC_CHECK_TYPE(socklen_t, ,
   [AC_DEFINE([socklen_t], [unsigned int],
-  [If we don't have a real socklen_t, unsigned int is good enough.])],
+  [If we don't have a real socklen_t, unsigned int is good enough])],
   [#include <sys/types.h>
 #include <sys/socket.h>])
 
-dnl Checks for library functions.
+dnl Checks for library functions
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([strchr memcpy strdup strerror strncpy gettimeofday])
+AC_CHECK_FUNCS([select strchr memcpy strdup strerror strncpy gettimeofday])
 AC_SEARCH_LIBS(gethostbyname, nsl, ,
-  [AC_MSG_ERROR([You have no gethostbyname()! Aborting.])])
+  [AC_MSG_ERROR([You have no gethostbyname()! Aborting])])
 AC_SEARCH_LIBS(socket, socket, ,
-  [AC_MSG_ERROR([You have no socket()! Aborting.])])
+  [AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
 
 dnl Try dmalloc support
-AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable dmalloc support [default=no]])
-if test "x$enable_dmalloc" = "xyes"; then
+AC_MSG_CHECKING([compile with malloc debugging libs])
+AC_ARG_ENABLE(dmalloc,
+  [  --enable-dmalloc        Enable dmalloc support [default=no]],
+  [cf_enable_malloc=$enableval],
+  [cf_enable_malloc="no"])
+if test "x$cf_enable_malloc" = "xyes"; then
+	AC_MSG_RESULT(yes)
   AC_CHECK_LIB(dmalloc, malloc)
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Get nick/chan/topic length
+AC_ARG_WITH(nicklen,
+  [  --with-nicklen=LENGTH     Sets nick length to LENGTH],
+  [ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
+AC_MSG_RESULT([checking nick length... $ac_cv_nicklen])
+AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
+AC_ARG_WITH(chanellen,
+  [  --with-chanellen=LENGTH   Sets channel length to LENGTH],
+  [ac_cv_chanellen=$withval], [ac_cv_chanellen="200"])
+AC_MSG_RESULT([checking channel length... $ac_cv_chanellen])
+AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_chanellen, [Define to channel length])
+AC_ARG_WITH(topiclen,
+  [  --with-topiclen=LENGTH    Sets topic length to LENGTH],
+  [ac_cv_topiclen=$withval], [ac_cv_topiclen="90"])
+AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
+AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
+
+dnl Check if warnings are to be enabled
+AC_MSG_CHECKING([compile with warning flags])
+AC_ARG_ENABLE(warnings,
+  [  --enable-warnings       Enable compiler warnings],
+  [cf_enable_warnings=$enableval],
+  [cf_enable_warnings=no])
+if test "x$cf_enable_warnings" = "xyes"; then
+	CFLAGS="$CFLAGS -Wall"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
 fi
 
 AC_OUTPUT(Makefile src/Makefile tools/Makefile \
@@ -85,7 +122,7 @@ AC_OUTPUT(Makefile src/Makefile tools/Makefile \
 
 echo "
 Configuration:
-  Source revision:    ${REVISION}
+  Source revision:    ${ac_cv_revision}
   Detected OS:        ${host_os}
   Install path:       ${prefix}/hybserv
   Compiler:           ${CC}
@@ -94,6 +131,10 @@ Configuration:
   Preprocessor flags: ${CPPFLAGS}
   Linker flags:       ${LDFLAGS}
   Libraries to link:  ${LIBS}
+
+  Nick length:        ${ac_cv_nicklen}
+  Channel length:     ${ac_cv_chanellen}
+  Topic length:       ${ac_cv_topiclen}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS REVISION build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RM CP MV LN TOUCH CPP EGREP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ac_cv_revision build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RM CP MV LN TOUCH CPP EGREP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -850,6 +850,14 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-largefile     omit support for large files
   --enable-dmalloc        Enable dmalloc support default=no
+  --enable-warnings       Enable compiler warnings
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-nicklen=LENGTH     Sets nick length to LENGTH
+  --with-chanellen=LENGTH   Sets channel length to LENGTH
+  --with-topiclen=LENGTH    Sets topic length to LENGTH
 
 Some influential environment variables:
   CC          C compiler command
@@ -1319,10 +1327,10 @@ _ACEOF
 
 
 
-if test -f "$srcdir/.svn/entries" ; then
-  REVISION=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+if test -f "$srcdir/.svn/entries"; then
+  ac_cv_revision=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
 else
-  REVISION="unknown"
+  ac_cv_revision="unknown"
 fi
 
 
@@ -4797,7 +4805,8 @@ _ACEOF
 
 
 
-for ac_func in strchr memcpy strdup strerror strncpy gettimeofday
+
+for ac_func in select strchr memcpy strdup strerror strncpy gettimeofday
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -5020,8 +5029,8 @@ if test "$ac_cv_search_gethostbyname" != no; then
   test "$ac_cv_search_gethostbyname" = "none required" || LIBS="$ac_cv_search_gethostbyname $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: You have no gethostbyname()! Aborting." >&5
-echo "$as_me: error: You have no gethostbyname()! Aborting." >&2;}
+  { { echo "$as_me:$LINENO: error: You have no gethostbyname()! Aborting" >&5
+echo "$as_me: error: You have no gethostbyname()! Aborting" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -5148,8 +5157,8 @@ if test "$ac_cv_search_socket" != no; then
   test "$ac_cv_search_socket" = "none required" || LIBS="$ac_cv_search_socket $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: You have no socket()! Aborting." >&5
-echo "$as_me: error: You have no socket()! Aborting." >&2;}
+  { { echo "$as_me:$LINENO: error: You have no socket()! Aborting" >&5
+echo "$as_me: error: You have no socket()! Aborting" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -5278,12 +5287,18 @@ if test "$ac_cv_search_crypt" != no; then
 fi
 
 
+echo "$as_me:$LINENO: checking compile with malloc debugging libs" >&5
+echo $ECHO_N "checking compile with malloc debugging libs... $ECHO_C" >&6
 # Check whether --enable-dmalloc or --disable-dmalloc was given.
 if test "${enable_dmalloc+set}" = set; then
   enableval="$enable_dmalloc"
-
+  cf_enable_malloc=$enableval
+else
+  cf_enable_malloc="no"
 fi;
-if test "x$enable_dmalloc" = "xyes"; then
+if test "x$cf_enable_malloc" = "xyes"; then
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 
 echo "$as_me:$LINENO: checking for malloc in -ldmalloc" >&5
 echo $ECHO_N "checking for malloc in -ldmalloc... $ECHO_C" >&6
@@ -5357,6 +5372,73 @@ _ACEOF
 
 fi
 
+else
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+# Check whether --with-nicklen or --without-nicklen was given.
+if test "${with_nicklen+set}" = set; then
+  withval="$with_nicklen"
+  ac_cv_nicklen=$withval
+else
+  ac_cv_nicklen="18"
+fi;
+echo "$as_me:$LINENO: result: checking nick length... $ac_cv_nicklen" >&5
+echo "${ECHO_T}checking nick length... $ac_cv_nicklen" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define NICKLEN $ac_cv_nicklen
+_ACEOF
+
+
+# Check whether --with-chanellen or --without-chanellen was given.
+if test "${with_chanellen+set}" = set; then
+  withval="$with_chanellen"
+  ac_cv_chanellen=$withval
+else
+  ac_cv_chanellen="200"
+fi;
+echo "$as_me:$LINENO: result: checking channel length... $ac_cv_chanellen" >&5
+echo "${ECHO_T}checking channel length... $ac_cv_chanellen" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define CHANNELLEN $ac_cv_chanellen
+_ACEOF
+
+
+# Check whether --with-topiclen or --without-topiclen was given.
+if test "${with_topiclen+set}" = set; then
+  withval="$with_topiclen"
+  ac_cv_topiclen=$withval
+else
+  ac_cv_topiclen="90"
+fi;
+echo "$as_me:$LINENO: result: checking topic length... $ac_cv_topiclen" >&5
+echo "${ECHO_T}checking topic length... $ac_cv_topiclen" >&6
+
+cat >>confdefs.h <<_ACEOF
+#define TOPICLEN $ac_cv_topiclen
+_ACEOF
+
+
+echo "$as_me:$LINENO: checking compile with warning flags" >&5
+echo $ECHO_N "checking compile with warning flags... $ECHO_C" >&6
+# Check whether --enable-warnings or --disable-warnings was given.
+if test "${enable_warnings+set}" = set; then
+  enableval="$enable_warnings"
+  cf_enable_warnings=$enableval
+else
+  cf_enable_warnings=no
+fi;
+if test "x$cf_enable_warnings" = "xyes"; then
+	CFLAGS="$CFLAGS -Wall"
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 fi
 
                                                             ac_config_files="$ac_config_files Makefile src/Makefile tools/Makefile bin/settings.conf bin/cleandb include/config.h"
@@ -5976,7 +6058,7 @@ s,@ECHO_C@,$ECHO_C,;t t
 s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
-s,@REVISION@,$REVISION,;t t
+s,@ac_cv_revision@,$ac_cv_revision,;t t
 s,@build@,$build,;t t
 s,@build_cpu@,$build_cpu,;t t
 s,@build_vendor@,$build_vendor,;t t
@@ -6500,7 +6582,7 @@ fi
 
 echo "
 Configuration:
-  Source revision:    ${REVISION}
+  Source revision:    ${ac_cv_revision}
   Detected OS:        ${host_os}
   Install path:       ${prefix}/hybserv
   Compiler:           ${CC}
@@ -6509,6 +6591,10 @@ Configuration:
   Preprocessor flags: ${CPPFLAGS}
   Linker flags:       ${LDFLAGS}
   Libraries to link:  ${LIBS}
+
+  Nick length:        ${ac_cv_nicklen}
+  Channel length:     ${ac_cv_chanellen}
+  Topic length:       ${ac_cv_topiclen}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

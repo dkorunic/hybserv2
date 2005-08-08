@@ -1,5 +1,8 @@
-Hybserv: Sun,  7 Aug 2005 23:23:12 +0200
+Hybserv-HEAD: Mon,  8 Aug 2005 23:11:11 +0200
 
+  * add --enable-warnings, --with-nicklen, --with-chanellen and
+    --with-topiclen
+  * several Solaris fuckups fixed
   * fix for invalid link count [fix from sofit]
   * fix for autovoice/autoop for operserv admins, problem with
     EMPOWERADMINS_MORE [fix from sofit]
@@ -19,11 +22,6 @@ Hybserv: Sun,  7 Aug 2005 23:23:12 +0200
     possible of already written ChanServ code; new code will autoop Admins
     only if AutoOpAdmins is set.. and will do stuff is should have been
     doing already [but it didn't]
-
- -- Dinko Korunic <dinko|korunic|AT|gmail|com>
-
-Hybserv: Thu, 21 Jul 2005 20:06:04 +0200
-
   * since I've migrated to Subversion, we've lost automatic ChangeLog, so
     I'll be manually writing the changes every now and then
   * fix ghost to use instant collide, instead of KILL

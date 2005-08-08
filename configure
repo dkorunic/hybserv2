@@ -849,8 +849,11 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-largefile     omit support for large files
-  --enable-dmalloc        Enable dmalloc support default=no
-  --enable-warnings       Enable compiler warnings
+  --enable-dmalloc        Enable dmalloc support [default=no]
+  --enable-warnings       Enable compiler warnings [default=no]
+  --enable-asserts        Enable asserts in code [default=no]
+  --enable-gimmecore      Enable core dumping [default=yes]
+  --enable-daemontools    Enable daemontools support [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1424,14 +1427,14 @@ MYHOST=$host_os
 case "$host_os" in
 *sunos*|*solaris*)
 
-cat >>confdefs.h <<_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_SOLARIS
 _ACEOF
 
   ;;
 *cygwin)
 
-cat >>confdefs.h <<_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_CYGWIN
 _ACEOF
 
@@ -5430,12 +5433,88 @@ if test "${enable_warnings+set}" = set; then
   enableval="$enable_warnings"
   cf_enable_warnings=$enableval
 else
-  cf_enable_warnings=no
+  cf_enable_warnings="no"
 fi;
 if test "x$cf_enable_warnings" = "xyes"; then
 	CFLAGS="$CFLAGS -Wall"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+else
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+echo "$as_me:$LINENO: checking compile with asserts enabled" >&5
+echo $ECHO_N "checking compile with asserts enabled... $ECHO_C" >&6
+# Check whether --enable-asserts or --disable-asserts was given.
+if test "${enable_asserts+set}" = set; then
+  enableval="$enable_asserts"
+  cf_enable_asserts=$enableval
+else
+  cf_enable_asserts="no"
+fi;
+if test "x$cf_enable_asserts" = "xno"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define NDEBUG 1
+_ACEOF
+
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+elif test "x$cf_enable_asserts" = "xsoft"; then
+	echo "$as_me:$LINENO: result: soft" >&5
+echo "${ECHO_T}soft" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define SOFT_ASSERT 1
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define NDEBUG 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking compile with core dumping enabled" >&5
+echo $ECHO_N "checking compile with core dumping enabled... $ECHO_C" >&6
+# Check whether --enable-gimmecore or --disable-gimmecore was given.
+if test "${enable_gimmecore+set}" = set; then
+  enableval="$enable_gimmecore"
+  cf_enable_gimmecore=$enableval
+else
+  cf_enable_gimmecore="yes"
+fi;
+if test "x$cf_enable_gimmecore" = "xno"; then
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+else
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define GIMMECORE 1
+_ACEOF
+
+fi
+
+echo "$as_me:$LINENO: checking compile for daemontools" >&5
+echo $ECHO_N "checking compile for daemontools... $ECHO_C" >&6
+# Check whether --enable-daemontools or --disable-daemontools was given.
+if test "${enable_daemontools+set}" = set; then
+  enableval="$enable_daemontools"
+  cf_enable_daemontools=$enableval
+else
+  cf_enable_daemontools="no"
+fi;
+if test "x$cf_enable_daemontools" = "xyes"; then
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define DAEMONTOOLS 1
+_ACEOF
+
 else
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -6582,19 +6661,25 @@ fi
 
 echo "
 Configuration:
-  Source revision:    ${ac_cv_revision}
-  Detected OS:        ${host_os}
-  Install path:       ${prefix}/hybserv
-  Compiler:           ${CC}
-  Compiler flags:     ${CFLAGS}
-  Preprocessor:       ${CPP}
-  Preprocessor flags: ${CPPFLAGS}
-  Linker flags:       ${LDFLAGS}
-  Libraries to link:  ${LIBS}
-
-  Nick length:        ${ac_cv_nicklen}
-  Channel length:     ${ac_cv_chanellen}
-  Topic length:       ${ac_cv_topiclen}
+  Source revision:      ${ac_cv_revision}
+  Detected OS:          ${host_os}
+  Install path:         ${prefix}/hybserv
+Compiler suite:
+  Compiler:             ${CC}
+  Compiler flags:       ${CFLAGS}
+  Preprocessor:         ${CPP}
+  Preprocessor flags:   ${CPPFLAGS}
+  Linker flags:         ${LDFLAGS}
+  Libraries to link:    ${LIBS}
+Compile configuration:
+  Nick length:          ${ac_cv_nicklen}
+  Channel length:       ${ac_cv_chanellen}
+  Topic length:         ${ac_cv_topiclen}
+Extra configurations:
+  Warnings enabled:     ${cf_enable_warnings}
+  Asserts enabled:      ${cf_enable_asserts}
+  Coredumps enabled:    ${cf_enable_gimmecore}
+  Daemontools enabled:  ${cf_enable_daemontools}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

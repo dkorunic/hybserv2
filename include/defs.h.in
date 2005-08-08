@@ -3,6 +3,12 @@
 /* Define to channel length */
 #undef CHANNELLEN
 
+/* Define this to enable daemontools support */
+#undef DAEMONTOOLS
+
+/* Define this to enable core dumping */
+#undef GIMMECORE
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
@@ -108,6 +114,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define this to disable debugging support */
+#undef NDEBUG
+
 /* Define to nick length */
 #undef NICKLEN
 
@@ -128,6 +137,9 @@
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
+
+/* Define this to enable soft asserts */
+#undef SOFT_ASSERT
 
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN

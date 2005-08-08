@@ -448,19 +448,6 @@
 /* --- Don't touch unless you know exactly what are you doing --- */
 
 /*
- * Turn off assertions by default if not debugging. Undefine this if you
- * still want assertions, and DEBUG is not defined.
- */
-#define   NDEBUG
-
-/*
- * Define this if you want to make sure core will be properly dumped if
- * something goes wrong, whether your global/local corelimit is 0 or not.
- * If you define DEBUG, it will be automatically used.
- */
-#define   GIMMECORE
-
-/*
  * This will give MUCH CPU overhead, and usually should not be enabled.
  * This code makes double-checks for duplicate nicks in nick.db which
  * shouldn't happen otherwise, but as a result of sloppy coding in
@@ -469,12 +456,6 @@
  * you doing, you can disable it.
  */
 #undef    STRICT_DATA_CHECK
-
-/*
- * DJB's daemontools compatibility stuff. Won't fork() into background, nor
- * setsid(), which makes it possible to be run under svscan.
- */
-#undef    DAEMONTOOLS
 
 /* -------------------------------------------------------------- */
 /* ------------------- End of configurable section -------------- */

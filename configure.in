@@ -23,10 +23,10 @@ AC_CANONICAL_HOST
 MYHOST=$host_os
 case "$host_os" in
 *sunos*|*solaris*)
-  AC_DEFINE_UNQUOTED(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
+  AC_DEFINE(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
   ;;
 *cygwin)
-  AC_DEFINE_UNQUOTED(HAVE_CYGWIN, , [Define to 1 if you have CygWin environment])
+  AC_DEFINE(HAVE_CYGWIN, , [Define to 1 if you have CygWin environment])
 esac
 
 dnl Standard installation path
@@ -77,7 +77,7 @@ AC_SEARCH_LIBS(crypt, [crypt descrypt])
 dnl Try dmalloc support
 AC_MSG_CHECKING([compile with malloc debugging libs])
 AC_ARG_ENABLE(dmalloc,
-  [  --enable-dmalloc        Enable dmalloc support [default=no]],
+  [  --enable-dmalloc        Enable dmalloc support [[default=no]]],
   [cf_enable_malloc=$enableval],
   [cf_enable_malloc="no"])
 if test "x$cf_enable_malloc" = "xyes"; then
@@ -107,12 +107,53 @@ AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 dnl Check if warnings are to be enabled
 AC_MSG_CHECKING([compile with warning flags])
 AC_ARG_ENABLE(warnings,
-  [  --enable-warnings       Enable compiler warnings],
+  [  --enable-warnings       Enable compiler warnings [[default=no]]],
   [cf_enable_warnings=$enableval],
-  [cf_enable_warnings=no])
+  [cf_enable_warnings="no"])
 if test "x$cf_enable_warnings" = "xyes"; then
 	CFLAGS="$CFLAGS -Wall"
 	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check if asserts are to be enabled
+AC_MSG_CHECKING([compile with asserts enabled])
+AC_ARG_ENABLE(asserts,
+  [  --enable-asserts        Enable asserts in code [[default=no]]],
+  [cf_enable_asserts=$enableval],
+  [cf_enable_asserts="no"])
+if test "x$cf_enable_asserts" = "xno"; then
+  AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
+	AC_MSG_RESULT(yes)
+elif test "x$cf_enable_asserts" = "xsoft"; then
+	AC_MSG_RESULT(soft)
+  AC_DEFINE(SOFT_ASSERT, 1, [Define this to enable soft asserts])
+  AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
+fi
+
+dnl Check if coredumping is to be enabled
+AC_MSG_CHECKING([compile with core dumping enabled])
+AC_ARG_ENABLE(gimmecore,
+  [  --enable-gimmecore      Enable core dumping [[default=yes]]],
+  [cf_enable_gimmecore=$enableval],
+  [cf_enable_gimmecore="yes"])
+if test "x$cf_enable_gimmecore" = "xno"; then
+	AC_MSG_RESULT(no)
+else
+	AC_MSG_RESULT(yes)
+  AC_DEFINE(GIMMECORE, 1, [Define this to enable core dumping])
+fi
+
+dnl Check if program is to be monitored under daemontools
+AC_MSG_CHECKING([compile for daemontools])
+AC_ARG_ENABLE(daemontools,
+  [  --enable-daemontools    Enable daemontools support [[default=no]]],
+  [cf_enable_daemontools=$enableval],
+  [cf_enable_daemontools="no"])
+if test "x$cf_enable_daemontools" = "xyes"; then
+	AC_MSG_RESULT(yes)
+  AC_DEFINE(DAEMONTOOLS, 1, [Define this to enable daemontools support])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -122,19 +163,25 @@ AC_OUTPUT(Makefile src/Makefile tools/Makefile \
 
 echo "
 Configuration:
-  Source revision:    ${ac_cv_revision}
-  Detected OS:        ${host_os}
-  Install path:       ${prefix}/hybserv
-  Compiler:           ${CC}
-  Compiler flags:     ${CFLAGS}
-  Preprocessor:       ${CPP}
-  Preprocessor flags: ${CPPFLAGS}
-  Linker flags:       ${LDFLAGS}
-  Libraries to link:  ${LIBS}
-
-  Nick length:        ${ac_cv_nicklen}
-  Channel length:     ${ac_cv_chanellen}
-  Topic length:       ${ac_cv_topiclen}
+  Source revision:      ${ac_cv_revision}
+  Detected OS:          ${host_os}
+  Install path:         ${prefix}/hybserv
+Compiler suite:
+  Compiler:             ${CC}
+  Compiler flags:       ${CFLAGS}
+  Preprocessor:         ${CPP}
+  Preprocessor flags:   ${CPPFLAGS}
+  Linker flags:         ${LDFLAGS}
+  Libraries to link:    ${LIBS}
+Compile configuration:
+  Nick length:          ${ac_cv_nicklen}
+  Channel length:       ${ac_cv_chanellen}
+  Topic length:         ${ac_cv_topiclen}
+Extra configurations:
+  Warnings enabled:     ${cf_enable_warnings}
+  Asserts enabled:      ${cf_enable_asserts}
+  Coredumps enabled:    ${cf_enable_gimmecore}
+  Daemontools enabled:  ${cf_enable_daemontools}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

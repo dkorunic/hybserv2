@@ -461,8 +461,8 @@
 /* ------------------- End of configurable section -------------- */
 /* -------------------------------------------------------------- */
 
-#if defined ADVFLOOD && defined ADVFLOOD_NOTIFY && defined ADVFLOOD_NOTIFY_ALL
-# undef ADVFLOOD_NOTIFY_ALL
+#if defined ADVFLOOD_NOTIFY && defined ADVFLOOD_NOTIFY_ALL
+# undef ADVFLOOD_NOTIFY
 #endif
 
 #if defined HYBRID7

@@ -409,7 +409,8 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   errval = 0;
   errlen = sizeof(errval);
-  if (getsockopt(HubSock, SOL_SOCKET, SO_ERROR, &errval, &errlen) < 0)
+  if (getsockopt(HubSock, SOL_SOCKET, SO_ERROR, (void *)&errval, &errlen)
+      < 0)
     {
       putlog(LOG1,
              "getsockopt(SO_ERROR) failed: %s",

@@ -8,13 +8,8 @@
 **
 ** $Id$
 */
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 
-#include "defs.h"
+#include "stdinc.h"
 
 #define FLAG_MD5     0x00000001
 #define FLAG_DES     0x00000002

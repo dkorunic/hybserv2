@@ -879,11 +879,10 @@ GreetDccUser(struct DccUser *dccptr)
 
   errval = 0;
   errlen = sizeof(errval);
-  if (getsockopt(dccptr->socket, SOL_SOCKET, SO_ERROR, &errval, &errlen) < 0)
+  if (getsockopt(dccptr->socket, SOL_SOCKET, SO_ERROR, (void *)&errval,
+        &errlen) < 0)
     {
-      putlog(LOG1,
-             "getsockopt(SO_ERROR) failed: %s",
-             strerror(errno));
+      putlog(LOG1, "getsockopt(SO_ERROR) failed: %s", strerror(errno));
       return 0;
     }
 

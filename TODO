@@ -9,6 +9,8 @@ Pending bugs:
 -------------
 *) fix absolutely ugly code formatting! [progress..]
 *) remove ocasions of ugly strcpy
+*) check capabs of host server, including nicklen - report if nicklen >
+   hybserv nicklen[!]
 *) bunch of *old* stuff I've found around:
   - take IP bans into account
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite

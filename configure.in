@@ -2,8 +2,10 @@ dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.50)
-AC_INIT(Hybserv2, testing, kreator|AT|srce|hr)
+AC_COPYRIGHT([$Id$])
+AC_INIT([Hybserv2], [testing])
 AC_CONFIG_HEADER(include/defs.h)
+AC_GNU_SOURCE
 
 dnl Get revision number
 if test -f "$srcdir/.svn/entries" ; then
@@ -36,13 +38,16 @@ AC_ISC_POSIX
 AC_C_INLINE
 AC_C_CONST
 AC_SYS_LARGEFILE
+AC_C_BIGENDIAN
 
 dnl Checks for programs.
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
+AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(LN, ln)
+AC_PATH_PROG(TOUCH, touch)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -50,15 +55,24 @@ AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_HEADER_STAT
-AC_CHECK_HEADERS(errno.h assert.h netdb.h fcntl.h signal.h \
-  arpa/inet.h sys/socket.h netinet/in.h sys/resource.h sys/signal.h)
+AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
+  arpa/inet.h sys/socket.h netinet/in.h sys/resource.h sys/signal.h])
+
+dnl Checks for types.
+AC_CHECK_TYPE(socklen_t, ,
+  [AC_DEFINE([socklen_t], [unsigned int],
+  [If we don't have a real socklen_t, unsigned int is good enough.])],
+  [#include <sys/types.h>
+#include <sys/socket.h>])
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(strchr memcpy strdup strerror strncpy gettimeofday)
-AC_CHECK_LIB(nsl, gethostbyname)
-AC_CHECK_LIB(socket, socket)
-AC_CHECK_LIB(crypt, crypt)
+AC_CHECK_FUNCS([strchr memcpy strdup strerror strncpy gettimeofday])
+AC_SEARCH_LIBS(gethostbyname, nsl, ,
+  [AC_MSG_ERROR([You have no gethostbyname()! Aborting.])])
+AC_SEARCH_LIBS(socket, socket, ,
+  [AC_MSG_ERROR([You have no socket()! Aborting.])])
+AC_SEARCH_LIBS(crypt, [crypt descrypt])
 
 dnl Try dmalloc support
 AC_ARG_ENABLE(dmalloc, [  --enable-dmalloc        Enable dmalloc support [default=no]])

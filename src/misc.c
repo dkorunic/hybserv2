@@ -960,31 +960,3 @@ char* stripctrlsymbols( char * source )
     }
   return source;
 }
-
-char* stripformatsymbols( char * source )
-{
-  char *p ;
-
-  if( source == NULL )
-    return NULL;
-
-  for (p = source; *p; p++)
-    if (*p == '%' )
-      *p = '*';
-  return source;
-}
-
-int checkforproc( char* source )
-{
-
-  char * p;
-  if( source == NULL )
-    return 0;
-
-  for (p = source; *p; p++)
-    if (*p == '%' )
-      return 1;
-  return 0;
-
-}
-

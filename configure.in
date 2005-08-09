@@ -107,7 +107,10 @@ AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 dnl Get the network identificator
 AC_ARG_WITH(network,
   [  --with-network=TYPE       Sets network type TYPE],
-  [ac_cv_network=$withval], [ac_cv_network="hybrid"])
+  [ac_cv_network=$withval], [ac_cv_network="hybrid7"])
+if test "x$ac_cv_network" = "xyes"; then
+  ac_cv_network="hybrid7"
+fi
 AC_MSG_RESULT([checking network type... $ac_cv_network])
 if test "x$ac_cv_network" = "xhybrid"; then
   ac_cv_nicklen=18

@@ -232,24 +232,24 @@ m4trace:configure.in:100: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel leng
 m4trace:configure.in:105: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
 m4trace:configure.in:105: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
 #undef TOPICLEN])
-m4trace:configure.in:154: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:154: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:157: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:157: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:158: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
-m4trace:configure.in:158: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
+m4trace:configure.in:161: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
+m4trace:configure.in:161: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
 #undef SOFT_ASSERT])
-m4trace:configure.in:159: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:159: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:162: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:162: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:172: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
-m4trace:configure.in:172: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
+m4trace:configure.in:175: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
+m4trace:configure.in:175: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
 #undef GIMMECORE])
-m4trace:configure.in:183: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
-m4trace:configure.in:183: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
+m4trace:configure.in:186: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
+m4trace:configure.in:186: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 #undef DAEMONTOOLS])
-m4trace:configure.in:189: -1- AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:192: -1- AC_CONFIG_FILES([Makefile src/Makefile tools/Makefile \
   bin/settings.conf bin/cleandb include/config.h])
-m4trace:configure.in:189: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:192: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:189: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:189: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:192: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:192: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

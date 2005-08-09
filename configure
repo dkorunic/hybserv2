@@ -5433,8 +5433,11 @@ if test "${with_network+set}" = set; then
   withval="$with_network"
   ac_cv_network=$withval
 else
-  ac_cv_network="hybrid"
+  ac_cv_network="hybrid7"
 fi;
+if test "x$ac_cv_network" = "xyes"; then
+  ac_cv_network="hybrid7"
+fi
 echo "$as_me:$LINENO: result: checking network type... $ac_cv_network" >&5
 echo "${ECHO_T}checking network type... $ac_cv_network" >&6
 if test "x$ac_cv_network" = "xhybrid"; then

@@ -202,8 +202,6 @@ RecordCommand(char *format, ...)
   va_end(args);
 
   /* log the command */
-  // stripformatsymbols( buffer );
-
   putlog(LOG2, "%s", buffer);
 
   /* send it to opers with usermode +s */

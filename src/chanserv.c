@@ -3099,16 +3099,6 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  /* this is not a way to eliminate format bugs -kre */
-#if 0
-  if( checkforproc( av[1]) )
-    {
-      notice(n_ChanServ, lptr->nick,
-             "Invalid channel name");
-      return;
-    }
-#endif
-
   if (HasFlag(lptr->nick, NS_NOREGISTER))
     {
       notice(n_ChanServ, lptr->nick,

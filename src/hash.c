@@ -115,8 +115,8 @@ FindClient()
 
 struct Luser *FindClient(const char *name)
   {
-    register struct Luser *tempuser;
-    register aHashEntry *temphash;
+    struct Luser *tempuser;
+    aHashEntry *temphash;
     int hashv;
 
     if (!name)
@@ -276,7 +276,7 @@ struct Luser *
       HashAddClient(struct Luser *lptr, int nickchange)
 
   {
-    register int hashv;
+    int hashv;
     int foundclone = 0,
                      killclones = 0;
     struct Luser *tempuser, *temp2;
@@ -800,8 +800,8 @@ int
 HashDelClient(struct Luser *lptr, int nickchange)
 
 {
-  register struct Luser  *tmp, *prev = NULL;
-  register int  hashv, ret = -1;
+  struct Luser  *tmp, *prev = NULL;
+  int  hashv, ret = -1;
   char uhost[UHOSTLEN + 2];
 #ifdef STATSERVICES
 
@@ -1017,9 +1017,9 @@ int
 HashUhost(char *userhost)
 
 {
-  register unsigned char *hname = (unsigned char *)userhost;
-  register unsigned int h = 0;
-  register int i = 30; /* only use first 30 chars of uhost */
+  unsigned char *hname = (unsigned char *)userhost;
+  unsigned int h = 0;
+  int i = 30; /* only use first 30 chars of uhost */
 
 #if 0
 
@@ -1054,7 +1054,7 @@ static unsigned int
 HashChannel(const char *name)
 
 {
-  register int i = 30;
+  int i = 30;
   unsigned int h = 0;
 
 #if 0
@@ -1088,7 +1088,7 @@ unsigned int
 CSHashChan(const char *name)
 
 {
-  register int i = 30;
+  int i = 30;
   unsigned int h = 0;
 
 #if 0
@@ -1124,7 +1124,7 @@ unsigned int
 MSHashMemo(const char *name)
 
 {
-  register int i = 30;
+  int i = 30;
   unsigned int h = 0;
 
   /*
@@ -1162,7 +1162,7 @@ int
 HashAddChan(struct Channel *chptr)
 
 {
-  register int hashv;
+  int hashv;
 
   if (!chptr)
     return (0);
@@ -1186,8 +1186,8 @@ int
 HashDelChan(struct Channel *chptr)
 
 {
-  register struct Channel *tmp, *prev;
-  register int hashv;
+  struct Channel *tmp, *prev;
+  int hashv;
 
   if (!chptr)
     return (0);
@@ -1223,7 +1223,7 @@ struct Channel *
 
   {
     int hashv;
-    register struct Channel *tempchan;
+    struct Channel *tempchan;
     aHashEntry *temphash;
 
     if (!name)
@@ -1273,7 +1273,7 @@ struct Server *
       FindServer(const char *name)
 
   {
-    register struct Server *tempserv;
+    struct Server *tempserv;
 
     assert(name != NULL);
 
@@ -1321,7 +1321,7 @@ int
 HashAddServer(struct Server *sptr)
 
 {
-  register int hashv;
+  int hashv;
 
   if (!sptr)
     return (0);
@@ -1345,8 +1345,8 @@ int
 HashDelServer(struct Server *sptr)
 
 {
-  register struct Server *tmp, *prev;
-  register int hashv;
+  struct Server *tmp, *prev;
+  int hashv;
 
   if (!sptr)
     return (0);

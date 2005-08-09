@@ -204,7 +204,6 @@ RecordCommand(char *format, ...)
   /* log the command */
   // stripformatsymbols( buffer );
 
-  /* avoid using stripformatsymbols() -Sarisa */
   putlog(LOG2, "%s", buffer);
 
   /* send it to opers with usermode +s */

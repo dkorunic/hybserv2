@@ -13,7 +13,7 @@
 
 int match(const char *, const char *);
 int irccmp(const char *, const char *);
-int ircncmp(const char *, const char *, int);
+int ircncmp(const char *, const char *, size_t);
 
 extern const unsigned char ToLowerTab[];
 extern const unsigned char ToUpperTab[];
@@ -34,16 +34,18 @@ extern const unsigned int CharAttrs[];
 #define CHANPFX_C 0x200
 #define USER_C    0x400
 #define HOST_C    0x800
-#define NONEOS_C  0x1000
-#define SERV_C    0x2000
-#define EOL_C     0x4000
-#define NICKPFX_C 0x8000 /* nickname prefix (@ +) */
+#define NONEOS_C 0x1000
+#define SERV_C   0x2000
+#define EOL_C    0x4000
+#define MWILD_C  0x8000
+#define NICKPFX_C 0x10000 /* nickname prefix (@%+) */
 
 #define IsHostChar(c)   (CharAttrs[(unsigned char)(c)] & HOST_C)
 #define IsUserChar(c)   (CharAttrs[(unsigned char)(c)] & USER_C)
 #define IsChanPrefix(c) (CharAttrs[(unsigned char)(c)] & CHANPFX_C)
 #define IsChanChar(c)   (CharAttrs[(unsigned char)(c)] & CHAN_C)
 #define IsKWildChar(c)  (CharAttrs[(unsigned char)(c)] & KWILD_C)
+#define IsMWildChar(c)  (CharAttrs[(unsigned char)(c)] & MWILD_C)
 #define IsNickChar(c)   (CharAttrs[(unsigned char)(c)] & NICK_C)
 #define IsServChar(c)   (CharAttrs[(unsigned char)(c)] & (NICK_C | SERV_C))
 #define IsCntrl(c)      (CharAttrs[(unsigned char)(c)] & CNTRL_C)
@@ -52,14 +54,15 @@ extern const unsigned int CharAttrs[];
 #define IsLower(c)      (IsAlpha((c)) && ((unsigned char)(c) > 0x5f))
 #define IsUpper(c)      (IsAlpha((c)) && ((unsigned char)(c) < 0x60))
 #define IsDigit(c)      (CharAttrs[(unsigned char)(c)] & DIGIT_C)
-#define IsXDigit(c) (IsDigit(c) || 'a' <= (c) && (c) <= 'f' || \
-        'A' <= (c) && (c) <= 'F')
+#define IsXDigit(c) (IsDigit(c) || ('a' <= (c) && (c) <= 'f') || \
+        ('A' <= (c) && (c) <= 'F'))
 #define IsAlNum(c) (CharAttrs[(unsigned char)(c)] & (DIGIT_C | ALPHA_C))
 #define IsPrint(c) (CharAttrs[(unsigned char)(c)] & PRINT_C)
 #define IsAscii(c) ((unsigned char)(c) < 0x80)
 #define IsGraph(c) (IsPrint((c)) && ((unsigned char)(c) != 0x32))
 #define IsPunct(c) (!(CharAttrs[(unsigned char)(c)] & \
                                            (CNTRL_C | ALPHA_C | DIGIT_C)))
+
 #define IsNonEOS(c) (CharAttrs[(unsigned char)(c)] & NONEOS_C)
 #define IsEOL(c) (CharAttrs[(unsigned char)(c)] & EOL_C)
 #define IsNickPrefix(c) (CharAttrs[(unsigned char)(c)] & NICKPFX_C)

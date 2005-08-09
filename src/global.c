@@ -47,8 +47,7 @@ static void g_gcmemo(struct Luser *, int, char **);
 
 static struct Command globalcmds[] =
     {
-      { "HELP", g_help, LVL_NONE
-      },
+      { "HELP", g_help, LVL_NONE },
       { "MOTD", g_motd, LVL_NONE },
       { "LOGONNEWS", g_motd, LVL_NONE },
 

@@ -274,7 +274,7 @@ ConnectHost(char *hostname, unsigned int port)
 
 {
   struct sockaddr_in ServAddr;
-  register struct hostent *hostptr;
+  struct hostent *hostptr;
   struct in_addr ip;
   int socketfd; /* socket file descriptor */
 
@@ -714,8 +714,8 @@ ReadHub()
 
 {
   int length; /* number of bytes we read */
-  register char *ch;
-  register char *linech;
+  char *ch;
+  char *linech;
 #ifdef EXTREMEDEBUG
 
   FILE *fp;
@@ -779,7 +779,7 @@ ReadHub()
 
   while (*ch)
     {
-      register char tmp;
+      char tmp;
 #ifdef DEBUGMODE
 
       int    ii;
@@ -944,7 +944,7 @@ ReadSock(struct DccUser *connptr)
 
   while (*ch)
     {
-      register char tmp;
+      char tmp;
 
       tmp = *ch;
       if (IsEOL(tmp))

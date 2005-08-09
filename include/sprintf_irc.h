@@ -8,7 +8,7 @@
 #include "stdinc.h"
 #include "config.h"
 
-extern int vsprintf_irc(register char *, register const char *, va_list);
-extern int ircsprintf(register char *, register const char *, ...);
+extern int vsprintf_irc(char *, const char *, va_list);
+extern int ircsprintf(char *, const char *, ...);
 
 #endif /* INCLUDED_sprintf_irc_h */

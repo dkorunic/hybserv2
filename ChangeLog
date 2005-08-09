@@ -1,5 +1,6 @@
 Hybserv-HEAD: Mon,  8 Aug 2005 23:11:11 +0200
 
+  * import newer match.c, which has '#' wildcard [thanks Ales Tokic]
   * add --enable-asserts, --enable-gimmecore and --enable-daemontools
   * add --enable-warnings, --with-nicklen, --with-chanellen and
     --with-topiclen

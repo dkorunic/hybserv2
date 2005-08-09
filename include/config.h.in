@@ -125,18 +125,14 @@
  * Hybserv use Hybrid7 features like glines/klines, etc.  This includes
  * +h and +I support, as well as some other stuff available through
  * #define HYBRID7_*..
+ * (this will go into ./configure script)
  */
 #define    HYBRID7
 
 /*
- * Defining this will turn on IRCNet daemon compatibility. Undergoing a
- * lot of changes, so don't use it, since it is unuseable.
- */
-#undef    IRCNET
-
-/*
  * Define this if you want DANCER ircd compatibility. It has +c and
  * +f modes for channels, as well as +e umode for users.
+ * (this will go into ./configure script)
  */
 #undef    DANCER
 

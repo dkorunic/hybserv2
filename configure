@@ -861,6 +861,7 @@ Optional Packages:
   --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
   --with-chanellen=LENGTH   Sets channel length to LENGTH [default=200]
   --with-topiclen=LENGTH    Sets topic length to LENGTH [default=90]
+  --with-network=TYPE       Sets network type TYPE
 
 Some influential environment variables:
   CC          C compiler command
@@ -5426,6 +5427,38 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+
+# Check whether --with-network or --without-network was given.
+if test "${with_network+set}" = set; then
+  withval="$with_network"
+  ac_cv_network=$withval
+else
+  ac_cv_network="hybrid"
+fi;
+echo "$as_me:$LINENO: result: checking network type... $ac_cv_network" >&5
+echo "${ECHO_T}checking network type... $ac_cv_network" >&6
+if test "x$ac_cv_network" = "xhybrid"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=90
+elif test "x$ac_cv_network" = "xhybrid7"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=90
+elif test "x$ac_cv_network" = "xidolnet"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=240
+elif test "x$ac_cv_network" = "xbalcannet"; then
+  ac_cv_nicklen=24
+  ac_cv_chanellen=200
+  ac_cv_topiclen=400
+elif test "x$ac_cv_network" = "xdancer"; then
+  ac_cv_nicklen=20
+  ac_cv_chanellen=30
+  ac_cv_topiclen=450
+fi
+
 echo "$as_me:$LINENO: checking compile with warning flags" >&5
 echo $ECHO_N "checking compile with warning flags... $ECHO_C" >&6
 # Check whether --enable-warnings or --disable-warnings was given.
@@ -6672,6 +6705,7 @@ Compiler suite:
   Linker flags:         ${LDFLAGS}
   Libraries to link:    ${LIBS}
 Compile configuration:
+  Configured network:   ${ac_cv_network}
   Nick length:          ${ac_cv_nicklen}
   Channel length:       ${ac_cv_chanellen}
   Topic length:         ${ac_cv_topiclen}

@@ -1180,11 +1180,5 @@ void signon(void)
          "\r\n", currenthub->password);
 #endif /* HYBRID_ONLY */
 
-#ifdef IRCNET
-  /* Authenticate to IRCNet daemon -kre */
-  toserv("PASS %s %s IRC|%s %s\r\n", currenthub->password,
-         "0210030000", "HEiJKps", "P");
-#endif /* IRCNET */
-
   toserv("SERVER %s 1 :%s\r\n", Me.name, Me.info);
 } /* signon() */

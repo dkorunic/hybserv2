@@ -104,6 +104,33 @@ AC_ARG_WITH(topiclen,
 AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
 AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 
+dnl Get the network identificator
+AC_ARG_WITH(network,
+  [  --with-network=TYPE       Sets network type TYPE],
+  [ac_cv_network=$withval], [ac_cv_network="hybrid"])
+AC_MSG_RESULT([checking network type... $ac_cv_network])
+if test "x$ac_cv_network" = "xhybrid"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=90
+elif test "x$ac_cv_network" = "xhybrid7"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=90
+elif test "x$ac_cv_network" = "xidolnet"; then
+  ac_cv_nicklen=18
+  ac_cv_chanellen=200
+  ac_cv_topiclen=240
+elif test "x$ac_cv_network" = "xbalcannet"; then
+  ac_cv_nicklen=24
+  ac_cv_chanellen=200
+  ac_cv_topiclen=400
+elif test "x$ac_cv_network" = "xdancer"; then
+  ac_cv_nicklen=20
+  ac_cv_chanellen=30
+  ac_cv_topiclen=450
+fi
+
 dnl Check if warnings are to be enabled
 AC_MSG_CHECKING([compile with warning flags])
 AC_ARG_ENABLE(warnings,
@@ -174,6 +201,7 @@ Compiler suite:
   Linker flags:         ${LDFLAGS}
   Libraries to link:    ${LIBS}
 Compile configuration:
+  Configured network:   ${ac_cv_network}
   Nick length:          ${ac_cv_nicklen}
   Channel length:       ${ac_cv_chanellen}
   Topic length:         ${ac_cv_topiclen}

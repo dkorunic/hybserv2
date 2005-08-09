@@ -1,5 +1,7 @@
 Hybserv-HEAD: Tue,  9 Aug 2005 21:19:47 +0200
 
+  * add --with-network, possible targets are idolnet, balcannet, hybrid,
+    hybrid7, dancer
   * fix a dozen of format string vulnerabilities [thanks Ales Tokic for
     notice]
   * import newer match.c, which has '#' wildcard [thanks Ales Tokic for

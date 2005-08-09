@@ -3156,7 +3156,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
               os_notice(lptr, sockfd, "** Noticing %s", tempuser->nick);
 
               /* send 'msgbuf' to matches through a NOTICE */
-              os_notice(tempuser, sockfd, msgbuf);
+              os_notice(tempuser, sockfd, "%s", msgbuf);
             }
           else if (kill) /* -kill */
             {
@@ -3330,7 +3330,7 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
                 tempchan->chptr->name);
 
           if (sockfd == NODCC)
-            os_notice(lptr, sockfd, tmp);
+            os_notice(lptr, sockfd, "%s", tmp);
           else
             {
               strcat(tmp, "\r\n");
@@ -3707,7 +3707,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
             tempuser->lptr->nick);
 
         if (sockfd == NODCC)
-          os_notice(lptr, sockfd, temp);
+          os_notice(lptr, sockfd, "%s", temp);
         else
           {
             strcat(temp, "\r\n");
@@ -6795,7 +6795,7 @@ CalcMem(char *nick, int socket)
                  "Clients:    %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalUsers, clientm, clientm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6804,7 +6804,7 @@ CalcMem(char *nick, int socket)
                  "Servers:    %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalServers, servm, servm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6813,7 +6813,7 @@ CalcMem(char *nick, int socket)
                  "Channels:   %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalChannels, chanm, chanm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6822,7 +6822,7 @@ CalcMem(char *nick, int socket)
                  "Bans:       %5ld (%10.0fb) (%10.2fkb)",
                  chanbanc, chanbanm, chanbanm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6832,7 +6832,7 @@ CalcMem(char *nick, int socket)
                  "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)",
                  changecosbanc, changecosbanm, changecosbanm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 #endif /* GECOSBANS */
@@ -6842,7 +6842,7 @@ CalcMem(char *nick, int socket)
                  "Exceptions: %5ld (%10.0fb) (%10.2fkb)",
                  chanexceptc, chanexceptm, chanexceptm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6850,7 +6850,7 @@ CalcMem(char *nick, int socket)
                  "Conf lines: %5ld (%10.0fb) (%10.2fkb)",
                  confc, confm, confm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6858,7 +6858,7 @@ CalcMem(char *nick, int socket)
                  "Ignores: %8ld (%10.0fb) (%10.2fkb)",
                  igc, igm, igm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6866,7 +6866,7 @@ CalcMem(char *nick, int socket)
                  "Partyline: %6d (%10.0fb) (%10.2fkb)",
                  Network->TotalConns, connm, connm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6876,7 +6876,7 @@ CalcMem(char *nick, int socket)
                  "NickServ:         (%10.0fb) (%10.2fkb)",
                  nsm, nsm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6886,7 +6886,7 @@ CalcMem(char *nick, int socket)
                  "ChanServ:         (%10.0fb) (%10.2fkb)",
                  csm, csm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 #endif
@@ -6897,7 +6897,7 @@ CalcMem(char *nick, int socket)
                  "MemoServ:         (%10.0fb) (%10.2fkb)",
                  msm, msm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 #endif
@@ -6910,7 +6910,7 @@ CalcMem(char *nick, int socket)
                  "StatServ:         (%10.0fb) (%10.2fkb)",
                  ssm, ssm / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 #endif /* STATSERVICES */
@@ -6920,7 +6920,7 @@ CalcMem(char *nick, int socket)
                  "Client Hash:      (%10.0fb) (%10.2fkb)",
                  hashc, hashc / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6929,7 +6929,7 @@ CalcMem(char *nick, int socket)
                  "Channel Hash:     (%10.0fb) (%10.2fkb)",
                  hashch, hashch / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6938,7 +6938,7 @@ CalcMem(char *nick, int socket)
                  "Clone Hash:       (%10.0fb) (%10.2fkb)",
                  hashcl, hashcl / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
 
@@ -6947,7 +6947,7 @@ CalcMem(char *nick, int socket)
                  "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)",
                  total, total / 1024, (total / 1024) / 1024);
       if (socket == NODCC)
-        os_notice(lptr, socket, sendstr);
+        os_notice(lptr, socket, "%s", sendstr);
       else
         writesocket(socket, sendstr);
     } /* if (nick || (socket != NODCC)) */

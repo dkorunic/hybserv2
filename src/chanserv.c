@@ -348,12 +348,9 @@ void cs_process(char *nick, char *command)
     {
       /* the command requires a registered nickname */
 
-      notice(n_ChanServ, lptr->nick,
-             "Your nickname is not registered");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_NickServ,
-             "REGISTER");
+      notice(n_ChanServ, lptr->nick, "Your nickname is not registered");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+          "REGISTER");
       MyFree(arv);
       return;
     }
@@ -376,7 +373,7 @@ void cs_process(char *nick, char *command)
       if (realptr->flags & NS_FORBID)
         {
           notice(n_ChanServ, lptr->nick,
-                 "Cannot execute commands for forbidden nicknames");
+              "Cannot execute commands for forbidden nicknames");
           MyFree(arv);
           return;
         }
@@ -386,11 +383,11 @@ void cs_process(char *nick, char *command)
           if (!(nptr->flags & NS_IDENTIFIED))
             {
               notice(n_ChanServ, lptr->nick,
-                     "Password identification is required for [\002%s\002]",
-                     cptr->cmd);
+                  "Password identification is required for [\002%s\002]",
+                  cptr->cmd);
               notice(n_ChanServ, lptr->nick,
-                     "Type \002/msg %s IDENTIFY <password>\002 and retry",
-                     n_NickServ);
+                  "Type \002/msg %s IDENTIFY <password>\002 and retry",
+                  n_NickServ);
               MyFree(arv);
               return;
             }
@@ -405,7 +402,7 @@ void cs_process(char *nick, char *command)
           if (chptr->flags & CS_FORBID)
             {
               notice(n_ChanServ, lptr->nick,
-                     "Cannot execute commands for forbidden channels");
+                  "Cannot execute commands for forbidden channels");
               MyFree(arv);
               return;
             }
@@ -413,7 +410,7 @@ void cs_process(char *nick, char *command)
             if (chptr->flags & CS_FORGET)
               {
                 notice(n_ChanServ, lptr->nick,
-                       "Cannot execute commands for forgotten channels");
+                    "Cannot execute commands for forgotten channels");
                 MyFree(arv);
                 return;
               }
@@ -1415,14 +1412,11 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 
               notice(n_ChanServ, lptr->nick,
-                     "You are not permitted to have channel op privileges");
+                  "You are not permitted to have channel op privileges");
               SendUmode(OPERUMODE_Y,
-                        "Flagged user %s!%s@%s was opped on channel [%s] by %s",
-                        lptr->nick,
-                        lptr->username,
-                        lptr->hostname,
-                        cptr->name,
-                        source->nick);
+                  "Flagged user %s!%s@%s was opped on channel [%s] by %s",
+                  lptr->nick, lptr->username, lptr->hostname, cptr->name,
+                  source->nick);
             }
         }
       return;
@@ -3105,19 +3099,22 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
+  /* this is not a way to eliminate format bugs -kre */
+#if 0
   if( checkforproc( av[1]) )
     {
       notice(n_ChanServ, lptr->nick,
              "Invalid channel name");
       return;
     }
+#endif
 
   if (HasFlag(lptr->nick, NS_NOREGISTER))
     {
       notice(n_ChanServ, lptr->nick,
-             "You are not permitted to register channels");
+          "You are not permitted to register channels");
       putlog(LOG1,
-             "Flagged user %s!%s@%s attempted to register channel [%s]",
+            "Flagged user %s!%s@%s attempted to register channel [%s]",
              lptr->nick, lptr->username, lptr->hostname, av[1]);
       return;
     }
@@ -3129,9 +3126,8 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           notice(n_ChanServ, lptr->nick,
                  "Use of the [\002REGISTER\002] command is restricted");
-          RecordCommand("%s: %s!%s@%s failed REGISTER [%s]",
-                 n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
-                 av[1]);
+          RecordCommand("%s: %s!%s@%s failed REGISTER [%s]", n_ChanServ,
+              lptr->nick, lptr->username, lptr->hostname, av[1]);
           return;
         }
     }
@@ -3141,8 +3137,8 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       (master->fccnt >= MaxChansPerUser))
     {
       notice(n_ChanServ, lptr->nick,
-             "You are only allowed to register [\002%d\002] channels",
-             MaxChansPerUser);
+          "You are only allowed to register [\002%d\002] channels",
+          MaxChansPerUser);
       return;
     }
 
@@ -3154,16 +3150,16 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                       lptr->hostname);
 
       notice(n_ChanServ, lptr->nick,
-             "The channel [\002%s\002] is already registered",
-             av[1]);
+          "The channel [\002%s\002] is already registered",
+          av[1]);
       return;
     }
 
   if (!IsChannelOp(FindChannel(av[1]), lptr) && !IsValidAdmin(lptr))
     {
       notice(n_ChanServ, lptr->nick,
-             "You are not a channel operator on [\002%s\002]",
-             av[1]);
+          "You are not a channel operator on [\002%s\002]",
+          av[1]);
       return;
     }
 
@@ -3171,11 +3167,9 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!ChangeChanPass(cptr, av[2]))
     {
-      notice(n_ChanServ, lptr->nick,
-             "Register failed");
+      notice(n_ChanServ, lptr->nick, "Register failed");
       RecordCommand("%s: failed to create password for registered channel [%s]",
-                    n_ChanServ,
-                    av[1]);
+                    n_ChanServ, av[1]);
       MyFree(cptr);
       return;
     }
@@ -3252,18 +3246,13 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       notice(n_ChanServ, lptr->nick,
              "Syntax: \002DROP <channel> [password]\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "DROP");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "DROP");
       return;
     }
 
   if (!(cptr = FindChan(av[1])))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_CH_NOT_REGGED,
-             av[1]);
+      notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
       return;
     }
 
@@ -3271,8 +3260,7 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       if (!pwmatch(cptr->password, av[2]))
         {
-          notice(n_ChanServ, lptr->nick,
-                 ERR_BAD_PASS);
+          notice(n_ChanServ, lptr->nick, ERR_BAD_PASS);
 
           RecordCommand("%s: %s!%s@%s failed DROP [%s]",
                         n_ChanServ,
@@ -3293,7 +3281,7 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             ))
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002DROP <channel> <password>\002");
+          "Syntax: \002DROP <channel> <password>\002");
       notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "DROP");
       return;
     }
@@ -3311,8 +3299,8 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   DeleteChan(cptr);
 
   notice(n_ChanServ, lptr->nick,
-         "The channel [\002%s\002] has been dropped",
-         av[1]);
+      "The channel [\002%s\002] has been dropped",
+      av[1]);
 } /* c_drop() */
 
 /*
@@ -3330,11 +3318,8 @@ c_access(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (ac < 3)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002ACCESS <channel> {ADD|DEL|LIST} [mask [level]]\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "ACCESS");
+          "Syntax: \002ACCESS <channel> {ADD|DEL|LIST} [mask [level]]\002");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "ACCESS");
       return;
     }
 
@@ -4891,7 +4876,7 @@ void chanopsnotice(struct Channel *cptr, char* msg )
           if (FindService(tempuser->lptr))
             continue;
 
-          notice(n_ChanServ, tempuser->lptr->nick, msg);
+          notice(n_ChanServ, tempuser->lptr->nick, "%s", msg);
         }
     }
 }

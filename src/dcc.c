@@ -306,21 +306,6 @@ SendUmode(int umode, char *format, ...)
           if (!IsOper(tempuser))
             continue;
 
-          /* This sends +y users a notice informing them of the detected flood - but
-           * do we want it? It is BC flood, so it is safer to silently work and
-           * resume BC after BCFloodTime. And constant BC messages will make it even
-           * worse, some more BC Flood :-) -kre
-           
-                if (ActiveFlood)
-                {
-                  if (tempuser->umodes & OPERUMODE_Y)
-                  {
-                    tosock(dccptr->socket,
-                      "%s *** Broadcast Flood detected, halting broadcasts for %d seconds\r\n",
-                      timestr, BCFLoodTime);
-                  }
-                }
-          */
           if (!ActiveFlood && tempuser->umodes & umode)
             {
               tosock(dccptr->socket, "%s %s\r\n", timestr, buffer);
@@ -975,7 +960,7 @@ onctcp(char *nick, char *target, char *msg)
 
   if (ircncmp(msg, "PING", 4) == 0)
     {
-      notice(target, nick, msg - 1);
+      notice(target, nick, "%s", msg - 1);
       SendUmode(OPERUMODE_Y,
                 "%s: CTCP PING received from %s!%s@%s",
                 target,

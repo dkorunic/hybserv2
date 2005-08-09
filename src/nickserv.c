@@ -2694,7 +2694,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
     }
   if( strlen(mask)-strlen(host) > USERLEN - 1 )
     {
-      notice(n_NickServ, lptr->nick, "Invalid hostmask!  Username too long!");
+      notice(n_NickServ, lptr->nick, "Invalid hostmask! Username too long!");
       return;
     }
 

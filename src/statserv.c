@@ -1438,7 +1438,7 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
   iCounter = 0;
   time(&t);
   tm = *localtime(&t);
-  putlog( LOG1, "Thread for log browsing started.");
+  putlog( LOG1, "Log browsing started.");
 
   ircsprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1,
               tm.tm_mday );
@@ -1485,7 +1485,7 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
     }
   notice(n_StatServ,lptr->nick,
          "End of search." );
-  putlog( LOG1, "Thread for log browsing ended.");
+  putlog( LOG1, "Log browsing ended.");
 
   return;
 

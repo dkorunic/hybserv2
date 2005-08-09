@@ -2532,7 +2532,7 @@ static void CheckServCollide(struct Server *bad_server)
               char *reason = MyMalloc(sizeof(note1) + sizeof(bad_server->name));
               ircsprintf(reason, note1, bad_server->name);
 
-              SendUmode(OPERUMODE_Y, reason);
+              SendUmode(OPERUMODE_Y, "%s", reason);
               DoShutdown(NULL, reason);
             }
           else

@@ -363,8 +363,7 @@ void updateConnectTable(char *user, char *host)
                           "operators notified"
                          );
 #endif /* ADVFLOOD_GLINE && ALLOW_GLINES */
-
-                  SendUmode(OPERUMODE_Y, message);
+                  SendUmode(OPERUMODE_Y, "%s", message);
 #endif /* ADVFLOOD_NOTIFY */
 
 #ifdef ADVFLOOD_NOTIFY_ALL

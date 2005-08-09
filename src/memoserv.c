@@ -1150,7 +1150,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                  (memoptr->flags & MS_READ) ? "R" : "N",
                  (memoptr->flags & MS_REPLIED) ? "/RE" : "",
                  (memoptr->flags & MS_DELETE)? "/D" : "");
-          notice(n_MemoServ, lptr->nick, memoptr->text);
+          notice(n_MemoServ, lptr->nick, "%s", memoptr->text);
           if (ac < 3)
             {
               /* only mark nickname memos as read - not channel memos */

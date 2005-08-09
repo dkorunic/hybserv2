@@ -1,6 +1,9 @@
-Hybserv-HEAD: Mon,  8 Aug 2005 23:11:11 +0200
+Hybserv-HEAD: Tue,  9 Aug 2005 21:19:47 +0200
 
-  * import newer match.c, which has '#' wildcard [thanks Ales Tokic]
+  * fix a dozen of format string vulnerabilities [thanks Ales Tokic for
+    notice]
+  * import newer match.c, which has '#' wildcard [thanks Ales Tokic for
+    notice]
   * add --enable-asserts, --enable-gimmecore and --enable-daemontools
   * add --enable-warnings, --with-nicklen, --with-chanellen and
     --with-topiclen

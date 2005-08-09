@@ -7,14 +7,10 @@ As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
-*) priority 1: fix format string bugs creeping around:
-   - helpserv (via notice..)
-   - memoserv
-   - global
-   - helpserv [again!]
 *) fix absolutely ugly code formatting! [progress..]
 *) remove ocasions of ugly strcpy
 *) enable use of strlcat and strlcpy
+*) move most of txt constants into a header, for easier localisation
 *) check capabs of host server, including nicklen - report if nicklen >
    hybserv nicklen[!]
 *) bunch of *old* stuff I've found around:

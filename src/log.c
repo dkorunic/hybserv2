@@ -207,5 +207,5 @@ RecordCommand(char *format, ...)
   putlog(LOG2, "%s", buffer);
 
   /* send it to opers with usermode +s */
-  SendUmode(OPERUMODE_S, buffer);
+  SendUmode(OPERUMODE_S, "%s", buffer);
 } /* RecordCommand() */

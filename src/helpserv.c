@@ -332,7 +332,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           if (final && (final != (char *) -1))
             {
               if (sockfd == NODCC)
-                notice(Serv, helpnick, final);
+                notice(Serv, helpnick, "%s", final);
               else
                 writesocket(sockfd, final);
             }
@@ -350,11 +350,12 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
       arg2[0] = '\0';
 
       /* Bug found by larne and binder -kre */
-      if (strchr(command, '/') || strstr(command, ".."))
+      if (strchr(command, '/') || strstr(command, "..") ||
+          strstr(command, "%"))
         {
           ircsprintf(sendstr, "Invalid help string");
           if (sockfd == NODCC)
-            notice(Serv, helpnick, sendstr);
+            notice(Serv, helpnick, "%s", sendstr);
           else
             {
               writesocket(sockfd, sendstr);
@@ -471,7 +472,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
         {
           ircsprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
           if (sockfd == NODCC)
-            notice(Serv, helpnick, sendstr);
+            notice(Serv, helpnick, "%s", sendstr);
           else
             {
               writesocket(sockfd, sendstr);
@@ -496,7 +497,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           if (final && (final != (char *) -1))
             {
               if (sockfd == NODCC)
-                notice(Serv, helpnick, final);
+                notice(Serv, helpnick, "%s", final);
               else
                 writesocket(sockfd, final);
             }

@@ -178,7 +178,6 @@ Compile configuration:
   Channel length:       ${ac_cv_chanellen}
   Topic length:         ${ac_cv_topiclen}
 Extra configurations:
-  Warnings enabled:     ${cf_enable_warnings}
   Asserts enabled:      ${cf_enable_asserts}
   Coredumps enabled:    ${cf_enable_gimmecore}
   Daemontools enabled:  ${cf_enable_daemontools}

@@ -336,7 +336,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
       if (bad)
         continue;
 
-      notice(n_Global, tempuser->nick, message);
+      notice(n_Global, tempuser->nick, "%s", message);
 
       ++cnt;
     }
@@ -371,8 +371,7 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
 
   if (!GlobalNotices)
     {
-      notice(n_Global, lptr->nick,
-             "Global notices are disabled");
+      notice(n_Global, lptr->nick, "Global notices are disabled");
       return;
     }
 
@@ -448,7 +447,7 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
       if (*(temp + 1))
         DoMode(cptr, temp, 0);
 
-      notice(n_Global, cptr->name, message);
+      notice(n_Global, cptr->name, "%s", message);
       ++cnt;
 
       if (*(temp + 1))

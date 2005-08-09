@@ -134,5 +134,5 @@ void SendMessageFile(struct Luser *lptr, struct MessageFile *motdptr)
   assert(lptr && motdptr);
 
   for (lineptr = motdptr->Contents; lineptr; lineptr = lineptr->next)
-    notice(n_Global, lptr->nick, lineptr->line);
+    notice(n_Global, lptr->nick, "%s", lineptr->line);
 } /* SendMessageFile() */

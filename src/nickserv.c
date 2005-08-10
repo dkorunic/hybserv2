@@ -1379,13 +1379,13 @@ collide(char *nick)
 
 {
   struct Luser *lptr;
-  struct NickInfo *nptr;
-  char sendstr[MAXLINE];
 #if defined SVSNICK || defined FORCENICK
   char newnick[NICKLEN];
   nicknum = random();
 #else
   char **av;
+  char sendstr[MAXLINE];
+  struct NickInfo *nptr = NULL;
 #endif
 
   if(!SafeConnect)
@@ -1397,7 +1397,7 @@ collide(char *nick)
 #ifdef DANCER
   ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
       "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
-#else
+#elif !defined SVSNICK && !defined FORCENICK
   ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
       lptr->nick, (long) (lptr->nick_ts - 1), "enforced", Me.name,
       Me.name, "Nickname Enforcement");
@@ -1407,18 +1407,16 @@ collide(char *nick)
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #elif defined FORCENICK
-#ifdef FORCENICK_LEN
+# ifdef FORCENICK_LEN
   snprintf(newnick, 5 + FORCENICK_LEN, "User%ld", nicknum);
-#else
+# else
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
-#endif /* FORCENICK_LEN */
+# endif /* FORCENICK_LEN */
   toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #else
-  /*
-   * Sending a server kill will be quieter than an oper
-   * kill since most clients are -k
-   */
 
+  /* Sending a server kill will be quieter than an oper
+   * kill since most clients are -k */
   toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
          lptr->nick, Me.name, n_NickServ, sendstr);
 
@@ -1430,7 +1428,6 @@ collide(char *nick)
   AddClient(av);
 
   MyFree(av);
-#endif
 
   if ((nptr = FindNick(nick)))
     {
@@ -1441,6 +1438,7 @@ collide(char *nick)
       nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
       nptr->flags |= NS_RELEASE;
     }
+#endif
 } /* collide() */
 
 /*

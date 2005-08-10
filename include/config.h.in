@@ -516,10 +516,6 @@
 # undef HYBRID7_HALFOPS
 #endif
 
-#if defined SVSNICK
-# error "We haven't implemented SVSNICK yet, sorry"
-#endif
-
 #if !defined ALLOW_JUPES
 # undef JUPEVOTES
 #else

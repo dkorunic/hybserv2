@@ -49,10 +49,10 @@ sofit       Stanislav Zahariev   sofit|AT|proshe|bg
 toot        Toby Verrall         to7|AT|antipope|fsnet|co|uk
     
 Hybserv was specifically designed to run with Hybrid ircd, although it
-*should* work with CSr as well.  You may receive the Hybrid irc daemon
-from http://ircd-hybrid.com/. These services (more or less same code) are
-currently used by EFNet / DalNet / ICQ / WFNet / HybNet / EFNow /
-OpenProjects Network.
+*could* work with CSr as well as IRCD-Ratbox. You may find the Hybrid
+irc daemon from http://ircd-hybrid.com/. These services (more or less same
+code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet / EFNow
+/ OpenProjects Network.
 
 This software is released under the terms of the GNU General Public
 License (see COPYING). Should you choose to use and/or modify any of
@@ -111,7 +111,7 @@ NOTE: We recommend using services on same server that is your
       (which will give you some performance, since traffic will
       go through loop back device).
 
-However in Hybrid 7 to accomplish the same you have to put in
+However in Hybrid7 to accomplish the same you have to put in
 ircd.conf following code:
 
   connect {
@@ -171,7 +171,7 @@ IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC
   Q:ChanServ:This nickname is reserved.
   Q:OperServ:This nickname is reserved.
 
-However Q lines changed in Hybrid-7 Feel free to copy and paste
+However Q lines changed in Hybrid7. Feel free to copy and paste
 these lines:
 
   resv {

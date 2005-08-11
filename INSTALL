@@ -17,10 +17,10 @@ INSTALLATION:
        which should find whatever it needs for compilation.
 
     2) Edit include/config.h and change the information to suit your IRC
-       network. This is *strongly* *recommended*.
+       network. This is a *must*.
        Also, be sure to edit bin/hybserv.conf to set up the services to
-       work with your network. (This is the file where you can give others
-       access to Hybserv2)
+       work with your network. This is the file where you can give others
+       access to Hybserv2.
 
     3) Run 'make' in the hybserv tree to compile the package. When make
        finishes, you'll probably want to: 'strip bin/hybserv' to remove

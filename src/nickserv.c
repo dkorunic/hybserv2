@@ -1378,7 +1378,7 @@ void
 collide(char *nick)
 
 {
-  struct Luser *lptr;
+  struct Luser *lptr = NULL;
 #if defined SVSNICK || defined FORCENICK
   char newnick[NICKLEN];
   nicknum = random();
@@ -1388,7 +1388,7 @@ collide(char *nick)
   struct NickInfo *nptr = NULL;
 #endif
 
-  if(!SafeConnect)
+  if (!SafeConnect)
     return;
 
   if (!(lptr = FindClient(nick)))

@@ -860,7 +860,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
   --with-chanellen=LENGTH   Sets channel length to LENGTH [default=200]
-  --with-topiclen=LENGTH    Sets topic length to LENGTH [default=90]
+  --with-topiclen=LENGTH    Sets topic length to LENGTH [default=160]
   --with-network=TYPE       Sets network type TYPE
 
 Some influential environment variables:
@@ -5417,7 +5417,7 @@ if test "${with_topiclen+set}" = set; then
   withval="$with_topiclen"
   ac_cv_topiclen=$withval
 else
-  ac_cv_topiclen="90"
+  ac_cv_topiclen="160"
 fi;
 echo "$as_me:$LINENO: result: checking topic length... $ac_cv_topiclen" >&5
 echo "${ECHO_T}checking topic length... $ac_cv_topiclen" >&6
@@ -5433,7 +5433,7 @@ if test "${with_network+set}" = set; then
   withval="$with_network"
   ac_cv_network=$withval
 else
-  ac_cv_network="hybrid7"
+  ac_cv_network="no"
 fi;
 if test "x$ac_cv_network" = "xyes"; then
   ac_cv_network="hybrid7"
@@ -5441,13 +5441,13 @@ fi
 echo "$as_me:$LINENO: result: checking network type... $ac_cv_network" >&5
 echo "${ECHO_T}checking network type... $ac_cv_network" >&6
 if test "x$ac_cv_network" = "xhybrid"; then
-  ac_cv_nicklen=18
+  ac_cv_nicklen=9
   ac_cv_chanellen=200
-  ac_cv_topiclen=90
+  ac_cv_topiclen=120
 elif test "x$ac_cv_network" = "xhybrid7"; then
   ac_cv_nicklen=18
   ac_cv_chanellen=200
-  ac_cv_topiclen=90
+  ac_cv_topiclen=160
 elif test "x$ac_cv_network" = "xidolnet"; then
   ac_cv_nicklen=18
   ac_cv_chanellen=200
@@ -5460,6 +5460,10 @@ elif test "x$ac_cv_network" = "xdancer"; then
   ac_cv_nicklen=20
   ac_cv_chanellen=30
   ac_cv_topiclen=450
+elif test "x$ac_cv_network" = "xratbox"; then
+  ac_cv_nicklen=9
+  ac_cv_chanellen=200
+  ac_cv_topiclen=160
 fi
 
 echo "$as_me:$LINENO: checking compile with warning flags" >&5

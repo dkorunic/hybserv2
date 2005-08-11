@@ -74,7 +74,7 @@ m4trace:configure.in:26: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SOLARIS])
 m4trace:configure.in:26: -1- AH_OUTPUT([HAVE_SOLARIS], [/* Define to 1 if you have Solaris OS */
 #undef HAVE_SOLARIS])
 m4trace:configure.in:29: -1- AC_DEFINE_TRACE_LITERAL([HAVE_CYGWIN])
-m4trace:configure.in:29: -1- AH_OUTPUT([HAVE_CYGWIN], [/* Define to 1 if you have CygWin environment */
+m4trace:configure.in:29: -1- AH_OUTPUT([HAVE_CYGWIN], [/* Define to 1 if you have Cygwin environment */
 #undef HAVE_CYGWIN])
 m4trace:configure.in:36: -1- AC_PROG_CC
 m4trace:configure.in:36: -1- AC_SUBST([CC])

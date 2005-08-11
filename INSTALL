@@ -17,9 +17,10 @@ INSTALLATION:
        which should find whatever it needs for compilation.
 
     2) Edit include/config.h and change the information to suit your IRC
-       Network(!!). Also, be sure to edit bin/hybserv.conf to set up the
-       services to work with your network. (This is the file where you can
-       give others access to Hybserv2)
+       network. This is *strongly* *recommended*.
+       Also, be sure to edit bin/hybserv.conf to set up the services to
+       work with your network. (This is the file where you can give others
+       access to Hybserv2)
 
     3) Run 'make' in the hybserv tree to compile the package. When make
        finishes, you'll probably want to: 'strip bin/hybserv' to remove
@@ -48,15 +49,34 @@ INSTALLATION:
 
      Then, Hybserv2 will be installed in /home/mydir/hybserv.
 
+   ** Note: ./configure script accepts several additional parameters which
+            can be used to fine-tune your setup:
+
+       --disable-largefile     omit support for large files
+       --enable-dmalloc        Enable dmalloc support [default=no]
+       --enable-warnings       Enable compiler warnings [default=no]
+       --enable-asserts        Enable asserts in code [default=no]
+       --enable-gimmecore      Enable core dumping [default=yes]
+       --enable-daemontools    Enable daemontools support [default=no]
+       --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
+       --with-chanellen=LENGTH   Sets channel length to LENGTH [default=200]
+       --with-topiclen=LENGTH    Sets topic length to LENGTH [default=90]
+       --with-network=TYPE       Sets network type TYPE
+
   Hybserv2 is known to compile cleanly on the following operating systems,
   and may compile on others.
 
-    Linux 2.6.x (and older) with most distributions
+    Linux 2.6.x (and older)
     FreeBSD 5.x (and older)
     OpenBSD 2.x (and older)
     Solaris 10 (and older)
-    Digital Unix 4.0
-    Cygwin 1.1.3 (and newer)
+    Tru64 5.0 (and older)
+    Cygwin 1.5.13 (and older)
+    IRIX 6.5 (and older)
+
+ Systems known not to compile sucessfuly:
+
+    HP-UX 11.11 with builtin cc
 
  If you are unable to compile Hybserv, please let me know at
  kreator|AT|srce|hr. Bug reports/suggestions may be sent to the same

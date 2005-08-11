@@ -15,7 +15,7 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
-/* Define to 1 if you have CygWin environment */
+/* Define to 1 if you have Cygwin environment */
 #undef HAVE_CYGWIN
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.

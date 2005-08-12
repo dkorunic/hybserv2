@@ -37,7 +37,7 @@ INSTALLATION:
        installation. You can do this via 'make clean'. If you wish to
        remove any configure generated files as well, use 'make distclean'.
 
-	 ** Note: if you want to install Hybserv2 in a directory other than
+	 ** NOTE: if you want to install Hybserv2 in a directory other than
             /usr/local/hybserv, you must run the configure script with 
             the --prefix option.
 
@@ -49,7 +49,7 @@ INSTALLATION:
 
      Then, Hybserv2 will be installed in /home/mydir/hybserv.
 
-   ** Note: ./configure script accepts several additional parameters which
+   ** NOTE: ./configure script accepts several additional parameters which
             can be used to fine-tune your setup:
 
        --disable-largefile     omit support for large files

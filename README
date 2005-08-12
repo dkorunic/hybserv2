@@ -1,22 +1,22 @@
 $Id$
 
 NOTES:
-The former Hybserv development team has decided to spin off and
-focus its energies towards the Hybserv2 project. Like the name
-implies this new version will be even better then that last. If
-their is something you would like to see added to Hybserv2 please
-let us know as we are always looking for new ideas.
+The former Hybserv development team has decided to spin off and focus its
+energies towards the Hybserv2 project. Like the name implies this new
+version will be even better then that last. If their is something you
+would like to see added to Hybserv2 please let us know as we are always
+looking for new ideas.
 
 #########################################################
 
 IMPORTANT NOTE:
-Per Sidewnder's (Cosine's) request - Hybserv will no longer be
-supported. So if you have some questions or problems, please
-*upgrade* first to a version listed in the Hybserv2 dir.
+Per Sidewnder's (Cosine's) request - Hybserv will no longer be supported.
+So if you have some questions or problems, please *upgrade* first to a
+version listed in the Hybserv2 dir.
 
-Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net)
-and is now maintained by the Hybserv2 Coding Team, unless
-otherwise mentioned in the code or the credits.
+Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net) and is
+now maintained by the Hybserv2 Coding Team, unless otherwise mentioned in
+the code or the credits.
 
 #########################################################
 
@@ -24,7 +24,7 @@ HYBSERV STAFF:
 Lead developer of Hybserv2
 kreator     Dinko Korunic        kreator|AT|srce|hr
 
-The following people have contributed to this release of Hybserv2
+The following people have contributed to the Hybserv2 source
 (in nick alphabetical order):
 adx         Piotr Nizynski       adx|AT|crashnet|pl
 args        Antoniu-George Savu  antoniu-george|savu|AT|fr|tiscali|com
@@ -49,33 +49,37 @@ sofit       Stanislav Zahariev   sofit|AT|proshe|bg
 toot        Toby Verrall         to7|AT|antipope|fsnet|co|uk
     
 Hybserv was specifically designed to run with Hybrid ircd, although it
-*could* work with CSr as well as IRCD-Ratbox. You may find the Hybrid
-irc daemon from http://ircd-hybrid.com/. These services (more or less same
+*could* work with CSr as well as IRCD-Ratbox. You may find the Hybrid irc
+daemon from http://ircd-hybrid.com/. These services (more or less same
 code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet / EFNow
 / OpenProjects Network.
 
 This software is released under the terms of the GNU General Public
-License (see COPYING). Should you choose to use and/or modify any of
-code, please do so under the terms of the GNU General Public License,
-published by the Free Software Foundation.
+License (see COPYING). Should you choose to use and/or modify any of code,
+please do so under the terms of the GNU General Public License, published
+by the Free Software Foundation.
 
 #########################################################
 
 DISTRIBUTION:
   You can get Hybserv2 from:
 
-  #1:  Anonymous SVN (current version - HEAD):
+  #0:  Hybserv2 home:
+       http://www.hybserv.net/
+       [http://trac.hybserv.net/trac.cgi/wiki/HybservReleases]
+
+  #1:  Anonymous Subversiona access:
        svn co svn://svn.hybserv.net/trunk hybserv
 
-  #2:  SVN Web access:
+  #2:  Subversion Web access:
        http://svn.hybserv.net/
 
   #3:  Mirrors:
-       http://www.hybserv.net/downloads/
        http://kreator.esa.fer.hr/projects/tarballs/
        http://hybserv.icsbg.net/
 
-NOTE: SVN is usually more current than the release.
+NOTE: Subversion copy is always more current than the release, since it is
+      working/development version.
 
 
 INSTALLATION:
@@ -84,11 +88,11 @@ Please read the INSTALL file. NOW.
 #########################################################
  
 RUNNING HYBSERV:
-Make sure that each hub server you have specified in your config
-file has C/N lines for Hybserv matching the password in the first
-field of the S: line and the server name specified in the N:
-line.  Also, if you wish to enable jupes (#define ALLOW_JUPES),
-you *MUST* give services an H: line in ircd.conf.
+Make sure that each hub server you have specified in your config file has
+C/N lines for Hybserv matching the password in the first field of the S:
+line and the server name specified in the N: line. Also, if you wish to
+enable jupes (#define ALLOW_JUPES), you *MUST* give services an H: line in
+ircd.conf.
 
 Configuration examples:
 
@@ -111,8 +115,8 @@ NOTE: We recommend using services on same server that is your
       (which will give you some performance, since traffic will
       go through loop back device).
 
-However in Hybrid7 to accomplish the same you have to put in
-ircd.conf following code:
+However in Hybrid7 to accomplish the same you have to put in ircd.conf
+following code:
 
   connect {
     name = "services.name";
@@ -130,49 +134,46 @@ In hybserv.conf configuration should be as follows:
   S:password:hub.server.somewhere:6667
   N:services.name:Hybrid services
 
-When you have compiled Hybserv and edited the necessary files,
-simply type ./hybserv which should start daemon properly. If it
-is not in process list, check hybserv.log which should state
-reasons of failure. 
+When you have compiled Hybserv and edited the necessary files, simply type
+./hybserv which should start daemon properly. If it is not in process
+list, check hybserv.log which should state reasons of failure. 
 
 Then, go on IRC and type:
   /msg OperServ identify <password>
 
-Assuming OperServ is the OperServNick defined in settings.conf
-and you have given yourself a O: line in hybserv.conf. You should
-be allowed to give OperServ commands through /msg or DCC CHAT.  
+Assuming OperServ is the OperServNick defined in settings.conf and you
+have given yourself a O: line in hybserv.conf. You should be allowed to
+give OperServ commands through /msg or DCC CHAT.
 
 For a list of commands do:
   /msg OperServ help
 
-Most commands may also be done through DCC CHAT, and in fact more
-commands are available through DCC CHAT. Simply /dcc chat
-OperServ to connect, and .help
+Most commands may also be done through DCC CHAT, and in fact more commands
+are available through DCC CHAT. Simply /dcc chat OperServ to connect, and
+.help
 
-I have tried to make Hybserv fully compatible with TCM (linking
-wise). If you wish Hybserv to be part of your TCM botnet,
-read TCM-LINKING for instructions.  If you have no idea what a
-TCM bot is, don't worry about it :-).
+I have tried to make Hybserv fully compatible with TCM (linking wise). If
+you wish Hybserv to be part of your TCM botnet, read TCM-LINKING for
+instructions. If you have no idea what a TCM bot is, don't worry about it
+:-)
 
-If you enabled NickServ, ChanServ, MemoServ etc. in config.h, you
-can get lists of their commands through /msg *Serv help. NickServ
-and ChanServ have several commands that can only be executed by
-administrators.  This means you must match an O: line (with an
-"a" flag) in hybserv.conf and be registered with OperServ to
-use them. This can be done by typing /msg OperServ password,
-these commands CANNOT be accessed by DCC Chat. 
+If you enabled NickServ, ChanServ, MemoServ etc. in config.h, you can get
+lists of their commands through /msg *Serv help. NickServ and ChanServ
+have several commands that can only be executed by administrators. This
+means you must match an O: line (with an "a" flag) in hybserv.conf and be
+registered with OperServ to use them. This can be done by typing /msg
+OperServ password, these commands CANNOT be accessed by DCC Chat. 
 
-IMPORTANT NOTE! If you use Hybrid or Hybrid-compatible IRC
-  daemon, you should enable Q-lines (quarantined nickname) for
-  services-reserved nicknames because of obvious security
-  reasons:
+NOTE: If you use Hybrid or Hybrid-compatible IRC daemon, you should enable
+      Q-lines (quarantined nickname) for services-reserved nicknames
+      because of obvious security reasons:
 
   Q:NickServ:This nickname is reserved.
   Q:ChanServ:This nickname is reserved.
   Q:OperServ:This nickname is reserved.
 
-However Q lines changed in Hybrid7. Feel free to copy and paste
-these lines:
+However Q lines changed in Hybrid7. Feel free to copy and paste these
+lines:
 
   resv {
     # The reason must go first
@@ -183,50 +184,44 @@ these lines:
   };
 
 
-#########################################################################
-# BUGS -  PLEASE mail any bugs you find to                              #
-#          kreator|AT|srce|hr                                           #
-#########################################################################
+################################################################
+# BUGS -  PLEASE mail any bugs you find to kreator|AT|srce|hr  #
+#         or use a ticketing system:                           #
+#         http://trac.hybserv.net/trac.cgi/newticket           #
+################################################################
  
 We can't fix bugs if no one reports them!
 
-The criteria for reporting bugs is somewhat specific. 
-
-1. We need to know exactly how to reproduce the bugs. Use
-   #define DEBUG in include/config.h to make sure server
-   will produce corefile.
-
-2. If you do not know how to reproduce the bug at will, please
-   do the following: #define EXTREMEDEBUG in config.h, which will
-   cause the file "hybserv.hubinfo" to be created. If the bug
-   occurs again, email to us the hybserv.hubinfo file, and it\
-   will give us a starting point.
-
 
 ################################################################
-# If you are interested in helping out with the development of #
-# Hybserv feel free to join the Hybserv Development List       #
-################################################################
+
+MAILING LISTS:
+If you are interested in helping out with the development of Hybserv,
+or just tracking the changes in Hybserv, feel free to join the Hybserv
+Development List
 
 Below are the official Hybserv2 mailing lists:
-
-These are publicly postable lists.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
 sending email to:
 
-hybserv-request|AT|hybserv|net
+  hybserv-request|AT|hybserv|net
 
-(Please use a command from below in the body of the message and
- not in the subject)
+NOTE: Please use a command from below in the body of the message and not
+in the subject. E-mail should corrected that "|AT|" is translated into "@"
+and rest of "|" characters are translated to ".", forming a correct
+destination.
 
-Available Lists 
+Once subscribed, you can send a public post to:
 
-  hybserv         General Hybserv2 talk, issues, bugs, etc.
+  hybserv|AT|hybserv|net -- General mailing list
 
-Available List Manager (Ecartis) Commands:
-------------------------------------------
+List manager interface is available at:
+
+  ecartis|AT|hybserv|net -- List manager interface
+
+The following commands are available:
 
 subscribe
         Syntax: subscribe [<list>] [<user>]
@@ -259,7 +254,7 @@ help
 commands
         Syntax: commands
         Send list of available commands, providing a 'cheat sheet' for
-        users.  This takes into account any local plugins. 
+        users. This takes into account any local plugins. 
 
 end
         Syntax: end
@@ -268,7 +263,7 @@ end
 ################################################################
 
 LEGAL STUFF:
-This package has absolutely no warranty.  Use at your own risk.
+This package has absolutely no warranty. Use at your own risk.
 The author will accept no responsibility for any damage,
 whatsoever, caused by this program.
 

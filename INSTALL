@@ -77,6 +77,6 @@ Systems known not to compile sucessfuly (ie. miserably fail):
 
   HP-UX 11.11 with builtin cc
 
-If you are unable to compile Hybserv, please read the README and report
-the ticket using the provided URL.  Bug reports/suggestions may be sent to
-the same place. Now, go back to the README.
+If you are unable to compile Hybserv, please read the README and make a
+new ticket using the provided URL. Bug reports/suggestions should be sent
+to the same place. Now, go back to the README.

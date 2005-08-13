@@ -1,31 +1,43 @@
 $Id$
 
-NOTES:
+README
+======
+
+INFO:
+Hybserv2 is a new and improved version of the now unsupported Hybserv,
+sporting new features, bugfixes, and more.  It is specifically designed
+for Hybrid IRC servers, but may work with others as well. It includes
+OperServ, NickServ, ChanServ, MemoServ, StatServ, HelpServ, and Global.
+Each of the services can be enabled and disabled as necessary.
+
+Hybserv was specifically designed to run with Hybrid6/7 ircd, although it
+*should* work with Ratbox ircd and any other Hybrid-based ircd. You may
+find the Hybrid IRC daemon at http://ircd-hybrid.com/. These services
+(more or less same code) are currently used by several other networks such
+as idolNET, BalcanNET, BGNet, BGFree, UniBG< BCNet, GunNet, ShakeIT,
+FreeWorld, IRCBG, FreeNode/OPN.
+
 The former Hybserv development team has decided to spin off and focus its
-energies towards the Hybserv2 project. Like the name implies this new
-version will be even better then that last. If their is something you
-would like to see added to Hybserv2 please let us know as we are always
-looking for new ideas.
+energy towards the Hybserv2 project. Like the name implies, this new
+version is even better. If there is something you would like to see added
+to Hybserv2, please let us know as we are always looking for fresh ideas.
 
-#########################################################
-
-IMPORTANT NOTE:
-Per Sidewnder's (Cosine's) request - Hybserv will no longer be supported.
-So if you have some questions or problems, please *upgrade* first to a
-version listed in the Hybserv2 dir.
+NOTE: Per Sidewnder's (Cosine's) request - original Hybserv will no longer
+      be supported.  So if you have questions or some problems, please
+      *upgrade* first to a recent stable or even to a development version.
 
 Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net) and is
 now maintained by the Hybserv2 Coding Team, unless otherwise mentioned in
-the code or the credits.
+the code or the Credits.
 
 #########################################################
 
-HYBSERV STAFF:
+STAFF:
 Lead developer of Hybserv2
 kreator     Dinko Korunic        kreator|AT|srce|hr
 
-The following people have contributed to the Hybserv2 source
-(in nick alphabetical order):
+The following people have contributed to Hybserv2 in blood and sweat
+(nick alphabetical order):
 adx         Piotr Nizynski       adx|AT|crashnet|pl
 args        Antoniu-George Savu  antoniu-george|savu|AT|fr|tiscali|com
 asuffield   Andrew Suffield      asuffield|AT|users|sourceforge|net
@@ -41,46 +53,39 @@ Sarisa      Wendy Campbell       wcampbel|AT|botbay|net
 ike         Ivan Krstic          ike|AT|gnjilux|srk|fer|hr 
 Janos       John Binder          jbinder|AT|kgazd|bme|hu
 John-Work   F| John Rowan        john|AT|tdkt|org
-kreator     Dinko Korunic        kreator|AT|srce|hr
 KrisDuv     Christophe Duverger  krisduv2000|AT|yahoo|fr
 mend0za     Vladimir Shahov      mend0za|AT|nsys|by
 rhodie      Julian Petrov        rhodie|AT|irchelp|unibg|org
 sofit       Stanislav Zahariev   sofit|AT|proshe|bg
 toot        Toby Verrall         to7|AT|antipope|fsnet|co|uk
-    
-Hybserv was specifically designed to run with Hybrid ircd, although it
-*could* work with CSr as well as IRCD-Ratbox. You may find the Hybrid irc
-daemon from http://ircd-hybrid.com/. These services (more or less same
-code) are currently used by EFNet / DalNet / ICQ / WFNet / HybNet / EFNow
-/ OpenProjects Network.
 
-This software is released under the terms of the GNU General Public
-License (see COPYING). Should you choose to use and/or modify any of code,
-please do so under the terms of the GNU General Public License, published
-by the Free Software Foundation.
+We are grateful to all these people, as well as all users that have been
+reporting bugs last several years. Thank you, without you this project
+would be meaningless.
 
 #########################################################
 
 DISTRIBUTION:
   You can get Hybserv2 from:
 
-  #0:  Hybserv2 home:
-       http://www.hybserv.net/
-       [http://trac.hybserv.net/trac.cgi/wiki/HybservReleases]
+  1)  Hybserv2 home:
+      http://www.hybserv.net/
+      [http://trac.hybserv.net/trac.cgi/wiki/HybservReleases]
 
-  #1:  Anonymous Subversiona access:
-       svn co svn://svn.hybserv.net/trunk hybserv
+  2)  Anonymous Subversion access:
+      svn co svn://svn.hybserv.net/trunk hybserv
 
-  #2:  Subversion Web access:
-       http://svn.hybserv.net/
+  3)  Subversion Web access:
+      http://svn.hybserv.net/
 
-  #3:  Mirrors:
-       http://dkorunic.net/projects/tarballs/
-       http://hybserv.icsbg.net/
+  4)  Mirrors:
+      http://dkorunic.net/projects/tarballs/
+      http://hybserv.icsbg.net/
 
 NOTE: Subversion copy is always more current than the release, since it is
       working/development version.
 
+#########################################################
 
 INSTALLATION:
 Please read the INSTALL file. NOW.
@@ -185,22 +190,21 @@ lines:
 
 
 ################################################################
-# BUGS -  PLEASE mail any bugs you find to kreator|AT|srce|hr  #
-#         or use a ticketing system:                           #
-#         http://trac.hybserv.net/trac.cgi/newticket           #
-################################################################
- 
-We can't fix bugs if no one reports them!
 
+BUGS:
+Use the appropriate bug reporting and ticketing system:
+
+  #0:  http://trac.hybserv.net/trac.cgi/newticket
+
+Alternative, subscribe to the mailing list (details follow) and post them
+there.  We can't fix bugs if no one reports them!
 
 ################################################################
 
 MAILING LISTS:
-If you are interested in helping out with the development of Hybserv,
-or just tracking the changes in Hybserv, feel free to join the Hybserv
-Development List
-
-Below are the official Hybserv2 mailing lists:
+If you are interested in helping out with the development of Hybserv, or
+just tracking the changes in Hybserv, feel free to join the Hybserv
+Development List.
 
 Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
@@ -209,9 +213,9 @@ sending email to:
   hybserv-request|AT|hybserv|net
 
 NOTE: Please use a command from below in the body of the message and not
-in the subject. E-mail should corrected that "|AT|" is translated into "@"
-and rest of "|" characters are translated to ".", forming a correct
-destination.
+      in the subject. E-mail should corrected that "|AT|" is translated
+      into "@" and rest of "|" characters are translated to ".", forming a
+      correct destination.
 
 Once subscribed, you can send a public post to:
 
@@ -223,49 +227,55 @@ List manager interface is available at:
 
 The following commands are available:
 
-subscribe
+  subscribe
         Syntax: subscribe [<list>] [<user>]
         Subscribe to a list                                                   
 
-unsubscribe
+  unsubscribe
         Syntax: unsubscribe [<list>] [<user>]
         Unsubscribe from a list      
 
-which
+  which
         Syntax: which
         Display lists to which you are subscribed
         
-who
+  who
         Syntax: who [<list>]
         Display membership for a list
 
-info
+  info
         Syntax: info [<list>]
         Retrieves the info for a list.
 
-lists
+  lists
         Syntax: lists
         Send list of mailing lists available on this site.
 
-help
+  help
         Syntax: help
         Send user the helpfile
 
-commands
+  commands
         Syntax: commands
         Send list of available commands, providing a 'cheat sheet' for
         users. This takes into account any local plugins. 
 
-end
+  end
         Syntax: end
         Ends processing of list server commands       
 
 ################################################################
 
 LEGAL STUFF:
-This package has absolutely no warranty. Use at your own risk.
-The author will accept no responsibility for any damage,
-whatsoever, caused by this program.
+This package has absolutely no warranty. Use at your own risk.  The author
+will accept no responsibility for any damage, whatsoever, caused by this
+program.
+
+This software is released under the terms of the GNU General Public
+License (see COPYING). Should you choose to use and/or modify any of code,
+please do so under the terms of the GNU General Public License, published
+by the Free Software Foundation.
+
 
 ################################################################
 
@@ -280,9 +290,9 @@ tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
 
 Some help files were used from EsperNet's service package:
 
-ftp.dragonfire.net/software/unix/irc
+  ftp.dragonfire.net/software/unix/irc
 
-The ideas for a settings.conf and the shownicks/showchans
-programs were inspired from this package as well. 
+The ideas for a settings.conf and the shownicks/showchans programs were
+inspired from this package as well. 
 
 See also the beginning of this file.

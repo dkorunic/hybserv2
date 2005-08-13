@@ -4,18 +4,18 @@ To use the following commands, type: %b/msg %T <command>%b.
 For more information on a specific command, type:
 %b/msg %T help <command>%b.
 
-    STATS      Gives general network statistics
-    SHOWSTATS  Statistics for Chan, Nick, Memo Services
-    SHOWOPERS  List currently identified irc operators
     SHOWADMINS LIST currently identified services admins
+    SHOWOPERS  List currently identified irc operators
+    SHOWSTATS  Statistics for Chan, Nick, Memo Services
+    STATS      Gives general network statistics
 
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b
-%+a    REFRESH    Update server lag information
 %+a    CLEARSTATS Clear statistic information
-%+a    GREPLOG    Grep services logs
-%+a    SPLIT      Shows infomation about netsplits
-%+a    HOST       List statistics for a hostname
 %+a    DOMAIN     List statistics for a domain
+%+a    GREPLOG    Grep services logs
+%+a    HOST       List statistics for a hostname
+%+a    REFRESH    Update server lag information
 %+a    SERVER     List statistics for a server
+%+a    SPLIT      Shows infomation about netsplits

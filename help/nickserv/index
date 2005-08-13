@@ -6,27 +6,27 @@ nicknames; to use them, type %b/msg %N <command>%b.
 For more information on a specific command, type
 %b/msg %N help <command>%b.
 
-    REGISTER   Register a nickname
-    DROP       Cancel the registration of a nickname
-    IDENTIFY   Identify yourself with your password
     ACCESS     Modify the list of authorized addresses
-    SET        Set various options for your nickname
-    LIST       Display list of nicks matching a pattern
-    RECOVER    Kill another user who has taken your nick
-    RELEASE    Regain custody of your nick after %bRECOVER%b
+    DROP       Cancel the registration of a nickname
     GHOST      Kill a ghosted nickname
+    IDENTIFY   Identify yourself with your password
     INFO       Get information for a nickname
     LINK       Link your nickname to another
+    LIST       Display list of nicks matching a pattern
+    RECOVER    Kill another user who has taken your nick
+    REGISTER   Register a nickname
+    RELEASE    Regain custody of your nick after %bRECOVER%b
+    SET        Set various options for your nickname
     UNLINK     UnLink your nickname
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b
-%+a    FORBID     Prevent anyone from using a nickname
-%+a    UNFORBID   Reverses effects of FORBID command
-%+a    SETPASS    Change a nickname's password
-%+a    NOEXPIRE   Prevent a nickname from expiring
-%+a    SHOWLINK   Display a certain nickname link list
-%+a    DROPLINK   Drop an entire nickname link
-%+a    COLLIDE    Manipulate nickname collision list
-%+a    FLAG       Set flags to limit a user's privileges
 %+a    CLEARNOEXP Clear all noexpire flags for nicks
+%+a    COLLIDE    Manipulate nickname collision list
+%+a    DROPLINK   Drop an entire nickname link
+%+a    FLAG       Set flags to limit a user's privileges
+%+a    FORBID     Prevent anyone from using a nickname
+%+a    NOEXPIRE   Prevent a nickname from expiring
+%+a    SETPASS    Change a nickname's password
+%+a    SHOWLINK   Display a certain nickname link list
+%+a    UNFORBID   Reverses effects of FORBID command

@@ -9,11 +9,11 @@ For more information on the commands, type
 %+o%bOperator commands:%b
 %+o    CLONES     Display list of clones on the network
 %+g    GLINE      Prevent a user from joining the network 
-%+g    KLINE      Kline a user, if your ircd supports it
 %+o    HTM        Toggle HTM on/off
 %+o    HUB        Display a hub's leaf servers
 %+j    JUPE       Prevent a server from connecting
 %+o    KILL       Disconnect a user from the network
+%+g    KLINE      Kline a user, if your ircd supports it
 %+o    STATS      Display various statistics
 %+o    STATUS     Display current status
 %+o    UMODE      Set various usermodes for yourself
@@ -27,11 +27,11 @@ For more information on the commands, type
 %+a    JUMP       Switch hub servers
 %+a    KILLCHAN   Kill users in a channel
 %+a    KILLHOST   Kill users matching a certain host
+%+a    MOTD       Maintains the current motd (logon news)
 %+s    OMODE      Set modes on any channel
 %+a    PART       Stop monitoring a channel
 %+a    SECURE     Secure a channel
 %+a    TRACE      Display users matching a pattern
-%+a    MOTD       Maintains the current motd (logon news)
 %+s%b* * * *
 %+s%bServices Administrator commands:%b
 %+s    DIE        Shutdown services

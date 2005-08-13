@@ -9,9 +9,11 @@ commands, type: %b/msg %M <command>%b.  For more
 information on a specific command, type:
 %b/msg %M help <command>%b.
 
-    SEND    Send a memo to a nick/channel
-    LIST    List all of your or a channel's memos
-    READ    Read a memo (or all memos)
+    DEL     Mark a memo for deletion (or all memos)
     FORWARD Forward a memo to a nick/channel
+    LIST    List all of your or a channel's memos
+    PURGE   Purge all marked for deletion memos
+    READ    Read a memo (or all memos)
     REPLY   Reply to a memo by number
-    DEL     Delete a memo (or all memos)
+    SEND    Send a memo to a nick/channel
+    UNDEL   Unmark a memo for deletion (or all memos)

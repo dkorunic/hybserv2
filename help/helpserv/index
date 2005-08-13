@@ -4,8 +4,8 @@ service nicks. To use the following commands, type:
 %b/msg %H help <command>%b.
 
 %+o    OPERSERV  Access %O's help files
-    NICKSERV  Access %N's help files
     CHANSERV  Access %C's help files
     MEMOSERV  Access %M's help files
-    STATSERV  Access %T's help files
+    NICKSERV  Access %N's help files
     SEENSERV  Access %E's help files
+    STATSERV  Access %T's help files

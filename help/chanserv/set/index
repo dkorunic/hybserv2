@@ -10,22 +10,22 @@ specific information on each option, type:
 
 Available options:
 
+    COMMENT     Set the channel comment line
+    EMAIL       Set the channel email address
+    ENTRYMSG    Send a message to users upon entry
+    EXPIREBANS  Expire bans on a channel
+    FORGET      Make %C forget your channel %bFOREVER%b
     FOUNDER     Set the founder of a channel (founder)
-    SUCCESSOR   Set the successor for the channel
-    PASSWORD    Set the founder password (founder)
+    GUARD       Have %C join your channel
     MLOCK       Lock channel modes on or off
-    TOPIC       Change the topic on a channel
-    TOPICLOCK   Topic can only be changed with SET TOPIC
+    PASSWORD    Set the founder password (founder)
     PRIVATE     Hide channel from ChanServ lists
-    SECUREOPS   Stricter control of chanop status
     RESTRICTED  Restricts access to channel
     SECURE      Activate ChanServ security features
-    ENTRYMSG    Send a message to users upon entry
-    EMAIL       Set the channel email address
-    URL         Set the channel url
-    COMMENT     Set the channel comment line
-    FORGET      Make %C forget your channel %bFOREVER%b
-    GUARD       Have %C join your channel
+    SECUREOPS   Stricter control of chanop status
     SPLITOPS    Let anyone keep ops from a netsplit
+    SUCCESSOR   Set the successor for the channel
+    TOPIC       Change the topic on a channel
+    TOPICLOCK   Topic can only be changed with SET TOPIC
+    URL         Set the channel url
     VERBOSE     Notify chanops on access changes
-    EXPIREBANS  Expire bans on a channel

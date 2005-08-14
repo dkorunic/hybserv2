@@ -980,6 +980,10 @@ onctcp(char *nick, char *target, char *msg)
              "\001VERSION Hybserv2 TS Services version %s\001",
              hVersion);
       notice(target, nick,
+          "\001VERSION Compiled with NICKLEN=%s, "
+          "CHANNELLEN=%s, TOPICLEN=%s\001",
+          NICKLEN, CHANNELLEN, TOPICLEN);
+      notice(target, nick,
              "\001VERSION Administrator: %s\001",
              Me.admin);
 

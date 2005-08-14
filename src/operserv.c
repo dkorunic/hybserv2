@@ -1217,8 +1217,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   float mem;
   struct rusage rus;
 
-  o_RecordCommand(sockfd,
-                  "STATUS");
+  o_RecordCommand(sockfd, "STATUS");
 
 #if defined(NICKSERVICES) || defined(STATSERVICES)
 
@@ -1379,8 +1378,15 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
     os_notice(lptr, sockfd, "   Tcm Link Interval: \002%s\002",
               timeago(AutoLinkFreq, 3));
 
-  os_notice(lptr, sockfd,   "         Compiled at: \002%s\002, \002%s\002", __DATE__,
-            __TIME__);
+#if defined __DATE__ && defined __TIME__
+  os_notice(lptr, sockfd,   "         Compiled at: \002%s\002, \002%s\002", __DATE__, __TIME__);
+#endif
+
+  os_notice(lptr, sockfd, 
+      "       Compiled with: NICKLEN=\002%s\002, "
+      "CHANNELLEN=\002%s\002, TOPICLEN=\002%s\002",
+      NICKLEN, CHANNELLEN, TOPICLEN);
+
 } /* o_status() */
 
 /*

@@ -1383,8 +1383,8 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 #endif
 
   os_notice(lptr, sockfd, 
-      "       Compiled with: NICKLEN=\002%s\002, "
-      "CHANNELLEN=\002%s\002, TOPICLEN=\002%s\002",
+      "       Compiled with: NICKLEN=\002%d\002, "
+      "CHANNELLEN=\002%d\002, TOPICLEN=\002%d\002",
       NICKLEN, CHANNELLEN, TOPICLEN);
 
 } /* o_status() */

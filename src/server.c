@@ -1539,7 +1539,6 @@ s_kill(int ac, char **av)
         cs_RejoinChannels();
 
 #endif
-
     }
 } /* s_kill() */
 

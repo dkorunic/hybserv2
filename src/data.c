@@ -1018,13 +1018,13 @@ WriteChans()
 
               for (ca = cptr->access; ca; ca = ca->next)
                 fprintf(fp, "->ACCESS %s %d %ld %ld\n", ca->nptr ?
-                    ca->nptr->nick : stripctrlsymbols(ca->hostmask),
+                    ca->nptr->nick : ca->hostmask,
                     ca->level, (long)ca->created, (long)ca->last_used);
 
               for (ak = cptr->akick; ak; ak = ak->next)
                 fprintf(fp, "->AKICK %ld %s :%s\n",
-                  (long)ak->expires, stripctrlsymbols(ak->hostmask),
-                  ak->reason ? stripctrlsymbols(ak->reason) : "");
+                  (long)ak->expires, ak->hostmask,
+                  ak->reason ? ak->reason : "");
             } /* if (!(cptr->flags & CS_FORGET)) */
         } /* for (cptr = chanlist[ii]; cptr; cptr = cnext) */
     } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */

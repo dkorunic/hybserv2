@@ -49,7 +49,6 @@ int IsInNickArray(int, char **, char *);
 int IsNum(char *);
 char *HostToMask(char *, char *);
 char *Substitute(char *, char *, int);
-char* stripctrlsymbols(char *);
 char* stripformatsymbols(char *);
 int checkforproc(char *);
 

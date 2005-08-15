@@ -936,27 +936,3 @@ struct Command *
     else
       return ((struct Command *) -1); /* multiple matches found */
   } /* GetCommand() */
-
-char* stripctrlsymbols( char * source )
-{
-  char *p = NULL;
-
-  if( source == NULL )
-    return NULL;
-
-  for (p = source; *p; p++)
-    {
-      if (*p == 0x04 && (*(p + 1) == 0x08 ))
-        {
-          *(p+1) = '*';
-          source = p+1;
-          continue;
-        }
-      if( *p < 0x21 )
-        {
-          *(p) = '*';
-          source = p;
-        }
-    }
-  return source;
-}

@@ -158,18 +158,19 @@ void DoTimer(time_t unixtime)
 
     } /* if ((unixtime % 60) == 0) */
 
-#if !defined(HYBRID_ONLY) && defined(NICKSERVICES) && defined(CHANNELSERVICES)
+#if !defined HYBRID_ONLY && defined NICKSERVICES && defined CHANNELSERVICES
 
   if (InhabitTimeout && ((unixtime % InhabitTimeout) == 0))
     {
       /*
        * Check for any empty channels that ChanServ is monitoring -
        * part the channel if ChanServ is the only one in there
+       * or part if it shouldn't be there
        */
       CheckEmptyChans();
     }
 
-#endif /* !defined(HYBRID_ONLY) && defined(NICKSERVICES) && defined(CHANNELSERVICES) */
+#endif /* !defined HYBRID_ONLY && defined NICKSERVICES && defined CHANNELSERVICES */
 
   if ((unixtime % 3600) == 0)
     {
@@ -203,7 +204,7 @@ void DoTimer(time_t unixtime)
 
     } /* if ((unixtime % 3600) == 0) */
 
-#if defined(NICKSERVICES) && defined(MEMOSERVICES)
+#if defined NICKSERVICES && defined MEMOSERVICES
 
   if (MemoPurgeFreq && ((unixtime % MemoPurgeFreq) == 0))
     {
@@ -218,7 +219,7 @@ void DoTimer(time_t unixtime)
       PurgeCheck();
     }
 
-#endif /* defined(NICKSERVICES) && defined(MEMOSERVICES) */
+#endif /* defined NICKSERVICES && defined MEMOSERVICES */
 
   if (AutoLinkFreq && (unixtime % AutoLinkFreq) == 0)
     {

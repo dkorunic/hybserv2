@@ -2147,14 +2147,15 @@ ExpireChannels(time_t unixtime)
 /*
 CheckEmptyChans()
  Part any channels in which ChanServ is the only user
+ or part if it shouldn't be on channel
 */
 
 void
 CheckEmptyChans()
 
 {
-  struct UserChannel *tempc;
-  struct UserChannel *temp;
+  struct UserChannel *tempc = NULL;
+  struct UserChannel *temp = NULL;
 
   if (Me.csptr)
     {

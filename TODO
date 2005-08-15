@@ -40,6 +40,7 @@ Pending bugs:
    NOTE: this should be done via %v or %t.. something like it
 *) add flag for keeping other people's channel/nick status when
    reconnecting - i find it annonying to look at forced synching
+*) on connect, services sometimes don't msg all the users [??]
 
 
 Features yet to come:

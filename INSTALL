@@ -67,15 +67,18 @@ and may compile on others:
 
   Linux 2.6.x (and older)
   FreeBSD 5.x (and older)
+  DragonFly BSD 1.2.x (and older)
+  NetBSD 2.0.x (and older)
   OpenBSD 2.x (and older)
   Solaris 10 (and older)
   Tru64 5.0 (and older)
-  Cygwin 1.5.13 (and older)
+  Cygwin 1.5.x (and older)
   IRIX 6.5 (and older)
+  OSX Tiger 10.4.2
 
 Systems known not to compile sucessfuly (ie. miserably fail):
 
-  HP-UX 11.11 with builtin cc
+  HP-UX 11.11 with builtin cc - should work with Gcc though
 
 If you are unable to compile Hybserv, please read the README and make a
 new ticket using the provided URL. Bug reports/suggestions should be sent

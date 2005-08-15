@@ -401,6 +401,7 @@ ParseConf(char *filename, int rehash)
               {
                 /* a new chan was added to the conf */
                 AddMyChan(cname);
+                os_join(FindChannel(cname));
               }
 
             break;

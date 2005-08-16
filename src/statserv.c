@@ -13,6 +13,7 @@
 #include "alloc.h"
 #include "client.h"
 #include "config.h"
+#include "data.h"
 #include "err.h"
 #include "hash.h"
 #include "helpserv.h"
@@ -30,7 +31,7 @@
 
 #ifdef  STATSERVICES
 
-extern  aHashEntry  hostTable[HASHCLIENTS];
+aHashEntry  hostTable[HASHCLIENTS];
 
 static void ss_host(struct Luser *, int, char **);
 static void ss_domain(struct Luser *, int, char **);
@@ -1002,7 +1003,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
                 lptr->hostname);
 
   avgops = Network->TotalOperators / Network->TotalServers;
-  if (Network->TotalChannels)
+  if (Network->TotalChannels > 0.0)
     avguc = Network->TotalUsers / Network->TotalChannels;
   else
     avguc = 0;

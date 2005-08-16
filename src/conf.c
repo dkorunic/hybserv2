@@ -38,13 +38,13 @@ static void AddServ(char *hostname, char *password, int port);
 static void AddBot(char *nick, char *host, char *pass, int port);
 static void AddRemoteBot(char *nick, char *host, char *pass);
 static void AddPort(int port, char *host, char *type);
-static void ClearConfLines();
+static void ClearConfLines(void);
 
-static void CheckChans();
-static void CheckServers();
-static void CheckListenPorts();
+static void CheckChans(void);
+static void CheckServers(void);
+static void CheckListenPorts(void);
 
-static struct Servlist *CreateServer();
+static struct Servlist *CreateServer(void);
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
 void AddReconnect(const char *, const int, const char *, const long);
@@ -584,7 +584,7 @@ ParseConf(char *filename, int rehash)
         case '.':
           {
             char *start, *end;
-            char *filename;
+            char *filename2;
 
             if (!ircncmp(line, ".include", 8))
               {
@@ -596,7 +596,7 @@ ParseConf(char *filename, int rehash)
                  */
 
                 if ((start = strchr(line, '"')))
-                  filename = start + 1;
+                  filename2 = start + 1;
                 else
                   {
                     /*
@@ -609,10 +609,10 @@ ParseConf(char *filename, int rehash)
                   }
 
                 /*
-                 * "filename" should now point past the first quote
+                 * "filename2" should now point past the first quote
                  * (ie: file") so now set the end quote to a \0
                  */
-                if ((end = strchr(filename, '"')))
+                if ((end = strchr(filename2, '"')))
                   *end = '\0';
                 else
                   {
@@ -626,7 +626,7 @@ ParseConf(char *filename, int rehash)
                  * Now recursively call ParseConf() to parse the new
                  * configuration file
                  */
-                ParseConf(filename, 0);
+                ParseConf(filename2, 0);
               } /* if (!ircncmp(line, ".include", 8)) */
 
             break;

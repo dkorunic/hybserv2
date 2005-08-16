@@ -14,6 +14,7 @@
 #include "channel.h"
 #include "chanserv.h"
 #include "client.h"
+#include "data.h"
 #include "config.h"
 #include "err.h"
 #include "hash.h"
@@ -32,8 +33,8 @@
 /* hash table of memos */
 struct MemoInfo *memolist[MEMOLIST_MAX];
 
-static struct MemoInfo *MakeMemoList();
-static struct Memo *MakeMemo();
+static struct MemoInfo *MakeMemoList(void);
+static struct Memo *MakeMemo(void);
 static void DeleteMemo(struct MemoInfo *mptr, struct Memo *memoptr);
 static void AddMemoList(struct MemoInfo *mptr);
 static void AddMemo(struct MemoInfo *mptr, struct Memo *memoptr);

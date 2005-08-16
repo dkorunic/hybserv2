@@ -740,7 +740,7 @@ void RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
  *      are simple enough to handle in UpdateChanModes()
  */
 void SetChannelMode(struct Channel *cptr, int add, int type, struct Luser
-    *lptr, char *arg)
+    *lptr)
 {
     struct UserChannel *tempc = NULL;
     struct ChannelUser *tempu = NULL;
@@ -907,7 +907,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 #else
         if (add || userptr != Me.osptr)
 #endif /* CHANNELSERVICES */
-            SetChannelMode(cptr, add, MODE_O, userptr, 0);
+            SetChannelMode(cptr, add, MODE_O, userptr);
 
         if (add)
         {
@@ -973,7 +973,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
           if ((userptr = FindClient(modeargs[argidx])) == NULL)
             break;
 
-          SetChannelMode(cptr, add, MODE_V, userptr, 0);
+          SetChannelMode(cptr, add, MODE_V, userptr);
 
           if (add)
           {
@@ -1009,7 +1009,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         if ((userptr = FindClient(modeargs[argidx])) == NULL)
           break;
 
-        SetChannelMode(cptr, add, MODE_H, userptr, 0);
+        SetChannelMode(cptr, add, MODE_H, userptr);
 
         if (add)
         {
@@ -1498,8 +1498,8 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
         continue;
       mask = HostToMask(lptr->username, lptr->hostname);
       ircsprintf(temp, "*!%s", mask);
-      bans = MyRealloc(bans, strlen(bans) + strlen(temp) + (2 *
-            sizeof(char)));
+      bans = MyRealloc(bans, strlen(bans) + strlen(temp)
+          + (2 * sizeof(char)));
       strcat(bans, temp);
       strcat(bans, " ");
       MyFree(mask);

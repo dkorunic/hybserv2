@@ -28,9 +28,9 @@
 #include "nickserv.h"
 #include "server.h"
 
-extern char *crypt();
+extern char *crypt(const char *, const char *);
 #ifdef HAVE_SOLARIS
-extern char *crypt_md5();
+extern char *crypt_md5(const char *, const char *);
 #endif
 
 /*
@@ -647,7 +647,8 @@ Substitute(char *nick, char *str, int sockfd)
                     return (finstr);
                   }
                 else
-                  return ((char *) -1); /* user doesn't have privs to read line */
+                  return ((char *) -1); /* user doesn't have privs to read
+                                           line */
                 break;
               }
 

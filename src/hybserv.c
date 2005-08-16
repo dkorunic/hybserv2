@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
   else
     {
       char line[MAXLINE];
-      ircsprintf(line, "%u\n", getpid());
+      ircsprintf(line, "%d\n", getpid());
       fputs(line, pidfile);
       fclose(pidfile);
     }
@@ -320,5 +320,5 @@ int main(int argc, char *argv[])
       PostCleanup();
     } /* while (1) */
 
-  return (0);
+  return 0;
 } /* main() */

@@ -14,10 +14,10 @@
 static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
 extern int rename(const char *oldpath, const char *newpath);
-extern char *crypt();
+extern char *crypt(const char *, const char *);
 
 #ifdef HAVE_SOLARIS
-extern char *crypt_md5();
+extern char *crypt_md5(const char *, const char *);
 #endif
 
 /*

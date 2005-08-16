@@ -37,6 +37,11 @@ void signon(void);
 extern int HubSock;
 extern char *LocalHostName;
 extern struct sockaddr_in LocalAddr;
+extern char buffer[];
+extern int paramc;
+extern char *nextparam;
+extern char spill[];
+extern int offset;
 
 #ifdef HIGHTRAFFIC_MODE
 extern int HTM;

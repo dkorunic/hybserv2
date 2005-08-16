@@ -14,6 +14,7 @@
 #include "channel.h"
 #include "chanserv.h"
 #include "client.h"
+#include "data.h"
 #include "conf.h"
 #include "config.h"
 #include "dcc.h"
@@ -44,7 +45,7 @@ static void cs_CheckChan(struct ChanInfo *, struct Channel *);
 static void cs_SetTopic(struct Channel *, char *);
 static int ChangeChanPass(struct ChanInfo *, char *);
 static void AddChan(struct ChanInfo *);
-static struct ChanInfo *MakeChan();
+static struct ChanInfo *MakeChan(void);
 static void AddFounder(struct Luser *, struct ChanInfo *);
 static int AddAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *, int, time_t, time_t);
@@ -432,8 +433,7 @@ if the errors are unrecoverable
 */
 
 int
-cs_loaddata()
-
+cs_loaddata(void)
 {
   FILE *fp;
   char line[MAXLINE], **av;
@@ -6118,7 +6118,7 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
     if (cptr->flags & (CS_FORBID | CS_FORGET))
     {
       notice(n_ChanServ, lptr->nick, "[\002%s\002] is a %s channel",
-          cptr->name, CS_FORBID ? "forbidden" : "forgotten");
+          cptr->name, (cptr->flags & CS_FORBID) ? "forbidden" : "forgotten");
       return;
     }
     
@@ -7114,8 +7114,8 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           !(cuser->flags & CH_OPPED))
         continue;
 
-      ops = (char *) MyRealloc(ops, strlen(ops)
-                               + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
+      ops = (char *) MyRealloc(ops, strlen(ops) +
+          strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strcat(ops, cuser->lptr->nick);
       strcat(ops, " ");
     }
@@ -7398,8 +7398,8 @@ static void
 c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
-  struct ChanInfo *cptr;
-  struct Channel *chptr;
+  struct ChanInfo *cptr = NULL;
+  struct Channel *chptr = NULL;
 
   if (ac < 2)
     {

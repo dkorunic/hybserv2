@@ -610,7 +610,7 @@ void readauth(struct DccUser *dccptr)
       unsigned short remport = 0, locport = 0;
       int num;
 
-      num = sscanf(buffer, "%hd , %hd : USERID : %*[^:]: %10s",
+      num = sscanf(buffer, "%hu , %hu : USERID : %*[^:]: %10s",
                    &remport, &locport, ident);
 
       /*

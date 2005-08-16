@@ -17,6 +17,7 @@
 #include "config.h"
 #include "hash.h"
 #include "helpserv.h"
+#include "global.h"
 #include "log.h"
 #include "match.h"
 #include "memoserv.h"

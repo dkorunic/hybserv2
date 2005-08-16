@@ -17,6 +17,7 @@
 #include "channel.h"
 #include "conf.h"
 #include "config.h"
+#include "data.h"
 #include "hash.h"
 #include "helpserv.h"
 #include "seenserv.h"
@@ -43,7 +44,7 @@ static void es_seen(struct Luser *, int, char **);
 static void es_seennick(struct Luser *, int, char **);
 static void es_help(struct Luser *, int, char **);
 static void es_seenstat(struct Luser *, int, char **);
-static void FreeSeen();
+static void FreeSeen(void);
 
 static struct Command seencmds[] =
     {

@@ -164,8 +164,8 @@ int       UseMD5;
 int       MaxServerCollides;
 long      MinServerCollidesDelta;
 
-static void ClearDirectives();
-static int CheckDirectives();
+static void ClearDirectives(int);
+static int CheckDirectives(void);
 static int dparse(char *, int, int);
 
 struct Directive directives[] =

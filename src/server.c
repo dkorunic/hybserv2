@@ -41,7 +41,7 @@
 
 #ifdef STATSERVICES
 
-extern aHashEntry hostTable[HASHCLIENTS];
+aHashEntry hostTable[HASHCLIENTS];
 
 #endif /* STATSERVICES */
 

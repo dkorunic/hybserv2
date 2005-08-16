@@ -62,7 +62,7 @@ void InitHeaps(void);
 void *MyMalloc(size_t);
 void *MyRealloc(void *, size_t);
 char *MyStrdup(const char *);
-void OutOfMem();
+void OutOfMem(void);
 
 /* MyFree - free an argument */
 #define MyFree(ptr) \

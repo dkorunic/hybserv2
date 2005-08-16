@@ -15,6 +15,7 @@
 #include "hybdefs.h"
 #include "log.h"
 #include "match.h"
+#include "mystring.h"
 #include "sprintf_irc.h"
 
 /*

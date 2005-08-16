@@ -17,13 +17,13 @@
 #define FLAG_PASS    0x00000008
 #define FLAG_LENGTH  0x00000010
 
-extern char *getpass();
-extern char *crypt();
+extern char *getpass(const char *);
+extern char *crypt(const char *, const char *);
 #ifdef HAVE_SOLARIS
-extern char *crypt_md5();
+extern char *crypt_md5(const char *, const char *);
 #endif
 
-char *make_des_salt();
+char *make_des_salt(void);
 char *make_md5_salt(int);
 char *make_md5_salt_para(char *);
 void usage();
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-char *make_des_salt()
+char *make_des_salt(void)
 {
   static char salt[3];
   salt[0] = saltChars[random() % 64];

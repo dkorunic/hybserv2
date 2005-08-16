@@ -143,6 +143,7 @@ void DeleteChannel(struct Channel *);
 void AddToChannel(struct Channel *, char *);
 void RemoveNickFromChannel(char *, char *);
 void RemoveFromChannel(struct Channel *, struct Luser *);
+void SetChannelMode(struct Channel *, int, int, struct Luser *);
 void UpdateChanModes(struct Luser *, char *, struct Channel *, char *);
 struct UserChannel *FindChannelByUser(struct Luser *, struct Channel *);
 struct ChannelUser *FindUserByChannel(struct Channel *, struct Luser *);

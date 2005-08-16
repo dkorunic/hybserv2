@@ -24,7 +24,7 @@
 
 #ifdef NICKSERVICES
 
-static void InitData();
+static void InitData(void);
 static long parseargs(int, char **);
 
 

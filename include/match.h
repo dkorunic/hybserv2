@@ -12,6 +12,7 @@
 #define INCLUDED_match_h
 
 int match(const char *, const char *);
+char *collapse(char *);
 int irccmp(const char *, const char *);
 int ircncmp(const char *, const char *, size_t);
 

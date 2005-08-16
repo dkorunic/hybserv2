@@ -6825,7 +6825,7 @@ CalcMem(char *nick, int socket)
 
       /* Channel ban mem usage */
       ircsprintf(sendstr,
-                 "Bans:       %5ld (%10.0fb) (%10.2fkb)",
+                 "Bans:       %5lu (%10.0fb) (%10.2fkb)",
                  chanbanc, chanbanm, chanbanm / 1024);
       if (socket == NODCC)
         os_notice(lptr, socket, "%s", sendstr);
@@ -6845,7 +6845,7 @@ CalcMem(char *nick, int socket)
 
       /* Channel exception memory usage */
       ircsprintf(sendstr,
-                 "Exceptions: %5ld (%10.0fb) (%10.2fkb)",
+                 "Exceptions: %5lu (%10.0fb) (%10.2fkb)",
                  chanexceptc, chanexceptm, chanexceptm / 1024);
       if (socket == NODCC)
         os_notice(lptr, socket, "%s", sendstr);
@@ -6853,7 +6853,7 @@ CalcMem(char *nick, int socket)
         writesocket(socket, sendstr);
 
       ircsprintf(sendstr,
-                 "Conf lines: %5ld (%10.0fb) (%10.2fkb)",
+                 "Conf lines: %5lu (%10.0fb) (%10.2fkb)",
                  confc, confm, confm / 1024);
       if (socket == NODCC)
         os_notice(lptr, socket, "%s", sendstr);
@@ -6861,7 +6861,7 @@ CalcMem(char *nick, int socket)
         writesocket(socket, sendstr);
 
       ircsprintf(sendstr,
-                 "Ignores: %8ld (%10.0fb) (%10.2fkb)",
+                 "Ignores: %8lu (%10.0fb) (%10.2fkb)",
                  igc, igm, igm / 1024);
       if (socket == NODCC)
         os_notice(lptr, socket, "%s", sendstr);

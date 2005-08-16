@@ -16,6 +16,9 @@
 #define  SHOW_FILE        0x000004 /* -f file */
 #define  SHOW_DETAIL      0x000008 /* display specific nickname(s) */
 
+extern char *Filename;
+extern int ncidx;
+
 #ifdef NICKSERVICES
 
 void ShowNicknames(int, char **);

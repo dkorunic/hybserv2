@@ -16,6 +16,7 @@
 #include "conf.h"
 #include "config.h"
 #include "channel.h"
+#include "data.h"
 #include "dcc.h"
 #include "err.h"
 #include "helpserv.h"
@@ -45,7 +46,7 @@ static long nicknum;
 
 static int ChangePass(struct NickInfo *, char *);
 static void AddHostToNick(char *, struct NickInfo *);
-static struct NickInfo *MakeNick();
+static struct NickInfo *MakeNick(void);
 static void AddNick(struct NickInfo *);
 static int OnAccessList(char *, char *, struct NickInfo *);
 

@@ -1707,8 +1707,7 @@ s_sjoin(int ac, char **av)
   int chanserv_deopped = 0, operserv_deopped = 0;
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-
-  struct ChanInfo *ci;
+  struct ChanInfo *ci = NULL;
   char *currnick;
   int ii;
 #endif
@@ -1744,20 +1743,19 @@ s_sjoin(int ac, char **av)
 
 #ifdef HYBRID_ONLY
 
-      /*
-       * Since HYBRID_ONLY is defined, ChanServ won't join
-       * the channel from this call, but will call cs_CheckChan()
-       * on it
-       */
-      if (cptr && (cptr->numusers <= 1))
-        cs_join(FindChan(chan));
+      if (cptr)
+      {
+        ci = FindChan(chan);
+        if ((cptr->numusers <= 1) || cs_ShouldBeOnChan(ci))
+          cs_join(ci);
+      }
 
 #else
 
       if (cptr)
         if ((ci = FindChan(chan)) && !IsChannelMember(cptr, Me.csptr))
           if (!(ci->flags & CS_FORGET))
-            cs_join(FindChan(chan));
+            cs_join(ci);
 
 #endif /* HYBRID_ONLY */
 

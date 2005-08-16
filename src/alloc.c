@@ -323,7 +323,8 @@ void BlockSubFree(Heap *heapptr, void *element)
         }
         else
         {
-          subptr->LastUsedSlot -= heapptr->ElementSize;
+          subptr->LastUsedSlot = (void *)((unsigned
+                long)subptr->LastUsedSlot - heapptr->ElementSize);
 
           /*
            * If the element right before 'element' was also
@@ -333,7 +334,8 @@ void BlockSubFree(Heap *heapptr, void *element)
            */
           while ((index = IsHole(subptr, subptr->LastUsedSlot)) != -1)
           {
-            subptr->LastUsedSlot -= heapptr->ElementSize;
+            subptr->LastUsedSlot = (void *)((unsigned
+                  long)subptr->LastUsedSlot - heapptr->ElementSize);
             subptr->SlotHoles[index] = NULL;
           }
 

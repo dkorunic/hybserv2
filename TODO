@@ -7,6 +7,7 @@ As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
+*) remove MaxTrace
 *) fix absolutely ugly code formatting! [progress..]
 *) remove ocasions of ugly strcpy
 *) enable use of strlcat and strlcpy

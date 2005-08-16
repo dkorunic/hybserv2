@@ -849,7 +849,6 @@ cs_loaddata()
                * to the list before proceeding
                */
               AddChan(cptr);
-              cs_join(cptr);
             } /* if (cptr) */
 
           /*
@@ -913,7 +912,6 @@ cs_loaddata()
            * the table
            */
           AddChan(cptr);
-          cs_join(cptr);
         }
       else
         {

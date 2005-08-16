@@ -1,9 +1,8 @@
 #!/bin/sh
+set -e
 
-# this script will find all double nicknames in nick.db and print them.
-# -kre
-
-echo Starting double nicknames search:
+# this script will find all double nicknames in nick.db and print them
+echo Starting double nicknames search...
 if [ -f nick.db ]; then
   grep -v "^->" nick.db | awk '{print $1}'| uniq -d
 fi

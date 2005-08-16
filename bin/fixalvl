@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+# this script will remove all ALVL occurencies in chan.db
+echo Starting ALVL remove...
+if [ -f chan.db ]; then
+  grep -v "ALVL" chan.db > chan.db.$$
+  mv -f chan.db.$$ chan.db
+fi
+echo done.

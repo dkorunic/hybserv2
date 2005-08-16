@@ -227,14 +227,14 @@ m4trace:configure.in:98: -1- AC_CHECK_LIB([dmalloc], [malloc])
 m4trace:configure.in:98: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
 #undef HAVE_LIBDMALLOC])
 m4trace:configure.in:98: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
-m4trace:configure.in:108: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
-m4trace:configure.in:108: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
+m4trace:configure.in:150: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
+m4trace:configure.in:150: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
 #undef NICKLEN])
-m4trace:configure.in:113: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
-m4trace:configure.in:113: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
+m4trace:configure.in:151: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
+m4trace:configure.in:151: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
 #undef CHANNELLEN])
-m4trace:configure.in:118: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
-m4trace:configure.in:118: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
+m4trace:configure.in:152: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
+m4trace:configure.in:152: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
 #undef TOPICLEN])
 m4trace:configure.in:174: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
 m4trace:configure.in:174: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */

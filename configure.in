@@ -105,17 +105,14 @@ AC_ARG_WITH(nicklen,
   [  --with-nicklen=LENGTH     Sets nick length to LENGTH [[default=18]]],
   [ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
 AC_MSG_RESULT([checking nick length... $ac_cv_nicklen])
-AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
 AC_ARG_WITH(chanellen,
   [  --with-chanellen=LENGTH   Sets channel length to LENGTH [[default=200]]],
   [ac_cv_chanellen=$withval], [ac_cv_chanellen="200"])
 AC_MSG_RESULT([checking channel length... $ac_cv_chanellen])
-AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_chanellen, [Define to channel length])
 AC_ARG_WITH(topiclen,
   [  --with-topiclen=LENGTH    Sets topic length to LENGTH [[default=160]]],
   [ac_cv_topiclen=$withval], [ac_cv_topiclen="160"])
 AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
-AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 
 dnl Get the network identificator
 AC_ARG_WITH(network,
@@ -150,6 +147,9 @@ elif test "x$ac_cv_network" = "xratbox"; then
   ac_cv_chanellen=200
   ac_cv_topiclen=160
 fi
+AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
+AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_chanellen, [Define to channel length])
+AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 
 dnl Check if warnings are to be enabled
 AC_MSG_CHECKING([compile with warning flags])

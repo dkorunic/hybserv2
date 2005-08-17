@@ -70,17 +70,23 @@ DISTRIBUTION:
 
   1)  Hybserv2 home:
       http://www.hybserv.net/
-      [http://trac.hybserv.net/trac.cgi/wiki/HybservReleases]
+      http://trac.hybserv.net/trac.cgi/wiki/HybservReleases
 
   2)  Anonymous Subversion access:
       svn co svn://svn.hybserv.net/trunk hybserv
 
   3)  Subversion Web access:
+      http://viewcvs.hybserv.net/
       http://svn.hybserv.net/
 
   4)  Mirrors:
       http://dkorunic.net/projects/tarballs/
-      http://hybserv.icsbg.net/
+      http://hybserv.icsbg.net/ [thanks sofit!]
+      http://www.sosdg.org/hybserv2/ [thanks Bruns!]
+      http://trac.hybserv.net/downloads/
+
+NOTE: For each of these sites there is one in hybserv.net and one in
+      hybserv2.net domain, for increased redundancy.
 
 NOTE: Subversion copy is always more current than the release, since it is
       working/development version.

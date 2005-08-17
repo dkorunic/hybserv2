@@ -701,7 +701,7 @@ MaxConnections     20
 #  Set this to the amount of time in between nickname, channel,
 # memo, stat, and oper database saves.
 
-DatabaseSync       "30m"
+DatabaseSync       "15m"
 
 # BackupFreq <time> [OPTIONAL]
 #

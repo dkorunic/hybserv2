@@ -1413,7 +1413,6 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
   ircsprintf( what, "%s", StrToupper(av[2]));
   ircsprintf( nick, "%s", lptr->nick );
 
-  //        if( av[3] != NULL )
   if (ac > 3 && av[3] != NULL)
     day = atoi(av[3]);
   else
@@ -1422,10 +1421,10 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
   putlog( LOG1, "Who:%s What:%s Nick:%s",who,what,nick);
 
 
-  if( day < 0 || day > 30 )
+  if (day < 0)
     {
       notice(n_StatServ,lptr->nick,
-             "Too large range of days, min:0, max:30!" );
+             "Day count should be positive." );
       return;
     }
 

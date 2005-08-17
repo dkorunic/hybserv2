@@ -241,24 +241,8 @@ static struct OperCommand opercmds[] =
       { "ENABLE", o_on, 0, 's' },
 
       /*
-       * After a lot of thinking, and a lot of input from "network gurus",
-       * I've decided to disable this command, since it could be
-       * considered a DoS attack.  The flood itself doesn't actually last
-       * longer than 5 seconds at most, but it can be argued that during
-       * that period, it could interfere with other internet activities
-       * that the user is engaged in.  That is illegal.  Although
-       * originally coded for use on ednet, a small group of friends, for
-       * fun, if it were to be used on the wrong person, it could become
-       * an excuse to sue and/or accuse the administrator of the services
-       * of malicious DoS activities (especially if used often and without
-       * good reason).
-       *                   -Patrick Alken 10/21/1998
-       */
-
-      /*
-       * "fuckover" re-enabled under #define ALLOW_FUCKOVER due to
-       * user requests (undefined by default)
-       * 03/07/1999
+       * "fuckover" re-enabled under #define ALLOW_FUCKOVER due to user
+       * requests (undefined by default) 03/07/1999
        */
 
 #ifdef ALLOW_FUCKOVER
@@ -1515,10 +1499,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  /*
-   * Make sure we don't jupe our hub server
-   * (thanks good!)
-   */
+  /* Make sure we don't jupe our hub server */
   if (currenthub && currenthub->realname)
     {
       if (match(av[1], currenthub->realname))

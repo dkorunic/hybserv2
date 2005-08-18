@@ -421,18 +421,21 @@
 #define   FORCE_NICK_CHANGE
 
 /*
- * Alternative nick changing methods - SVSNICK [could be working on
- * ratbox, but haven't tried] and FORCENICK. The later should work on any
- * recent Hybrid7 server, with module contrib/m_forcenick.c compiled and
- * installed. I generally find FORCENICK rather useful, instead of mass
- * killing.
- * Additionally, there is FORCENICK_LEN which can be used to specify how
- * many characters you want to fill in as random numbers. When undefined,
- * it pads as much numbers as in can get to fill the nickname length.
+ * Alternative nick changing methods - SVSNICK and FORCENICK.
+ * SVSNICK should be supported on recent Ratbox or Hybrid7. FORCENICK
+ * should work on any recent Hybrid7 server, with module
+ * contrib/m_forcenick.c compiled and installed (instead of using
+ * SVSNICK).
+ * I generally find either of those (they have same functionality) rather
+ * useful instead of mass killing collided users.  Additionally, there is
+ * FORCENICK_LEN/SVSNICK_LEN which can be used to specify how many
+ * characters you want to fill in as random numbers. When undefined, it
+ * pads as much numbers as in can get to fill the nickname length.
  */
 #undef    FORCENICK
 #define   FORCENICK_LEN 4
 #undef    SVSNICK
+#define   SVSNICK_LEN 4
 
 /*
  * Schedule nick kill instead of immediate killing for user-triggered
@@ -514,6 +517,12 @@
 # undef HYBRID7_GLINES
 # undef HYBRID7_UNKLINE
 # undef HYBRID7_HALFOPS
+# undef FORCENICK
+# undef SVSNICK
+#endif
+
+#if defined FORCENICK && defined SVSNICK
+# undef FORCENICK
 #endif
 
 #if !defined ALLOW_JUPES

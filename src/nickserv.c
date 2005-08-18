@@ -1405,15 +1405,25 @@ collide(char *nick)
 #endif /* DANCER */
 
 #ifdef SVSNICK
+
+# ifdef SVSNICK_LEN
+  snprintf(newnick, 5 + SVSNICK_LEN, "User%ld", nicknum);
+# else
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
+# endif /* SVSNICK_LEN */
+
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
+
 #elif defined FORCENICK
+
 # ifdef FORCENICK_LEN
   snprintf(newnick, 5 + FORCENICK_LEN, "User%ld", nicknum);
 # else
   snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
 # endif /* FORCENICK_LEN */
+
   toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
+
 #else
 
   /* Sending a server kill will be quieter than an oper

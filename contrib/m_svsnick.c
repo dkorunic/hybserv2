@@ -48,7 +48,7 @@ _moddeinit(void)
   mod_del_cmd(&svsnick_msgtab);
 }
 
-const char *_version = "$Revision: 1058 $";
+const char *_version = "$Revision$";
 #endif
 
 /*

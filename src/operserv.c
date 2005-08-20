@@ -716,7 +716,7 @@ int ignore_loaddata()
 {
   FILE *fp;
   char line[MAXLINE], **av;
-  int ac, cnt = 0, ret = 1, found;
+  int ac, cnt = 0, ret = 1, found = 0;
   time_t expire;
   struct Ignore *temp;
 
@@ -761,7 +761,7 @@ int ignore_loaddata()
   
     for (temp = IgnoreList; temp; temp = temp->next)
     {
-      if (!irccmp(av[0], temp->hostmask))
+      if (match(av[0], temp->hostmask))
       {
         if (expire)
           temp->expire = expire + current_ts;

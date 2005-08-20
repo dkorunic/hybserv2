@@ -1066,7 +1066,8 @@ s_privmsg(int ac, char **av)
 
       if (lptr)
         {
-          ircsprintf(chkstr, "*!%s@%s", lptr->username, lptr->hostname);
+          ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
+              lptr->hostname);
           if (OnIgnoreList(chkstr))
             return;
         }

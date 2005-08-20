@@ -47,8 +47,6 @@ SUBDIRS = src tools
 
 # Rest of standard Makefile
 all: depend src tools
-	@echo "*** Begin building Hybserv2 version $(VERSION) ***"
-	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Building $$i ***"; \
 		cd $$i; \
@@ -56,13 +54,11 @@ all: depend src tools
 		cd ..; \
 		echo; \
 	done
-	@echo "*** Done building Hybserv2 version $(VERSION) ***"
 
 build: all
 
 clean:
 	@echo '** Begin cleaning and removing objects **'
-	@echo
 	@for i in $(SUBDIRS); do \
 		echo "*** Cleaning $$i ***"; \
 		cd $$i; \
@@ -87,9 +83,9 @@ depend:
 	@echo '*** Making dependancies ***'
 	@if test ! -f src/.depend; then \
 		touch src/.depend; \
+		cd src; $(MAKE) depend; \
+		echo; \
 	fi
-	@cd src; $(MAKE) depend
-	@echo '*** Done making dependancies ***'
 
 install: all install-binary install-help
 	@echo "*** Done installing Hybserv2 $(VERSION) ***"

@@ -597,7 +597,7 @@ int WriteIgnores()
   
   for (temp = IgnoreList; temp; temp = temp->next)
   {
-    fprintf(fp, "%s %ld\n", temp->hostmask, temp->expire - current_ts);
+    fprintf(fp, "%s %d\n", temp->hostmask, temp->expire - current_ts);
   }
   
   fclose(fp);

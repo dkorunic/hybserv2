@@ -763,7 +763,10 @@ int ignore_loaddata()
     {
       if (!irccmp(av[0], temp->hostmask))
       {
-        temp->expire = expire + current_ts;
+        if (expire)
+          temp->expire = expire + current_ts;
+        else
+          temp->expire = 0;
         MyFree(av);
         found = 1;
         break;
@@ -4463,6 +4466,8 @@ o_ignore_add(struct Luser *lptr, int ac, char **av, int sockfd)
 
   if (ac >= 4)
     expire = timestr(av[3]);
+  else
+    expire = 0;
 
   o_RecordCommand(sockfd,
                   "IGNORE ADD %s %s",

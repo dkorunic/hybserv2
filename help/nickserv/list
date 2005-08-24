@@ -10,7 +10,6 @@ displayed. Valid options are:
   %b-protect%b   - List all protected nicknames
   %b-noexpire%b  - List all noexpire nicknames
 
-
 Example: %bLIST *nick*%b
            Lists all nicknames that contain %bnick%b
          %bLIST *nick* -forbid -noexpire%b

@@ -4052,7 +4052,7 @@ n_list(struct Luser *lptr, int ac, char **av)
   if (ac < 2)
     {
       notice(n_NickServ, lptr->nick,
-             "Syntax: \002LIST <pattern>\002");
+             "Syntax: \002LIST <pattern> [options]\002");
       notice(n_NickServ, lptr->nick, ERR_MORE_INFO,
              n_NickServ, "LIST");
       return;

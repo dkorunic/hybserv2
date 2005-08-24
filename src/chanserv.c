@@ -4172,32 +4172,39 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *temp;
   int IsAnAdmin;
-  int ii,
-  mcnt, /* total matches found */
-  acnt; /* total matches - private nicks */
+  int ii;
+  int mcnt; /* total matches found */
+  int acnt; /* total matches - private nicks */
+  int cnt;
+  int match_flags = 0;
 
   if (ac < 2)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002LIST <pattern>\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
-             "LIST");
+             "Syntax: \002LIST <pattern> [options]\002");
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "LIST");
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s LIST %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1]);
+  RecordCommand("%s: %s!%s@%s LIST %s", n_ChanServ, lptr->nick,
+      lptr->username, lptr->hostname, av[1]);
 
   if (IsValidAdmin(lptr))
     IsAnAdmin = 1;
   else
     IsAnAdmin = 0;
+
+  for (cnt = 2; cnt < ac; cnt++)
+    {
+      if (!ircncmp(av[cnt], "-forbid", strlen(av[cnt])))
+        match_flags |= CS_FORBID;
+      else if (!ircncmp(av[cnt], "-private", strlen(av[cnt])))
+        match_flags |= CS_PRIVATE;
+      else if (!ircncmp(av[cnt], "-forget", strlen(av[cnt])))
+        match_flags |= CS_FORGET;
+      else if (!ircncmp(av[cnt], "-noexpire", strlen(av[cnt])))
+        match_flags |= CS_NOEXPIRE;
+    }
 
   acnt = mcnt = 0;
   notice(n_ChanServ, lptr->nick,
@@ -4210,12 +4217,17 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           if (match(av[1], temp->name))
             {
+
+              if (match_flags && !(temp->flags & match_flags))
+                continue;
+              
               mcnt++;
+
               if ((IsAnAdmin) || !(temp->flags & CS_PRIVATE))
                 {
                   char  str[20];
 
-                  acnt++;
+                  ++acnt;
                   if (temp->flags & CS_FORBID)
                     strcpy(str, "<< FORBIDDEN >>");
                   else if (temp->flags & CS_FORGET)
@@ -4229,9 +4241,7 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
                   notice(n_ChanServ, lptr->nick,
                          "%-10s %15s created %s ago",
-                         temp->name,
-                         str,
-                         timeago(temp->created, 1));
+                         temp->name, str, timeago(temp->created, 1));
                 }
             }
         }

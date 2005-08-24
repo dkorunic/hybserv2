@@ -910,7 +910,7 @@ WriteChans()
           cnext = cptr->next;
 
           if (!GetLink(cptr->founder) &&
-              !(cptr->flags & CS_FORGET))
+              !(cptr->flags & (CS_FORGET | CS_FORBID)))
             {
               /*
                * There is no founder - check if there is a successor.
@@ -971,12 +971,19 @@ WriteChans()
               int jj;
 
               /* write founder */
-              fprintf(fp, "->FNDR %s %ld\n", cptr->founder,
-                  (long)cptr->last_founder_active);
-
+              if (cptr->founder)
+                fprintf(fp, "->FNDR %s %ld\n", cptr->founder,
+                    (long)cptr->last_founder_active);
+              
               /* write password */
-              fprintf(fp, "->PASS %s\n",
-                      cptr->password);
+              if (cptr->password)
+                fprintf(fp, "->PASS %s\n", cptr->password);
+
+              if (cptr->forbidby)
+                fprintf(fp, "->FORBIDBY %s\n", cptr->forbidby);
+
+              if (cptr->forbidreason)
+                fprintf(fp, "->FORBIDREASON :%s\n", cptr->forbidreason);
 
               if (cptr->successor)
                 fprintf(fp, "->SUCCESSOR %s %ld\n", cptr->successor,

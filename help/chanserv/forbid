@@ -1,6 +1,7 @@
-Syntax: %bFORBID <channel>%b
+Syntax: %bFORBID <channel> [reason]%b
 
 When a channel is forbidden, noone will be allowed in
 (If someone tries to join, they will be kickbanned).
-Forbidden channels can be cancelled through the %bDROP%b
-command. (%b/msg %C HELP DROP%b)
+You can optionally give a %breason%b of forbidding the channel.
+Forbidden channels can be cancelled through the %bUNFORBID%b
+command or %bDROP%b command.

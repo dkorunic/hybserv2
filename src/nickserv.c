@@ -464,7 +464,7 @@ ns_loaddata()
                     ret = -1;
                 }
             }
-          else if (!ircncmp(keyword, "FORBIDREASON", 8))
+          else if (!ircncmp(keyword, "FORBIDREASON", 12))
             {
               if (!nptr->forbidreason)
                 nptr->forbidreason = MyStrdup(av[1] + 1);

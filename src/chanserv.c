@@ -664,6 +664,34 @@ cs_loaddata(void)
                     ret = -1;
                 }
             }
+          else if (!ircncmp("FORBIDBY", keyword, 8))
+            {
+              if (!cptr->forbidby)
+                cptr->forbidby = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d ChanServ entry for [%s] has multiple FORBIDBY lines (using first)",
+                        ChanServDB,
+                        cnt,
+                        cptr->name);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp("FORBIDREASON", keyword, 12))
+            {
+              if (!cptr->forbidreason)
+                cptr->forbidreason = MyStrdup(av[1] + 1);
+              else
+                {
+                  fatal(1, "%s:%d ChanServ entry for [%s] has multiple FORBIDREASON lines (using first)",
+                        ChanServDB,
+                        cnt,
+                        cptr->name);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
           else if (!ircncmp("TOPIC", keyword, 5))
             {
               if (!cptr->topic)
@@ -2429,23 +2457,18 @@ DeleteChan(struct ChanInfo *chanptr)
     DeleteMemoList(mi);
 #endif
 
-  if (chanptr->password)
-    MyFree(chanptr->password);
-  if (chanptr->topic)
-    MyFree(chanptr->topic);
-  if (chanptr->key)
-    MyFree(chanptr->key);
+  MyFree(chanptr->password);
+  MyFree(chanptr->topic);
+  MyFree(chanptr->key);
 #ifdef DANCER
-  if (chanptr->forward)
-    MyFree(chanptr->forward);
+  MyFree(chanptr->forward);
 #endif /* DANCER */
 
   while (chanptr->akick)
     {
       ak = chanptr->akick->next;
       MyFree(chanptr->akick->hostmask);
-      if (chanptr->akick->reason)
-        MyFree(chanptr->akick->reason);
+      MyFree(chanptr->akick->reason);
       MyFree(chanptr->akick);
       chanptr->akick = ak;
     }
@@ -2485,18 +2508,15 @@ DeleteChan(struct ChanInfo *chanptr)
       MyFree(chanptr->founder);
     }
 
-  if (chanptr->successor)
-    MyFree(chanptr->successor);
-  if (chanptr->email)
-    MyFree(chanptr->email);
-  if (chanptr->url)
-    MyFree(chanptr->url);
-  if (chanptr->entrymsg)
-    MyFree(chanptr->entrymsg);
-  if (chanptr->access_lvl)
-    MyFree(chanptr->access_lvl);
-  if (chanptr->comment)
-    MyFree(chanptr->comment);
+  MyFree(chanptr->successor);
+  MyFree(chanptr->email);
+  MyFree(chanptr->url);
+  MyFree(chanptr->entrymsg);
+  MyFree(chanptr->access_lvl);
+  MyFree(chanptr->comment);
+
+  MyFree(chanptr->forbidby);
+  MyFree(chanptr->forbidreason);
 
   if (chanptr->next)
     chanptr->next->prev = chanptr->prev;
@@ -3135,11 +3155,6 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if ((cptr = FindChan(av[1])))
     {
-      if (cptr->flags & (CS_FORBID | CS_FORGET))
-        RecordCommand("%s: Attempt to register forbidden channel [%s] by %s!%s@%s",
-                      n_ChanServ, cptr->name, lptr->nick, lptr->username,
-                      lptr->hostname);
-
       notice(n_ChanServ, lptr->nick,
           "The channel [\002%s\002] is already registered",
           av[1]);
@@ -6027,9 +6042,16 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
     return;
   }
 
-  if (cptr->flags & (CS_FORBID | CS_FORGET))
+  if (cptr->flags & CS_FORBID)
   {
     notice(n_ChanServ, lptr->nick, "[\002%s\002] is a forbidden channel",
+      cptr->name);
+    return;
+  }
+
+  if (cptr->flags & CS_FORGET)
+  {
+    notice(n_ChanServ, lptr->nick, "[\002%s\002] is a forgotten channel",
       cptr->name);
     return;
   }
@@ -6209,10 +6231,18 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (cptr->flags & (CS_FORBID | CS_FORGET))
+  if (cptr->flags & CS_FORBID)
     {
       notice(n_ChanServ, lptr->nick,
              "[\002%s\002] is a forbidden channel",
+             cptr->name);
+      return;
+    }
+
+  if (cptr->flags & CS_FORGET)
+    {
+      notice(n_ChanServ, lptr->nick,
+             "[\002%s\002] is a forgotten channel",
              cptr->name);
       return;
     }
@@ -6862,13 +6892,14 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
          "     Channel: %s",
          cptr->name);
 
-  notice(n_ChanServ, lptr->nick,
-    "     Founder: %s%s%s%s", cptr->founder ? cptr->founder : "",
-    founder_online ? " << ONLINE >>" :
-    (cptr->last_founder_active ? ", last seen: " : ""),
-    (founder_online || !cptr->last_founder_active) ? "" :
-    timeago(cptr->last_founder_active, 1),
-    (founder_online || !cptr->last_founder_active) ? "" : " ago");
+  if (cptr->founder)
+    notice(n_ChanServ, lptr->nick,
+      "     Founder: %s%s%s%s", cptr->founder,
+      founder_online ? " << ONLINE >>" :
+      (cptr->last_founder_active ? ", last seen: " : ""),
+      (founder_online || !cptr->last_founder_active) ? "" :
+      timeago(cptr->last_founder_active, 1),
+      (founder_online || !cptr->last_founder_active) ? "" : " ago");
 
   if (cptr->successor)
     notice(n_ChanServ, lptr->nick,
@@ -6883,10 +6914,6 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   notice(n_ChanServ, lptr->nick, "  Registered: %s ago",
       timeago(cptr->created, 1));
 
-#if 0
-  /* XXX: testing -kre */
-  if (!FindChannel(cptr->name))
-#endif
     notice(n_ChanServ, lptr->nick,
            "   Last Used: %s ago",
            timeago(cptr->lastused, 1));
@@ -6946,6 +6973,19 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
              "     Options: %s",
              buf);
     }
+
+  if (IsValidAdmin(lptr))
+  {
+    if (cptr->flags & CS_FORBID)
+    {
+      if (cptr->forbidby)
+        notice(n_ChanServ, lptr->nick, "    Forbid by: %s",
+            cptr->forbidby);
+      if (cptr->forbidreason)
+        notice(n_ChanServ, lptr->nick, "Forbid reason: %s",
+            cptr->forbidreason);
+    }
+  }
 
   buf[0] = '\0';
   if (cptr->modes_off)
@@ -7400,11 +7440,12 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr = NULL;
   struct Channel *chptr = NULL;
+  char sendstr[MAXLINE];
 
   if (ac < 2)
     {
       notice(n_ChanServ, lptr->nick,
-             "Syntax: \002FORBID <channel>\002");
+             "Syntax: \002FORBID <channel> [reason]\002");
       notice(n_ChanServ, lptr->nick,
              ERR_MORE_INFO,
              n_ChanServ,
@@ -7412,16 +7453,14 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  RecordCommand("%s: %s!%s@%s FORBID [%s]",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1]);
+  RecordCommand("%s: %s!%s@%s FORBID [%s]", n_ChanServ, lptr->nick,
+      lptr->username, lptr->hostname, av[1]);
 
-  o_Wallops("Forbid from %s!%s@%s for channel [%s]",
-            lptr->nick, lptr->username, lptr->hostname,
-            av[1] );
+  o_Wallops("Forbid from %s!%s@%s for channel [%s]", lptr->nick,
+      lptr->username, lptr->hostname, av[1] );
+
+  ircsprintf(sendstr, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
 
   if ((cptr = FindChan(av[1])))
     {
@@ -7435,6 +7474,11 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
 
       cptr->flags |= CS_FORBID;
+      cptr->forbidby = MyStrdup(sendstr);
+      if (ac < 3)
+        cptr->forbidreason = NULL;
+      else
+        cptr->forbidreason = GetString(ac - 2, av + 2);
     }
   else
     {
@@ -7446,11 +7490,16 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           return;
         }
 
-      /* Create channel - it didn't exist -kre */
+      /* Create channel - it didn't exist */
       cptr = MakeChan();
       cptr->name = MyStrdup(av[1]);
-      cptr->created = current_ts;
       cptr->flags |= CS_FORBID;
+      cptr->created = cptr->lastused = current_ts;
+      cptr->forbidby = MyStrdup(sendstr);
+      if (ac < 3)
+        cptr->forbidreason = NULL;
+      else
+        cptr->forbidreason = GetString(ac - 2, av + 2);
       SetDefaultALVL(cptr);
       AddChan(cptr);
     }

@@ -121,6 +121,9 @@ struct ChanInfo
   char *url;                    /* url of channel */
   char *comment;                /* channel comment line */
 
+  char *forbidby;               /* who did a forbid on channel */
+  char *forbidreason;           /* and an optional reason */
+
   /* list of users who have founder access */
   struct f_users
   {

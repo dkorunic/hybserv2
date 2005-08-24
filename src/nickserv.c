@@ -452,6 +452,30 @@ ns_loaddata()
                     ret = -1;
                 }
             }
+          else if (!ircncmp(keyword, "FORBIDBY", 8))
+            {
+              if (!nptr->forbidby)
+                nptr->forbidby = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple FORBIDBY lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "FORBIDREASON", 8))
+            {
+              if (!nptr->forbidreason)
+                nptr->forbidreason = MyStrdup(av[1] + 1);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple FORBIDREASON lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
           else if (!ircncmp(keyword, "UIN", 3))
             {
               if (!nptr->UIN)
@@ -1005,16 +1029,18 @@ DeleteNick(struct NickInfo *nickptr)
 
 #endif /* CHANNELSERVICES */
 
-  if (nickptr->email)
-    MyFree(nickptr->email);
-  if (nickptr->url)
-    MyFree(nickptr->url);
-  if (nickptr->lastu)
-    MyFree(nickptr->lastu);
-  if (nickptr->lasth)
-    MyFree(nickptr->lasth);
-  if (nickptr->lastqmsg)
-    MyFree(nickptr->lastqmsg);
+  MyFree(nickptr->email);
+  MyFree(nickptr->url);
+  MyFree(nickptr->gsm);
+  MyFree(nickptr->phone);
+  MyFree(nickptr->UIN);
+  
+  MyFree(nickptr->forbidby);
+  MyFree(nickptr->forbidreason);
+
+  MyFree(nickptr->lastu);
+  MyFree(nickptr->lasth);
+  MyFree(nickptr->lastqmsg);
 
   if (nickptr->next)
     nickptr->next->prev = nickptr->prev;
@@ -3868,8 +3894,7 @@ static void n_set_phone(struct Luser *lptr, int ac, char **av)
   RecordCommand("%s: %s!%s@%s SET PHONE %s",
                 n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[2]);
 
-  if (nptr->phone)
-    MyFree(nptr->phone);
+  MyFree(nptr->phone);
 
   if (!irccmp(av[2], "-"))
     {
@@ -4255,6 +4280,19 @@ n_info(struct Luser *lptr, int ac, char **av)
         }
     }
 
+  if (isadmin)
+  {
+    if (nptr->flags & NS_FORBID)
+    {
+      if (nptr->forbidby)
+        notice(n_NickServ, lptr->nick, "          Forbid by: %s",
+            nptr->forbidby);
+      if (nptr->forbidreason)
+        notice(n_NickServ, lptr->nick, "      Forbid reason: %s",
+            nptr->forbidreason);
+    }
+  }
+
   if (isadmin || isowner)
     {
       int cnt;
@@ -4544,11 +4582,12 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr, *realptr;
+  char sendstr[MAXLINE];
 
   if (ac < 2)
     {
       notice(n_NickServ, lptr->nick,
-             "Syntax: \002FORBID <nickname>\002");
+             "Syntax: \002FORBID <nickname> [reason]\002");
       notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "FORBID");
       return;
     }
@@ -4560,15 +4599,21 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 
   nptr = FindNick(av[1]);
   realptr = GetMaster(nptr);
+  ircsprintf(sendstr, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
 
   if (nptr == NULL)
     {
       /* nick is not registered - do so now; add nick to nick table */
-
       nptr = MakeNick();
       nptr->nick = MyStrdup(av[1]);
       nptr->created = current_ts;
       nptr->flags |= NS_FORBID;
+      nptr->forbidby = MyStrdup(sendstr);
+      if (ac < 3)
+        nptr->forbidreason = NULL;
+      else
+        nptr->forbidreason = GetString(ac - 2, av + 2);
       AddNick(nptr);
     }
   else
@@ -4584,6 +4629,11 @@ n_forbid(struct Luser *lptr, int ac, char **av)
         }
 
       realptr->flags |= NS_FORBID;
+      realptr->forbidby = MyStrdup(sendstr);
+      if (ac < 3)
+        realptr->forbidreason = NULL;
+      else
+        realptr->forbidreason = GetString(ac - 2, av + 2);
       nptr->flags &= ~NS_IDENTIFIED;
     }
 
@@ -4643,11 +4693,12 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
   else
     {
       realptr->flags &= ~NS_FORBID;
+      MyFree(realptr->forbidby);
+      MyFree(realptr->forbidreason);
 
       notice(n_NickServ, lptr->nick,
              "Nickname [\002%s\002] is now unforbidden", av[1]);
 
-      /* Check if av[1] is currently online and tell it to identify -kre */
       CheckNick(av[1]);
     }
 } /* n_unforbid() */

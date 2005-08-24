@@ -81,6 +81,8 @@ struct NickInfo
   char *lastu;               /* last seen username */
   char *lasth;               /* last seen hostname */
   char *lastqmsg;            /* last quit message */
+  char *forbidby;            /* who forbidded the nickname */
+  char *forbidreason;        /* why was it forbidden [optional] */
   time_t collide_ts;         /* TS of when to collide them */
 
 #ifdef RECORD_SPLIT_TS

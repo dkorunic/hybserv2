@@ -722,9 +722,14 @@ WriteNicks()
                   (long) nptr->created,
                   (long) nptr->lastseen);
 
-          /* write out password only if not forbidden! -kre */
           if (nptr->password)
             fprintf(fp, "->PASS %s\n", nptr->password);
+
+          if (nptr->forbidby)
+            fprintf(fp, "->FORBIDBY %s\n", nptr->forbidby);
+
+          if (nptr->forbidreason)
+            fprintf(fp, "->FORBIDREASON :%s\n", nptr->forbidreason);
 
           if (nptr->email)
             fprintf(fp, "->EMAIL %s\n", nptr->email);
@@ -795,6 +800,12 @@ WriteNicks()
 
           if (nptr->password)
             fprintf(fp, "->PASS %s\n", nptr->password);
+
+          if (nptr->forbidby)
+            fprintf(fp, "->FORBIDBY %s\n", nptr->forbidby);
+
+          if (nptr->forbidreason)
+            fprintf(fp, "->FORBIDREASON :%s\n", nptr->forbidreason);
 
           if (nptr->email)
             fprintf(fp, "->EMAIL %s\n", nptr->email);

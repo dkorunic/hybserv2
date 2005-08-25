@@ -3185,13 +3185,6 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   cptr->created = cptr->lastused = cptr->last_founder_active = current_ts;
   SetDefaultALVL(cptr);
 
-  /*
-   * If the channel is registered by an operator or higher,
-   * make the channel NoExpire
-   */
-  if ((lptr->flags & L_OSREGISTERED) && IsOper(userptr))
-    cptr->flags |= CS_NOEXPIRE;
-
   /* Add Secure flag to channel by default (advice by harly) -kre */
   cptr->flags |= CS_SECURE;
 
@@ -4234,6 +4227,8 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                     strcpy(str, "<< FORGOTTEN >>");
                   else if (temp->flags & CS_PRIVATE)
                     strcpy(str, "<< PRIVATE >>");
+                  else if (temp->flags & CS_NOEXPIRE)
+                    strcpy(str, "<< NOEXPIRE >>");
                   else if (FindChannel(temp->name))
                     strcpy(str, "<< ACTIVE >>");
                   else

@@ -1,5 +1,6 @@
 Hybserv-HEAD: Wed, 24 Aug 2005 14:26:08 +0200
 
+  * new channels registered by opers are not NOEXPIRE by default
   * implement options for ChanServ LIST
   * add reason informations for nick and channel forbid [can be seen with
     info commands]

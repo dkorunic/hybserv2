@@ -670,7 +670,7 @@ ns_loaddata()
               nptr->flags = atol(av[1]);
               nptr->created = atol(av[2]);
               nptr->lastseen = atol(av[3]);
-              nptr->flags &= ~(NS_IDENTIFIED | NS_COLLIDE | NS_NUMERIC);
+              nptr->flags &= ~(NS_IDENTIFIED | NS_COLLIDE | NS_NUMERIC | NS_DELETE);
 #ifdef STRICT_DATA_CHECK
 
             }

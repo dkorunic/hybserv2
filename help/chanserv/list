@@ -7,6 +7,7 @@ displayed. Valid options are:
   %b-forbid%b    - List all forbidden channels
   %b-private%b   - List all private channels
   %b-forget%b    - List all forgotten channels
+  %b-guard%b     - List all guarded channels
   %b-noexpire%b  - List all noexpire channels
 
 Example: %bLIST #*bleh*%b

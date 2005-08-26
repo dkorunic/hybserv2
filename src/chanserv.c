@@ -4195,6 +4195,8 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         match_flags |= CS_PRIVATE;
       else if (!ircncmp(av[cnt], "-forget", strlen(av[cnt])))
         match_flags |= CS_FORGET;
+      else if (!ircncmp(av[cnt], "-guard", strlen(av[cnt])))
+        match_flags |= CS_GUARD;
       else if (!ircncmp(av[cnt], "-noexpire", strlen(av[cnt])))
         match_flags |= CS_NOEXPIRE;
     }

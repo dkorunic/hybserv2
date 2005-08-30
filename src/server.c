@@ -1701,7 +1701,6 @@ s_sjoin(int ac, char **av)
   char **line,
   **nicks, /* array of SJOINing nicknames */
   *oldnick;
-  time_t CurrTime; /* current TS if its a new channel */
   struct Channel *cptr, *oldptr;
   int ncnt, /* number of SJOINing nicks */
   mcnt;
@@ -1722,20 +1721,16 @@ s_sjoin(int ac, char **av)
 
       chan = (*av[2] == ':') ? av[2] + 1 : av[2];
 
-      CurrTime = current_ts;
-
       /* kludge for older ircds that don't use SJOIN */
       ircsprintf(sendstr, ":%s SJOIN %ld %s + :%s",
-                 currenthub->realname, (long) CurrTime, chan, av[0]);
+                 currenthub->realname, (long) current_ts, chan, av[0]);
 
       SplitBuf(sendstr, &line);
       SplitBuf(av[0], &nicks);
 
       cptr = AddChannel(line, 1, nicks);
 
-      /*
-       * If the channel has a C: line, have OperServ join it
-       */
+      /* If the channel has a C: line, have OperServ join it */
       if (cptr)
         if (IsChannel(cptr->name) && !IsChannelMember(cptr, Me.osptr))
           os_join(cptr);

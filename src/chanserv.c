@@ -7911,9 +7911,9 @@ static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
                  n_ChanServ, cptr->name, cptr->since);
 
           /* Use c_clear_users() for fixing channel TS. */
-          ircsprintf(line, "FOOBAR #%s", cptr->name);
+          ircsprintf(line, "FOOBAR %s", cptr->name);
           acnt = SplitBuf(line, &arv);
-          c_clear_users(lptr, nptr, acnt, arv);
+          c_clear_all(lptr, nptr, acnt, arv);
 
           MyFree(arv);
         }

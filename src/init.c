@@ -76,7 +76,7 @@ RETSIGTYPE ProcessSignal(int sig)
 
     case SIGPIPE:
       {
-        /* putlog(LOG1, "Received signal SIGPIPE, ignoring"); */
+        signal(SIGPIPE, ProcessSignal);
         break;
       }
 

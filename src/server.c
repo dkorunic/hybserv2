@@ -1724,9 +1724,11 @@ s_sjoin(int ac, char **av)
 
       CurrTime = current_ts;
 
+#ifndef HYBRID_ONLY
       /* kludge for older ircds that don't use SJOIN */
       ircsprintf(sendstr, ":%s SJOIN %ld %s + :%s",
                  currenthub->realname, (long) CurrTime, chan, av[0]);
+#endif
 
       SplitBuf(sendstr, &line);
       SplitBuf(av[0], &nicks);
@@ -1754,9 +1756,11 @@ s_sjoin(int ac, char **av)
 #else
 
       if (cptr)
-        if ((ci = FindChan(chan)) && !IsChannelMember(cptr, Me.csptr))
-          if (!(ci->flags & CS_FORGET))
+      {
+        if ((ci = FindChan(chan)) && !IsChannelMember(cptr, Me.csptr) &&
+            !(ci->flags & CS_FORGET))
             cs_join(ci);
+      }
 
 #endif /* HYBRID_ONLY */
 

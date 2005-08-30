@@ -464,7 +464,7 @@ DeleteClient(struct Luser *user)
 
 #endif /* NICKSERVICES */
 
-  if (!user)
+  if (user == NULL)
     return;
 
   SendUmode(OPERUMODE_CAPE,

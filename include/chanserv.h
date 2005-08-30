@@ -19,7 +19,7 @@
 #define CS_TOPICLOCK    0x00000002 /* must be changed via SET TOPIC */
 #define CS_SECURE       0x00000004 /* channel is secure */
 #define CS_SECUREOPS    0x00000008 /* only aop/sop/founders can be opped */
-#define CS_SUSPENDED    0x00000010 /* channel is suspended */
+#define CS_SUSPENDED    0x00000010 /* channel is suspended - NOT IN USE */
 #define CS_FORBID       0x00000020 /* channel is forbidden */
 #define CS_RESTRICTED   0x00000040 /* channel is restricted */
 #define CS_FORGET       0x00000080 /* channel is forgotten */

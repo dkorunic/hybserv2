@@ -438,7 +438,7 @@ NicknameWarn
 # a nickname enforcer after a nick collide. If you disable
 # this, nicknames will never be released.
 
-NSReleaseTimeout   "60s"
+NSReleaseTimeout   "5m"
 
 # NickRegDelay <time> [RECOMMENDED]
 #

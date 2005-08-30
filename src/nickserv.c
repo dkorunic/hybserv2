@@ -173,8 +173,7 @@ static struct Command accesscmds[] =
 /* sub commands of NickServ SET */
 static struct Command setcmds[] =
     {
-      { "KILL", n_set_kill, LVL_NONE
-      },
+      { "KILL", n_set_kill, LVL_NONE },
       { "AUTOMASK", n_set_automask, LVL_NONE },
       { "PRIVATE", n_set_private, LVL_NONE },
       { "PRIVMSG", n_set_privmsg, LVL_NONE },
@@ -1421,6 +1420,7 @@ collide(char *nick)
   if (!(lptr = FindClient(nick)))
     return;
 
+  /* normal ghosted nickname */
 #ifdef DANCER
   ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
       "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
@@ -1430,6 +1430,8 @@ collide(char *nick)
       Me.name, "Nickname Enforcement");
 #endif /* DANCER */
 
+  /* nope, we won't use ghosted nicknames, instead we'll force nick change
+   * on remote nickname using SVSNICK or FORCENICK */
 #ifdef SVSNICK
 
 # ifdef SVSNICK_LEN
@@ -2562,9 +2564,8 @@ n_ghost(struct Luser *lptr, int ac, char **av)
         }
 
       collide(gptr->nick);
-      DeleteClient(gptr);
 
-      notice(n_NickServ, lptr->nick, "[\002%s\002] has been killed",
+      notice(n_NickServ, lptr->nick, "[\002%s\002] has been collided",
           av[1]);
 
       RecordCommand("%s: %s!%s@%s GHOST [%s]", n_NickServ, lptr->nick,
@@ -4270,6 +4271,10 @@ n_info(struct Luser *lptr, int ac, char **av)
         strcat(buf, "MemoNotify, ");
       if (nptr->flags & NS_MEMOSIGNON)
         strcat(buf, "MemoSignon, ");
+      if (nptr->flags & NS_NOREGISTER)
+        strcat(buf, "NoRegister, ");
+      if (nptr->flags & NS_NOCHANOPS)
+        strcat(buf, "NoChannelOps, ");
 
       if (*buf)
         {

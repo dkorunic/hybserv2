@@ -912,6 +912,7 @@ cs_loaddata(void)
           cptr->flags = atoi(av[1]);
           cptr->created = atoi(av[2]);
           cptr->lastused = atoi(av[3]);
+          cptr->flags &= ~CS_DELETE;
         }
 
       MyFree(av);

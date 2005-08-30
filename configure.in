@@ -106,7 +106,7 @@ AC_ARG_WITH(nicklen,
   [ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
 AC_MSG_RESULT([checking nick length... $ac_cv_nicklen])
 AC_ARG_WITH(channellen,
-  [  --with-channellen=LENGTH   Sets channel length to LENGTH [[default=200]]],
+  [  --with-channellen=LENGTH  Sets channel length to LENGTH [[default=200]]],
   [ac_cv_channellen=$withval], [ac_cv_channellen="200"])
 AC_MSG_RESULT([checking channel length... $ac_cv_channellen])
 AC_ARG_WITH(topiclen,

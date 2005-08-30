@@ -105,10 +105,10 @@ AC_ARG_WITH(nicklen,
   [  --with-nicklen=LENGTH     Sets nick length to LENGTH [[default=18]]],
   [ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
 AC_MSG_RESULT([checking nick length... $ac_cv_nicklen])
-AC_ARG_WITH(chanellen,
-  [  --with-chanellen=LENGTH   Sets channel length to LENGTH [[default=200]]],
-  [ac_cv_chanellen=$withval], [ac_cv_chanellen="200"])
-AC_MSG_RESULT([checking channel length... $ac_cv_chanellen])
+AC_ARG_WITH(channellen,
+  [  --with-channellen=LENGTH   Sets channel length to LENGTH [[default=200]]],
+  [ac_cv_channellen=$withval], [ac_cv_channellen="200"])
+AC_MSG_RESULT([checking channel length... $ac_cv_channellen])
 AC_ARG_WITH(topiclen,
   [  --with-topiclen=LENGTH    Sets topic length to LENGTH [[default=160]]],
   [ac_cv_topiclen=$withval], [ac_cv_topiclen="160"])
@@ -124,31 +124,31 @@ fi
 AC_MSG_RESULT([checking network type... $ac_cv_network])
 if test "x$ac_cv_network" = "xhybrid"; then
   ac_cv_nicklen=9
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=120
 elif test "x$ac_cv_network" = "xhybrid7"; then
   ac_cv_nicklen=18
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=160
 elif test "x$ac_cv_network" = "xidolnet"; then
   ac_cv_nicklen=18
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=240
 elif test "x$ac_cv_network" = "xbalcannet"; then
   ac_cv_nicklen=24
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=400
 elif test "x$ac_cv_network" = "xdancer"; then
   ac_cv_nicklen=20
-  ac_cv_chanellen=30
+  ac_cv_channellen=30
   ac_cv_topiclen=450
 elif test "x$ac_cv_network" = "xratbox"; then
   ac_cv_nicklen=9
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=160
 fi
 AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
-AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_chanellen, [Define to channel length])
+AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_channellen, [Define to channel length])
 AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 
 dnl Check if warnings are to be enabled
@@ -223,7 +223,7 @@ Compiler suite:
 Compile configuration:
   Configured network:   ${ac_cv_network}
   Nick length:          ${ac_cv_nicklen}
-  Channel length:       ${ac_cv_chanellen}
+  Channel length:       ${ac_cv_channellen}
   Topic length:         ${ac_cv_topiclen}
 Extra configurations:
   Asserts enabled:      ${cf_enable_asserts}

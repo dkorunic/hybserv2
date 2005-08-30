@@ -860,7 +860,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
-  --with-chanellen=LENGTH   Sets channel length to LENGTH [default=200]
+  --with-channellen=LENGTH   Sets channel length to LENGTH [default=200]
   --with-topiclen=LENGTH    Sets topic length to LENGTH [default=160]
   --with-network=TYPE       Sets network type TYPE
 
@@ -5483,15 +5483,15 @@ fi;
 echo "$as_me:$LINENO: result: checking nick length... $ac_cv_nicklen" >&5
 echo "${ECHO_T}checking nick length... $ac_cv_nicklen" >&6
 
-# Check whether --with-chanellen or --without-chanellen was given.
-if test "${with_chanellen+set}" = set; then
-  withval="$with_chanellen"
-  ac_cv_chanellen=$withval
+# Check whether --with-channellen or --without-channellen was given.
+if test "${with_channellen+set}" = set; then
+  withval="$with_channellen"
+  ac_cv_channellen=$withval
 else
-  ac_cv_chanellen="200"
+  ac_cv_channellen="200"
 fi; 
-echo "$as_me:$LINENO: result: checking channel length... $ac_cv_chanellen" >&5
-echo "${ECHO_T}checking channel length... $ac_cv_chanellen" >&6
+echo "$as_me:$LINENO: result: checking channel length... $ac_cv_channellen" >&5
+echo "${ECHO_T}checking channel length... $ac_cv_channellen" >&6
 
 # Check whether --with-topiclen or --without-topiclen was given.
 if test "${with_topiclen+set}" = set; then
@@ -5518,27 +5518,27 @@ echo "$as_me:$LINENO: result: checking network type... $ac_cv_network" >&5
 echo "${ECHO_T}checking network type... $ac_cv_network" >&6
 if test "x$ac_cv_network" = "xhybrid"; then
   ac_cv_nicklen=9
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=120
 elif test "x$ac_cv_network" = "xhybrid7"; then
   ac_cv_nicklen=18
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=160
 elif test "x$ac_cv_network" = "xidolnet"; then
   ac_cv_nicklen=18
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=240
 elif test "x$ac_cv_network" = "xbalcannet"; then
   ac_cv_nicklen=24
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=400
 elif test "x$ac_cv_network" = "xdancer"; then
   ac_cv_nicklen=20
-  ac_cv_chanellen=30
+  ac_cv_channellen=30
   ac_cv_topiclen=450
 elif test "x$ac_cv_network" = "xratbox"; then
   ac_cv_nicklen=9
-  ac_cv_chanellen=200
+  ac_cv_channellen=200
   ac_cv_topiclen=160
 fi
 
@@ -5548,7 +5548,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-@%:@define CHANNELLEN $ac_cv_chanellen
+@%:@define CHANNELLEN $ac_cv_channellen
 _ACEOF
 
 
@@ -6805,7 +6805,7 @@ Compiler suite:
 Compile configuration:
   Configured network:   ${ac_cv_network}
   Nick length:          ${ac_cv_nicklen}
-  Channel length:       ${ac_cv_chanellen}
+  Channel length:       ${ac_cv_channellen}
   Topic length:         ${ac_cv_topiclen}
 Extra configurations:
   Asserts enabled:      ${cf_enable_asserts}

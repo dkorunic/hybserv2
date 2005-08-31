@@ -76,8 +76,7 @@ DISTRIBUTION:
       svn co svn://svn.hybserv.net/trunk hybserv
 
   3)  Subversion Web access:
-      http://viewcvs.hybserv.net/
-      http://svn.hybserv.net/
+      http://www.hybserv.net/browser
 
   4)  Mirrors:
       http://dkorunic.net/projects/tarballs/

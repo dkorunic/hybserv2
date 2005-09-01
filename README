@@ -70,7 +70,7 @@ DISTRIBUTION:
 
   1)  Hybserv2 home:
       http://www.hybserv.net/
-      http://trac.hybserv.net/trac.cgi/wiki/HybservReleases
+      http://www.hybserv.net/wiki/HybservReleases
 
   2)  Anonymous Subversion access:
       svn co svn://svn.hybserv.net/trunk hybserv
@@ -82,7 +82,7 @@ DISTRIBUTION:
       http://dkorunic.net/projects/tarballs/
       http://hybserv.icsbg.net/ [thanks sofit!]
       http://www.sosdg.org/hybserv2/ [thanks Bruns!]
-      http://trac.hybserv.net/downloads/
+      http://www.hybserv.net/downloads/
 
 NOTE: For each of these sites there is one in hybserv.net and one in
       hybserv2.net domain, for increased redundancy.
@@ -199,7 +199,7 @@ lines:
 BUGS:
 Use the appropriate bug reporting and ticketing system:
 
-  #0:  http://trac.hybserv.net/trac.cgi/newticket
+  #0:  http://www.hybserv.net/newticket
 
 Alternative, subscribe to the mailing list (details follow) and post them
 there.  We can't fix bugs if no one reports them!

@@ -922,18 +922,18 @@ void
 DeleteNick(struct NickInfo *nickptr)
 
 {
-  struct NickHost *htmp;
-  unsigned int hashv;
+  struct NickHost *htmp = NULL;
+  unsigned int hashv = 0;
 #ifdef CHANNELSERVICES
 
-  struct ChanInfo *cptr;
-  struct aChannelPtr *ftmp;
-  struct aChannelPtr *ntmp;
-  struct AccessChannel *atmp;
+  struct ChanInfo *cptr = NULL;
+  struct aChannelPtr *ftmp = NULL;
+  struct aChannelPtr *ntmp = NULL;
+  struct AccessChannel *atmp = NULL;
 #endif
 #ifdef MEMOSERVICES
 
-  struct MemoInfo *mi;
+  struct MemoInfo *mi = NULL;
 #endif
 
   if (!nickptr)
@@ -965,7 +965,7 @@ DeleteNick(struct NickInfo *nickptr)
 
 #ifdef CHANNELSERVICES
 
-  while ((ntmp = nickptr->FounderChannels))
+  while ((ntmp = nickptr->FounderChannels) != NULL)
     {
       cptr = ntmp->cptr;
       ftmp = ntmp->next;
@@ -986,11 +986,8 @@ DeleteNick(struct NickInfo *nickptr)
        * cptr->founder to null here, so there is *NO* chance of it ever
        * being used to delete nickptr's FounderChannels list.
        */
-      if (cptr->founder)
-      {
-        MyFree(cptr->founder);
-        cptr->founder = NULL;
-      }
+      MyFree(cptr->founder);
+      --nickptr->fccnt;
 
       /* If the channel has a successor, promote them to founder, otherwise
        * delete the channel */
@@ -1699,8 +1696,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
       for (tmpchan = leafmaster->FounderChannels; tmpchan; tmpchan =
            tmpchan->next)
         {
-          if (tmpchan->cptr->founder)
-            MyFree(tmpchan->cptr->founder);
+          MyFree(tmpchan->cptr->founder);
 
           /* Add this channel to masters founder list -jared */
           AddFounderChannelToNick(&master,tmpchan->cptr);

@@ -255,7 +255,7 @@ ExpireGlines(time_t unixtime)
       if ((tempgline->expires) && (tempgline->expires <= unixtime))
         {
           SendUmode(OPERUMODE_Y,
-                    "*** Expired gline: %s@%s [%s]",
+                    "*** Expired gline %s@%s [%s]",
                     tempgline->username,
                     tempgline->hostname,
                     tempgline->reason);

@@ -2104,8 +2104,7 @@ PromoteSuccessor(struct ChanInfo *cptr)
          cptr->successor,
          cptr->name);
 
-  if (cptr->founder)
-    MyFree(cptr->founder);
+  MyFree(cptr->founder);
 
   cptr->founder = cptr->successor;
   cptr->last_founder_active = cptr->last_successor_active;
@@ -2157,7 +2156,7 @@ ExpireChannels(time_t unixtime)
               ((unixtime - cptr->lastused) >= ChannelExpire))
             {
               putlog(LOG2,
-                     "%s: Expired channel: [%s]",
+                     "%s: Expired channel [%s]",
                      n_ChanServ,
                      cptr->name);
 
@@ -2274,7 +2273,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
     return;
 
   cprev = NULL;
-  for (fcptr = lptr->founder_channels; fcptr; )
+  for (fcptr = lptr->founder_channels; fcptr != NULL; )
     {
       if (fcptr->cptr == cptr)
         {
@@ -2288,7 +2287,6 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
             {
               lptr->founder_channels = fcptr->next;
               MyFree(fcptr);
-              /* fcptr = NULL; */
             }
 
           /*
@@ -2307,7 +2305,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
     }
 
   uprev = NULL;
-  for (fuptr = cptr->founders; fuptr; )
+  for (fuptr = cptr->founders; fuptr != NULL; )
     {
       if (fuptr->lptr == lptr)
         {
@@ -2321,7 +2319,6 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
             {
               cptr->founders = fuptr->next;
               MyFree(fuptr);
-              fuptr = NULL;
             }
 
           break;
@@ -2442,12 +2439,12 @@ DeleteChan(struct ChanInfo *chanptr)
   struct ChanAccess *ca;
   struct f_users *fdrs;
   int hashv;
-#ifdef MEMOSERVICES
 
+#ifdef MEMOSERVICES
   struct MemoInfo *mi;
 #endif
 
-  if (!chanptr)
+  if (chanptr == NULL)
     return;
 
   hashv = CSHashChan(chanptr->name);
@@ -2485,8 +2482,7 @@ DeleteChan(struct ChanInfo *chanptr)
       if (chanptr->access->nptr && chanptr->access->acptr)
         DeleteAccessChannel(chanptr->access->nptr, chanptr->access->acptr);
 
-      if (chanptr->access->hostmask)
-        MyFree(chanptr->access->hostmask);
+      MyFree(chanptr->access->hostmask);
       MyFree(chanptr->access);
       chanptr->access = ca;
     }
@@ -8034,7 +8030,7 @@ ExpireAkicks(time_t unixtime)
 
     	  if ((temp->expires) && (temp->expires <= unixtime))
         {
-          SendUmode(OPERUMODE_Y, "*** Expired akick: %s [%s]",
+          SendUmode(OPERUMODE_Y, "*** Expired akick %s [%s]",
             temp->hostmask, temp->reason ? temp->reason : "");
 	
           memset(&modes, 0, sizeof(modes));

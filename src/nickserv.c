@@ -778,19 +778,18 @@ AddFounderChannelToNick(struct NickInfo **nptr, struct ChanInfo *cptr)
 void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
                                   *cptr)
 {
-  struct aChannelPtr *tmp, *prev;
-
-  prev = NULL;
+  struct aChannelPtr *tmp = NULL;
+  struct aChannelPtr *prev = NULL;
 
   /* Iterate list of nick's founder channels */
-  for (tmp = (*nptr)->FounderChannels; tmp; )
+  for (tmp = (*nptr)->FounderChannels; tmp != NULL; )
     {
       /* We have a match! */
       if (tmp->cptr == cptr)
         {
           /* Last time we didn't have a match, so we have a ptr before this
            * one in case of list relinking */
-          if (prev)
+          if (prev != NULL)
             {
               prev->next = tmp->next;
               MyFree(tmp);
@@ -800,7 +799,6 @@ void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
             {
               (*nptr)->FounderChannels = tmp->next;
               MyFree(tmp);
-              tmp = NULL;
             }
 
           /* KrisDuv's fix for decreasing number of registered channels */
@@ -924,86 +922,66 @@ DeleteNick(struct NickInfo *nickptr)
 {
   struct NickHost *htmp = NULL;
   unsigned int hashv = 0;
-#ifdef CHANNELSERVICES
 
+#ifdef CHANNELSERVICES
   struct ChanInfo *cptr = NULL;
   struct aChannelPtr *ftmp = NULL;
   struct aChannelPtr *ntmp = NULL;
   struct AccessChannel *atmp = NULL;
-#endif
+#endif /* CHANNELSERVICES */
+
 #ifdef MEMOSERVICES
-
   struct MemoInfo *mi = NULL;
-#endif
+#endif /* MEMOSERVICES */
 
-  if (!nickptr)
+  if (nickptr == NULL)
     return;
 
-#ifdef MEMOSERVICES
-  /* check if the nick had any memos - if so delete them */
-  if ((mi = FindMemoList(nickptr->nick)))
-    DeleteMemoList(mi);
-#endif
-
 #ifdef LINKED_NICKNAMES
-
   DeleteLink(nickptr, 0);
 #endif /* LINKED_NICKNAMES */
 
+#ifdef MEMOSERVICES
+  /* check if the nick had any memos - if so delete them */
+  if ((mi = FindMemoList(nickptr->nick)) != NULL)
+    DeleteMemoList(mi);
+#endif
+
   hashv = NSHashNick(nickptr->nick);
 
-  MyFree(nickptr->nick);
-  MyFree(nickptr->password);
-
-  while (nickptr->hosts)
-    {
-      htmp = nickptr->hosts->next;
-      MyFree(nickptr->hosts->hostmask);
-      MyFree(nickptr->hosts);
-      nickptr->hosts = htmp;
-    }
-
 #ifdef CHANNELSERVICES
-
   while ((ntmp = nickptr->FounderChannels) != NULL)
     {
       cptr = ntmp->cptr;
       ftmp = ntmp->next;
 
-      assert(ntmp);
-
+      /* this way we won't use RemoveFounderChannelFromNick() */
       MyFree(ntmp);
-      nickptr->FounderChannels = ftmp;
-
-      /* All channels that this nick registered should be dropped, unless
-       * there is a successor.
-       * Before calling DeleteChan(), it would be best if nickptr has
-       * already been removed from nicklist[]. Otherwise, DeleteChan()
-       * might try to call RemoveFounderChannelFromNick(). This would be
-       * very bad, since this loop is modifying nickptr's FounderChannels
-       * list. Right now, all calls to DeleteNick() remove nickptr from
-       * nicklist[] beforehand, but, being as paranoid as I am, we'll set
-       * cptr->founder to null here, so there is *NO* chance of it ever
-       * being used to delete nickptr's FounderChannels list.
-       */
-      MyFree(cptr->founder);
-      --nickptr->fccnt;
 
       /* If the channel has a successor, promote them to founder, otherwise
        * delete the channel */
       if (cptr->successor)
+      {
         PromoteSuccessor(cptr);
+        --nickptr->fccnt;
+      }
       else
-        {
-          /* Fix by KrisDuv - make ChanServ part if on channel */
-          struct Channel *chptr;
-          chptr = FindChannel(cptr->name);
-          if (IsChannelMember(chptr, Me.csptr))
-            cs_part(chptr);
+      {
+        /* Fix by KrisDuv - make ChanServ part if on channel */
+        struct Channel *chptr;
+        chptr = FindChannel(cptr->name);
+        if (IsChannelMember(chptr, Me.csptr))
+          cs_part(chptr);
 
-          /* And delete channel finally */
-          DeleteChan(cptr);
-        }
+        putlog(LOG2, "%s: Deleting [%s] caused deletion of channel [%s]",
+            n_NickServ, nickptr->nick, cptr->name);
+            
+        /* And delete channel finally */
+        DeleteChan(cptr);
+      }
+
+      assert(nickptr->FounderChannels != NULL);
+      nickptr->FounderChannels = ftmp;
     }
 
   /*
@@ -1013,17 +991,27 @@ DeleteNick(struct NickInfo *nickptr)
    * register the same nickname and gain instant access to
    * the channels the old nick had access on.
    */
-  for (atmp = nickptr->AccessChannels; atmp; atmp = atmp->next)
+  for (atmp = nickptr->AccessChannels; atmp != NULL; atmp = atmp->next)
     DeleteAccess(atmp->cptr, atmp->accessptr);
 
-  while (nickptr->AccessChannels)
+  while (nickptr->AccessChannels != NULL)
     {
       atmp = nickptr->AccessChannels->next;
       MyFree(nickptr->AccessChannels);
       nickptr->AccessChannels = atmp;
     }
-
 #endif /* CHANNELSERVICES */
+
+  MyFree(nickptr->nick);
+  MyFree(nickptr->password);
+
+  while (nickptr->hosts != NULL)
+  {
+    htmp = nickptr->hosts->next;
+    MyFree(nickptr->hosts->hostmask);
+    MyFree(nickptr->hosts);
+    nickptr->hosts = htmp;
+  }
 
   MyFree(nickptr->email);
   MyFree(nickptr->url);
@@ -1311,7 +1299,7 @@ ExpireNicknames(time_t unixtime)
                   && ((unixtime - nptr->lastseen) >= NickNameExpire))
                 {
                   putlog(LOG2,
-                         "%s: Expired nickname: [%s]",
+                         "%s: Expired nickname [%s]",
                          n_NickServ,
                          nptr->nick);
 
@@ -1810,7 +1798,6 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
           AddHostToNick(hptr->hostmask, nptr->nextlink);
 
 #ifdef CHANNELSERVICES
-
       /*
        * The new master should keep the list of founder channels from the
        * old master

@@ -1929,28 +1929,23 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  /* It _has_ to be ac counter check here - if not, and time not specified
-   * OperServ will crash instantly, trying to gline probably wrong stuff
-   * from av[2] if _any_ digit is present in av[1] since timestr will then
-   * return non-zero value. Also, it is necessary to check if `@' is
-   * contained in av[2] -kre */
-  expires = timestr(av[1]);
-  if ((strchr(av[1], '@') == NULL) && (ac > 2) && expires)
+  if ((ac > 2) && (strchr(av[2], '@') != NULL))
+  {
+    expires = timestr(av[1]);
+    if (expires < 0)
     {
-      if (expires < 0)
-      {
-        os_notice(lptr, sockfd,
-            "Expire time was too big, the gline is now permanent!");
-        expires = 0;
-      }              
-      sidx = 3;
-      hostmask = av[2];
+      os_notice(lptr, sockfd,
+          "Expire time was too big, the gline is now permanent!");
     }
+    sidx = 3;
+    hostmask = av[2];
+  }
   else
-    {
-      sidx = 2;
-      hostmask = av[1];
-    }
+  {
+    expires = 0;
+    sidx = 2;
+    hostmask = av[1];
+  }
 
   if (NonStarChars)
     {

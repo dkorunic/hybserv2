@@ -619,10 +619,10 @@ ns_loaddata()
                */
               /* 
                * Bug. When the nick is in the list already must have the
-               * NS_DELETE flag remove There are two work arrounds
-               * possible. The first one, add the newly charged user
-               * regardles if is in the current nicklist. The current one,
-               * will be deleted in ReloadData(). The other, is to reset
+               * NS_DELETE flag. There are two workarrounds
+               * possible. The first one: add the newly charged user
+               * regardles if is in the current nicklist. The old nick
+               * will be deleted in ReloadData(). The other: to reset
                * the NS_DELETE of nptr if the user is already in the nick
                * list. I rather preffere loading all the database and
                * throwing away all the current users (that's the meaning
@@ -1614,8 +1614,6 @@ CollisionCheck(time_t unixtime)
  *         0 for NULL arguments,
  *        -1 if a circular link is detected,
  *        -2 if more than MaxLinks links are formed
- *
- * rewrote it, but just a little bit -kre
  */
 static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 {
@@ -1671,10 +1669,6 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
    * leafmaster's channels to master's channels. There's no point in
    * reallocating - just assign master's pointer to leafmaster's
    *
-   * BUG: Dropping the leaf nick, which is a founder of a channel, doesn't
-   * get the channel dropped, because chanserv thinks it is registered to
-   * the master.
-   *
    * POSSIBLE BUG: Leaving the leafnick's access on channels and granting
    * the master's founder access... This doesn't seem logical?
    */
@@ -1687,8 +1681,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
           MyFree(tmpchan->cptr->founder);
 
           /* Add this channel to masters founder list -jared */
-          AddFounderChannelToNick(&master,tmpchan->cptr);
-
+          AddFounderChannelToNick(&master, tmpchan->cptr);
           tmpchan->cptr->founder = MyStrdup(master->nick);
         }
     }
@@ -1696,21 +1689,20 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
   if (leafmaster->AccessChannels)
     {
       struct AccessChannel *acptr;
+      struct AccessChannel *tcptr;
 
-      for (acptr = leafmaster->AccessChannels; acptr; acptr = acptr->next)
+      for (acptr = leafmaster->AccessChannels; acptr != NULL; acptr =
+          tcptr)
       {
         /* Add this channel to masters channel access list -jared */
-        AddAccessChannel(master,acptr->cptr,acptr->accessptr);
+        AddAccessChannel(master, acptr->cptr, acptr->accessptr);
         acptr->accessptr->nptr = master;
+
+        tcptr = acptr->next;
+        MyFree(acptr);
       }
     }
 
-  /* Remove this code, or it will clobber the users lists
-   * -jared */
-  /*
-  master->FounderChannels = leafmaster->FounderChannels;
-  master->AccessChannels = leafmaster->AccessChannels;
-  */
   master->fccnt = leafmaster->fccnt;
   leafmaster->FounderChannels = NULL;
   leafmaster->AccessChannels = NULL;
@@ -1719,7 +1711,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 #endif /* CHANNELSERVICES */
 
   /* setup masters in whole list */
-  for (tmp = leafmaster; tmp->nextlink; tmp = tmp->nextlink)
+  for (tmp = leafmaster; tmp->nextlink != NULL; tmp = tmp->nextlink)
       tmp->master = master;
 
   /* do last master, insert hub's list at the end of leaf's list */
@@ -1747,32 +1739,33 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
  * XXX: We have bugs here. Fix them! -kre
  * started rewriting, however very slowly -kre
  */
-static int DeleteLink(struct NickInfo *nptr, int copyhosts)
+static int DeleteLink(struct NickInfo *nptr, int copy)
 {
-  struct NickInfo *tmp = NULL, *master = NULL;
+  struct NickInfo *tmp = NULL;
+  struct NickInfo *master = NULL;
   struct NickHost *hptr = NULL;
 
-  if (!nptr)
+  if (nptr == NULL)
     return(0);
 
   /* nptr is master but there is NO list! */
-  if (!nptr->master && !nptr->nextlink)
+  if ((nptr->master == NULL) && (nptr->nextlink == NULL))
     return(-1);
 
   /* let us find structure -before- nptr */
-  if (nptr->master)
+  if (nptr->master != NULL)
     {
-      for (tmp = nptr->master; tmp; tmp = tmp->nextlink)
+      for (tmp = nptr->master; tmp != NULL; tmp = tmp->nextlink)
         if (tmp->nextlink == nptr)
           break;
       /* we've reached the end, and there was no nptr? now that's kinda
        * strange */
-      if (!tmp)
+      if (tmp == NULL)
         return(0);
     }
 
   /* do relink: before nptr to after nptr */
-  if (tmp)
+  if (tmp != NULL)
     {
       master = nptr->master;
       tmp->nextlink = nptr->nextlink;
@@ -1780,34 +1773,41 @@ static int DeleteLink(struct NickInfo *nptr, int copyhosts)
       /* and make a master from nptr */
       nptr->master = nptr->nextlink = NULL;
 
-      if (copyhosts)
-        /* make hosts list for nptr since it is alone now */
-        for (hptr = master->hosts; hptr; hptr = hptr->next)
+      if (copy)
+      {
+        struct AccessChannel *acptr = NULL;
+
+        /* hosts list */
+        for (hptr = master->hosts; hptr != NULL; hptr = hptr->next)
           AddHostToNick(hptr->hostmask, nptr);
+
+        /* access list */
+        for (acptr = master->AccessChannels; acptr != NULL;
+            acptr = acptr->next)
+          AddAccessChannel(nptr, acptr->cptr, acptr->accessptr);
+      }
     }
   else /* nptr->master is NULL indicating this is master nick */
     {
       /* make nptr->nextlink the new master */
       nptr->nextlink->master = NULL;
       nptr->nextlink->numlinks = nptr->numlinks;
-      for (tmp = nptr->nextlink->nextlink; tmp; tmp = tmp->nextlink)
+      for (tmp = nptr->nextlink->nextlink; tmp != NULL; tmp = tmp->nextlink)
         tmp->master = nptr->nextlink;
 
-      if (copyhosts)
-        for (hptr = nptr->hosts; hptr; hptr = hptr->next)
+      if (copy)
+      {
+        struct AccessChannel *acptr = NULL;
+
+        /* hosts list */
+        for (hptr = nptr->hosts; hptr != NULL; hptr = hptr->next)
           AddHostToNick(hptr->hostmask, nptr->nextlink);
 
-#ifdef CHANNELSERVICES
-      /*
-       * The new master should keep the list of founder channels from the
-       * old master
-       */
-      nptr->nextlink->FounderChannels = nptr->FounderChannels;
-      nptr->nextlink->fccnt = nptr->fccnt;
-      nptr->FounderChannels = NULL;
-      nptr->fccnt = 0;
-
-#endif /* CHANNELSERVICES */
+        /* access list */
+        for (acptr = nptr->AccessChannels; acptr != NULL;
+            acptr = acptr->next)
+          AddAccessChannel(nptr->nextlink, acptr->cptr, acptr->accessptr);
+      }
 
       master = nptr->nextlink;
 
@@ -2232,11 +2232,8 @@ n_identify(struct Luser *lptr, int ac, char **av)
       /*
        * Update last seen user@host info
        */
-
-      if (realptr->lastu)
-        MyFree(realptr->lastu);
-      if (realptr->lasth)
-        MyFree(realptr->lasth);
+      MyFree(realptr->lastu);
+      MyFree(realptr->lasth);
       realptr->lastu = MyStrdup(lptr->username);
       realptr->lasth = MyStrdup(lptr->hostname);
     } /* if (LastSeenInfo) */

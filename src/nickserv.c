@@ -977,10 +977,11 @@ DeleteNick(struct NickInfo *nickptr)
             n_NickServ, nickptr->nick, cptr->name);
             
         /* And delete channel finally */
-        DeleteChan(cptr);
+        MyFree(cptr->founder);
+        cptr->flags |= CS_DELETE;
+        /* DeleteChan(cptr); */
       }
 
-      assert(nickptr->FounderChannels != NULL);
       nickptr->FounderChannels = ftmp;
     }
 

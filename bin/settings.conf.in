@@ -486,6 +486,13 @@ AllowKillImmed
 
 MaxChansPerUser    10
 
+# MinChanUsers <value> [RECOMMENDED]
+#
+#  Set this to the minimum channel users required to
+# be able to register a channel.
+
+MinChanUsers       10
+
 # MaxAkicks <value> [RECOMMENDED]
 #
 #  Set this to the maximum number of auto-kicks a channel

@@ -143,6 +143,7 @@ int       AllowKillImmed;
 int	      AllowGuardChannel;
 
 int       MaxChansPerUser;
+int       MinChanUsers;
 int       MaxAkicks;
 long      InhabitTimeout;
 int       AllowAccessIfSOp;
@@ -307,6 +308,7 @@ struct Directive directives[] =
 
     /* ChanServ Configuration */
     { "MaxChansPerUser", D_OPTIONAL,  { { PARAM_INT, &MaxChansPerUser } } },
+    { "MinChanUsers", D_OPTIONAL,     { { PARAM_INT, &MinChanUsers } } },
     { "MaxAkicks", D_OPTIONAL,        { { PARAM_INT, &MaxAkicks } } },
     { "InhabitTimeout", D_OPTIONAL,   { { PARAM_TIME, &InhabitTimeout } } },
     { "AllowAccessIfSOp", D_OPTIONAL, { { PARAM_SET, &AllowAccessIfSOp } } },

@@ -109,6 +109,7 @@ extern  int       MaxAkicks;
 extern  int       MaxBinds;
 extern  int       MaxChannel;
 extern  int       MaxChansPerUser;
+extern  int       MinChanUsers;
 extern  int       MaxClones;
 extern  int       MaxConnections;
 extern  int       MaxKill;

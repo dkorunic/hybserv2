@@ -3107,6 +3107,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   struct ChanInfo *cptr;
   struct Userlist *userptr;
   struct NickInfo *master;
+  struct Channel *chptr;
 
   if (ac < 3)
     {
@@ -3158,7 +3159,22 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (!IsChannelOp(FindChannel(av[1]), lptr) && !IsValidAdmin(lptr))
+  chptr = FindChannel(av[1]);
+
+  if (chptr == NULL)
+    return;
+
+  if (!IsValidAdmin(lptr) && MinChanUsers &&
+      (chptr->numusers < MinChanUsers))
+  {
+    notice(n_ChanServ, lptr->nick,
+        "You need %d more users to register channel [\002%s\002]",
+        MinChanUsers - chptr->numusers,
+        av[1]);
+    return;
+  }
+
+  if (!IsChannelOp(chptr, lptr) && !IsValidAdmin(lptr))
     {
       notice(n_ChanServ, lptr->nick,
           "You are not a channel operator on [\002%s\002]",

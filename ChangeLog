@@ -1,5 +1,8 @@
-Hybserv-HEAD: Wed, 24 Aug 2005 14:26:08 +0200
+Hybserv-HEAD: Wed,  7 Sep 2005 21:03:03 +0200
 
+  * add MinChanUsers, which allows administrator to set minimum channel
+    users requirement for channel registration
+  * fix reload coring services
   * new channels registered by opers are not NOEXPIRE by default
   * implement options for ChanServ LIST
   * add reason informations for nick and channel forbid [can be seen with

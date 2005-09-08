@@ -6792,25 +6792,25 @@ fi
 
 echo "
 Configuration:
-  Source revision:      ${ac_cv_revision}
-  Detected OS:          ${host_os}
-  Install path:         ${prefix}/hybserv
+  Source revision ...... ${ac_cv_revision}
+  Detected OS .......... ${host_os}
+  Install path ......... ${prefix}/hybserv
 Compiler suite:
-  Compiler:             ${CC}
-  Compiler flags:       ${CFLAGS}
-  Preprocessor:         ${CPP}
-  Preprocessor flags:   ${CPPFLAGS}
-  Linker flags:         ${LDFLAGS}
-  Libraries to link:    ${LIBS}
+  Compiler ............. ${CC}
+  Compiler flags ....... ${CFLAGS}
+  Preprocessor ......... ${CPP}
+  Preprocessor flags ... ${CPPFLAGS}
+  Linker flags ......... ${LDFLAGS}
+  Libraries to link .... ${LIBS}
 Compile configuration:
-  Configured network:   ${ac_cv_network}
-  Nick length:          ${ac_cv_nicklen}
-  Channel length:       ${ac_cv_channellen}
-  Topic length:         ${ac_cv_topiclen}
+  Configured network ... ${ac_cv_network}
+  Nick length .......... ${ac_cv_nicklen}
+  Channel length ....... ${ac_cv_channellen}
+  Topic length ......... ${ac_cv_topiclen}
 Extra configurations:
-  Asserts enabled:      ${cf_enable_asserts}
-  Coredumps enabled:    ${cf_enable_gimmecore}
-  Daemontools enabled:  ${cf_enable_daemontools}
+  Asserts enabled ...... ${cf_enable_asserts}
+  Coredumps enabled .... ${cf_enable_gimmecore}
+  Daemontools enabled .. ${cf_enable_daemontools}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

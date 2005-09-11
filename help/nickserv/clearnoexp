@@ -1,9 +1,0 @@
-SYNTAX: %bCLEARNOEXP <pattern>%b
-
-Clears the noexpire flags on registered nicknames that match
-%b<pattern>%b. The change will undo previous %bSET OPER ON%b
-and %bNOEXPIRE%b commands.
-
-Example:
-        CLEARNOEXP *
-        Clears %ball%b noexpire flags

@@ -1,4 +1,4 @@
-Syntax: %bSET SECURE {ON|OFF}%b
+Syntax: %bSET <nickname> SECURE {ON|OFF}%b
 
 If %bSECURE%b is ON, clients that use your nickname
 will be required to %bIDENTIFY%b regardless of
@@ -10,4 +10,6 @@ ACCESS list.  When %bSECURE%b is OFF, clients
 that use your nickname will not be killed, if they
 do not IDENTIFY, but they will not be allowed to
 execute %N commands without first IDENTIFY'ing.
-See: %bSET UNSECURE%b
+Note that settings should be usually applied to
+%bmaster%b nickname.
+See: %bUNSECURE%b

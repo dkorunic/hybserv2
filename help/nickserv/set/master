@@ -1,4 +1,4 @@
-Syntax: %bSET MASTER <nickname>%b
+Syntax: %bSET <nickname> MASTER <nickname>%b
 
 Resets the master nickname for your nickname link to
 <nickname>. The master nickname contains the %bACCESS%b
@@ -7,5 +7,5 @@ the link are aliased to the master nickname. In order
 to change the master nickname, <nickname> must already
 be in the nickname link (through the %bLINK%b command).
 Example:
-        %b/msg %N SET MASTER MainNick%b
+        %b/msg %N SET nick MASTER MainNick%b
           Sets the new master to "MainNick".

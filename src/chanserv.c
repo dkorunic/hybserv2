@@ -4666,8 +4666,8 @@ static void
 c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
-  struct ChanInfo *cptr;
-  struct Command *cmdptr;
+  struct ChanInfo *cptr = NULL;
+  struct Command *cmdptr = NULL;
 
   if (ac < 3)
     {
@@ -7798,33 +7798,25 @@ static void c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
     {
       notice(n_ChanServ, lptr->nick,
              "Syntax: \002NOEXPIRE <channel> {ON|OFF}\002");
-      notice(n_ChanServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_ChanServ,
+      notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
              "NOEXPIRE");
       return;
     }
 
   RecordCommand("%s: %s!%s@%s NOEXPIRE [%s] %s",
-                n_ChanServ,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname,
-                av[1],
-                (ac < 3) ? "" : StrToupper(av[2]));
+      n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
+      av[1], (ac < 3) ? "" : StrToupper(av[2]));
 
   if (!(cptr = FindChan(av[1])))
     {
-      notice(n_ChanServ, lptr->nick,
-             ERR_CH_NOT_REGGED,
-             av[1]);
+      notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
       return;
     }
 
   if (ac < 3)
     {
       notice(n_ChanServ, lptr->nick,
-             "NoExpire for channel %s is [\002%s\002]",
+             "NoExpire for channel [\002%s\002] is [\002%s\002]",
              cptr->name,
              (cptr->flags & CS_NOEXPIRE) ? "ON" : "OFF");
       return;

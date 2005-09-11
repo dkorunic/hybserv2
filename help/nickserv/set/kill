@@ -1,4 +1,4 @@
-Syntax: %bSET KILL {ON|OFF|IMMED}%b
+Syntax: %bSET <nickname> KILL {ON|OFF|IMMED}%b
 
  This toggles kill protection for your nickname ON/OFF.
 If kill protection is on, %N will forcibly remove users
@@ -7,10 +7,13 @@ match a hostmask on your %bACCESS%b list.
 
  If you specify IMMED, users who are not on your access
 list will be killed immediately, without a delay. If you
-%bSET SECURE%b ON in addition to this option, the user
+set it ON in addition to this option, the user
 will be given a one minute delay to identify. Otherwise
 they will never get a chance to identify, even if they come
 from a known host because of the definition of SET SECURE.
+Note that settings should be usually applied to
+%bmaster%b nickname.
 
  Use this option carefully. Some administrators may opt
 to completely disable SET KILL IMMED.
+

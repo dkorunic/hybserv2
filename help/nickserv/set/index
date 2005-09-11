@@ -1,8 +1,9 @@
-Syntax: %bSET <option> [parameters]%b
+Syntax: %bSET <nickname> <option> [parameters]%b
 
-Configures various nickname options.
+Configures various nickname options. Note that most of the
+settings should be applied to %bmaster%b nickname.
+
 %bOptions:%b
-
     AUTOMASK   Auto add new hostmasks on %bIDENTIFY%b
     EMAIL      Associate an email address with your nick
     GSM        Set number of mobile phone for this user
@@ -10,7 +11,6 @@ Configures various nickname options.
     KILL       Turn kill protection on or off
     MASTER     Reset the master nickname for your link
     MEMOS      Allow memos sent to your nick
-    NOEXPIRE   Turn nickname expiration on or off
     NOTIFY     Turn notification of new memos on/off
     PASSWORD   Reset your nickname password
     PHONE      Set the phone for this user

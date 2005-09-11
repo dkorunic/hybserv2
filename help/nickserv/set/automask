@@ -1,6 +1,8 @@
-Syntax: %bSET AUTOMASK {ON|OFF}%b
+Syntax: %bSET <nickname> AUTOMASK {ON|OFF}%b
 
 This toggles auto-adding of new hostmasks ON/OFF.  If
 %bAUTOMASK%b is ON, and you %bIDENTIFY%b from an
 unknown host, the hostmask will automaticaly be added
 to your %bACCESS%b list.
+Note that settings should be usually applied to
+%bmaster%b nickname.

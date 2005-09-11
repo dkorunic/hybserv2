@@ -1,5 +1,9 @@
-Hybserv-HEAD: Wed,  7 Sep 2005 21:03:03 +0200
+Hybserv-HEAD: Sun, 11 Sep 2005 23:30:19 +0200
 
+  * fixes for NickServ's set EXPIRE
+  * rewrote n_set* group of functions to allow SET <nickname> PARAM
+    [flags] for any nickname linked with sender nickame and for admins to be
+    able to change settings for users, if EMPOWERADMINMORE
   * add MinChanUsers, which allows administrator to set minimum channel
     users requirement for channel registration
   * fix reload coring services

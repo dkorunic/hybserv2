@@ -3558,7 +3558,7 @@ static void n_set_url(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     {
       nptr->url = NULL;
       notice(n_NickServ, lptr->nick,
-             "URL for [[\002%s\002] has been cleared",
+             "URL for [\002%s\002] has been cleared",
              nptr->nick);
       return;
     }

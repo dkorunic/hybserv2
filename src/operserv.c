@@ -843,7 +843,7 @@ static struct OperCommand *
 /*
 os_notice()
   args: struct Luser *lptr, int sockfd, char *msg
-  purpose: send a NOTICE to 'lptr->nick' with 'msg'
+  purpose: send a NOTICE to 'lptr->nick' with 'msg' or MSG via DCC
   return: none
 */
 
@@ -3301,10 +3301,7 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
 
   if (target->firstchan)
     {
-      if (sockfd == NODCC)
-        os_notice(lptr, sockfd, "Channels:");
-      else
-        writesocket(sockfd, "Channels:");
+      os_notice(lptr, sockfd, "Channels:");
 
       for (tempchan = target->firstchan; tempchan; tempchan = tempchan->next)
         {
@@ -3313,13 +3310,7 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
                 (tempchan->flags & CH_VOICED) ? "+" : "",
                 tempchan->chptr->name);
 
-          if (sockfd == NODCC)
-            os_notice(lptr, sockfd, "%s", tmp);
-          else
-            {
-              strcat(tmp, "\r\n");
-              writesocket(sockfd, tmp);
-            }
+          os_notice(lptr, sockfd, "%s", tmp);
         }
     }
 } /* show_trace() */
@@ -3678,10 +3669,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   os_notice(lptr, sockfd, "IrcOps:    %d", icnt);
   os_notice(lptr, sockfd, "Total:     %d", cptr->numusers);
 
-  if (sockfd == NODCC)
-    os_notice(lptr, sockfd, "Nicks:");
-  else
-    writesocket(sockfd, "Nicks:");
+  os_notice(lptr, sockfd, "Nicks:");
 
   for (tempuser = cptr->firstuser; tempuser; tempuser = tempuser->next)
     {
@@ -3690,13 +3678,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
             (tempuser->flags & CH_VOICED) ? "+" : "",
             tempuser->lptr->nick);
 
-        if (sockfd == NODCC)
-          os_notice(lptr, sockfd, "%s", temp);
-        else
-          {
-            strcat(temp, "\r\n");
-            writesocket(sockfd, temp);
-          }
+      os_notice(lptr, sockfd, "%s", temp);
     }
 
   if (cptr->firstban)
@@ -6262,8 +6244,8 @@ CalcMem(char *nick, int socket)
   struct UserChannel *userc;
   struct ChannelUser *chanu;
   struct Luser *lptr = NULL;
-#ifdef GECOSBANS
 
+#ifdef GECOSBANS
   struct ChannelGecosBan *tempgecosban;
 #endif /* GECOSBANS */
 
@@ -6386,8 +6368,6 @@ CalcMem(char *nick, int socket)
 
   if (nick)
     lptr = FindClient(nick);
-  if (!lptr)
-    nick = NULL;
   
   for (tempuser = ClientList; tempuser; tempuser = tempuser->next)
     {
@@ -6780,101 +6760,67 @@ CalcMem(char *nick, int socket)
       ircsprintf(sendstr,
                  "Clients:    %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalUsers, clientm, clientm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Server structures usage */
       ircsprintf(sendstr,
                  "Servers:    %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalServers, servm, servm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Channel structures usage */
       ircsprintf(sendstr,
                  "Channels:   %5.0f (%10.0fb) (%10.2fkb)",
                  Network->TotalChannels, chanm, chanm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Channel ban mem usage */
       ircsprintf(sendstr,
                  "Bans:       %5lu (%10.0fb) (%10.2fkb)",
                  chanbanc, chanbanm, chanbanm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
 #ifdef GECOSBANS
       /* Channel gecos ban mem usage */
       ircsprintf(sendstr,
                  "Gecos Bans:       %5ld (%10.0fb) (%10.2fkb)",
                  changecosbanc, changecosbanm, changecosbanm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 #endif /* GECOSBANS */
 
       /* Channel exception memory usage */
       ircsprintf(sendstr,
                  "Exceptions: %5lu (%10.0fb) (%10.2fkb)",
                  chanexceptc, chanexceptm, chanexceptm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
-
+      os_notice(lptr, socket, "%s", sendstr);
       ircsprintf(sendstr,
                  "Conf lines: %5lu (%10.0fb) (%10.2fkb)",
                  confc, confm, confm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       ircsprintf(sendstr,
                  "Ignores: %8lu (%10.0fb) (%10.2fkb)",
                  igc, igm, igm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       ircsprintf(sendstr,
                  "Partyline: %6d (%10.0fb) (%10.2fkb)",
                  Network->TotalConns, connm, connm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
 #ifdef NICKSERVICES
 
       ircsprintf(sendstr,
                  "NickServ:         (%10.0fb) (%10.2fkb)",
                  nsm, nsm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
 #ifdef CHANNELSERVICES
 
       ircsprintf(sendstr,
                  "ChanServ:         (%10.0fb) (%10.2fkb)",
                  csm, csm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 #endif
 
 #ifdef MEMOSERVICES
@@ -6882,10 +6828,7 @@ CalcMem(char *nick, int socket)
       ircsprintf(sendstr,
                  "MemoServ:         (%10.0fb) (%10.2fkb)",
                  msm, msm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 #endif
 
 #endif /* NICKSERVICES */
@@ -6895,47 +6838,32 @@ CalcMem(char *nick, int socket)
       ircsprintf(sendstr,
                  "StatServ:         (%10.0fb) (%10.2fkb)",
                  ssm, ssm / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 #endif /* STATSERVICES */
 
       /* Client Hash */
       ircsprintf(sendstr,
                  "Client Hash:      (%10.0fb) (%10.2fkb)",
                  hashc, hashc / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Channel Hash */
       ircsprintf(sendstr,
                  "Channel Hash:     (%10.0fb) (%10.2fkb)",
                  hashch, hashch / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Clone Hash */
       ircsprintf(sendstr,
                  "Clone Hash:       (%10.0fb) (%10.2fkb)",
                  hashcl, hashcl / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
 
       /* Total memory used */
       ircsprintf(sendstr,
                  "Total:            (%10.0fb) (%10.2fkb) (%10.2fmb)",
                  total, total / 1024, (total / 1024) / 1024);
-      if (socket == NODCC)
-        os_notice(lptr, socket, "%s", sendstr);
-      else
-        writesocket(socket, sendstr);
+      os_notice(lptr, socket, "%s", sendstr);
     } /* if (nick || (socket != NODCC)) */
 
   return (total);

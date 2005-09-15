@@ -1363,7 +1363,6 @@ ss_showstats(struct Luser *lptr, int ac, char **av)
 } /* ss_showstats() */
 
 
-/* markgreplog */
 
 /*
  * static void ss_greplog() 
@@ -1375,117 +1374,79 @@ ss_showstats(struct Luser *lptr, int ac, char **av)
 static void
 ss_greplog(struct Luser *lptr, int ac, char **av )
 {
-  char            who[32];
-  char            what[32];
-  char            nick[16];
   int             day;
-  char            buf[512];
-  char            szBuf[128];
+  char            buf[MAXLINE];
   char            date[10];
   FILE *          lf;
-  char            grep_log_filename[128];
+  char            grep_log_filename[MAXLINE];
   int             i;
-  time_t          t;
-  struct tm       tm;
+  struct tm *     tm;
   int             iCounter;
-
-  memset( &who,  0x00, 16 );
-  memset( &what, 0x00, 32 );
-  memset( &nick, 0x00, 16 );
 
   if (ac < 3 )
     {
       notice(n_StatServ,lptr->nick,
-             "Syntax: \002GREPLOG <service> <pattern> [days] \002");
+             "Syntax: \002GREPLOG <service> <pattern> [days]\002");
       return;
     }
-
-
-  if( strlen(av[1]) > 15 || strlen(av[2]) > 31 || strlen(lptr->nick)
-      > 15 )
-    {
-      notice(n_StatServ,lptr->nick,
-             "Invalid params!" );
-      return;
-    }
-
-  ircsprintf( who,  "%s", StrToupper(av[1]));
-  ircsprintf( what, "%s", StrToupper(av[2]));
-  ircsprintf( nick, "%s", lptr->nick );
 
   if (ac > 3 && av[3] != NULL)
     day = atoi(av[3]);
   else
     day = 0;
 
-  putlog( LOG1, "Who:%s What:%s Nick:%s",who,what,nick);
-
-
   if (day < 0)
     {
-      notice(n_StatServ,lptr->nick,
-             "Day count should be positive." );
+      notice(n_StatServ, lptr->nick, "Day count should be positive.");
       return;
     }
 
-  if( !GetService( who ) )
+  if (!GetService(av[1]))
     {
-      notice(n_StatServ,lptr->nick,
-             "Invalid service!" );
+      notice(n_StatServ, lptr->nick, "Invalid service!");
       return;
     }
 
   iCounter = 0;
-  time(&t);
-  tm = *localtime(&t);
-  putlog( LOG1, "Log browsing started.");
+  tm = localtime(&current_ts);
+  putlog(LOG1, "Log browsing started.");
+  putlog(LOG1, "av[1]:%s av[2]:%s Nick:%s", av[1], av[2], lptr->nick);
 
-  ircsprintf( date, "%4.4d%2.2d%2.2d", tm.tm_year+1900, tm.tm_mon+1,
-              tm.tm_mday );
+  ircsprintf(date, "%4.4d%2.2d%2.2d",
+      tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
 
-  for( i=0; i<=day; i++ )
+  for (i = 0; i <= day; i++)
     {
-      if( i == 0 )
+      if (i == 0)
         ircsprintf(grep_log_filename, "%s", LogFile );
       else
-        ircsprintf(grep_log_filename, "%s.%8.8ld",
-                   LogFile,
-                   korectdat(atol(date), i*-1)
-                  );
+        ircsprintf(grep_log_filename, "%s.%8.8ld", LogFile,
+            korectdat(atol(date), -i));
 
       if ((lf = fopen(grep_log_filename, "r")) == NULL)
         {
-          notice(n_StatServ,lptr->nick,
-                 "No Log file detected :%s",
-                 grep_log_filename );
+          notice(n_StatServ, lptr->nick, "No log file: %s",
+                 grep_log_filename);
           continue;
         }
-      notice(n_StatServ,lptr->nick,
-             "Searching for string [%s] with service [%s] for [%d] days in file [%s]",
-             what,
-             who,
-             day,
-             grep_log_filename );
+      notice(n_StatServ, lptr->nick,
+        "Searching for [%s] with service [%s] for [%d] days in file [%s]",
+        av[2], av[1], day, grep_log_filename);
 
-      while ( fgets ( buf, 128 - 1, lf ) )
+      while (fgets(buf, 128 - 1, lf))
         {
-
-          memset( szBuf,0x00, sizeof( szBuf ) );
-          strcpy( szBuf, buf );
-
-          if( strncmp( StrToupper((char*)&szBuf[25]), who, strlen(who) ) == 0 )
-            if (match(what, StrToupper((char*)&szBuf[25+strlen(who)+2]) ))
+          if (ircncmp(buf + 25, av[1], strlen(av[1])) == 0)
+            if (match(av[2], buf + 25 + strlen(av[1]) + 2))
               {
                 iCounter ++;
-                notice(n_StatServ,lptr->nick,
-                       "[%d] ... %s", iCounter,  buf );
+                notice(n_StatServ, lptr->nick,
+                       "[%d] ... %s", iCounter, buf);
               }
         }
-      fclose( lf);
+      fclose(lf);
     }
-  notice(n_StatServ,lptr->nick,
-         "End of search." );
-  putlog( LOG1, "Log browsing ended.");
+  notice(n_StatServ, lptr->nick, "End of search." );
+  putlog(LOG1, "Log browsing ended.");
 
   return;
 
@@ -1496,7 +1457,6 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
  *
  * get date before / or after dat1 with dni days
  */
-
 long korectdat( long dat1, int dni)
 {
   int g, m, d;

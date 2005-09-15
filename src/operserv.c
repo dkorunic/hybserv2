@@ -609,7 +609,7 @@ os_loaddata()
     tempuser->umodes = 0;
 
   cnt = 0;
-  while (fgets(line, MAXLINE - 1, fp))
+  while (fgets(line, sizeof(line), fp))
     {
       cnt++;
 
@@ -688,7 +688,7 @@ os_loaddata()
         }
 
       MyFree(av);
-    } /* while (fgets(line, MAXLINE - 1, fp)) */
+    }
 
   fclose(fp);
 
@@ -727,7 +727,7 @@ int ignore_loaddata()
   for (temp = IgnoreList; temp; temp = temp->next)
     temp->expire = current_ts;
 
-  while (fgets(line, MAXLINE - 1, fp))
+  while (fgets(line, sizeof(line), fp))
   {
     cnt++;
     found = 0;
@@ -1737,7 +1737,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
   jcnt = 0;
-  while (fgets(line, MAXLINE - 1, configfp))
+  while (fgets(line, sizeof(line), configfp))
     {
       strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");
@@ -2240,7 +2240,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  while (fgets(line, MAXLINE - 1, configfp))
+  while (fgets(line, sizeof(line), configfp))
     {
       strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");
@@ -2450,7 +2450,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
       return;
     }
 
-  while (fgets(line, MAXLINE - 1, configfp))
+  while (fgets(line, sizeof(line), configfp))
     {
       strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");

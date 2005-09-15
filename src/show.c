@@ -21,12 +21,12 @@
 #include "settings.h"
 #include "show.h"
 #include "timestr.h"
+#include "mystring.h"
 
 #ifdef NICKSERVICES
 
 static void InitData(void);
 static long parseargs(int, char **);
-
 
 static void DisplayNick(struct NickInfo *, int);
 

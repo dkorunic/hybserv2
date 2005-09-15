@@ -16,6 +16,7 @@
 #include "misc.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 /*
  * timeago()
@@ -380,36 +381,8 @@ struct timeval *GetTime(struct timeval *timer)
  */
 long GetGMTOffset(time_t unixtime)
 {
-#if 0
-  struct tm *gmt,
-        *lt;
-  long days,
-  hours,
-  minutes,
-  seconds;
-#endif
-
   struct tm *tm_gmt;
 
   tm_gmt = gmtime(&TimeStarted);
   return (TimeStarted - mktime(tm_gmt));
-
-#if 0
-
-  gmt = gmtime(&unixtime);
-  lt = localtime(&unixtime);
-
-  days = (long) (lt->tm_yday - gmt->tm_yday);
-  if (days < (-1))
-    hours = 24;
-  else if (days > 1)
-    hours = (-24);
-  else
-    hours = (days * 24) + (long) (lt->tm_hour - gmt->tm_hour);
-
-  minutes = (hours * 60) + (long) (lt->tm_min - gmt->tm_min);
-  seconds = (minutes * 60) + (long) (lt->tm_sec - gmt->tm_sec);
-
-  return (seconds);
-#endif
 } /* GetGMTOffset() */

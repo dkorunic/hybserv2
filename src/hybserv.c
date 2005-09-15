@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     pid_t mypid;
     char line[MAXLINE];
 
-    fgets(line, MAXLINE, pidfile);
+    fgets(line, sizeof(line), pidfile);
     fclose(pidfile);
     mypid = atoi(line);
     if (mypid && !kill(mypid, 0))

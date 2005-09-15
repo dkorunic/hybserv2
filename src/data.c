@@ -26,6 +26,7 @@
 #include "seenserv.h"
 #include "misc.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 static int CopyFile(char *oldfile, char *newfile);
 

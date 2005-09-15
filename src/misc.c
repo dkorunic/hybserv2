@@ -27,6 +27,7 @@
 #include "sprintf_irc.h"
 #include "nickserv.h"
 #include "server.h"
+#include "mystring.h"
 
 extern char *crypt(const char *, const char *);
 #ifdef HAVE_SOLARIS

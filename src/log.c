@@ -20,6 +20,7 @@
 #include "settings.h"
 #include "sprintf_irc.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 /*
 putlog()

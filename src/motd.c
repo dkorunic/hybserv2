@@ -18,6 +18,7 @@
 #include "sock.h"
 #include "sprintf_irc.h"
 #include "misc.h"
+#include "mystring.h"
 
 /*
 InitMessageFile()
@@ -84,7 +85,7 @@ ReadMessageFile(struct MessageFile *fileptr)
 
   CurrentLine = NULL;
 
-  while (fgets(buffer, MESSAGELINELEN - 1, fptr))
+  while (fgets(buffer, sizeof(buffer), fptr))
     {
       if ((ch = strchr(buffer, '\n')))
         *ch = '\0';

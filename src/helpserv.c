@@ -315,7 +315,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
             return; /* no other *Serv's allow dcc chat */
         }
 
-      while (fgets(line, MAXLINE - 1, fp))
+      while (fgets(line, sizeof(line), fp))
         {
           if (IsEOL(*line))
           {
@@ -459,7 +459,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           return;
         }
 
-      while (fgets(line, MAXLINE - 1, fp))
+      while (fgets(line, sizeof(line), fp))
         {
           if (IsEOL(*line))
           {

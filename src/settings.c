@@ -19,6 +19,7 @@
 #include "settings.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 /*
  * These variables, or directives, are set by parsing
@@ -829,7 +830,7 @@ LoadSettings(int rehash)
   cnt = 0;
   goodread = 1;
 
-  while (fgets(buffer, MAXLINE - 1, fp))
+  while (fgets(buffer, sizeof(buffer), fp))
     {
       cnt++;
       if (buffer[0] != '#') /* comment line */

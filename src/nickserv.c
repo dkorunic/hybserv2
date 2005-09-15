@@ -334,7 +334,7 @@ ns_loaddata()
   islink = 0;
 
   /* load data into list */
-  while (fgets(line, MAXLINE - 1, fp))
+  while (fgets(line, sizeof(line), fp))
     {
       cnt++;
       ac = SplitBuf(line, &av);

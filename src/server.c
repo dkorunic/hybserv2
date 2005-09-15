@@ -2311,7 +2311,7 @@ s_motd(int ac, char **av)
          who,
          Me.name);
 
-  while (fgets(line, MAXLINE - 1, fp))
+  while (fgets(line, sizeof(line), fp))
     {
       if (IsEOL(*line))
         {

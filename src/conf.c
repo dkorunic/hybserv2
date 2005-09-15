@@ -256,7 +256,7 @@ ParseConf(char *filename, int rehash)
 
   scnt = 0;
 
-  while (fgets(line, MAXLINE - 1, fileptr))
+  while (fgets(line, sizeof(line), fileptr))
     {
       /*
        * you may add comments to config file using a '#'

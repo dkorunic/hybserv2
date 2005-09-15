@@ -66,7 +66,7 @@ SendMotd(int sockfd)
       return;
     }
 
-  while (fgets(line, MAXLINE - 1, fp))
+  while (fgets(line, sizeof(line), fp))
     {
       final = Substitute(NULL, line, sockfd);
       if (final && (final != (char *) -1))

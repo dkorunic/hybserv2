@@ -100,7 +100,7 @@ ReadMessageFile(struct MessageFile *fileptr)
        * characters should work
        */
       if (!NewLine->line[0])
-        strcpy(NewLine->line, "\002\002");
+        strlcpy(NewLine->line, "\002\002", sizeof(NewLine->line));
 
       NewLine->next = NULL;
 

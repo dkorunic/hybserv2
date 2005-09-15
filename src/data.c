@@ -558,7 +558,7 @@ WriteOpers()
           ircsprintf(temp, "%s ", tempuser->nick);
           donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
                                        + 1);
-          strcat(donestr, temp);
+          strlcat(donestr, temp, sizeof(donestr));
         }
     }
 

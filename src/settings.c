@@ -903,7 +903,7 @@ int SaveSettings()
                   {
                     ircsprintf(tmp, "\"%s\" ",
                                *(char **) dptr->param[ii].ptr);
-                    strcat(buffer, tmp);
+                    strlcat(buffer, tmp, sizeof(buffer));
                   }
 
                 break;
@@ -913,7 +913,7 @@ int SaveSettings()
               {
                 ircsprintf(tmp, "%s ",
                            timeago(*(long *) dptr->param[ii].ptr, 4));
-                strcat(buffer, tmp);
+                strlcat(buffer, tmp, sizeof(buffer));
 
                 break;
               } /* case PARAM_TIME */
@@ -922,7 +922,7 @@ int SaveSettings()
             case PARAM_PORT:
               {
                 ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
-                strcat(buffer, tmp);
+                strlcat(buffer, tmp, sizeof(buffer));
 
                 break;
               }
@@ -942,10 +942,10 @@ int SaveSettings()
 #if 0
                     ircsprintf(tmp, "%d ",
                                *(int *) dptr->param[ii].ptr);
-                    strcat(buffer, tmp);
+                    strlcat(buffer, tmp, sizeof(buffer));
 #endif
                     /* Fill in buffer.. */
-                    strcat(buffer, " ");
+                    strlcat(buffer, " ", sizeof(buffer));
                     /* and then do continue -kre */
                   }
                 else

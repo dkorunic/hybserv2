@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
   InitSignals();
 
   /* Initialise random number generator -kre */
-  srandom(current_ts + getpid());
+  srandom(current_ts);
 
   /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)

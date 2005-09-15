@@ -1031,15 +1031,15 @@ m_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   for (memoptr = mi->memos; memoptr; memoptr = memoptr->next)
     {
       if (memoptr->flags & MS_DELETE)
-        strcpy(status, "(D)");
+        strlcpy(status, "(D)", sizeof(status));
       else if (mi->name[0] != '#')
         {
           if (memoptr->flags & MS_READ)
-            strcpy(status, "(R)");
+            strlcpy(status, "(R)", sizeof(status));
           else
-            strcpy(status, "(N)");
+            strlcpy(status, "(N)", sizeof(status));
           if (memoptr->flags & MS_REPLIED)
-            strcat(status, "(RE)");
+            strlcat(status, "(RE)", sizeof(status));
         }
       else
         status[0] = '\0';
@@ -1165,7 +1165,7 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (index)
     ircsprintf(istr, "%d", index);
   else
-    strcpy(istr, "ALL");
+    strlcpy(istr, "ALL", sizeof(istr));
 
   if (ac >= 3)
     notice(n_MemoServ, lptr->nick,
@@ -1313,7 +1313,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (index)
     ircsprintf(istr, "Memo #%d has", index);
   else
-    strcpy(istr, "All memos have");
+    strlcpy(istr, "All memos have", sizeof(istr));
 
   if (ac >= 3)
     notice(n_MemoServ, lptr->nick,
@@ -1423,7 +1423,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (index)
     ircsprintf(istr, "Memo #%d has", index);
   else
-    strcpy(istr, "All memos have");
+    strlcpy(istr, "All memos have", sizeof(istr));
 
   if (ac >= 3)
     notice(n_MemoServ, lptr->nick,
@@ -1588,7 +1588,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           memoptr->sent = current_ts;
           memoptr->index = target->memocnt;
 
-          strcpy(buf, "[Fwd]: ");
+          strlcpy(buf, "[Fwd]: ", sizeof(buf));
           strncat(buf, fromptr->text, MAXLINE - 8);
           memoptr->text = MyStrdup(buf);
 
@@ -1753,8 +1753,8 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   {
     memotext = (char *) MyRealloc(memotext, strlen(memotext) +
       strlen(av[ii]) + (2 * sizeof(char)));
-    strcat(memotext, " ");
-    strcat(memotext, av[ii]);
+    strlcat(memotext, " ", sizeof(memotext));
+    strlcat(memotext, av[ii], sizeof(memotext));
     ii++;
   }
 

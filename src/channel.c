@@ -340,13 +340,13 @@ struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
 
   if (line[ncnt][0] != ':') /* names list *should* start w/ a : */
   {                         /* if it doesn't, theres a limit and/or key */
-    strcat(modes, " ");
-    strcat(modes, line[ncnt]);
+    strlcat(modes, " ", sizeof(modes));
+    strlcat(modes, line[ncnt], sizeof(modes));
     ncnt++;
     if (line[ncnt][0] != ':')
     {
-      strcat(modes, " ");
-      strcat(modes, line[ncnt]);
+      strlcat(modes, " ", sizeof(modes));
+      strlcat(modes, line[ncnt], sizeof(modes));
       ncnt++;
     }
   }
@@ -1442,9 +1442,9 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
   mcnt = 1;
   for (ii = 0; ii < acnt; ii++)
   {
-    strcat(done, av[ii]);
+    strlcat(done, av[ii], sizeof(done));
     if (mcnt != MaxModes)
-      strcat(done, " ");
+      strlcat(done, " ", sizeof(done));
     else
     {
       mcnt = 0;
@@ -1500,8 +1500,8 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
       ircsprintf(temp, "*!%s", mask);
       bans = MyRealloc(bans, strlen(bans) + strlen(temp)
           + (2 * sizeof(char)));
-      strcat(bans, temp);
-      strcat(bans, " ");
+      strlcat(bans, temp, sizeof(bans));
+      strlcat(bans, " ", sizeof(bans));
       MyFree(mask);
     }
 

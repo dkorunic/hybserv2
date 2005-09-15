@@ -283,27 +283,27 @@ DisplayNick(struct NickInfo *realptr, int detail)
 
       buf[0] = '\0';
       if (nptr->flags & NS_PROTECTED)
-        strcat(buf, "Kill Protection, ");
+        strlcat(buf, "Kill Protection, ", sizeof(buf));
       if (nptr->flags & NS_NOEXPIRE)
-        strcat(buf, "NoExpire, ");
+        strlcat(buf, "NoExpire, ", sizeof(buf));
       if (nptr->flags & NS_AUTOMASK)
-        strcat(buf, "AutoMask, ");
+        strlcat(buf, "AutoMask, ", sizeof(buf));
       if (nptr->flags & NS_PRIVATE)
-        strcat(buf, "Private, ");
+        strlcat(buf, "Private, ", sizeof(buf));
       if (realptr->flags & NS_FORBID)
-        strcat(buf, "Forbidden, ");
+        strlcat(buf, "Forbidden, ", sizeof(buf));
       if (nptr->flags & NS_SECURE)
-        strcat(buf, "Secure, ");
+        strlcat(buf, "Secure, ", sizeof(buf));
       if (nptr->flags & NS_UNSECURE)
-        strcat(buf, "UnSecure, ");
+        strlcat(buf, "UnSecure, ", sizeof(buf));
       if (nptr->flags & NS_HIDEALL)
-        strcat(buf, "Hidden, ");
+        strlcat(buf, "Hidden, ", sizeof(buf));
       if (nptr->flags & NS_MEMOS)
-        strcat(buf, "AllowMemos, ");
+        strlcat(buf, "AllowMemos, ", sizeof(buf));
       if (nptr->flags & NS_MEMONOTIFY)
-        strcat(buf, "MemoNotify, ");
+        strlcat(buf, "MemoNotify, ", sizeof(buf));
       if (nptr->flags & NS_MEMOSIGNON)
-        strcat(buf, "MemoSignon, ");
+        strlcat(buf, "MemoSignon, ", sizeof(buf));
 
       if (*buf)
         {
@@ -536,28 +536,28 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
 
       buf[0] = '\0';
       if (chanptr->flags & CS_TOPICLOCK)
-        strcat(buf, "TopicLock, ");
+        strlcat(buf, "TopicLock, ", sizeof(buf));
       if (chanptr->flags & CS_SECURE)
-        strcat(buf, "Secure, ");
+        strlcat(buf, "Secure, ", sizeof(buf));
       if (chanptr->flags & CS_SECUREOPS)
-        strcat(buf, "SecureOps, ");
+        strlcat(buf, "SecureOps, ", sizeof(buf));
       if (chanptr->flags & CS_GUARD)
-        strcat(buf, "ChanGuard, ");
+        strlcat(buf, "ChanGuard, ", sizeof(buf));
       if (chanptr->flags & CS_RESTRICTED)
-        strcat(buf, "Restricted, ");
+        strlcat(buf, "Restricted, ", sizeof(buf));
       if (chanptr->flags & CS_PRIVATE)
-        strcat(buf, "Private, ");
+        strlcat(buf, "Private, ", sizeof(buf));
       if (chanptr->flags & CS_FORBID)
-        strcat(buf, "Forbidden, ");
+        strlcat(buf, "Forbidden, ", sizeof(buf));
       if (chanptr->flags & CS_FORGET)
-        strcat(buf, "Forgotten, ");
+        strlcat(buf, "Forgotten, ", sizeof(buf));
       if (chanptr->flags & CS_NOEXPIRE)
-        strcat(buf, "NoExpire, ");
+        strlcat(buf, "NoExpire, ", sizeof(buf));
       if (chanptr->flags & CS_SPLITOPS)
-        strcat(buf, "SplitOps, ");
+        strlcat(buf, "SplitOps, ", sizeof(buf));
 #ifdef GECOSBANS
       if ((chanptr->flags & CS_EXPIREBANS) && BanExpire)
-        strcat(buf, "Expirebans, ");
+        strlcat(buf, "Expirebans, ", sizeof(buf));
 #endif
 
       if (*buf)
@@ -572,30 +572,30 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
       buf[0] = '\0';
       if (chanptr->modes_off)
         {
-          strcat(buf, "-");
+          strlcat(buf, "-", sizeof(buf));
           if (chanptr->modes_off & MODE_S)
-            strcat(buf, "s");
+            strlcat(buf, "s", sizeof(buf));
           if (chanptr->modes_off & MODE_P)
-            strcat(buf, "p");
+            strlcat(buf, "p", sizeof(buf));
           if (chanptr->modes_off & MODE_N)
-            strcat(buf, "n");
+            strlcat(buf, "n", sizeof(buf));
           if (chanptr->modes_off & MODE_T)
-            strcat(buf, "t");
+            strlcat(buf, "t", sizeof(buf));
           if (chanptr->modes_off & MODE_M)
-            strcat(buf, "m");
+            strlcat(buf, "m", sizeof(buf));
 #ifdef DANCER
           if (chanptr->modes_off & MODE_C)
-            strcat(buf, "c");
+            strlcat(buf, "c", sizeof(buf));
 #endif /* DANCER */
           if (chanptr->modes_off & MODE_I)
-            strcat(buf, "i");
+            strlcat(buf, "i", sizeof(buf));
           if (chanptr->modes_off & MODE_L)
-            strcat(buf, "l");
+            strlcat(buf, "l", sizeof(buf));
           if (chanptr->modes_off & MODE_K)
-            strcat(buf, "k");
+            strlcat(buf, "k", sizeof(buf));
 #ifdef DANCER
           if (chanptr->modes_off & MODE_F)
-            strcat(buf, "f");
+            strlcat(buf, "f", sizeof(buf));
 #endif /* DANCER */
         }
 
@@ -606,30 +606,30 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
       if (chanptr->modes_on || chanptr->limit || chanptr->key)
 #endif /* DANCER */
         {
-          strcat(buf, "+");
+          strlcat(buf, "+", sizeof(buf));
           if (chanptr->modes_on & MODE_S)
-            strcat(buf, "s");
+            strlcat(buf, "s", sizeof(buf));
           if (chanptr->modes_on & MODE_P)
-            strcat(buf, "p");
+            strlcat(buf, "p", sizeof(buf));
           if (chanptr->modes_on & MODE_N)
-            strcat(buf, "n");
+            strlcat(buf, "n", sizeof(buf));
           if (chanptr->modes_on & MODE_T)
-            strcat(buf, "t");
+            strlcat(buf, "t", sizeof(buf));
 #ifdef DANCER
           if (chanptr->modes_on & MODE_C)
-            strcat(buf, "c");
+            strlcat(buf, "c", sizeof(buf));
 #endif /* DANCER */
           if (chanptr->modes_on & MODE_M)
-            strcat(buf, "m");
+            strlcat(buf, "m", sizeof(buf));
           if (chanptr->modes_on & MODE_I)
-            strcat(buf, "i");
+            strlcat(buf, "i", sizeof(buf));
           if (chanptr->limit)
-            strcat(buf, "l");
+            strlcat(buf, "l", sizeof(buf));
           if (chanptr->key)
-            strcat(buf, "k");
+            strlcat(buf, "k", sizeof(buf));
 #ifdef DANCER
           if (chanptr->forward)
-            strcat(buf, "f");
+            strlcat(buf, "f", sizeof(buf));
 #endif /* DANCER */
         }
 

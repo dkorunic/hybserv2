@@ -7,14 +7,9 @@ As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
-*) rewrite n_set to allow both users to change several nicknames' options
-   as well as admins to change all their flags if necessary
-*) move c_noexpire into c_set_noexpire, as in NickServ
 *) remove MaxTrace
 *) fix absolutely ugly code formatting! [progress..]
 *) splint check
-*) remove ocasions of ugly strcpy
-*) enable use of strlcat and strlcpy
 *) diet libc compatibility fixes
 *) move most of txt constants into a header, for easier localisation
 *) check capabs of host server, including nicklen - report if nicklen >

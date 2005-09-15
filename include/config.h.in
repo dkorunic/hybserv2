@@ -429,8 +429,9 @@
  * I generally find either of those (they have same functionality) rather
  * useful instead of mass killing collided users.  Additionally, there is
  * FORCENICK_LEN/SVSNICK_LEN which can be used to specify how many
- * characters you want to fill in as random numbers. When undefined, it
- * pads as much numbers as in can get to fill the nickname length.
+ * additional characters you want to fill in as random numbers. When
+ * undefined, it pads as much numbers as in can get to fill the nickname
+ * length.
  */
 #undef    FORCENICK
 #define   FORCENICK_LEN 4

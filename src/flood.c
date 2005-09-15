@@ -326,7 +326,7 @@ void updateConnectTable(char *user, char *host)
 
                   /* As far as we're concerned, offender shouldn't be in the table
                    * anymore */
-                  strcpy(table[tmp].host, "@"); /* reset the host, remove from table */
+                  strlcpy(table[tmp].host, "@", sizeof(table[tmp].host)); /* reset the host, remove from table */
                   last--;
                   if (last < 0)
                     last = 0;
@@ -404,8 +404,8 @@ void updateConnectTable(char *user, char *host)
    */
   if (found == 0)
     {
-      strcpy(table[last].host, host);
-      strcpy(table[last].user, user);
+      strlcpy(table[last].host, host, sizeof(table[last].host));
+      strlcpy(table[last].user, user, sizeof(table[last].user));
       table[last].frequency = 1;
       table[last].last = current_ts;
       last++;

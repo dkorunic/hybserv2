@@ -1389,7 +1389,10 @@ collide(char *nick)
   struct Luser *lptr = NULL;
 #if defined SVSNICK || defined FORCENICK
   char newnick[NICKLEN];
-  nicknum = random();
+  long nicknum;
+  int base;
+  int i;
+  int j;
 #else
   char **av;
   char sendstr[MAXLINE];
@@ -1401,6 +1404,22 @@ collide(char *nick)
 
   if (!(lptr = FindClient(nick)))
     return;
+
+  /* calculate how many chars do we need to pad */
+#if defined SVSNICK || defined FORCENICK
+  nicknum = random();
+#if defined SVSNICK_LEN
+  base = SVSNICK_LEN;
+#elif defined FORCENICK_LEN
+  base = FORCENICK_LEN;
+#else
+  base = NICKLEN - 4;
+#endif
+  j = 1;
+  for (i = 1; i <= base; ++i)
+    j *= 10;
+  nicknum %= j;
+#endif /* defined SVSNICK || defined FORCENICK */
 
   /* normal ghosted nickname */
 #ifdef DANCER
@@ -1414,24 +1433,15 @@ collide(char *nick)
 
   /* nope, we won't use ghosted nicknames, instead we'll force nick change
    * on remote nickname using SVSNICK or FORCENICK */
+
 #ifdef SVSNICK
 
-# ifdef SVSNICK_LEN
-  snprintf(newnick, 5 + SVSNICK_LEN, "User%ld", nicknum);
-# else
-  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
-# endif /* SVSNICK_LEN */
-
+  ircsprintf(newnick, "User%ld", nicknum);
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #elif defined FORCENICK
 
-# ifdef FORCENICK_LEN
-  snprintf(newnick, 5 + FORCENICK_LEN, "User%ld", nicknum);
-# else
-  snprintf(newnick, sizeof(newnick), "User%ld", nicknum);
-# endif /* FORCENICK_LEN */
-
+  ircsprintf(newnick, "User%ld", nicknum);
   toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #else
@@ -3395,7 +3405,7 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
       return;
     }
 
-  strcpy(str, StrToupper(av[3]));
+  strlcpy(str, StrToupper(av[3]), sizeof(str));
 
   RecordCommand("%s: %s!%s@%s SET %s HIDE %s %s",
       n_NickServ, lptr->nick, lptr->username, lptr->hostname,
@@ -3405,27 +3415,27 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   if (!ircncmp(av[3], "ALL", strlen(av[2])))
     {
       flag = NS_HIDEALL;
-      strcpy(str, "Hide Info");
+      strlcpy(str, "Hide Info", sizeof(str));
     }
   else if (!ircncmp(av[3], "EMAIL", strlen(av[2])))
     {
       flag = NS_HIDEEMAIL;
-      strcpy(str, "Hide Email");
+      strlcpy(str, "Hide Email", sizeof(str));
     }
   else if (!ircncmp(av[3], "URL", strlen(av[2])))
     {
       flag = NS_HIDEURL;
-      strcpy(str, "Hide Url");
+      strlcpy(str, "Hide Url", sizeof(str));
     }
   else if (!ircncmp(av[3], "QUIT", strlen(av[2])))
     {
       flag = NS_HIDEQUIT;
-      strcpy(str, "Hide Quit");
+      strlcpy(str, "Hide Quit", sizeof(str));
     }
   else if (!ircncmp(av[3], "ADDR", strlen(av[2])))
     {
       flag = NS_HIDEADDR;
-      strcpy(str, "Hide Address");
+      strlcpy(str, "Hide Address", sizeof(str));
     }
 
   /* order this properly */
@@ -3813,15 +3823,15 @@ n_list(struct Luser *lptr, int ac, char **av)
 
                   ++acnt;
                   if (temp->flags & NS_FORBID)
-                    strcpy(str, "<< FORBIDDEN >>");
+                    strlcpy(str, "<< FORBIDDEN >>", sizeof(str));
                   else if ((temp->flags & NS_IDENTIFIED) && FindClient(temp->nick))
-                    strcpy(str, "<< ONLINE >>");
+                    strlcpy(str, "<< ONLINE >>", sizeof(str));
                   else if (temp->flags & NS_PRIVATE)
-                    strcpy(str, "<< PRIVATE >>");
+                    strlcpy(str, "<< PRIVATE >>", sizeof(str));
                   else if (temp->flags & NS_PROTECTED)
-                    strcpy(str, "<< PROTECTED >>");
+                    strlcpy(str, "<< PROTECTED >>", sizeof(str));
                   else if (temp->flags & NS_NOEXPIRE)
-                    strcpy(str, "<< NOEXPIRE >>");
+                    strlcpy(str, "<< NOEXPIRE >>", sizeof(str));
                   else
                     str[0] = '\0';
 
@@ -3960,31 +3970,31 @@ n_info(struct Luser *lptr, int ac, char **av)
       buf[0] = '\0';
       if (AllowKillProtection)
         if (nptr->flags & NS_PROTECTED)
-          strcat(buf, "Kill Protection, ");
+          strlcat(buf, "Kill Protection, ", sizeof(buf));
       if (nptr->flags & NS_NOEXPIRE)
-        strcat(buf, "NoExpire, ");
+        strlcat(buf, "NoExpire, ", sizeof(buf));
       if (nptr->flags & NS_AUTOMASK)
-        strcat(buf, "AutoMask, ");
+        strlcat(buf, "AutoMask, ", sizeof(buf));
       if (nptr->flags & NS_PRIVATE)
-        strcat(buf, "Private, ");
+        strlcat(buf, "Private, ", sizeof(buf));
       if (nptr->flags & NS_FORBID)
-        strcat(buf, "Forbidden, ");
+        strlcat(buf, "Forbidden, ", sizeof(buf));
       if (nptr->flags & NS_SECURE)
-        strcat(buf, "Secure, ");
+        strlcat(buf, "Secure, ", sizeof(buf));
       if (nptr->flags & NS_UNSECURE)
-        strcat(buf, "UnSecure, ");
+        strlcat(buf, "UnSecure, ", sizeof(buf));
       if (nptr->flags & NS_HIDEALL)
-        strcat(buf, "Hidden, ");
+        strlcat(buf, "Hidden, ", sizeof(buf));
       if (nptr->flags & NS_MEMOS)
-        strcat(buf, "AllowMemos, ");
+        strlcat(buf, "AllowMemos, ", sizeof(buf));
       if (nptr->flags & NS_MEMONOTIFY)
-        strcat(buf, "MemoNotify, ");
+        strlcat(buf, "MemoNotify, ", sizeof(buf));
       if (nptr->flags & NS_MEMOSIGNON)
-        strcat(buf, "MemoSignon, ");
+        strlcat(buf, "MemoSignon, ", sizeof(buf));
       if (nptr->flags & NS_NOREGISTER)
-        strcat(buf, "NoRegister, ");
+        strlcat(buf, "NoRegister, ", sizeof(buf));
       if (nptr->flags & NS_NOCHANOPS)
-        strcat(buf, "NoChannelOps, ");
+        strlcat(buf, "NoChannelOps, ", sizeof(buf));
 
       if (*buf)
         {
@@ -4749,16 +4759,16 @@ n_collide(struct Luser *lptr, int ac, char **av)
   ircsprintf(argbuf, "[%s] ", target);
 
   if (list)
-    strcat(argbuf, "-list ");
+    strlcat(argbuf, "-list ", sizeof(argbuf));
 
   if (halt)
-    strcat(argbuf, "-halt ");
+    strlcat(argbuf, "-halt ", sizeof(argbuf));
 
   if (set)
-    strcat(argbuf, "-set ");
+    strlcat(argbuf, "-set ", sizeof(argbuf));
 
   if (setnow)
-    strcat(argbuf, "-setnow ");
+    strlcat(argbuf, "-setnow ", sizeof(argbuf));
 
   RecordCommand("%s: %s!%s@%s COLLIDE %s",
                 n_NickServ,
@@ -4907,9 +4917,9 @@ n_flag(struct Luser *lptr, int ac, char **av)
        * nptr's current flags
        */
       if (nptr->flags & NS_NOREGISTER)
-        strcat(buf, "NoRegister, ");
+        strlcat(buf, "NoRegister, ", sizeof(buf));
       if (nptr->flags & NS_NOCHANOPS)
-        strcat(buf, "NoChannelOps, ");
+        strlcat(buf, "NoChannelOps, ", sizeof(buf));
 
       if (*buf)
         {
@@ -4937,14 +4947,14 @@ n_flag(struct Luser *lptr, int ac, char **av)
       if (!ircncmp(av[ii], "-noregister", strlen(av[ii])))
         {
           nptr->flags |= NS_NOREGISTER;
-          strcat(buf, "NoRegister, ");
-          strcat(pstr, "-noregister ");
+          strlcat(buf, "NoRegister, ", sizeof(buf));
+          strlcat(pstr, "-noregister ", sizeof(pstr));
         }
       else if (!ircncmp(av[ii], "-nochanops", strlen(av[ii])))
         {
           nptr->flags |= NS_NOCHANOPS;
-          strcat(buf, "NoChannelOps, ");
-          strcat(pstr, "-nochanops ");
+          strlcat(buf, "NoChannelOps, ", sizeof(buf));
+          strlcat(pstr, "-nochanops ", sizeof(pstr));
         }
       else if (!ircncmp(av[ii], "-clear", strlen(av[ii])))
         {
@@ -4953,7 +4963,7 @@ n_flag(struct Luser *lptr, int ac, char **av)
                  "The flags for [\002%s\002] have been cleared",
                  realptr->nick);
           buf[0] = '\0';
-          strcat(pstr, "-clear ");
+          strlcat(pstr, "-clear ", sizeof(pstr));
 
           break;
         }

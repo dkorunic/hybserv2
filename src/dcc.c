@@ -237,7 +237,7 @@ SendDccMessage(struct DccUser *from, char *message)
     return;
 
   ircsprintf(final, "<%s@%s> %s", from->nick, n_OperServ, message);
-  strcat(final, "\r\n");
+  strlcat(final, "\r\n", sizeof(final));
 
   /* now send the string to all clients */
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
@@ -619,12 +619,12 @@ void readauth(struct DccUser *dccptr)
        * so make the ident "unknown"
        */
       if (num != 3)
-        strcpy(ident, "unknown");
+        strlcpy(ident, "unknown", sizeof(ident));
     }
   else
     {
       /* connection was closed */
-      strcpy(ident, "unknown");
+      strlcpy(ident, "unknown", sizeof(ident));
     }
 
   close(dccptr->authfd);
@@ -908,13 +908,13 @@ GreetDccUser(struct DccUser *dccptr)
   assert(tempuser != 0);
 
   if (IsServicesAdmin(tempuser))
-    strcpy(prefix, "Admin(%)");
+    strlcpy(prefix, "Admin(%)", sizeof(prefix));
   else if (IsAdmin(tempuser))
-    strcpy(prefix, "Admin");
+    strlcpy(prefix, "Admin", sizeof(prefix));
   else if (IsOper(tempuser))
-    strcpy(prefix, "Oper");
+    strlcpy(prefix, "Oper", sizeof(prefix));
   else
-    strcpy(prefix, "User");
+    strlcpy(prefix, "User", sizeof(prefix));
 
   /* inform everyone of new user */
   BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\n",
@@ -1088,7 +1088,7 @@ onctcp(char *nick, char *target, char *msg)
           return;
         }
 
-      strcpy(buff, av[3]);
+      strlcpy(buff, av[3], sizeof(buff));
 
       if (atoi(av[4]) < 1024)
         {
@@ -1294,19 +1294,19 @@ CloseConnection(struct DccUser *dccptr)
       prefix[0] = '\0';
 
       if (dccptr->flags & SOCK_TCMBOT)
-        strcpy(prefix, "Bot");
+        strlcpy(prefix, "Bot", sizeof(prefix));
       else
         {
           tempuser = DccGetUser(dccptr);
 
           if (IsServicesAdmin(tempuser))
-            strcpy(prefix, "Admin(%)");
+            strlcpy(prefix, "Admin(%)", sizeof(prefix));
           else if (IsAdmin(tempuser))
-            strcpy(prefix, "Admin");
+            strlcpy(prefix, "Admin", sizeof(prefix));
           else if (IsOper(tempuser))
-            strcpy(prefix, "Oper");
+            strlcpy(prefix, "Oper", sizeof(prefix));
           else
-            strcpy(prefix, "User");
+            strlcpy(prefix, "User", sizeof(prefix));
         }
 
       BroadcastDcc(DCCALL,
@@ -1833,13 +1833,13 @@ DccProcess(struct DccUser *dccptr, char *command)
           ClearDccPending(dccptr);
 
           if (IsServicesAdmin(tempuser))
-            strcpy(prefix, "Admin(%)");
+            strlcpy(prefix, "Admin(%)", sizeof(prefix));
           else if (IsAdmin(tempuser))
-            strcpy(prefix, "Admin");
+            strlcpy(prefix, "Admin", sizeof(prefix));
           else if (IsOper(tempuser))
-            strcpy(prefix, "Oper");
+            strlcpy(prefix, "Oper", sizeof(prefix));
           else
-            strcpy(prefix, "User");
+            strlcpy(prefix, "User", sizeof(prefix));
 
           /* turn ECHO back on */
           writesocket(dccptr->socket, "\377\374\001\r\n");

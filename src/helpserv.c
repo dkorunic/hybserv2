@@ -165,7 +165,7 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
         }
 
       if (ac < 2)
-        strcpy(str, "HELP");
+        strlcpy(str, "HELP", sizeof(str));
       else if (ac >= 3)
         {
           ircsprintf(str, "HELP %s %s", av[1], av[2]);
@@ -349,10 +349,10 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
       /* Proceed with splitting -kre */
       cac = SplitBuf(command, &cav);
-      strcpy(helparg, StrTolower(cav[0]));
+      strlcpy(helparg, StrTolower(cav[0]), sizeof(helparg));
 
       if (cac > 1)
-        strcpy(arg2, StrTolower(cav[1]));
+        strlcpy(arg2, StrTolower(cav[1]), sizeof(arg2));
 
       if (sockfd == NODCC)
         {

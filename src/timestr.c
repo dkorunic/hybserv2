@@ -108,9 +108,9 @@ char *timeago(time_t timestamp, int flag)
         {
           ircsprintf(temp, "%ldy", years);
           if (spaces)
-            strcat(temp, " ");
+            strlcat(temp, " ", sizeof(temp));
         }
-      strcat(final, temp);
+      strlcat(final, temp, sizeof(final));
     }
 
   if (weeks)
@@ -121,9 +121,9 @@ char *timeago(time_t timestamp, int flag)
         {
           ircsprintf(temp, "%ldw", weeks);
           if (spaces)
-            strcat(temp, " ");
+            strlcat(temp, " ", sizeof(temp));
         }
-      strcat(final, temp);
+      strlcat(final, temp, sizeof(final));
     }
 
   if (days)
@@ -134,9 +134,9 @@ char *timeago(time_t timestamp, int flag)
         {
           ircsprintf(temp, "%ldd", days);
           if (spaces)
-            strcat(temp, " ");
+            strlcat(temp, " ", sizeof(temp));
         }
-      strcat(final, temp);
+      strlcat(final, temp, sizeof(final));
     }
 
   if (years || weeks || days)
@@ -150,7 +150,7 @@ char *timeago(time_t timestamp, int flag)
           if (hours || minutes || seconds)
             {
               ircsprintf(temp, "(%ldh %ldm %lds)", hours, minutes, seconds);
-              strcat(final, temp);
+              strlcat(final, temp, sizeof(final));
             }
         }
       else
@@ -160,24 +160,24 @@ char *timeago(time_t timestamp, int flag)
             {
               ircsprintf(temp, "%ldh", hours);
               if (spaces)
-                strcat(temp, " ");
-              strcat(final, temp);
+                strlcat(temp, " ", sizeof(temp));
+              strlcat(final, temp, sizeof(final));
             }
 
           if (minutes)
             {
               ircsprintf(temp, "%ldm", minutes);
               if (spaces)
-                strcat(temp, " ");
-              strcat(final, temp);
+                strlcat(temp, " ", sizeof(temp));
+              strlcat(final, temp, sizeof(final));
             }
 
           if (seconds)
             {
               ircsprintf(temp, "%lds", seconds);
               if (spaces)
-                strcat(temp, " ");
-              strcat(final, temp);
+                strlcat(temp, " ", sizeof(temp));
+              strlcat(final, temp, sizeof(final));
             }
 
           /*
@@ -201,9 +201,9 @@ char *timeago(time_t timestamp, int flag)
             {
               ircsprintf(temp, "%ldh", hours);
               if (spaces)
-                strcat(temp, " ");
+                strlcat(temp, " ", sizeof(final));
             }
-          strcat(final, temp);
+          strlcat(final, temp, sizeof(final));
         }
 
       if (minutes)
@@ -215,9 +215,9 @@ char *timeago(time_t timestamp, int flag)
             {
               ircsprintf(temp, "%ldm", minutes);
               if (spaces)
-                strcat(temp, " ");
+                strlcat(temp, " ", sizeof(temp));
             }
-          strcat(final, temp);
+          strlcat(final, temp, sizeof(final));
         }
 
       if (seconds)
@@ -229,17 +229,17 @@ char *timeago(time_t timestamp, int flag)
             {
               ircsprintf(temp, "%lds", seconds);
               if (spaces)
-                strcat(temp, " ");
+                strlcat(temp, " ", sizeof(temp));
             }
-          strcat(final, temp);
+          strlcat(final, temp, sizeof(final));
         }
 
       if (!final[0])
         {
           if (longfmt)
-            strcpy(final, "0 seconds");
+            strlcpy(final, "0 seconds", sizeof(final));
           else
-            strcpy(final, "0s");
+            strlcpy(final, "0s", sizeof(final));
         }
       else if (spaces)
         {
@@ -281,7 +281,7 @@ long timestr(char *format)
       ircsprintf(fmtbuf, "%ss", format);
     }
   else
-    strcpy(fmtbuf, format);
+    strlcpy(fmtbuf, format, sizeof(fmtbuf));
 
   cnt = 0;
   for (ptr = fmtbuf; *ptr; ptr++)

@@ -520,14 +520,14 @@ ss_host(struct Luser *lptr, int ac, char **av)
          "Current Opers:    %ld",
          hosth->curropers);
 
-  strcpy(str, ctime(&hosth->maxclients_ts));
+  strlcpy(str, ctime(&hosth->maxclients_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Clients:      %ld on %s",
          hosth->maxclients,
          str);
 
-  strcpy(str, ctime(&hosth->maxunique_ts));
+  strlcpy(str, ctime(&hosth->maxunique_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Unique:       %ld on %s",
@@ -536,8 +536,8 @@ ss_host(struct Luser *lptr, int ac, char **av)
 
   if (hosth->maxopers_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&hosth->maxopers_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&hosth->maxopers_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -607,14 +607,14 @@ ss_domain(struct Luser *lptr, int ac, char **av)
          "Current Opers:    %ld",
          hosth->curropers);
 
-  strcpy(str, ctime(&hosth->maxclients_ts));
+  strlcpy(str, ctime(&hosth->maxclients_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Clients:      %ld on %s",
          hosth->maxclients,
          str);
 
-  strcpy(str, ctime(&hosth->maxunique_ts));
+  strlcpy(str, ctime(&hosth->maxunique_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Unique:       %ld on %s",
@@ -623,8 +623,8 @@ ss_domain(struct Luser *lptr, int ac, char **av)
 
   if (hosth->maxopers_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&hosth->maxopers_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&hosth->maxopers_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -756,22 +756,22 @@ ss_server(struct Luser *lptr, int ac, char **av)
   if (maxusers >= 0)
     {
       ircsprintf(str, "-maxusers %d ", maxusers);
-      strcat(argbuf, str);
+      strlcat(argbuf, str, sizeof(argbuf));
     }
 
   if (minusers >= 0)
     {
       ircsprintf(str, "-minusers %d ", minusers);
-      strcat(argbuf, str);
+      strlcat(argbuf, str, sizeof(argbuf));
     }
 
   if (info)
-    strcat(argbuf, "-info ");
+    strlcat(argbuf, "-info ", sizeof(argbuf));
 
   if (hub)
     {
       ircsprintf(str, "-hub %s ", hub->name);
-      strcat(argbuf, str);
+      strlcat(argbuf, str, sizeof(argbuf));
     }
 
   RecordCommand("%s: %s!%s@%s SERVER [%s] %s",
@@ -882,8 +882,8 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
   if (servptr->maxusers_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&servptr->maxusers_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&servptr->maxusers_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -895,8 +895,8 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
   if (servptr->maxopers_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&servptr->maxopers_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&servptr->maxopers_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -908,8 +908,8 @@ ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
   if (servptr->maxservs_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&servptr->maxservs_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&servptr->maxservs_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -1025,7 +1025,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
          "Current Servers:            %1.0f",
          Network->TotalServers);
 
-  strcpy(str, ctime(&Network->MaxUsers_ts));
+  strlcpy(str, ctime(&Network->MaxUsers_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Users:                  %ld on %s",
@@ -1034,8 +1034,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
 
   if (Network->MaxOperators_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&Network->MaxOperators_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&Network->MaxOperators_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -1047,8 +1047,8 @@ ss_stats(struct Luser *lptr, int ac, char **av)
 
   if (Network->MaxChannels_ts)
     {
-      strcpy(str, "on ");
-      strcat(str, ctime(&Network->MaxChannels_ts));
+      strlcpy(str, "on ", sizeof(str));
+      strlcat(str, ctime(&Network->MaxChannels_ts), sizeof(str));
       str[strlen(str) - 1] = '\0';
     }
   else
@@ -1058,7 +1058,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
          Network->MaxChannels,
          str);
 
-  strcpy(str, ctime(&Network->MaxServers_ts));
+  strlcpy(str, ctime(&Network->MaxServers_ts), sizeof(str));
   str[strlen(str) - 1] = '\0';
   notice(n_StatServ, lptr->nick,
          "Max Servers:                %ld on %s",
@@ -1079,7 +1079,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
          (long) Network->TotalUsers - Network->ResHosts);
 
   currtime = current_ts;
-  strcpy(tmp, ctime(&currtime));
+  strlcpy(tmp, ctime(&currtime), sizeof(tmp));
   SplitBuf(tmp, &tav);
   ircsprintf(str, "%s %s %s, %s", tav[0], tav[1], tav[2], tav[4]);
   notice(n_StatServ, lptr->nick,
@@ -1261,21 +1261,21 @@ ss_clearstats(struct Luser *lptr, int ac, char **av)
 
   if (domain && host)
     {
-      strcat(buf, "-all");
-      strcat(buf2, "All");
+      strlcat(buf, "-all", sizeof(buf));
+      strlcat(buf2, "All", sizeof(buf2));
     }
   else
     {
       if (domain)
         {
-          strcat(buf, "-domain");
-          strcat(buf2, "Domains");
+          strlcat(buf, "-domain", sizeof(buf));
+          strlcat(buf2, "Domains", sizeof(buf2));
         }
 
       if (host)
         {
-          strcat(buf, "-host");
-          strcat(buf2, "Hostnames");
+          strlcat(buf, "-host", sizeof(buf));
+          strlcat(buf2, "Hostnames", sizeof(buf2));
         }
     }
 

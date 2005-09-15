@@ -1739,7 +1739,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
   jcnt = 0;
   while (fgets(line, MAXLINE - 1, configfp))
     {
-      strcpy(linetemp, line);
+      strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");
       if ((*key == 'J') || (*key == 'j'))
         {
@@ -2166,7 +2166,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
   o_Wallops("UNGLINE %s",
             av[1]);
 
-  strcpy(chkstr, av[1]);
+  strlcpy(chkstr, av[1], sizeof(chkstr));
   if (!(host = strchr(av[1], '@')))
     {
       user = NULL;
@@ -2242,7 +2242,7 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 
   while (fgets(line, MAXLINE - 1, configfp))
     {
-      strcpy(linetemp, line);
+      strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");
       if ((*key == 'g') || (*key == 'G'))
         {
@@ -2452,7 +2452,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 
   while (fgets(line, MAXLINE - 1, configfp))
     {
-      strcpy(linetemp, line);
+      strlcpy(linetemp, line, sizeof(linetemp));
       key = strtok(line, ":");
       if (!irccmp(key, "c"))
         {
@@ -2952,7 +2952,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
           while (cnt < ac)
             {
               strncat(msgbuf, av[cnt++], sizeof(msgbuf) - strlen(msgbuf) - 20);
-              strcat(msgbuf, " ");
+              strlcat(msgbuf, " ", sizeof(msgbuf));
             }
           msgbuf[strlen(msgbuf) - 1] = '\0';
 
@@ -2997,43 +2997,43 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
   ircsprintf(argbuf, "[%s] ", target);
 
   if (showlong)
-    strcat(argbuf, "-long ");
+    strlcat(argbuf, "-long ", sizeof(argbuf));
 
   if (nolimit)
-    strcat(argbuf, "-nolimit ");
+    strlcat(argbuf, "-nolimit ", sizeof(argbuf));
 
   if (ops == 1)
-    strcat(argbuf, "-ops ");
+    strlcat(argbuf, "-ops ", sizeof(argbuf));
   else if (ops == 2)
-    strcat(argbuf, "-nonops ");
+    strlcat(argbuf, "-nonops ", sizeof(argbuf));
 
   if (clones)
-    strcat(argbuf, "-clones ");
+    strlcat(argbuf, "-clones ", sizeof(argbuf));
 
   if (showinfo)
-    strcat(argbuf, "-info ");
+    strlcat(argbuf, "-info ", sizeof(argbuf));
 
   if (realname)
     {
-      strcat(argbuf, "-realname ");
-      strcat(argbuf, realname);
-      strcat(argbuf, " ");
+      strlcat(argbuf, "-realname ", sizeof(argbuf));
+      strlcat(argbuf, realname, sizeof(argbuf));
+      strlcat(argbuf, " ", sizeof(argbuf));
     }
 
   if (servptr)
     {
-      strcat(argbuf, "-server ");
-      strcat(argbuf, servptr->name);
-      strcat(argbuf, " ");
+      strlcat(argbuf, "-server ", sizeof(argbuf));
+      strlcat(argbuf, servptr->name, sizeof(argbuf));
+      strlcat(argbuf, " ", sizeof(argbuf));
     }
 
   if (kill)
-    strcat(argbuf, "-kill ");
+    strlcat(argbuf, "-kill ", sizeof(argbuf));
 
   if (*msgbuf)
     {
-      strcat(argbuf, "-msg ");
-      strcat(argbuf, msgbuf);
+      strlcat(argbuf, "-msg ", sizeof(argbuf));
+      strlcat(argbuf, msgbuf, sizeof(argbuf));
     }
 
   o_RecordCommand(sockfd,
@@ -3282,20 +3282,20 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
             "Server:    %s",
             target->server ? target->server->name : "*unknown*");
 
-  strcpy(tmp, "+");
+  strlcpy(tmp, "+", sizeof(tmp));
   if (target->umodes & UMODE_I)
-    strcat(tmp, "i");
+    strlcat(tmp, "i", sizeof(tmp));
   if (target->umodes & UMODE_S)
-    strcat(tmp, "s");
+    strlcat(tmp, "s", sizeof(tmp));
   if (target->umodes & UMODE_W)
-    strcat(tmp, "w");
+    strlcat(tmp, "w", sizeof(tmp));
   if (target->umodes & UMODE_O)
-    strcat(tmp, "o");
+    strlcat(tmp, "o", sizeof(tmp));
   os_notice(lptr, sockfd,
             "Usermodes: %s",
             tmp);
 
-  strcpy(tmp, ctime((time_t *) &target->since));
+  strlcpy(tmp, ctime((time_t *) &target->since), sizeof(tmp));
   tmp[strlen(tmp) - 1] = '\0';
   os_notice(lptr, sockfd, "Signon:    %s", tmp);
 
@@ -3475,34 +3475,34 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   ircsprintf(argbuf, "[%s] ", target);
 
   if (nolimit)
-    strcat(argbuf, "-nolimit ");
+    strlcat(argbuf, "-nolimit ", sizeof(argbuf));
 
   if (min)
     {
-      strcat(argbuf, "-minimum");
+      strlcat(argbuf, "-minimum", sizeof(argbuf));
       ircsprintf(temp, "%s %d ", argbuf, min);
-      strcpy(argbuf, temp);
+      strlcpy(argbuf, temp, sizeof(argbuf));
     }
 
   if (max)
     {
-      strcat(argbuf, "-maximum");
+      strlcat(argbuf, "-maximum", sizeof(argbuf));
       ircsprintf(temp, "%s %d ", argbuf, max);
-      strcpy(argbuf, temp);
+      strlcpy(argbuf, temp, sizeof(argbuf));
     }
 
   if (banmatch)
     {
-      strcat(argbuf, "-banmatch ");
-      strcat(argbuf, banmatch);
-      strcat(argbuf, " ");
+      strlcat(argbuf, "-banmatch ", sizeof(argbuf));
+      strlcat(argbuf, banmatch, sizeof(argbuf));
+      strlcat(argbuf, " ", sizeof(argbuf));
     }
 
   if (exmatch)
     {
-      strcat(argbuf, "-exmatch ");
-      strcat(argbuf, exmatch);
-      strcat(argbuf, " ");
+      strlcat(argbuf, "-exmatch ", sizeof(argbuf));
+      strlcat(argbuf, exmatch, sizeof(argbuf));
+      strlcat(argbuf, " ", sizeof(argbuf));
     }
 
   o_RecordCommand(sockfd,
@@ -3599,54 +3599,54 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 
   os_notice(lptr, sockfd, "Channel Information for %s:",
             cptr->name);
-  strcpy(modes, "+");
+  strlcpy(modes, "+", sizeof(modes));
   if (cptr->modes & MODE_S)
-    strcat(modes, "s");
+    strlcat(modes, "s", sizeof(modes));
   if (cptr->modes & MODE_P)
-    strcat(modes, "p");
+    strlcat(modes, "p", sizeof(modes));
   if (cptr->modes & MODE_N)
-    strcat(modes, "n");
+    strlcat(modes, "n", sizeof(modes));
   if (cptr->modes & MODE_T)
-    strcat(modes, "t");
+    strlcat(modes, "t", sizeof(modes));
 #ifdef DANCER
   if (cptr->modes & MODE_C)
-    strcat(modes, "c");
+    strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
   if (cptr->modes & MODE_M)
-    strcat(modes, "m");
+    strlcat(modes, "m", sizeof(modes));
   if (cptr->modes & MODE_I)
-    strcat(modes, "i");
+    strlcat(modes, "i", sizeof(modes));
   if (cptr->limit)
-    strcat(modes, "l");
+    strlcat(modes, "l", sizeof(modes));
   if (cptr->key && *cptr->key)
-    strcat(modes, "k");
+    strlcat(modes, "k", sizeof(modes));
 #ifdef DANCER
   if (cptr->forward && *cptr->forward)
-    strcat(modes, "f");
+    strlcat(modes, "f", sizeof(modes));
 #endif /* DANCER */
 
   if (cptr->limit)
     {
       ircsprintf(temp, "%s %d", modes, cptr->limit);
-      strcpy(modes, temp);
+      strlcpy(modes, temp, sizeof(modes));
     }
 
   if (cptr->key && *cptr->key)
     {
       ircsprintf(temp, "%s %s", modes, cptr->key);
-      strcpy(modes, temp);
+      strlcpy(modes, temp, sizeof(modes));
     }
 
 #ifdef DANCER
   if (cptr->forward && *cptr->forward)
   {
     ircsprintf(temp, "%s %s", modes, cptr->forward);
-    strcpy(modes, temp);
+    strlcpy(modes, temp, sizeof(modes));
   }
 #endif /* DANCER */
 
   os_notice(lptr, sockfd, "Modes:     %s", modes);
-  strcpy(modes, ctime(&cptr->since));
+  strlcpy(modes, ctime(&cptr->since), sizeof(modes));
   modes[strlen(modes) - 1] = '\0';
   os_notice(lptr, sockfd, "Created:   %s", modes);
 
@@ -3917,11 +3917,11 @@ o_save(struct Luser *lptr, int ac, char **av, int sockfd)
 
   argbuf[0] = '\0';
   if (savedbs && savesets)
-    strcat(argbuf, "-all ");
+    strlcat(argbuf, "-all ", sizeof(argbuf));
   else if (savedbs)
-    strcat(argbuf, "-databases ");
+    strlcat(argbuf, "-databases ", sizeof(argbuf));
   else if (savesets)
-    strcat(argbuf, "-settings ");
+    strlcat(argbuf, "-settings ", sizeof(argbuf));
 
   o_RecordCommand(sockfd,
                   "SAVE %s",
@@ -4051,7 +4051,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
               {
                 ircsprintf(tmp, "\"%s\" ",
                            *(char **) dptr->param[ii].ptr);
-                strcat(sendstr, tmp);
+                strlcat(sendstr, tmp, sizeof(sendstr));
                 break;
               }
 
@@ -4059,7 +4059,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
               {
                 ircsprintf(tmp, "%s ",
                            timeago(*(long *) dptr->param[ii].ptr, 2));
-                strcat(sendstr, tmp);
+                strlcat(sendstr, tmp, sizeof(sendstr));
                 break;
               }
 
@@ -4068,7 +4068,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             case PARAM_PORT:
               {
                 ircsprintf(tmp, "%d ", *(int *) dptr->param[ii].ptr);
-                strcat(sendstr, tmp);
+                strlcat(sendstr, tmp, sizeof(sendstr));
                 break;
               }
             } /* switch (dptr->param[ii].type) */
@@ -4140,7 +4140,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             *(char **) dptr->param[ii].ptr = MyStrdup(strptr);
 
             ircsprintf(tmp, "\"%s\" ", strptr);
-            strcat(sendstr, tmp);
+            strlcat(sendstr, tmp, sizeof(sendstr));
 
             break;
           }
@@ -4167,7 +4167,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             *(int *) dptr->param[ii].ptr = value;
 
             ircsprintf(tmp, "%d ", value);
-            strcat(sendstr, tmp);
+            strlcat(sendstr, tmp, sizeof(sendstr));
 
             break;
           }
@@ -4188,7 +4188,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             *(long *) dptr->param[ii].ptr = value;
 
             ircsprintf(tmp, "%s ", timeago(value, 2));
-            strcat(sendstr, tmp);
+            strlcat(sendstr, tmp, sizeof(sendstr));
 
             break;
           }
@@ -4211,12 +4211,12 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             if (value)
               {
                 *(int *) dptr->param[ii].ptr = 1;
-                strcat(sendstr, "1 ");
+                strlcat(sendstr, "1 ", sizeof(sendstr));
               }
             else
               {
                 *(int *) dptr->param[ii].ptr = 0;
-                strcat(sendstr, "0 ");
+                strlcat(sendstr, "0 ", sizeof(sendstr));
               }
 
             break;
@@ -4248,7 +4248,7 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
             *(int *) dptr->param[ii].ptr = value;
 
             ircsprintf(tmp, "%d ", value);
-            strcat(sendstr, tmp);
+            strlcat(sendstr, tmp, sizeof(sendstr));
 
             break;
           }
@@ -4308,7 +4308,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
                   {
                     ircsprintf(tmp, "\"%s\" ",
                                *(char **) dptr->param[ii].ptr);
-                    strcat(sendstr, tmp);
+                    strlcat(sendstr, tmp, sizeof(sendstr));
                   }
                 break;
               }
@@ -4317,7 +4317,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
               {
                 ircsprintf(tmp, "%s ",
                            timeago(*(long *) dptr->param[ii].ptr, 2));
-                strcat(sendstr, tmp);
+                strlcat(sendstr, tmp, sizeof(sendstr));
                 break;
               }
 
@@ -4327,7 +4327,7 @@ DisplaySettings(struct Luser *lptr, int sockfd)
               {
                 ircsprintf(tmp, "%d ",
                            *(int *) dptr->param[ii].ptr);
-                strcat(sendstr, tmp);
+                strlcat(sendstr, tmp, sizeof(sendstr));
                 break;
               }
             } /* switch (dptr->param[ii].type) */
@@ -4396,21 +4396,21 @@ o_ignore_add(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
   if (match("*!*@*", av[2]))
-    strcpy(hostmask, av[2]);
+    strlcpy(hostmask, av[2], sizeof(hostmask));
   else if (match("*!*", av[2]))
     {
-      strcpy(hostmask, av[2]);
-      strcat(hostmask, "@*");
+      strlcpy(hostmask, av[2], sizeof(hostmask));
+      strlcat(hostmask, "@*", sizeof(hostmask));
     }
   else if (match("*@*", av[2]))
     {
-      strcpy(hostmask, "*!");
-      strcat(hostmask, av[2]);
+      strlcpy(hostmask, "*!", sizeof(hostmask));
+      strlcat(hostmask, av[2], sizeof(hostmask));
     }
   else if (match("*.*", av[2]))
     {
-      strcpy(hostmask, "*!*@");
-      strcat(hostmask, av[2]);
+      strlcpy(hostmask, "*!*@", sizeof(hostmask));
+      strlcat(hostmask, av[2], sizeof(hostmask));
     }
   else
     {
@@ -4421,14 +4421,14 @@ o_ignore_add(struct Luser *lptr, int ac, char **av, int sockfd)
       if ((ptr = FindClient(av[2])))
         {
           mask = HostToMask(ptr->username, ptr->hostname);
-          strcpy(hostmask, "*!");
-          strcat(hostmask, mask);
+          strlcpy(hostmask, "*!", sizeof(hostmask));
+          strlcat(hostmask, mask, sizeof(hostmask));
           MyFree(mask);
         }
       else
         {
-          strcpy(hostmask, av[2]);
-          strcat(hostmask, "!*@*");
+          strlcpy(hostmask, av[2], sizeof(hostmask));
+          strlcat(hostmask, "!*@*", sizeof(hostmask));
         }
     }
 
@@ -4756,8 +4756,8 @@ o_who(struct Luser *lptr, int ac, char **av, int sockfd)
       mins = ((current_ts - tempconn->idle) / 60) % 60;
       if (mins >= 5)
         {
-          strcpy(idle, "idle: ");
-          strcat(idle, timeago(tempconn->idle, 0));
+          strlcpy(idle, "idle: ", sizeof(idle));
+          strlcat(idle, timeago(tempconn->idle, 0), sizeof(idle));
         }
       else
         idle[0] = '\0';
@@ -5238,21 +5238,21 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 
             flags[0] = '\0';
             if (tempuser->flags & PRIV_ADMIN)
-              strcat(flags, "a");
+              strlcat(flags, "a", sizeof(flags));
             if (tempuser->flags & PRIV_CHAT)
-              strcat(flags, "d");
+              strlcat(flags, "d", sizeof(flags));
             if (tempuser->flags & PRIV_EXCEPTION)
-              strcat(flags, "e");
+              strlcat(flags, "e", sizeof(flags));
             if (tempuser->flags & PRIV_FRIEND)
-              strcat(flags, "f");
+              strlcat(flags, "f", sizeof(flags));
             if (tempuser->flags & PRIV_GLINE)
-              strcat(flags, "g");
+              strlcat(flags, "g", sizeof(flags));
             if (tempuser->flags & PRIV_JUPE)
-              strcat(flags, "j");
+              strlcat(flags, "j", sizeof(flags));
             if (tempuser->flags & PRIV_OPER)
-              strcat(flags, "o");
+              strlcat(flags, "o", sizeof(flags));
             if (tempuser->flags & PRIV_SADMIN)
-              strcat(flags, "S");
+              strlcat(flags, "S", sizeof(flags));
 
             ircsprintf(uhost, "%s@%s", tempuser->username,
                        tempuser->hostname);
@@ -5324,7 +5324,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
         /* Test if we will do "stats g pattern" matching -kre */
         if (ac > 2)
           {
-            strcpy(chkstr, av[2]);
+            strlcpy(chkstr, av[2], sizeof(chkstr));
             if (!(host = strchr(av[2], '@')))
               {
                 user = NULL;
@@ -5587,19 +5587,19 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   argbuf[0] = '\0';
 
   if (nonopers)
-    strcat(argbuf, "-nonopers ");
+    strlcat(argbuf, "-nonopers ", sizeof(argbuf));
 
   if (ops)
-    strcat(argbuf, "-ops ");
+    strlcat(argbuf, "-ops ", sizeof(argbuf));
 
   if (nonops)
-    strcat(argbuf, "-nonops ");
+    strlcat(argbuf, "-nonops ", sizeof(argbuf));
 
   if (voices)
-    strcat(argbuf, "-voices ");
+    strlcat(argbuf, "-voices ", sizeof(argbuf));
 
   if (nonvoices)
-    strcat(argbuf, "-nonvoices ");
+    strlcat(argbuf, "-nonvoices ", sizeof(argbuf));
 
   o_RecordCommand(sockfd,
                   "KILLCHAN %s %s[%s]",
@@ -6172,7 +6172,7 @@ o_dump(struct Luser *lptr, int ac, char **av, int sockfd)
    * ProcessInfo earlier, sending it through the whole routine again could
    * cause problems - make a new one
    */
-  strcpy(tempstr, dstr);
+  strlcpy(tempstr, dstr, sizeof(tempstr));
   newac = SplitBuf(tempstr, &newav);
   ProcessInfo(newac, newav);
 

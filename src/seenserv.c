@@ -249,7 +249,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
   memset(seen, 0, sizeof(aSeen));
   strncpy(seen->nick, nick, NICKLEN);
   strncpy(userhost, user, USERLEN);
-  strcat(userhost, "@");
+  strlcat(userhost, "@", sizeof(userhost));
   strncat(userhost, host, HOSTLEN);
   seen->userhost = MyStrdup(userhost);
   seen->msg = (type == 1) ? MyStrdup(msg) : NULL;
@@ -311,11 +311,11 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       else if (match("*!*", av[1]))
       {
         strncpy(seenstring, av[1], MAXLINE - 3);
-        strcat(seenstring, "@*");
+        strlcat(seenstring, "@*", sizeof(seenstring));
       }
       else if (match("*@*", av[1]))
       {
-        strcpy(seenstring, "*!");
+        strlcpy(seenstring, "*!", sizeof(seenstring));
         strncat(seenstring, av[1], MAXLINE - 3);
       }
       else
@@ -326,7 +326,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
         {
           memset(nuhost, 0, sizeof(nuhost));
           strncpy(nuhost, seen->nick, NICKLEN);
-          strcat(nuhost, "!");
+          strlcat(nuhost, "!", sizeof(nuhost));
           strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
           if (match(seenstring, nuhost))
             {
@@ -382,15 +382,15 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 
       ircsprintf(sendstr, "I found %d match(es), ", count);
       if (count > 5)
-        strcat(sendstr, "here are the 5 most recent, ");
-      strcat(sendstr, "sorted:");
+        strlcat(sendstr, "here are the 5 most recent, ", sizeof(sendstr));
+      strlcat(sendstr, "sorted:", sizeof(sendstr));
       count = i;
       for (i = 0; i < count; i++)
         {
-          strcat(sendstr, " ");
-          strcat(sendstr, sorted[i]->nick);
+          strlcat(sendstr, " ", sizeof(sendstr));
+          strlcat(sendstr, sorted[i]->nick, sizeof(sendstr));
         }
-      strcat(sendstr, ". ");
+      strlcat(sendstr, ". ", sizeof(sendstr));
       if (sorted[0]->type == 1)
         {
           notice(n_SeenServ, lptr->nick,

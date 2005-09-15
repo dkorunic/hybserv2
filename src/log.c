@@ -58,7 +58,7 @@ putlog(int level, char *format, ...)
     }
 
   CurrTime = current_ts;
-  strcpy(buf, ctime(&CurrTime));
+  strlcpy(buf, ctime(&CurrTime), sizeof(buf));
 
   /*
    * Erase the \n character that ctime() puts on the end, in order
@@ -145,12 +145,12 @@ CheckLogs(time_t unixtime)
                * if its the oldest.
                */
               if (!*olddate)
-                strcpy(olddate, dirp->d_name + len);
+                strlcpy(olddate, dirp->d_name + len, sizeof(olddate));
               else
                 {
                   currdate = dirp->d_name + len;
                   if (atol(olddate) > atol(currdate))
-                    strcpy(olddate, currdate);
+                    strlcpy(olddate, currdate, sizeof(olddate));
                 }
             }
         }

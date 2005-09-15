@@ -276,16 +276,16 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   *argbuf = '\0';
 
   if (all)
-    strcat(argbuf, "-all ");
+    strlcat(argbuf, "-all ", sizeof(argbuf));
 
   if (ops)
-    strcat(argbuf, "-ops ");
+    strlcat(argbuf, "-ops ", sizeof(argbuf));
 
   if (opers)
-    strcat(argbuf, "-opers ");
+    strlcat(argbuf, "-opers ", sizeof(argbuf));
 
   if (admins)
-    strcat(argbuf, "-admins ");
+    strlcat(argbuf, "-admins ", sizeof(argbuf));
 
   ircsprintf(temp, "%s%s", argbuf, message);
   strncpy(argbuf, temp, MAXLINE);
@@ -441,9 +441,9 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
       *temp = '-';
       *(temp + 1) = '\0';
       if (cptr->modes & MODE_N)
-        strcat(temp, "n");
+        strlcat(temp, "n", sizeof(temp));
       if (cptr->modes & MODE_M)
-        strcat(temp, "m");
+        strlcat(temp, "m", sizeof(temp));
 
       if (*(temp + 1))
         DoMode(cptr, temp, 0);

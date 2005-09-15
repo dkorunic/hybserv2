@@ -789,7 +789,7 @@ s_nick(int ac, char **av)
 
 #ifdef BLOCK_ALLOCATION
 
-      strcpy(lptr->nick, newnick);
+      strlcpy(lptr->nick, newnick, sizeof(lptr->nick));
 #else
 
       MyFree(lptr->nick);
@@ -1773,7 +1773,7 @@ s_sjoin(int ac, char **av)
     return;
 
   mcnt = 5; /* default position for channel nicks, if no limit/key */
-  strcpy(modes, av[4]);
+  strlcpy(modes, av[4], sizeof(modes));
 
   /*
    * names list *should* start with a :, if it doesn't, there's a
@@ -1781,13 +1781,13 @@ s_sjoin(int ac, char **av)
    */
   if (av[mcnt][0] != ':')
     {
-      strcat(modes, " ");
-      strcat(modes, av[mcnt]);
+      strlcat(modes, " ", sizeof(modes));
+      strlcat(modes, av[mcnt], sizeof(modes));
       mcnt++;
       if (av[mcnt][0] != ':') /* XXX - same code, rewrite it! -kre */
         {
-          strcat(modes, " ");
-          strcat(modes, av[mcnt]);
+          strlcat(modes, " ", sizeof(modes));
+          strlcat(modes, av[mcnt], sizeof(modes));
           mcnt++;
         }
     }

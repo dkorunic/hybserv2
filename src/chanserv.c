@@ -1124,8 +1124,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
             continue;
           knicks = (char *) MyRealloc(knicks, strlen(knicks) +
               strlen(tempu->lptr->nick) + (2 * sizeof(char)));
-          strcat(knicks, tempu->lptr->nick);
-          strcat(knicks, " ");
+          strlcat(knicks, tempu->lptr->nick, sizeof(knicks));
+          strlcat(knicks, " ", sizeof(knicks));
         }
       SetModes(n_ChanServ, 0, 'o', chptr, knicks);
 
@@ -1159,8 +1159,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
             {
               dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) +
                   strlen(tempu->lptr->nick) + (2 * sizeof(char)));
-              strcat(dopnicks, tempu->lptr->nick);
-              strcat(dopnicks, " ");
+              strlcat(dopnicks, tempu->lptr->nick, sizeof(dopnicks));
+              strlcat(dopnicks, " ", sizeof(dopnicks));
             }
         }
       SetModes(n_ChanServ, 0, 'o', chptr, dopnicks);
@@ -1182,8 +1182,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
             {
               kbnicks = (char *) MyRealloc(kbnicks, strlen(kbnicks) +
                   strlen(tempu->lptr->nick) + (2 * sizeof(char)));
-              strcat(kbnicks, tempu->lptr->nick);
-              strcat(kbnicks, " ");
+              strlcat(kbnicks, tempu->lptr->nick, sizeof(kbnicks));
+              strlcat(kbnicks, " ", sizeof(kbnicks));
             }
         }
 
@@ -1197,7 +1197,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       MyFree(kbnicks);
     }
 
-  strcpy(modes, "+");
+  strlcpy(modes, "+", sizeof(modes));
 #ifdef DANCER
   if (cptr->modes_on || cptr->key || cptr->limit || cptr->forward)
 #else
@@ -1206,41 +1206,41 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
     {
       if ((cptr->modes_on & MODE_S) &&
           !(chptr->modes & MODE_S))
-        strcat(modes, "s");
+        strlcat(modes, "s", sizeof(modes));
       if ((cptr->modes_on & MODE_P) &&
           !(chptr->modes & MODE_P))
-        strcat(modes, "p");
+        strlcat(modes, "p", sizeof(modes));
       if ((cptr->modes_on & MODE_N) &&
           !(chptr->modes & MODE_N))
-        strcat(modes, "n");
+        strlcat(modes, "n", sizeof(modes));
       if ((cptr->modes_on & MODE_T) &&
           !(chptr->modes & MODE_T))
-        strcat(modes, "t");
+        strlcat(modes, "t", sizeof(modes));
       if ((cptr->modes_on & MODE_M) &&
           !(chptr->modes & MODE_M))
-        strcat(modes, "m");
+        strlcat(modes, "m", sizeof(modes));
 #ifdef DANCER
       if ((cptr->modes_on & MODE_C) &&
           !(chptr->modes & MODE_C))
-        strcat(modes, "c");
+        strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
       if ((cptr->modes_on & MODE_I) &&
           !(chptr->modes & MODE_I))
-        strcat(modes, "i");
+        strlcat(modes, "i", sizeof(modes));
       if (cptr->limit)
-        strcat(modes, "l");
+        strlcat(modes, "l", sizeof(modes));
       if (cptr->key)
-        strcat(modes, "k");
+        strlcat(modes, "k", sizeof(modes));
 #ifdef DANCER
       if (cptr->forward)
-        strcat(modes, "f");
+        strlcat(modes, "f", sizeof(modes));
 #endif /* DANCER */ /* DANCER */
       if (cptr->limit)
         {
           char temp[MAXLINE];
 
           ircsprintf(temp, "%s %ld", modes, cptr->limit);
-          strcpy(modes, temp);
+          strlcpy(modes, temp, sizeof(modes));
         }
       if (cptr->key)
         {
@@ -1253,7 +1253,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
               UpdateChanModes(Me.csptr, n_ChanServ, chptr, temp);
             }
           ircsprintf(temp, "%s %s", modes, cptr->key);
-          strcpy(modes, temp);
+          strlcpy(modes, temp, sizeof(modes));
         }
 #ifdef DANCER
       if (cptr->forward)
@@ -1261,7 +1261,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         char temp[MAXLINE];
         
         ircsprintf(temp, "%s %s", modes, cptr->forward);
-        strcpy(modes, temp);
+        strlcpy(modes, temp, sizeof(modes));
       }
 #endif /* DANCER */
     }
@@ -1271,47 +1271,47 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
     }
 
-  strcpy(modes, "-");
+  strlcpy(modes, "-", sizeof(modes));
   if (cptr->modes_off)
     {
       if ((cptr->modes_off & MODE_S) &&
           (chptr->modes & MODE_S))
-        strcat(modes, "s");
+        strlcat(modes, "s", sizeof(modes));
       if ((cptr->modes_off & MODE_P) &&
           (chptr->modes & MODE_P))
-        strcat(modes, "p");
+        strlcat(modes, "p", sizeof(modes));
       if ((cptr->modes_off & MODE_N) &&
           (chptr->modes & MODE_N))
-        strcat(modes, "n");
+        strlcat(modes, "n", sizeof(modes));
       if ((cptr->modes_off & MODE_T) &&
           (chptr->modes & MODE_T))
-        strcat(modes, "t");
+        strlcat(modes, "t", sizeof(modes));
       if ((cptr->modes_off & MODE_M) &&
           (chptr->modes & MODE_M))
-        strcat(modes, "m");
+        strlcat(modes, "m", sizeof(modes));
 #ifdef DANCER
       if ((cptr->modes_off & MODE_C) &&
           (chptr->modes & MODE_C))
-        strcat(modes, "c");
+        strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
       if ((cptr->modes_off & MODE_I) &&
           (chptr->modes & MODE_I))
-        strcat(modes, "i");
+        strlcat(modes, "i", sizeof(modes));
       if ((cptr->modes_off & MODE_L) &&
           (chptr->limit))
-        strcat(modes, "l");
+        strlcat(modes, "l", sizeof(modes));
       if ((cptr->modes_off & MODE_K) &&
           (chptr->key))
         {
-          strcat(modes, "k ");
-          strcat(modes, chptr->key);
+          strlcat(modes, "k ", sizeof(modes));
+          strlcat(modes, chptr->key, sizeof(modes));
         }
 #ifdef DANCER
       if ((cptr->modes_off & MODE_F) &&
           (chptr->forward))
       {
-        strcat(modes, "f ");
-        strcat(modes, chptr->forward);
+        strlcat(modes, "f ", sizeof(modes));
+        strlcat(modes, chptr->forward, sizeof(modes));
       }
 #endif /* DANCER */
     }
@@ -2002,8 +2002,8 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 
       dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) +
           strlen(nlptr->nick) + (2 * sizeof(char)));
-      strcat(dnicks, nlptr->nick);
-      strcat(dnicks, " ");
+      strlcat(dnicks, nlptr->nick, sizeof(dnicks));
+      strlcat(dnicks, " ", sizeof(dnicks));
 
       /*
        * Send them a notice so they know why they're being
@@ -2724,7 +2724,7 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
               for (hptr = ca->nptr->hosts; hptr; hptr = hptr->next)
                 {
                   if (strchr(hptr->hostmask, '!'))
-                    strcpy(chkstr, hptr->hostmask);
+                    strlcpy(chkstr, hptr->hostmask, sizeof(chkstr));
                   else
                     ircsprintf(chkstr, "*!%s", hptr->hostmask);
 
@@ -3441,16 +3441,16 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else if (match("*!*", av[3]))
   {
     strncpy(hostmask, av[3], MAXLINE - 3);
-    strcat(hostmask, "@*");
+    strlcat(hostmask, "@*", sizeof(hostmask));
   }
   else if (match("*@*", av[3]))
   {
-    strcpy(hostmask, "*!");
+    strlcpy(hostmask, "*!", sizeof(hostmask));
     strncat(hostmask, av[3], MAXLINE - 3);
   }
   else if (match("*.*", av[3]))
   {
-    strcpy(hostmask, "*!*@");
+    strlcpy(hostmask, "*!*@", sizeof(hostmask));
     strncat(hostmask, av[3], MAXLINE - 5);
   }
   else
@@ -3873,16 +3873,16 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else if (match("*!*", av[sidx]))
     {
       strncpy(hostmask, av[sidx], MAXLINE - 3);
-      strcat(hostmask, "@*");
+      strlcat(hostmask, "@*", sizeof(hostmask));
     }
   else if (match("*@*", av[sidx]))
     {
-      strcpy(hostmask, "*!");
+      strlcpy(hostmask, "*!", sizeof(hostmask));
       strncpy(hostmask, av[sidx], MAXLINE - 3);
     }
   else if (match("*.*", av[sidx]))
     {
-      strcpy(hostmask, "*!*@");
+      strlcpy(hostmask, "*!*@", sizeof(hostmask));
       strncpy(hostmask, av[sidx], MAXLINE - 5);
     }
   else
@@ -3900,7 +3900,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       else
         {
           strncpy(hostmask, av[sidx], MAXLINE - 5);
-          strcat(hostmask, "!*@*");
+          strlcat(hostmask, "!*@*", sizeof(hostmask));
         }
     }
 
@@ -3972,9 +3972,9 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 		  memset(nuhost, 0, sizeof(nuhost));
 		  strncpy(nuhost, tempuser->lptr->nick, NICKLEN);
-		  strcat(nuhost, "!");
+		  strlcat(nuhost, "!", sizeof(nuhost));
 		  strncat(nuhost, tempuser->lptr->username, USERLEN);
-		  strcat(nuhost, "@");
+		  strlcat(nuhost, "@", sizeof(nuhost));
 		  strncat(nuhost, tempuser->lptr->hostname, HOSTLEN);
 
 		  if (!match(hostmask, nuhost))
@@ -4064,22 +4064,22 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     else if (match("*!*", av[3]))
     {
       strncpy(hostmask, av[3], MAXLINE - 3);
-      strcat(hostmask, "@*");
+      strlcat(hostmask, "@*", sizeof(hostmask));
     }
     else if (match("*@*", av[3]))
     {
-      strcpy(hostmask, "*!");
+      strlcpy(hostmask, "*!", sizeof(hostmask));
       strncat(hostmask, av[3], MAXLINE - 3);
     }
     else if (match("*.*", av[3]))
     {
-      strcpy(hostmask, "*!*@");
+      strlcpy(hostmask, "*!*@", sizeof(hostmask));
       strncat(hostmask, av[3], MAXLINE - 5);
     }
     else
     {
       strncpy(hostmask, av[3], MAXLINE - 5);
-      strcat(hostmask, "!*@*");
+      strlcat(hostmask, "!*@*", sizeof(hostmask));
     }
 	  host = MyStrdup(hostmask);
   }
@@ -4237,15 +4237,15 @@ c_list(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
                   ++acnt;
                   if (temp->flags & CS_FORBID)
-                    strcpy(str, "<< FORBIDDEN >>");
+                    strlcpy(str, "<< FORBIDDEN >>", sizeof(str));
                   else if (temp->flags & CS_FORGET)
-                    strcpy(str, "<< FORGOTTEN >>");
+                    strlcpy(str, "<< FORGOTTEN >>", sizeof(str));
                   else if (temp->flags & CS_PRIVATE)
-                    strcpy(str, "<< PRIVATE >>");
+                    strlcpy(str, "<< PRIVATE >>", sizeof(str));
                   else if (temp->flags & CS_NOEXPIRE)
-                    strcpy(str, "<< NOEXPIRE >>");
+                    strlcpy(str, "<< NOEXPIRE >>", sizeof(str));
                   else if (FindChannel(temp->name))
-                    strcpy(str, "<< ACTIVE >>");
+                    strlcpy(str, "<< ACTIVE >>", sizeof(str));
                   else
                     str[0] = '\0';
 
@@ -5647,30 +5647,30 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   modes[0] = '\0';
   if (cptr->modes_off)
     {
-      strcat(modes, "-");
+      strlcat(modes, "-", sizeof(modes));
       if (cptr->modes_off & MODE_S)
-        strcat(modes, "s");
+        strlcat(modes, "s", sizeof(modes));
       if (cptr->modes_off & MODE_P)
-        strcat(modes, "p");
+        strlcat(modes, "p", sizeof(modes));
       if (cptr->modes_off & MODE_N)
-        strcat(modes, "n");
+        strlcat(modes, "n", sizeof(modes));
       if (cptr->modes_off & MODE_T)
-        strcat(modes, "t");
+        strlcat(modes, "t", sizeof(modes));
       if (cptr->modes_off & MODE_M)
-        strcat(modes, "m");
+        strlcat(modes, "m", sizeof(modes));
       if (cptr->modes_off & MODE_I)
-        strcat(modes, "i");
+        strlcat(modes, "i", sizeof(modes));
 #ifdef DANCER
       if (cptr->modes_off & MODE_C)
-        strcat(modes, "c");
+        strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
       if (cptr->modes_off & MODE_L)
-        strcat(modes, "l");
+        strlcat(modes, "l", sizeof(modes));
       if (cptr->modes_off & MODE_K)
-        strcat(modes, "k");
+        strlcat(modes, "k", sizeof(modes));
 #ifdef DANCER
       if (cptr->modes_off & MODE_F)
-        strcat(modes, "f");
+        strlcat(modes, "f", sizeof(modes));
 #endif /* DANCER */
     }
 
@@ -5680,30 +5680,30 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (cptr->modes_on || cptr->limit || cptr->key)
 #endif /* DANCER */
     {
-      strcat(modes, "+");
+      strlcat(modes, "+", sizeof(modes));
       if (cptr->modes_on & MODE_S)
-        strcat(modes, "s");
+        strlcat(modes, "s", sizeof(modes));
       if (cptr->modes_on & MODE_P)
-        strcat(modes, "p");
+        strlcat(modes, "p", sizeof(modes));
       if (cptr->modes_on & MODE_N)
-        strcat(modes, "n");
+        strlcat(modes, "n", sizeof(modes));
       if (cptr->modes_on & MODE_T)
-        strcat(modes, "t");
+        strlcat(modes, "t", sizeof(modes));
 #ifdef DANCER
       if (cptr->modes_on & MODE_C)
-        strcat(modes, "c");
+        strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
       if (cptr->modes_on & MODE_M)
-        strcat(modes, "m");
+        strlcat(modes, "m", sizeof(modes));
       if (cptr->modes_on & MODE_I)
-        strcat(modes, "i");
+        strlcat(modes, "i", sizeof(modes));
       if (cptr->limit)
-        strcat(modes, "l");
+        strlcat(modes, "l", sizeof(modes));
       if (cptr->key)
-        strcat(modes, "k");
+        strlcat(modes, "k", sizeof(modes));
 #ifdef DANCER
       if (cptr->forward)
-        strcat(modes, "f");
+        strlcat(modes, "f", sizeof(modes));
 #endif /* DANCER */
 
       if (cptr->limit)
@@ -5711,18 +5711,18 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           char  temp[MAXLINE];
 
           ircsprintf(temp, "%s %ld", modes, cptr->limit);
-          strcpy(modes, temp);
+          strlcpy(modes, temp, sizeof(modes));
         }
       if (cptr->key)
         {
-          strcat(modes, " ");
-          strcat(modes, cptr->key);
+          strlcat(modes, " ", sizeof(modes));
+          strlcat(modes, cptr->key, sizeof(modes));
         }
 #ifdef DANCER
       if (cptr->forward)
       {
-        strcat(modes, " ");
-        strcat(modes, cptr->forward);
+        strlcat(modes, " ", sizeof(modes));
+        strlcat(modes, cptr->forward, sizeof(modes));
       }
 #endif /* DANCER */
     }
@@ -6098,34 +6098,34 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
   if ((chptr = FindChannel(cptr->name)))
   {
-    strcpy(modes, "+");
+    strlcpy(modes, "+", sizeof(modes));
     if (chptr->modes & MODE_S)
-      strcat(modes, "s");
+      strlcat(modes, "s", sizeof(modes));
     if (chptr->modes & MODE_P)
-      strcat(modes, "p");
+      strlcat(modes, "p", sizeof(modes));
     if (chptr->modes & MODE_N)
-      strcat(modes, "n");
+      strlcat(modes, "n", sizeof(modes));
     if (chptr->modes & MODE_T)
-      strcat(modes, "t");
+      strlcat(modes, "t", sizeof(modes));
     if (chptr->modes & MODE_M)
-      strcat(modes, "m");
+      strlcat(modes, "m", sizeof(modes));
     if (chptr->modes & MODE_I)
-      strcat(modes, "i");
+      strlcat(modes, "i", sizeof(modes));
     if (chptr->limit)
-      strcat(modes, "l");
+      strlcat(modes, "l", sizeof(modes));
     if ((chptr->key) && (chptr->key[0] != '\0'))
-      strcat(modes, "k");
+      strlcat(modes, "k", sizeof(modes));
     if (chptr->limit)
     {
       char temp[MAXLINE];
       sprintf(temp, "%s %d", modes, chptr->limit);
-      strcpy(modes, temp);
+      strlcpy(modes, temp, sizeof(modes));
     }
     if ((chptr->key) && (chptr->key[0] != '\0'))
     {
       char temp[MAXLINE];
       sprintf(temp, "%s %s", modes, chptr->key);
-      strcpy(modes, temp);
+      strlcpy(modes, temp, sizeof(modes));
     }
 
     notice(n_ChanServ, lptr->nick,
@@ -6191,17 +6191,17 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
     else
       cs_CheckChan(cptr, chptr);
 
-    strcpy(modes, "-");
+    strlcpy(modes, "-", sizeof(modes));
     if ((chptr->modes & MODE_M) && !(cptr->modes_on & MODE_M))
-      strcat(modes, "m");
+      strlcat(modes, "m", sizeof(modes));
     if ((chptr->modes & MODE_I) && !(cptr->modes_on & MODE_I))
-      strcat(modes, "i");
+      strlcat(modes, "i", sizeof(modes));
     if ((chptr->limit) && (!cptr->limit))
-      strcat(modes, "l");
+      strlcat(modes, "l", sizeof(modes));
     if ((chptr->key) && (chptr->key[0] != '\0') && (!cptr->key))
     {
-      strcat(modes, "k ");
-      strcat(modes, chptr->key);
+      strlcat(modes, "k ", sizeof(modes));
+      strlcat(modes, chptr->key, sizeof(modes));
     }
     toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, modes);
 
@@ -6467,8 +6467,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             {
               dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
                 + strlen(arv[ii] + 1) + (2 * sizeof(char)));
-              strcat(dnicks, arv[ii] + 1);
-              strcat(dnicks, " ");
+              strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
+              strlcat(dnicks, " ", sizeof(dnicks));
             }
           else if (!IsChannelOp(chptr, currlptr))
             {
@@ -6490,8 +6490,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
               onicks = (char *) MyRealloc(onicks, strlen(onicks)
                                           + strlen(arv[ii]) + (2 * sizeof(char)));
-              strcat(onicks, arv[ii]);
-              strcat(onicks, " ");
+              strlcat(onicks, arv[ii], sizeof(onicks));
+              strlcat(onicks, " ", sizeof(onicks));
             }
         }
 
@@ -6594,15 +6594,15 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
             {
               dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) +
                   strlen(arv[ii] + 1) + (2 * sizeof(char)));
-              strcat(dnicks, arv[ii] + 1);
-              strcat(dnicks, " ");
+              strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
+              strlcat(dnicks, " ", sizeof(dnicks));
             }
           else
             {
               hnicks = (char *) MyRealloc(hnicks, strlen(hnicks) +
                   strlen(arv[ii]) + (2 * sizeof(char)));
-              strcat(hnicks, arv[ii]);
-              strcat(hnicks, " ");
+              strlcat(hnicks, arv[ii], sizeof(hnicks));
+              strlcat(hnicks, " ", sizeof(hnicks));
             }
         }
 
@@ -6718,15 +6718,15 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
             {
               dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
                                           + strlen(arv[ii] + 1) + (2 * sizeof(char)));
-              strcat(dnicks, arv[ii] + 1);
-              strcat(dnicks, " ");
+              strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
+              strlcat(dnicks, " ", sizeof(dnicks));
             }
           else
             {
               vnicks = (char *) MyRealloc(vnicks, strlen(vnicks)
                                           + strlen(arv[ii]) + (2 * sizeof(char)));
-              strcat(vnicks, arv[ii]);
-              strcat(vnicks, " ");
+              strlcat(vnicks, arv[ii], sizeof(vnicks));
+              strlcat(vnicks, " ", sizeof(vnicks));
             }
         }
 
@@ -6838,8 +6838,8 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           bans = (char *) MyRealloc(bans, strlen(bans) +
               strlen(bptr->mask) + (2 * sizeof(char)));
-          strcat(bans, bptr->mask);
-          strcat(bans, " ");
+          strlcat(bans, bptr->mask, sizeof(bans));
+          strlcat(bans, " ", sizeof(bans));
         }
     }
 
@@ -6960,29 +6960,29 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
   buf[0] = '\0';
   if (cptr->flags & CS_TOPICLOCK)
-    strcat(buf, "TopicLock, ");
+    strlcat(buf, "TopicLock, ", sizeof(buf));
   if (cptr->flags & CS_SECURE)
-    strcat(buf, "Secure, ");
+    strlcat(buf, "Secure, ", sizeof(buf));
   if (cptr->flags & CS_SECUREOPS)
-    strcat(buf, "SecureOps, ");
+    strlcat(buf, "SecureOps, ", sizeof(buf));
   if (cptr->flags & CS_GUARD)
-    strcat(buf, "ChanGuard, ");
+    strlcat(buf, "ChanGuard, ", sizeof(buf));
   if (cptr->flags & CS_RESTRICTED)
-    strcat(buf, "Restricted, ");
+    strlcat(buf, "Restricted, ", sizeof(buf));
   if (cptr->flags & CS_PRIVATE)
-    strcat(buf, "Private, ");
+    strlcat(buf, "Private, ", sizeof(buf));
   if (cptr->flags & CS_FORBID)
-    strcat(buf, "Forbidden, ");
+    strlcat(buf, "Forbidden, ", sizeof(buf));
   if (cptr->flags & CS_FORGET)
-    strcat(buf, "Forgotten, ");
+    strlcat(buf, "Forgotten, ", sizeof(buf));
   if (cptr->flags & CS_NOEXPIRE)
-    strcat(buf, "NoExpire, ");
+    strlcat(buf, "NoExpire, ", sizeof(buf));
   if (cptr->flags & CS_SPLITOPS)
-    strcat(buf, "SplitOps, ");
+    strlcat(buf, "SplitOps, ", sizeof(buf));
   if (cptr->flags & CS_VERBOSE)
-    strcat(buf, "Verbose, ");
+    strlcat(buf, "Verbose, ", sizeof(buf));
   if ((cptr->flags & CS_EXPIREBANS) && BanExpire)
-    strcat(buf, "Expirebans, "); 
+    strlcat(buf, "Expirebans, ", sizeof(buf)); 
 
   if (*buf)
     {
@@ -7010,30 +7010,30 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   buf[0] = '\0';
   if (cptr->modes_off)
     {
-      strcat(buf, "-");
+      strlcat(buf, "-", sizeof(buf));
       if (cptr->modes_off & MODE_S)
-        strcat(buf, "s");
+        strlcat(buf, "s", sizeof(buf));
       if (cptr->modes_off & MODE_P)
-        strcat(buf, "p");
+        strlcat(buf, "p", sizeof(buf));
       if (cptr->modes_off & MODE_N)
-        strcat(buf, "n");
+        strlcat(buf, "n", sizeof(buf));
       if (cptr->modes_off & MODE_T)
-        strcat(buf, "t");
+        strlcat(buf, "t", sizeof(buf));
 #ifdef DANCER
       if (cptr->modes_off & MODE_C)
-        strcat(buf, "c");
+        strlcat(buf, "c", sizeof(buf));
 #endif /* DANCER */
       if (cptr->modes_off & MODE_M)
-        strcat(buf, "m");
+        strlcat(buf, "m", sizeof(buf));
       if (cptr->modes_off & MODE_I)
-        strcat(buf, "i");
+        strlcat(buf, "i", sizeof(buf));
       if (cptr->modes_off & MODE_L)
-        strcat(buf, "l");
+        strlcat(buf, "l", sizeof(buf));
       if (cptr->modes_off & MODE_K)
-        strcat(buf, "k");
+        strlcat(buf, "k", sizeof(buf));
 #ifdef DANCER
       if (cptr->modes_off & MODE_F)
-        strcat(buf, "f");
+        strlcat(buf, "f", sizeof(buf));
 #endif /* DANCER */
     }
 #ifdef DANCER
@@ -7042,30 +7042,30 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   if (cptr->modes_on || cptr->limit || cptr->key)
 #endif /* DANCER */
     {
-      strcat(buf, "+");
+      strlcat(buf, "+", sizeof(buf));
       if (cptr->modes_on & MODE_S)
-        strcat(buf, "s");
+        strlcat(buf, "s", sizeof(buf));
       if (cptr->modes_on & MODE_P)
-        strcat(buf, "p");
+        strlcat(buf, "p", sizeof(buf));
       if (cptr->modes_on & MODE_N)
-        strcat(buf, "n");
+        strlcat(buf, "n", sizeof(buf));
       if (cptr->modes_on & MODE_T)
-        strcat(buf, "t");
+        strlcat(buf, "t", sizeof(buf));
 #ifdef DANCER
       if (cptr->modes_on & MODE_C)
-        strcat(buf, "c");
+        strlcat(buf, "c", sizeof(modes));
 #endif /* DANCER */
       if (cptr->modes_on & MODE_M)
-        strcat(buf, "m");
+        strlcat(buf, "m", sizeof(buf));
       if (cptr->modes_on & MODE_I)
-        strcat(buf, "i");
+        strlcat(buf, "i", sizeof(buf));
       if (cptr->limit)
-        strcat(buf, "l");
+        strlcat(buf, "l", sizeof(buf));
       if (cptr->key)
-        strcat(buf, "k");
+        strlcat(buf, "k", sizeof(buf));
 #ifdef DANCER
       if (cptr->forward)
-        strcat(buf, "f");
+        strlcat(buf, "f", sizeof(buf));
 #endif /* DANCER */
     }
   if (buf[0])
@@ -7176,8 +7176,8 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       ops = (char *) MyRealloc(ops, strlen(ops) +
           strlen(cuser->lptr->nick) + (2 * sizeof(char)));
-      strcat(ops, cuser->lptr->nick);
-      strcat(ops, " ");
+      strlcat(ops, cuser->lptr->nick, sizeof(ops));
+      strlcat(ops, " ", sizeof(ops));
     }
 
   SetModes(n_ChanServ, 0, 'o', chptr, ops);
@@ -7211,8 +7211,8 @@ static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
 
       hops = (char *) MyRealloc(hops, strlen(hops) +
           strlen(cuser->lptr->nick) + (2 * sizeof(char)));
-      strcat(hops, cuser->lptr->nick);
-      strcat(hops, " ");
+      strlcat(hops, cuser->lptr->nick, sizeof(hops));
+      strlcat(hops, " ", sizeof(hops));
     }
 
   SetModes(n_ChanServ, 0, 'h', chptr, hops);
@@ -7246,8 +7246,8 @@ c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         continue;
 
       voices = (char *) MyRealloc(voices, strlen(voices) + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
-      strcat(voices, cuser->lptr->nick);
-      strcat(voices, " ");
+      strlcat(voices, cuser->lptr->nick, sizeof(voices));
+      strlcat(voices, " ", sizeof(voices));
     }
 
   SetModes(n_ChanServ, 0, 'v', chptr, voices);
@@ -7270,36 +7270,36 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  strcpy(modes, "-");
+  strlcpy(modes, "-", sizeof(modes));
 
   if (chptr->modes & MODE_S)
-    strcat(modes, "s");
+    strlcat(modes, "s", sizeof(modes));
   if (chptr->modes & MODE_P)
-    strcat(modes, "p");
+    strlcat(modes, "p", sizeof(modes));
   if (chptr->modes & MODE_N)
-    strcat(modes, "n");
+    strlcat(modes, "n", sizeof(modes));
   if (chptr->modes & MODE_T)
-    strcat(modes, "t");
+    strlcat(modes, "t", sizeof(modes));
 #ifdef DANCER
   if (chptr->modes & MODE_C)
-    strcat(modes, "c");
+    strlcat(modes, "c", sizeof(modes));
 #endif /* DANCER */
   if (chptr->modes & MODE_M)
-    strcat(modes, "m");
+    strlcat(modes, "m", sizeof(modes));
   if (chptr->modes & MODE_I)
-    strcat(modes, "i");
+    strlcat(modes, "i", sizeof(modes));
   if (chptr->limit)
-    strcat(modes, "l");
+    strlcat(modes, "l", sizeof(modes));
   if (chptr->key)
     {
-      strcat(modes, "k ");
-      strcat(modes, chptr->key);
+      strlcat(modes, "k ", sizeof(modes));
+      strlcat(modes, chptr->key, sizeof(modes));
     }
 #ifdef DANCER
   if (chptr->forward)
   {
-    strcat(modes, "f ");
-    strcat(modes, chptr->forward);
+    strlcat(modes, "f ", sizeof(modes));
+    strlcat(modes, chptr->forward, sizeof(modes));
   }
 #endif /* DANCER */
 
@@ -7331,8 +7331,8 @@ c_clear_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) +
           (2 * sizeof(char)));
-      strcat(bans, bptr->mask);
-      strcat(bans, " ");
+      strlcat(bans, bptr->mask, sizeof(bans));
+      strlcat(bans, " ", sizeof(bans));
     }
 
   SetModes(n_ChanServ, 0, 'b', chptr, bans);
@@ -7371,14 +7371,14 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         {
           ops = (char *) MyRealloc(ops, strlen(ops)
                                    + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
-          strcat(ops, cuser->lptr->nick);
-          strcat(ops, " ");
+          strlcat(ops, cuser->lptr->nick, sizeof(ops));
+          strlcat(ops, " ", sizeof(ops));
         }
 
       knicks = (char *) MyRealloc(knicks, strlen(knicks)
                                   + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
-      strcat(knicks, cuser->lptr->nick);
-      strcat(knicks, " ");
+      strlcat(knicks, cuser->lptr->nick, sizeof(knicks));
+      strlcat(knicks, " ", sizeof(knicks));
     }
 
   SetModes(n_ChanServ, 0, 'o', chptr, ops);
@@ -7438,8 +7438,8 @@ static void c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr,
     {
       bans = (char *)MyRealloc(bans, strlen(bans)
                                + strlen(bptr->mask) + (2 * sizeof(char)));
-      strcat(bans, bptr->mask);
-      strcat(bans, " ");
+      strlcat(bans, bptr->mask, sizeof(bans));
+      strlcat(bans, " ", sizeof(bans));
     }
 
   SetModes(n_ChanServ, 0, 'd', chptr, bans);
@@ -7998,8 +7998,8 @@ void ExpireBans(time_t unixtime)
               n_ChanServ, bptr->mask, cptr->name);
             bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask)
                 + (2 * sizeof(char)));
-            strcat(bans, bptr->mask);
-            strcat(bans, " ");
+            strlcat(bans, bptr->mask, sizeof(bans));
+            strlcat(bans, " ", sizeof(bans));
           }
         }
        if (bans)

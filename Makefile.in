@@ -36,7 +36,7 @@ INSTALL_SECURE = ${INSTALL} -m 600
 BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
 					 finddupe fixalvl
 # Secure configuration files (mode 600)
-SECUREFILES = hybserv.conf settings.conf
+SECUREFILES = hybserv.conf settings.conf jupes.conf glines.conf
 # General configuration files
 CONFFILES = motd.dcc motd.global
 # File containing HPath variable

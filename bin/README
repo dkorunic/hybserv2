@@ -17,5 +17,7 @@ Files you can usually find in bin/ directory:
   * motd.global   - Motd file for global clients
   * servchk       - Crontab script to restart Hybserv
   * settings.conf - Configuration settings for Hybserv
+  * jupes.conf    - Jupes list for Hybserv
+  * glines.conf   - Glines list for Hybserv
 
 Good luck! Don't forget to read documentation.

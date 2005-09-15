@@ -1438,7 +1438,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
 
   temp = MyStrdup(args);
   acnt = SplitBuf(temp, &av);
-  memset(&done, 0, MAXLINE);
+  memset(done, 0, MAXLINE);
   mcnt = 1;
   for (ii = 0; ii < acnt; ii++)
   {
@@ -1453,7 +1453,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
       toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
       UpdateChanModes(0, source, chptr, sendstr);
       MyFree(mtmp);
-      memset(&done, 0, MAXLINE);
+      memset(done, 0, MAXLINE);
     }
     mcnt++;
   }

@@ -1577,7 +1577,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       if (!index || (fromptr->index == index))
         {
-          memset(&buf, 0, MAXLINE);
+          memset(buf, 0, MAXLINE);
 
           target->memocnt++;
           target->newmemos++;

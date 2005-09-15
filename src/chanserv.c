@@ -8041,7 +8041,7 @@ ExpireAkicks(time_t unixtime)
           SendUmode(OPERUMODE_Y, "*** Expired akick %s [%s]",
             temp->hostmask, temp->reason ? temp->reason : "");
 	
-          memset(&modes, 0, sizeof(modes));
+          memset(modes, 0, sizeof(modes));
           ircsprintf(modes, "-b %s", temp->hostmask);
           modes[sizeof(modes) - 1] = '\0'; /* Paranoic - there is no
                                               ircnsprintf() :) */

@@ -684,7 +684,6 @@ s_nick(int ac, char **av)
         return;
 
 #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
-      /*memset(&newnick, 0, NICKLEN + 1);*/
       strncpy(newnick, av[2], NICKLEN);
       newnick[NICKLEN] = '\0';
 #endif

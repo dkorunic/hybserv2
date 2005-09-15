@@ -72,10 +72,7 @@ distclean: clean
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
 		include/config.h bin/settings.conf bin/cleandb \
 		config.status src/.depend config.cache config.log ~* core \
-		hybserv.core `find src/ -type f -size 0 -print`
-	$(RM) `find . -type f \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
-		-o -name '*.bak' -o -name '.#*' -o -name '#*#' -o -name '.*.orig' \
-		-o -name '.*.rej' -o -name '*.da' -o -name '.SUMS' \) -print`
+		hybserv.core
 
 mrproper: distclean
 

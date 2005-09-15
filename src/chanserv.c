@@ -1106,7 +1106,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
 {
   struct ChannelUser *tempu;
-  char *dopnicks; /* nicks to deop */
   char modes[MAXLINE]; /* mlock modes to set */
 
   if (!cptr || !chptr)
@@ -1114,16 +1113,13 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
   if (cptr->flags & CS_FORBID)
     {
-      char  *knicks; /* nicks to kick */
-
-      knicks = (char *)MyMalloc(sizeof(char));
+      char knicks[MAXLINE]; /* nicks to kick */
       knicks[0] = '\0';
+
       for (tempu = chptr->firstuser; tempu; tempu = tempu->next)
         {
           if (FindService(tempu->lptr))
             continue;
-          knicks = (char *) MyRealloc(knicks, strlen(knicks) +
-              strlen(tempu->lptr->nick) + (2 * sizeof(char)));
           strlcat(knicks, tempu->lptr->nick, sizeof(knicks));
           strlcat(knicks, " ", sizeof(knicks));
         }
@@ -1138,7 +1134,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
       toserv(":%s MODE %s +i\r\n", n_ChanServ, cptr->name);
       UpdateChanModes(Me.csptr, n_ChanServ, chptr, "+i");
       KickBan(0, n_ChanServ, chptr, knicks, "Forbidden Channel");
-      MyFree(knicks);
 
       return;
     }
@@ -1148,8 +1143,9 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
   if ((cptr->flags & CS_SECUREOPS) || (cptr->flags & CS_RESTRICTED))
     {
       /* SECUREOPS is set - deop all non autoops */
-      dopnicks = (char *) MyMalloc(sizeof(char));
+      char dopnicks[MAXLINE];
       dopnicks[0] = '\0';
+
       for (tempu = chptr->firstuser; tempu; tempu = tempu->next)
         {
           if (FindService(tempu->lptr))
@@ -1157,31 +1153,25 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           if ((tempu->flags & CH_OPPED) &&
               !HasAccess(cptr, tempu->lptr, CA_AUTOOP))
             {
-              dopnicks = (char *) MyRealloc(dopnicks, strlen(dopnicks) +
-                  strlen(tempu->lptr->nick) + (2 * sizeof(char)));
               strlcat(dopnicks, tempu->lptr->nick, sizeof(dopnicks));
               strlcat(dopnicks, " ", sizeof(dopnicks));
             }
         }
       SetModes(n_ChanServ, 0, 'o', chptr, dopnicks);
-      MyFree(dopnicks);
     }
 
   if ((cptr->flags & CS_RESTRICTED))
     {
-      char *kbnicks; /* nicks to kickban */
-
       /* channel is restricted - kickban all non-autoops */
-      kbnicks = (char *) MyMalloc(sizeof(char));
+      char kbnicks[MAXLINE];
       kbnicks[0] = '\0';
+
       for (tempu = chptr->firstuser; tempu; tempu = tempu->next)
         {
           if (FindService(tempu->lptr))
             continue;
           if (!HasAccess(cptr, tempu->lptr, CA_AUTOOP))
             {
-              kbnicks = (char *) MyRealloc(kbnicks, strlen(kbnicks) +
-                  strlen(tempu->lptr->nick) + (2 * sizeof(char)));
               strlcat(kbnicks, tempu->lptr->nick, sizeof(kbnicks));
               strlcat(kbnicks, " ", sizeof(kbnicks));
             }
@@ -1194,7 +1184,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
         cs_joinchan(cptr);
 
       KickBan(1, n_ChanServ, chptr, kbnicks, "Restricted Channel");
-      MyFree(kbnicks);
     }
 
   strlcpy(modes, "+", sizeof(modes));
@@ -1887,8 +1876,8 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 
 {
   struct Luser *nlptr;
-  char *dnicks, /* nicks to deop */
-  *currnick;
+  char dnicks[MAXLINE]; /* nicks to deop */
+  char *currnick;
   int ii; /* looping */
 
   if (!chptr || !cptr || !nicks)
@@ -1979,7 +1968,6 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
     * deop the nick(s) who created the channel if they
     * aren't an autoop or higher
     */
-  dnicks = (char *) MyMalloc(sizeof(char));
   dnicks[0] = '\0';
 
   for (ii = 0; ii < nickcnt; ii++)
@@ -2000,8 +1988,6 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
           HasAccess(cptr, nlptr, CA_AUTOOP))
         continue;
 
-      dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) +
-          strlen(nlptr->nick) + (2 * sizeof(char)));
       strlcat(dnicks, nlptr->nick, sizeof(dnicks));
       strlcat(dnicks, " ", sizeof(dnicks));
 
@@ -2020,8 +2006,6 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
    * Deop the non-autoops
    */
   SetModes(n_ChanServ, 0, 'o', chptr, dnicks);
-
-  MyFree(dnicks);
 } /* cs_CheckSjoin() */
 
 /*
@@ -3434,7 +3418,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
   }
 
-  memset(hostmask, 0, MAXLINE);
+  hostmask[0] = '\0';
 
   if (match("*!*@*", av[3]))
     strncpy(hostmask, av[3], MAXLINE - 1);
@@ -3652,15 +3636,13 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
                  nickptr ? nickptr->nick : host,
                  cptr->name);
 
-          if (host)
-            MyFree(host);
+          MyFree(host);
 
           return;
         }
     }
 
-  if (host)
-    MyFree(host);
+  MyFree(host);
 } /* c_access_del() */
 
 static void
@@ -3866,7 +3848,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
     sidx = 3;
 
-  memset(hostmask, 0, MAXLINE);
+  hostmask[0] = '\0';
 
   if (match("*!*@*", av[sidx]))
     strncpy(hostmask, av[sidx], MAXLINE - 1);
@@ -3970,7 +3952,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		  if (IsFounder(tempuser->lptr, cptr)) 
 		    continue;
 
-		  memset(nuhost, 0, sizeof(nuhost));
+		  nuhost[0] = '\0';
 		  strncpy(nuhost, tempuser->lptr->nick, NICKLEN);
 		  strlcat(nuhost, "!", sizeof(nuhost));
 		  strncat(nuhost, tempuser->lptr->username, USERLEN);
@@ -4057,7 +4039,7 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   else
   {
     char hostmask[MAXLINE];
-    memset(hostmask, 0, MAXLINE);
+    hostmask[0] = '\0';
 
     if (match("*!*@*", av[3]))
       strncpy(hostmask, av[3], MAXLINE - 1);
@@ -5421,8 +5403,7 @@ c_set_successor(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!irccmp(av[3], "-"))
   {
-    if (cptr->successor)
-      MyFree(cptr->successor);
+    MyFree(cptr->successor);
     cptr->successor = NULL;
     notice(n_ChanServ, lptr->nick,
       "The successor nickname for %s has been cleared", cptr->name);
@@ -5435,8 +5416,7 @@ c_set_successor(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  if (cptr->successor)
-    MyFree(cptr->successor);
+  MyFree(cptr->successor);
 
   cptr->successor = MyStrdup(fptr->nick);
 
@@ -6347,7 +6327,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char *onicks, *dnicks;
+  char onicks[MAXLINE], dnicks[MAXLINE];
   struct UserChannel *uchan;
   struct ChannelUser *cuser;
   struct Luser *currlptr;
@@ -6435,9 +6415,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           return;
         }
 
-      onicks = MyStrdup(lptr->nick);
-      dnicks = MyStrdup("");
-
+      strlcpy(onicks, lptr->nick, MAXLINE);
+      dnicks[0] = '\0';
     }
   else
     {
@@ -6449,9 +6428,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       tempptr = tempnix;
       arc = SplitBuf(tempnix, &arv);
-      onicks = (char *) MyMalloc(sizeof(char));
       onicks[0] = '\0';
-      dnicks = (char *) MyMalloc(sizeof(char));
       dnicks[0] = '\0';
       for (ii = 0; ii < arc; ii++)
         {
@@ -6465,18 +6442,12 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
           if ((arv[ii][0] == '-') && (IsChannelOp(chptr, currlptr)))
             {
-              dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
-                + strlen(arv[ii] + 1) + (2 * sizeof(char)));
               strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
               strlcat(dnicks, " ", sizeof(dnicks));
             }
           else if (!IsChannelOp(chptr, currlptr))
             {
               struct Luser *alptr = FindClient(arv[ii]);
-#if 0
-              if ((cptr->flags & CS_SECUREOPS) &&
-                  (!HasAccess(cptr, FindClient(arv[ii]), CA_AUTOOP)))
-#endif
               if ((cptr->flags & CS_SECUREOPS) && (alptr != lptr) &&
                   (!HasAccess(cptr, alptr, CA_AUTOOP)))
                   
@@ -6488,8 +6459,6 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
               if (HasFlag(arv[ii], NS_NOCHANOPS))
                 continue;
 
-              onicks = (char *) MyRealloc(onicks, strlen(onicks)
-                                          + strlen(arv[ii]) + (2 * sizeof(char)));
               strlcat(onicks, arv[ii], sizeof(onicks));
               strlcat(onicks, " ", sizeof(onicks));
             }
@@ -6507,8 +6476,6 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                 strlen(onicks) ? " [+] " : "", strlen(onicks) ? onicks : "",
                 strlen(dnicks) ? " [-] " : "", strlen(dnicks) ? dnicks : "");
 
-  MyFree(onicks);
-  MyFree(dnicks);
 } /* c_op() */
 
 #ifdef HYBRID7_HALFOPS
@@ -6524,7 +6491,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char *hnicks, *dnicks;
+  char hnicks[MAXLINE], dnicks[MAXLINE];
 
   if (ac < 2)
     {
@@ -6540,8 +6507,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     }
 
   /* NOTE: only CMDOP people can +h other people */
-  /* So why do we have CMDHALFOP level?? -adx */
-  if (!HasAccess(cptr, lptr, CA_CMDHALFOP))   /* XXX */
+  if (!HasAccess(cptr, lptr, CA_CMDHALFOP))
     {
       notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
              cptr->access_lvl[CA_CMDHALFOP], "HALFOP", cptr->name);
@@ -6554,14 +6520,12 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   chptr = FindChannel(av[1]);
   if (ac < 3)
     {
-      hnicks = MyStrdup(lptr->nick);
-      dnicks = MyStrdup("");
+      strlcpy(hnicks, lptr->nick, MAXLINE);
+      dnicks[0] = '\0';
       if (!IsChannelMember(chptr, lptr))
         {
           notice(n_ChanServ, lptr->nick,
                  "You are not on [\002%s\002]", cptr->name);
-          MyFree(hnicks);
-          MyFree(dnicks);
           return;
         }
     }
@@ -6576,9 +6540,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
       tempptr = tempnix;
       arc = SplitBuf(tempnix, &arv);
-      hnicks = (char *) MyMalloc(sizeof(char));
       hnicks[0] = '\0';
-      dnicks = (char *) MyMalloc(sizeof(char));
       dnicks[0] = '\0';
       for (ii = 0; ii < arc; ii++)
         {
@@ -6592,15 +6554,11 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
           if (arv[ii][0] == '-')
             {
-              dnicks = (char *) MyRealloc(dnicks, strlen(dnicks) +
-                  strlen(arv[ii] + 1) + (2 * sizeof(char)));
               strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
               strlcat(dnicks, " ", sizeof(dnicks));
             }
           else
             {
-              hnicks = (char *) MyRealloc(hnicks, strlen(hnicks) +
-                  strlen(arv[ii]) + (2 * sizeof(char)));
               strlcat(hnicks, arv[ii], sizeof(hnicks));
               strlcat(hnicks, " ", sizeof(hnicks));
             }
@@ -6619,9 +6577,6 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
                 strlen(hnicks) ? " [+] " : "", strlen(hnicks) ? hnicks : "",
                 strlen(dnicks) ? " [-] " : "", strlen(dnicks) ? dnicks : "");
 
-  MyFree(hnicks);
-  MyFree(dnicks);
-
   return;
 } /* c_hop() */
 #endif /* HYBRID7_HALFOPS */
@@ -6637,7 +6592,7 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char *vnicks, *dnicks;
+  char vnicks[MAXLINE], dnicks[MAXLINE];
 
   if (ac < 2)
     {
@@ -6677,15 +6632,13 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   chptr = FindChannel(av[1]);
   if (ac < 3)
     {
-      vnicks = MyStrdup(lptr->nick);
-      dnicks = MyStrdup("");
+      strlcpy(vnicks, lptr->nick, MAXLINE);
+      dnicks[0] = '\0';
       if (!IsChannelMember(chptr, lptr))
         {
           notice(n_ChanServ, lptr->nick,
                  "You are not on [\002%s\002]",
                  cptr->name);
-          MyFree(vnicks);
-          MyFree(dnicks);
           return;
         }
     }
@@ -6700,9 +6653,7 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       tempptr = tempnix;
       arc = SplitBuf(tempnix, &arv);
-      vnicks = (char *) MyMalloc(sizeof(char));
       vnicks[0] = '\0';
-      dnicks = (char *) MyMalloc(sizeof(char));
       dnicks[0] = '\0';
       for (ii = 0; ii < arc; ii++)
         {
@@ -6716,15 +6667,11 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
           if (arv[ii][0] == '-')
             {
-              dnicks = (char *) MyRealloc(dnicks, strlen(dnicks)
-                                          + strlen(arv[ii] + 1) + (2 * sizeof(char)));
               strlcat(dnicks, arv[ii] + 1, sizeof(dnicks));
               strlcat(dnicks, " ", sizeof(dnicks));
             }
           else
             {
-              vnicks = (char *) MyRealloc(vnicks, strlen(vnicks)
-                                          + strlen(arv[ii]) + (2 * sizeof(char)));
               strlcat(vnicks, arv[ii], sizeof(vnicks));
               strlcat(vnicks, " ", sizeof(vnicks));
             }
@@ -6748,9 +6695,6 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                 strlen(dnicks) ? " [-] " : "",
                 strlen(dnicks) ? dnicks : "");
 
-  MyFree(vnicks);
-  MyFree(dnicks);
-
   return;
 } /* c_voice() */
 
@@ -6764,7 +6708,7 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char chkstr[MAXLINE], *bans;
+  char chkstr[MAXLINE], bans[MAXLINE];
   struct Channel *chptr;
   struct ChannelBan *bptr;
   int all = 0;
@@ -6830,22 +6774,17 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         return;
       }
 
-    bans = (char *) MyMalloc(sizeof(char));
     bans[0] = '\0';
     for (bptr = chptr->firstban; bptr; bptr = bptr->next)
       {
         if (all || match(bptr->mask, chkstr))
         {
-          bans = (char *) MyRealloc(bans, strlen(bans) +
-              strlen(bptr->mask) + (2 * sizeof(char)));
           strlcat(bans, bptr->mask, sizeof(bans));
           strlcat(bans, " ", sizeof(bans));
         }
     }
 
   SetModes(n_ChanServ, 0, 'b', chptr, bans);
-
-  MyFree(bans);
 
   notice(n_ChanServ, lptr->nick,
          "All bans matching [\002%s\002] have been cleared on %s",
@@ -6987,8 +6926,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   if (*buf)
     {
       /* kill the trailing "," */
-      buf[strlen(buf) - 2]
-      = '\0';
+      buf[strlen(buf) - 2] = '\0';
       notice(n_ChanServ, lptr->nick,
              "     Options: %s",
              buf);
@@ -7156,7 +7094,7 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChannelUser *cuser;
-  char *ops;
+  char ops[MAXLINE];
   struct Channel *chptr;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7166,7 +7104,6 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  ops = (char *) MyMalloc(sizeof(char));
   ops[0] = '\0';
   for (cuser = chptr->firstuser; cuser; cuser = cuser->next)
     {
@@ -7174,15 +7111,11 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           !(cuser->flags & CH_OPPED))
         continue;
 
-      ops = (char *) MyRealloc(ops, strlen(ops) +
-          strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strlcat(ops, cuser->lptr->nick, sizeof(ops));
       strlcat(ops, " ", sizeof(ops));
     }
 
   SetModes(n_ChanServ, 0, 'o', chptr, ops);
-
-  MyFree(ops);
 } /* c_clear_ops() */
 
 #ifdef HYBRID7_HALFOPS
@@ -7191,7 +7124,7 @@ static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
                          ac, char **av)
 {
   struct ChannelUser *cuser;
-  char *hops;
+  char hops[MAXLINE];
   struct Channel *chptr;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7201,7 +7134,6 @@ static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
       return;
     }
 
-  hops = (char *) MyMalloc(sizeof(char));
   hops[0] = '\0';
   for (cuser = chptr->firstuser; cuser; cuser = cuser->next)
     {
@@ -7209,15 +7141,11 @@ static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
           !(cuser->flags & CH_HOPPED))
         continue;
 
-      hops = (char *) MyRealloc(hops, strlen(hops) +
-          strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strlcat(hops, cuser->lptr->nick, sizeof(hops));
       strlcat(hops, " ", sizeof(hops));
     }
 
   SetModes(n_ChanServ, 0, 'h', chptr, hops);
-
-  MyFree(hops);
 } /* c_clear_hops() */
 #endif /* HYBRID7_HALFOPS */
 
@@ -7227,7 +7155,7 @@ c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelUser *cuser;
-  char *voices;
+  char voices[MAXLINE];
 
   if (!(chptr = FindChannel(av[1])))
     {
@@ -7237,7 +7165,6 @@ c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  voices = (char *) MyMalloc(sizeof(char));
   voices[0] = '\0';
   for (cuser = chptr->firstuser; cuser; cuser = cuser->next)
     {
@@ -7245,14 +7172,11 @@ c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           !(cuser->flags & CH_VOICED))
         continue;
 
-      voices = (char *) MyRealloc(voices, strlen(voices) + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strlcat(voices, cuser->lptr->nick, sizeof(voices));
       strlcat(voices, " ", sizeof(voices));
     }
 
   SetModes(n_ChanServ, 0, 'v', chptr, voices);
-
-  MyFree(voices);
 } /* c_clear_voices() */
 
 static void
@@ -7314,7 +7238,7 @@ c_clear_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelBan *bptr;
-  char *bans;
+  char bans[MAXLINE];
 
   if (!(chptr = FindChannel(av[1])))
     {
@@ -7324,20 +7248,15 @@ c_clear_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  bans = (char *) MyMalloc(sizeof(char));
   bans[0] = '\0';
 
   for (bptr = chptr->firstban; bptr; bptr = bptr->next)
     {
-      bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask) +
-          (2 * sizeof(char)));
       strlcat(bans, bptr->mask, sizeof(bans));
       strlcat(bans, " ", sizeof(bans));
     }
 
   SetModes(n_ChanServ, 0, 'b', chptr, bans);
-
-  MyFree(bans);
 } /* c_clear_bans() */
 
 static void
@@ -7346,8 +7265,8 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelUser *cuser;
-  char *knicks,
-  *ops; /* deop before kicking */
+  char knicks[MAXLINE];
+  char ops[MAXLINE]; /* deop before kicking */
 
   if (!(chptr = FindChannel(av[1])))
     {
@@ -7357,9 +7276,7 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
       return;
     }
 
-  knicks = (char *) MyMalloc(sizeof(char));
   knicks[0] = '\0';
-  ops = (char *) MyMalloc(sizeof(char));
   ops[0] = '\0';
 
   for (cuser = chptr->firstuser; cuser; cuser = cuser->next)
@@ -7369,27 +7286,21 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if (cuser->flags & CH_OPPED)
         {
-          ops = (char *) MyRealloc(ops, strlen(ops)
-                                   + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
           strlcat(ops, cuser->lptr->nick, sizeof(ops));
           strlcat(ops, " ", sizeof(ops));
         }
 
-      knicks = (char *) MyRealloc(knicks, strlen(knicks)
-                                  + strlen(cuser->lptr->nick) + (2 * sizeof(char)));
       strlcat(knicks, cuser->lptr->nick, sizeof(knicks));
       strlcat(knicks, " ", sizeof(knicks));
     }
 
   SetModes(n_ChanServ, 0, 'o', chptr, ops);
-  MyFree(ops);
 
   toserv(":%s MODE %s +i\r\n", n_ChanServ, chptr->name);
 
   UpdateChanModes(Me.csptr, n_ChanServ, chptr, "+i");
 
   KickBan(0, n_ChanServ, chptr, knicks, "Clearing Users");
-  MyFree(knicks);
 
   toserv(":%s MODE %s -i\r\n", n_ChanServ, chptr->name);
 
@@ -7421,7 +7332,7 @@ static void c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr,
 {
   struct Channel *chptr;
   struct ChannelGecosBan *bptr;
-  char *bans;
+  char bans[MAXLINE];
 
   if (!(chptr = FindChannel(av[1])))
     {
@@ -7431,20 +7342,15 @@ static void c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr,
       return;
     }
 
-  bans = (char *)MyMalloc(sizeof(char));
   bans[0] = '\0';
 
   for (bptr = chptr->firstgecosban; bptr; bptr = bptr->next)
     {
-      bans = (char *)MyRealloc(bans, strlen(bans)
-                               + strlen(bptr->mask) + (2 * sizeof(char)));
       strlcat(bans, bptr->mask, sizeof(bans));
       strlcat(bans, " ", sizeof(bans));
     }
 
   SetModes(n_ChanServ, 0, 'd', chptr, bans);
-
-  MyFree(bans);
 } /* c_clear_gecos_bans() */
 #endif /* GECOSBANS */
 
@@ -7971,7 +7877,7 @@ void ExpireBans(time_t unixtime)
   struct ChanInfo *cptr;
   struct ChannelBan *bptr;
   struct Channel *chptr;
-  char *bans;
+  char bans[MAXLINE];
 
   /* If ban expire time is 0 seconds, don't remove the ban. */
   if (!BanExpire)
@@ -7986,7 +7892,6 @@ void ExpireBans(time_t unixtime)
         if (!(chptr = FindChannel(cptr->name)))
           continue;
 
-        bans = MyMalloc(sizeof(char));
         bans[0] = '\0';
        
         for (bptr = chptr->firstban; bptr; bptr = bptr->next)
@@ -7996,15 +7901,12 @@ void ExpireBans(time_t unixtime)
             /* Ban has expired. Remove it. */
             putlog(LOG2, "%s: Removing ban %s on %s (expired)",
               n_ChanServ, bptr->mask, cptr->name);
-            bans = (char *) MyRealloc(bans, strlen(bans) + strlen(bptr->mask)
-                + (2 * sizeof(char)));
             strlcat(bans, bptr->mask, sizeof(bans));
             strlcat(bans, " ", sizeof(bans));
           }
         }
        if (bans)
         SetModes(n_ChanServ, 0, 'b', chptr, bans);
-       MyFree(bans);
       } /* if (cptr->flags & CS_EXPIREBANS) */
     } /* for (cptr = chanlist[ii]; cptr; cptr = cptr->next) */
   } /* for (ii = 0; ii < CHANLIST_MAX; ++ii) */
@@ -8041,7 +7943,7 @@ ExpireAkicks(time_t unixtime)
           SendUmode(OPERUMODE_Y, "*** Expired akick %s [%s]",
             temp->hostmask, temp->reason ? temp->reason : "");
 	
-          memset(modes, 0, sizeof(modes));
+          modes[0] = '\0';
           ircsprintf(modes, "-b %s", temp->hostmask);
           modes[sizeof(modes) - 1] = '\0'; /* Paranoic - there is no
                                               ircnsprintf() :) */

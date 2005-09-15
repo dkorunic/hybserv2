@@ -507,9 +507,7 @@ Substitute()
           to read the line; otherwise a ptr to substituted string
 */
 
-char *
-Substitute(char *nick, char *str, int sockfd)
-
+char *Substitute(char *nick, char *str, int sockfd)
 {
   char tempstr[MAXLINE], key;
   char *finalstr = NULL;
@@ -536,28 +534,28 @@ Substitute(char *nick, char *str, int sockfd)
             case 'o':
             case 'O':
               {
-                strlcat(finalstr, n_OperServ, sizeof(finalstr));
+                strlcat(finalstr, n_OperServ, MAXLINE);
                 fcnt += strlen(n_OperServ) - 1;
                 break;
               }
             case 'n':
             case 'N':
               {
-                strlcat(finalstr, n_NickServ, sizeof(finalstr));
+                strlcat(finalstr, n_NickServ, MAXLINE);
                 fcnt += strlen(n_NickServ) - 1;
                 break;
               }
             case 'c':
             case 'C':
               {
-                strlcat(finalstr, n_ChanServ, sizeof(finalstr));
+                strlcat(finalstr, n_ChanServ, MAXLINE);
                 fcnt += strlen(n_ChanServ) - 1;
                 break;
               }
             case 'e':
             case 'E':
               {
-                strlcat(finalstr, n_SeenServ, sizeof(finalstr));
+                strlcat(finalstr, n_SeenServ, MAXLINE);
                 fcnt += strlen(n_SeenServ) - 1;
                 break;
               }
@@ -565,55 +563,55 @@ Substitute(char *nick, char *str, int sockfd)
             case 'm':
             case 'M':
               {
-                strlcat(finalstr, n_MemoServ, sizeof(finalstr));
+                strlcat(finalstr, n_MemoServ, MAXLINE);
                 fcnt += strlen(n_MemoServ) - 1;
                 break;
               }
             case 't':
             case 'T':
               {
-                strlcat(finalstr, n_StatServ, sizeof(finalstr));
+                strlcat(finalstr, n_StatServ, MAXLINE);
                 fcnt += strlen(n_StatServ) - 1;
                 break;
               }
             case 'h':
             case 'H':
               {
-                strlcat(finalstr, n_HelpServ, sizeof(finalstr));
+                strlcat(finalstr, n_HelpServ, MAXLINE);
                 fcnt += strlen(n_HelpServ) - 1;
                 break;
               }
             case 'g':
             case 'G':
               {
-                strlcat(finalstr, n_Global, sizeof(finalstr));
+                strlcat(finalstr, n_Global, MAXLINE);
                 fcnt += strlen(n_Global) - 1;
                 break;
               }
             case 's':
             case 'S':
               {
-                strlcat(finalstr, Me.name, sizeof(finalstr));
+                strlcat(finalstr, Me.name, MAXLINE);
                 fcnt += strlen(Me.name) - 1;
                 break;
               }
             case 'b':
             case 'B':
               {
-                strlcat(finalstr, "\002", sizeof(finalstr));
+                strlcat(finalstr, "\002", MAXLINE);
                 break;
               }
             case 'v':
             case 'V':
               {
-                strlcat(finalstr, hVersion, sizeof(finalstr));
+                strlcat(finalstr, hVersion, MAXLINE);
                 fcnt += strlen(hVersion) - 1;
                 break;
               }
             case 'a':
             case 'A':
               {
-                strlcat(finalstr, Me.admin, sizeof(finalstr));
+                strlcat(finalstr, Me.admin, MAXLINE);
                 fcnt += strlen(Me.admin) - 1;
                 break;
               }
@@ -655,7 +653,7 @@ Substitute(char *nick, char *str, int sockfd)
 
             default:
               {
-                strlcat(finalstr, "%", sizeof(finalstr));
+                strlcat(finalstr, "%", MAXLINE);
                 finalstr[++fcnt] = tempstr[tcnt];
                 break;
               }

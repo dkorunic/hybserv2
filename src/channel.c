@@ -1438,7 +1438,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
 
   temp = MyStrdup(args);
   acnt = SplitBuf(temp, &av);
-  memset(done, 0, MAXLINE);
+  done[0] = '\0';
   mcnt = 1;
   for (ii = 0; ii < acnt; ii++)
   {
@@ -1453,7 +1453,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
       toserv(":%s MODE %s %s\r\n", source, chptr->name, sendstr);
       UpdateChanModes(0, source, chptr, sendstr);
       MyFree(mtmp);
-      memset(done, 0, MAXLINE);
+      done[0] = '\0';
     }
     mcnt++;
   }
@@ -1477,7 +1477,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
 void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
     char *reason)
 {
-  char *mask = NULL, *tempnix = NULL, **av, *bans = NULL;
+  char *mask = NULL, *tempnix = NULL, **av;
   char temp[MAXLINE];
   int ac, ii;
   struct Luser *lptr = NULL;
@@ -1490,7 +1490,7 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
 
   if (ban)
   {
-    bans = MyMalloc(sizeof(char));
+    char bans[MAXLINE];
     bans[0] = '\0';
     for (ii = 0; ii < ac; ii++)
     {
@@ -1498,15 +1498,12 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
         continue;
       mask = HostToMask(lptr->username, lptr->hostname);
       ircsprintf(temp, "*!%s", mask);
-      bans = MyRealloc(bans, strlen(bans) + strlen(temp)
-          + (2 * sizeof(char)));
       strlcat(bans, temp, sizeof(bans));
       strlcat(bans, " ", sizeof(bans));
       MyFree(mask);
     }
 
     SetModes(source, 1, 'b', channel, bans);
-    MyFree(bans);
   }
 
   for (ii = 0; ii < ac; ii++)

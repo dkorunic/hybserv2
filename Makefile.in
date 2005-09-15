@@ -138,5 +138,9 @@ install-help:
 autoconf:
 	autoreconf
 
+# Tags
+etags:
+	etags include/*.h src/*.c
+
 # End of Makefile
 # vim: set noexpandtab

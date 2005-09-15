@@ -84,7 +84,7 @@ ReadMessageFile(struct MessageFile *fileptr)
 
   CurrentLine = NULL;
 
-  while (fgets(buffer, sizeof(buffer) - 1, fptr))
+  while (fgets(buffer, MESSAGELINELEN - 1, fptr))
     {
       if ((ch = strchr(buffer, '\n')))
         *ch = '\0';

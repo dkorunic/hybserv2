@@ -829,7 +829,7 @@ LoadSettings(int rehash)
   cnt = 0;
   goodread = 1;
 
-  while (fgets(buffer, sizeof(buffer), fp))
+  while (fgets(buffer, MAXLINE - 1, fp))
     {
       cnt++;
       if (buffer[0] != '#') /* comment line */

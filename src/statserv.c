@@ -1433,7 +1433,7 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
         "Searching for [%s] with service [%s] for [%d] days in file [%s]",
         av[2], av[1], day, grep_log_filename);
 
-      while (fgets(buf, 128 - 1, lf))
+      while (fgets(buf, MAXLINE - 1, lf))
         {
           if (ircncmp(buf + 25, av[1], strlen(av[1])) == 0)
             if (match(av[2], buf + 25 + strlen(av[1]) + 2))

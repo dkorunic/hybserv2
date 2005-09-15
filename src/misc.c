@@ -667,17 +667,14 @@ Substitute(char *nick, char *str, int sockfd)
       tcnt++;
     }
 
-  if (finalstr[0])
+  if (*finalstr)
     {
-      finalstr[fcnt++] = '\n';
       finalstr[fcnt] = '\0';
-      return (finalstr);
+      return(finalstr);
     }
-  else
-    {
-      MyFree(finalstr);
-      return (NULL);
-    }
+
+  MyFree(finalstr);
+  return NULL;
 } /* Substitute() */
 
 /*

@@ -666,7 +666,7 @@ writeauth(struct DccUser *dccptr)
     }
 
   /* send ident request */
-  ircsprintf(idstr, "%u , %u\n",
+  ircsprintf(idstr, "%u , %u\r\n",
              (unsigned int) ntohs(remote.sin_port),
              (unsigned int) ntohs(local.sin_port));
   writesocket(dccptr->authfd, idstr);
@@ -760,7 +760,7 @@ TelnetGreet(struct DccUser *dccptr)
 
   SetDccPending(dccptr);
 
-  ircsprintf(ver, "\nHybserv2 (TS Services version %s)\n", hVersion);
+  ircsprintf(ver, "\r\nHybserv2 (TS Services version %s)\r\n", hVersion);
   writesocket(dccptr->socket, ver);
 
   writesocket(dccptr->socket, "\r\nEnter nickname\r\n");
@@ -888,7 +888,7 @@ GreetDccUser(struct DccUser *dccptr)
     }
 
   motd_tm = localtime(&CurrTime);
-  ircsprintf(sendstr, "Hybserv2 %s (%d/%d/%d %d:%02d)\n",
+  ircsprintf(sendstr, "Hybserv2 %s (%d/%d/%d %d:%02d)\r\n",
              hVersion, 1900 + motd_tm->tm_year, motd_tm->tm_mon + 1,
              motd_tm->tm_mday, motd_tm->tm_hour, motd_tm->tm_min);
   writesocket(dccptr->socket, sendstr);
@@ -899,7 +899,7 @@ GreetDccUser(struct DccUser *dccptr)
   if (IsDccPending(dccptr))
     {
       writesocket(dccptr->socket,
-                  "You must .identify before you may use commands\n\n");
+                  "You must .identify before you may use commands\r\n");
       tempuser = GetUser(0, dccptr->nick, dccptr->username, dccptr->hostname);
     }
   else
@@ -1171,7 +1171,7 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
 
       if (nptr)
         {
-          ircsprintf(sendstr, "Unable to connect to port %d of %s: %s\n",
+          ircsprintf(sendstr, "Unable to connect to port %d of %s: %s\r\n",
                      bptr->port, bptr->hostname, strerror(errno));
           writesocket(nptr->socket, sendstr);
         }
@@ -1219,13 +1219,13 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
 
       if (tmp->flags & SOCK_TCMBOT)
         {
-          ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
+          ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
                      n_OperServ, bptr->name, dccptr->username, dccptr->hostname);
           writesocket(tmp->socket, sendstr);
         }
       else
         {
-          ircsprintf(sendstr, "*** Linked to %s [%s@%s]\n",
+          ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
                      bptr->name, dccptr->username, dccptr->hostname);
           writesocket(tmp->socket, sendstr);
         }
@@ -2002,14 +2002,14 @@ int BotProcess(struct DccUser *botptr, char *line)
 
                   if (tmp->flags & SOCK_TCMBOT)
                     {
-                      ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\n",
+                      ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
                                  n_OperServ, botptr->nick, botptr->username,
                                  botptr->hostname);
                       writesocket(tmp->socket, sendstr);
                     }
                   else
                     {
-                      ircsprintf(sendstr, "*** Linked to %s [%s@%s]\n",
+                      ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
                                  botptr->nick, botptr->username, botptr->hostname);
                       writesocket(tmp->socket, sendstr);
                     }
@@ -2065,7 +2065,7 @@ int BotProcess(struct DccUser *botptr, char *line)
     {
       /* <nick@bot> said something */
 
-      ircsprintf(buf, "%s\n", line);
+      ircsprintf(buf, "%s\r\n", line);
       for (tmp = connections; tmp; tmp = tmp->next)
         {
           if (botptr == tmp)

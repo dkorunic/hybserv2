@@ -33,11 +33,11 @@
 #ifdef HELPSERVICES
 
 static void hs_givehelp(struct Luser *, int, char **);
+static void hs_notice(char *, char *, int, char *, ...);
 
 static struct Command helpcmds[] =
     {
-      { "HELP", hs_givehelp, LVL_NONE
-      },
+      { "HELP", hs_givehelp, LVL_NONE },
       { "OPERSERV", hs_givehelp, LVL_NONE },
 
 #ifdef NICKSERVICES
@@ -70,9 +70,7 @@ hs_process()
   Process command coming from 'nick' directed towards n_HelpServ
 */
 
-void
-hs_process(char *nick, char *command)
-
+void hs_process(char *nick, char *command)
 {
   int acnt;
   char **arv;
@@ -308,7 +306,8 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
               ircsprintf(sendstr, "%s/operserv/dcc/index", HelpPath);
               if ((fp = fopen(sendstr, "r")) == NULL)
                 {
-                  writesocket(sockfd, "Unable to open help file\r\n");
+                  hs_notice(n_OperServ, helpnick, sockfd,
+                      "Unable to open help file");
                   return;
                 }
             }
@@ -319,23 +318,13 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
       while (fgets(line, MAXLINE - 1, fp))
         {
           if (IsEOL(*line))
-            {
-              if (sockfd != NODCC)
-                writesocket(sockfd, "\r\n");
-              else
-                notice(Serv, helpnick, "\002\002");
-
-              continue;
-            }
-
+          {
+            hs_notice(Serv,helpnick, sockfd, "");
+            continue;
+          }
           final = Substitute(helpnick, line, sockfd);
           if (final && (final != (char *) -1))
-            {
-              if (sockfd == NODCC)
-                notice(Serv, helpnick, "%s", final);
-              else
-                writesocket(sockfd, final);
-            }
+              hs_notice(Serv, helpnick, sockfd, "%s", final);
           if (final != (char *) -1)
             MyFree(final);
         }
@@ -354,13 +343,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           strstr(command, "%"))
         {
           ircsprintf(sendstr, "Invalid help string");
-          if (sockfd == NODCC)
-            notice(Serv, helpnick, "%s", sendstr);
-          else
-            {
-              writesocket(sockfd, sendstr);
-              writesocket(sockfd, "\r\n");
-            }
+          hs_notice(Serv, helpnick, sockfd, "%s", sendstr);
           return;
         }
 
@@ -470,40 +453,63 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
       if ((fp = fopen(sendstr, "r")) == NULL)
         {
-          ircsprintf(sendstr, "No help available on \002%s %s\002", helparg, arg2);
-          if (sockfd == NODCC)
-            notice(Serv, helpnick, "%s", sendstr);
-          else
-            {
-              writesocket(sockfd, sendstr);
-              writesocket(sockfd, "\r\n");
-            }
+          ircsprintf(sendstr, "No help available on \002%s %s\002",
+              helparg, arg2);
+          hs_notice(Serv, helpnick, sockfd, "%s", sendstr);
           return;
         }
 
       while (fgets(line, MAXLINE - 1, fp))
         {
           if (IsEOL(*line))
-            {
-              if (sockfd != NODCC)
-                writesocket(sockfd, "\r\n");
-              else
-                notice(Serv, helpnick, "\002\002");
-
-              continue;
-            }
-
+          {
+            hs_notice(Serv,helpnick, sockfd, "");
+            continue;
+          }
           final = Substitute(helpnick, line, sockfd);
           if (final && (final != (char *) -1))
-            {
-              if (sockfd == NODCC)
-                notice(Serv, helpnick, "%s", final);
-              else
-                writesocket(sockfd, final);
-            }
+              hs_notice(Serv, helpnick, sockfd, "%s", final);
           if (final != (char *) -1)
             MyFree(final);
         }
       fclose(fp);
     }  /* else */
 } /* GiveHelp() */
+
+/*
+  hs_notice()
+  args: struct Luser *lptr, int sockfd, char *msg
+  purpose: send a NOTICE to 'lptr->nick' with 'msg' or MSG via DCC
+  return: none
+*/
+
+static void hs_notice(char *Serv, char *nick, int sockfd, char
+    *format, ...)
+{
+  va_list args;
+  char finstr[MAXLINE * 2];
+  struct NickInfo *nptr;
+
+  va_start(args, format);
+  vsprintf_irc(finstr, format, args);
+  va_end(args);
+
+  if (sockfd == NODCC)
+    {
+      if (nick)
+      {
+        nptr = GetLink(nick);
+        if (nptr && (nptr->flags & NS_PRIVMSG))
+          toserv(":%s PRIVMSG %s :%s\r\n",
+              Serv, nick, finstr);
+        else
+          toserv(":%s NOTICE %s :%s\r\n",
+              Serv, nick, finstr);
+      }
+    }
+  else
+    {
+      writesocket(sockfd, finstr);
+      writesocket(sockfd, "\r\n");
+    }
+} /* os_notice() */

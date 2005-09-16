@@ -1491,8 +1491,8 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
   if (ban)
   {
     char bans[MAXLINE];
-    bans[0] = '\0';
     int jj = 1;
+    bans[0] = '\0';
 
     for (ii = 0; ii < ac; ii++)
     {

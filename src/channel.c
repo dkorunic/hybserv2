@@ -1492,15 +1492,26 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
   {
     char bans[MAXLINE];
     bans[0] = '\0';
+    int jj = 1;
+
     for (ii = 0; ii < ac; ii++)
     {
       if ((lptr = FindClient(av[ii])) == NULL)
         continue;
       mask = HostToMask(lptr->username, lptr->hostname);
       ircsprintf(temp, "*!%s", mask);
+      MyFree(mask);
+
+      if (jj * (MAXUSERLEN + 1) >= sizeof(bans))
+      {
+        SetModes(source, 1, 'b', channel, bans);
+        bans[0] = '\0';
+        jj = 1;
+      }
+
       strlcat(bans, temp, sizeof(bans));
       strlcat(bans, " ", sizeof(bans));
-      MyFree(mask);
+      ++jj;
     }
 
     SetModes(source, 1, 'b', channel, bans);

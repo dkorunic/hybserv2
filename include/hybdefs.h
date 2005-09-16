@@ -20,6 +20,7 @@
 #define   KEYLEN      23  /* channel key length */
 #define   SERVERLEN   63  /* server hostname length */
 #define   UHOSTLEN    (USERLEN + HOSTLEN)
+#define   MAXUSERLEN  (NICKLEN + USERLEN + HOSTLEN + 2)
 
 /* Command execution levels */
 #define LVL_NONE        0 /* anyone can execute */

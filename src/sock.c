@@ -63,7 +63,7 @@ char                      *nextparam = NULL;    /* address of next parameter */
  * the "spilled over" characters - the partial line that
  * buffer wasn't big enough to hold
  */
-char                      spill[MAXLINE * 2];
+char                      spill[MAXBUF];
 
 /*
  * Index of spill[] where we left off

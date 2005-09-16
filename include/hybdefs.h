@@ -13,6 +13,7 @@
 #include "motd.h"
 
 #define   MAXLINE     512 /* don't change this */
+#define   MAXBUF      16364 /* don't change this */
 #define   REALLEN     50  /* ircd value for max server info length */
 #define   USERLEN     10  /* username length */
 #define   HOSTLEN     63  /* hostname length */

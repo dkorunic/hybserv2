@@ -11,7 +11,7 @@
 #include "stdinc.h"
 #include "config.h"
 
-#define MESSAGELINELEN 89
+#define MESSAGELINELEN 256
 #define MAX_DATESTRING 32
 
 struct Luser;

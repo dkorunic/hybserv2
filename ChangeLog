@@ -1,5 +1,6 @@
 Hybserv-HEAD: Fri, 16 Sep 2005 14:01:13 +0200
 
+  * add configurable FORCENICK/SVSNICK prefix
   * strlcat/strlcpy merge, lot of memory stuff fixes, better internal
     spill control, less malloc/realloc stuff, less useless memsets
   * fix excessive writesock usage, fix several DCC-related issues

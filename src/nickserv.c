@@ -1404,40 +1404,54 @@ collide(char *nick)
   /* calculate how many chars do we need to pad */
 #if defined SVSNICK || defined FORCENICK
   nicknum = random();
+
+#if defined SVSNICK
 #if defined SVSNICK_LEN
   base = SVSNICK_LEN;
-#elif defined FORCENICK_LEN
+#else
+  base = NICKLEN - strlen(SVSNICK_PREFIX);
+#endif /* SVSNICK */
+#endif
+
+#if defined FORCENICK
+#if defined FORCENICK_LEN
   base = FORCENICK_LEN;
 #else
-  base = NICKLEN - 4;
+  base = NICKLEN - strlen(FORCENICK_PREFIX);
+#endif /* FORCENICK */
 #endif
+  
   j = 1;
   for (i = 1; i <= base; ++i)
     j *= 10;
   nicknum %= j;
+
 #endif /* defined SVSNICK || defined FORCENICK */
 
   /* normal ghosted nickname */
 #ifdef DANCER
+
   ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
       "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
+
 #elif !defined SVSNICK && !defined FORCENICK
+
   ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
       lptr->nick, (long) (lptr->nick_ts - 1), "enforced", Me.name,
       Me.name, "Nickname Enforcement");
+
 #endif /* DANCER */
 
   /* nope, we won't use ghosted nicknames, instead we'll force nick change
    * on remote nickname using SVSNICK or FORCENICK */
-
 #ifdef SVSNICK
 
-  ircsprintf(newnick, "User%ld", nicknum);
+  ircsprintf(newnick, "%s%ld", SVSNICK_PREFIX, nicknum);
   toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #elif defined FORCENICK
 
-  ircsprintf(newnick, "User%ld", nicknum);
+  ircsprintf(newnick, "%s%ld", FORCENICK_PREFIX, nicknum);
   toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #else

@@ -81,9 +81,9 @@ time_t                    HTM_ts = 0;      /* when HTM was activated */
  */
 int                       ReceiveLoad = RECVLOAD;
 
-struct DccUser            *dccnext;
-
 #endif /* HIGHTRAFFIC_MODE */
+
+struct DccUser            *dccnext;
 
 /* Set this to 1 when exiting ReadSocketInfo (XXX: CRUDE SEMAPHORE HACK!)
  * */
@@ -466,10 +466,7 @@ ReadSocketInfo(void)
   fd_set readfds,
   writefds;
 
-#if defined HIGHTRAFFIC_MODE
   time_t curr_ts;
-#endif
-
   time_t last_ts = current_ts;
 
   spill[0] = '\0';

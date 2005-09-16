@@ -59,8 +59,7 @@ static struct Command globalcmds[] =
 
 #if defined(NICKSERVICES) && defined(MEMOSERVICES)
 
-      { "GMEMO", g_gmemo, LVL_ADMIN
-      },
+      { "GMEMO", g_gmemo, LVL_ADMIN },
 
 #ifdef CHANNELSERVICES
       { "GCMEMO", g_gcmemo, LVL_ADMIN },

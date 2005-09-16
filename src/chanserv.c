@@ -387,7 +387,7 @@ void cs_process(char *nick, char *command)
                   "Password identification is required for [\002%s\002]",
                   cptr->cmd);
               notice(n_ChanServ, lptr->nick,
-                  "Type \002/msg %s IDENTIFY <password>\002 and retry",
+                  "Type \002/MSG %s IDENTIFY <password>\002 and retry",
                   n_NickServ);
               MyFree(arv);
               return;
@@ -3722,7 +3722,7 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
       notice(n_ChanServ, lptr->nick,
         "Password identification is required for [\002ACCESS LIST\002]");
       notice(n_ChanServ, lptr->nick,
-        "Type \002/msg %s IDENTIFY <password>\002 and retry",
+        "Type \002/MSG %s IDENTIFY <password>\002 and retry",
         n_NickServ);
       return;
     }

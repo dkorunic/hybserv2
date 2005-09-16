@@ -276,7 +276,7 @@ void ns_process(const char *nick, char *command)
                  "You must register your nick with \002%s\002 first",
                  n_NickServ);
           notice(n_NickServ, lptr->nick,
-                 "Type: \002/msg %s REGISTER <password>\002 to register your nickname",
+                 "Type: \002/MSG %s REGISTER <password>\002 to register your nickname",
                  n_NickServ);
           MyFree(arv);
           return;
@@ -288,7 +288,7 @@ void ns_process(const char *nick, char *command)
                  "Password identification is required for [\002%s\002]",
                  cptr->cmd);
           notice(n_NickServ, lptr->nick,
-                 "Type \002/msg %s IDENTIFY <password>\002 and retry",
+                 "Type \002/MSG %s IDENTIFY <password>\002 and retry",
                  n_NickServ);
           MyFree(arv);
           return;
@@ -1248,8 +1248,8 @@ CheckOper(char *nickname)
         notice(n_NickServ, nickname,
                "You have not set the NoExpire nickname flag for your nickname");
         notice(n_NickServ, nickname,
-               "Please type \002/msg %s SET NOEXPIRE ON\002 so your nickname does not expire",
-               n_NickServ);
+               "Please type \002/MSG %s SET %s NOEXPIRE ON\002 so your nickname does not expire",
+               n_NickServ, nickname);
       }
 } /* CheckOper() */
 
@@ -2270,7 +2270,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
                      mi->newmemos,
                      (mi->newmemos == 1) ? "" : "s");
               notice(n_MemoServ, lptr->nick,
-                     "Type \002/msg %s LIST\002 to view them",
+                     "Type \002/MSG %s LIST\002 to view them",
                      n_MemoServ);
             }
         }
@@ -2362,7 +2362,7 @@ n_recover(struct Luser *lptr, int ac, char **av)
              "The nickname [\002%s\002] has been recovered",
              av[1]);
       notice(n_NickServ, lptr->nick,
-             "Type: \002/msg %s RELEASE %s\002 to release the "
+             "Type: \002/MSG %s RELEASE %s\002 to release the "
              "nickname before the timeout",
              n_NickServ,
              av[1]);

@@ -156,7 +156,7 @@ ms_process(char *nick, char *command)
                      "Password identification is required for [\002%s\002]",
                      mptr->cmd);
               notice(n_MemoServ, lptr->nick,
-                     "Type \002/msg %s IDENTIFY <password>\002 and retry",
+                     "Type \002/MSG %s IDENTIFY <password>\002 and retry",
                      n_NickServ);
               MyFree(arv);
               return;
@@ -885,7 +885,7 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                      lptr->nick,
                      index);
               notice(n_MemoServ, realptr->nick,
-                     "Type \002/msg %s READ %d\002 to read it",
+                     "Type \002/MSG %s READ %d\002 to read it",
                      n_MemoServ,
                      index);
             }
@@ -927,7 +927,7 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                              lptr->nick,
                              index);
                       notice(n_MemoServ, cu->lptr->nick,
-                             "Type \002/msg %s READ %s %d\002 to read it",
+                             "Type \002/MSG %s READ %s %d\002 to read it",
                              n_MemoServ,
                              chptr->name,
                              index);
@@ -1169,11 +1169,11 @@ m_read(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (ac >= 3)
     notice(n_MemoServ, lptr->nick,
-           "To delete, type \002/msg %s DEL %s %s",
+           "To delete, type \002/MSG %s DEL %s %s",
            n_MemoServ, av[1], istr);
   else
     notice(n_MemoServ, lptr->nick,
-           "To delete, type \002/msg %s DEL %s",
+           "To delete, type \002/MSG %s DEL %s",
            n_MemoServ, istr);
 
 } /* m_read() */
@@ -1625,7 +1625,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                  (cnt == 1) ? "" : "s",
                  memoptr->sender);
           notice(n_MemoServ, realptr->nick,
-                 "Type \002/msg %s LIST\002 to view %s",
+                 "Type \002/MSG %s LIST\002 to view %s",
                  n_MemoServ,
                  (cnt == 1) ? "it" : "them");
         }
@@ -1666,7 +1666,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                          memoptr->sender);
 
                   notice(n_MemoServ, cu->lptr->nick,
-                         "Type \002/msg %s LIST %s\002 to view %s",
+                         "Type \002/MSG %s LIST %s\002 to view %s",
                          n_MemoServ,
                          chptr->name,
                          (cnt == 1) ? "it" : "them");
@@ -1776,7 +1776,7 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                  "You have a new memo from \002%s\002 (#%d)",
                  lptr->nick, index);
           notice(n_MemoServ, realptr->nick,
-                 "Type \002/msg %s READ %d\002 to read it",
+                 "Type \002/MSG %s READ %d\002 to read it",
                  n_MemoServ, index);
         }
     } /* if (index) */

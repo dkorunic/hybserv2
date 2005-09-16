@@ -99,8 +99,8 @@ void
 CheckLogs(time_t unixtime)
 
 {
-  char tmplog[MAXLINE],
-  olddate[MAXLINE];
+  char tmplog[MAXLINE];
+  char olddate[MAXLINE];
   char *currdate;
   struct tm *log_tm;
   time_t oldts;
@@ -145,7 +145,7 @@ CheckLogs(time_t unixtime)
                * Now check the date on the log file to see
                * if its the oldest.
                */
-              if (!*olddate)
+              if (!olddate[0])
                 strlcpy(olddate, dirp->d_name + len, sizeof(olddate));
               else
                 {

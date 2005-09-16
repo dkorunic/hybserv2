@@ -78,28 +78,16 @@ char *GetString(int ac, char **av)
   char temp[MAXLINE];
   int ii;
 
-  final = (char *) MyMalloc(sizeof(char));
-  *final = '\0';
+  final = MyMalloc(MAXLINE);
+  final[0] = '\0';
 
   ii = 0;
   while (ii < ac)
     {
       ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
-
-      final = (char *) MyRealloc(final,
-                                 strlen(final) + strlen(temp) + sizeof(char));
-      strlcat(final, temp, sizeof(final));
-
+      strlcat(final, temp, MAXLINE);
       ++ii;
     }
-
-  /* Routine to get rid of spaces at the end of new string. However, we
-   * don't need it atm -kre */
-#if 0
-  ii = strlen(final) - 1;
-  while (final[ii] == ' ' && ii)
-    final[ii--] = 0;
-#endif
 
   return (final);
 } /* GetString() */

@@ -37,8 +37,8 @@
  */
 char *timeago(time_t timestamp, int flag)
 {
-  static char final[50];
-  char temp[50];
+  static char final[TIMELEN];
+  char temp[TIMELEN];
   time_t delta;
   long years, weeks, days, hours, minutes, seconds;
   int longfmt;

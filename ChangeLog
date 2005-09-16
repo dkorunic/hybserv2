@@ -1,5 +1,9 @@
-Hybserv-HEAD: Sun, 11 Sep 2005 23:30:19 +0200
+Hybserv-HEAD: Fri, 16 Sep 2005 14:01:13 +0200
 
+  * strlcat/strlcpy merge, lot of memory stuff fixes, better internal
+    spill control, less malloc/realloc stuff, less useless memsets
+  * fix excessive writesock usage, fix several DCC-related issues
+  * greplog fixes
   * fixes for NickServ's set EXPIRE
   * rewrote n_set* group of functions to allow SET <nickname> PARAM
     [flags] for any nickname linked with sender nickame and for admins to be

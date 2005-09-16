@@ -8045,6 +8045,7 @@ void ExpireBans(time_t unixtime)
   struct ChannelBan *bptr;
   struct Channel *chptr;
   char bans[MAXLINE];
+  int jj = 1;
 
   /* If ban expire time is 0 seconds, don't remove the ban. */
   if (!BanExpire)
@@ -8068,10 +8069,20 @@ void ExpireBans(time_t unixtime)
             /* Ban has expired. Remove it. */
             putlog(LOG2, "%s: Removing ban %s on %s (expired)",
               n_ChanServ, bptr->mask, cptr->name);
+
+            if (jj * (MAXUSERLEN + 1) >= sizeof(bans))
+            {
+              SetModes(n_ChanServ, 0, 'b', chptr, bans);
+              bans[0] = '\0';
+              jj = 1;
+            }
+
             strlcat(bans, bptr->mask, sizeof(bans));
             strlcat(bans, " ", sizeof(bans));
+            ++jj;
           }
         }
+
        if (bans)
         SetModes(n_ChanServ, 0, 'b', chptr, bans);
       } /* if (cptr->flags & CS_EXPIREBANS) */

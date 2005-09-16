@@ -341,19 +341,16 @@ HostToMask (char *username, char *hostname)
    */
   *topsegment = NULL;
   char userhost[UHOSTLEN + 2];
-  int ii, /* looping */
-  cnt,
-  len;
+  int ii; /* looping */
+  int cnt;
 
   if (!username || !hostname)
     return (NULL);
 
   ircsprintf(userhost, "%s@%s", username, hostname);
 
-  len = strlen(userhost) + 32;
-
-  final = (char *) MyMalloc(len);
-  memset(final, 0, len);
+  final = MyMalloc(MAXUSERLEN);
+  final[0] = '\0';
 
   /* strip off a nick nick!user@host (if there is one) */
   realhost = (host = strchr(userhost, '!')) ? host + 1 : userhost;
@@ -381,7 +378,7 @@ HostToMask (char *username, char *hostname)
   else
     {
       /* there's no @ in the hostname, just make it *@*.host.com */
-      strlcpy(final, "*@", sizeof(final));
+      strlcpy(final, "*@", MAXUSERLEN);
       ii = 2;
       host = userhost;
     }
@@ -401,7 +398,7 @@ HostToMask (char *username, char *hostname)
        * domain; and if topsegment is NULL, the hostname must be
        * 2 parts (ie: blah.org), so don't strip off "blah"
        */
-      strlcpy(final + ii, host, sizeof(final));
+      strlcpy(final + ii, host, MAXUSERLEN);
     }
   else
     {
@@ -412,8 +409,7 @@ HostToMask (char *username, char *hostname)
        */
 
       /* advance to the end of topsegment */
-      for (temp = topsegment; *temp; temp++)
-        ;
+      for (temp = topsegment; *temp; temp++);
 
       --temp; /* point to the last letter (number) of the TLD */
       if ((*temp >= '0') && (*temp <= '9'))
@@ -430,7 +426,7 @@ HostToMask (char *username, char *hostname)
 
           /* stick a .* on the end :-) */
           ii += (temp - host);
-          strlcpy(final + ii, ".*", sizeof(final));
+          strlcpy(final + ii, ".*", MAXUSERLEN);
         }
       else
         {
@@ -517,10 +513,12 @@ char *Substitute(char *nick, char *str, int sockfd)
   lptr = FindClient(nick);
 
   strlcpy(tempstr, str, sizeof(tempstr));
-  finalstr = (char *) MyMalloc(MAXLINE);
+  finalstr = MyMalloc(MAXLINE);
   memset(finalstr, 0, MAXLINE);
+
   fcnt = 0;
   tcnt = 0;
+
   while (tcnt < MAXLINE)
     {
       if (IsEOL(tempstr[tcnt]))
@@ -625,7 +623,8 @@ char *Substitute(char *nick, char *str, int sockfd)
                 if (!nick)
                   tempuser = DccGetUser(IsDccSock(sockfd));
                 else if (lptr)
-                  tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
+                  tempuser = GetUser(1, lptr->nick, lptr->username,
+                      lptr->hostname);
                 else
                   tempuser = GetUser(1, nick, NULL, NULL);
 
@@ -637,12 +636,8 @@ char *Substitute(char *nick, char *str, int sockfd)
                     tcnt += 2;
                     cptr = &tempstr[tcnt];
                     finstr = Substitute(nick, cptr, sockfd);
-                    if (!finstr)
-                      {
-                        /* its a line like "%+a" with no text, so send a \r\n */
-                        MyFree(finstr);
+                    if (finstr == NULL)
                         finstr = MyStrdup("\r\n");
-                      }
                     return (finstr);
                   }
                 else
@@ -666,11 +661,11 @@ char *Substitute(char *nick, char *str, int sockfd)
       tcnt++;
     }
 
-  if (*finalstr)
-    {
-      finalstr[fcnt] = '\0';
-      return(finalstr);
-    }
+  if (finalstr[0])
+  {
+    finalstr[fcnt] = '\0';
+    return(finalstr);
+  }
 
   MyFree(finalstr);
   return NULL;

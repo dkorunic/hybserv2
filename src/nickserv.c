@@ -2616,13 +2616,12 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 
 {
   struct NickInfo *nptr;
+  char user[USERLEN];
   char *mask,
   *host,
   *tmp;
 
-  char user[USERLEN];
-
-  memset( (char*)user, 0x00, USERLEN );
+  user[0] = '\0';
 
   if (target)
     {
@@ -4874,8 +4873,8 @@ n_flag(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr, *realptr;
-  char buf[MAXLINE],
-  pstr[MAXLINE];
+  char buf[MAXLINE];
+  char pstr[MAXLINE];
   int ii;
 
   if (ac < 2)

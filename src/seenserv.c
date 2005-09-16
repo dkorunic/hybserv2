@@ -288,7 +288,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 {
   int i, count, j;
   aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
-  char nuhost[NICKLEN + USERLEN + HOSTLEN + 3], sendstr[256];
+  char nuhost[MAXUSERLEN], sendstr[MAXLINE];
   time_t mytime, last;
   char seenstring[MAXLINE];
 
@@ -301,7 +301,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       return ;
     }
 
-  memset(seenstring, 0, MAXLINE);
+  seenstring[0] = '\0';
 
   if (strchr(av[1], '*') || strchr(av[1], '?') ||
       strchr(av[1], '@') || strchr(av[1], '!'))

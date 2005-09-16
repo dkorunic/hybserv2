@@ -273,7 +273,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
   if (!all && !ops && !opers && !admins)
     all = 1; /* -all is the default */
 
-  *argbuf = '\0';
+  argbuf[0] = '\0';
 
   if (all)
     strlcat(argbuf, "-all ", sizeof(argbuf));

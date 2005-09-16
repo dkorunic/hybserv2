@@ -463,7 +463,6 @@ WriteDatabases()
 
   if (!WriteOpers())
     return (0);
-
   
   if (FloodProtection && !WriteIgnores())
     return (0);
@@ -523,8 +522,6 @@ WriteOpers()
   FILE *fp;
   char tempname[MAXLINE];
   struct Userlist *tempuser;
-  char *donestr; /* list of nicks we wrote */
-  char temp[MAXLINE];
 
   ircsprintf(tempname, "%s.tmp", OperServDB);
   fp = CreateDatabase(tempname, "OperServ Database");
@@ -536,41 +533,15 @@ WriteOpers()
       return 0;
     }
 
-  /*
-   * The problem here is some O: lines may be for the same
-   * nickname, so we need to keep track to make sure we don't
-   * write the same nickname twice.  It doesn't matter which
-   * Userlist structure we write for each nickname, because
-   * all structures for the same nickname will have the
-   * exact same value for "umodes", which os_loaddata()
-   * or o_umode() did already.
-   * Check to make sure the nick we're about to write
-   * is not already in 'donestr' - if not, write it
-   * and cat it to donestr.
-   */
-  donestr = (char *) MyMalloc(sizeof(char));
-  *donestr = '\0';
+  /* Some O: lines may be for the same * nickname...  */
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-    {
-      ircsprintf(temp, "*%s*", tempuser->nick);
-      if (match(temp, donestr) == 0)
-        {
-          fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
-          ircsprintf(temp, "%s ", tempuser->nick);
-          donestr = (char *) MyRealloc(donestr, strlen(donestr) + strlen(temp)
-                                       + 1);
-          strlcat(donestr, temp, sizeof(donestr));
-        }
-    }
-
-  MyFree(donestr);
+      fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
 
   fclose(fp);
 
   rename(tempname, OperServDB);
 
-  putlog(LOG3, "Wrote %s",
-         OperServDB);
+  putlog(LOG3, "Wrote %s", OperServDB);
 
   return 1;
 } /* WriteOpers() */

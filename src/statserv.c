@@ -751,7 +751,7 @@ ss_server(struct Luser *lptr, int ac, char **av)
       return;
     }
 
-  *argbuf = '\0';
+  argbuf[0] = '\0';
 
   if (maxusers >= 0)
     {

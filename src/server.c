@@ -788,7 +788,7 @@ s_nick(int ac, char **av)
 
 #ifdef BLOCK_ALLOCATION
 
-      strlcpy(lptr->nick, newnick, sizeof(lptr->nick));
+      strlcpy(lptr->nick, newnick, NICKLEN);
 #else
 
       MyFree(lptr->nick);
@@ -1692,17 +1692,14 @@ void
 s_sjoin(int ac, char **av)
 
 {
-  char sendstr[MAXLINE],
-  /* new modes if the SJOIN TS is lower than the
-   * current TS
-   */
-  modes[MAXLINE];
-  char **line,
-  **nicks, /* array of SJOINing nicknames */
-  *oldnick;
+  char sendstr[MAXLINE];
+  char modes[MAXLINE];
+  char **line;
+  char **nicks; /* array of SJOINing nicknames */
+  char *oldnick;
   struct Channel *cptr, *oldptr;
-  int ncnt, /* number of SJOINing nicks */
-  mcnt;
+  int ncnt; /* number of SJOINing nicks */
+  int mcnt;
   int chanserv_deopped = 0, operserv_deopped = 0;
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -1783,7 +1780,7 @@ s_sjoin(int ac, char **av)
       strlcat(modes, " ", sizeof(modes));
       strlcat(modes, av[mcnt], sizeof(modes));
       mcnt++;
-      if (av[mcnt][0] != ':') /* XXX - same code, rewrite it! -kre */
+      if (av[mcnt][0] != ':')
         {
           strlcat(modes, " ", sizeof(modes));
           strlcat(modes, av[mcnt], sizeof(modes));

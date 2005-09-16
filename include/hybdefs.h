@@ -19,6 +19,7 @@
 #define   HOSTLEN     63  /* hostname length */
 #define   KEYLEN      23  /* channel key length */
 #define   SERVERLEN   63  /* server hostname length */
+#define   TIMELEN     50  /* internal time strings */
 #define   UHOSTLEN    (USERLEN + HOSTLEN)
 #define   MAXUSERLEN  (NICKLEN + USERLEN + HOSTLEN + 2)
 

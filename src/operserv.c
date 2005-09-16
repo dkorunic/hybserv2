@@ -656,19 +656,8 @@ os_loaddata()
             {
               found = 1;
               if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
-                {
-                  /*
-                   * we've already seen a line with this nickname in
-                   * OperServDB, so there must be multiple entries
-                   */
-                  fatal(1, "%s:%d OperServ entry [%s] has multiple occurences (using first)",
-                        OperServDB,
-                        cnt,
-                        tempuser->nick);
-                  if (ret > 0)
-                    ret = (-1);
-                  break;
-                }
+                /* multiple umodes */
+                continue;
               else
                 tempuser->umodes = atol(av[1]);
             } /* if (!irccmp(av[0], tempuser->nick)) */

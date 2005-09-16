@@ -296,12 +296,6 @@ void updateConnectTable(char *user, char *host)
   struct Luser *ouser = NULL;
 #endif /* ADVFLOOD_NOTIFY_ALL */
 
-#if 0
-
-  if (!user || !host)
-    return;
-#endif
-
 #ifdef ADVFLOOD_NOIDENT_GLINEHOST
 
   if (user[0] == '~')
@@ -323,10 +317,9 @@ void updateConnectTable(char *user, char *host)
               table[tmp].frequency++;
               if (table[tmp].frequency == ADVFLOOD_COUNT)
                 {
-
-                  /* As far as we're concerned, offender shouldn't be in the table
-                   * anymore */
-                  strlcpy(table[tmp].host, "@", sizeof(table[tmp].host)); /* reset the host, remove from table */
+                  /* offender shouldn't be in the table anymore */
+                  strlcpy(table[tmp].host, "@", sizeof(table[tmp].host));
+                  /* reset the host, remove from table */
                   last--;
                   if (last < 0)
                     last = 0;
@@ -337,7 +330,7 @@ void updateConnectTable(char *user, char *host)
                   if (IsProtectedHost((banhost == 1) ? "*" : user, host))
                     banhost = -1; /* Can't do that. */
 
-                  if ((gptr = IsGline((banhost == 1) ? "*" : user, host )))
+                  if ((gptr = IsGline((banhost == 1) ? "*" : user, host)))
                     banhost = -1; /* Can't do that either. */
 
                   putlog(LOG1, "Advanced flood detected from [%s@%s], %s",

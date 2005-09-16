@@ -1577,7 +1577,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     {
       if (!index || (fromptr->index == index))
         {
-          memset(buf, 0, MAXLINE);
+          buf[0] = '\0';
 
           target->memocnt++;
           target->newmemos++;
@@ -1690,7 +1690,7 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   struct Memo *memoptr;
   struct NickInfo *master,
         *realptr;
-  char *memotext;
+  char memotext[MAXLINE];
   int index, ii;
 
   if (!nptr)
@@ -1746,13 +1746,10 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   if (!master || !realptr)
     return;
 
-  memotext = (char *) MyMalloc(strlen("[Re]: ") + strlen(av[2]) + 1);
   ircsprintf(memotext, "[Re]: %s", av[2]);
   ii = 3;
   while (ii < ac)
   {
-    memotext = (char *) MyRealloc(memotext, strlen(memotext) +
-      strlen(av[ii]) + (2 * sizeof(char)));
     strlcat(memotext, " ", sizeof(memotext));
     strlcat(memotext, av[ii], sizeof(memotext));
     ii++;
@@ -1783,8 +1780,6 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
                  n_MemoServ, index);
         }
     } /* if (index) */
-
-  MyFree(memotext);
 } /* m_reply() */
 
 /*

@@ -230,7 +230,7 @@ void
 SendDccMessage(struct DccUser *from, char *message)
 
 {
-  char final[MAXLINE * 2];
+  char final[MAXLINE];
   struct DccUser *dccptr;
 
   if (!from || !message)
@@ -603,8 +603,9 @@ void readauth(struct DccUser *dccptr)
   char buffer[MAXLINE], ident[USERLEN + 1];
   int length;
 
-  memset(buffer, 0, MAXLINE);
+  buffer[0] = '\0';
   length = recv(dccptr->authfd, buffer, sizeof(buffer), 0);
+
   if (length > 0)
     {
       unsigned short remport = 0, locport = 0;
@@ -956,7 +957,7 @@ onctcp(char *nick, char *target, char *msg)
   if (!ircncmp(msg, "ACTION", 6))
     return; /* don't log ctcp actions */
 
-  memset(temp, 0, MAXLINE);
+  temp[0] = '\0';
 
   if (ircncmp(msg, "PING", 4) == 0)
     {

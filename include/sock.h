@@ -47,9 +47,9 @@ extern int offset;
 extern int HTM;
 extern time_t HTM_ts;
 extern int ReceiveLoad;
-extern struct DccUser *dccnext;
 #endif /* HIGHTRAFFIC_MODE */
 
+extern struct DccUser *dccnext;
 extern int read_socket_done;
 
 #endif /* INCLUDED_sock_h */

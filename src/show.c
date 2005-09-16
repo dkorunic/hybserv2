@@ -167,19 +167,17 @@ ShowNicknames(int ac, char *av[])
 
   if (flags & SHOW_HELP)
     {
-      fprintf(stderr, "\
-              Usage: %s [-h|?] [-n] [-f file] [nick1 nick2 ...]\n\
-              -h/-?     : Display this help screen\n\
-              -n        : Display number of registered nicknames\n\
-              -f file   : Use \"file\" as nickname database\n\
-              nick1 ... : Display information about specific nicknames\n\
-              \n\
-              If no nicknames are specified, the entire database will be\n\
-              printed. Detailed information will be shown for given nicknames.\n\
-              If -n is specified, ONLY the number of registered nicknames will\n\
-              be displayed.\n\
-              \n",
-              av[0]);
+      fprintf(stderr,
+        "Usage: %s [-h|?] [-n] [-f file] [nick1 nick2 ...]\n" \
+        "-h/-?     : Display this help screen\n" \
+        "-n        : Display number of registered nicknames\n" \
+        "-f file   : Use \"file\" as nickname database\n" \
+        "nick1 ... : Display information about specific nicknames\n" \
+        "\n" \
+        "If no nicknames are specified, the entire database will be\n" \
+        "printed. Detailed information will be shown for given nicknames.\n" \
+        "If -n is specified, ONLY the number of registered nicknames will\n" \
+        "be displayed.\n", av[0]);
       exit(EXIT_SUCCESS);
     }
 
@@ -414,19 +412,18 @@ ShowChannels(int ac, char *av[])
 
   if (flags & SHOW_HELP)
     {
-      fprintf(stderr, "\
-              Usage: %s [-h|?] [-n] [-f file] [chan1 chan2 ...]\n\
-              -h/-?     : Display this help screen\n\
-              -n        : Display number of registered channels\n\
-              -f file   : Use \"file\" as channel database\n\
-              chan1 ... : Display information about specific channels\n\
-              \n\
-              If no channels are specified, the entire database will be\n\
-              printed. Detailed information will be shown for given channels.\n\
-              If -n is specified, ONLY the number of registered channels will\n\
-              be displayed.\n\
-              \n",
-              av[0]);
+      fprintf(stderr,
+        "Usage: %s [-h|?] [-n] [-f file] [chan1 chan2 ...]\n" \
+        "-h/-?     : Display this help screen\n" \
+        "-n        : Display number of registered channels\n" \
+        "-f file   : Use \"file\" as channel database\n" \
+        "chan1 ... : Display information about specific channels\n" \
+        "\n" \
+        "If no channels are specified, the entire database will be\n" \
+        "printed. Detailed information will be shown for given channels.\n" \
+        "If -n is specified, ONLY the number of registered channels will\n" \
+        "be displayed.\n", av[0]);
+
       exit(EXIT_SUCCESS);
     }
 

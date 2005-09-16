@@ -40,10 +40,6 @@
  */
 struct NickInfo *nicklist[NICKLIST_MAX];
 
-#if defined SVSNICK || defined FORCENICK
-static long nicknum;
-#endif
-
 static int ChangePass(struct NickInfo *, char *);
 static void AddHostToNick(char *, struct NickInfo *);
 static struct NickInfo *MakeNick(void);

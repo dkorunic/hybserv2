@@ -9,8 +9,12 @@
  * $Id$
  */
 
-#ifdef VERSION
-char  hVersion[] = VERSION;
+#include "stdinc.h"
+
+#if defined HYBSERV_VERSION
+char  hVersion[] = HYBSERV_VERSION;
+#elif defined PACKAGE_VERSION
+char  hVersion[] = PACKAGE_VERSION;
 #else
-char  hVersion[] = "*unknown*";
+char  hVersion[] = "unknown";
 #endif

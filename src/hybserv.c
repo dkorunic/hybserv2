@@ -77,6 +77,9 @@ int main(int argc, char *argv[])
   /* Initialise current TS for services -kre */
   TimeStarted = current_ts = time(NULL);
 
+  /* Be sure, be paranoid, be safe. -kre */
+  umask(077);
+
   fprintf(stderr,
           "Hybserv2 TS services version %s by Hybserv2 team\n"
 #if defined __DATE__ && defined __TIME__
@@ -89,7 +92,6 @@ int main(int argc, char *argv[])
          );
 
 #ifdef GDB_DEBUG
-
   while (!GDBAttached)
     sleep(1);
 #endif /* GDB_DEBUG */
@@ -130,7 +132,8 @@ int main(int argc, char *argv[])
 
   /* Check for running services -kre */
   if ((pidfile = fopen(PidFile, "r")) == NULL)
-    putlog(LOG1, "Unable to read %s", PidFile);
+    fprintf(stderr, "WARNING: Unable to read pid file %s\n",
+        PidFile);
   else
   {
     pid_t mypid;
@@ -141,54 +144,33 @@ int main(int argc, char *argv[])
     mypid = atoi(line);
     if (mypid && !kill(mypid, 0))
     {
-      fprintf(stderr, "Services are already running!\n");
+      fprintf(stderr, "FATAL: Services are already running!\n");
       exit(EXIT_FAILURE);
     }
   }
 
-  putlog(LOG1, "Hybserv2 TS services version %s started", hVersion);
-
-  /*
-   * Get the offset from GMT (London time)
-   */
-  gmt_offset = GetGMTOffset(TimeStarted);
-
-#if 0
-
-  tm_gmt = gmtime(&TimeStarted);
-  gmt_offset = TimeStarted - mktime(tm_gmt);
-#endif /* 0 */
-
   uid = getuid(); /* the user id of the user who ran the process */
   euid = geteuid(); /* the effective id (different if setuid) */
+
+  if (!uid || !euid)
+    {
+      fprintf(stderr,
+          "FATAL: Please don't run services as root. Now exiting.\n");
+      exit(EXIT_FAILURE);
+    }
 
   if (chdir(HPath) != 0)
     {
       fprintf(stderr,
               "HPath is an invalid directory, please check %s\n",
               SETPATH);
-      putlog(LOG1, "Invalid HPath (%s), shutting down", HPath);
       exit(EXIT_FAILURE);
     }
 
-  if (!uid || !euid)
-    {
-      /*
-       * It is setuid root or running as root
-       * Let us chroot() hybserv then. -kre
-       */
-      putlog(LOG1, "Detected running with root uid, chrooting");
+  putlog(LOG1, "Hybserv2 TS services version %s started", hVersion);
 
-      if (chroot(HPath))
-        {
-          fprintf(stderr, "Cannot chroot, exiting.\n");
-          putlog(LOG1,"Cannot chroot, shutting down");
-          exit(EXIT_FAILURE);
-        }
-    }
-
-  /* Be sure, be paranoid, be safe. -kre */
-  umask(077);
+  /* Get the offset from GMT (London time) */
+  gmt_offset = GetGMTOffset(TimeStarted);
 
   /*
    * the Network list must be initialized before the config

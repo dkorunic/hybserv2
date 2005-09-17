@@ -48,9 +48,10 @@ SOURCES =                  \
   statserv.c               \
   timer.c                  \
   timestr.c                \
+  version.c                \
   sprintf_irc.c
 
-OBJECTS = ${SOURCES:.c=.o} version.o
+OBJECTS = ${SOURCES:.c=.o} @LIBOBJS@
 
 # Binaries
 
@@ -73,16 +74,10 @@ distclean: clean
 install:
 	@echo "Run make install from top directory!"
 
-# $(DEPENDFILE): depend
-
 .SUFFIXES: .c .o
 
 .c.o:
 	$(CC) $(INCLUDE) $(CFLAGS) -c $<
-
-## Dependencies
-version.o: version.c
-	$(CC) $(INCLUDE) $(CFLAGS) -DVERSION=\"$(VERSION)\" -c $<
 
 include $(DEPENDFILE)
 

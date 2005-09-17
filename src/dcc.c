@@ -72,6 +72,7 @@ SendMotd(int sockfd)
       if (final && (final != (char *) -1))
         {
           writesocket(sockfd, final);
+          writesocket(sockfd, "\r\n");
           MyFree(final);
         }
     }
@@ -116,8 +117,8 @@ void
 BroadcastDcc(int towho, char *format, ...)
 
 {
-  char tcmbuf[MAXLINE * 2],
-  buffer[MAXLINE * 2];
+  char tcmbuf[MAXLINE * 2];
+  char buffer[MAXLINE * 2];
   struct DccUser *dccptr;
   va_list args;
 
@@ -918,11 +919,8 @@ GreetDccUser(struct DccUser *dccptr)
     strlcpy(prefix, "User", sizeof(prefix));
 
   /* inform everyone of new user */
-  BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\n",
-               prefix,
-               dccptr->nick,
-               dccptr->username,
-               dccptr->hostname);
+  BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\r\n",
+               prefix, dccptr->nick, dccptr->username, dccptr->hostname);
 
   return 1;
 } /* GreetDccUser() */
@@ -1184,7 +1182,7 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
     The fields for linking to a tcm are in order:
     <remote tcm's nick> <connecting bot's nick> <password>
   */
-  ircsprintf(sendstr, "%s %s %s\n",
+  ircsprintf(sendstr, "%s %s %s\r\n",
              bptr->name, n_OperServ, bptr->password);
   writesocket(dccptr->socket, sendstr);
 
@@ -1311,10 +1309,8 @@ CloseConnection(struct DccUser *dccptr)
         }
 
       BroadcastDcc(DCCALL,
-                   "%s %s (%s@%s) has disconnected\n",
-                   prefix,
-                   dccptr->nick,
-                   dccptr->username,
+                   "%s %s (%s@%s) has disconnected\r\n",
+                   prefix, dccptr->nick, dccptr->username,
                    dccptr->hostname);
     }
   else
@@ -1849,10 +1845,8 @@ DccProcess(struct DccUser *dccptr, char *command)
           SendMotd(dccptr->socket);
 
           /* inform everyone of new user */
-          BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\n",
-                       prefix,
-                       dccptr->nick,
-                       dccptr->username,
+          BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\r\n",
+                       prefix, dccptr->nick, dccptr->username,
                        dccptr->hostname);
         }
 
@@ -1991,7 +1985,7 @@ int BotProcess(struct DccUser *botptr, char *line)
               ClearDccPending(botptr);
 
               SendUmode(OPERUMODE_B,
-                        "*** Connection with %s [%s@%s] established\n",
+                        "*** Connection with %s [%s@%s] established",
                         botptr->nick,
                         botptr->username,
                         botptr->hostname);

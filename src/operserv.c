@@ -5828,7 +5828,7 @@ o_htm_on(struct Luser *lptr, int ac, char **av, int sockfd)
          ohost);
 
   SendUmode(OPERUMODE_Y,
-    "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s\r\n",
+    "*** Entering high-traffic mode (%0.2f K/s): Forced by %s!%s@%s",
     currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now ON");
@@ -5856,7 +5856,7 @@ o_htm_off(struct Luser *lptr, int ac, char **av, int sockfd)
          currload, onick, ouser, ohost);
 
   SendUmode(OPERUMODE_Y,
- "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s\r\n",
+ "*** Resuming standard traffic operations (%0.2f K/s): Forced by %s!%s@%s",
             currload, onick, ouser, ohost);
 
   os_notice(lptr, sockfd, "High-Traffic mode is now OFF");
@@ -5892,7 +5892,7 @@ o_htm_max(struct Luser *lptr, int ac, char **av, int sockfd)
          ohost);
 
   SendUmode(OPERUMODE_Y,
-            "*** New HTM Rate: %d K/s (forced by %s!%s@%s)\r\n",
+            "*** New HTM Rate: %d K/s (forced by %s!%s@%s)",
             newmax, onick, ouser, ohost);
 
   os_notice(lptr, sockfd,

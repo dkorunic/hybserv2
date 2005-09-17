@@ -67,7 +67,7 @@ AC_CHECK_TYPE(socklen_t, ,
 
 dnl Checks for library functions
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([select strchr memcpy strdup strerror strncpy \
+AC_CHECK_FUNCS([select strchr memcpy strdup strerror \
   gettimeofday strlcat strlcpy])
 AC_SEARCH_LIBS(gethostbyname, nsl, ,
   [AC_MSG_ERROR([You have no gethostbyname()! Aborting])])

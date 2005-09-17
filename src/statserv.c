@@ -465,7 +465,7 @@ GetDomain(char *hostname)
   else if ((dotcnt != 1) || (*domain == '.'))
     return (NULL); /* invalid domain */
 
-  strncpy(done, domain, sizeof(done) - 1);
+  strlcpy(done, domain, sizeof(done) - 1);
   done[sizeof(done) - 1] = '\0';
 
   return (done);

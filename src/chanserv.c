@@ -3463,10 +3463,10 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   hostmask[0] = '\0';
 
   if (match("*!*@*", av[3]))
-    strncpy(hostmask, av[3], MAXLINE - 1);
+    strlcpy(hostmask, av[3], MAXLINE - 1);
   else if (match("*!*", av[3]))
   {
-    strncpy(hostmask, av[3], MAXLINE - 3);
+    strlcpy(hostmask, av[3], MAXLINE - 3);
     strlcat(hostmask, "@*", sizeof(hostmask));
   }
   else if (match("*@*", av[3]))
@@ -3893,21 +3893,21 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   hostmask[0] = '\0';
 
   if (match("*!*@*", av[sidx]))
-    strncpy(hostmask, av[sidx], MAXLINE - 1);
+    strlcpy(hostmask, av[sidx], MAXLINE - 1);
   else if (match("*!*", av[sidx]))
     {
-      strncpy(hostmask, av[sidx], MAXLINE - 3);
+      strlcpy(hostmask, av[sidx], MAXLINE - 3);
       strlcat(hostmask, "@*", sizeof(hostmask));
     }
   else if (match("*@*", av[sidx]))
     {
       strlcpy(hostmask, "*!", sizeof(hostmask));
-      strncpy(hostmask, av[sidx], MAXLINE - 3);
+      strlcpy(hostmask, av[sidx], MAXLINE - 3);
     }
   else if (match("*.*", av[sidx]))
     {
       strlcpy(hostmask, "*!*@", sizeof(hostmask));
-      strncpy(hostmask, av[sidx], MAXLINE - 5);
+      strlcpy(hostmask, av[sidx], MAXLINE - 5);
     }
   else
     {
@@ -3923,7 +3923,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
       else
         {
-          strncpy(hostmask, av[sidx], MAXLINE - 5);
+          strlcpy(hostmask, av[sidx], MAXLINE - 5);
           strlcat(hostmask, "!*@*", sizeof(hostmask));
         }
     }
@@ -3995,7 +3995,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		    continue;
 
 		  nuhost[0] = '\0';
-		  strncpy(nuhost, tempuser->lptr->nick, NICKLEN);
+		  strlcpy(nuhost, tempuser->lptr->nick, NICKLEN);
 		  strlcat(nuhost, "!", sizeof(nuhost));
 		  strncat(nuhost, tempuser->lptr->username, USERLEN);
 		  strlcat(nuhost, "@", sizeof(nuhost));
@@ -4084,10 +4084,10 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     hostmask[0] = '\0';
 
     if (match("*!*@*", av[3]))
-      strncpy(hostmask, av[3], MAXLINE - 1);
+      strlcpy(hostmask, av[3], MAXLINE - 1);
     else if (match("*!*", av[3]))
     {
-      strncpy(hostmask, av[3], MAXLINE - 3);
+      strlcpy(hostmask, av[3], MAXLINE - 3);
       strlcat(hostmask, "@*", sizeof(hostmask));
     }
     else if (match("*@*", av[3]))
@@ -4102,7 +4102,7 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
     else
     {
-      strncpy(hostmask, av[3], MAXLINE - 5);
+      strlcpy(hostmask, av[3], MAXLINE - 5);
       strlcat(hostmask, "!*@*", sizeof(hostmask));
     }
 	  host = MyStrdup(hostmask);
@@ -4720,7 +4720,7 @@ c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
              ERR_NEED_ACCESS, cptr->access_lvl[CA_SET], "SET", av[1]);
 
       /* static buffers .. argh */
-      strncpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
+      strlcpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
       tmp[sizeof(tmp) - 1] = '\0';
 
       RecordCommand("%s: %s!%s@%s failed SET [%s] %s",

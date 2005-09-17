@@ -184,7 +184,7 @@ int es_loaddata()
             {
               seen = MyMalloc(sizeof(aSeen));
               memset(seen, 0, sizeof(aSeen));
-              strncpy(seen->nick, av[1], NICKLEN);
+              strlcpy(seen->nick, av[1], NICKLEN);
               seen->userhost = MyStrdup(av[2]);
               seen->msg = (type == 1) ? MyStrdup(av[4] + 1) : NULL;
               seen->time = atol(av[3]);
@@ -247,8 +247,8 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
     }
   memset(userhost, 0, sizeof(userhost));
   memset(seen, 0, sizeof(aSeen));
-  strncpy(seen->nick, nick, NICKLEN);
-  strncpy(userhost, user, USERLEN);
+  strlcpy(seen->nick, nick, NICKLEN);
+  strlcpy(userhost, user, USERLEN);
   strlcat(userhost, "@", sizeof(userhost));
   strncat(userhost, host, HOSTLEN);
   seen->userhost = MyStrdup(userhost);
@@ -307,10 +307,10 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       strchr(av[1], '@') || strchr(av[1], '!'))
     {
       if (match("*!*@*", av[1]))
-        strncpy(seenstring, av[1], MAXLINE - 1);
+        strlcpy(seenstring, av[1], MAXLINE - 1);
       else if (match("*!*", av[1]))
       {
-        strncpy(seenstring, av[1], MAXLINE - 3);
+        strlcpy(seenstring, av[1], MAXLINE - 3);
         strlcat(seenstring, "@*", sizeof(seenstring));
       }
       else if (match("*@*", av[1]))
@@ -319,13 +319,13 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
         strncat(seenstring, av[1], MAXLINE - 3);
       }
       else
-        strncpy(seenstring, av[1], MAXLINE);
+        strlcpy(seenstring, av[1], MAXLINE);
 
       count = 0;
       for (seen = seenp; seen; seen = seen->prev)
         {
           memset(nuhost, 0, sizeof(nuhost));
-          strncpy(nuhost, seen->nick, NICKLEN);
+          strlcpy(nuhost, seen->nick, NICKLEN);
           strlcat(nuhost, "!", sizeof(nuhost));
           strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
           if (match(seenstring, nuhost))

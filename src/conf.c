@@ -29,6 +29,7 @@
 #include "sock.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 static char *getfield (char *newline);
 
@@ -289,7 +290,7 @@ ParseConf(char *filename, int rehash)
               {
                 Me.admin = (char *) MyMalloc(REALLEN);
                 memset(Me.admin, 0, REALLEN);
-                strncpy(Me.admin, temp, REALLEN - 1);
+                strlcpy(Me.admin, temp, REALLEN - 1);
               }
             else
               Me.admin = MyStrdup(temp);
@@ -441,7 +442,7 @@ ParseConf(char *filename, int rehash)
               {
                 Me.name = (char *) MyMalloc(REALLEN);
                 memset(Me.name, 0, REALLEN);
-                strncpy(Me.name, name, REALLEN - 1);
+                strlcpy(Me.name, name, REALLEN - 1);
               }
             else
               Me.name = MyStrdup(name);
@@ -450,7 +451,7 @@ ParseConf(char *filename, int rehash)
               {
                 Me.info = (char *) MyMalloc(REALLEN);
                 memset(Me.info, 0, REALLEN);
-                strncpy(Me.info, info, REALLEN - 1);
+                strlcpy(Me.info, info, REALLEN - 1);
               }
             else
               Me.info = MyStrdup(info);

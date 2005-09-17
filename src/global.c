@@ -287,7 +287,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     strlcat(argbuf, "-admins ", sizeof(argbuf));
 
   ircsprintf(temp, "%s%s", argbuf, message);
-  strncpy(argbuf, temp, MAXLINE);
+  strlcpy(argbuf, temp, MAXLINE);
   argbuf[MAXLINE] = '\0';
 
   RecordCommand("%s: %s!%s@%s GNOTE %s",
@@ -421,7 +421,7 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
 
   ircsprintf(temp, "%s%s", argbuf, message);
 
-  strncpy(argbuf, temp, sizeof(argbuf) - 1);
+  strlcpy(argbuf, temp, sizeof(argbuf) - 1);
   argbuf[sizeof(argbuf) - 1] = '\0';
 
   RecordCommand("%s: %s!%s@%s GCHANNOTE %s",

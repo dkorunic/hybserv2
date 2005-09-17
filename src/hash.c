@@ -25,6 +25,7 @@
 #include "sock.h"
 #include "statserv.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 static aHashEntry clientTable[HASHCLIENTS];
 static aHashEntry channelTable[HASHCHANNELS];
@@ -1297,7 +1298,7 @@ struct Server *
       char *s = buffer - 1;
 
       buffer[HOSTLEN] = '\0';
-      strncpy(buffer, name, HOSTLEN);
+      strlcpy(buffer, name, HOSTLEN);
 
       while ((s = strchr(s + 2, '.')) != NULL)
         {

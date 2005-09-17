@@ -177,7 +177,7 @@ struct Server *
     if (argcnt == 4)
       {
 #ifdef BLOCK_ALLOCATION
-        strncpy(tempserv->name, line[1], SERVERLEN);
+        strlcpy(tempserv->name, line[1], SERVERLEN);
 #else
 
         tempserv->name = MyStrdup(line[1]);
@@ -200,7 +200,7 @@ struct Server *
 
 #ifdef BLOCK_ALLOCATION
 
-        strncpy(tempserv->name, line[2], SERVERLEN);
+        strlcpy(tempserv->name, line[2], SERVERLEN);
 #else
 
         tempserv->name = MyStrdup(line[2]);
@@ -684,7 +684,7 @@ s_nick(int ac, char **av)
         return;
 
 #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
-      strncpy(newnick, av[2], NICKLEN);
+      strlcpy(newnick, av[2], NICKLEN);
       newnick[NICKLEN] = '\0';
 #endif
 
@@ -783,7 +783,7 @@ s_nick(int ac, char **av)
 
 #ifdef SEENSERVICES
 
-      strncpy(oldnick, lptr->nick, NICKLEN);
+      strlcpy(oldnick, lptr->nick, NICKLEN);
 #endif /* SEENSERVICES */
 
 #ifdef BLOCK_ALLOCATION

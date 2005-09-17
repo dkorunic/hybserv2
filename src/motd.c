@@ -92,7 +92,7 @@ ReadMessageFile(struct MessageFile *fileptr)
 
       NewLine = (struct MessageFileLine *)
                 MyMalloc(sizeof(struct MessageFileLine));
-      strncpy(NewLine->line, buffer, MESSAGELINELEN);
+      strlcpy(NewLine->line, buffer, MESSAGELINELEN);
       NewLine->line[MESSAGELINELEN] = '\0';
 
       /*

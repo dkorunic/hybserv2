@@ -1075,7 +1075,7 @@ onctcp(char *nick, char *target, char *msg)
         }
 
       cnt = strlen(msg) - 1;
-      strncpy(temp, msg, cnt);
+      strlcpy(temp, msg, cnt);
       temp[cnt] = '\0';
 
       acnt = SplitBuf(temp, &av);
@@ -1116,7 +1116,7 @@ onctcp(char *nick, char *target, char *msg)
        */
 
       cnt = strlen(msg) - 1;
-      strncpy(temp, msg, cnt);
+      strlcpy(temp, msg, cnt);
       temp[cnt] = '\0';
 
       SendUmode(OPERUMODE_Y,

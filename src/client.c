@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "statserv.h"
 #include "sock.h"
+#include "mystring.h"
 
 #if defined NICKSERVICES || defined CHANNELSERVICES
 
@@ -246,10 +247,10 @@ struct Luser *
 
     memset(tempuser, 0, sizeof(struct Luser));
 
-    strncpy(tempuser->nick, line[1], NICKLEN);
-    strncpy(tempuser->username, line[5], USERLEN);
-    strncpy(tempuser->hostname, line[6], HOSTLEN);
-    strncpy(tempuser->realname, line[8] + 1, REALLEN);
+    strlcpy(tempuser->nick, line[1], NICKLEN);
+    strlcpy(tempuser->username, line[5], USERLEN);
+    strlcpy(tempuser->hostname, line[6], HOSTLEN);
+    strlcpy(tempuser->realname, line[8] + 1, REALLEN);
 
 #else
 

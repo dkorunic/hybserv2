@@ -524,6 +524,10 @@
 # undef SVSNICK
 #endif
 
+#if defined FORCENICK || defined SVSNICK
+# undef FORCE_NICK_CHANGE
+#endif
+
 #if defined FORCENICK && defined SVSNICK
 # undef FORCENICK
 # if defined FORCENICK && !defined FORCENICK_PREFIX

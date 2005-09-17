@@ -1,19 +1,23 @@
 dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
+AC_INIT(Hybserv2, 1.9.0, hybserv@hybserv.net)
 AC_PREREQ(2.50)
 AC_COPYRIGHT([$Id$])
-AC_INIT([Hybserv2], [testing])
 AC_CONFIG_HEADER(include/defs.h)
 AC_GNU_SOURCE
 
-dnl Get revision number
+dnl Get version and revision number
 if test -f "$srcdir/.svn/entries"; then
-  ac_cv_revision=`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+  ac_cv_revision="svn-"`grep revision $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
 else
   ac_cv_revision="release"
 fi
-AC_SUBST(ac_cv_revision)
+ac_cv_version="$PACKAGE_VERSION-$ac_cv_revision"
+AC_SUBST(ac_cv_version)
+AC_DEFINE_UNQUOTED(HYBSERV_VERSION, ["$ac_cv_version"],
+  [Hybserv release version])
+AC_MSG_NOTICE([configuring Hybserv2 $ac_cv_version])
 
 dnl Set language and save it
 AC_LANG_C
@@ -58,34 +62,150 @@ AC_HEADER_STAT
 AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
   arpa/inet.h sys/socket.h netinet/in.h sys/resource.h sys/signal.h])
 
-dnl Checks for types
+dnl Checks for additional types and headers
 AC_CHECK_TYPE(socklen_t, ,
   [AC_DEFINE([socklen_t], [unsigned int],
   [If we don't have a real socklen_t, unsigned int is good enough])],
   [#include <sys/types.h>
 #include <sys/socket.h>])
+AC_CHECK_MEMBER([struct sockaddr.sa_len],
+  [AC_DEFINE(HAVE_SOCKADDR_LEN, 1,
+    [Define to 1 if you have sockaddr.sa_len])], ,
+  [#include <sys/types.h>
+#include <sys/socket.h>])
+AC_MSG_CHECKING(struct sockaddr_storage)
+AC_TRY_COMPILE([#include <sys/types.h>
+#include <sys/socket.h>],
+[struct sockaddr_storage x;],
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1,
+    [Define to 1 if you have struct sockaddr_storage]),
+  AC_MSG_RESULT(no))
 
 dnl Checks for library functions
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([select strchr memcpy strdup strerror \
-  gettimeofday strlcat strlcpy])
+  gettimeofday strlcat strlcpy inet_ntoa])
 AC_SEARCH_LIBS(gethostbyname, nsl, ,
   [AC_MSG_ERROR([You have no gethostbyname()! Aborting])])
 AC_SEARCH_LIBS(socket, socket, ,
   [AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
+AC_CHECK_FUNCS(getnameinfo, , [AC_LIBOBJ(getnameinfo)])
+AC_CHECK_FUNCS(getaddrinfo, , [AC_LIBOBJ(getaddrinfo)])
+
+dnl IPv6 defines
+ac_cv_ipv6type=unknown
+ac_cv_ipv6lib=none
+ac_cv_ipv6trylibc=yes
+
+dnl And check if we have IPv6 libraries
+AC_MSG_CHECKING([compile with ipv6 support])
+AC_ARG_ENABLE(ipv6,
+  [  --disable-ipv6          Disable IPv6 support [[default=no]]],
+  [cf_enable_ipv6=$enableval],
+  [cf_enable_ipv6="yes"])
+if test "x$cf_enable_ipv6" = "xyes"; then
+  AC_MSG_RESULT(yes)
+	AC_MSG_CHECKING([ipv6 stack type])
+	for i in inria kame linux-glibc linux-inet6 toshiba v6d zeta; do
+		case "$i" in
+		inria)
+			# http://www.kame.net/
+			AC_EGREP_CPP(yes, [#include <netinet/in.h>
+#ifdef IPV6_INRIA_VERSION
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+				])
+			;;
+		kame)
+			# http://www.kame.net/
+			AC_EGREP_CPP(yes, [#include <netinet/in.h>
+#ifdef __KAME__
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+				])
+			;;
+		linux-glibc)
+			# http://www.v6.linux.or.jp/
+			AC_EGREP_CPP(yes, [#include <features.h>
+#if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+				])
+			;;
+		linux-inet6)
+			# http://www.v6.linux.or.jp/
+			if test -d /usr/inet6 -o -f /usr/inet6/lib/libinet6.a; then
+				ac_cv_ipv6type=$i
+				ac_cv_ipv6lib=inet6
+				ac_cv_ipv6libdir=/usr/inet6/lib
+				ac_cv_ipv6trylibc=yes;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+				CFLAGS="$CFLAGS -I/usr/inet6/include"
+			fi
+			;;
+		toshiba)
+			AC_EGREP_CPP(yes, [#include <sys/param.h>
+#ifdef _TOSHIBA_INET6
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				ac_cv_ipv6lib=inet6;
+				ac_cv_ipv6libdir=/usr/local/v6/lib;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+        ])
+			;;
+		v6d)
+			AC_EGREP_CPP(yes, [#include </usr/local/v6/include/sys/v6config.h>
+#ifdef __V6D__
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				ac_cv_ipv6lib=v6;
+				ac_cv_ipv6libdir=/usr/local/v6/lib;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+        ])
+			;;
+		zeta)
+			AC_EGREP_CPP(yes, [#include <sys/param.h>
+#ifdef _ZETA_MINAMI_INET6
+yes
+#endif],
+				[ac_cv_ipv6type=$i;
+				ac_cv_ipv6lib=inet6;
+				ac_cv_ipv6libdir=/usr/local/v6/lib;
+				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
+        ])
+			;;
+		esac
+		if test "x$ac_cv_ipv6type" != "xunknown"; then
+			break
+		fi
+	done
+	AC_MSG_RESULT([$ac_cv_ipv6type])
+	AC_SEARCH_LIBS(getaddrinfo, inet6)
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl Try libefence support
-AC_MSG_CHECKING([compile with Electric Fence library])
+AC_MSG_CHECKING([compile with electricfence library])
 AC_ARG_ENABLE(efence,
   [  --enable-efence         Enable libefence support [[default=no]]],
   [cf_enable_efence=$enableval],
   [cf_enable_efence="no"])
 if test "x$cf_enable_efence" = "xyes"; then
-	AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes)
   AC_CHECK_LIB(efence, malloc)
 else
-	AC_MSG_RESULT(no)
+  AC_MSG_RESULT(no)
 fi
 
 dnl Try dmalloc support
@@ -95,10 +215,10 @@ AC_ARG_ENABLE(dmalloc,
   [cf_enable_malloc=$enableval],
   [cf_enable_malloc="no"])
 if test "x$cf_enable_malloc" = "xyes"; then
-	AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes)
   AC_CHECK_LIB(dmalloc, malloc)
 else
-	AC_MSG_RESULT(no)
+  AC_MSG_RESULT(no)
 fi
 
 dnl Get nick/chan/topic length
@@ -118,7 +238,7 @@ AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
 dnl Get the network identificator
 AC_ARG_WITH(network,
   [  --with-network=TYPE       Sets network type TYPE],
-  [ac_cv_network=$withval], [ac_cv_network="no"])
+  [ac_cv_network=$withval], [ac_cv_network="hybrid7"])
 if test "x$ac_cv_network" = "xyes"; then
   ac_cv_network="hybrid7"
 fi
@@ -159,10 +279,10 @@ AC_ARG_ENABLE(warnings,
   [cf_enable_warnings=$enableval],
   [cf_enable_warnings="no"])
 if test "x$cf_enable_warnings" = "xyes"; then
-	CFLAGS="$CFLAGS -Wall"
-	AC_MSG_RESULT(yes)
+  CFLAGS="$CFLAGS -Wall"
+  AC_MSG_RESULT(yes)
 else
-	AC_MSG_RESULT(no)
+  AC_MSG_RESULT(no)
 fi
 
 dnl Check if asserts are to be enabled
@@ -173,9 +293,9 @@ AC_ARG_ENABLE(asserts,
   [cf_enable_asserts="no"])
 if test "x$cf_enable_asserts" = "xno"; then
   AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
-	AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes)
 elif test "x$cf_enable_asserts" = "xsoft"; then
-	AC_MSG_RESULT(soft)
+  AC_MSG_RESULT(soft)
   AC_DEFINE(SOFT_ASSERT, 1, [Define this to enable soft asserts])
   AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
 fi
@@ -187,9 +307,9 @@ AC_ARG_ENABLE(gimmecore,
   [cf_enable_gimmecore=$enableval],
   [cf_enable_gimmecore="yes"])
 if test "x$cf_enable_gimmecore" = "xno"; then
-	AC_MSG_RESULT(no)
+  AC_MSG_RESULT(no)
 else
-	AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes)
   AC_DEFINE(GIMMECORE, 1, [Define this to enable core dumping])
 fi
 
@@ -200,10 +320,10 @@ AC_ARG_ENABLE(daemontools,
   [cf_enable_daemontools=$enableval],
   [cf_enable_daemontools="no"])
 if test "x$cf_enable_daemontools" = "xyes"; then
-	AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(yes)
   AC_DEFINE(DAEMONTOOLS, 1, [Define this to enable daemontools support])
 else
-	AC_MSG_RESULT(no)
+  AC_MSG_RESULT(no)
 fi
 
 AC_OUTPUT(Makefile src/Makefile tools/Makefile \

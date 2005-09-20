@@ -447,6 +447,13 @@
  */
 #define   SCHEDULE_COLLIDE
 
+/*
+ * Define this if you want to have IPv6-capable hybserv.conf. Please note
+ * that you need to sed -e 's/:/|/g' first, since new delimiter becomes
+ * '|' character.
+ */
+#undef IPV6CONF
+
 /* --- Don't touch unless you know exactly what are you doing --- */
 
 /*

@@ -51,17 +51,14 @@ static struct Servlist *CreateServer(void);
 void AddReconnect(const char *, const int, const char *, const long);
 #endif
 
-#if 0
-static void AddAddressToServer(struct Servlist **ptr,
-                               char *ip, int length);
-#endif /* 0 */
-
 struct rHost *rHostList = NULL;      /* list of restricted hosts */
 struct Userlist *UserList = NULL;    /* list of privileged users */
 struct Servlist *ServList = NULL;    /* list of hub servers */
 struct Chanlist *ChanList = NULL;    /* list of channels to monitor */
-struct Botlist *BotList = NULL,      /* list of tcm bots that can be linked to */
-                                *RemoteBots = NULL;   /* list of tcm bots authorized to connect */
+struct Botlist *BotList = NULL,      /* list of tcm bots that can be
+                                        linked to */
+               *RemoteBots = NULL;   /* list of tcm bots authorized to
+                                        connect */
 struct PortInfo *PortList = NULL;    /* list of ports to listen on */
 
 struct Userlist *GenericOper = NULL;
@@ -734,7 +731,11 @@ getfield (char *newline)
     return (NULL);
 
   field = line;
+#ifdef IPV6CONF
+  if ((end = strchr(line, '|')) == NULL)
+#else
   if ((end = strchr(line, ':')) == NULL)
+#endif /* IPV6CONF */
     {
       line = NULL;
       if ((end = strchr(field, '\n')) == NULL)
@@ -1056,47 +1057,6 @@ AddServ(char *hostname, char *password, int port)
 {
   struct Servlist *ptr;
 
-#if 0
-  /*
-   * maybe someday when I'm really bored I'll fix this
-   */
-  struct hostent *hp;
-  struct in_addr ip;
-  char **curraddr;
-
-  /*
-   * All S: line hostnames are pre-resolved so when we
-   * want to connect to a server, we don't waste time resolving
-   * the hostname again and again.
-   */
-  hp = LookupHostname(hostname, &ip);
-
-  if (hp)
-    {
-      /*
-       * We have a resolving hostname - it is possible it points
-       * to more than one ip - add all of them
-       */
-      ptr = CreateServer();
-
-      for (curraddr = hp->h_addr_list; *curraddr; ++curraddr)
-        AddAddressToServer(&ptr, *curraddr, hp->h_length);
-    }
-  else
-    {
-      if (ip.s_addr == INADDR_NONE)
-        {
-          putlog(LOG1,
-                 "Unresolvable server name: %s",
-                 hostname);
-          return;
-        }
-
-      ptr = CreateServer();
-      AddAddressToServer(&ptr, (char *) &ip.s_addr, sizeof(ip));
-    }
-#endif /* 0 */
-
   ptr = CreateServer();
   ptr->hostname = MyStrdup(hostname);
   ptr->password = MyStrdup(password);
@@ -1124,27 +1084,6 @@ static struct Servlist *
 
     return (ptr);
   } /* CreateServer() */
-
-#if 0
-/*
-AddAddressToServer()
- Add the given ip address to the given server structure
-*/
-
-static void
-AddAddressToServer(struct Servlist **ptr, char *ip, int length)
-
-{
-  int offset;
-
-  ++(*ptr)->numips;
-  (*ptr)->ips = (struct in_addr **)
-                MyRealloc((*ptr)->ips, sizeof(struct in_addr) * (*ptr)->numips);
-
-  offset = sizeof(struct in_addr) * ((*ptr)->numips - 1);
-  memcpy((*ptr)->ips[0] + offset, ip, length);
-} /* AddAddressToServer() */
-#endif /* 0 */
 
 /*
 AddMyChan()

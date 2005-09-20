@@ -1,5 +1,6 @@
-Hybserv-HEAD: Fri, 16 Sep 2005 14:01:13 +0200
+Hybserv-HEAD: Mon, 19 Sep 2005 12:20:47 +0200
 
+  * add basic IPv6 support and getaddrinfo/getnameinfo stuff
   * add configurable FORCENICK/SVSNICK prefix
   * strlcat/strlcpy merge, lot of memory stuff fixes, better internal
     spill control, less malloc/realloc stuff, less useless memsets

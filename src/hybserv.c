@@ -213,8 +213,15 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
   }
 
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+
   /* Make current process session leader -kre */
-  setsid();
+  if (setsid() == -1)
+  {
+    exit(EXIT_FAILURE);
+  }
 #else
 
   printf("Entering foreground debug mode\n");
@@ -237,6 +244,7 @@ int main(int argc, char *argv[])
 
   /* Initialise random number generator -kre */
   srandom(current_ts);
+  srandom((unsigned int)random());
 
   /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)
@@ -244,6 +252,7 @@ int main(int argc, char *argv[])
   else
     {
       char line[MAXLINE];
+
       ircsprintf(line, "%d\n", getpid());
       fputs(line, pidfile);
       fclose(pidfile);
@@ -256,7 +265,6 @@ int main(int argc, char *argv[])
   ClearHashes(1);
 
 #ifdef BLOCK_ALLOCATION
-
   InitHeaps();
 #endif
 

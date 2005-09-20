@@ -12,19 +12,19 @@
 #include "config.h"
 #include "conf.h"
 
-/* number of bytes to read from sockets - used to be 8192 */
-#define BUFSIZE        16384
-/* max parameters the hub can send us */
-#define MAXPARAM       15
-
 struct Servlist;
 
 int writesocket(int, char *);
 void toserv(char *, ...);
 void tosock(int, char *, ...);
 void SetupVirtualHost(void);
-struct hostent *LookupHostname(char *, struct in_addr *);
-int ConnectHost(char *, unsigned int);
+struct addrinfo *LookupHostname(const char *);
+char *LookupAddress(struct sockaddr *, socklen_t);
+char *ConvertHostname(struct sockaddr *, socklen_t);
+int IgnoreErrno(int);
+unsigned short int GetPort(struct sockaddr *);
+void SetPort(struct sockaddr *, unsigned short int);
+int ConnectHost(const char *, unsigned int);
 int CompleteHubConnection(struct Servlist *);
 void ReadSocketInfo(void);
 void DoListen(struct PortInfo *);
@@ -36,7 +36,8 @@ void signon(void);
 
 extern int HubSock;
 extern char *LocalHostName;
-extern struct sockaddr_in LocalAddr;
+extern struct sockaddr_storage LocalAddr;
+extern socklen_t LocalAddrSize;
 extern char buffer[];
 extern int paramc;
 extern char *nextparam;

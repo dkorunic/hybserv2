@@ -289,18 +289,8 @@ DoShutdown(char *who, char *reason)
     if (pptr->socket != NOSOCKET)
       close(pptr->socket);
 
-  if (reason)
-    {
-      if (who)
-        ircsprintf(sendstr, "%s (authorized by %s)", reason, who);
-      else
-        strlcpy(sendstr, reason, sizeof(sendstr));
-    }
-  else
-    if (who)
-      ircsprintf(sendstr, "Authorized by %s", who);
-    else
-      sendstr[0] = '\0';
+  ircsprintf(sendstr, "DIE [%s] (authorized by %s)",
+      reason ? reason : "", who ? who : "?");
 
   putlog(LOG1, "%s", sendstr);
 

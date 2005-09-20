@@ -24,13 +24,6 @@
 #include "sprintf_irc.h"
 #include "timer.h"
 
-/* Solaris does not provide this by default. Anyway this is wrong approach,
-   since -1 is 255.255.255.255 addres which is _valid_! Obviously
-   inet_aton() should be used instead. I'll fix that later. -kre */
-#ifndef INADDR_NONE
-# define INADDR_NONE ((unsigned long)-1)
-#endif
-
 static int ReadHub(void);
 static int ReadSock(struct DccUser *dccptr);
 
@@ -43,7 +36,8 @@ int                       HubSock;
  * Virtual hostname
  */
 char                      *LocalHostName = NULL;
-struct sockaddr_in        LocalAddr;
+struct sockaddr_storage   LocalAddr;
+socklen_t                 LocalAddrSize;
 
 /*
  * Contains data read from socket descriptors
@@ -63,7 +57,7 @@ char                      *nextparam = NULL;    /* address of next parameter */
  * the "spilled over" characters - the partial line that
  * buffer wasn't big enough to hold
  */
-char                      spill[MAXBUF];
+char                      spill[BUFSIZE];
 
 /*
  * Index of spill[] where we left off
@@ -181,211 +175,250 @@ tosock(int sockfd, char *format, ...)
 } /* tosock() */
 
 /*
-SetupVirtualHost()
- Initialize virtual hostname
-*/
-
-void
-SetupVirtualHost()
-
+ * SetupVirtualHost()
+ * Initialize virtual hostname
+ */
+void SetupVirtualHost()
 {
-  struct hostent *hptr;
+  struct addrinfo *res;
 
   assert(LocalHostName != 0);
 
-  if (((hptr = gethostbyname(LocalHostName)) == NULL) &&
-      ((hptr = gethostbyaddr(LocalHostName, 4, AF_INET)) == NULL))
-    {
-      fprintf(stderr,
-              "Unable to resolve virtual host [%s]: Unknown hostname\n",
-              LocalHostName);
+  res = LookupHostname(LocalHostName);
 
-      MyFree(LocalHostName);
-      LocalHostName = NULL;
-    }
+  if (res == NULL)
+  {
+    putlog(LOG1, "FATAL: Unresolvable LocalHostName");
+    MyFree(LocalHostName);
+  }
   else
-    {
-      memset((void *) &LocalAddr, 0, sizeof(struct sockaddr_in));
-
-      LocalAddr.sin_family = AF_INET;
-      LocalAddr.sin_port = 0;
-
-      memcpy((void *) &LocalAddr.sin_addr, (void *) hptr->h_addr,
-             hptr->h_length);
-
-      fprintf(stderr, "Using virtual host %s[%s]\n",
-              LocalHostName,
-              inet_ntoa(LocalAddr.sin_addr));
-    }
+  {
+    /* use only first address */
+    memset(&LocalAddr, 0, sizeof(LocalAddr));
+    memcpy(&LocalAddr, res->ai_addr, res->ai_addrlen);
+    LocalAddrSize = res->ai_addrlen;
+    freeaddrinfo(res);
+  }
 } /* SetupVirtualHost() */
 
 /*
-LookupHostname()
- Attempt to resolve 'host' into an ip address. 'ip_address' is
-modified to contain the resolved ip address in unsigned int form.
- 
-Return: a hostent pointer to the hostname information
+ * LookupHostname()
+ * 
+ * Attempt to resolve 'host' into an ip address. 
+ * Return: a addrinfo list with the hostname information
 */
+struct addrinfo *LookupHostname(const char *host)
+{
+#if 0
+  struct addrinfo hints;
+#endif
+  struct addrinfo *res = NULL;
+  int error;
 
-struct hostent *
-      LookupHostname(char *host, struct in_addr *ip_address)
+#if 0
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = PF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_NUMERICHOST;
+#endif
 
-  {
-    struct hostent *hp;
-    struct in_addr ip;
+  error = getaddrinfo(host, NULL, NULL, &res);
 
-    /*
-     * If 'host' was given in dotted notation (1.2.3.4),
-     * inet_addr() will convert it to unsigned int form,
-     * otherwise return -1L.
-     */
-    ip.s_addr = inet_addr(host);
+  if (error)
+    putlog(LOG1, "Unable to resolve %s: %s", host,
+        gai_strerror(error));
 
-    if (ip.s_addr != INADDR_NONE)
-      {
-        /*
-         * No point in resolving it now
-         */
-        hp = NULL;
-      }
-    else
-      {
-        hp = gethostbyname(host);
-        if (hp)
-          memcpy(&ip.s_addr, hp->h_addr_list[0], (size_t) hp->h_length);
-      }
-
-    if (ip_address)
-      *ip_address = ip;
-
-    return (hp);
-  } /* LookupHostname() */
+  return res;
+} /* LookupHostname() */
 
 /*
-ConnectHost()
-  args: hostname, port
-  purpose: bind socket and begin a non-blocking connection to
-           hostname at port
-  return: socket file descriptor if successful connect, -1 if not
+ * LookupAddress()
+ * 
+ * Attempt to resolve 'ip' address into hostname.
+ * Return: a addrinfo list with the hostname information
 */
-
-int
-ConnectHost(char *hostname, unsigned int port)
-
+char *LookupAddress(struct sockaddr *ss, socklen_t sslen)
 {
-  struct sockaddr_in ServAddr;
-  struct hostent *hostptr;
-  struct in_addr ip;
+  char *name;
+  int error;
+
+  name = MyMalloc(HOSTLEN);
+  memset(name, 0, HOSTLEN);
+
+  error = getnameinfo(ss, sslen, name, HOSTLEN, NULL, 0, 0);
+
+  if (error)
+    putlog(LOG1, "Unable to convert address back to ASCII: %s",
+        gai_strerror(error));
+
+  return name;
+} /* LookupAddress() */
+
+/* 
+ * ConvertHostname()
+ * Convert address from sockaddr struct back to char string
+ */
+char *ConvertHostname(struct sockaddr *ss, socklen_t sslen)
+{
+  char *name;
+  int error;
+
+  name = MyMalloc(HOSTLEN);
+  memset(name, 0, HOSTLEN);
+
+  error = getnameinfo(ss, sslen, name, HOSTLEN, NULL, 0,
+      NI_NUMERICHOST);
+
+  if (error)
+  {
+    putlog(LOG1, "Unable to convert: %s", gai_strerror(error));
+  }
+
+  return name;
+} /* ConvertHostname() */
+
+/*
+ * Originally from squid
+ * IgnoreErrno()
+ * Find out if we can ignore network error
+ */
+int IgnoreErrno(int ierrno)
+{
+  switch (ierrno)
+  {
+    case EINPROGRESS:
+    case EWOULDBLOCK:
+#if EAGAIN != EWOULDBLOCK
+    case EAGAIN:
+#endif
+    case EALREADY:
+    case EINTR:
+#ifdef ERESTART
+    case ERESTART:
+#endif
+        return 1;
+    default:
+        return 0;
+  }
+}
+
+/*
+ * GetPort()
+ * Get port from sockaddr struct
+ */
+unsigned short int GetPort(struct sockaddr *addr)
+{
+  unsigned short port = htons(0);
+
+  switch (addr->sa_family)
+  {
+#ifdef INET6
+    case AF_INET6:
+      port = ((struct sockaddr_in6 *)addr)->sin6_port;
+      break;
+#endif
+    case AF_INET:
+      port = ((struct sockaddr_in *)addr)->sin_port;
+      break;
+    default:
+      putlog(LOG1, "FATAL: Unknown address family %d", addr->sa_family);
+  }
+
+  return ntohs(port);
+}
+
+/*
+ * SetPort()
+ * Set port in sockaddr structure
+ */
+void SetPort(struct sockaddr *addr, unsigned short int port)
+{
+  switch (addr->sa_family)
+  {
+#ifdef INET6
+    case AF_INET6:
+      ((struct sockaddr_in6 *)addr)->sin6_port = htons(port);
+      break;
+#endif
+    case AF_INET:
+      ((struct sockaddr_in *)addr)->sin_port = htons(port);
+      break;
+    default:
+      putlog(LOG1, "FATAL: Unknown address family %d", addr->sa_family);
+  }
+}
+
+/*
+ * ConnectHost()
+ * args: hostname, port
+ * purpose: bind socket and begin a non-blocking connection to
+ *          hostname at port
+ * return: socket file descriptor if successful connect, -1 if not
+ */
+int ConnectHost(const char *hostname, unsigned int port)
+{
+  struct addrinfo *res, *res_o;
   int socketfd; /* socket file descriptor */
+  char *resolved = NULL;
 
-  memset((void *) &ServAddr, 0, sizeof(struct sockaddr_in));
+  res_o = res = LookupHostname(hostname);
 
-  hostptr = LookupHostname(hostname, &ip);
+  while (res != NULL)
+  {
+    resolved = ConvertHostname(res->ai_addr, res->ai_addrlen);
 
-  if (hostptr)
+    putlog(LOG1, "Connecting to %s[%s] tcp/%d",
+        hostname, resolved, port);
+
+    if ((socketfd = socket(res->ai_family, SOCK_STREAM, 6)) == -1)
     {
-      assert(ip.s_addr != INADDR_NONE);
-
-      ServAddr.sin_family = hostptr->h_addrtype;
-      ServAddr.sin_addr.s_addr = ip.s_addr;
-    }
-  else
-    {
-      /*
-       * There is no host entry, but there might be an ip address
-       */
-      if (ip.s_addr == INADDR_NONE)
-        {
-#ifdef DEBUGMODE
-          fprintf(stderr,
-                  "Cannot connect to port %d of %s: Unknown host\n",
-                  port,
-                  hostname);
-#endif
-
-          putlog(LOG1,
-                 "Unable to connect to %s:%d: Unknown hostname",
-                 hostname,
-                 port);
-          return (-1);
-        }
-
-      ServAddr.sin_family = AF_INET;
-      ServAddr.sin_addr.s_addr = ip.s_addr;
+      putlog(LOG1, "FATAL: Problem allocating socket: %s", strerror(errno));
+      exit(EXIT_FAILURE);
     }
 
-#ifdef DEBUGMODE
-  fprintf(stderr,
-          "Connecting to %s[%s].%d\n",
-          hostname,
-          inet_ntoa(ServAddr.sin_addr),
-          port);
-#endif
+    SetSocketOptions(socketfd);
+    SetPort((struct sockaddr *)res->ai_addr, port);
 
-  if ((socketfd = socket(ServAddr.sin_family, SOCK_STREAM, 0)) < 0)
-    {
-#ifdef DEBUGMODE
-      fprintf(stderr, "Unable to open stream socket\n");
-#endif
+    if (LocalHostName)
+      {
+        /* bind to virtual host */
+        if (bind(socketfd, (struct sockaddr *)&LocalAddr,
+              LocalAddrSize) == -1)
+          {
+            char *resolved2;
+            resolved2 = ConvertHostname((struct sockaddr *)&LocalAddr,
+                LocalAddrSize);
 
-      putlog(LOG1,
-             "Unable to open stream socket: %s",
-             strerror(errno));
+            putlog(LOG1, "FATAL: Unable to bind virtual host %s[%s]: %s",
+                   LocalHostName, resolved2, strerror(errno));
 
-      return(-1);
-    }
+            MyFree(resolved2);
+          }
+      }
 
-  if (LocalHostName)
-    {
-      /* bind to virtual host */
-      if ((bind(socketfd, (struct sockaddr *) &LocalAddr, sizeof(LocalAddr))) < 0)
-        {
-          putlog(LOG1, "Unable to bind virtual host %s[%s]: %s",
-                 LocalHostName,
-                 inet_ntoa(LocalAddr.sin_addr),
-                 strerror(errno));
-          close (socketfd);
-          return (-1);
-        }
-    }
+    if ((connect(socketfd, (struct sockaddr *)res->ai_addr,
+          res->ai_addrlen)) == -1)
+      {
+        putlog(LOG1, "Error connecting to %s[%s] tcp/%d: %s",
+            hostname, resolved, port, strerror(errno));
 
-  if (!SetNonBlocking(socketfd))
-    {
-      putlog(LOG1,
-             "Unable to set socket [%d] non-blocking",
-             socketfd);
-      close(socketfd);
-      return (-1);
-    }
+        close(socketfd);
+        MyFree(resolved);
+        res = res->ai_next;
+        continue;
+      }
 
-  ServAddr.sin_port = (unsigned short) htons((unsigned short) port);
+    /* nope, no error whatsoever */
+    freeaddrinfo(res_o);
+    MyFree(resolved);
+    SetNonBlocking(socketfd);
+    return socketfd;
+  }
 
-  /* Check for both if return value is -1 and errno is set. This is
-   * paranoid, I know, but it was obviously necessary on Solaris -kre */
-  if (connect(socketfd, (struct sockaddr *) &ServAddr, sizeof(ServAddr))==-1)
-    {
-      if (errno && errno!=EINPROGRESS)
-        {
-#ifdef DEBUGMODE
-          fprintf(stderr,
-                  "Cannot connect to port %d of %s: %s\n",
-                  port,
-                  hostname,
-                  strerror(errno));
-#endif
+  if (res_o != NULL)
+    freeaddrinfo(res_o);
 
-          putlog(LOG1,
-                 "Error connecting to %s[%s].%d: %s",
-                 hostname,
-                 hostname,
-                 port,
-                 strerror(errno));
-          close(socketfd);
-          return(-1);
-        }
-    }
-
-  return (socketfd);
+  return -1;
 } /* ConnectHost() */
 
 /*
@@ -409,26 +442,19 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   errval = 0;
   errlen = sizeof(errval);
-  if (getsockopt(HubSock, SOL_SOCKET, SO_ERROR, (void *)&errval, &errlen)
-      < 0)
+
+  if (getsockopt(HubSock, SOL_SOCKET, SO_ERROR,
+        (void *)&errval, &errlen) == -1)
     {
-      putlog(LOG1,
-             "getsockopt(SO_ERROR) failed: %s",
-             strerror(errno));
+      putlog(LOG1, "getsockopt(SO_ERROR) failed: %s", strerror(errno));
       return 0;
     }
 
   if (errval > 0)
     {
-#ifdef DEBUGMODE
-      fprintf(stderr,
-              "Cannot connect to port %d of %s: %s\n",
-              hubptr->port, hubptr->hostname, strerror(errval));
-#endif
-
       putlog(LOG1,
-             "Error connecting to port %d of %s: %s",
-             hubptr->port, hubptr->hostname, strerror(errval));
+             "Error connecting to %s tcp/%d: %s",
+             hubptr->hostname, hubptr->port, strerror(errval));
 
       return 0;
     }
@@ -437,9 +463,9 @@ CompleteHubConnection(struct Servlist *hubptr)
 
   hubptr->connect_ts = current_ts;
 
-  SendUmode(OPERUMODE_Y, "*** Connected to %s:%d",
+  SendUmode(OPERUMODE_Y, "*** Connected to %s tcp/%d",
             hubptr->hostname, hubptr->port);
-  putlog(LOG1, "Connected to %s:%d", hubptr->hostname, hubptr->port);
+  putlog(LOG1, "Connected to %s tcp/%d", hubptr->hostname, hubptr->port);
 
   burst_complete = 0;
 
@@ -1087,68 +1113,97 @@ void
 SetSocketOptions(int socket)
 
 {
-  int option;
-
-  option = 1;
+  int option = 1;
 
   /*
    * SO_REUSEADDR will enable immediate local address reuse of
    * the port this socket is bound to
    */
-  if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (char *) &option, sizeof(option)) < 0)
+  if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (char *)&option,
+        sizeof(option)) == -1)
     {
       putlog(LOG1, "SetSocketOptions: setsockopt(SO_REUSEADDR) failed: %s",
+             strerror(errno));
+      return;
+    }
+
+  /* disable Nagle, if possible */
+  if (setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (char *)&option,
+        sizeof(option)) == -1)
+    {
+      putlog(LOG1, "SetSocketOptions: setsockopt(TCP_NODELAY) failed: %s",
              strerror(errno));
       return;
     }
 } /* SetSocketOptions() */
 
 /*
-DoListen()
+  DoListen()
 */
-
-void
-DoListen(struct PortInfo *portptr)
-
+void DoListen(struct PortInfo *portptr)
 {
-  struct sockaddr_in socketname;
+  struct addrinfo hints;
+  struct addrinfo *res, *res_o;
+  int error;
 
-  memset((void *) &socketname, 0, sizeof(struct sockaddr));
-  socketname.sin_family = AF_INET;
-  socketname.sin_addr.s_addr = INADDR_ANY;
-  socketname.sin_port = htons(portptr->port);
+  /* can't use standard LookupHostname */
+  memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	error = getaddrinfo(NULL, NULL, &hints, &res);
+
+  res_o = res;
+
+  if (error)
+  {
+    putlog(LOG1,
+        "Unable to get local addresses, this should never happen: %s",
+        gai_strerror(error));
+    return;
+  }
+
+  while (res != NULL)
+  {
+    if ((portptr->socket = socket(res->ai_family, SOCK_STREAM, 6)) < 0)
+      {
+        putlog(LOG1, "FATAL: Problem allocating socket: %s",
+               strerror(errno));
+        exit(EXIT_FAILURE);
+      }
+
+    /* set various socket options */
+    SetSocketOptions(portptr->socket);
+    SetPort((struct sockaddr *)res->ai_addr, portptr->port);
+
+    if (bind(portptr->socket, res->ai_addr, res->ai_addrlen) == -1)
+      {
+        putlog(LOG1, "FATAL: Unable to bind port tcp/%d: %s",
+               portptr->port, strerror(errno));
+        close(portptr->socket);
+        portptr->socket = NOSOCKET;
+      }
+    else
+#ifdef SOMAXCONN
+      if (listen(portptr->socket, SOMAXCONN) == -1)
+#else
+      if (listen(portptr->socket, HYBSERV_SOMAXCONN) == -1)
+#endif
+        {
+          putlog(LOG1, "Unable to listen on port tcp/%d: %s",
+                 portptr->port, strerror(errno));
+          close(portptr->socket);
+          portptr->socket = NOSOCKET;
+        }
+
+    res = res->ai_next;
+  }
 
   portptr->tries++;
 
-  if ((portptr->socket = socket(PF_INET, SOCK_STREAM, 6)) < 0)
-    {
-      putlog(LOG1, "Unable to create stream socket: %s",
-             strerror(errno));
-      close(portptr->socket);
-      portptr->socket = NOSOCKET;
-      return;
-    }
-
-  /* set various socket options */
-  SetSocketOptions(portptr->socket);
-
-  if (bind(portptr->socket, (struct sockaddr *)&socketname, sizeof(socketname)) < 0)
-    {
-      putlog(LOG1, "Unable to bind port %d: %s",
-             portptr->port, strerror(errno));
-      close(portptr->socket);
-      portptr->socket = NOSOCKET;
-      return;
-    }
-
-  if (listen(portptr->socket, 4) < 0)
-    {
-      putlog(LOG1, "Unable to listen on port %d: %s",
-             portptr->port, strerror(errno));
-      close(portptr->socket);
-      portptr->socket = NOSOCKET;
-      return;
-    }
+  if (res_o != NULL)
+    freeaddrinfo(res_o);
 } /* DoListen() */
 
 /*

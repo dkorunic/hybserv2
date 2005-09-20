@@ -82,6 +82,10 @@ char *strchr(), *strrchr();
 # include <netinet/in.h>
 #endif
 
+#if defined HAVE_NETINET_TCP_H
+# include <netinet/tcp.h>
+#endif
+
 #if defined HAVE_ERRNO_H
 # include <errno.h>
 #endif
@@ -147,6 +151,23 @@ char *strchr(), *strrchr();
 # if defined HAVE_NDIR_H
 #  include <ndir.h>
 # endif
+#endif
+
+#if !defined HAVE_SOCKADDR_STORAGE
+struct sockaddr_storage {
+  unsigned char ss_len;
+  unsigned char ss_family;
+  unsigned char padding[128 - 2];
+};
+# define HAVE_SOCKADDR_STORAGE
+#endif
+
+#if !defined HAVE_INET_NTOP
+const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+#endif
+
+#if !defined HAVE_INET_PTON
+int inet_pton(int af, const char *src, void *dst);
 #endif
 
 #endif /* INCLUDED_stdinc_h */

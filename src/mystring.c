@@ -75,21 +75,19 @@ char *StrTolower(char *str)
 char *GetString(int ac, char **av)
 {
   char *final;
-  char temp[MAXLINE];
-  int ii;
+  int ii = 0, bw = 0;
 
   final = MyMalloc(MAXLINE);
   final[0] = '\0';
 
-  ii = 0;
-  while (ii < ac)
-    {
-      ircsprintf(temp, "%s%s", av[ii], ((ii + 1) >= ac) ? "" : " ");
-      strlcat(final, temp, MAXLINE);
-      ++ii;
-    }
+  for (; ii < ac; ++ii)
+  {
+    bw += strlcat(final + bw, av[ii], MAXLINE);
+    bw += strlcat(final + bw, " ", MAXLINE);
+  }
+  final[bw - 1] = '\0';
 
-  return (final);
+  return final;
 } /* GetString() */
 
 /*
@@ -99,86 +97,63 @@ char *GetString(int ac, char **av)
  * pointers to the beginning of each word, and store them in "array".
  * Returns the number of words in "buff"
  */
-int SplitBuf(char *buff, char ***array)
+int SplitBuf(char *string, char ***array)
 {
-  int argsize = 8;
-  int acnt, ii;
-  char *temp1, *tempbuf;
+  int x = 0;
+  int len;
+  char *p, *buf = string;
 
-  /* Be safe. If something down fails, it will point
-   * to NULL anyway -kre */
   *array = NULL;
 
-  /* Perform this check -kre */
-  if (buff == NULL)
+  if ((buf == NULL) || (*buf == '\0'))
     return 0;
 
-  tempbuf = buff;
+  *array = MyMalloc(sizeof(char *) * (MAXPARAM + 1));
 
-  ii = strlen(tempbuf);
+  len = strlen(string);
+  if (IsEOL(string[len - 1]))
+    string[len - 1] = '\0';
 
-  /* No reason to parse this at all -kre */
-  if (!ii)
-    return 0;
+  (*array)[x] = NULL;
 
-  /* try to kill trailing \r or \n chars */
-  if (IsEOL(tempbuf[ii - 1]))
-    tempbuf[ii - 1] = '\0';
+  /* contained only spaces */
+  while (IsSpace(*buf))
+    ++buf;
 
-  /*
-   * When hybrid sends channel bans during a netjoin, it leaves
-   * a preceding space (not sure why) - just make sure there
-   * are no preceding spaces
-   *
-   * Note that Hybrid7 sends also spaces after SJOIN's, like in
-   * <fl_> :irc.vchan SJOIN 978405679 #ircd-coders +sptna : @Diane @dia
-   * -kre
-   */
-  while (IsSpace(*tempbuf))
-    ++tempbuf;
+  if (*buf == '\0')
+    return x;
 
-  /* Check if tempbuf contained only but spaces -kre */
-  if (!*tempbuf)
-    return 0;
-
-  *array = (char **) MyMalloc(sizeof(char *) * argsize);
-  memset(*array, 0, sizeof(char *) * argsize);
-  acnt = 0;
-  while (*tempbuf)
+  do
+  {
+    (*array)[x++] = buf;
+    (*array)[x] = NULL;
+    if ((p = strchr(buf, ' ')) != NULL)
     {
-      if (acnt == argsize)
-        {
-          argsize += 8;
-          *array = (char **) MyRealloc(*array, sizeof(char *) * argsize);
-        }
+      if (*(p + 1) == ':')
+      {
+        *p = '\0';
+        (*array)[x++] = p + 1;
+        (*array)[x] = NULL;
+        return x;
+      }
 
-      if ((*tempbuf == ':') && (acnt != 0))
-        {
-          (*array)[acnt++] = tempbuf;
-          /* (*array)[acnt++] = tempbuf + 1; */
-          tempbuf = "";
-        }
-      else
-        {
-          /* Why use strpbrk() on only 1 character? We have faster strchr for
-           * that. -kre */
-          /* temp1 = strpbrk(tempbuf, " "); */
-          temp1 = strchr(tempbuf, ' ');
-          if (temp1)
-            {
-              *temp1++ = 0;
-              while (IsSpace(*temp1))
-                ++temp1;
-            }
-          else
-            temp1 = tempbuf + strlen(tempbuf);
-
-          (*array)[acnt++] = tempbuf;
-          tempbuf = temp1;
-        }
+      *p++ = '\0';
+      buf = p;
     }
+    else
+      return x;
 
-  return (acnt);
+    while (*buf == ' ')
+      ++buf;
+
+    if (*buf == '\0')
+      return x;
+  } while (x < MAXPARAM - 1);
+
+  (*array)[x++] = p;
+  (*array)[x] = NULL;
+  
+  return x;
 } /* SplitBuf() */
 
 /*

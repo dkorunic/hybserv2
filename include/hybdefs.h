@@ -12,8 +12,11 @@
 #include "config.h"
 #include "motd.h"
 
-#define   MAXLINE     512 /* don't change this */
-#define   MAXBUF      16364 /* don't change this */
+#define   MAXLINE    512  /* don't change this */
+#define   BUFSIZE  16364  /* don't change this - number of bytes to read
+                             from sockets */
+#define   MAXPARAM    15  /* don't change this - max parameters the hub
+                             can send us */
 #define   REALLEN     50  /* ircd value for max server info length */
 #define   USERLEN     10  /* username length */
 #define   HOSTLEN     63  /* hostname length */
@@ -31,6 +34,9 @@
 
 /* Network flags */
 #define NET_OFF         0x0001 /* Services are deactivated */
+
+/* SOMAXCONN */
+#define HYBSERV_SOMAXCONN 25
 
 struct Server;
 

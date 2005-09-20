@@ -71,7 +71,7 @@ distclean: clean
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
 		include/config.h bin/settings.conf bin/cleandb \
 		config.status src/.depend config.cache config.log ~* core \
-		hybserv.core
+		hybserv.core configure.lineno
 
 mrproper: distclean
 
@@ -80,8 +80,8 @@ depend:
 	@if test ! -f src/.depend; then \
 		touch src/.depend; \
 		cd src; $(MAKE) depend; \
-		echo; \
 	fi
+	@echo
 
 install: all install-binary install-help
 	@echo "*** Done installing Hybserv2 $(VERSION) ***"

@@ -28,15 +28,9 @@
 #include "sock.h"
 #include "sprintf_irc.h"
 
-/* Ugly Solaris hack -kre */
-#ifndef INADDR_NONE
-# define INADDR_NONE ((unsigned long)-1)
-#endif
-
-static int DccConnectHost(char *hostname, unsigned int port);
 static int MakeConnection(char *host, int port, struct Luser *lptr);
 static int IsAuth(struct DccUser *);
-static int RequestIdent(struct DccUser *, struct in_addr *);
+static int RequestIdent(struct DccUser *, struct sockaddr *, socklen_t);
 static void LinkDccClient(struct DccUser *dccptr);
 static void UnlinkDccClient(struct DccUser *dccptr);
 
@@ -316,158 +310,26 @@ SendUmode(int umode, char *format, ...)
 } /* SendUmode() */
 
 /*
-DccConnectHost()
- Similar to ConnectHost(), but assume hostname is a hostname in
-long format (as the dcc protocol specifies)
- 
-Return: socket descriptor for connection
-*/
-
-static int
-DccConnectHost(char *hostname, unsigned int port)
-
+ * ConnectClient()
+ * purpose: accept remote connection on portptr->socket
+ * return: none 
+ */
+void ConnectClient(struct PortInfo *portptr)
 {
-  struct sockaddr_in ServAddr;
-  struct hostent *remote_host;
-  int socketfd; /* socket file descriptor */
-  int optspacer; /* spacer for setsockopt() later -kre */
-  struct in_addr ip;
-
-  memset((void *) &ServAddr, 0, sizeof(struct sockaddr_in));
-
-  remote_host = LookupHostname(hostname, &ip);
-
-  if (remote_host)
-    {
-      assert(ip.s_addr != INADDR_NONE);
-
-      ServAddr.sin_family = remote_host->h_addrtype;
-      ServAddr.sin_addr.s_addr = ip.s_addr;
-    }
-  else
-    {
-      if (ip.s_addr == INADDR_NONE)
-        {
-#ifdef DEBUGMODE
-          fprintf(stderr,
-                  "Cannot connect to port %d of %s: Unknown host\n", port,
-                  hostname);
-#endif
-
-          putlog(LOG1,
-                 "Unable to connect to %s.%d: Unknown hostname",
-                 hostname,
-                 port);
-          return (-1);
-        }
-      ServAddr.sin_family = AF_INET;
-      ServAddr.sin_addr.s_addr = ip.s_addr;
-    }
-
-  ServAddr.sin_port = (unsigned short) htons((unsigned short) port);
-
-#ifdef DEBUGMODE
-
-  fprintf(stderr,
-          "Connecting to %s:%d\n",
-          inet_ntoa(ServAddr.sin_addr),
-          port);
-#endif /* DEBUGMODE */
-
-  /* Open INET socket -kre */
-  if ((socketfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-#ifdef DEBUGMODE
-      fprintf(stderr, "Unable to open stream socket\n");
-#endif
-
-      putlog(LOG1,
-             "Unable to open stream socket: %s",
-             strerror(errno));
-
-      return(-1);
-    }
-
-  /* Make reusable address, look socket(7) -kre */
-  optspacer=1;
-  setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (char *)&optspacer,
-             sizeof(optspacer));
-
-  if (LocalHostName)
-    {
-      /* bind to virtual host */
-      if ((bind(socketfd, (struct sockaddr *) &LocalAddr,
-                sizeof(LocalAddr))) < 0)
-        {
-          putlog(LOG1, "Unable to bind virtual host %s[%s]: %s",
-                 LocalHostName,
-                 inet_ntoa(LocalAddr.sin_addr),
-                 strerror(errno));
-          close (socketfd);
-          return (-1);
-        }
-    }
-
-  if (!SetNonBlocking(socketfd))
-    {
-      putlog(LOG1,
-             "Unable to set socket [%d] non-blocking",
-             socketfd);
-      close(socketfd);
-      return (-1);
-    }
-
-  if (connect(socketfd, (struct sockaddr *) &ServAddr, sizeof(ServAddr))==-1)
-    {
-      /* React only if errno is set. -kre */
-      if (errno && errno!=EINPROGRESS)
-        {
-#ifdef DEBUGMODE
-          fprintf(stderr,
-                  "Cannot connect to port %d of %s: %s\n",
-                  port,
-                  inet_ntoa(ServAddr.sin_addr),
-                  strerror(errno));
-#endif
-
-          putlog(LOG1,
-                 "Error connecting to dcc host %s.%d: %s",
-                 inet_ntoa(ServAddr.sin_addr),
-                 port,
-                 strerror(errno));
-
-          close(socketfd);
-          return(-1);
-        }
-    }
-
-  return (socketfd);
-} /* DccConnectHost() */
-
-/*
-ConnectClient()
-  purpose: accept remote connection on portptr->socket
-  return: none 
-*/
-
-void
-ConnectClient(struct PortInfo *portptr)
-
-{
-  struct sockaddr_in RemoteAddr;
-  struct hostent *RemoteHost;
-  socklen_t addrlen;
-  int goodid = 1, fd;
+  struct sockaddr_storage addr;
+  socklen_t addrlen = sizeof(addr);
+  char *resolved;
+  int goodid = 1, fd, sock;
   struct DccUser *tempconn;
 
-  if (!portptr)
+  if (portptr == NULL)
     return;
 
-  addrlen = sizeof(struct sockaddr_in);
-  if ((fd = accept(portptr->socket, (struct sockaddr *)&RemoteAddr,
-          &addrlen)) < 0)
+  if ((fd = accept(portptr->socket, (struct sockaddr *)&addr,
+          &addrlen)) == -1)
     {
-      putlog(LOG1, "Error in accept on socket %d", portptr->socket);
+      putlog(LOG1, "Error in accept on socket %d: %s", portptr->socket,
+          strerror(errno));
       return;
     }
 
@@ -479,94 +341,87 @@ ConnectClient(struct PortInfo *portptr)
       return;
     }
 
-  RemoteHost = gethostbyaddr((char *)&RemoteAddr.sin_addr.s_addr, 4,
-      AF_INET);
+  resolved = LookupAddress((struct sockaddr *)&addr, addrlen);
 
-  tempconn = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
-  memset(tempconn, 0, sizeof(struct DccUser));
+  tempconn = MyMalloc(sizeof(struct DccUser));
 
   tempconn->socket = fd;
 
-  if (RemoteHost)
-    tempconn->hostname = MyStrdup(RemoteHost->h_name);
+  if (resolved != NULL)
+    tempconn->hostname = resolved;
   else
-    tempconn->hostname = MyStrdup(inet_ntoa(RemoteAddr.sin_addr));
+  {
+    tempconn->hostname = ConvertHostname((struct sockaddr *)&addr,
+        addrlen);
+  }
 
-  tempconn->username = MyStrdup("unknown");
-  tempconn->port = ntohs(RemoteAddr.sin_port);
+  tempconn->username = NULL;
   tempconn->idle = current_ts;
+  tempconn->port = GetPort((struct sockaddr *)&addr);
 
   SetNonBlocking(tempconn->socket);
 
   switch (portptr->type)
-    {
+  {
     case PRT_TCM:
-      {
-        int sock;
+    {
+      tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
 
-        tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
+      putlog(LOG1, "Received tcm connection from [%s:%d] on port %d",
+                tempconn->hostname, tempconn->port, portptr->port);
+      SendUmode(OPERUMODE_B,
+                "*** Received tcm connection from [%s:%d] on port %d",
+                tempconn->hostname, tempconn->port, portptr->port);
 
-        putlog(LOG1, "Received tcm connection from [%s:%d] on port %d",
-                  tempconn->hostname, tempconn->port, portptr->port);
-        SendUmode(OPERUMODE_B,
-                  "*** Received tcm connection from [%s:%d] on port %d",
-                  tempconn->hostname, tempconn->port, portptr->port);
+      sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
+      if (sock < 0)
+        goodid = 0;
 
-        sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
-        if (sock < 0)
-          goodid = 0;
-
-        break;
-      }
+      break;
+    }
 
     case PRT_USERS:
-      {
-        int sock;
+    {
+      if (portptr->host)
+        {
+          /* Check if incoming connection has an authorized host */
+          if (match(portptr->host, tempconn->hostname) == 0)
+            {
+              putlog(LOG1,
+                "Illegal connection attempt on port %d from [%s:%d]",
+                portptr->port, tempconn->hostname, tempconn->port);
 
-        if (portptr->host)
-          {
-            /* Check if incoming connection has an authorized host */
-            if (match(portptr->host, tempconn->hostname) == 0)
-              {
-                putlog(LOG1,
-                       "Illegal connection attempt on port %d from [%s:%d]",
-                       portptr->port, tempconn->hostname, tempconn->port);
+              SendUmode(OPERUMODE_B,
+                "*** Unauthorized connection attempt from [%s:%d] on port %d",
+                tempconn->hostname, tempconn->port,
+                portptr->port);
 
-                SendUmode(OPERUMODE_B,
-                          "*** Unauthorized connection attempt from [%s:%d] on port %d",
-                          tempconn->hostname, tempconn->port,
-                          portptr->port);
+              close(tempconn->socket);
+              MyFree(tempconn->hostname);
+              MyFree(tempconn);
+              return;
+            }
+        }
 
-                close(tempconn->socket);
-                MyFree(tempconn->hostname);
-                MyFree(tempconn);
-                return;
-              }
-          }
+      tempconn->flags = SOCK_NEEDID;
 
-        tempconn->flags = SOCK_NEEDID;
+      SendUmode(OPERUMODE_Y,
+        "*** Received connection from [%s:%d] on port %d",
+        tempconn->hostname, tempconn->port, portptr->port);
 
-        SendUmode(OPERUMODE_Y,
-                  "*** Received connection from [%s:%d] on port %d",
-                  tempconn->hostname,
-                  tempconn->port,
-                  portptr->port);
+      sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
+      if (sock < 0)
+        goodid = 0;
 
-        sock = RequestIdent(tempconn, &RemoteAddr.sin_addr);
-        if (sock < 0)
-          goodid = 0;
-
-        break;
-      }
+      break;
+    }
 
     default:
       {
         /* something is really screwed */
         putlog(LOG1,
-               "Invalid connection type specified on port [%d] (%s:%d)",
-               portptr->port,
-               tempconn->hostname,
-               tempconn->port);
+           "Invalid connection type specified on port [%d] (%s:%d)",
+           portptr->port, tempconn->hostname, tempconn->port);
 
         close(tempconn->socket);
         MyFree(tempconn->hostname);
@@ -582,10 +437,9 @@ ConnectClient(struct PortInfo *portptr)
       close(tempconn->authfd);
       tempconn->authfd = NOSOCKET;
       tempconn->flags &= ~SOCK_NEEDID;
+      tempconn->username = MyStrdup("unknown");
 
-      /*
-       * Their username will remain "unknown" from above
-       */
+      /* Their username will remain "unknown" from above */
 
       if (!(tempconn->flags & SOCK_TCMBOT))
         TelnetGreet(tempconn);
@@ -604,7 +458,7 @@ void readauth(struct DccUser *dccptr)
   char buffer[MAXLINE], ident[USERLEN + 1];
   int length;
 
-  buffer[0] = '\0';
+  memset(buffer, 0, sizeof(buffer));
   length = recv(dccptr->authfd, buffer, sizeof(buffer), 0);
 
   if (length > 0)
@@ -634,8 +488,7 @@ void readauth(struct DccUser *dccptr)
 
   dccptr->flags &= ~SOCK_NEEDID;
 
-  if (dccptr->username)
-    MyFree(dccptr->username);
+  MyFree(dccptr->username);
   dccptr->username = MyStrdup(ident);
 
   if (!(dccptr->flags & SOCK_TCMBOT))
@@ -652,95 +505,104 @@ writeauth(struct DccUser *dccptr)
 
 {
   char idstr[MAXLINE];
-  struct sockaddr_in local, remote;
+  struct sockaddr_storage local, remote;
   socklen_t len;
 
   len = sizeof(local);
-  if (getsockname(dccptr->socket, (struct sockaddr *) &local, &len) ||
-      getpeername(dccptr->socket, (struct sockaddr *) &remote, &len))
+  if ((getsockname(dccptr->socket, (struct sockaddr *)&local,
+          &len) == -1) ||
+      (getpeername(dccptr->socket,
+            (struct sockaddr *)&remote, &len) == -1))
     {
       /* something went wrong */
       putlog(LOG1,
-             "writeauth: get{sock,peer}name error for %d: %s",
-             dccptr->socket,
-             strerror(errno));
+             "FATAL: get{sock,peer}name error for %d: %s",
+             dccptr->socket, strerror(errno));
       return;
     }
 
   /* send ident request */
   ircsprintf(idstr, "%u , %u\r\n",
-             (unsigned int) ntohs(remote.sin_port),
-             (unsigned int) ntohs(local.sin_port));
+             (unsigned int)ntohs(GetPort((struct sockaddr *)&remote)),
+             (unsigned int)ntohs(GetPort((struct sockaddr *)&local)));
   writesocket(dccptr->authfd, idstr);
 
   dccptr->flags &= ~SOCK_WRID;
 } /* writeauth() */
 
 /*
-RequestIdent()
-  Connect to the ident port of dccptr
-*/
-
-static int
-RequestIdent(struct DccUser *dccptr, struct in_addr *in)
-
+ * RequestIdent()
+ * Connect to the ident port of dccptr
+ */
+static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
+    socklen_t addrlen)
 {
-  int length;
-  struct sockaddr_in localaddr;
-  struct sockaddr_in remote;
+  int domain = PF_INET;
+  struct sockaddr_storage laddr;
+  struct sockaddr_storage remote;
+  socklen_t laddrlen = sizeof(laddr);
 
-  if ((dccptr->authfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-      putlog(LOG1,
-             "Unable to open stream socket for connection %s/%d: %s",
-             dccptr->hostname,
-             dccptr->port,
-             strerror(errno));
-      return (-1);
-    }
+  switch (addr->sa_family)
+  {
+#ifdef INET6
+	  case AF_INET6:
+      domain = PF_INET6;
+		  break;
+#endif
+	  case AF_INET:
+      domain = PF_INET;
+		  break;
+    default:
+      putlog(LOG1, "FATAL: Unknown address family %d", addr->sa_family);
+	}
 
+  if ((dccptr->authfd = socket(domain, SOCK_STREAM, 6)) == -1)
+  {
+    putlog(LOG1, "FATAL: Problem allocating socket: %s",
+           strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  SetSocketOptions(dccptr->authfd);
   SetNonBlocking(dccptr->authfd);
-  /*fcntl(dccptr->authfd, F_SETFL, O_NONBLOCK);*/
 
-  length = sizeof(struct sockaddr_in);
-  memset((void *) &localaddr, 0, length);
-  /* getsockname(dccptr->socket, (struct sockaddr *) &localaddr, &length); */
-  localaddr.sin_port = htons(0);
+  getsockname(dccptr->socket, (struct sockaddr *)&laddr, &laddrlen);
+  SetPort((struct sockaddr *)&laddr, 0);
 
-  if (bind(dccptr->authfd, (struct sockaddr *)&localaddr,
-           sizeof(localaddr)) == -1)
+  if (bind(dccptr->authfd, (struct sockaddr *)&laddr, laddrlen) == -1)
     {
-      putlog(LOG1,
-             "Error binding ident stream socket %d: %s",
-             dccptr->authfd,
-             strerror(errno));
+      putlog(LOG1, "FATAL: Unable to bind port tcp/%d: %s",
+               0, strerror(errno));
       close(dccptr->authfd);
-      return (-1);
+      return -1;
     }
 
-  memset((void *) &remote, 0, sizeof(struct sockaddr_in));
-  memcpy((void *) &remote.sin_addr, (void *) in,
-         sizeof(struct in_addr));
+  memcpy(&remote, addr, sizeof(remote));
+  SetPort((struct sockaddr *)&remote, 113);
 
-  remote.sin_port = htons(113);
-  remote.sin_family = AF_INET;
-
-  /* Check for connect() return value, errno is set and
-   * EINPROGRESS.. -kre */
   if ((connect(dccptr->authfd, (struct sockaddr *)&remote,
-               sizeof(remote)) == -1) && errno && errno!=EINPROGRESS)
+               addrlen)) == -1)
     {
-      putlog(LOG1,
-             "Unable to connect to ident port of %s: %s",
-             dccptr->hostname,
-             strerror(errno));
-      close(dccptr->authfd);
-      return (-1);
+      if (IgnoreErrno(errno))
+      {
+        /* probably all alright */
+        dccptr->flags |= SOCK_WRID;
+        return(dccptr->authfd);
+      }
+      else
+      {
+        /* error, can't retry */
+        putlog(LOG1, "Error connecting to %s tcp/%d: %s",
+            dccptr->hostname, 113, strerror(errno));
+
+        close(dccptr->authfd);
+        return -1;
+      }
     }
 
+  /* no problems at all */
   dccptr->flags |= SOCK_WRID;
-
-  return (dccptr->authfd);
+  return(dccptr->authfd);
 } /* RequestIdent() */
 
 /*
@@ -804,7 +666,7 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   dccptr = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
   memset(dccptr, 0, sizeof(struct DccUser));
 
-  dccptr->socket = DccConnectHost(host, port);
+  dccptr->socket = ConnectHost(host, port);
   if (dccptr->socket == -1)
     {
       MyFree(dccptr);
@@ -819,13 +681,6 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   dccptr->idle = current_ts;
   dccptr->authfd = NOSOCKET;
 
-#if 0
-
-  dccptr->nick = MyStrdup(tempuser->nick);
-#endif
-  /* I don't care if telnet connections get b0rked, this stupid to put
-   * tempuser->nick since it will contain nick from O line, not _real_
-   * nick from IRC! -kre */
   dccptr->nick = MyStrdup(lptr->nick);
   dccptr->username = MyStrdup(lptr->username);
   dccptr->hostname = MyStrdup(lptr->hostname);
@@ -875,11 +730,10 @@ GreetDccUser(struct DccUser *dccptr)
 
   if (errval > 0)
     {
-#ifdef DEBUGMODE
-      fprintf(stderr,
-              "Cannot connect to port %d of %s: %s\n",
-              dccptr->port, dccptr->hostname, strerror(errval));
-#endif
+      putlog(LOG1,
+             "Error connecting to %s@%s tcp/%d: %s",
+             dccptr->username, dccptr->hostname, dccptr->port,
+             strerror(errval));
 
       SendUmode(OPERUMODE_Y,
                 "*** Lost connection to [%s@%s:%d]: %s",
@@ -937,8 +791,7 @@ onctcp(char *nick, char *target, char *msg)
 
 {
   char temp[MAXLINE];
-  int goodDCC,
-  cnt;
+  int goodDCC;
   struct Luser *lptr;
   struct Userlist *tempuser;
 
@@ -954,8 +807,6 @@ onctcp(char *nick, char *target, char *msg)
 
   if (!ircncmp(msg, "ACTION", 6))
     return; /* don't log ctcp actions */
-
-  temp[0] = '\0';
 
   if (ircncmp(msg, "PING", 4) == 0)
     {
@@ -1074,15 +925,15 @@ onctcp(char *nick, char *target, char *msg)
           return;
         }
 
-      cnt = strlen(msg) - 1;
-      strlcpy(temp, msg, cnt);
-      temp[cnt] = '\0';
+      strlcpy(temp, msg, sizeof(temp));
 
       acnt = SplitBuf(temp, &av);
       if (acnt < 5)
         {
           notice(n_OperServ, nick, "DCC CHAT connection failed");
           notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
+          putlog(LOG1, "Invalid DCC string received from [%s]: %s",
+              nick, temp);
           MyFree(av);
           return;
         }
@@ -1115,17 +966,11 @@ onctcp(char *nick, char *target, char *msg)
        * Chop off ending \001
        */
 
-      cnt = strlen(msg) - 1;
-      strlcpy(temp, msg, cnt);
-      temp[cnt] = '\0';
+      strlcpy(temp, msg, sizeof(temp));
 
       SendUmode(OPERUMODE_Y,
-                "%s: CTCP [%s] received from %s!%s@%s",
-                target,
-                temp,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname);
+        "%s: CTCP [%s] received from %s!%s@%s",
+        target, temp, lptr->nick, lptr->username, lptr->hostname);
     }
 } /* onctcp() */
 

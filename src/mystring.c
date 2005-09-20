@@ -27,19 +27,18 @@
 */
 char *StrToupper(char *str)
 {
-  unsigned int ii;
+  int ii = 0;
   static char retstr[MAXLINE];
 
-  if (!str)
-    return (NULL);
+  if (str == NULL)
+    return NULL;
 
-  retstr[0] = '\0';
-  for (ii = 0; ii < strlen(str); ++ii)
+  for (; ii < strlen(str); ++ii)
     retstr[ii] = ToUpper(str[ii]);
 
   retstr[ii] = '\0';
 
-  return (retstr);
+  return retstr;
 } /* StrToupper() */
 
 /*
@@ -51,19 +50,18 @@ char *StrToupper(char *str)
  */
 char *StrTolower(char *str)
 {
-  unsigned int ii;
+  int ii = 0;
   static char retstr[MAXLINE];
 
-  if (!str)
-    return (NULL);
+  if (str == NULL)
+    return NULL;
 
-  retstr[0] = '\0';
-  for (ii = 0; ii < strlen(str); ++ii)
+  for (; ii < strlen(str); ++ii)
     retstr[ii] = ToLower(str[ii]);
 
   retstr[ii] = '\0';
 
-  return (retstr);
+  return retstr;
 } /* StrTolower() */
 
 /*

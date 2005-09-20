@@ -1,5 +1,7 @@
-Hybserv-HEAD: Mon, 19 Sep 2005 12:20:47 +0200
+Hybserv-HEAD: Tue, 20 Sep 2005 20:05:15 +0200
 
+  * rewrote core string/array handling functions SplitBuf() and
+    GetString()
   * add basic IPv6 support and getaddrinfo/getnameinfo stuff
   * add configurable FORCENICK/SVSNICK prefix
   * strlcat/strlcpy merge, lot of memory stuff fixes, better internal

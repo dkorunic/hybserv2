@@ -6140,13 +6140,13 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
     if (chptr->limit)
     {
       char temp[MAXLINE];
-      sprintf(temp, "%s %d", modes, chptr->limit);
+      ircsprintf(temp, "%s %d", modes, chptr->limit);
       strlcpy(modes, temp, sizeof(modes));
     }
     if ((chptr->key) && (chptr->key[0] != '\0'))
     {
       char temp[MAXLINE];
-      sprintf(temp, "%s %s", modes, chptr->key);
+      ircsprintf(temp, "%s %s", modes, chptr->key);
       strlcpy(modes, temp, sizeof(modes));
     }
 

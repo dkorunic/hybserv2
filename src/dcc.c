@@ -52,6 +52,7 @@ SendMotd(int sockfd)
 {
   char line[MAXLINE];
   char *final;
+  char *ch;
   FILE *fp;
 
   if ((fp = fopen(DccMotdFile, "r")) == NULL)
@@ -62,13 +63,20 @@ SendMotd(int sockfd)
 
   while (fgets(line, sizeof(line), fp))
     {
-      final = Substitute(NULL, line, sockfd);
-      if (final && (final != (char *) -1))
-        {
-          writesocket(sockfd, final);
-          writesocket(sockfd, "\r\n");
-          MyFree(final);
-        }
+      if ((ch = strchr(buffer, '\n')) != NULL)
+        *ch = '\0';
+
+      if (*line != '\0')
+      {
+        final = Substitute(NULL, line, sockfd);
+        if (final && (final != (char *) -1))
+          {
+            writesocket(sockfd, final);
+            MyFree(final);
+          }
+      }
+
+      writesocket(sockfd, "\r\n");
     }
 
   fclose(fp);

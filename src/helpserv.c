@@ -324,9 +324,10 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           }
           final = Substitute(helpnick, line, sockfd);
           if (final && (final != (char *) -1))
-              hs_notice(Serv, helpnick, sockfd, "%s", final);
-          if (final != (char *) -1)
+          {
+            hs_notice(Serv, helpnick, sockfd, "%s", final);
             MyFree(final);
+          }
         }
       fclose(fp);
     }
@@ -468,9 +469,10 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           }
           final = Substitute(helpnick, line, sockfd);
           if (final && (final != (char *) -1))
-              hs_notice(Serv, helpnick, sockfd, "%s", final);
-          if (final != (char *) -1)
+          {
+            hs_notice(Serv, helpnick, sockfd, "%s", final);
             MyFree(final);
+          }
         }
       fclose(fp);
     }  /* else */

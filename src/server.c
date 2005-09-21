@@ -2275,6 +2275,7 @@ static void
 s_motd(int ac, char **av)
 
 {
+  char *ch;
   char *who, *final;
   char line[MAXLINE];
   FILE *fp;
@@ -2309,26 +2310,26 @@ s_motd(int ac, char **av)
 
   while (fgets(line, sizeof(line), fp))
     {
-      if (IsEOL(*line))
-        {
-          toserv(":%s 372 %s :- \r\n",
-                 Me.name,
-                 who);
-          continue;
-        }
+      if ((ch = strchr(line, '\n')) != NULL)
+        *ch = '\0';
 
-      final = Substitute(NULL, line, NODCC);
-      if (final && (final != (char *) -1))
+      if (*line == '\0')
+      {
+        toserv(":%s 372 %s :- \r\n", Me.name, who);
+        continue;
+      }
+      else
+      {
+        final = Substitute(NULL, line, NODCC);
+        if (final && (final != (char *) -1))
         {
-          toserv(":%s 372 %s :- %s\r\n",
-                 Me.name, who, final);
+          toserv(":%s 372 %s :- %s\r\n", Me.name, who, final);
           MyFree(final);
         }
+      }
     }
 
-  toserv(":%s 376 %s :End of /MOTD command\r\n",
-         Me.name,
-         who);
+  toserv(":%s 376 %s :End of /MOTD command\r\n", Me.name, who);
 
   fclose(fp);
 } /* s_motd() */

@@ -19,7 +19,7 @@ struct Luser;
 struct MessageFileLine
 {
   struct MessageFileLine *next;
-  char line[MESSAGELINELEN + 1];
+  char *line;
 };
 
 struct MessageFile

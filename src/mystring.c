@@ -80,10 +80,11 @@ char *GetString(int ac, char **av)
 
   for (; ii < ac; ++ii)
   {
-    bw += strlcat(final + bw, av[ii], MAXLINE);
-    bw += strlcat(final + bw, " ", MAXLINE);
+    strlcat(final, av[ii], MAXLINE);
+    bw = strlcat(final, " ", MAXLINE);
   }
-  final[bw - 1] = '\0';
+  if (bw)
+    final[bw - 1] = '\0';
 
   return final;
 } /* GetString() */

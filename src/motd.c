@@ -54,6 +54,7 @@ ReadMessageFile(struct MessageFile *fileptr)
   FILE *fptr;
   char buffer[MESSAGELINELEN + 1];
   char *ch;
+  char *final;
   struct MessageFileLine *NewLine,
         *CurrentLine;
 
@@ -73,35 +74,36 @@ ReadMessageFile(struct MessageFile *fileptr)
   /*
    * Clear out old data
    */
-  while (fileptr->Contents)
+  while (fileptr->Contents != NULL)
     {
       CurrentLine = fileptr->Contents->next;
+      MyFree(fileptr->Contents->line);
       MyFree(fileptr->Contents);
       fileptr->Contents = CurrentLine;
     }
 
-  if (!(fptr = fopen(fileptr->filename, "r")))
+  if ((fptr = fopen(fileptr->filename, "r")) == NULL)
     return 0;
 
   CurrentLine = NULL;
 
   while (fgets(buffer, sizeof(buffer), fptr))
     {
-      if ((ch = strchr(buffer, '\n')))
+      if ((ch = strchr(buffer, '\n')) != NULL)
         *ch = '\0';
 
-      NewLine = (struct MessageFileLine *)
-                MyMalloc(sizeof(struct MessageFileLine));
-      strlcpy(NewLine->line, buffer, MESSAGELINELEN);
-      NewLine->line[MESSAGELINELEN] = '\0';
-
-      /*
-       * If it's a blank line, we need to put some kind of data
-       * in, or ircd won't send the notice later - two ascii bold
-       * characters should work
-       */
-      if (!NewLine->line[0])
-        strlcpy(NewLine->line, "\002\002", MESSAGELINELEN);
+      NewLine = MyMalloc(sizeof(struct MessageFileLine));
+      
+      if (*buffer != '\0')
+      {
+        final = Substitute(NULL, buffer, NODCC);
+        if (final && (final != (char *) -1))
+          NewLine->line = final;
+        else
+          NewLine->line = MyStrdup("");
+      }
+      else
+        NewLine->line = MyStrdup("");
 
       NewLine->next = NULL;
 
@@ -134,6 +136,10 @@ void SendMessageFile(struct Luser *lptr, struct MessageFile *motdptr)
 
   assert(lptr && motdptr);
 
-  for (lineptr = motdptr->Contents; lineptr; lineptr = lineptr->next)
+  if (motdptr->Contents == NULL)
+    return;
+
+  for (lineptr = motdptr->Contents; lineptr != NULL; lineptr =
+      lineptr->next)
     notice(n_Global, lptr->nick, "%s", lineptr->line);
 } /* SendMessageFile() */

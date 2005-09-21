@@ -495,122 +495,110 @@ Substitute()
 
 char *Substitute(char *nick, char *str, int sockfd)
 {
-  char tempstr[MAXLINE], key;
+  char key;
   char *finalstr = NULL;
   int tcnt, fcnt;
   struct Luser *lptr;
 
   lptr = FindClient(nick);
 
-  strlcpy(tempstr, str, sizeof(tempstr));
   finalstr = MyMalloc(MAXLINE);
   memset(finalstr, 0, MAXLINE);
 
   fcnt = 0;
   tcnt = 0;
 
-  while (tcnt < MAXLINE)
+  while (fcnt < MAXLINE)
     {
-      if (IsEOL(tempstr[tcnt]))
+      if ((str[tcnt] == '\0') || IsEOL(str[tcnt]))
         break;
 
-      if (tempstr[tcnt] == '%')
+      if (str[tcnt] == '%')
         {
-          key = tempstr[++tcnt];
+          key = str[++tcnt];
           switch (key)
             {
             case 'o':
             case 'O':
               {
-                strlcat(finalstr, n_OperServ, MAXLINE);
-                fcnt += strlen(n_OperServ) - 1;
+                fcnt = strlcat(finalstr, n_OperServ, MAXLINE);
                 break;
               }
             case 'n':
             case 'N':
               {
-                strlcat(finalstr, n_NickServ, MAXLINE);
-                fcnt += strlen(n_NickServ) - 1;
+                fcnt = strlcat(finalstr, n_NickServ, MAXLINE);
                 break;
               }
             case 'c':
             case 'C':
               {
-                strlcat(finalstr, n_ChanServ, MAXLINE);
-                fcnt += strlen(n_ChanServ) - 1;
+                fcnt = strlcat(finalstr, n_ChanServ, MAXLINE);
                 break;
               }
             case 'e':
             case 'E':
               {
-                strlcat(finalstr, n_SeenServ, MAXLINE);
-                fcnt += strlen(n_SeenServ) - 1;
+                fcnt = strlcat(finalstr, n_SeenServ, MAXLINE);
                 break;
               }
 
             case 'm':
             case 'M':
               {
-                strlcat(finalstr, n_MemoServ, MAXLINE);
-                fcnt += strlen(n_MemoServ) - 1;
+                fcnt = strlcat(finalstr, n_MemoServ, MAXLINE);
                 break;
               }
             case 't':
             case 'T':
               {
-                strlcat(finalstr, n_StatServ, MAXLINE);
-                fcnt += strlen(n_StatServ) - 1;
+                fcnt = strlcat(finalstr, n_StatServ, MAXLINE);
                 break;
               }
             case 'h':
             case 'H':
               {
-                strlcat(finalstr, n_HelpServ, MAXLINE);
-                fcnt += strlen(n_HelpServ) - 1;
+                fcnt = strlcat(finalstr, n_HelpServ, MAXLINE);
                 break;
               }
             case 'g':
             case 'G':
               {
-                strlcat(finalstr, n_Global, MAXLINE);
-                fcnt += strlen(n_Global) - 1;
+                fcnt = strlcat(finalstr, n_Global, MAXLINE);
                 break;
               }
             case 's':
             case 'S':
               {
-                strlcat(finalstr, Me.name, MAXLINE);
-                fcnt += strlen(Me.name) - 1;
+                fcnt = strlcat(finalstr, Me.name, MAXLINE);
                 break;
               }
             case 'b':
             case 'B':
               {
-                strlcat(finalstr, "\002", MAXLINE);
+                fcnt = strlcat(finalstr, "\002", MAXLINE);
                 break;
               }
             case 'v':
             case 'V':
               {
-                strlcat(finalstr, hVersion, MAXLINE);
-                fcnt += strlen(hVersion) - 1;
+                fcnt = strlcat(finalstr, hVersion, MAXLINE);
                 break;
               }
             case 'a':
             case 'A':
               {
-                strlcat(finalstr, Me.admin, MAXLINE);
-                fcnt += strlen(Me.admin) - 1;
+                fcnt = strlcat(finalstr, Me.admin, MAXLINE);
                 break;
               }
             case '+':
               {
                 char flag;
-                char *cptr, *finstr;
+                char *cptr, *finstr = NULL;
                 struct Userlist *tempuser = NULL;
 
-                flag = tempstr[tcnt + 1];
-                if (!nick)
+                flag = str[tcnt + 1];
+                if (nick == NULL)
                   tempuser = DccGetUser(IsDccSock(sockfd));
                 else if (lptr)
                   tempuser = GetUser(1, lptr->nick, lptr->username,
@@ -624,7 +612,8 @@ char *Substitute(char *nick, char *str, int sockfd)
                       return ((char *) -1);
 
                     tcnt += 2;
-                    cptr = &tempstr[tcnt];
+                    cptr = str + tcnt;
+                    MyFree(finalstr);
                     finstr = Substitute(nick, cptr, sockfd);
                     if (finstr == NULL)
                         finstr = MyStrdup("\r\n");
@@ -638,22 +627,20 @@ char *Substitute(char *nick, char *str, int sockfd)
 
             default:
               {
-                strlcat(finalstr, "%", MAXLINE);
-                finalstr[++fcnt] = tempstr[tcnt];
+                fcnt = strlcat(finalstr, "%", MAXLINE);
+                finalstr[fcnt++] = str[tcnt];
                 break;
               }
             } /* switch (key) */
+          ++tcnt;
         }
       else
-        finalstr[fcnt] = tempstr[tcnt];
-
-      fcnt++;
-      tcnt++;
+        finalstr[fcnt++] = str[tcnt++];
     }
 
-  if (finalstr[0])
+  if (finalstr[0] != '\0')
   {
-    finalstr[fcnt] = '\0';
+    finalstr[MAXLINE - 1] = '\0';
     return(finalstr);
   }
 

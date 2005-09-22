@@ -1,5 +1,7 @@
-Hybserv-HEAD: Tue, 20 Sep 2005 20:05:15 +0200
+Hybserv-HEAD: Thu, 22 Sep 2005 11:59:43 +0200
 
+  * Substitute now works for dcc motd and server [logon] motd
+  * rewrote Substitute code
   * rewrote core string/array handling functions SplitBuf() and
     GetString()
   * add basic IPv6 support and getaddrinfo/getnameinfo stuff

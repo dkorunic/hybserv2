@@ -804,7 +804,7 @@ LoadSettings(int rehash)
 
 {
   FILE *fp;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE + 1];
   int goodread;
   int cnt;
 
@@ -870,9 +870,9 @@ int SaveSettings()
   FILE *fp;
   struct Directive *dptr;
   int ii;
-  char buffer[MAXLINE],
-  tmp[MAXLINE],
-  tempname[MAXLINE];
+  char buffer[MAXLINE + 1],
+  tmp[MAXLINE + 1],
+  tempname[MAXLINE + 1];
 
   /* MMkay, this should write safe config files so that they won't get
    * b0rked if something happens when writing. -kre */

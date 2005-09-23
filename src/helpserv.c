@@ -149,7 +149,7 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
     }
   else
     {
-      char  str[MAXLINE];
+      char  str[MAXLINE + 1];
 
       if (!(serviceptr = GetService(av[0])))
         {
@@ -229,8 +229,8 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
 {
   FILE *fp;
-  char sendstr[MAXLINE];
-  char line[MAXLINE];
+  char sendstr[MAXLINE + 1];
+  char line[MAXLINE + 1];
   char *final;
   struct Luser *servptr;
 
@@ -335,7 +335,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
     {
       int cac;
       char **cav;
-      char helparg[MAXLINE], arg2[MAXLINE];
+      char helparg[MAXLINE + 1], arg2[MAXLINE + 1];
 
       arg2[0] = '\0';
 

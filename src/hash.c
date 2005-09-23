@@ -1298,7 +1298,7 @@ struct Server *
       char *s = buffer - 1;
 
       buffer[HOSTLEN] = '\0';
-      strlcpy(buffer, name, HOSTLEN);
+      strlcpy(buffer, name, sizeof(buffer));
 
       while ((s = strchr(s + 2, '.')) != NULL)
         {

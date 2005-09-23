@@ -329,14 +329,14 @@ struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
   char *names = NULL;
   char **anames = NULL;
   char *currnick = NULL;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
   struct Channel *chname = NULL;
   struct Channel *cptr = NULL;
   struct Channel *tempchan = NULL;
   int ii, ncnt, acnt;
 
   ncnt = 5; /* default position for channel nicks, if no limit/key */
-  strlcpy(modes, line[4], MAXLINE);
+  strlcpy(modes, line[4], sizeof(modes));
 
   if (line[ncnt][0] != ':') /* names list *should* start w/ a : */
   {                         /* if it doesn't, theres a limit and/or key */
@@ -377,7 +377,7 @@ struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
 #ifdef BLOCK_ALLOCATION
     tempchan = (struct Channel *) BlockSubAllocate(ChannelHeap);
     memset(tempchan, 0, sizeof(struct Channel));
-    strlcpy(tempchan->name, line[3], CHANNELLEN);
+    strlcpy(tempchan->name, line[3], CHANNELLEN + 1);
 #else
     tempchan = MyMalloc(sizeof(struct Channel));
     memset(tempchan, 0, sizeof(struct Channel));
@@ -824,7 +824,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 #endif /* NICKSERVICES && CHANNELSERVICES */
 
   char **modeargs; /* arguements to +l/k/o/v modes */
-  char tempargs[MAXLINE];
+  char tempargs[MAXLINE + 1];
   int argcnt; /* number of arguements */
   int argidx; /* current index in modeargs[] */
 
@@ -850,7 +850,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
   }
 
   if ((tmp = strchr(modes, ' ')))
-    strlcpy(tempargs, *(tmp + 1) ? tmp + 1 : "", MAXLINE);
+    strlcpy(tempargs, *(tmp + 1) ? tmp + 1 : "", sizeof(tempargs));
   else
     tempargs[0] = '\0';
 
@@ -1070,8 +1070,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         if (add)
         {
 #ifdef BLOCK_ALLOCATION
-          strlcpy(cptr->key, modeargs[argidx], KEYLEN);
-          cptr->key[KEYLEN] = '\0';
+          strlcpy(cptr->key, modeargs[argidx], KEYLEN + 1);
 #else
           cptr->key = MyStrdup(modeargs[argidx]);
 #endif /* BLOCK_ALLOCATION */
@@ -1109,8 +1108,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
         if (add)
         {
 #ifdef BLOCK_ALLOCATION
-          strlcpy(cptr->forward, modeargs[argidx], CHANNELLEN);
-          cptr->forward[CHANNELLEN] = '\0';
+          strlcpy(cptr->forward, modeargs[argidx], CHANNELLEN + 1);
 #else
           cptr->forward = MyStrdup(modeargs[argidx]);
 #endif /* BLOCK_ALLOCATION */
@@ -1430,7 +1428,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
     char *args)
 {
   int acnt, mcnt, ii;
-  char done[MAXLINE], sendstr[MAXLINE];
+  char done[MAXLINE + 1], sendstr[MAXLINE + 1];
   char **av, *temp = NULL, *mtmp = NULL;
 
   if ((source == NULL) || (chptr == NULL) || (args == NULL))
@@ -1478,7 +1476,7 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
     char *reason)
 {
   char *mask = NULL, *tempnix = NULL, **av;
-  char temp[MAXLINE];
+  char temp[MAXLINE + 1];
   int ac, ii;
   struct Luser *lptr = NULL;
 
@@ -1490,7 +1488,7 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
 
   if (ban)
   {
-    char bans[MAXLINE];
+    char bans[MAXLINE + 1];
     int jj = 1;
     bans[0] = '\0';
 

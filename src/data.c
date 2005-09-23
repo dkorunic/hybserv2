@@ -355,8 +355,8 @@ BackupDatabases(time_t unixtime)
 
 {
   struct tm *backup_tm;
-  char bpath[MAXLINE],
-  temp[MAXLINE];
+  char bpath[MAXLINE + 1],
+  temp[MAXLINE + 1];
 
   /*
    * First make sure HPath/backup/ exists
@@ -520,7 +520,7 @@ WriteOpers()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   struct Userlist *tempuser;
 
   ircsprintf(tempname, "%s.tmp", OperServDB);
@@ -555,7 +555,7 @@ WriteOpers()
 int WriteIgnores()
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   struct Ignore *temp;
 
   ircsprintf(tempname, "%s.tmp", OperServIgnoreDB);
@@ -595,7 +595,7 @@ WriteStats()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
 
   ircsprintf(tempname, "%s.tmp", StatServDB);
   fp = CreateDatabase(tempname, "StatServ Database");
@@ -647,7 +647,7 @@ WriteNicks()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   int ii, ncnt;
   struct NickInfo *nptr;
   struct NickHost *hptr;
@@ -859,7 +859,7 @@ WriteChans()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   struct ChanInfo *cptr, *cnext;
   int ii,
   ccnt;
@@ -1048,7 +1048,7 @@ WriteMemos()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   int ii,
   mcnt;
   struct MemoInfo *mi;
@@ -1240,7 +1240,7 @@ CopyFile(char *oldfile, char *newfile)
   int oldfd,
   newfd;
   struct stat fst;
-  char buffer[MAXLINE];
+  char buffer[MAXLINE + 1];
   int bytes;
 
   if ((oldfd = open(oldfile, O_RDONLY, 0)) < 0)
@@ -1297,7 +1297,7 @@ WriteSeen()
 
 {
   FILE *fp;
-  char tempname[MAXLINE];
+  char tempname[MAXLINE + 1];
   aSeen *seen;
 
   ircsprintf(tempname, "%s.tmp", SeenServDB);

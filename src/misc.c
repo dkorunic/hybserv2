@@ -271,7 +271,7 @@ void
 DoShutdown(char *who, char *reason)
 
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   struct PortInfo *pptr;
 
   putlog(LOG1, "Shutting down services");
@@ -339,7 +339,7 @@ HostToMask (char *username, char *hostname)
 
   ircsprintf(userhost, "%s@%s", username, hostname);
 
-  final = MyMalloc(MAXUSERLEN);
+  final = MyMalloc(MAXUSERLEN + 1);
   final[0] = '\0';
 
   /* strip off a nick nick!user@host (if there is one) */
@@ -368,7 +368,7 @@ HostToMask (char *username, char *hostname)
   else
     {
       /* there's no @ in the hostname, just make it *@*.host.com */
-      strlcpy(final, "*@", MAXUSERLEN);
+      strlcpy(final, "*@", MAXUSERLEN + 1);
       ii = 2;
       host = userhost;
     }
@@ -388,7 +388,7 @@ HostToMask (char *username, char *hostname)
        * domain; and if topsegment is NULL, the hostname must be
        * 2 parts (ie: blah.org), so don't strip off "blah"
        */
-      strlcpy(final + ii, host, MAXUSERLEN);
+      strlcpy(final + ii, host, MAXUSERLEN + 1);
     }
   else
     {
@@ -416,7 +416,7 @@ HostToMask (char *username, char *hostname)
 
           /* stick a .* on the end :-) */
           ii += (temp - host);
-          strlcpy(final + ii, ".*", MAXUSERLEN);
+          strlcpy(final + ii, ".*", MAXUSERLEN + 1);
         }
       else
         {
@@ -502,8 +502,8 @@ char *Substitute(char *nick, char *str, int sockfd)
 
   lptr = FindClient(nick);
 
-  finalstr = MyMalloc(MAXLINE);
-  memset(finalstr, 0, MAXLINE);
+  finalstr = MyMalloc(MAXLINE + 1);
+  memset(finalstr, 0, MAXLINE + 1);
 
   fcnt = 0;
   tcnt = 0;
@@ -521,74 +521,74 @@ char *Substitute(char *nick, char *str, int sockfd)
             case 'o':
             case 'O':
               {
-                fcnt = strlcat(finalstr, n_OperServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_OperServ, MAXLINE + 1);
                 break;
               }
             case 'n':
             case 'N':
               {
-                fcnt = strlcat(finalstr, n_NickServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_NickServ, MAXLINE + 1);
                 break;
               }
             case 'c':
             case 'C':
               {
-                fcnt = strlcat(finalstr, n_ChanServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_ChanServ, MAXLINE + 1);
                 break;
               }
             case 'e':
             case 'E':
               {
-                fcnt = strlcat(finalstr, n_SeenServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_SeenServ, MAXLINE + 1);
                 break;
               }
 
             case 'm':
             case 'M':
               {
-                fcnt = strlcat(finalstr, n_MemoServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_MemoServ, MAXLINE + 1);
                 break;
               }
             case 't':
             case 'T':
               {
-                fcnt = strlcat(finalstr, n_StatServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_StatServ, MAXLINE + 1);
                 break;
               }
             case 'h':
             case 'H':
               {
-                fcnt = strlcat(finalstr, n_HelpServ, MAXLINE);
+                fcnt = strlcat(finalstr, n_HelpServ, MAXLINE + 1);
                 break;
               }
             case 'g':
             case 'G':
               {
-                fcnt = strlcat(finalstr, n_Global, MAXLINE);
+                fcnt = strlcat(finalstr, n_Global, MAXLINE + 1);
                 break;
               }
             case 's':
             case 'S':
               {
-                fcnt = strlcat(finalstr, Me.name, MAXLINE);
+                fcnt = strlcat(finalstr, Me.name, MAXLINE + 1);
                 break;
               }
             case 'b':
             case 'B':
               {
-                fcnt = strlcat(finalstr, "\002", MAXLINE);
+                fcnt = strlcat(finalstr, "\002", MAXLINE + 1);
                 break;
               }
             case 'v':
             case 'V':
               {
-                fcnt = strlcat(finalstr, hVersion, MAXLINE);
+                fcnt = strlcat(finalstr, hVersion, MAXLINE + 1);
                 break;
               }
             case 'a':
             case 'A':
               {
-                fcnt = strlcat(finalstr, Me.admin, MAXLINE);
+                fcnt = strlcat(finalstr, Me.admin, MAXLINE + 1);
                 break;
               }
             case '+':
@@ -627,7 +627,7 @@ char *Substitute(char *nick, char *str, int sockfd)
 
             default:
               {
-                fcnt = strlcat(finalstr, "%", MAXLINE);
+                fcnt = strlcat(finalstr, "%", MAXLINE + 1);
                 finalstr[fcnt++] = str[tcnt];
                 break;
               }
@@ -640,7 +640,7 @@ char *Substitute(char *nick, char *str, int sockfd)
 
   if (finalstr[0] != '\0')
   {
-    finalstr[MAXLINE - 1] = '\0';
+    finalstr[MAXLINE] = '\0';
     return(finalstr);
   }
 
@@ -823,7 +823,7 @@ IsNum(char *str)
 
 {
   int result = 0;
-  char tmp[MAXLINE];
+  char tmp[MAXLINE + 1];
   char *tmp2;
 
   if (!str)

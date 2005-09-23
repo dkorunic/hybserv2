@@ -282,13 +282,13 @@ void updateConnectTable(char *user, char *host)
   struct rHost *rhostptr = NULL;
 
 #ifdef ADVFLOOD_GLINE
-  char togline[UHOSTLEN];
+  char togline[UHOSTLEN + 2];
   struct Gline *gptr;
 #endif /* ADVFLOOD_GLINE */
 
 #if defined ADVFLOOD_NOTIFY || defined ADVFLOOD_NOTIFY_ALL
 
-  char message[MAXLINE];
+  char message[MAXLINE + 1];
 #endif /* ADVFLOOD_NOTIFY || ADVFLOOD_NOTIFY_ALL */
 
 #ifdef ADVFLOOD_NOTIFY_ALL

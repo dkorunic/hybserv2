@@ -243,7 +243,7 @@ introduce()
 
 static struct Luser *introduce(char *nick, char *ident, char *info)
   {
-    char sendstr[MAXLINE];
+    char sendstr[MAXLINE + 1];
     time_t CurrTime = current_ts;
     char **av;
     struct Luser *lptr;

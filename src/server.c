@@ -177,7 +177,7 @@ struct Server *
     if (argcnt == 4)
       {
 #ifdef BLOCK_ALLOCATION
-        strlcpy(tempserv->name, line[1], SERVERLEN);
+        strlcpy(tempserv->name, line[1], SERVERLEN + 1);
 #else
 
         tempserv->name = MyStrdup(line[1]);
@@ -200,7 +200,7 @@ struct Server *
 
 #ifdef BLOCK_ALLOCATION
 
-        strlcpy(tempserv->name, line[2], SERVERLEN);
+        strlcpy(tempserv->name, line[2], SERVERLEN + 1);
 #else
 
         tempserv->name = MyStrdup(line[2]);
@@ -527,7 +527,7 @@ static void
 s_server(int ac, char **av)
 
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   char **line;
   struct Server *tempserv;
 
@@ -684,8 +684,7 @@ s_nick(int ac, char **av)
         return;
 
 #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
-      strlcpy(newnick, av[2], NICKLEN);
-      newnick[NICKLEN] = '\0';
+      strlcpy(newnick, av[2], sizeof(newnick));
 #endif
 
       SendUmode(OPERUMODE_N,
@@ -783,12 +782,12 @@ s_nick(int ac, char **av)
 
 #ifdef SEENSERVICES
 
-      strlcpy(oldnick, lptr->nick, NICKLEN);
+      strlcpy(oldnick, lptr->nick, sizeof(oldnick));
 #endif /* SEENSERVICES */
 
 #ifdef BLOCK_ALLOCATION
 
-      strlcpy(lptr->nick, newnick, NICKLEN);
+      strlcpy(lptr->nick, newnick, NICKLEN + 1);
 #else
 
       MyFree(lptr->nick);
@@ -1061,7 +1060,7 @@ s_privmsg(int ac, char **av)
 #ifndef EXTREMEDEBUG
   if (IgnoreList)
     {
-      char chkstr[MAXLINE];
+      char chkstr[MAXLINE + 1];
 
       if (lptr)
         {
@@ -1692,8 +1691,8 @@ void
 s_sjoin(int ac, char **av)
 
 {
-  char sendstr[MAXLINE];
-  char modes[MAXLINE];
+  char sendstr[MAXLINE + 1];
+  char modes[MAXLINE + 1];
   char **line;
   char **nicks; /* array of SJOINing nicknames */
   char *oldnick;
@@ -2277,7 +2276,7 @@ s_motd(int ac, char **av)
 {
   char *ch;
   char *who, *final;
-  char line[MAXLINE];
+  char line[MAXLINE + 1];
   FILE *fp;
 
   if (ac < 3)

@@ -50,7 +50,7 @@ void
 SendMotd(int sockfd)
 
 {
-  char line[MAXLINE];
+  char line[MAXLINE + 1];
   char *final;
   char *ch;
   FILE *fp;
@@ -233,7 +233,7 @@ void
 SendDccMessage(struct DccUser *from, char *message)
 
 {
-  char final[MAXLINE];
+  char final[MAXLINE + 1];
   struct DccUser *dccptr;
 
   if (!from || !message)
@@ -276,7 +276,7 @@ SendUmode(int umode, char *format, ...)
   struct DccUser *dccptr;
   struct Userlist *tempuser;
   struct tm *tmp_tm;
-  char timestr[MAXLINE];
+  char timestr[MAXLINE + 1];
 
   if (ActiveFlood)
     return;
@@ -463,7 +463,7 @@ readauth()
 
 void readauth(struct DccUser *dccptr)
 {
-  char buffer[MAXLINE], ident[USERLEN + 1];
+  char buffer[MAXLINE + 1], ident[USERLEN + 1];
   int length;
 
   memset(buffer, 0, sizeof(buffer));
@@ -512,7 +512,7 @@ void
 writeauth(struct DccUser *dccptr)
 
 {
-  char idstr[MAXLINE];
+  char idstr[MAXLINE + 1];
   struct sockaddr_storage local, remote;
   socklen_t len;
 
@@ -622,7 +622,7 @@ void
 TelnetGreet(struct DccUser *dccptr)
 
 {
-  char ver[MAXLINE];
+  char ver[MAXLINE + 1];
 
   if (!dccptr)
     return;
@@ -715,8 +715,8 @@ int
 GreetDccUser(struct DccUser *dccptr)
 
 {
-  char prefix[MAXLINE],
-  sendstr[MAXLINE];
+  char prefix[MAXLINE + 1],
+  sendstr[MAXLINE + 1];
   time_t CurrTime = current_ts;
   struct tm *motd_tm;
   struct Userlist *tempuser;
@@ -798,7 +798,7 @@ void
 onctcp(char *nick, char *target, char *msg)
 
 {
-  char temp[MAXLINE];
+  char temp[MAXLINE + 1];
   int goodDCC;
   struct Luser *lptr;
   struct Userlist *tempuser;
@@ -870,7 +870,7 @@ onctcp(char *nick, char *target, char *msg)
     {
       int acnt;
       char **av;
-      char buff[MAXLINE];
+      char buff[MAXLINE + 1];
 
       if (irccmp(target, n_OperServ) != 0)
         return; /* only let n_OperServ accept dcc chats */
@@ -993,7 +993,7 @@ int
 ConnectToTCM(char *nick, struct Botlist *bptr)
 
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   struct Luser *lptr;
   struct DccUser *dccptr, *nptr, *tmp;
 
@@ -1135,7 +1135,7 @@ void
 CloseConnection(struct DccUser *dccptr)
 
 {
-  char prefix[MAXLINE];
+  char prefix[MAXLINE + 1];
   struct Userlist *tempuser;
 
   if (!dccptr)
@@ -1598,7 +1598,7 @@ DccProcess(struct DccUser *dccptr, char *command)
   if (!(dccptr->flags & SOCK_DCC) && IsDccPending(dccptr))
     {
       struct Userlist *tempuser;
-      char prefix[MAXLINE];
+      char prefix[MAXLINE + 1];
       int goodconn; /* are they allowed to connect? */
 
       /*
@@ -1760,7 +1760,7 @@ BotProcess()
 int BotProcess(struct DccUser *botptr, char *line)
 {
   struct DccUser *tmp;
-  char buf[MAXLINE];
+  char buf[MAXLINE + 1];
 
   if (!line)
     return 0;
@@ -1774,7 +1774,7 @@ int BotProcess(struct DccUser *botptr, char *line)
       char *password;
       struct Botlist *bptr;
       int goodconn = 1;
-      char sendstr[MAXLINE];
+      char sendstr[MAXLINE + 1];
 
       if (!(bptr = GoodTCM(botptr)))
         {

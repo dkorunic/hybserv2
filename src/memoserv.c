@@ -183,7 +183,7 @@ ms_loaddata()
 
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   char *keyword;
   int ac, ret = 1, cnt;
   struct MemoInfo *mi = NULL;
@@ -1189,7 +1189,7 @@ m_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char str[MAXLINE];
+      char str[MAXLINE + 1];
       struct Command *cptr;
 
       for (cptr = memocmds; cptr->cmd; cptr++)
@@ -1226,7 +1226,7 @@ m_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct MemoInfo *mi;
   struct Memo *memoptr;
-  char istr[MAXLINE];
+  char istr[MAXLINE + 1];
   int index;
 
   if (!nptr)
@@ -1337,7 +1337,7 @@ m_undel(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct MemoInfo *mi;
   struct Memo *memoptr;
-  char istr[MAXLINE];
+  char istr[MAXLINE + 1];
   int index;
 
   if (!nptr)
@@ -1450,7 +1450,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   struct Memo *fromptr;
   char *to; /* who the memo is sent to */
   int index, cnt;
-  char buf[MAXLINE];
+  char buf[MAXLINE + 1];
   struct NickInfo *master,
         *realptr;
 #ifdef CHANNELSERVICES
@@ -1690,7 +1690,7 @@ m_reply(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   struct Memo *memoptr;
   struct NickInfo *master,
         *realptr;
-  char memotext[MAXLINE];
+  char memotext[MAXLINE + 1];
   int index, ii;
 
   if (!nptr)

@@ -314,7 +314,7 @@ ns_loaddata()
 
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   char *keyword;
   int ac, ret = 1, cnt;
   int islink;
@@ -1384,14 +1384,14 @@ collide(char *nick)
 {
   struct Luser *lptr = NULL;
 #if defined SVSNICK || defined FORCENICK
-  char newnick[NICKLEN];
+  char newnick[NICKLEN + 1];
   long nicknum;
   int base;
   int i;
   int j;
 #else
   char **av;
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   struct NickInfo *nptr = NULL;
 #endif
 
@@ -1894,7 +1894,7 @@ static void n_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char  str[MAXLINE];
+      char  str[MAXLINE + 1];
 
       if (ac >= 3)
         ircsprintf(str, "%s %s", av[1], av[2]);
@@ -2626,7 +2626,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 
 {
   struct NickInfo *nptr;
-  char user[USERLEN];
+  char user[USERLEN + 1];
   char *mask,
   *host,
   *tmp;
@@ -2688,7 +2688,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
       return;
     }
 
-  if(strlen(host))
+  if (strlen(host))
     {
       strlcpy(user,mask,strlen(mask)-strlen(host));
     }
@@ -3400,7 +3400,7 @@ static void n_set_signon(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     **av)
 {
-  char str[MAXLINE];
+  char str[MAXLINE + 1];
   int flag = 0;
 
   /* Check arguments first .. */
@@ -3937,7 +3937,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 
   if (!(nptr->flags & NS_HIDEALL) || isadmin || isowner)
     {
-      char buf[MAXLINE];
+      char buf[MAXLINE + 1];
 
       if (LastSeenInfo)
         {
@@ -4316,7 +4316,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr, *realptr;
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -4715,7 +4715,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
     , /* 1 if -set given */
     setnow; /* 1 if -setnow given */
   char *target;
-  char argbuf[MAXLINE];
+  char argbuf[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -4883,8 +4883,8 @@ n_flag(struct Luser *lptr, int ac, char **av)
 
 {
   struct NickInfo *nptr, *realptr;
-  char buf[MAXLINE];
-  char pstr[MAXLINE];
+  char buf[MAXLINE + 1];
+  char pstr[MAXLINE + 1];
   int ii;
 
   if (ac < 2)

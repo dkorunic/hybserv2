@@ -225,7 +225,7 @@ ParseConf(char *filename, int rehash)
 
 {
   FILE *fileptr;
-  char line[MAXLINE];
+  char line[MAXLINE + 1];
   char *key;
   int scnt; /* S: line count */
 
@@ -277,20 +277,12 @@ ParseConf(char *filename, int rehash)
              * If this is a rehash, Me.admin should already be
              * set, so make sure it gets freed.
              */
-            if (Me.admin)
-              MyFree(Me.admin);
-
             if (!(temp = getfield(NULL)))
-              break;
+              continue;
 
-            if (strlen(temp) > REALLEN)
-              {
-                Me.admin = (char *) MyMalloc(REALLEN);
-                memset(Me.admin, 0, REALLEN);
-                strlcpy(Me.admin, temp, REALLEN - 1);
-              }
-            else
-              Me.admin = MyStrdup(temp);
+            MyFree(Me.admin);
+            Me.admin = MyMalloc(REALLEN + 1);
+            strlcpy(Me.admin, temp, REALLEN + 1);
 
             break;
           } /* case 'A' */
@@ -312,15 +304,8 @@ ParseConf(char *filename, int rehash)
             if ((servptr = IsServLine(host, port)))
               {
                 servptr->flags &= ~SL_DELETE;
-                if (servptr->password)
-                  {
-                    /*
-                     * This must be a rehash, so in case the password
-                     * was changed, set servptr->password to the new one.
-                     */
-                    MyFree(servptr->password);
-                    servptr->password = MyStrdup(pass);
-                  }
+                MyFree(servptr->password);
+                servptr->password = MyStrdup(pass);
               }
             else
               {
@@ -341,6 +326,7 @@ ParseConf(char *filename, int rehash)
 
             name = getfield(NULL);
             reason = getfield(NULL);
+
             who = getfield(NULL);
             if (!name || !reason || !who)
               continue;
@@ -379,6 +365,7 @@ ParseConf(char *filename, int rehash)
             struct Chanlist *chanptr;
 
             cname = getfield(NULL);
+
             if (!cname)
               continue;
 
@@ -416,6 +403,7 @@ ParseConf(char *filename, int rehash)
             pass = getfield(NULL);
             nick = getfield(NULL);
             flags = getfield(NULL);
+
             if (!host || !pass || !nick || !flags)
               continue;
 
@@ -432,26 +420,17 @@ ParseConf(char *filename, int rehash)
 
             name = getfield(NULL);
             info = getfield(NULL);
+
             if (!name || !info)
               continue;
 
-            if (strlen(name) > REALLEN)
-              {
-                Me.name = (char *) MyMalloc(REALLEN);
-                memset(Me.name, 0, REALLEN);
-                strlcpy(Me.name, name, REALLEN - 1);
-              }
-            else
-              Me.name = MyStrdup(name);
+            MyFree(Me.name);
+            Me.name = MyMalloc(REALLEN + 1);
+            strlcpy(Me.name, name, REALLEN + 1);
 
-            if (strlen(info) > REALLEN)
-              {
-                Me.info = (char *) MyMalloc(REALLEN);
-                memset(Me.info, 0, REALLEN);
-                strlcpy(Me.info, info, REALLEN - 1);
-              }
-            else
-              Me.info = MyStrdup(info);
+            MyFree(Me.info);
+            Me.info = MyMalloc(REALLEN + 1);
+            strlcpy(Me.info, info, REALLEN - 1);
 
             break;
           } /* case 'N' */
@@ -468,6 +447,7 @@ ParseConf(char *filename, int rehash)
             name = getfield(NULL);
             pass = getfield(NULL);
             port = getfield(NULL);
+
             if (!name || !host || !pass)
               continue;
 
@@ -486,6 +466,7 @@ ParseConf(char *filename, int rehash)
             host = getfield(NULL);
             name = getfield(NULL);
             pass = getfield(NULL);
+
             if (!name || !host || !pass)
               continue;
 
@@ -502,8 +483,10 @@ ParseConf(char *filename, int rehash)
             host = getfield(NULL);
             num = getfield(NULL);
             banhost = getfield(NULL);
+
             if (!banhost)
               banhost = "0";
+
             if (!host || !num)
               continue;
 
@@ -523,6 +506,7 @@ ParseConf(char *filename, int rehash)
 
             if (!port)
               continue;
+
             if (!IsNum(port))
               continue;
 
@@ -540,20 +524,13 @@ ParseConf(char *filename, int rehash)
             if (!vhost)
               continue;
 
-            if (!LocalHostName)
-              LocalHostName = MyStrdup(vhost);
+            MyFree(LocalHostName);
+            LocalHostName = MyStrdup(vhost);
 
             break;
           } /* case 'V' */
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
-          /* This includes routines for auto-connecting in case of split -
-           * Hybserv will send required CONNECT string and try to connect
-           * server if splitted. Usually this is not necessary because of
-           * auto-connecting ports, but what if you want to make sure they
-           * will be reconnected after some time if admin is not present, ant
-           * non-autoconnecting c/N lines exist? -kre 
-           */
         case 'm':
         case 'M':
           {
@@ -561,14 +538,14 @@ ParseConf(char *filename, int rehash)
             long re_time;
             int port;
 
-            hub=getfield(NULL);
-            port_str=getfield(NULL);
+            hub = getfield(NULL);
+            port_str = getfield(NULL);
             if (!port_str)
-              port=DefaultHubPort;
+              port = DefaultHubPort;
             else
-              port=atoi(port_str);
-            leaf=getfield(NULL);
-            re_time=timestr(getfield(NULL));
+              port = atoi(port_str);
+            leaf = getfield(NULL);
+            re_time = timestr(getfield(NULL));
 
             if (!hub || !leaf || !re_time)
               continue;
@@ -1290,21 +1267,6 @@ ClearConfLines()
       MyFree(UserList);
       UserList = tempuser;
     }
-
-  /*
-   * Don't clear the ServList during a rehash because currenthub
-   * will point to garbage
-   while (ServList)
-   {
-   MyFree(ServList->hostname);
-   MyFree(ServList->password);
-   if (ServList->realname)
-   MyFree(ServList->realname);
-   tempserv = ServList->next;
-   MyFree(ServList);
-   ServList = tempserv;
-   }
-  */
 
   while (BotList)
     {

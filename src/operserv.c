@@ -587,7 +587,7 @@ os_loaddata()
 
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   int ac,
   ret = 1,
         cnt,
@@ -704,7 +704,7 @@ os_loaddata()
 int ignore_loaddata()
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   int ac, cnt = 0, ret = 1, found = 0;
   time_t expire;
   struct Ignore *temp;
@@ -878,7 +878,7 @@ void
 os_join(struct Channel *cptr)
 
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   char **av;
 
   if (!cptr)
@@ -908,7 +908,7 @@ void
 os_join_ts_minus_1(struct Channel *cptr)
 
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   char **av;
   int ac;
 
@@ -1472,7 +1472,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   char *reason; /* reason for jupe */
-  char sendstr[MAXLINE], whostr[MAXLINE], **arv;
+  char sendstr[MAXLINE + 1], whostr[MAXLINE + 1], **arv;
   struct Jupe *tempjupe;
   FILE *fp;
   unsigned int ii;
@@ -1678,8 +1678,8 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   int jcnt; /* number of matching jupes found */
-  char line[MAXLINE], linetemp[MAXLINE];
-  char tmpfile[MAXLINE];
+  char line[MAXLINE + 1], linetemp[MAXLINE + 1];
+  char tmpfile[MAXLINE + 1];
   char *configname;
   char *key;
   char *jhost;
@@ -1898,7 +1898,7 @@ static void
 o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
-  char whostr[MAXLINE];
+  char whostr[MAXLINE + 1];
   char *reason, *hostmask;
   char *username,
   *hostname;
@@ -1998,7 +1998,7 @@ o_gline(struct Luser *lptr, int ac, char **av, int sockfd)
     }
 
   if (ac < (sidx + 1))
-    reason = MyStrdup("");
+    reason = MyStrdup("No reason");
   else
     reason = GetString(ac - sidx, av + sidx);
 
@@ -2126,9 +2126,9 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   int gcnt;
-  char line[MAXLINE], linetemp[MAXLINE];
-  char tmpfile[MAXLINE];
-  char chkstr[MAXLINE];
+  char line[MAXLINE + 1], linetemp[MAXLINE + 1];
+  char tmpfile[MAXLINE + 1];
+  char chkstr[MAXLINE + 1];
   char *configname;
   char *key;
   char *ghost;
@@ -2354,11 +2354,11 @@ static void
 o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
-  char line[MAXLINE], linetemp[MAXLINE];
+  char line[MAXLINE + 1], linetemp[MAXLINE + 1];
   char *key, *ptemp;
   FILE *fp;
   FILE *configfp;
-  char tmpfile[MAXLINE];
+  char tmpfile[MAXLINE + 1];
   struct Chanlist *chanptr, *tempchan, *prev;
   struct Channel *chptr;
 
@@ -2844,7 +2844,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   char *target;
-  char chkstr[MAXLINE];
+  char chkstr[MAXLINE + 1];
   char *argbuf;
   int argmem,
   alen;
@@ -2866,7 +2866,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
   struct Server *servptr;
   char *realname;
-  char msgbuf[MAXLINE];
+  char msgbuf[MAXLINE + 1];
 
   target = NULL;
   servptr = NULL;
@@ -3239,7 +3239,7 @@ show_trace(struct Luser *lptr, struct Luser *target, int sockfd, int showlong)
 
 {
   struct UserChannel *tempchan;
-  char tmp[MAXLINE];
+  char tmp[MAXLINE + 1];
 
   if (!target)
     return;
@@ -3363,7 +3363,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   struct Channel *cptr;
-  char argbuf[MAXLINE];
+  char argbuf[MAXLINE + 1];
   int cnt, /* number of matches */
   bad,
   exactmatch;
@@ -3373,7 +3373,7 @@ o_channel(struct Luser *lptr, int ac, char **av, int sockfd)
   char *banmatch, /* -banmatch */
   *exmatch; /* -exmatch */
   int nolimit; /* -nolimit */
-  char temp[MAXLINE];
+  char temp[MAXLINE + 1];
   int alen,
   showmatches;
 
@@ -3577,8 +3577,8 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
   struct Exception *tempe;
   struct ChannelUser *tempuser;
   char *btime; /* time ban was set */
-  char modes[MAXLINE]; /* channel modes */
-  char  temp[MAXLINE];
+  char modes[MAXLINE + 1]; /* channel modes */
+  char  temp[MAXLINE + 1];
   int bcnt = 0, /* ban count */
       ecnt = 0, /* exception count */
       ocnt = 0, /* chan ops */
@@ -3883,7 +3883,7 @@ o_save(struct Luser *lptr, int ac, char **av, int sockfd)
   alen;
   int savesets, /* -sets */
   savedbs; /* -dbs */
-  char argbuf[MAXLINE];
+  char argbuf[MAXLINE + 1];
 
   savesets = 0;
   savedbs = 0;
@@ -3992,8 +3992,8 @@ o_set(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   struct Directive *dptr;
-  char sendstr[MAXLINE],
-  tmp[MAXLINE];
+  char sendstr[MAXLINE + 1],
+  tmp[MAXLINE + 1];
   int ii,
   pcnt;
 
@@ -4273,8 +4273,8 @@ DisplaySettings(struct Luser *lptr, int sockfd)
   struct Directive *dptr;
   int ii,
   cnt;
-  char sendstr[MAXLINE],
-  tmp[MAXLINE];
+  char sendstr[MAXLINE + 1],
+  tmp[MAXLINE + 1];
 
   os_notice(lptr, sockfd,
             "-- Listing settings --");
@@ -4374,7 +4374,7 @@ static void
 o_ignore_add(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
-  char hostmask[MAXLINE];
+  char hostmask[MAXLINE + 1];
   time_t expire = (time_t) NULL;
 
   if (ac < 3)
@@ -4703,7 +4703,7 @@ static void
 o_who(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
-  char idle[MAXLINE];
+  char idle[MAXLINE + 1];
   char prefix;
   int AreBots = 0, mins;
   struct Userlist *tempuser;
@@ -5057,7 +5057,7 @@ o_unlink()
 static void
 o_unlink(struct Luser *lptr, int ac, char **av, int sockfd)
 {
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   char *reason;
   struct DccUser *botptr, *tmp;
 
@@ -5213,7 +5213,7 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
     case 'o':
     case 'O':
       {
-        char flags[MAXLINE];
+        char flags[MAXLINE + 1];
         char uhost[UHOSTLEN + 2];
         struct Userlist *tempuser;
         int cnt = 0;
@@ -5301,9 +5301,9 @@ o_stats(struct Luser *lptr, int ac, char **av, int sockfd)
 #ifdef ALLOW_GLINES
         struct Gline *gptr;
         time_t currtime = current_ts;
-        char expstr[MAXLINE];
+        char expstr[MAXLINE + 1];
         char uh[UHOSTLEN + 2];
-        char chkstr[MAXLINE];
+        char chkstr[MAXLINE + 1];
         char *user = NULL, *host = NULL;
 
         os_notice(lptr, sockfd, "-- Listing Glines --");
@@ -5517,7 +5517,7 @@ o_killchan(struct Luser *lptr, int ac, char **av, int sockfd)
   nonvoices, /* -nonvoices */
   voices, /* -voices */
   nonopers; /* -nonopers */
-  char argbuf[MAXLINE];
+  char argbuf[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -6032,7 +6032,7 @@ o_umode(struct Luser *lptr, int ac, char **av, int sockfd)
 {
   struct UmodeInfo  *umodeptr;
   struct Userlist *userptr, *tempuser;
-  char str[MAXLINE];
+  char str[MAXLINE + 1];
   char *tmpstr;
   int minus,
   ii;
@@ -6137,7 +6137,7 @@ o_dump(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
   char *dstr;
-  char tempstr[MAXLINE];
+  char tempstr[MAXLINE + 1];
   char **newav;
   int newac;
 
@@ -6294,7 +6294,7 @@ CalcMem(char *nick, int socket)
 
   struct DccUser *tmpconn;
 
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
 
   float clientm;          /* memory used by clients */
   float servm;            /* memory used by servers */

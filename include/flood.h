@@ -18,8 +18,8 @@ struct Channel;
 #ifdef ADVFLOOD
 struct connectInfo
 {
-  char user[USERLEN];
-  char host[HOSTLEN]; 
+  char user[USERLEN + 1];
+  char host[HOSTLEN + 1]; 
   time_t last;
   int frequency;
 };

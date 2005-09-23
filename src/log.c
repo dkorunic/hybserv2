@@ -35,7 +35,7 @@ putlog(int level, char *format, ...)
 {
   FILE *fp;
   time_t CurrTime;
-  char buf[MAXLINE];
+  char buf[MAXLINE + 1];
   va_list args;
 
   /*
@@ -99,8 +99,8 @@ void
 CheckLogs(time_t unixtime)
 
 {
-  char tmplog[MAXLINE];
-  char olddate[MAXLINE];
+  char tmplog[MAXLINE + 1];
+  char olddate[MAXLINE + 1];
   char *currdate;
   struct tm *log_tm;
   time_t oldts;

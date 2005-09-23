@@ -28,7 +28,7 @@
 char *StrToupper(char *str)
 {
   int ii = 0;
-  static char retstr[MAXLINE];
+  static char retstr[MAXLINE + 1];
 
   if (str == NULL)
     return NULL;
@@ -51,7 +51,7 @@ char *StrToupper(char *str)
 char *StrTolower(char *str)
 {
   int ii = 0;
-  static char retstr[MAXLINE];
+  static char retstr[MAXLINE + 1];
 
   if (str == NULL)
     return NULL;
@@ -75,13 +75,13 @@ char *GetString(int ac, char **av)
   char *final;
   int ii = 0, bw = 0;
 
-  final = MyMalloc(MAXLINE);
+  final = MyMalloc(MAXLINE + 1);
   final[0] = '\0';
 
   for (; ii < ac; ++ii)
   {
-    strlcat(final, av[ii], MAXLINE);
-    bw = strlcat(final, " ", MAXLINE);
+    strlcat(final, av[ii], MAXLINE + 1);
+    bw = strlcat(final, " ", MAXLINE + 1);
   }
   if (bw)
     final[bw - 1] = '\0';

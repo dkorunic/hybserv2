@@ -125,7 +125,7 @@ void es_process(char *nick, char *command)
 int es_loaddata()
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   char *keyword;
   int ac, ret = 1, cnt, type = 0;
   aSeen *seen;
@@ -184,7 +184,7 @@ int es_loaddata()
             {
               seen = MyMalloc(sizeof(aSeen));
               memset(seen, 0, sizeof(aSeen));
-              strlcpy(seen->nick, av[1], NICKLEN);
+              strlcpy(seen->nick, av[1], NICKLEN + 1);
               seen->userhost = MyStrdup(av[2]);
               seen->msg = (type == 1) ? MyStrdup(av[4] + 1) : NULL;
               seen->time = atol(av[3]);
@@ -212,7 +212,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
             int type)
 {
   int ac;
-  char userhost[USERLEN + HOSTLEN + 2], **av, *mymsg;
+  char userhost[MAXUSERLEN + 1], **av, *mymsg;
   aSeen *seen = MyMalloc(sizeof(aSeen));
 
 #ifdef NOSQUITSEEN
@@ -247,8 +247,8 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
     }
   memset(userhost, 0, sizeof(userhost));
   memset(seen, 0, sizeof(aSeen));
-  strlcpy(seen->nick, nick, NICKLEN);
-  strlcpy(userhost, user, USERLEN);
+  strlcpy(seen->nick, nick, NICKLEN + 1);
+  strlcpy(userhost, user, USERLEN + 1);
   strlcat(userhost, "@", sizeof(userhost));
   strncat(userhost, host, HOSTLEN);
   seen->userhost = MyStrdup(userhost);
@@ -288,9 +288,9 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 {
   int i, count, j;
   aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
-  char nuhost[MAXUSERLEN], sendstr[MAXLINE];
+  char nuhost[MAXUSERLEN + 1], sendstr[MAXLINE + 1];
   time_t mytime, last;
-  char seenstring[MAXLINE];
+  char seenstring[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -325,7 +325,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       for (seen = seenp; seen; seen = seen->prev)
         {
           memset(nuhost, 0, sizeof(nuhost));
-          strlcpy(nuhost, seen->nick, NICKLEN);
+          strlcpy(nuhost, seen->nick, NICKLEN + 1);
           strlcat(nuhost, "!", sizeof(nuhost));
           strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
           if (match(seenstring, nuhost))
@@ -484,7 +484,7 @@ static void es_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char str[MAXLINE];
+      char str[MAXLINE + 1];
       struct Command *sptr;
 
       for (sptr = seencmds; sptr->cmd; sptr++)

@@ -436,7 +436,7 @@ int
 cs_loaddata(void)
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   char *keyword;
   int ac, ret = 1, cnt;
   struct ChanInfo *cptr = NULL;
@@ -979,7 +979,7 @@ cs_join(struct ChanInfo *chanptr)
 
 {
   int goodjoin;
-  char sendstr[MAXLINE], **av;
+  char sendstr[MAXLINE + 1], **av;
   struct Channel *chptr;
   time_t chants;
 
@@ -1036,7 +1036,7 @@ static void
 cs_joinchan(struct ChanInfo *chanptr)
 
 {
-  char sendstr[MAXLINE], **av;
+  char sendstr[MAXLINE + 1], **av;
   struct Channel *chptr;
 
   chptr = FindChannel(chanptr->name);
@@ -1060,7 +1060,7 @@ void
 cs_join_ts_minus_1(struct ChanInfo *chanptr)
 
 {
-  char sendstr[MAXLINE], **av;
+  char sendstr[MAXLINE + 1], **av;
   struct Channel *cptr = FindChannel(chanptr->name);
   int ac;
 
@@ -1106,14 +1106,14 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
 {
   struct ChannelUser *tempu;
-  char modes[MAXLINE]; /* mlock modes to set */
+  char modes[MAXLINE + 1]; /* mlock modes to set */
 
   if (!cptr || !chptr)
     return;
 
   if (cptr->flags & CS_FORBID)
     {
-      char knicks[MAXLINE]; /* nicks to kick */
+      char knicks[MAXLINE + 1]; /* nicks to kick */
       int jj = 1;
       knicks[0] = '\0';
 
@@ -1154,7 +1154,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
   if ((cptr->flags & CS_SECUREOPS) || (cptr->flags & CS_RESTRICTED))
     {
       /* SECUREOPS is set - deop all non autoops */
-      char dopnicks[MAXLINE];
+      char dopnicks[MAXLINE + 1];
       int jj = 1;
       dopnicks[0] = '\0';
 
@@ -1185,7 +1185,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
   if ((cptr->flags & CS_RESTRICTED))
     {
       /* channel is restricted - kickban all non-autoops */
-      char kbnicks[MAXLINE];
+      char kbnicks[MAXLINE + 1];
       int jj = 1;
       kbnicks[0] = '\0';
 
@@ -1259,14 +1259,14 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 #endif /* DANCER */ /* DANCER */
       if (cptr->limit)
         {
-          char temp[MAXLINE];
+          char temp[MAXLINE + 1];
 
           ircsprintf(temp, "%s %ld", modes, cptr->limit);
           strlcpy(modes, temp, sizeof(modes));
         }
       if (cptr->key)
         {
-          char temp[MAXLINE];
+          char temp[MAXLINE + 1];
 
           if (chptr->key)
             {
@@ -1280,7 +1280,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 #ifdef DANCER
       if (cptr->forward)
       {
-        char temp[MAXLINE];
+        char temp[MAXLINE + 1];
         
         ircsprintf(temp, "%s %s", modes, cptr->forward);
         strlcpy(modes, temp, sizeof(modes));
@@ -1396,7 +1396,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
 
 {
   int slev; /* user level for source */
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
   struct Channel *chptr;
 
   if (!cptr || !source)
@@ -1682,7 +1682,7 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
 
 {
   struct ChannelUser *tempuser;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
 
   if (!chanptr || !cptr || !nick)
     return;
@@ -1760,8 +1760,8 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
   struct Luser *lptr;
   struct NickInfo *nptr;
   struct AutoKick *ak;
-  char chkstr[MAXLINE];
-  char modes[MAXLINE];
+  char chkstr[MAXLINE + 1];
+  char modes[MAXLINE + 1];
   char *nick;
 
   if (!chanptr || !cptr || !nickname)
@@ -1909,7 +1909,7 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 
 {
   struct Luser *nlptr;
-  char dnicks[MAXLINE]; /* nicks to deop */
+  char dnicks[MAXLINE + 1]; /* nicks to deop */
   char *currnick;
   int ii, jj = 1; /* looping */
 
@@ -2745,7 +2745,7 @@ static int AddAkick(struct ChanInfo *chanptr, struct Luser *lptr, char
           if (ca->nptr)
             {
               struct NickHost *hptr;
-              char chkstr[MAXLINE];
+              char chkstr[MAXLINE + 1];
 
               for (hptr = ca->nptr->hosts; hptr; hptr = hptr->next)
                 {
@@ -2874,7 +2874,7 @@ static int GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 {
   struct ChanAccess *ca;
   struct Channel *chptr;
-  char chkstr[MAXLINE];
+  char chkstr[MAXLINE + 1];
   int level = -9999;
   struct NickInfo *nptr;
   int found;
@@ -3081,7 +3081,7 @@ c_help(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char str[MAXLINE];
+      char str[MAXLINE + 1];
 
       if (ac >= 3)
         ircsprintf(str, "%s %s", av[1], av[2]);
@@ -3403,7 +3403,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char hostmask[MAXLINE];
+  char hostmask[MAXLINE + 1];
   struct NickInfo *nickptr = NULL;
   int level; /* lptr->nick's access level */
   int newlevel, founder;
@@ -3463,21 +3463,21 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   hostmask[0] = '\0';
 
   if (match("*!*@*", av[3]))
-    strlcpy(hostmask, av[3], MAXLINE - 1);
+    strlcpy(hostmask, av[3], sizeof(hostmask));
   else if (match("*!*", av[3]))
   {
-    strlcpy(hostmask, av[3], MAXLINE - 3);
+    strlcpy(hostmask, av[3], sizeof(hostmask));
     strlcat(hostmask, "@*", sizeof(hostmask));
   }
   else if (match("*@*", av[3]))
   {
     strlcpy(hostmask, "*!", sizeof(hostmask));
-    strncat(hostmask, av[3], MAXLINE - 3);
+    strncat(hostmask, av[3], sizeof(hostmask));
   }
   else if (match("*.*", av[3]))
   {
     strlcpy(hostmask, "*!*@", sizeof(hostmask));
-    strncat(hostmask, av[3], MAXLINE - 5);
+    strncat(hostmask, av[3], sizeof(hostmask));
   }
   else
   {
@@ -3504,7 +3504,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if ((cptr->flags & CS_VERBOSE))
       {
-        char line[MAXLINE];
+        char line[MAXLINE + 1];
         ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %d", lptr->nick,
             lptr->username, lptr->hostname, cptr->name, nickptr ?
             nickptr->nick : hostmask ? hostmask : "unknown!", newlevel);
@@ -3529,7 +3529,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
               if (!IsChannelOp(chptr, luptr) &&
                   (newlevel >= cptr->access_lvl[CA_AUTOOP]))
                 {
-                  char modes[MAXLINE];
+                  char modes[MAXLINE + 1];
                   ircsprintf(modes, "+o %s", nickptr->nick);
                   toserv(":%s MODE %s %s\r\n", n_ChanServ, cptr->name, modes);
                   UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
@@ -3639,7 +3639,7 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
 
       if (cptr->flags & CS_VERBOSE)
       {
-        char line[MAXLINE];
+        char line[MAXLINE + 1];
         ircsprintf(line, "%s!%s@%s ACCESS [%s] DEL %s",
           lptr->nick, lptr->username, lptr->hostname, cptr->name,
           nickptr ? nickptr->nick : host);
@@ -3857,7 +3857,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char hostmask[MAXLINE];
+  char hostmask[MAXLINE + 1];
   char *reason = NULL;
   int sidx;
   long expires;
@@ -3893,21 +3893,21 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   hostmask[0] = '\0';
 
   if (match("*!*@*", av[sidx]))
-    strlcpy(hostmask, av[sidx], MAXLINE - 1);
+    strlcpy(hostmask, av[sidx], sizeof(hostmask));
   else if (match("*!*", av[sidx]))
     {
-      strlcpy(hostmask, av[sidx], MAXLINE - 3);
+      strlcpy(hostmask, av[sidx], sizeof(hostmask));
       strlcat(hostmask, "@*", sizeof(hostmask));
     }
   else if (match("*@*", av[sidx]))
     {
       strlcpy(hostmask, "*!", sizeof(hostmask));
-      strlcpy(hostmask, av[sidx], MAXLINE - 3);
+      strlcpy(hostmask, av[sidx], sizeof(hostmask));
     }
   else if (match("*.*", av[sidx]))
     {
       strlcpy(hostmask, "*!*@", sizeof(hostmask));
-      strlcpy(hostmask, av[sidx], MAXLINE - 5);
+      strlcpy(hostmask, av[sidx], sizeof(hostmask));
     }
   else
     {
@@ -3923,7 +3923,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
         }
       else
         {
-          strlcpy(hostmask, av[sidx], MAXLINE - 5);
+          strlcpy(hostmask, av[sidx], sizeof(hostmask));
           strlcat(hostmask, "!*@*", sizeof(hostmask));
         }
     }
@@ -3939,13 +3939,13 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (ac < (sidx + 2))
   {
-    char temp[MAXLINE];
+    char temp[MAXLINE + 1];
     ircsprintf(temp, "(by %s)", lptr->nick);
     reason = MyStrdup(temp);
   }
   else
   {
-    char temp[MAXLINE];
+    char temp[MAXLINE + 1];
     int cutoff;
     
     reason = GetString(ac - (sidx + 1), av + (sidx + 1));
@@ -3963,9 +3963,9 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     (expires ? (expires + current_ts) : 0)))
   {
     struct ChannelUser *tempuser;
-    char nuhost[NICKLEN + USERLEN + HOSTLEN + 3];
+    char nuhost[MAXUSERLEN + 1];
     struct Channel *chptr;
-	  char modes[MAXLINE];
+	  char modes[MAXLINE + 1];
 
 	  if (!expires)
       notice(n_ChanServ, lptr->nick,
@@ -3995,11 +3995,11 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		    continue;
 
 		  nuhost[0] = '\0';
-		  strlcpy(nuhost, tempuser->lptr->nick, NICKLEN);
+		  strlcpy(nuhost, tempuser->lptr->nick, NICKLEN + 1);
 		  strlcat(nuhost, "!", sizeof(nuhost));
-		  strncat(nuhost, tempuser->lptr->username, USERLEN);
+		  strncat(nuhost, tempuser->lptr->username, USERLEN + 1);
 		  strlcat(nuhost, "@", sizeof(nuhost));
-		  strncat(nuhost, tempuser->lptr->hostname, HOSTLEN);
+		  strncat(nuhost, tempuser->lptr->hostname, HOSTLEN + 1);
 
 		  if (!match(hostmask, nuhost))
 		    continue;
@@ -4080,29 +4080,29 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
     }
   else
   {
-    char hostmask[MAXLINE];
+    char hostmask[MAXLINE + 1];
     hostmask[0] = '\0';
 
     if (match("*!*@*", av[3]))
-      strlcpy(hostmask, av[3], MAXLINE - 1);
+      strlcpy(hostmask, av[3], sizeof(hostmask));
     else if (match("*!*", av[3]))
     {
-      strlcpy(hostmask, av[3], MAXLINE - 3);
+      strlcpy(hostmask, av[3], sizeof(hostmask));
       strlcat(hostmask, "@*", sizeof(hostmask));
     }
     else if (match("*@*", av[3]))
     {
       strlcpy(hostmask, "*!", sizeof(hostmask));
-      strncat(hostmask, av[3], MAXLINE - 3);
+      strncat(hostmask, av[3], sizeof(hostmask));
     }
     else if (match("*.*", av[3]))
     {
       strlcpy(hostmask, "*!*@", sizeof(hostmask));
-      strncat(hostmask, av[3], MAXLINE - 5);
+      strncat(hostmask, av[3], sizeof(hostmask));
     }
     else
     {
-      strlcpy(hostmask, av[3], MAXLINE - 5);
+      strlcpy(hostmask, av[3], sizeof(hostmask));
       strlcat(hostmask, "!*@*", sizeof(hostmask));
     }
 	  host = MyStrdup(hostmask);
@@ -4128,7 +4128,7 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (cptr->flags & CS_VERBOSE)
   {
-    char line[MAXLINE];
+    char line[MAXLINE + 1];
     ircsprintf(line, "%s!%s@%s AKICK [%s] DEL %s",
       lptr->nick, lptr->username, lptr->hostname, cptr->name, host);
     chanopsnotice(FindChannel(cptr->name), line);
@@ -4617,7 +4617,7 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char nmask[MAXLINE];
+  char nmask[MAXLINE + 1];
 
   if (ac < 3)
     {
@@ -4714,14 +4714,13 @@ c_set(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
   if (!HasAccess(cptr, lptr, CA_SET))
     {
-      char tmp[MAXLINE];
+      char tmp[MAXLINE + 1];
 
       notice(n_ChanServ, lptr->nick,
              ERR_NEED_ACCESS, cptr->access_lvl[CA_SET], "SET", av[1]);
 
       /* static buffers .. argh */
-      strlcpy(tmp, StrToupper(av[2]), sizeof(tmp) - 1);
-      tmp[sizeof(tmp) - 1] = '\0';
+      strlcpy(tmp, StrToupper(av[2]), sizeof(tmp));
 
       RecordCommand("%s: %s!%s@%s failed SET [%s] %s",
                     n_ChanServ, lptr->nick, lptr->username,
@@ -5473,7 +5472,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
   struct Channel *chptr;
   int minus = 0, argidx = 4;
   unsigned int ii;
@@ -5730,7 +5729,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if (cptr->limit)
         {
-          char  temp[MAXLINE];
+          char  temp[MAXLINE + 1];
 
           ircsprintf(temp, "%s %ld", modes, cptr->limit);
           strlcpy(modes, temp, sizeof(modes));
@@ -6069,7 +6068,7 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
 
   if (ac < 2)
   {
@@ -6139,13 +6138,13 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
       strlcat(modes, "k", sizeof(modes));
     if (chptr->limit)
     {
-      char temp[MAXLINE];
+      char temp[MAXLINE + 1];
       ircsprintf(temp, "%s %d", modes, chptr->limit);
       strlcpy(modes, temp, sizeof(modes));
     }
     if ((chptr->key) && (chptr->key[0] != '\0'))
     {
-      char temp[MAXLINE];
+      char temp[MAXLINE + 1];
       ircsprintf(temp, "%s %s", modes, chptr->key);
       strlcpy(modes, temp, sizeof(modes));
     }
@@ -6168,7 +6167,7 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
 
   if (ac < 2)
   {
@@ -6337,7 +6336,7 @@ c_invite(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
       if ((cptr->flags & CS_VERBOSE))
       {
-        char line[MAXLINE];
+        char line[MAXLINE + 1];
 	      ircsprintf(line, "%s!%s@%s INVITE [%s]",
 	        lptr->nick, lptr->username, lptr->hostname, cptr->name);
 	      chanopsnotice(FindChannel(cptr->name), line);
@@ -6369,7 +6368,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char onicks[MAXLINE], dnicks[MAXLINE];
+  char onicks[MAXLINE + 1], dnicks[MAXLINE + 1];
   struct UserChannel *uchan;
   struct ChannelUser *cuser;
   struct Luser *currlptr;
@@ -6457,7 +6456,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
           return;
         }
 
-      strlcpy(onicks, lptr->nick, MAXLINE);
+      strlcpy(onicks, lptr->nick, sizeof(onicks));
       dnicks[0] = '\0';
     }
   else
@@ -6550,7 +6549,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char hnicks[MAXLINE], dnicks[MAXLINE];
+  char hnicks[MAXLINE + 1], dnicks[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -6579,7 +6578,7 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
   chptr = FindChannel(av[1]);
   if (ac < 3)
     {
-      strlcpy(hnicks, lptr->nick, MAXLINE);
+      strlcpy(hnicks, lptr->nick, sizeof(hnicks));
       dnicks[0] = '\0';
       if (!IsChannelMember(chptr, lptr))
         {
@@ -6670,7 +6669,7 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr;
   struct Channel *chptr;
-  char vnicks[MAXLINE], dnicks[MAXLINE];
+  char vnicks[MAXLINE + 1], dnicks[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -6710,7 +6709,7 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
   chptr = FindChannel(av[1]);
   if (ac < 3)
     {
-      strlcpy(vnicks, lptr->nick, MAXLINE);
+      strlcpy(vnicks, lptr->nick, sizeof(vnicks));
       dnicks[0] = '\0';
       if (!IsChannelMember(chptr, lptr))
         {
@@ -6804,7 +6803,7 @@ c_unban(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChanInfo *cptr;
-  char chkstr[MAXLINE], bans[MAXLINE];
+  char chkstr[MAXLINE + 1], bans[MAXLINE + 1];
   struct Channel *chptr;
   struct ChannelBan *bptr;
   int all = 0;
@@ -6916,7 +6915,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 {
   struct ChanInfo *cptr;
   struct NickInfo *ni;
-  char buf[MAXLINE];
+  char buf[MAXLINE + 1];
   int founder_online = 0, successor_online = 0;
 
   if (ac < 2)
@@ -7199,7 +7198,7 @@ c_clear_ops(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
   struct ChannelUser *cuser;
-  char ops[MAXLINE];
+  char ops[MAXLINE + 1];
   struct Channel *chptr;
   int jj = 1;
 
@@ -7238,7 +7237,7 @@ static void c_clear_hops(struct Luser *lptr, struct NickInfo *nptr, int
                          ac, char **av)
 {
   struct ChannelUser *cuser;
-  char hops[MAXLINE];
+  char hops[MAXLINE + 1];
   struct Channel *chptr;
   int jj = 1;
 
@@ -7278,7 +7277,7 @@ c_clear_voices(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelUser *cuser;
-  char voices[MAXLINE];
+  char voices[MAXLINE + 1];
   int jj = 1;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7315,7 +7314,7 @@ static void
 c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
   struct Channel *chptr;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7370,7 +7369,7 @@ c_clear_bans(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelBan *bptr;
-  char bans[MAXLINE];
+  char bans[MAXLINE + 1];
   int jj = 1;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7406,8 +7405,8 @@ c_clear_users(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct Channel *chptr;
   struct ChannelUser *cuser;
-  char knicks[MAXLINE];
-  char ops[MAXLINE]; /* deop before kicking */
+  char knicks[MAXLINE + 1];
+  char ops[MAXLINE + 1]; /* deop before kicking */
   int jj1 = 1, jj2 = 1;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7490,7 +7489,7 @@ static void c_clear_gecos_bans(struct Luser *lptr, struct NickInfo *nptr,
 {
   struct Channel *chptr;
   struct ChannelGecosBan *bptr;
-  char bans[MAXLINE];
+  char bans[MAXLINE + 1];
   int jj = 1;
 
   if (!(chptr = FindChannel(av[1])))
@@ -7533,7 +7532,7 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 {
   struct ChanInfo *cptr = NULL;
   struct Channel *chptr = NULL;
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -7960,7 +7959,7 @@ static void c_fixts(struct Luser *lptr, struct NickInfo *nptr, int ac,
                 "below TS_MAX_DELTA %d";
   int acnt = 0;
   char **arv = NULL;
-  char line[MAXLINE];
+  char line[MAXLINE + 1];
 
   if (ac < 2)
     tsdelta = MaxTSDelta;
@@ -8044,7 +8043,7 @@ void ExpireBans(time_t unixtime)
   struct ChanInfo *cptr;
   struct ChannelBan *bptr;
   struct Channel *chptr;
-  char bans[MAXLINE];
+  char bans[MAXLINE + 1];
   int jj = 1;
 
   /* If ban expire time is 0 seconds, don't remove the ban. */
@@ -8105,7 +8104,7 @@ ExpireAkicks(time_t unixtime)
   struct ChanInfo *cptr;
   struct Channel *chptr; /* Ban removal purpose */
   int ii;
-  char modes[MAXLINE];
+  char modes[MAXLINE + 1];
 
   for (ii = 0; ii < CHANLIST_MAX; ii++)
   {

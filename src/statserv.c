@@ -154,7 +154,7 @@ ss_loaddata()
 
 {
   FILE *fp;
-  char line[MAXLINE], **av;
+  char line[MAXLINE + 1], **av;
   char *keyword;
   int ac, ret = 1, cnt;
 
@@ -465,8 +465,7 @@ GetDomain(char *hostname)
   else if ((dotcnt != 1) || (*domain == '.'))
     return (NULL); /* invalid domain */
 
-  strlcpy(done, domain, sizeof(done) - 1);
-  done[sizeof(done) - 1] = '\0';
+  strlcpy(done, domain, sizeof(done));
 
   return (done);
 } /* GetDomain() */
@@ -481,7 +480,7 @@ ss_host(struct Luser *lptr, int ac, char **av)
 
 {
   struct HostHash *hosth;
-  char str[MAXLINE];
+  char str[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -566,7 +565,7 @@ ss_domain(struct Luser *lptr, int ac, char **av)
 {
   struct HostHash *hosth;
   char *domain;
-  char str[MAXLINE];
+  char str[MAXLINE + 1];
 
   if (ac < 2)
     {
@@ -662,8 +661,8 @@ ss_server(struct Luser *lptr, int ac, char **av)
 {
   struct Server *servptr,
         *hub;
-  char argbuf[MAXLINE],
-  str[MAXLINE];
+  char argbuf[MAXLINE + 1],
+  str[MAXLINE + 1];
   char *target; /* target server */
   int maxusers, /* -maxusers */
   minusers, /* -minusers */
@@ -827,7 +826,7 @@ static void
 ShowServerInfo(struct Server *servptr, struct Luser *lptr, int showinfo)
 
 {
-  char str[MAXLINE];
+  char str[MAXLINE + 1];
 
   assert(servptr != 0);
   assert(lptr != 0);
@@ -992,7 +991,7 @@ ss_stats(struct Luser *lptr, int ac, char **av)
 {
   float avgops, avguc, avgus;
   struct tm *tmp_tm;
-  char str[MAXLINE], tmp[MAXLINE];
+  char str[MAXLINE + 1], tmp[MAXLINE + 1];
   char **tav;
   time_t currtime;
 
@@ -1158,7 +1157,7 @@ ss_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char str[MAXLINE];
+      char str[MAXLINE + 1];
       struct Command *sptr;
 
       for (sptr = statcmds; sptr->cmd; sptr++)
@@ -1227,8 +1226,8 @@ ss_clearstats(struct Luser *lptr, int ac, char **av)
 {
   int ii, bad;
   struct HostHash *hosth, *hnext;
-  char buf[MAXLINE],
-  buf2[MAXLINE];
+  char buf[MAXLINE + 1],
+  buf2[MAXLINE + 1];
   int domain,
   host;
 
@@ -1375,10 +1374,10 @@ static void
 ss_greplog(struct Luser *lptr, int ac, char **av )
 {
   int             day;
-  char            buf[MAXLINE];
+  char            buf[MAXLINE + 1];
   char            date[10];
   FILE *          lf;
-  char            grep_log_filename[MAXLINE];
+  char            grep_log_filename[MAXLINE + 1];
   int             i;
   struct tm *     tm;
   int             iCounter;

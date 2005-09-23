@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   else
   {
     pid_t mypid;
-    char line[MAXLINE];
+    char line[MAXLINE + 1];
 
     fgets(line, sizeof(line), pidfile);
     fclose(pidfile);
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
     putlog(LOG1, "Unable to open %s", PidFile);
   else
     {
-      char line[MAXLINE];
+      char line[MAXLINE + 1];
 
       ircsprintf(line, "%d\n", getpid());
       fputs(line, pidfile);

@@ -234,7 +234,7 @@ DisplayNick(struct NickInfo *realptr, int detail)
 
 {
   struct NickInfo *nptr;
-  char  buf[MAXLINE];
+  char  buf[MAXLINE + 1];
   int cnt;
 
   if (!(nptr = GetMaster(realptr)))
@@ -480,7 +480,7 @@ static void
 DisplayChan(struct ChanInfo *chanptr, int detail)
 
 {
-  char buf[MAXLINE];
+  char buf[MAXLINE + 1];
 
   if (detail)
     {

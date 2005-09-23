@@ -261,8 +261,8 @@ char *timeago(time_t timestamp, int flag)
 long timestr(char *format)
 {
   long seconds;
-  char digitbuf[MAXLINE];
-  char fmtbuf[MAXLINE];
+  char digitbuf[MAXLINE + 1];
+  char fmtbuf[MAXLINE + 1];
   long bufvalue; /* integer value of number stored in digitbuf[] */
   char *ptr;
   int cnt;

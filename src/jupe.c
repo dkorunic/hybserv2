@@ -160,7 +160,7 @@ DoJupeSquit(char *serv, char *reason, char *who)
 
 {
   struct Server *tempserv, *prev;
-  char sendstr[MAXLINE], **arv;
+  char sendstr[MAXLINE + 1], **arv;
   int acnt;
 
   for (tempserv = ServerList; tempserv; )
@@ -205,7 +205,7 @@ CheckJuped(char *name)
 {
   struct Jupe *tempjupe;
   struct Server *tempserv;
-  char sendstr[MAXLINE], **arv;
+  char sendstr[MAXLINE + 1], **arv;
 
   for (tempjupe = JupeList; tempjupe; tempjupe = tempjupe->next)
     {
@@ -316,7 +316,7 @@ InitJupes()
 
 {
   struct Jupe *tmpjupe;
-  char sendstr[MAXLINE];
+  char sendstr[MAXLINE + 1];
   char **av;
 
   for (tmpjupe = JupeList; tmpjupe; tmpjupe = tmpjupe->next)

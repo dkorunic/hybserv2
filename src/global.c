@@ -144,7 +144,7 @@ g_help(struct Luser *lptr, int ac, char **av)
 {
   if (ac >= 2)
     {
-      char str[MAXLINE];
+      char str[MAXLINE + 1];
       struct Command *cptr;
 
       for (cptr = globalcmds; cptr->cmd; ++cptr)
@@ -287,8 +287,7 @@ g_gnote(struct Luser *lptr, int ac, char **av)
     strlcat(argbuf, "-admins ", sizeof(argbuf));
 
   ircsprintf(temp, "%s%s", argbuf, message);
-  strlcpy(argbuf, temp, MAXLINE);
-  argbuf[MAXLINE] = '\0';
+  strlcpy(argbuf, temp, sizeof(argbuf));
 
   RecordCommand("%s: %s!%s@%s GNOTE %s",
                 n_Global,
@@ -421,8 +420,7 @@ g_gchannote(struct Luser *lptr, int ac, char **av)
 
   ircsprintf(temp, "%s%s", argbuf, message);
 
-  strlcpy(argbuf, temp, sizeof(argbuf) - 1);
-  argbuf[sizeof(argbuf) - 1] = '\0';
+  strlcpy(argbuf, temp, sizeof(argbuf));
 
   RecordCommand("%s: %s!%s@%s GCHANNOTE %s",
                 n_Global,

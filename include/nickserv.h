@@ -40,10 +40,15 @@
 #define NS_NOCHANOPS    0x00200000 /* not allowed to be opped */
 #define NS_NUMERIC      0x00400000 /* ignores 432 numeric */
 #define NS_PRIVMSG      0x00800000 /* PRIVMSG or NOTICE */
-#define NS_NOHALFOPS    0x01000000 /* can't halfop */
-#define NS_NOVOICE      0x02000000 /* can't +v */
-#define NS_NOACCESS     0x04000000 /* can't get access to chans */
-#define NO_LINK         0x08000000 /* can't link nicknames */
+#define NS_HIDEHOST     0x01000000 /* hide userhost */
+
+/* these are yet to be coded, probably as separate set of flags */
+#if 0
+# define NS_NOHALFOPS    0x01000000 /* can't halfop */
+# define NS_NOVOICE      0x02000000 /* can't +v */
+# define NS_NOACCESS     0x04000000 /* can't get access to chans */
+# define NS_NOLINK       0x08000000 /* can't link nicknames */
+#endif
 
 struct ChanInfo;
 struct ChanAccess;

@@ -100,10 +100,10 @@ ReadMessageFile(struct MessageFile *fileptr)
         if (final && (final != (char *) -1))
           NewLine->line = final;
         else
-          NewLine->line = MyStrdup("\r\n");
+          NewLine->line = MyStrdup(" ");
       }
       else
-        NewLine->line = MyStrdup("\r\n");
+        NewLine->line = MyStrdup(" ");
 
       NewLine->next = NULL;
 

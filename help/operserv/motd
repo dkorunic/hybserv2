@@ -16,7 +16,7 @@ Examples:
          %bMOTD ADD Welcome!%b
            Delete current MOTD and add "Welcome!".
 
-         %bMOTD APPEND!%b
+         %bMOTD APPEND%b
            Add a blank line.
 
          %bMOTD APPEND Read rules!%b

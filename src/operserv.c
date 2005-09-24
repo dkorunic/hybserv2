@@ -1232,7 +1232,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
             timeago(StatExpire, 3));
 #endif
 
-  os_notice(lptr, sockfd, "\002\002");
+  os_notice(lptr, sockfd, " ");
 
 #endif /* defined(NICKSERVICES) || defined(STATSERVICES) */
 
@@ -1254,7 +1254,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
            );
 #endif
 
-  os_notice(lptr, sockfd, "\002\002");
+  os_notice(lptr, sockfd, " ");
 
 #endif /* NICKSERVICES */
 
@@ -1314,7 +1314,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
   os_notice(lptr, sockfd, "   Restricted Access: \002%s\002",
             (RestrictedAccess) ? "on" : "off");
 
-  os_notice(lptr, sockfd, "\002\002");
+  os_notice(lptr, sockfd, " ");
   os_notice(lptr, sockfd, "General Status");
 
   mem = CalcMem(NULL, NODCC);

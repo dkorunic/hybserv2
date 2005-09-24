@@ -319,7 +319,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
         {
           if (IsEOL(*line))
           {
-            hs_notice(Serv,helpnick, sockfd, "");
+            hs_notice(Serv, helpnick, sockfd, " ");
             continue;
           }
           final = Substitute(helpnick, line, sockfd);
@@ -464,7 +464,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
         {
           if (IsEOL(*line))
           {
-            hs_notice(Serv,helpnick, sockfd, "");
+            hs_notice(Serv, helpnick, sockfd, " ");
             continue;
           }
           final = Substitute(helpnick, line, sockfd);

@@ -53,6 +53,24 @@ AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(LN, ln)
 AC_PATH_PROG(TOUCH, touch)
 
+dnl Find what to use as dependancy generator
+AC_PATH_PROG(MKDEP, mkdep)
+AC_PATH_PROG(MAKEDEPEND, makedepend)
+AC_MSG_CHECKING([how to generate dependency info])
+if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
+	AC_MSG_RESULT(gcc -MM)
+	MKDEP="$CC -MM"
+elif test ! -z "$MKDEP"; then
+	AC_MSG_RESULT(mkdep)
+elif test ! -z "$MAKEDEPEND"; then
+	AC_MSG_RESULT(makedepend)
+	MKDEP="$MAKEDEPEND -f-"
+else
+	AC_MSG_RESULT([nothing suitable.. forget it!])
+	MKDEP=":"
+fi
+AC_SUBST(MKDEP)
+
 dnl Checks for header files
 AC_HEADER_STDC
 AC_HEADER_TIME
@@ -74,7 +92,7 @@ AC_CHECK_MEMBER([struct sockaddr.sa_len],
     [Define to 1 if you have sockaddr.sa_len])], ,
   [#include <sys/types.h>
 #include <sys/socket.h>])
-AC_MSG_CHECKING(struct sockaddr_storage)
+AC_MSG_CHECKING([struct sockaddr_storage])
 AC_TRY_COMPILE([#include <sys/types.h>
 #include <sys/socket.h>],
 [struct sockaddr_storage x;],

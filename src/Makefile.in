@@ -10,7 +10,7 @@ IDIR = ../include
 INCLUDE = -I. -I$(IDIR) $(CPPFLAGS)
 DEFS =
 LIBS = @LIBS@
-MKDEP = $(CC) -MM
+MKDEP = @MKDEP@
 RM = @RM@ -f
 
 DEPENDFILE = .depend

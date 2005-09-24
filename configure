@@ -3611,8 +3611,8 @@ elif test ! -z "$MAKEDEPEND"; then
 echo "${ECHO_T}makedepend" >&6
 	MKDEP="$MAKEDEPEND -f-"
 else
-	echo "$as_me:$LINENO: result: nothing suitable.. forget it!" >&5
-echo "${ECHO_T}nothing suitable.. forget it!" >&6
+	echo "$as_me:$LINENO: result: nothing suitable" >&5
+echo "${ECHO_T}nothing suitable" >&6
 	MKDEP=":"
 fi
 

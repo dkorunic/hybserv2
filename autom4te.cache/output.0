@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1277 2005-09-20 18:02:50Z kreator $
+@%:@ $Id: configure.in 1288 2005-09-24 14:30:25Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1277 2005-09-20 18:02:50Z kreator $
+$Id: configure.in 1288 2005-09-24 14:30:25Z kreator $
 _ACEOF
   exit 0
 fi
@@ -3611,8 +3611,8 @@ elif test ! -z "$MAKEDEPEND"; then
 echo "${ECHO_T}makedepend" >&6
 	MKDEP="$MAKEDEPEND -f-"
 else
-	echo "$as_me:$LINENO: result: nothing suitable.. forget it!" >&5
-echo "${ECHO_T}nothing suitable.. forget it!" >&6
+	echo "$as_me:$LINENO: result: nothing suitable" >&5
+echo "${ECHO_T}nothing suitable" >&6
 	MKDEP=":"
 fi
 

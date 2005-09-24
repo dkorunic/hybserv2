@@ -125,7 +125,7 @@ crypt_md5(const char *pw, const char *salt)
 		    MD5Update(&ctx, (const unsigned char *)pw, 1);
 
 	/* Now make the output string */
-	strlcpy(passwd,magic,sizeof(password));
+	strlcpy(passwd,magic,sizeof(passwd));
 	strncat(passwd,sp,sl);
 	strlcat(passwd,"$",sizeof(passwd));
 

@@ -411,7 +411,7 @@ int ConnectHost(const char *hostname, unsigned int port)
     /* nope, no error whatsoever */
     freeaddrinfo(res_o);
     MyFree(resolved);
-    SetNonBlocking(socketfd);
+    /* SetNonBlocking(socketfd); */
     return socketfd;
   }
 

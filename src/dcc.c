@@ -367,7 +367,7 @@ void ConnectClient(struct PortInfo *portptr)
   tempconn->idle = current_ts;
   tempconn->port = GetPort((struct sockaddr *)&addr);
 
-  SetNonBlocking(tempconn->socket);
+  /* SetNonBlocking(tempconn->socket); */
 
   switch (portptr->type)
   {

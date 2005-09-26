@@ -15,7 +15,7 @@
 #define   MAXLINE    512  /* don't change this */
 #define   BUFSIZE  16364  /* don't change this - number of bytes to read
                              from sockets */
-#define   MAXPARAM    15  /* don't change this - max parameters the hub
+#define   MAXPARAM    20  /* don't change this - max parameters the hub
                              can send us */
 #define   REALLEN     50  /* ircd value for max server info length */
 #define   USERLEN     10  /* username length */

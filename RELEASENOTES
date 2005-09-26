@@ -1,10 +1,18 @@
-06/19/2005  -  Dinko Korunic <kreator@srce.hr>
+09/26/2005  -  Dinko Korunic <dinko|korunic|AT|gmail|com>
 
-  Well, after all these years, I'm finally releasing 1.9.0 Hybserv. I'm
-  quite aware that it might well be several bugs left, but it's really
-  time for us to go on ;)
+  Hybserv 1.9.1 is here!
+
+  Diff against 1.9.0 shows around 70000 changed lines, which includes a
+  dozen of fixes and new features. This version of Hybserv2 has been
+  improved in terms of speed, security and interconnectivity [IPv6
+  capabilities, different network fixes, etc].
 
 Releases are available from following sources:
 
-  http://kreator.esa.fer.hr/projects/tarballs/
+  http://www.hybserv.net/downloads/
   http://hybserv.icsbg.net/
+
+Hybserv has got a new homepage [still in the process of making, however]:
+
+  http://www.hybserv.net/
+  http://www.hybserv2.net/

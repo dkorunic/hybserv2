@@ -1,5 +1,6 @@
-Hybserv-HEAD: Thu, 22 Sep 2005 11:59:43 +0200
+Hybserv-1.9.1: Mon, 26 Sep 2005 14:44:49 +0200
 
+  * stage it to REL_1_9_1
   * Substitute now works for dcc motd and server [logon] motd
   * rewrote Substitute code
   * rewrote core string/array handling functions SplitBuf() and

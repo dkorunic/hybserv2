@@ -9,14 +9,14 @@ AC_GNU_SOURCE
 
 dnl Get version and revision number
 if test -f "$srcdir/.svn/entries"; then
-  ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+	ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
 else
-  ac_cv_revision="release"
+	ac_cv_revision="release"
 fi
 ac_cv_version="$PACKAGE_VERSION-$ac_cv_revision"
 AC_SUBST(ac_cv_version)
 AC_DEFINE_UNQUOTED(HYBSERV_VERSION, ["$ac_cv_version"],
-  [Hybserv release version])
+	[Hybserv release version])
 AC_MSG_NOTICE([configuring Hybserv2 $ac_cv_version])
 
 dnl Set language and save it
@@ -27,10 +27,10 @@ AC_CANONICAL_HOST
 MYHOST=$host_os
 case "$host_os" in
 *sunos*|*solaris*)
-  AC_DEFINE(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
-  ;;
+	AC_DEFINE(HAVE_SOLARIS, , [Define to 1 if you have Solaris OS])
+	;;
 *cygwin)
-  AC_DEFINE(HAVE_CYGWIN, , [Define to 1 if you have Cygwin environment])
+	AC_DEFINE(HAVE_CYGWIN, , [Define to 1 if you have Cygwin environment])
 esac
 
 dnl Standard installation path
@@ -78,118 +78,130 @@ AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
-  arpa/inet.h sys/socket.h netinet/in.h netinet/tcp.h \
-  sys/resource.h sys/signal.h])
+	arpa/inet.h sys/socket.h netinet/in.h netinet/tcp.h \
+	sys/resource.h sys/signal.h])
 
 dnl Checks for additional types and headers
 AC_CHECK_TYPE(socklen_t, ,
-  [AC_DEFINE([socklen_t], [unsigned int],
-  [If we don't have a real socklen_t, unsigned int is good enough])],
-  [#include <sys/types.h>
+	[AC_DEFINE([socklen_t], [unsigned int],
+	[If we don't have a real socklen_t, unsigned int is good enough])],
+	[#include <sys/types.h>
 #include <sys/socket.h>])
 AC_CHECK_MEMBER([struct sockaddr.sa_len],
-  [AC_DEFINE(HAVE_SOCKADDR_LEN, 1,
-    [Define to 1 if you have sockaddr.sa_len])], ,
-  [#include <sys/types.h>
+	[AC_DEFINE(HAVE_SOCKADDR_LEN, 1,
+		[Define to 1 if you have sockaddr.sa_len])], ,
+	[#include <sys/types.h>
 #include <sys/socket.h>])
 AC_MSG_CHECKING([struct sockaddr_storage])
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>],
-[struct sockaddr_storage x;],
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1,
-    [Define to 1 if you have struct sockaddr_storage]),
-  AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <sys/types.h>
+#include <sys/socket.h>
+struct sockaddr_storage x;
+]])],
+	[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_SOCKADDR_STORAGE, 1,
+		[Define to 1 if you have struct sockaddr_storage])],
+	[AC_MSG_RESULT(no)])
 
 dnl IPv6 defines
 ac_cv_ipv6type=unknown
 ac_cv_ipv6lib=none
-ac_cv_ipv6trylibc=yes
 
 dnl And check if we have IPv6 libraries
 AC_MSG_CHECKING([compile with ipv6 support])
 AC_ARG_ENABLE(ipv6,
-  [  --disable-ipv6          Disable IPv6 support [[default=no]]],
-  [cf_enable_ipv6=$enableval],
-  [cf_enable_ipv6="yes"])
+	[  --disable-ipv6					 Disable IPv6 support [[default=no]]],
+	[cf_enable_ipv6=$enableval],
+	[cf_enable_ipv6="yes"])
 if test "x$cf_enable_ipv6" = "xyes"; then
-  AC_MSG_RESULT(yes)
+	AC_MSG_RESULT(yes)
 	AC_MSG_CHECKING([ipv6 stack type])
 	for i in inria kame linux-glibc linux-inet6 toshiba v6d zeta; do
 		case "$i" in
 		inria)
 			# http://www.kame.net/
-			AC_EGREP_CPP(yes, [#include <netinet/in.h>
-#ifdef IPV6_INRIA_VERSION
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <netinet/in.h>
+#if !defined IPV6_INRIA_VERSION
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				])
 			;;
 		kame)
 			# http://www.kame.net/
-			AC_EGREP_CPP(yes, [#include <netinet/in.h>
-#ifdef __KAME__
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <netinet/in.h>
+#if !defined __KAME__
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				])
 			;;
 		linux-glibc)
 			# http://www.v6.linux.or.jp/
-			AC_EGREP_CPP(yes, [#include <features.h>
-#if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 1
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <features.h>
+#if !defined(__GLIBC__) || (__GLIBC__ < 2 && __GLIBC_MINOR__ < 1 )
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				])
 			;;
 		linux-inet6)
 			# http://www.v6.linux.or.jp/
 			if test -d /usr/inet6 -o -f /usr/inet6/lib/libinet6.a; then
-				ac_cv_ipv6type=$i
-				ac_cv_ipv6lib=inet6
-				ac_cv_ipv6libdir=/usr/inet6/lib
-				ac_cv_ipv6trylibc=yes;
+				ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/inet6/include"
+				LDFLAGS="$LDFLAGS -linet6 -L/usr/inet6/lib"
 			fi
 			;;
 		toshiba)
-			AC_EGREP_CPP(yes, [#include <sys/param.h>
-#ifdef _TOSHIBA_INET6
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
-				ac_cv_ipv6lib=inet6;
-				ac_cv_ipv6libdir=/usr/local/v6/lib;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <sys/param.h>
+#if !defined _TOSHIBA_INET6
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
-        ])
+				CFLAGS="$CFLAGS -I/usr/local/v6/include"
+				LDFLAGS="$LDFLAGS -linet6 -L/usr/local/v6/lib"
+				])
 			;;
 		v6d)
-			AC_EGREP_CPP(yes, [#include </usr/local/v6/include/sys/v6config.h>
-#ifdef __V6D__
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
-				ac_cv_ipv6lib=v6;
-				ac_cv_ipv6libdir=/usr/local/v6/lib;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include </usr/local/v6/include/sys/v6config.h>
+#if !defined __V6D__
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
+				ac_cv_ipv6lib="v6"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
-        ])
+				CFLAGS="$CFLAGS -I/usr/local/v6/include"
+				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				])
 			;;
 		zeta)
-			AC_EGREP_CPP(yes, [#include <sys/param.h>
-#ifdef _ZETA_MINAMI_INET6
-yes
-#endif],
-				[ac_cv_ipv6type=$i;
-				ac_cv_ipv6lib=inet6;
-				ac_cv_ipv6libdir=/usr/local/v6/lib;
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[[#include <sys/param.h>
+#if !defined _ZETA_MINAMI_INET6
+no
+#endif
+]])],
+				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
-        ])
+				CFLAGS="$CFLAGS -I/usr/local/v6/include"
+				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				])
 			;;
 		esac
 		if test "x$ac_cv_ipv6type" != "xunknown"; then
@@ -199,15 +211,15 @@ yes
 	AC_MSG_RESULT([$ac_cv_ipv6type])
 	AC_SEARCH_LIBS(getaddrinfo, inet6)
 else
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 fi
 
 dnl Checks for library functions
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([select strchr memcpy strdup strerror \
-  gettimeofday strlcat strlcpy inet_ntoa])
+	gettimeofday strlcat strlcpy inet_ntoa])
 AC_SEARCH_LIBS(socket, socket, ,
-  [AC_MSG_ERROR([You have no socket()! Aborting])])
+	[AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
 AC_SEARCH_LIBS(inet_ntop, resolv)
 AC_SEARCH_LIBS(inet_pton, resolv)
@@ -219,75 +231,75 @@ AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
 dnl Try libefence support
 AC_MSG_CHECKING([compile with electricfence library])
 AC_ARG_ENABLE(efence,
-  [  --enable-efence         Enable libefence support [[default=no]]],
-  [cf_enable_efence=$enableval],
-  [cf_enable_efence="no"])
+	[  --enable-efence				 Enable libefence support [[default=no]]],
+	[cf_enable_efence=$enableval],
+	[cf_enable_efence="no"])
 if test "x$cf_enable_efence" = "xyes"; then
-  AC_MSG_RESULT(yes)
-  AC_CHECK_LIB(efence, malloc)
+	AC_MSG_RESULT(yes)
+	AC_CHECK_LIB(efence, malloc)
 else
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 fi
 
 dnl Try dmalloc support
 AC_MSG_CHECKING([compile with malloc debugging libs])
 AC_ARG_ENABLE(dmalloc,
-  [  --enable-dmalloc        Enable dmalloc support [[default=no]]],
-  [cf_enable_malloc=$enableval],
-  [cf_enable_malloc="no"])
+	[  --enable-dmalloc				 Enable dmalloc support [[default=no]]],
+	[cf_enable_malloc=$enableval],
+	[cf_enable_malloc="no"])
 if test "x$cf_enable_malloc" = "xyes"; then
-  AC_MSG_RESULT(yes)
-  AC_CHECK_LIB(dmalloc, malloc)
+	AC_MSG_RESULT(yes)
+	AC_CHECK_LIB(dmalloc, malloc)
 else
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 fi
 
 dnl Get nick/chan/topic length
 AC_ARG_WITH(nicklen,
-  [  --with-nicklen=LENGTH     Sets nick length to LENGTH [[default=18]]],
-  [ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
+	[  --with-nicklen=LENGTH		 Sets nick length to LENGTH [[default=18]]],
+	[ac_cv_nicklen=$withval], [ac_cv_nicklen="18"])
 AC_MSG_RESULT([checking nick length... $ac_cv_nicklen])
 AC_ARG_WITH(channellen,
-  [  --with-channellen=LENGTH  Sets channel length to LENGTH [[default=200]]],
-  [ac_cv_channellen=$withval], [ac_cv_channellen="200"])
+	[  --with-channellen=LENGTH  Sets channel length to LENGTH [[default=200]]],
+	[ac_cv_channellen=$withval], [ac_cv_channellen="200"])
 AC_MSG_RESULT([checking channel length... $ac_cv_channellen])
 AC_ARG_WITH(topiclen,
-  [  --with-topiclen=LENGTH    Sets topic length to LENGTH [[default=160]]],
-  [ac_cv_topiclen=$withval], [ac_cv_topiclen="160"])
+	[  --with-topiclen=LENGTH		 Sets topic length to LENGTH [[default=160]]],
+	[ac_cv_topiclen=$withval], [ac_cv_topiclen="160"])
 AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
 
 dnl Get the network identificator
 AC_ARG_WITH(network,
-  [  --with-network=TYPE       Sets network type TYPE],
-  [ac_cv_network=$withval], [ac_cv_network="hybrid7"])
+	[  --with-network=TYPE			 Sets network type TYPE],
+	[ac_cv_network=$withval], [ac_cv_network="hybrid7"])
 if test "x$ac_cv_network" = "xyes"; then
-  ac_cv_network="hybrid7"
+	ac_cv_network="hybrid7"
 fi
 AC_MSG_RESULT([checking network type... $ac_cv_network])
 if test "x$ac_cv_network" = "xhybrid"; then
-  ac_cv_nicklen=9
-  ac_cv_channellen=200
-  ac_cv_topiclen=120
+	ac_cv_nicklen=9
+	ac_cv_channellen=200
+	ac_cv_topiclen=120
 elif test "x$ac_cv_network" = "xhybrid7"; then
-  ac_cv_nicklen=18
-  ac_cv_channellen=200
-  ac_cv_topiclen=160
+	ac_cv_nicklen=18
+	ac_cv_channellen=200
+	ac_cv_topiclen=160
 elif test "x$ac_cv_network" = "xidolnet"; then
-  ac_cv_nicklen=18
-  ac_cv_channellen=200
-  ac_cv_topiclen=240
+	ac_cv_nicklen=18
+	ac_cv_channellen=200
+	ac_cv_topiclen=240
 elif test "x$ac_cv_network" = "xbalcannet"; then
-  ac_cv_nicklen=24
-  ac_cv_channellen=200
-  ac_cv_topiclen=400
+	ac_cv_nicklen=24
+	ac_cv_channellen=200
+	ac_cv_topiclen=400
 elif test "x$ac_cv_network" = "xdancer"; then
-  ac_cv_nicklen=20
-  ac_cv_channellen=30
-  ac_cv_topiclen=450
+	ac_cv_nicklen=20
+	ac_cv_channellen=30
+	ac_cv_topiclen=450
 elif test "x$ac_cv_network" = "xratbox"; then
-  ac_cv_nicklen=9
-  ac_cv_channellen=200
-  ac_cv_topiclen=160
+	ac_cv_nicklen=9
+	ac_cv_channellen=200
+	ac_cv_topiclen=160
 fi
 AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
 AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_channellen, [Define to channel length])
@@ -296,83 +308,83 @@ AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 dnl Check if warnings are to be enabled
 AC_MSG_CHECKING([compile with warning flags])
 AC_ARG_ENABLE(warnings,
-  [  --enable-warnings       Enable compiler warnings [[default=no]]],
-  [cf_enable_warnings=$enableval],
-  [cf_enable_warnings="no"])
+	[  --enable-warnings			 Enable compiler warnings [[default=no]]],
+	[cf_enable_warnings=$enableval],
+	[cf_enable_warnings="no"])
 if test "x$cf_enable_warnings" = "xyes"; then
-  CFLAGS="$CFLAGS -Wall"
-  AC_MSG_RESULT(yes)
+	CFLAGS="$CFLAGS -Wall"
+	AC_MSG_RESULT(yes)
 else
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 fi
 
 dnl Check if asserts are to be enabled
 AC_MSG_CHECKING([compile with asserts enabled])
 AC_ARG_ENABLE(asserts,
-  [  --enable-asserts        Enable asserts in code [[default=no]]],
-  [cf_enable_asserts=$enableval],
-  [cf_enable_asserts="no"])
+	[  --enable-asserts				 Enable asserts in code [[default=no]]],
+	[cf_enable_asserts=$enableval],
+	[cf_enable_asserts="no"])
 if test "x$cf_enable_asserts" = "xno"; then
-  AC_MSG_RESULT(no)
-  AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
+	AC_MSG_RESULT(no)
+	AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
 elif test "x$cf_enable_asserts" = "xsoft"; then
-  AC_MSG_RESULT(soft)
-  AC_DEFINE(SOFT_ASSERT, 1, [Define this to enable soft asserts])
-  AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
+	AC_MSG_RESULT(soft)
+	AC_DEFINE(SOFT_ASSERT, 1, [Define this to enable soft asserts])
+	AC_DEFINE(NDEBUG, 1, [Define this to disable debugging support])
 else
-  AC_MSG_RESULT(yes)
+	AC_MSG_RESULT(yes)
 fi
 
 dnl Check if coredumping is to be enabled
 AC_MSG_CHECKING([compile with core dumping enabled])
 AC_ARG_ENABLE(gimmecore,
-  [  --enable-gimmecore      Enable core dumping [[default=yes]]],
-  [cf_enable_gimmecore=$enableval],
-  [cf_enable_gimmecore="yes"])
+	[  --enable-gimmecore			 Enable core dumping [[default=yes]]],
+	[cf_enable_gimmecore=$enableval],
+	[cf_enable_gimmecore="yes"])
 if test "x$cf_enable_gimmecore" = "xno"; then
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 else
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(GIMMECORE, 1, [Define this to enable core dumping])
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(GIMMECORE, 1, [Define this to enable core dumping])
 fi
 
 dnl Check if program is to be monitored under daemontools
 AC_MSG_CHECKING([compile for daemontools])
 AC_ARG_ENABLE(daemontools,
-  [  --enable-daemontools    Enable daemontools support [[default=no]]],
-  [cf_enable_daemontools=$enableval],
-  [cf_enable_daemontools="no"])
+	[  --enable-daemontools		 Enable daemontools support [[default=no]]],
+	[cf_enable_daemontools=$enableval],
+	[cf_enable_daemontools="no"])
 if test "x$cf_enable_daemontools" = "xyes"; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(DAEMONTOOLS, 1, [Define this to enable daemontools support])
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(DAEMONTOOLS, 1, [Define this to enable daemontools support])
 else
-  AC_MSG_RESULT(no)
+	AC_MSG_RESULT(no)
 fi
 
 AC_OUTPUT(Makefile src/Makefile tools/Makefile \
-  bin/settings.conf bin/cleandb include/config.h)
+	bin/settings.conf bin/cleandb include/config.h)
 
 echo "
 Configuration:
-  Source revision ...... ${ac_cv_revision}
-  Detected OS .......... ${host_os}
-  Install path ......... ${prefix}/hybserv
+	Source revision ...... ${ac_cv_revision}
+	Detected OS .......... ${host_os}
+	Install path ......... ${prefix}/hybserv
 Compiler suite:
-  Compiler ............. ${CC}
-  Compiler flags ....... ${CFLAGS}
-  Preprocessor ......... ${CPP}
-  Preprocessor flags ... ${CPPFLAGS}
-  Linker flags ......... ${LDFLAGS}
-  Libraries to link .... ${LIBS}
+	Compiler ............. ${CC}
+	Compiler flags ....... ${CFLAGS}
+	Preprocessor ......... ${CPP}
+	Preprocessor flags ... ${CPPFLAGS}
+	Linker flags ......... ${LDFLAGS}
+	Libraries to link .... ${LIBS}
 Compile configuration:
-  Configured network ... ${ac_cv_network}
-  Nick length .......... ${ac_cv_nicklen}
-  Channel length ....... ${ac_cv_channellen}
-  Topic length ......... ${ac_cv_topiclen}
+	Configured network ... ${ac_cv_network}
+	Nick length .......... ${ac_cv_nicklen}
+	Channel length ....... ${ac_cv_channellen}
+	Topic length ......... ${ac_cv_topiclen}
 Extra configurations:
-  Asserts enabled ...... ${cf_enable_asserts}
-  Coredumps enabled .... ${cf_enable_gimmecore}
-  Daemontools enabled .. ${cf_enable_daemontools}
+	Asserts enabled ...... ${cf_enable_asserts}
+	Coredumps enabled .... ${cf_enable_gimmecore}
+	Daemontools enabled .. ${cf_enable_daemontools}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

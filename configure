@@ -5214,7 +5214,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/inet6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/inet6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/inet6/lib"
 			fi
 			;;
 		toshiba)
@@ -5265,7 +5266,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 
 else
   echo "$as_me: failed program was:" >&5
@@ -5323,7 +5325,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 
 else
   echo "$as_me: failed program was:" >&5
@@ -5380,7 +5383,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 
 else
   echo "$as_me: failed program was:" >&5

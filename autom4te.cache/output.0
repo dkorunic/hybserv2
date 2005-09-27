@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1293 2005-09-26 13:15:59Z kreator $
+@%:@ $Id: configure.in 1300 2005-09-27 23:40:27Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1293 2005-09-26 13:15:59Z kreator $
+$Id: configure.in 1300 2005-09-27 23:40:27Z kreator $
 _ACEOF
   exit 0
 fi
@@ -5214,7 +5214,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/inet6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/inet6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/inet6/lib"
 			fi
 			;;
 		toshiba)
@@ -5265,7 +5266,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				
 else
   echo "$as_me: failed program was:" >&5
@@ -5323,7 +5325,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				
 else
   echo "$as_me: failed program was:" >&5
@@ -5380,7 +5383,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				
 else
   echo "$as_me: failed program was:" >&5

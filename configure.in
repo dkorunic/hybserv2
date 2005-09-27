@@ -160,7 +160,8 @@ no
 				ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/inet6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/inet6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/inet6/lib"
 			fi
 			;;
 		toshiba)
@@ -173,7 +174,8 @@ no
 				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -linet6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -linet6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				])
 			;;
 		v6d)
@@ -187,7 +189,8 @@ no
 				ac_cv_ipv6lib="v6"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				])
 			;;
 		zeta)
@@ -200,7 +203,8 @@ no
 				[ac_cv_ipv6type="$i"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LDFLAGS="$LDFLAGS -lv6 -L/usr/local/v6/lib"
+				LIBS="$LIBS -lv6"
+				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
 				])
 			;;
 		esac

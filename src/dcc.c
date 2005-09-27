@@ -33,6 +33,7 @@ static int IsAuth(struct DccUser *);
 static int RequestIdent(struct DccUser *, struct sockaddr *, socklen_t);
 static void LinkDccClient(struct DccUser *dccptr);
 static void UnlinkDccClient(struct DccUser *dccptr);
+void DCCNormalizeIP(char *, int);
 
 /*
  * Global - list of dcc/telnet connections
@@ -947,6 +948,7 @@ onctcp(char *nick, char *target, char *msg)
         }
 
       strlcpy(buff, av[3], sizeof(buff));
+      DCCNormalizeIP(buff, sizeof(buff));
 
       if (atoi(av[4]) < 1024)
         {
@@ -1975,3 +1977,25 @@ ServReboot()
 
   currenthub->connect_ts = 0;
 } /* ServReboot() */
+
+/*
+ * DCCStr2IP()
+ * This code is ugly and generally should not be used. Unfortunately,
+ * getaddrinfo() seems broken on some libc implementations so we'll use
+ * this approach for a while
+ *
+ * Thanks Alan LeVee
+ */
+void DCCNormalizeIP(char *name, int len)
+{
+  if (strchr(name, ':') == NULL)
+  {
+    unsigned long int addr;
+    struct in_addr ipaddr;
+
+    /* normal IPv4 address in 32bit number form */
+    addr = strtoul(name, NULL, 10);
+    ipaddr.s_addr = htonl(addr);
+    strlcpy(name, inet_ntoa(ipaddr), len);
+  }
+}

@@ -1,0 +1,5 @@
+Syntax: %bRECOVERPASS <nickname> <password> <password recovery phrase>%b
+
+Changes %b<nickname>%b's password to %b<password>%b if 
+%b<phrase>%b matches password recovery phrase stored in %b%N%b's
+database.

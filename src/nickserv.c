@@ -55,6 +55,7 @@ static void n_help(struct Luser *, int, char **);
 static void n_register(struct Luser *, int, char **);
 static void n_drop(struct Luser *, int, char **);
 static void n_identify(struct Luser *, int, char **);
+static void n_recoverpass(struct Luser *, int, char **);
 static void n_recover(struct Luser *, int, char **);
 static void n_release(struct Luser *, int, char **);
 static void n_ghost(struct Luser *, int, char **);
@@ -76,6 +77,7 @@ static void n_set_notify(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_signon(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_hide(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_password(struct Luser *, struct NickInfo *, int, char **);
+static void n_set_phrase(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_url(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_uin(struct Luser *, struct NickInfo *, int, char **);
@@ -119,6 +121,7 @@ static struct Command nickcmds[] =
       { "REGISTER", n_register, LVL_NONE },
       { "DROP", n_drop, LVL_NONE },
       { "IDENTIFY", n_identify, LVL_NONE },
+      { "RECOVERPASS", n_recoverpass, LVL_NONE },
       { "RECOVER", n_recover, LVL_NONE },
       { "RELEASE", n_release, LVL_NONE },
       { "GHOST", n_ghost, LVL_NONE },
@@ -177,6 +180,7 @@ static struct Command setcmds[] =
       { "SIGNON", n_set_signon, LVL_NONE },
       { "HIDE", n_set_hide, LVL_NONE },
       { "PASSWORD", n_set_password, LVL_NONE },
+      { "PHRASE", n_set_phrase, LVL_NONE },
       { "EMAIL", n_set_email, LVL_NONE },
       { "URL", n_set_url, LVL_NONE },
       { "UIN", n_set_uin, LVL_NONE },
@@ -276,7 +280,7 @@ void ns_process(const char *nick, char *command)
                  "You must register your nick with \002%s\002 first",
                  n_NickServ);
           notice(n_NickServ, lptr->nick,
-                 "Type: \002/MSG %s REGISTER <password>\002 to register your nickname",
+                 "Type: \002/MSG %s REGISTER <password> [password recovery phrase]\002 to register your nickname",
                  n_NickServ);
           MyFree(arv);
           return;
@@ -380,6 +384,20 @@ ns_loaddata()
               else
                 {
                   fatal(1, "%s:%d NickServ entry for [%s] has multiple PASS lines (using first)",
+                        NickServDB,
+                        cnt,
+                        nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+          else if (!ircncmp(keyword, "PHRASE", 6))
+            {
+              if (!nptr->phrase)
+                nptr->phrase = MyStrdup(av[1] + 1);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple PHRASE lines (using first)",
                         NickServDB,
                         cnt,
                         nptr->nick);
@@ -997,6 +1015,7 @@ DeleteNick(struct NickInfo *nickptr)
 
   MyFree(nickptr->nick);
   MyFree(nickptr->password);
+  MyFree(nickptr->phrase);
 
   while (nickptr->hosts != NULL)
   {
@@ -1940,13 +1959,13 @@ static void
 n_register(struct Luser *lptr, int ac, char **av)
 
 {
-  char *mask;
+  char *mask, *prphrase;
   struct NickInfo *nptr;
   time_t currtime;
 
   if (ac < 2)
     {
-      notice(n_NickServ, lptr->nick, "Syntax: \002REGISTER\002 <password>");
+      notice(n_NickServ, lptr->nick, "Syntax: \002REGISTER\002 <password> [password recovery phrase]");
       notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
           "REGISTER");
       return;
@@ -1974,9 +1993,28 @@ n_register(struct Luser *lptr, int ac, char **av)
   nptr = MakeNick();
   nptr->nick = MyStrdup(lptr->nick);
 
+  /* Password recovery phrase for nickname  -bane */
+  if (ac < 3)
+    prphrase = NULL;
+  else
+    prphrase = GetString(ac - 2, av + 2);
+
+  /* If prphrase is not NULL and prphrase len is < 8, return. -bane */
+  if ((prphrase != NULL) && (strlen(prphrase) < 8))
+    {
+      notice(n_NickServ, lptr->nick, "Password recovery phrase must be at least 8 characters long, register failed");
+      putlog(LOG1, "%s: failed to register with recovery phrase %s!%s@%s",
+          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+      MyFree(prphrase);
+      MyFree(nptr->nick);
+      MyFree(nptr);
+      return;
+    }
+
   if (!ChangePass(nptr, av[1]))
     {
-      notice(n_NickServ, lptr->nick, "Register failed");
+      notice(n_NickServ, lptr->nick,
+          "Register failed - can't set new password");
       putlog(LOG1, "%s: failed to register %s!%s@%s", n_NickServ,
           lptr->nick, lptr->username, lptr->hostname);
       MyFree(nptr->nick);
@@ -1984,6 +2022,8 @@ n_register(struct Luser *lptr, int ac, char **av)
       return;
     }
 
+  /* Password recovery phrase for nickname  -bane */
+  nptr->phrase = prphrase;
   nptr->created = nptr->lastseen = currtime;
 
   if (LastSeenInfo)
@@ -2035,6 +2075,12 @@ n_register(struct Luser *lptr, int ac, char **av)
   notice(n_NickServ, lptr->nick,
          "Your password is [\002%s\002] - Remember this for later use",
          av[1]);
+
+  if (ac > 2)
+    notice(n_NickServ, lptr->nick,
+           "Your password recovery phrase is [\002%s\002] - use it with RECOVERPASS if you ever forget your password",
+           prphrase);
+
 #ifdef DANCER
   /* for ircds that have +e mode -kre */
   toserv(":%s MODE %s +e\r\n", Me.name, lptr->nick);
@@ -2283,6 +2329,72 @@ n_identify(struct Luser *lptr, int ac, char **av)
   nptr->lastseen = realptr->lastseen = current_ts;
   
 } /* n_identify() */
+
+/*
+n_recoverpass()
+  Change the password for nickname av[1] to av[2] if correct
+  assword recovery phrase is entered.  -bane
+*/
+static void n_recoverpass(struct Luser *lptr, int ac, char **av)
+{
+  struct NickInfo *nptr;
+  char *prphrase;
+
+  if (ac < 4)
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002RECOVERPASS\002 <nick> <newpass> <password recovery phrase>");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+          "RECOVERPASS");
+      return;
+    }
+
+  if ((nptr = FindNick(av[1])) == NULL)
+  {
+    notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+    return;
+  }
+
+  /* Get password recovery phrase from input  -bane */
+  prphrase = GetString(ac - 3, av + 3);
+  
+  /* nick phrase == input phrase */
+  if ((nptr->phrase == NULL) || irccmp(nptr->phrase, prphrase))
+  {
+    notice(n_NickServ, lptr->nick, "Invalid password recovery phrase");
+    RecordCommand("%s: %s!%s@%s Invalid RECOVERPASS [%s] ...", n_NickServ,
+      lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+    MyFree(prphrase);
+    return;
+  }
+
+  if (!ChangePass(nptr, av[2]))
+  {
+    notice(n_NickServ, lptr->nick, "Password change failed");
+    RecordCommand("%s: Failed to change password for [%s] (RECOVERPASS)",
+      n_NickServ, av[1], av[2]);
+
+    MyFree(prphrase);
+    return;
+  }
+
+  RecordCommand("%s: %s!%s@%s RECOVERPASS [%s] ...", n_NickServ,
+      lptr->nick, lptr->username, lptr->hostname, av[1]);
+
+  /* unidentify if it is identified */
+  if (nptr->flags & NS_IDENTIFIED)
+  {
+    nptr->flags &= ~NS_IDENTIFIED;
+    CheckNick(nptr->nick);
+  }
+
+  notice(n_NickServ, lptr->nick,
+    "Password for [\002%s\002] has been recovered to [\002%s\002]",
+    av[1], av[2]);
+
+  MyFree(prphrase);
+} /* n_recoverpass() */
 
 /*
 n_recover()
@@ -3520,6 +3632,45 @@ static void n_set_password(struct Luser *lptr, struct NickInfo *nptr, int ac,
          "Password for [\002%s\002] is now [\002%s\002]",
          nptr->nick, av[3]);
 } /* n_set_password() */
+
+/* n_set_phrase()  -bane */
+static void n_set_phrase(struct Luser *lptr, struct NickInfo *nptr, int
+    ac, char **av)
+{
+  char *prphrase;
+
+  if (ac < 4)
+    {
+      notice(n_NickServ, lptr->nick,
+             "Syntax: \002SET <nickname> PHRASE <newphrase>\002");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+             "SET PHRASE");
+      return;
+    }
+
+  RecordCommand("%s: %s!%s@%s SET %s PHRASE ...",
+      n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+      nptr->nick);
+
+  /* Get password recovery phrase from input  -bane */
+  prphrase = GetString(ac - 3, av + 3);
+
+  if (strlen(prphrase) < 8)
+    {
+      notice(n_NickServ, lptr->nick,
+             "Password recovery phrase must be at least 8 characters long");
+
+      MyFree(prphrase);
+      return;
+    }
+
+  MyFree(nptr->phrase);
+  nptr->phrase = prphrase;
+
+  notice(n_NickServ, lptr->nick,
+         "Password recovery phrase for [\002%s\002] is now [\002%s\002]",
+         nptr->nick, prphrase);
+} /* n_set_phrase() */
 
 static void n_set_email(struct Luser *lptr, struct NickInfo *nptr, int ac, char
     **av)

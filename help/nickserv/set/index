@@ -14,6 +14,7 @@ settings should be applied to %bmaster%b nickname.
     NOTIFY     Turn notification of new memos on/off
     PASSWORD   Reset your nickname password
     PHONE      Set the phone for this user
+    PHRASE     Set password recovery phrase used with %bRECOVERPASS%b
     PRIVATE    Hide nickname information from %bLIST%bs
     PRIVMSG    Services will either privmsg or notice you
     SECURE     Turn nickname security on or off

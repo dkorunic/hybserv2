@@ -78,6 +78,7 @@ struct NickInfo
   struct NickInfo *next, *prev;
   char *nick;                /* registered nickname */
   char *password;            /* password */
+  char *phrase;              /* password recovery phrase */
   struct NickHost *hosts;    /* recognized hosts for this nick */
   time_t created;            /* timestamp when it was registered */
   time_t lastseen;           /* for expiration purposes */

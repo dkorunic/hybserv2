@@ -1,0 +1,9 @@
+Syntax: %bSET <nickname> PHRASE <password recovery phrase>%b
+
+This changes your current password recovery phrase to 
+%b<phrase>%b.  Password recovery phrase is used with
+%bRECOVERPASS%b, if you forget your nickname password.
+
+Examples:
+         %b/msg %N SET nick PHRASE this is me%b
+           Sets your PHRASE to "this is me".

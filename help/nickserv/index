@@ -6,18 +6,19 @@ nicknames; to use them, type %b/msg %N <command>%b.
 For more information on a specific command, type
 %b/msg %N help <command>%b.
 
-    ACCESS     Modify the list of authorized addresses
-    DROP       Cancel the registration of a nickname
-    GHOST      Kill a ghosted nickname
-    IDENTIFY   Identify yourself with your password
-    INFO       Get information for a nickname
-    LINK       Link your nickname to another
-    LIST       Display list of nicks matching a pattern
-    RECOVER    Kill another user who has taken your nick
-    REGISTER   Register a nickname
-    RELEASE    Regain custody of your nick after %bRECOVER%b
-    SET        Set various options for your nickname
-    UNLINK     UnLink your nickname
+    ACCESS       Modify the list of authorized addresses
+    DROP         Cancel the registration of a nickname
+    GHOST        Kill a ghosted nickname
+    IDENTIFY     Identify yourself with your password
+    INFO         Get information for a nickname
+    LINK         Link your nickname to another
+    LIST         Display list of nicks matching a pattern
+    RECOVER      Kill another user who has taken your nick
+    RECOVERPASS  Recover your password
+    REGISTER     Register a nickname
+    RELEASE      Regain custody of your nick after %bRECOVER%b
+    SET          Set various options for your nickname
+    UNLINK       UnLink your nickname
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b

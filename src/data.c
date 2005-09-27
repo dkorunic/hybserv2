@@ -698,6 +698,9 @@ WriteNicks()
           if (nptr->password)
             fprintf(fp, "->PASS %s\n", nptr->password);
 
+          if (nptr->phrase)
+            fprintf(fp, "->PHRASE :%s\n", nptr->phrase);
+
           if (nptr->forbidby)
             fprintf(fp, "->FORBIDBY %s\n", nptr->forbidby);
 

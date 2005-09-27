@@ -3472,7 +3472,7 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
       nptr->flags |= flag;
       notice(n_NickServ, lptr->nick,
              "%s for [\002%s\002] is now [\002ON\002]",
-             nptr->nick, str);
+             str, nptr->nick);
       return;
     }
 
@@ -3481,7 +3481,7 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
       nptr->flags &= ~flag;
       notice(n_NickServ, lptr->nick,
              "%s for [\002%s\002] is now [\002OFF\002]",
-             nptr->nick, str);
+             str, nptr->nick);
       return;
     }
 

@@ -44,6 +44,46 @@ AC_C_CONST
 AC_SYS_LARGEFILE
 AC_C_BIGENDIAN
 
+dnl Check for more detailed compiler info
+if test "x$ac_cv_c_compiler_gnu" != "xyes"; then
+	AC_MSG_CHECKING([$CC -version for TenDRA or MIPSpro cc])
+	case `$CC -version 2>&1` in
+		*TenDRA*)
+			AC_MSG_RESULT([TenDRA cc])
+			CPPFLAGS="$CPPFLAGS -Ylonglong -Yansi -Ysystem"
+			ac_cv_c_compiler="TenDRA"
+			;;
+		*MIPSpro*)
+			AC_MSG_RESULT([MIPSpro cc])
+			ac_cv_c_compiler="MIPSpro"
+			;;
+		*)
+			AC_MSG_RESULT(no)
+			;;
+	esac
+	
+	AC_MSG_CHECKING([$CC -V for Sun Workshop, Forte, HPUX or Tru64 cc])
+	case `$CC -V 2>&1` in
+		*Sun*WorkShop* | *Forte*Developer* | *Sun*C*)
+			AC_MSG_RESULT([Sun Workshop/Forte])
+			ac_cv_c_compiler="SunWorkShop"
+			;;
+		*Tru64*)
+			AC_MSG_RESULT([Tru64 cc])
+			CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+			ac_cv_c_compiler="Tru64"
+			;;
+		*HP*ANSI*)
+			AC_MSG_RESULT(HPUX cc)
+			CFLAGS="$CFLAGS +e"
+			ac_cv_c_compiler="HPUX"
+			;;
+		*)
+			AC_MSG_RESULT(no)
+			;;
+	esac
+fi
+
 dnl Checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
@@ -60,6 +100,9 @@ AC_MSG_CHECKING([how to generate dependency info])
 if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
 	AC_MSG_RESULT(gcc -MM)
 	MKDEP="$CC -MM"
+elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
+	AC_MSG_RESULT($CC -xM)
+	MKDEP="$CC -xM"
 elif test ! -z "$MKDEP"; then
 	AC_MSG_RESULT(mkdep)
 elif test ! -z "$MAKEDEPEND"; then
@@ -398,6 +441,7 @@ Compiler suite:
 	Preprocessor flags ... ${CPPFLAGS}
 	Linker flags ......... ${LDFLAGS}
 	Libraries to link .... ${LIBS}
+	Dependancy tool ...... ${MKDEP}
 Compile configuration:
 	Configured network ... ${ac_cv_network}
 	Nick length .......... ${ac_cv_nicklen}

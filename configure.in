@@ -232,6 +232,24 @@ AC_CHECK_FUNCS(getaddrinfo, , [AC_LIBOBJ(getaddrinfo)])
 AC_CHECK_FUNCS(inet_ntop, , [AC_LIBOBJ(inet_ntop)])
 AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
 
+dnl Check if getaddr info is broken for 32bit IPv4 integer notation
+AC_MSG_CHECKING([is getaddrinfo broken for integer notation])
+AC_RUN_IFELSE([AC_LANG_PROGRAM(
+[[#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+int main()
+{
+	char name[] = "2130706433";
+	struct addrinfo *res = NULL;
+	return getaddrinfo(name, NULL, NULL, &res);
+}
+]])],
+	[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_BROKEN_INT_GETADDRINFO, 1,
+		[Define to 1 if you have broken getaddrinfo for integer notation])],
+	[AC_MSG_RESULT(no)])
+
 dnl Try libefence support
 AC_MSG_CHECKING([compile with electricfence library])
 AC_ARG_ENABLE(efence,

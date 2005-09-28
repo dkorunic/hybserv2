@@ -15,6 +15,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
+/* Define to 1 if you have broken getaddrinfo for integer notation */
+#undef HAVE_BROKEN_INT_GETADDRINFO
+
 /* Define to 1 if you have Cygwin environment */
 #undef HAVE_CYGWIN
 

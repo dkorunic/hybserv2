@@ -33,7 +33,9 @@ static int IsAuth(struct DccUser *);
 static int RequestIdent(struct DccUser *, struct sockaddr *, socklen_t);
 static void LinkDccClient(struct DccUser *dccptr);
 static void UnlinkDccClient(struct DccUser *dccptr);
+#ifdef HAVE_BROKEN_INT_GETADDRINFO
 void DCCNormalizeIP(char *, int);
+#endif
 
 /*
  * Global - list of dcc/telnet connections
@@ -948,7 +950,9 @@ onctcp(char *nick, char *target, char *msg)
         }
 
       strlcpy(buff, av[3], sizeof(buff));
+#ifdef HAVE_BROKEN_INT_GETADDRINFO
       DCCNormalizeIP(buff, sizeof(buff));
+#endif
 
       if (atoi(av[4]) < 1024)
         {
@@ -1986,6 +1990,7 @@ ServReboot()
  *
  * Thanks Alan LeVee
  */
+#ifdef HAVE_BROKEN_INT_GETADDRINFO
 void DCCNormalizeIP(char *name, int len)
 {
   if (strchr(name, ':') == NULL)
@@ -1999,3 +2004,4 @@ void DCCNormalizeIP(char *name, int len)
     strlcpy(name, inet_ntoa(ipaddr), len);
   }
 }
+#endif

@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1303 2005-09-28 10:27:07Z kreator $
+@%:@ $Id: configure.in 1304 2005-09-28 10:31:15Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1303 2005-09-28 10:27:07Z kreator $
+$Id: configure.in 1304 2005-09-28 10:31:15Z kreator $
 _ACEOF
   exit 0
 fi
@@ -3648,8 +3648,8 @@ fi
 echo "$as_me:$LINENO: checking how to generate dependency info" >&5
 echo $ECHO_N "checking how to generate dependency info... $ECHO_C" >&6
 if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
-	echo "$as_me:$LINENO: result: gcc -MM" >&5
-echo "${ECHO_T}gcc -MM" >&6
+	echo "$as_me:$LINENO: result: $CC -MM" >&5
+echo "${ECHO_T}$CC -MM" >&6
 	MKDEP="$CC -MM"
 elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
 	echo "$as_me:$LINENO: result: $CC -xM" >&5

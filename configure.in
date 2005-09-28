@@ -98,7 +98,7 @@ AC_PATH_PROG(MKDEP, mkdep)
 AC_PATH_PROG(MAKEDEPEND, makedepend)
 AC_MSG_CHECKING([how to generate dependency info])
 if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
-	AC_MSG_RESULT(gcc -MM)
+	AC_MSG_RESULT($CC -MM)
 	MKDEP="$CC -MM"
 elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
 	AC_MSG_RESULT($CC -xM)

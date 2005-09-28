@@ -3648,8 +3648,8 @@ fi
 echo "$as_me:$LINENO: checking how to generate dependency info" >&5
 echo $ECHO_N "checking how to generate dependency info... $ECHO_C" >&6
 if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
-	echo "$as_me:$LINENO: result: gcc -MM" >&5
-echo "${ECHO_T}gcc -MM" >&6
+	echo "$as_me:$LINENO: result: $CC -MM" >&5
+echo "${ECHO_T}$CC -MM" >&6
 	MKDEP="$CC -MM"
 elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
 	echo "$as_me:$LINENO: result: $CC -xM" >&5

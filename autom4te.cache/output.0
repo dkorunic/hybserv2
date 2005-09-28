@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1302 2005-09-28 00:09:12Z kreator $
+@%:@ $Id: configure.in 1303 2005-09-28 10:27:07Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1302 2005-09-28 00:09:12Z kreator $
+$Id: configure.in 1303 2005-09-28 10:27:07Z kreator $
 _ACEOF
   exit 0
 fi
@@ -8291,3 +8291,4 @@ Extra configurations:
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"
+

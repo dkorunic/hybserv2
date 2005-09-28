@@ -1,3 +1,9 @@
+Hybserv-HEAD: Wed, 28 Sep 2005 12:27:35 +0200
+
+  * add password recovery and recover phrase into NickServ [thanks bane!]
+  * fixes for broken getaddrinfo() on some glibc2 platforms [thanks knight
+    and adx]
+
 Hybserv-1.9.1: Mon, 26 Sep 2005 14:44:49 +0200
 
   * stage it to REL_1_9_1

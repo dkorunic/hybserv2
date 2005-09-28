@@ -454,3 +454,5 @@ Extra configurations:
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"
+
+dnl vim: ts=4:noet

@@ -142,4 +142,4 @@ etags:
 	etags include/*.h src/*.c
 
 # End of Makefile
-# vim: set noexpandtab
+# vim: ts=4:noet

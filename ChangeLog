@@ -1,83 +1,91 @@
-Hybserv-HEAD: Wed, 28 Sep 2005 12:27:35 +0200
+$Id$
 
-  * add password recovery and recover phrase into NickServ [thanks bane!]
-  * fixes for broken getaddrinfo() on some glibc2 platforms [thanks knight
+  + = Added a feature
+  - = Fixed a bug
+  * = Changed something
+  ^ = Other
+
+Hybserv-HEAD
+
+  ^ new logging scheme applied
+  + add password recovery and recover phrase into NickServ [thanks bane!]
+  - fixes for broken getaddrinfo() on some glibc2 platforms [thanks knight
     and adx]
 
-Hybserv-1.9.1: Mon, 26 Sep 2005 14:44:49 +0200
+Hybserv-1.9.1
 
-  * stage it to REL_1_9_1
-  * Substitute now works for dcc motd and server [logon] motd
+  ^ stage it to REL_1_9_1
+  + Substitute now works for dcc motd and server [logon] motd
   * rewrote Substitute code
   * rewrote core string/array handling functions SplitBuf() and
     GetString()
-  * add basic IPv6 support and getaddrinfo/getnameinfo stuff
-  * add configurable FORCENICK/SVSNICK prefix
-  * strlcat/strlcpy merge, lot of memory stuff fixes, better internal
+  + add basic IPv6 support and getaddrinfo/getnameinfo stuff
+  + add configurable FORCENICK/SVSNICK prefix
+  + strlcat/strlcpy merge, lot of memory stuff fixes, better internal
     spill control, less malloc/realloc stuff, less useless memsets
-  * fix excessive writesock usage, fix several DCC-related issues
-  * greplog fixes
-  * fixes for NickServ's set EXPIRE
+  - fix excessive writesock usage, fix several DCC-related issues
+  - greplog fixes
+  - fixes for NickServ's set EXPIRE
   * rewrote n_set* group of functions to allow SET <nickname> PARAM
     [flags] for any nickname linked with sender nickame and for admins to be
     able to change settings for users, if EMPOWERADMINMORE
-  * add MinChanUsers, which allows administrator to set minimum channel
+  + add MinChanUsers, which allows administrator to set minimum channel
     users requirement for channel registration
-  * fix reload coring services
+  - fix reload coring services
   * new channels registered by opers are not NOEXPIRE by default
-  * implement options for ChanServ LIST
-  * add reason informations for nick and channel forbid [can be seen with
+  + implement options for ChanServ LIST
+  + add reason informations for nick and channel forbid [can be seen with
     info commands]
-  * fix smaller leak in DeleteChan
-  * fix forbidden channels dissapearing after save
-  * add --enable-efence support
-  * add --with-network, possible targets are idolnet, balcannet, hybrid,
+  - fix smaller leak in DeleteChan
+  - fix forbidden channels dissapearing after save
+  + add --enable-efence support
+  + add --with-network, possible targets are idolnet, balcannet, hybrid,
     hybrid7, dancer
-  * fix a dozen of format string vulnerabilities [thanks Ales Tokic for
+  - fix a dozen of format string vulnerabilities [thanks Ales Tokic for
     notice]
-  * import newer match.c, which has '#' wildcard [thanks Ales Tokic for
+  + import newer match.c, which has '#' wildcard [thanks Ales Tokic for
     notice]
-  * add --enable-asserts, --enable-gimmecore and --enable-daemontools
-  * add --enable-warnings, --with-nicklen, --with-chanellen and
+  + add --enable-asserts, --enable-gimmecore and --enable-daemontools
+  + add --enable-warnings, --with-nicklen, --with-chanellen and
     --with-topiclen
-  * several Solaris fuckups fixed
-  * fix for invalid link count [fix from sofit]
-  * fix for autovoice/autoop for operserv admins, problem with
+  - several Solaris fuckups fixed
+  - fix for invalid link count [fix from sofit]
+  - fix for autovoice/autoop for operserv admins, problem with
     EMPOWERADMINS_MORE [fix from sofit]
   * global code and style cleanups
   * massive rewrite of includes and better detection of system
     headers/functions
-  * fix trace to show channels when using -long parameters
+  - fix trace to show channels when using -long parameters
   * Makefile and configure script changes
   * totally rip out mode +a support, since there is no anonops in recent
     Hybrid7
-  * move autoconf stuff from autoconf/ to root .
+  ^ move autoconf stuff from autoconf/ to root .
   * halfops support is now under #define HYBRID7_HALFOPS
-  * fix cs_invite() not to invite if channel isn't +i
-  * fix SJOIN event to remove invite and ban exceptions properly, dump old
+  - fix cs_invite() not to invite if channel isn't +i
+  - fix SJOIN event to remove invite and ban exceptions properly, dump old
     data as required
   * rip off TakeOver() and rewrite o_secure() - idea is to use as much as
     possible of already written ChanServ code; new code will autoop Admins
     only if AutoOpAdmins is set.. and will do stuff is should have been
     doing already [but it didn't]
-  * since I've migrated to Subversion, we've lost automatic ChangeLog, so
+  ^ since I've migrated to Subversion, we've lost automatic ChangeLog, so
     I'll be manually writing the changes every now and then
   * fix ghost to use instant collide, instead of KILL
   * don't allow ghosting self
   * don't allow op all if NOCHANOPS
-  * fix clearnoexp, add pattern matching
+  - fix clearnoexp, add pattern matching
   * updates for NickServ's list command:
-    * implement matching flags
-    * remove display limits
-    * update documentation
+    + implement matching flags
+    + remove display limits
+    ^ update documentation
   * rip off unseen - it was buggy and ugly anyway, and I'm not fond of
     repairing the broken code
   * regularly part channels which ChanServ shouldn't be on
-  * code FORCENICK_LEN
+  + code FORCENICK_LEN
   * when manually adding nicknames to collision list, notify them with
     proper messaging
-  * add FORCENICK
-  * add SVSNICK
+  + add FORCENICK
+  + add SVSNICK
   * update config.h defaults to Hybrid7 [yay, at last!]
 
  -- Dinko Korunic <dinko|korunic|AT|gmail|com>

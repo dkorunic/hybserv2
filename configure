@@ -3655,10 +3655,10 @@ elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
 	echo "$as_me:$LINENO: result: $CC -xM" >&5
 echo "${ECHO_T}$CC -xM" >&6
 	MKDEP="$CC -xM"
-elif test ! -z "$MKDEP"; then
+elif test "x$MKDEP" != "x"; then
 	echo "$as_me:$LINENO: result: mkdep" >&5
 echo "${ECHO_T}mkdep" >&6
-elif test ! -z "$MAKEDEPEND"; then
+elif test "x$MAKEDEPEND" != "x"; then
 	echo "$as_me:$LINENO: result: makedepend" >&5
 echo "${ECHO_T}makedepend" >&6
 	MKDEP="$MAKEDEPEND -f-"

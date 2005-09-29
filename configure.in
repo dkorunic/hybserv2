@@ -103,9 +103,9 @@ if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
 elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
 	AC_MSG_RESULT($CC -xM)
 	MKDEP="$CC -xM"
-elif test ! -z "$MKDEP"; then
+elif test "x$MKDEP" != "x"; then
 	AC_MSG_RESULT(mkdep)
-elif test ! -z "$MAKEDEPEND"; then
+elif test "x$MAKEDEPEND" != "x"; then
 	AC_MSG_RESULT(makedepend)
 	MKDEP="$MAKEDEPEND -f-"
 else

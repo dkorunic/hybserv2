@@ -265,6 +265,7 @@ AC_CHECK_FUNCS([select strchr memcpy gettimeofday])
 AC_SEARCH_LIBS(socket, socket, ,
 	[AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
+AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(inet_ntoa, resolv)
 AC_SEARCH_LIBS(inet_ntop, resolv)
 AC_SEARCH_LIBS(inet_pton, resolv)

@@ -90,6 +90,10 @@ char *strchr(), *strrchr();
 # include <errno.h>
 #endif
 
+#if defined HAVE_LIMITS_H
+# include <limits.h>
+#endif
+
 #if defined HAVE_LIBDMALLOC
 # include <dmalloc.h>
 #endif
@@ -162,12 +166,30 @@ struct sockaddr_storage {
 # define HAVE_SOCKADDR_STORAGE
 #endif
 
+#if !defined HAVE_GETADDRINFO
+int getaddrinfo(const char *, const char *, const struct addrinfo *,
+    struct addrinfo **);
+#endif
+
+#if !defined HAVE_GETNAMEINFO
+int getnameinfo(const struct sockaddr *, socklen_t, char *,
+    size_t, char *, size_t, int);
+#endif
+
+#if !defined HAVE_INET_NTOA
+char *inet_ntoa(struct in_addr);
+#endif
+
 #if !defined HAVE_INET_NTOP
-const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+const char *inet_ntop(int, const void *, char *, size_t);
 #endif
 
 #if !defined HAVE_INET_PTON
-int inet_pton(int af, const char *src, void *dst);
+int inet_pton(int, const char *, void *);
+#endif
+
+#if !defined HAVE_STRTOUL
+unsigned long int strtoul(const char *, char **, int);
 #endif
 
 #endif /* INCLUDED_stdinc_h */

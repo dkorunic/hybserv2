@@ -123,8 +123,8 @@ AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
-	arpa/inet.h sys/socket.h netinet/in.h netinet/tcp.h \
-	sys/resource.h sys/signal.h])
+	limits.h arpa/inet.h netinet/in.h netinet/tcp.h \
+	sys/socket.h sys/resource.h sys/signal.h])
 
 dnl Checks for additional types and headers
 AC_CHECK_TYPE(socklen_t, ,
@@ -265,18 +265,21 @@ fi
 
 dnl Checks for library functions
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([select strchr memcpy strdup strerror \
-	gettimeofday strlcat strlcpy inet_ntoa])
+AC_CHECK_FUNCS([select strchr memcpy strdup strerror gettimeofday])
 AC_SEARCH_LIBS(socket, socket, ,
 	[AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
+AC_SEARCH_LIBS(inet_ntoa, resolv)
 AC_SEARCH_LIBS(inet_ntop, resolv)
 AC_SEARCH_LIBS(inet_pton, resolv)
 AC_CHECK_FUNCS(getnameinfo, , [AC_LIBOBJ(getnameinfo)])
 AC_CHECK_FUNCS(getaddrinfo, , [AC_LIBOBJ(getaddrinfo)])
+AC_CHECK_FUNCS(inet_ntoa, , [AC_LIBOBJ(inet_ntoa)])
 AC_CHECK_FUNCS(inet_ntop, , [AC_LIBOBJ(inet_ntop)])
 AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
 AC_CHECK_FUNCS(strtoul, , [AC_LIBOBJ(strtoul)])
+AC_CHECK_FUNCS(strlcat, , [AC_LIBOBJ(strlcat)])
+AC_CHECK_FUNCS(strlcpy, , [AC_LIBOBJ(strlcpy)])
 
 dnl Check if getaddr info is broken for 32bit IPv4 integer notation
 AC_MSG_CHECKING([is getaddrinfo broken for integer notation])

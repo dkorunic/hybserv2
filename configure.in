@@ -274,6 +274,7 @@ AC_CHECK_FUNCS(getnameinfo, , [AC_LIBOBJ(getnameinfo)])
 AC_CHECK_FUNCS(getaddrinfo, , [AC_LIBOBJ(getaddrinfo)])
 AC_CHECK_FUNCS(inet_ntop, , [AC_LIBOBJ(inet_ntop)])
 AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
+AC_CHECK_FUNCS(strtoulx, , [AC_LIBOBJ(strtoul)])
 
 dnl Check if getaddr info is broken for 32bit IPv4 integer notation
 AC_MSG_CHECKING([is getaddrinfo broken for integer notation])
@@ -426,7 +427,7 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_OUTPUT(Makefile src/Makefile tools/Makefile \
+AC_OUTPUT(Makefile lib/Makefile src/Makefile tools/Makefile \
 	bin/settings.conf bin/cleandb include/config.h)
 
 echo "

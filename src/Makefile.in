@@ -6,12 +6,15 @@ CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-IDIR = ../include
-INCLUDE = -I. -I$(IDIR) $(CPPFLAGS)
+INCLUDEDIR = ../include
+COMPATDIR = ../lib
+INCLUDE = -I. -I$(INCLUDEDIR) -I$(COMPATDIR) $(CPPFLAGS)
 DEFS =
-LIBS = @LIBS@
+LIBS = @LIBS@ -L$(COMPATDIR)
 MKDEP = @MKDEP@
 RM = @RM@ -f
+
+# Sources, etc.
 
 DEPENDFILE = .depend
 
@@ -51,7 +54,9 @@ SOURCES =                  \
   version.c                \
   sprintf_irc.c
 
-OBJECTS = ${SOURCES:.c=.o} @LIBOBJS@
+LIBOBJS = @LIBOBJS@
+
+OBJECTS = ${SOURCES:.c=.o}
 
 # Binaries
 
@@ -60,7 +65,7 @@ HYBSERV = ../bin/hybserv
 all: $(HYBSERV)
 
 $(HYBSERV): $(OBJECTS) $(LIBDEPS)
-	$(CC) -o $(HYBSERV) $(OBJECTS) $(LDFLAGS) $(LIBS)
+	$(CC) -o $(HYBSERV) $(OBJECTS) $(LIBOBJS) $(LDFLAGS) $(LIBS)
 
 depend:
 	$(MKDEP) $(INCLUDE) $(SOURCES) > $(DEPENDFILE)

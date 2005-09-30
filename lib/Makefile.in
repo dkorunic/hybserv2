@@ -1,0 +1,42 @@
+# Hybserv ./lib Makefile
+# $Id: Makefile.in 1305 2005-09-28 10:32:31Z kreator $
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+INCLUDEDIR = ../include
+COMPATDIR = ../lib
+INCLUDE = -I. -I$(INCLUDEDIR) -I$(COMPATDIR) $(CPPFLAGS)
+DEFS =
+LIBS = @LIBS@
+MKDEP = @MKDEP@
+RM = @RM@ -f
+
+# Sources, etc.
+
+LIBOBJS = @LIBOBJS@
+
+OBJECTS = $(LIBOBJS)
+
+# Binaries
+
+all: $(LIBOBJS)
+
+clean:
+	$(RM) $(OBJECTS)
+
+distclean: clean
+	$(RM) Makefile
+
+install:
+	@echo "Run make install from top directory!"
+
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(INCLUDE) $(CFLAGS) -c $<
+
+# End of lib/Makefile
+# vim: ts=4:noet

@@ -3514,7 +3514,7 @@ do
 done
 done
 
-  test -z "$ac_cv_prog_ac_ct_AR" && ac_cv_prog_ac_ct_AR="ar"
+  test -z "$ac_cv_prog_ac_ct_AR" && ac_cv_prog_ac_ct_AR="':'"
 fi
 fi
 ac_ct_AR=$ac_cv_prog_ac_ct_AR

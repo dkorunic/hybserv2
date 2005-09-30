@@ -28,8 +28,8 @@ CPR = @CP@ -R
 LN = @LN@ -sf
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-INSTALL_BIN = ${INSTALL} -m 755
-INSTALL_SECURE = ${INSTALL} -m 600
+INSTALL_BIN = $(INSTALL) -m 755
+INSTALL_SECURE = $(INSTALL) -m 600
 
 # Executable programs
 BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
@@ -49,7 +49,7 @@ all: depend src tools
 	@for i in $(SUBDIRS); do \
 		echo "*** Building $$i ***"; \
 		cd $$i; \
-		${MAKE} "VERSION=$(VERSION)"; \
+		$(MAKE) "VERSION=$(VERSION)"; \
 		cd ..; \
 		echo; \
 	done
@@ -61,7 +61,7 @@ clean:
 	@for i in $(SUBDIRS); do \
 		echo "*** Cleaning $$i ***"; \
 		cd $$i; \
-		${MAKE} clean; \
+		$(MAKE) clean; \
 		cd ..; \
 		echo; \
 	done

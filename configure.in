@@ -88,7 +88,7 @@ dnl Checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_CHECK_TOOL(RANLIB, ranlib, ':')
-AC_CHECK_TOOL(AR, ar, ar)
+AC_CHECK_TOOL(AR, ar, ':')
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(MV, mv)

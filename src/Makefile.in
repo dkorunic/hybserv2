@@ -7,12 +7,13 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+COMPATDIR = ../compat
 LDFLAGS = @LDFLAGS@ -L$(COMPATDIR)
 INCLUDEDIR = ../include
-COMPATDIR = ../compat
 INCLUDE = -I. -I$(INCLUDEDIR) $(CPPFLAGS)
 DEFS =
-LIBS = @LIBS@ -lmycompat
+LIBS = @LIBS@
+COMPATLIB = -lmycompat
 MKDEP = @MKDEP@
 RM = @RM@ -f
 
@@ -57,6 +58,9 @@ SOURCES =                  \
   sprintf_irc.c
 
 LIBOBJS = @LIBOBJS@
+ifdef LIBOBJS
+	LIBS = @LIBS@ $(COMPATLIB)
+endif
 
 OBJECTS = ${SOURCES:.c=$U.o}
 

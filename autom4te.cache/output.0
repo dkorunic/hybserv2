@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1316 2005-09-30 13:20:07Z kreator $
+@%:@ $Id: configure.in 1317 2005-09-30 13:54:10Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1316 2005-09-30 13:20:07Z kreator $
+$Id: configure.in 1317 2005-09-30 13:54:10Z kreator $
 _ACEOF
   exit 0
 fi
@@ -3514,7 +3514,7 @@ do
 done
 done
 
-  test -z "$ac_cv_prog_ac_ct_AR" && ac_cv_prog_ac_ct_AR="ar"
+  test -z "$ac_cv_prog_ac_ct_AR" && ac_cv_prog_ac_ct_AR="':'"
 fi
 fi
 ac_ct_AR=$ac_cv_prog_ac_ct_AR

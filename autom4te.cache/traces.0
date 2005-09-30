@@ -322,7 +322,7 @@ m4trace:configure.in:414: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable c
 m4trace:configure.in:425: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
 m4trace:configure.in:425: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 #undef DAEMONTOOLS])
-m4trace:configure.in:431: -1- AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:431: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
 	bin/settings.conf bin/cleandb include/config.h])
 m4trace:configure.in:431: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])

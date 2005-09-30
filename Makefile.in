@@ -42,7 +42,7 @@ CONFFILES = motd.dcc motd.global
 HPATHFIX = settings.conf
 
 # Subdirs for make
-SUBDIRS = lib src tools
+SUBDIRS = compat src tools
 
 # Rest of standard Makefile
 all: depend src tools

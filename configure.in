@@ -427,7 +427,7 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_OUTPUT(Makefile lib/Makefile src/Makefile tools/Makefile \
+AC_OUTPUT(Makefile compat/Makefile src/Makefile tools/Makefile \
 	bin/settings.conf bin/cleandb include/config.h)
 
 echo "

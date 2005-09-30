@@ -1,4 +1,4 @@
-# Hybserv ./lib Makefile
+# Hybserv ./compat Makefile
 # $Id: Makefile.in 1305 2005-09-28 10:32:31Z kreator $
 
 CC = @CC@
@@ -7,7 +7,7 @@ CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDEDIR = ../include
-COMPATDIR = ../lib
+COMPATDIR = ../compat
 INCLUDE = -I. -I$(INCLUDEDIR) -I$(COMPATDIR) $(CPPFLAGS)
 DEFS =
 LIBS = @LIBS@
@@ -38,5 +38,5 @@ install:
 .c.o:
 	$(CC) $(INCLUDE) $(CFLAGS) -c $<
 
-# End of lib/Makefile
+# End of compat/Makefile
 # vim: ts=4:noet

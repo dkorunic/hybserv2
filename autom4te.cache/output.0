@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1307 2005-09-29 10:36:26Z kreator $
+@%:@ $Id: configure.in 1309 2005-09-30 09:09:09Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1307 2005-09-29 10:36:26Z kreator $
+$Id: configure.in 1309 2005-09-30 09:09:09Z kreator $
 _ACEOF
   exit 0
 fi
@@ -7235,7 +7235,7 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-                                                                      ac_config_files="$ac_config_files Makefile lib/Makefile src/Makefile tools/Makefile bin/settings.conf bin/cleandb include/config.h"
+                                                                      ac_config_files="$ac_config_files Makefile compat/Makefile src/Makefile tools/Makefile bin/settings.conf bin/cleandb include/config.h"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7762,7 +7762,7 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-  "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+  "compat/Makefile" ) CONFIG_FILES="$CONFIG_FILES compat/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "tools/Makefile" ) CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
   "bin/settings.conf" ) CONFIG_FILES="$CONFIG_FILES bin/settings.conf" ;;

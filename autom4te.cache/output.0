@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1314 2005-09-30 11:29:19Z kreator $
+@%:@ $Id: configure.in 1315 2005-09-30 13:13:59Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1314 2005-09-30 11:29:19Z kreator $
+$Id: configure.in 1315 2005-09-30 13:13:59Z kreator $
 _ACEOF
   exit 0
 fi
@@ -5230,11 +5230,9 @@ echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 
-ac_cv_ipv6type=unknown
-ac_cv_ipv6lib=none
-
 echo "$as_me:$LINENO: checking compile with ipv6 support" >&5
 echo $ECHO_N "checking compile with ipv6 support... $ECHO_C" >&6
+ac_cv_ipv6type=unknown
 # Check whether --enable-ipv6 or --disable-ipv6 was given.
 if test "${enable_ipv6+set}" = set; then
   enableval="$enable_ipv6"
@@ -5531,7 +5529,6 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				ac_cv_ipv6lib="v6"
 				
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1

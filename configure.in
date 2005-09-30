@@ -148,12 +148,9 @@ struct sockaddr_storage x;
 		[Define to 1 if you have struct sockaddr_storage])],
 	[AC_MSG_RESULT(no)])
 
-dnl IPv6 defines
-ac_cv_ipv6type=unknown
-ac_cv_ipv6lib=none
-
 dnl And check if we have IPv6 libraries
 AC_MSG_CHECKING([compile with ipv6 support])
+ac_cv_ipv6type=unknown
 AC_ARG_ENABLE(ipv6,
 	[  --disable-ipv6					 Disable IPv6 support [[default=no]]],
 	[cf_enable_ipv6=$enableval],
@@ -231,7 +228,6 @@ no
 #endif
 ]])],
 				[ac_cv_ipv6type="$i"
-				ac_cv_ipv6lib="v6"
 				AC_DEFINE(INET6, 1, [Define to 1 if you have IPv6])
 				CFLAGS="$CFLAGS -I/usr/local/v6/include"
 				LIBS="$LIBS -lv6"

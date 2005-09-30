@@ -1,6 +1,8 @@
 # Hybserv ./src Makefile
 # $Id$
 
+
+# Compiler environment and flags
 AR = @AR@
 RANLIB = @RANLIB@
 CC = @CC@
@@ -17,10 +19,9 @@ COMPATLIB = -lmycompat
 MKDEP = @MKDEP@
 RM = @RM@ -f
 
-# Sources, etc.
 
+# Sources, objects, etc.
 DEPENDFILE = .depend
-
 SOURCES =                  \
   alloc.c                  \
   channel.c                \
@@ -64,10 +65,12 @@ endif
 
 OBJECTS = ${SOURCES:.c=$U.o}
 
-# Binaries
 
+# Binaries
 HYBSERV = ../bin/hybserv
 
+
+# Targets and rest of the stuff
 all: $(HYBSERV)
 
 $(HYBSERV): $(OBJECTS)

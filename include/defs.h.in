@@ -118,8 +118,8 @@
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
 
-/* Define to 1 if you have the `strtoulx' function. */
-#undef HAVE_STRTOULX
+/* Define to 1 if you have the `strtoul' function. */
+#undef HAVE_STRTOUL
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */

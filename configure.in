@@ -87,6 +87,8 @@ fi
 dnl Checks for programs
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_CHECK_TOOL(RANLIB, ranlib, ':')
+AC_CHECK_TOOL(AR, ar, ar)
 AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(MV, mv)
@@ -274,7 +276,7 @@ AC_CHECK_FUNCS(getnameinfo, , [AC_LIBOBJ(getnameinfo)])
 AC_CHECK_FUNCS(getaddrinfo, , [AC_LIBOBJ(getaddrinfo)])
 AC_CHECK_FUNCS(inet_ntop, , [AC_LIBOBJ(inet_ntop)])
 AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
-AC_CHECK_FUNCS(strtoulx, , [AC_LIBOBJ(strtoul)])
+AC_CHECK_FUNCS(strtoul, , [AC_LIBOBJ(strtoul)])
 
 dnl Check if getaddr info is broken for 32bit IPv4 integer notation
 AC_MSG_CHECKING([is getaddrinfo broken for integer notation])

@@ -1,6 +1,8 @@
 # Hybserv ./tools Makefile
 # $Id$
 
+AR = @AR@
+RANLIB = @RANLIB@
 CC = @CC@
 CFLAGS = @CFLAGS@
 CPP = @CPP@

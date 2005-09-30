@@ -1,6 +1,9 @@
 # Hybserv ./compat Makefile
 # $Id: Makefile.in 1305 2005-09-28 10:32:31Z kreator $
 
+AR = @AR@
+ARFLAGS = ru
+RANLIB = @RANLIB@
 CC = @CC@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -8,7 +11,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 INCLUDEDIR = ../include
 COMPATDIR = ../compat
-INCLUDE = -I. -I$(INCLUDEDIR) -I$(COMPATDIR) $(CPPFLAGS)
+INCLUDE = -I. -I$(INCLUDEDIR) $(CPPFLAGS)
 DEFS =
 LIBS = @LIBS@
 MKDEP = @MKDEP@
@@ -22,10 +25,16 @@ OBJECTS = $(LIBOBJS)
 
 # Binaries
 
-all: $(LIBOBJS)
+LIBCOMPAT = libmycompat.a
+
+all: $(LIBCOMPAT)
+
+$(LIBCOMPAT): $(LIBOBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	$(RANLIB) $@
 
 clean:
-	$(RM) $(OBJECTS)
+	$(RM) $(OBJECTS) $(LIBCOMPAT)
 
 distclean: clean
 	$(RM) Makefile

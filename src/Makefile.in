@@ -1,16 +1,18 @@
 # Hybserv ./src Makefile
 # $Id$
 
+AR = @AR@
+RANLIB = @RANLIB@
 CC = @CC@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
+LDFLAGS = @LDFLAGS@ -L$(COMPATDIR)
 INCLUDEDIR = ../include
 COMPATDIR = ../compat
-INCLUDE = -I. -I$(INCLUDEDIR) -I$(COMPATDIR) $(CPPFLAGS)
+INCLUDE = -I. -I$(INCLUDEDIR) $(CPPFLAGS)
 DEFS =
-LIBS = @LIBS@ -L$(COMPATDIR)
+LIBS = @LIBS@ -lmycompat
 MKDEP = @MKDEP@
 RM = @RM@ -f
 
@@ -56,7 +58,7 @@ SOURCES =                  \
 
 LIBOBJS = @LIBOBJS@
 
-OBJECTS = ${SOURCES:.c=.o}
+OBJECTS = ${SOURCES:.c=$U.o}
 
 # Binaries
 
@@ -64,8 +66,8 @@ HYBSERV = ../bin/hybserv
 
 all: $(HYBSERV)
 
-$(HYBSERV): $(OBJECTS) $(LIBDEPS)
-	$(CC) -o $(HYBSERV) $(OBJECTS) $(LIBOBJS) $(LDFLAGS) $(LIBS)
+$(HYBSERV): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
 
 depend:
 	$(MKDEP) $(INCLUDE) $(SOURCES) > $(DEPENDFILE)

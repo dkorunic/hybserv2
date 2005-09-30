@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  ^ moved compatibility stuff into compat/, made strtoul fallback if we
+    don't have it
   ^ new logging scheme applied
   + add password recovery and recover phrase into NickServ [thanks bane!]
   - fixes for broken getaddrinfo() on some glibc2 platforms [thanks knight

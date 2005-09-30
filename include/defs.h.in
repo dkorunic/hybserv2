@@ -128,9 +128,15 @@
    */
 #undef HAVE_SYS_DIR_H
 
+/* Define to 1 if you have *sys_errlist */
+#undef HAVE_SYS_ERRLIST
+
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
 #undef HAVE_SYS_NDIR_H
+
+/* Define to 1 if you have sys_nerr */
+#undef HAVE_SYS_NERR
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #undef HAVE_SYS_RESOURCE_H

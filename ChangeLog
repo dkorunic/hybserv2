@@ -7,8 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
-  ^ moved compatibility stuff into compat/, made strtoul fallback if we
-    don't have it
+  ^ moved compatibility stuff into compat/, made fallbacks if we
+    don't have strtoul, strerror, strdup
   ^ new logging scheme applied
   + add password recovery and recover phrase into NickServ [thanks bane!]
   - fixes for broken getaddrinfo() on some glibc2 platforms [thanks knight
@@ -16,7 +16,7 @@ Hybserv-HEAD
 
 Hybserv-1.9.1
 
-  ^ stage it to REL_1_9_1
+  ^ stage it to REL_1_9_1 [09/26/2005]
   + Substitute now works for dcc motd and server [logon] motd
   * rewrote Substitute code
   * rewrote core string/array handling functions SplitBuf() and

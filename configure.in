@@ -265,7 +265,7 @@ fi
 
 dnl Checks for library functions
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([select strchr memcpy strdup strerror gettimeofday])
+AC_CHECK_FUNCS([select strchr memcpy gettimeofday])
 AC_SEARCH_LIBS(socket, socket, ,
 	[AC_MSG_ERROR([You have no socket()! Aborting])])
 AC_SEARCH_LIBS(crypt, [crypt descrypt])
@@ -280,6 +280,8 @@ AC_CHECK_FUNCS(inet_pton, , [AC_LIBOBJ(inet_pton)])
 AC_CHECK_FUNCS(strtoul, , [AC_LIBOBJ(strtoul)])
 AC_CHECK_FUNCS(strlcat, , [AC_LIBOBJ(strlcat)])
 AC_CHECK_FUNCS(strlcpy, , [AC_LIBOBJ(strlcpy)])
+AC_CHECK_FUNCS(strerror, , [AC_LIBOBJ(strerror)])
+AC_CHECK_FUNCS(strdup, , [AC_LIBOBJ(strdup)])
 
 dnl Check if getaddr info is broken for 32bit IPv4 integer notation
 AC_MSG_CHECKING([is getaddrinfo broken for integer notation])
@@ -287,16 +289,39 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM(
 [[#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-int main()
-{
-	char name[] = "2130706433";
-	struct addrinfo *res = NULL;
-	return getaddrinfo(name, NULL, NULL, &res);
-}
+]],
+[[char name[] = "2130706433";
+struct addrinfo *res = NULL;
+return getaddrinfo(name, NULL, NULL, &res);
 ]])],
+	[AC_MSG_RESULT(no)],
 	[AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_BROKEN_INT_GETADDRINFO, 1,
-		[Define to 1 if you have broken getaddrinfo for integer notation])],
+		[Define to 1 if you have broken getaddrinfo for integer notation])])
+
+dnl Check if we have sys_errlist
+AC_MSG_CHECKING([if libc defines sys_errlist])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+[[#include <stdio.h>
+]],
+[[printf("%s", sys_errlist[0]);
+return 0;
+]])],
+	[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_SYS_ERRLIST, 1,
+		[Define to 1 if you have *sys_errlist])],
+	[AC_MSG_RESULT(no)])
+
+dnl Check if we have sys_nerr
+AC_MSG_CHECKING([if libc defines sys_nerr])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+[[#include <stdio.h>
+]],
+[[printf("%d", sys_nerr);
+]])],
+	[AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_SYS_NERR, 1,
+		[Define to 1 if you have sys_nerr])],
 	[AC_MSG_RESULT(no)])
 
 dnl Try libefence support

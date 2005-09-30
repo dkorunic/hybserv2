@@ -192,4 +192,12 @@ int inet_pton(int, const char *, void *);
 unsigned long int strtoul(const char *, char **, int);
 #endif
 
+#if !defined HAVE_STRDUP
+char *strdup(const char *);
+#endif
+
+#if !defined HAVE_STRERROR
+const char *strerror(int);
+#endif
+
 #endif /* INCLUDED_stdinc_h */

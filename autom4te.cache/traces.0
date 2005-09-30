@@ -246,17 +246,13 @@ m4trace:configure.in:267: -1- AC_TYPE_SIGNAL
 m4trace:configure.in:267: -1- AC_DEFINE_TRACE_LITERAL([RETSIGTYPE])
 m4trace:configure.in:267: -1- AH_OUTPUT([RETSIGTYPE], [/* Define as the return type of signal handlers (`int\' or `void\'). */
 #undef RETSIGTYPE])
-m4trace:configure.in:268: -1- AC_CHECK_FUNCS([select strchr memcpy strdup strerror gettimeofday])
+m4trace:configure.in:268: -1- AC_CHECK_FUNCS([select strchr memcpy gettimeofday])
 m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_SELECT], [/* Define to 1 if you have the `select\' function. */
 #undef HAVE_SELECT])
 m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_STRCHR], [/* Define to 1 if you have the `strchr\' function. */
 #undef HAVE_STRCHR])
 m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_MEMCPY], [/* Define to 1 if you have the `memcpy\' function. */
 #undef HAVE_MEMCPY])
-m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_STRDUP], [/* Define to 1 if you have the `strdup\' function. */
-#undef HAVE_STRDUP])
-m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_STRERROR], [/* Define to 1 if you have the `strerror\' function. */
-#undef HAVE_STRERROR])
 m4trace:configure.in:268: -1- AH_OUTPUT([HAVE_GETTIMEOFDAY], [/* Define to 1 if you have the `gettimeofday\' function. */
 #undef HAVE_GETTIMEOFDAY])
 m4trace:configure.in:275: -1- AC_CHECK_FUNCS([getnameinfo], [], [AC_LIBOBJ(getnameinfo)])
@@ -299,46 +295,62 @@ m4trace:configure.in:282: -1- AH_OUTPUT([HAVE_STRLCPY], [/* Define to 1 if you h
 #undef HAVE_STRLCPY])
 m4trace:configure.in:282: -1- AC_LIBSOURCE([strlcpy.c])
 m4trace:configure.in:282: -1- AC_SUBST([LIB@&t@OBJS])
+m4trace:configure.in:283: -1- AC_CHECK_FUNCS([strerror], [], [AC_LIBOBJ(strerror)])
+m4trace:configure.in:283: -1- AH_OUTPUT([HAVE_STRERROR], [/* Define to 1 if you have the `strerror\' function. */
+#undef HAVE_STRERROR])
+m4trace:configure.in:283: -1- AC_LIBSOURCE([strerror.c])
+m4trace:configure.in:283: -1- AC_SUBST([LIB@&t@OBJS])
+m4trace:configure.in:284: -1- AC_CHECK_FUNCS([strdup], [], [AC_LIBOBJ(strdup)])
+m4trace:configure.in:284: -1- AH_OUTPUT([HAVE_STRDUP], [/* Define to 1 if you have the `strdup\' function. */
+#undef HAVE_STRDUP])
+m4trace:configure.in:284: -1- AC_LIBSOURCE([strdup.c])
+m4trace:configure.in:284: -1- AC_SUBST([LIB@&t@OBJS])
 m4trace:configure.in:300: -1- _m4_warn([cross], [AC_RUN_IFELSE called without default to allow cross compiling], [autoconf/general.m4:2281: AC_RUN_IFELSE is expanded from...
 configure.in:300: the top level])
 m4trace:configure.in:300: -1- AC_DEFINE_TRACE_LITERAL([HAVE_BROKEN_INT_GETADDRINFO])
 m4trace:configure.in:300: -1- AH_OUTPUT([HAVE_BROKEN_INT_GETADDRINFO], [/* Define to 1 if you have broken getaddrinfo for integer notation */
 #undef HAVE_BROKEN_INT_GETADDRINFO])
-m4trace:configure.in:310: -1- AC_CHECK_LIB([efence], [malloc])
-m4trace:configure.in:310: -1- AH_OUTPUT([HAVE_LIBEFENCE], [/* Define to 1 if you have the `efence\' library (-lefence). */
+m4trace:configure.in:313: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SYS_ERRLIST])
+m4trace:configure.in:313: -1- AH_OUTPUT([HAVE_SYS_ERRLIST], [/* Define to 1 if you have *sys_errlist */
+#undef HAVE_SYS_ERRLIST])
+m4trace:configure.in:325: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SYS_NERR])
+m4trace:configure.in:325: -1- AH_OUTPUT([HAVE_SYS_NERR], [/* Define to 1 if you have sys_nerr */
+#undef HAVE_SYS_NERR])
+m4trace:configure.in:335: -1- AC_CHECK_LIB([efence], [malloc])
+m4trace:configure.in:335: -1- AH_OUTPUT([HAVE_LIBEFENCE], [/* Define to 1 if you have the `efence\' library (-lefence). */
 #undef HAVE_LIBEFENCE])
-m4trace:configure.in:310: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBEFENCE])
-m4trace:configure.in:323: -1- AC_CHECK_LIB([dmalloc], [malloc])
-m4trace:configure.in:323: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
+m4trace:configure.in:335: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBEFENCE])
+m4trace:configure.in:348: -1- AC_CHECK_LIB([dmalloc], [malloc])
+m4trace:configure.in:348: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
 #undef HAVE_LIBDMALLOC])
-m4trace:configure.in:323: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
-m4trace:configure.in:375: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
-m4trace:configure.in:375: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
+m4trace:configure.in:348: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
+m4trace:configure.in:400: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
+m4trace:configure.in:400: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
 #undef NICKLEN])
-m4trace:configure.in:376: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
-m4trace:configure.in:376: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
+m4trace:configure.in:401: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
+m4trace:configure.in:401: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
 #undef CHANNELLEN])
-m4trace:configure.in:377: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
-m4trace:configure.in:377: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
+m4trace:configure.in:402: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
+m4trace:configure.in:402: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
 #undef TOPICLEN])
-m4trace:configure.in:400: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:400: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:425: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:425: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:403: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
-m4trace:configure.in:403: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
+m4trace:configure.in:428: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
+m4trace:configure.in:428: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
 #undef SOFT_ASSERT])
-m4trace:configure.in:404: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:404: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:429: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:429: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:419: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
-m4trace:configure.in:419: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
+m4trace:configure.in:444: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
+m4trace:configure.in:444: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
 #undef GIMMECORE])
-m4trace:configure.in:430: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
-m4trace:configure.in:430: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
+m4trace:configure.in:455: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
+m4trace:configure.in:455: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 #undef DAEMONTOOLS])
-m4trace:configure.in:436: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:461: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
 	bin/settings.conf bin/cleandb include/config.h])
-m4trace:configure.in:436: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:461: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:436: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:436: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:461: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:461: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

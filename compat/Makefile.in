@@ -30,8 +30,10 @@ LIBCOMPAT = libmycompat.a
 all: $(LIBCOMPAT)
 
 $(LIBCOMPAT): $(LIBOBJS)
+ifdef LIBOBJS
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
+endif
 
 clean:
 	$(RM) $(OBJECTS) $(LIBCOMPAT)

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed missing Nickserv ACCESS for administrators
   - fixed local listener issue [listening bug, resolve bug]
   ^ moved compatibility stuff into compat/, made fallbacks if we
     don't have strtoul, strerror, strdup

@@ -158,8 +158,7 @@ static struct Command nickcmds[] =
 /* sub commands of NickServ ACCESS */
 static struct Command accesscmds[] =
     {
-      { "ADD", n_access_add, LVL_NONE
-      },
+      { "ADD", n_access_add, LVL_NONE },
       { "DEL", n_access_del, LVL_NONE },
       { "LIST", n_access_list, LVL_NONE },
 
@@ -2712,7 +2711,44 @@ n_access(struct Luser *lptr, int ac, char **av)
 
   target = NULL;
 
+#ifdef EMPOWERADMINS_MORE
+
+  /*
+   * Allow administrators to specify a nickname to modify
+   */
+  if (IsValidAdmin(lptr))
+    {
+      /*
+       * First, check if av[1] is a valid command. If not, check if it is
+       * a valid nickname. If av[1] is a valid command, process the
+       * command as though lptr is modifying their own access, which they
+       * most likely are. If av[1] is neither a valid command nor a valid
+       * nickname, give them a "Nick not registered" error.
+       */
+      cptr = GetCommand(accesscmds, av[1]);
+      if (!cptr || (cptr == (struct Command *) -1))
+        {
+          target = GetLink(av[1]);
+          if (!target)
+            {
+              notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, av[1]);
+              return;
+            }
+
+          if (ac >= 3)
+            cptr = GetCommand(accesscmds, av[2]);
+          else
+            cptr = NULL;
+        }
+    }
+  else
+    cptr = GetCommand(accesscmds, av[1]);
+
+#else
+
   cptr = GetCommand(accesscmds, av[1]);
+
+#endif /* EMPOWERADMINS_MORE */
 
   if (cptr && (cptr != (struct Command *) -1))
     {
@@ -2726,10 +2762,7 @@ n_access(struct Luser *lptr, int ac, char **av)
              "%s switch [\002%s\002]",
              (cptr == (struct Command *) -1) ? "Ambiguous" : "Unknown",
              av[1]);
-      notice(n_NickServ, lptr->nick,
-             ERR_MORE_INFO,
-             n_NickServ,
-             "ACCESS");
+      notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "ACCESS");
     }
 } /* n_access() */
 

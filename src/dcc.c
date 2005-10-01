@@ -571,7 +571,7 @@ static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
   {
     putlog(LOG1, "FATAL: Problem allocating socket: %s",
            strerror(errno));
-    exit(EXIT_FAILURE);
+    return -1;
   }
 
   SetSocketOptions(dccptr->authfd);

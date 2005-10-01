@@ -372,8 +372,9 @@ int ConnectHost(const char *hostname, unsigned int port)
 
     if ((socketfd = socket(res->ai_family, SOCK_STREAM, 6)) == -1)
     {
-      putlog(LOG1, "FATAL: Problem allocating socket: %s", strerror(errno));
-      exit(EXIT_FAILURE);
+      MyFree(resolved);
+      res = res->ai_next;
+      continue;
     }
 
     SetSocketOptions(socketfd);
@@ -1145,6 +1146,7 @@ void DoListen(struct PortInfo *portptr)
   struct addrinfo hints;
   struct addrinfo *res, *res_o;
   int error;
+  char port[MAXLINE];
 
   /* can't use standard LookupHostname */
   memset(&hints, 0, sizeof(hints));
@@ -1152,7 +1154,8 @@ void DoListen(struct PortInfo *portptr)
   hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	error = getaddrinfo(NULL, NULL, &hints, &res);
+  ircsprintf(port, "%d", portptr->port);
+  error = getaddrinfo(LocalHostName, port, &hints, &res);
 
   res_o = res;
 
@@ -1168,9 +1171,8 @@ void DoListen(struct PortInfo *portptr)
   {
     if ((portptr->socket = socket(res->ai_family, SOCK_STREAM, 6)) < 0)
       {
-        putlog(LOG1, "FATAL: Problem allocating socket: %s",
-               strerror(errno));
-        exit(EXIT_FAILURE);
+        res = res->ai_next;
+        continue;
       }
 
     /* set various socket options */
@@ -1196,6 +1198,13 @@ void DoListen(struct PortInfo *portptr)
           close(portptr->socket);
           portptr->socket = NOSOCKET;
         }
+      else
+      {
+        putlog(LOG1,
+            "Listener successfully started on host [%s] port tcp/%d",
+            (LocalHostName != NULL) ? LocalHostName : "*",
+            portptr->port);
+      }
 
     res = res->ai_next;
   }

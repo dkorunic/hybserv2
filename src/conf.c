@@ -1172,8 +1172,7 @@ AddPort(int port, char *host, char *type)
        * called from Rehash() - just change the hostmask and type
        * in case they were changed for the rehash
        */
-      if (ptr->host)
-        MyFree(ptr->host);
+      MyFree(ptr->host);
     }
   else
     {

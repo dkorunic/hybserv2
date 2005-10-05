@@ -28,6 +28,7 @@
 #include "sock.h"
 #include "statserv.h"
 #include "seenserv.h"
+#include "global.h"
 #include "sprintf_irc.h"
 
 #ifdef HELPSERVICES
@@ -60,6 +61,10 @@ static struct Command helpcmds[] =
 
 #ifdef SEENSERVICES
       { "SEENSERV", hs_givehelp, LVL_NONE },
+#endif
+
+#ifdef GLOBALSERVICES
+      { "GLOBAL", hs_givehelp, LVL_NONE },
 #endif
 
       { 0, 0, 0 }
@@ -211,6 +216,13 @@ hs_givehelp(struct Luser *lptr, int ac, char **av)
 
 #endif /* SEENSERVICES */
 
+#ifdef GLOBALSERVICES
+
+      if (serviceptr == Me.gsptr)
+        gs_process(lptr->nick, str);
+
+#endif /* GLOBALSERVICES */
+
     } /* else */
 } /* hs_givehelp() */
 
@@ -270,6 +282,12 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
             ircsprintf(sendstr, "%s/statserv/index", HelpPath);
 #endif /* STATSERVICES */
 
+#ifdef SEENSERVICES
+
+          else if (servptr == Me.esptr)
+            ircsprintf(sendstr, "%s/seenserv/index", HelpPath );
+#endif /* SEENSERVICES */
+
 #ifdef HELPSERVICES
 
           else if (servptr == Me.hsptr)
@@ -281,12 +299,6 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
           else if (servptr == Me.gsptr)
             ircsprintf(sendstr, "%s/global/index", HelpPath);
 #endif /* GLOBALSERVICES */
-
-#ifdef SEENSERVICES
-
-          else if (servptr == Me.esptr)
-            ircsprintf(sendstr, "%s/seenserv/index", HelpPath );
-#endif /* SEENSERVICES */
 
           if (sendstr[0])
             {
@@ -439,6 +451,19 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
                 ircsprintf(sendstr, "%s/global/%s", HelpPath, helparg);
             }
 #endif /* GLOBALSERVICES */
+
+#ifdef SEENSERVICES
+          else if (servptr == Me.esptr)
+            {
+              if (arg2[0])
+                ircsprintf(sendstr, "%s/seenserv/%s/%s",
+                           HelpPath,
+                           helparg,
+                           arg2);
+              else
+                ircsprintf(sendstr, "%s/seenserv/%s", HelpPath, helparg);
+            }
+#endif /* SEENSERVICES */
 
         }
       else

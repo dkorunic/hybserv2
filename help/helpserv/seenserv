@@ -1,0 +1,4 @@
+%bSyntax: SEENSERV [command]%b
+
+If [command] specified, displays help on [command], otherwise
+displays general %E help.

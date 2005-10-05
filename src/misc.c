@@ -481,6 +481,7 @@ Substitute()
       %C - Nickname of n_ChanServ
       %M - Nickname of n_MemoServ
       %T - Nickname of n_StatServ
+      %E - Nickname of n_SeenServ
       %H - Nickname of n_HelpServ
       %G - Nickname of n_Global
       %S - Name of this server

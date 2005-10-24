@@ -364,7 +364,7 @@ AC_MSG_RESULT([checking topic length... $ac_cv_topiclen])
 dnl Get the network identificator
 AC_ARG_WITH(network,
 	[  --with-network=TYPE			 Sets network type TYPE],
-	[ac_cv_network=$withval], [ac_cv_network="hybrid7"])
+	[ac_cv_network=$withval], [ac_cv_network="no"])
 if test "x$ac_cv_network" = "xyes"; then
 	ac_cv_network="hybrid7"
 fi

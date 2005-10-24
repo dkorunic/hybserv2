@@ -8152,7 +8152,7 @@ if test "${with_network+set}" = set; then
   withval="$with_network"
   ac_cv_network=$withval
 else
-  ac_cv_network="hybrid7"
+  ac_cv_network="no"
 fi;
 if test "x$ac_cv_network" = "xyes"; then
 	ac_cv_network="hybrid7"

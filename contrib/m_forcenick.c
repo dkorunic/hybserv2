@@ -27,6 +27,9 @@
  *  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
+ *  10/2005. update from Brian Brazil to send notices if oper is changing
+ *  a remote nickname
+ *
  */
 
 #include "stdinc.h"
@@ -71,7 +74,7 @@ _moddeinit(void)
   mod_del_cmd(&forcenick_msgtab);
 }
 
-char *_version = "$Revision$";
+char *_version = "$Revision$-bbrazil";
 #endif
 
 /* is_nickname()
@@ -128,12 +131,27 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
         me.name, source_p->name, parv[1]);
     return;
   }
+  
+  if (IsOper(source_p)) /* send it normally */
+  {
+         sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "Received FORCENICK message for '%s'->'%s'. From %s!%s@%s on %s",
+                         target_p->name, parv[2], source_p->name,
+                         source_p->username,source_p->host, source_p->user->server);
+  }
+  else
+  {
+         sendto_realops_flags(FLAGS_SKILL, L_ALL,
+                         "Received FORCENICK message for '%s'->'%s'. From %s",
+                         target_p->name, parv[2], parv[0]);
+  }
 
-  if ((hunt_server(client_p, source_p, ":%s FORCENICK %s %s", 1, parc,
-          parv)) != HUNTED_ISME)
-    return;
+  /* Pass on the message to everyone */
+  sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, 
+		  LL_ICLIENT, ":%s FORCENICK %s %s", parv[0], parv[1], parv[2]);
 
-  if (!IsClient(target_p))
+  /* See if the user is ours */
+  if (!MyClient(target_p))
     return;
 
   if (find_client(parv[2]) != NULL)

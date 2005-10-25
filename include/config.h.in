@@ -119,7 +119,7 @@
  * As a precuation this will only work for a short while after a SJOIN 
  * (the ConnectBurst setting).
  */
-#undef RECORD_RESTART_TS
+#define   RECORD_RESTART_TS
 
 /*
  * Define this ONLY if every server on your network is running some form
@@ -455,7 +455,7 @@
  * network don't have support for them, setting FALLBACK_TO_KILL will
  * KILL them after the forced nick change fails.
  */
-#undef   FALLBACK_TO_KILL
+#define   FALLBACK_TO_KILL
 
 /*
  * Schedule nick kill instead of immediate killing for user-triggered

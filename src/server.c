@@ -52,6 +52,7 @@ struct Server *ServerList = NULL;
 static int ServerCollides = 0;
 static time_t ServerCollidesTS = 0;
 int burst_complete = 0;
+time_t most_recent_sjoin=0;
 
 static void s_pass(int ac, char **av);
 static void s_ping(int ac, char **av);
@@ -693,8 +694,11 @@ s_nick(int ac, char **av)
                 av[2]);
 
 #ifdef NICKSERVICES
-
       nptr = FindNick(lptr->nick);
+
+#if (defined SVSNICK || defined FORCENICK) && defined FALLBACK_TO_KILL
+      lptr->flags &= ~(UMODE_NOFORCENICK);
+#endif
 
       /* Update lastseen info for old nickname */
       if (nptr && (nptr->flags & NS_IDENTIFIED))
@@ -985,6 +989,28 @@ s_nick(int ac, char **av)
             nptr->split_ts = nptr->whensplit = 0;
           }
 #endif /* RECORD_SPLIT_TS */
+
+#ifdef RECORD_RESTART_TS
+      /*
+       * If nick_ts is not 0 then it is the TS of the user when they
+       * last identified as this nick. Since then services must have 
+       * been stopped and started. If the TS match then they're the 
+       * same person
+       */
+      if (nptr->nick_ts){
+        if (nptr->nick_ts == atoi(av[3])){
+	  if (most_recent_sjoin + ConnectBurst >= current_ts){
+          
+            RecordCommand("%s: %s!%s@%s has been identified based on TS",
+                    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+            nptr->flags |= NS_IDENTIFIED;
+	  } else {
+            RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since an SJOIN",
+                    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+          }
+	}
+      }
+#endif /* RECORD_RESTART_TS */
 
     }
 
@@ -1793,6 +1819,10 @@ s_sjoin(int ac, char **av)
    * and we should silently ignore it kre */
   if (!ncnt)
     return;
+
+#ifdef RECORD_RESTART_TS
+  most_recent_sjoin = current_ts;
+#endif
 
   /*
    * when a user joins the channel "0", they get parted from all their

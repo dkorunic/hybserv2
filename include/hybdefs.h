@@ -118,5 +118,8 @@ extern char hVersion[];
 extern time_t TimeStarted;
 extern long gmt_offset;
 extern time_t current_ts;
+#ifdef RECORD_RESTART_TS
+extern time_t most_recent_sjoin;
+#endif
 
 #endif /* INCLUDED_hybdefs_h */

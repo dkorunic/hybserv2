@@ -463,6 +463,9 @@ CompleteHubConnection(struct Servlist *hubptr)
   signon();
 
   hubptr->connect_ts = current_ts;
+#ifdef RECORD_RESTART_TS
+  most_recent_sjoin = current_ts;
+#endif
 
   SendUmode(OPERUMODE_Y, "*** Connected to %s tcp/%d",
             hubptr->hostname, hubptr->port);

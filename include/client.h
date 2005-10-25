@@ -23,6 +23,7 @@
 #ifdef DANCER
 # define UMODE_E         0x0010 /* Identified umode */
 #endif /* DANCER */
+#define UMODE_NOFORCENICK          0x0020 /* Doesn't support forcenick */
 
 struct UserChannel
 {

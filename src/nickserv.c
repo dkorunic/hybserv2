@@ -592,6 +592,21 @@ ns_loaddata()
             }
 
 #endif /* LINKED_NICKNAMES */
+   
+#ifdef RECORD_RESTART_TS
+	  else if (!ircncmp(keyword, "TS", 2))
+            {
+              if (!nptr->nick_ts)
+                nptr->nick_ts = atol(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d NickServ entry for [%s] has multiple TS lines (using first)",
+                        NickServDB, cnt, nptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+#endif /* RECORD_RESTART_TS */
 
         } /* if (!ircncmp("->", keyword, 2)) */
       else
@@ -1407,7 +1422,9 @@ collide(char *nick)
   int base;
   int i;
   int j;
-#else
+#endif
+
+#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
   char **av;
   char sendstr[MAXLINE + 1];
   struct NickInfo *nptr = NULL;
@@ -1418,61 +1435,74 @@ collide(char *nick)
 
   if (!(lptr = FindClient(nick)))
     return;
-
   /* calculate how many chars do we need to pad */
 #if defined SVSNICK || defined FORCENICK
+
+#if defined FALLBACK_TO_KILL
+  if(!(lptr->flags & UMODE_NOFORCENICK)){
+    lptr->flags |= UMODE_NOFORCENICK;
+    if ((nptr = FindNick(nick)))
+      {
+        nptr->collide_ts = current_ts + 30;
+      }
+#endif
+  
   nicknum = random();
 
 #if defined SVSNICK
 #if defined SVSNICK_LEN
-  base = SVSNICK_LEN;
+    base = SVSNICK_LEN;
 #else
-  base = NICKLEN - strlen(SVSNICK_PREFIX);
+    base = NICKLEN - strlen(SVSNICK_PREFIX);
 #endif /* SVSNICK */
 #endif
 
 #if defined FORCENICK
 #if defined FORCENICK_LEN
-  base = FORCENICK_LEN;
+    base = FORCENICK_LEN;
 #else
-  base = NICKLEN - strlen(FORCENICK_PREFIX);
+    base = NICKLEN - strlen(FORCENICK_PREFIX);
 #endif /* FORCENICK */
 #endif
   
-  j = 1;
-  for (i = 1; i <= base; ++i)
-    j *= 10;
-  nicknum %= j;
+    j = 1;
+    for (i = 1; i <= base; ++i)
+      j *= 10;
+    nicknum %= j;
+  
+#ifdef SVSNICK
 
+  ircsprintf(newnick, "%s%ld", SVSNICK_PREFIX, nicknum);
+  toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
+
+#else /* defined FORCENICK */
+
+  ircsprintf(newnick, "%s%ld", FORCENICK_PREFIX, nicknum);
+  toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
+
+#endif
+
+  return;
+#ifdef FALLBACK_TO_KILL
+  }
+#endif
 #endif /* defined SVSNICK || defined FORCENICK */
-
+  
+#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
+  
   /* normal ghosted nickname */
 #ifdef DANCER
 
   ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
       "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
 
-#elif !defined SVSNICK && !defined FORCENICK
+#else
 
   ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
       lptr->nick, (long) (lptr->nick_ts - 1), "enforced", Me.name,
       Me.name, "Nickname Enforcement");
 
 #endif /* DANCER */
-
-  /* nope, we won't use ghosted nicknames, instead we'll force nick change
-   * on remote nickname using SVSNICK or FORCENICK */
-#ifdef SVSNICK
-
-  ircsprintf(newnick, "%s%ld", SVSNICK_PREFIX, nicknum);
-  toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
-
-#elif defined FORCENICK
-
-  ircsprintf(newnick, "%s%ld", FORCENICK_PREFIX, nicknum);
-  toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
-
-#else
 
   /* Sending a server kill will be quieter than an oper
    * kill since most clients are -k */
@@ -1594,7 +1624,8 @@ CollisionCheck(time_t unixtime)
                        */
                       collide(lptr->nick);
                       nptr->collide_ts = 0;
-                    }
+                    
+		    }
                 }
               else
                 {
@@ -2326,6 +2357,10 @@ n_identify(struct Luser *lptr, int ac, char **av)
 #endif /* MEMOSERVICES */
 
   nptr->lastseen = realptr->lastseen = current_ts;
+
+#ifdef RECORD_RESTART_TS
+  nptr->nick_ts = lptr->nick_ts;
+#endif
   
 } /* n_identify() */
 

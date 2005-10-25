@@ -7,6 +7,9 @@ $Id$
 
 Hybserv-HEAD
 
+  + fallback to plain KILL if FORCENICK doesn't suceed [from Brian Brazil]
+  + save authentication TS when netsplit or restart, so users don't have
+    to reauthenticate [from Brian Brazil]
   - fix network variables misoverride in configure
   + patch from Brian Brazil to send notices in m_forcenick
   - fix missing global help in helpserv as well as other similar bugs

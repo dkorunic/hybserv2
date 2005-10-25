@@ -74,7 +74,7 @@ _moddeinit(void)
   mod_del_cmd(&forcenick_msgtab);
 }
 
-char *_version = "$Revision$-bbrazil";
+char *_version = "$Revision: 1325$";
 #endif
 
 /* is_nickname()

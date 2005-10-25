@@ -102,6 +102,12 @@ struct NickInfo
   time_t whensplit;          /* for expiration purposes */
 #endif /* RECORD_SPLIT_TS */
 
+#ifdef RECORD_RESTART_TS
+  /* Record TS of nicks so that when services are restarted
+   * they won't have to reidentify */
+  time_t nick_ts;
+#endif
+
 #ifdef LINKED_NICKNAMES
   /* Pointer to next nick in the nickname link list */
   struct NickInfo *nextlink;

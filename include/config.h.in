@@ -107,9 +107,19 @@
  * Define this if you want NickServ to record the TS of users who split so
  * that when they rejoin they don't need to re-IDENTIFY if their TS
  * matches. Also, OperServ will record the TS of users who have identified
- * so they don't need to do it over again.
+ * so they don't need to do it over again. TS for split users is expired 
+ * after half an hour.
  */
 #define   RECORD_SPLIT_TS
+
+/*
+ * Define this to save the TS of users when they identify to NickServ. If 
+ * services are restarted this can be used to see if they identified 
+ * before the shutdown, so that they don't need to re-IDENTIFY.
+ * As a precuation this will only work for a short while after a SJOIN 
+ * (the ConnectBurst setting).
+ */
+#undef RECORD_RESTART_TS
 
 /*
  * Define this ONLY if every server on your network is running some form
@@ -439,6 +449,13 @@
 #undef    SVSNICK
 #define   SVSNICK_LEN 4
 #define   SVSNICK_PREFIX "Guest"
+
+/*
+ * If you've defined FORCENICK or SVSNICK above and some servers on your
+ * network don't have support for them, setting FALLBACK_TO_KILL will
+ * KILL them after the forced nick change fails.
+ */
+#undef   FALLBACK_TO_KILL
 
 /*
  * Schedule nick kill instead of immediate killing for user-triggered

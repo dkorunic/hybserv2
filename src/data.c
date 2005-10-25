@@ -735,6 +735,11 @@ WriteNicks()
           for (hptr = nptr->hosts; hptr; hptr = hptr->next)
             fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
+#ifdef RECORD_RESTART_TS
+          if (nptr->nick_ts)
+             fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+#endif
+
         } /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
     } /* for (ii = 0; ii < NICKLIST_MAX; ++ii) */
 
@@ -822,6 +827,11 @@ WriteNicks()
                 fprintf(fp, "->HOST %s\n",
                         hptr->hostmask);
             }
+
+#ifdef RECORD_RESTART_TS
+          if (nptr->nick_ts)
+             fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+#endif
 
 #ifdef LINKED_NICKNAMES
 

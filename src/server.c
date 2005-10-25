@@ -997,18 +997,22 @@ s_nick(int ac, char **av)
        * been stopped and started. If the TS match then they're the 
        * same person
        */
-      if (nptr->nick_ts){
-        if (nptr->nick_ts == atol(av[3])){
-	  if (most_recent_sjoin + ConnectBurst >= current_ts){
-          
+      if (nptr->nick_ts)
+      {
+        if (nptr->nick_ts == atol(av[3]))
+        {
+      	  if (most_recent_sjoin + ConnectBurst >= current_ts)
+          {
             RecordCommand("%s: %s!%s@%s has been identified based on TS",
-                    n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+                n_NickServ, lptr->nick, lptr->username, lptr->hostname);
             nptr->flags |= NS_IDENTIFIED;
-	  } else {
-            RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since an SJOIN",
+      	  }
+          else
+          {
+            RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since SJOIN",
                     n_NickServ, lptr->nick, lptr->username, lptr->hostname);
           }
-	}
+	      }
       }
 #endif /* RECORD_RESTART_TS */
 

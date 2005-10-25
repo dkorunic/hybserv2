@@ -811,7 +811,7 @@ s_nick(int ac, char **av)
        * when to do the KILL if they haven't registered within
        * 1 minute
        */
-      lptr->nick_ts = atoi(av[3] + 1);
+      lptr->nick_ts = atol(av[3] + 1);
 
       /* Useless check -kre */
 #if 0
@@ -975,7 +975,7 @@ s_nick(int ac, char **av)
        * and we can allow them to continue being identified
        */
       if (nptr->split_ts)
-        if (nptr->split_ts == atoi(av[3]))
+        if (nptr->split_ts == atol(av[3]))
           {
             nptr->flags |= NS_IDENTIFIED;
 
@@ -998,7 +998,7 @@ s_nick(int ac, char **av)
        * same person
        */
       if (nptr->nick_ts){
-        if (nptr->nick_ts == atoi(av[3])){
+        if (nptr->nick_ts == atol(av[3])){
 	  if (most_recent_sjoin + ConnectBurst >= current_ts){
           
             RecordCommand("%s: %s!%s@%s has been identified based on TS",
@@ -1025,7 +1025,7 @@ s_nick(int ac, char **av)
    */
   if ((uptr = GetUser(0, av[1], av[5], av[6])))
     {
-      if (uptr->split_ts && (uptr->split_ts == atoi(av[3])))
+      if (uptr->split_ts && (uptr->split_ts == atol(av[3])))
         {
           lptr->flags |= L_OSREGISTERED;
           uptr->split_ts = uptr->whensplit = 0;
@@ -1887,7 +1887,7 @@ s_sjoin(int ac, char **av)
 
   if (oldptr)
     {
-      if (atoi(av[2]) < cptr->since)
+      if (atol(av[2]) < cptr->since)
         {
           struct ChannelUser *tempuser;
           struct UserChannel *tempchan;
@@ -1909,7 +1909,7 @@ s_sjoin(int ac, char **av)
            * with the new modes, and all previous bans are unset
            */
 
-          cptr->since = atoi(av[2]); /* keep the older TS */
+          cptr->since = atol(av[2]); /* keep the older TS */
           /* keep older modes */
           cptr->modes = 0;
           UpdateChanModes(0, av[0] + 1, cptr, modes);
@@ -2040,7 +2040,7 @@ s_sjoin(int ac, char **av)
             }
 #endif
 
-        } /* if (atoi(av[2]) < cptr->since) */
+        } /* if (atol(av[2]) < cptr->since) */
     } /* if (oldptr) */
   else
     {

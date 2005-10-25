@@ -2359,7 +2359,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
   nptr->lastseen = realptr->lastseen = current_ts;
 
 #ifdef RECORD_RESTART_TS
-  nptr->nick_ts = lptr->nick_ts;
+  nptr->nick_ts = realptr->nick_ts = lptr->nick_ts;
 #endif
   
 } /* n_identify() */

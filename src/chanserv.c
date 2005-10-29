@@ -1194,6 +1194,11 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
           if (FindService(tempu->lptr))
             continue;
 
+#ifdef EMPOWERADMINS_MORE
+	    if (IsValidAdmin(tempu->lptr))
+        continue;
+#endif
+
           if (!HasAccess(cptr, tempu->lptr, CA_AUTOOP))
             {
 
@@ -1851,7 +1856,11 @@ cs_CheckJoin(struct Channel *chanptr, struct ChanInfo *cptr, char *nickname)
       RemoveFromChannel(chanptr, lptr);
     }
   else if ((cptr->flags & CS_RESTRICTED) &&
-           !HasAccess(cptr, lptr, CA_AUTOOP))
+           !HasAccess(cptr, lptr, CA_AUTOOP)
+#ifdef EMPOWERADMINS_MORE
+        && !IsValidAdmin(lptr)
+#endif
+	  )
     {
       char *mask = HostToMask(lptr->username, lptr->hostname);
 
@@ -2854,7 +2863,6 @@ IsFounder(struct Luser *lptr, struct ChanInfo *cptr)
   struct f_users *temp;
 
 #ifdef EMPOWERADMINS_MORE
-
   if (IsValidAdmin(lptr))
     return 1;
 #endif
@@ -3007,22 +3015,40 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
     }
 
 #ifdef EMPOWERADMINS
-  /*
-   * If AutoOpAdmins is disabled, check if lptr is an admin and if level
-   * is AUTOOP (or AUTOVOICE) - if so, check if they are on the channel's
-   * access list for the appropriate level; if they are, they are allowed
-   * to get opped/voiced (return 1), otherwise return 0. This extra check
-   * is needed because GetAccess() will return true if lptr is an admin,
-   * regardless of AutoOpAdmins being enabled.
-   * 
-   * Correction: AutoOpAdmins is for EMPOWERADMINS, not for EMPOWERADMINS_MORE.
-   * EMPOWERADMINS_MORE as a definition gives founder access to every admin,
-   * regardless of AutoOpAdmins being enabled or disabled. 
-   * But AutoOpAdmins works _only_ for EMPOWERADMINS.
+  /* 
+   * If AutoOpAdmins is enabled admins will have the same level of
+   * access as a channel founder.
    */
   if (AutoOpAdmins && IsValidAdmin(lptr))
     return 1;
 #endif /* EMPOWERADMINS */
+
+#ifdef EMPOWERADMINS_MORE
+  /*
+   * If AutoOpAdmins is disabled, don't give admins AUTO{OP,VOICE,HALFOP}
+   * access so that they won't be opped on joining a channel - unless 
+   * they'd have access on the channel anyway. Note that RESTRICTED 
+   * doen't apply to admins if EMPOWERADMINS_MORE is defined, irrelevent 
+   * of the setting of AutoOpAdmins.
+   */
+  if (!AutoOpAdmins && IsValidAdmin(lptr)
+      && (level == CA_AUTOOP || level == CA_AUTOVOICE
+#ifdef HYBRID7_HALFOPS
+  	|| level == CA_AUTOHALFOP
+#endif
+      ))
+    {
+      struct ChanAccess *ca;
+      char nmask[MAXLINE];
+
+      ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
+      lptr->hostname);
+      if ((ca = OnAccessList(cptr, nmask, FindNick(lptr->nick))))
+        if (ca->level >= cptr->access_lvl[level])
+          return 1;
+      return 0;
+    }
+#endif /* EMPOWERADMINS_MORE */
 
   if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
     return 1;

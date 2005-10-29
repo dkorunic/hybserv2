@@ -587,12 +587,12 @@ os_loaddata()
 
 {
   FILE *fp;
-  char line[MAXLINE + 1], **av;
+  char line[MAXLINE + 1], **av, *keyword;
   int ac,
   ret = 1,
         cnt,
-        found;
-  struct Userlist *tempuser;
+        found = 0;
+  struct Userlist *tempuser = NULL, *uptr = NULL;
 
   if (!(fp = fopen(OperServDB, "r")))
     {
@@ -606,7 +606,12 @@ os_loaddata()
    * log a warning about multiple entries
    */
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+  {
     tempuser->umodes = 0;
+#ifdef RECORD_RESTART_TS
+    tempuser->nick_ts = 0;
+#endif
+  }
 
   cnt = 0;
   while (fgets(line, sizeof(line), fp))
@@ -634,49 +639,110 @@ os_loaddata()
        * where <umodes> is an integer number corresponding to
        * the OPERUMODE_* flags
        */
+      if (ircncmp("->", av[0], 2))
+        { 
 
-      if (ac < 2)
-        {
-          fatal(1, "%s:%d Invalid database format (FATAL)",
-                OperServDB,
-                cnt);
-          ret = -2;
-          MyFree(av);
-          continue;
+        if (ac < 2)
+          {
+            fatal(1, "%s:%d Invalid database format (FATAL)",
+                  OperServDB,
+                  cnt);
+            ret = -2;
+            MyFree(av);
+            continue;
+          }
+
+        /*
+         * Go through user list and try to find a matching nickname
+         * with av[0]
+         */
+        found = 0;
+        for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+          {
+            if (!irccmp(av[0], tempuser->nick))
+              {
+                found = 1;
+                uptr = tempuser;
+                if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
+                  /* multiple umodes */
+                  continue;
+                else
+                  tempuser->umodes = atol(av[1]);
+              } /* if (!irccmp(av[0], tempuser->nick)) */
+          } /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
+
+        if (!found)
+          {
+            /*
+             * No O: line found matching the nickname
+             */
+            fatal(1, "%s:%d No O: line entry for nickname [%s] (ignoring)",
+                  OperServDB,
+                  cnt,
+                  av[0]);
+            if (ret > 0)
+              ret = (-1);
+          }
+
+        MyFree(av);
         }
+      else
+        {    /* (ircncmp("->", av[0], 2)) */
+#ifdef RECORD_RESTART_TS
+         if (ac < 2)
+            { 
+              fatal(1, "%s:%d Invalid database format (FATAL)",
+                    OperServDB,
+                    cnt);
+              ret = -2;
+              continue;
+            }
 
-      /*
-       * Go through user list and try to find a matching nickname
-       * with av[0]
-       */
-      found = 0;
-      for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-        {
-          if (!irccmp(av[0], tempuser->nick))
+          if (!found)
+            { 
+              /* previous user line was invalid - ingore all the params */
+              continue;
+            }
+          
+          /* check if there is no nickname associated with the data */
+          if (!uptr)
+            { 
+              fatal(1, "%s:%d No nickname associated with data",
+                    OperServDB,
+                    cnt);
+              if (ret > 0)
+                ret = -1;
+              continue;
+            }
+
+          keyword = av[0] + 2;
+          if (!ircncmp(keyword, "TS", 2))
             {
-              found = 1;
-              if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
-                /* multiple umodes */
-                continue;
+              if (!uptr->nick_ts)
+                uptr->nick_ts = atol(av[1]);
               else
-                tempuser->umodes = atol(av[1]);
-            } /* if (!irccmp(av[0], tempuser->nick)) */
-        } /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
+                {
+                  fatal(1, "%s:%d OperServ entry for [%s] has multiple TS lines (using first)",
+                        OperServDB, cnt, uptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+	  else if (!ircncmp(keyword, "LASTNICK", 2))
+            {
+              if (!uptr->last_nick)
+                uptr->last_nick = MyStrdup(av[1]);
+              else
+                {
+                  fatal(1, "%s:%d OperServ entry for [%s] has multiple LASTNICK lines (using first)",
+                        OperServDB, cnt, uptr->nick);
+                  if (ret > 0)
+                    ret = -1;
+                }
+            }
+#endif
 
-      if (!found)
-        {
-          /*
-           * No O: line found matching the nickname
-           */
-          fatal(1, "%s:%d No O: line entry for nickname [%s] (ignoring)",
-                OperServDB,
-                cnt,
-                av[0]);
-          if (ret > 0)
-            ret = (-1);
-        }
-
-      MyFree(av);
+         }
     }
 
   fclose(fp);
@@ -1080,6 +1146,12 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 
       o_RecordCommand(sockfd,
                       "IDENTIFY");
+
+#ifdef RECORD_RESTART_TS
+      uptr->nick_ts = lptr->nick_ts;
+      MyFree(uptr->last_nick);
+      uptr->last_nick = MyStrdup(lptr->nick);
+#endif
     }
   else
     {

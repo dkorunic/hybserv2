@@ -109,6 +109,13 @@ struct Userlist
   time_t split_ts;
   time_t whensplit;  /* for expiration purposes */
 #endif
+
+#ifdef RECORD_RESTART_TS
+  /* Record TS of nicks so that when services are restarted
+   * they won't have to reidentify */
+  time_t nick_ts;
+  char *last_nick;
+#endif
 };
 
 /* Stores C: lines from hybserv.conf */

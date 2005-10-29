@@ -1439,10 +1439,12 @@ collide(char *nick)
 #if defined SVSNICK || defined FORCENICK
 
 #if defined FALLBACK_TO_KILL
-  if(!(lptr->flags & UMODE_NOFORCENICK)){
+  if (!(lptr->flags & UMODE_NOFORCENICK))
+  {
     lptr->flags |= UMODE_NOFORCENICK;
     if ((nptr = FindNick(nick)))
       {
+        nptr->flags |= NS_COLLIDE;
         nptr->collide_ts = current_ts + 30;
       }
 #endif

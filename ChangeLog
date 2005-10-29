@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  + add OperServ TS saving when restart [from Brian Brazil]
   + fallback to plain KILL if FORCENICK doesn't suceed [from Brian Brazil]
   + save authentication TS when netsplit or restart, so users don't have
     to reauthenticate [from Brian Brazil]

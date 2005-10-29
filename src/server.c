@@ -261,7 +261,7 @@ struct Server *
 
 #ifdef SPLIT_INFO
 
-    tempserv->split_ts=0;
+    tempserv->split_ts = 0;
 
 #endif
 
@@ -562,12 +562,18 @@ s_server(int ac, char **av)
                     av[2], av[0] + 1, timeago(tempserv->split_ts, 0));
           tempserv->split_ts = 0;
           tempserv->connect_ts = current_ts;
+#ifdef RECORD_RESTART_TS
+          most_recent_sjoin = current_ts;
+#endif
         }
       return;
     }
 #endif /* SPLIT_INFO */
 
   tempserv = AddServer(ac, av);
+#ifdef RECORD_RESTART_TS
+  most_recent_sjoin = current_ts;
+#endif
   if (tempserv && (tempserv == Me.hub))
     {
       /*
@@ -655,7 +661,7 @@ s_nick(int ac, char **av)
   struct NickInfo *nptr, *newptr;
 #endif
 
-#ifdef RECORD_SPLIT_TS
+#ifdef RECORD_RESTART_TS
 
   struct Userlist *uptr;
 #endif
@@ -745,6 +751,11 @@ s_nick(int ac, char **av)
 #ifdef DANCER
                 toserv(":%s MODE %s +e\r\n", Me.name, newptr->nick);
 #endif /* DANCER */
+
+#ifdef RECORD_RESTART_TS
+		nptr->nick_ts = 0;
+		newptr->nick_ts = atol(av[3] + 1); /* need to skip the :*/
+#endif /* RECORD_RESTART_TS */
               }
               tmp = GetMaster(nptr);
               tmp->lastseen = current_ts;
@@ -774,6 +785,16 @@ s_nick(int ac, char **av)
        */
       if (GetUser(1, lptr->nick, lptr->username, lptr->hostname) == GenericOper)
         lptr->flags &= ~L_OSREGISTERED;
+
+#ifdef RECORD_RESTART_TS
+  if ((uptr = GetUser(0, lptr->nick, lptr->username, lptr->hostname)) &&
+      lptr->flags & L_OSREGISTERED)
+    {
+		  MyFree(uptr->last_nick);
+	    uptr->last_nick = MyStrdup(av[2]);
+	    uptr->nick_ts = atol(av[3] + 1);
+    }
+#endif 
 
 #ifdef ALLOW_FUCKOVER
       /* check if old nick was being flooded */
@@ -1022,20 +1043,37 @@ s_nick(int ac, char **av)
 
 #endif /* NICKSERVICES */
 
-#ifdef RECORD_SPLIT_TS
+#ifdef RECORD_RESTART_TS
   /*
-   * Check if they were registered with OperServ during a split,
+   * Check if they were registered with OperServ during a restart,
    * if so, re-register them
    */
-  if ((uptr = GetUser(0, av[1], av[5], av[6])))
+  if ((uptr = GetUser(0, av[1], av[5], av[6])) && uptr->last_nick &&
+      !irccmp(uptr->last_nick, av[1])
+#ifdef OPERNICKIDENT
+    && (nptr) && (nptr->flags & NS_IDENTIFIED)
+#ifdef IDENTIFOPER
+    && (nptr->flags & NS_NOEXPIRE) && (lptr->umodes & UMODE_O)
+#endif
+#endif
+     )
     {
-      if (uptr->split_ts && (uptr->split_ts == atol(av[3])))
+      if (uptr->nick_ts && (uptr->nick_ts == atol(av[3])))
+      {
+        if (most_recent_sjoin + ConnectBurst >= current_ts)
         {
+          RecordCommand("%s: %s!%s@%s has been identified based on TS",
+                  n_OperServ, lptr->nick, lptr->username, lptr->hostname);
           lptr->flags |= L_OSREGISTERED;
-          uptr->split_ts = uptr->whensplit = 0;
         }
+        else
+        {
+          RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since an SJOIN",
+                  n_OperServ, lptr->nick, lptr->username, lptr->hostname);
+        }
+      }
     }
-#endif /* RECORD_SPLIT_TS */
+#endif /* RECORD_RESTART_TS */
 
 } /* s_nick() */
 
@@ -1823,10 +1861,6 @@ s_sjoin(int ac, char **av)
    * and we should silently ignore it kre */
   if (!ncnt)
     return;
-
-#ifdef RECORD_RESTART_TS
-  most_recent_sjoin = current_ts;
-#endif
 
   /*
    * when a user joins the channel "0", they get parted from all their

@@ -535,7 +535,15 @@ WriteOpers()
 
   /* Some O: lines may be for the same * nickname...  */
   for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+    {
       fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+#ifdef RECORD_RESTART_TS
+      if (tempuser->nick_ts)
+        fprintf(fp, "->TS %lu\n", tempuser->nick_ts);
+      if (tempuser->last_nick)
+        fprintf(fp, "->LASTNICK %s\n", tempuser->last_nick);
+#endif
+    }
 
   fclose(fp);
 

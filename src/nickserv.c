@@ -1762,15 +1762,19 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
    */
   if (leafmaster->FounderChannels)
     {
-      struct aChannelPtr *tmpchan;
+      struct aChannelPtr *tmpchan, *nextchan;
+
       for (tmpchan = leafmaster->FounderChannels; tmpchan; tmpchan =
-           tmpchan->next)
+           nextchan)
         {
           MyFree(tmpchan->cptr->founder);
 
           /* Add this channel to masters founder list -jared */
           AddFounderChannelToNick(&master, tmpchan->cptr);
           tmpchan->cptr->founder = MyStrdup(master->nick);
+
+          nextchan = tmpchan->next;
+          RemoveFounderChannelFromNick(&leafmaster, tmpchan->cptr);
         }
     }
 
@@ -1787,7 +1791,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
         acptr->accessptr->nptr = master;
 
         tcptr = acptr->next;
-        MyFree(acptr);
+        DeleteAccessChannel(leafmaster, acptr);
       }
     }
 

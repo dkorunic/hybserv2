@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - check for duplicates when adding founder or channel access
   * fixes for EMPOWERADMINMORE and AutoOPAdmin behaviour [from Brian
     Brazil]
   + add OperServ TS saving when restart [from Brian Brazil]

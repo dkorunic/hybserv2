@@ -783,7 +783,17 @@ AddFounderChannelToNick(struct NickInfo **nptr, struct ChanInfo *cptr)
 {
   struct aChannelPtr *tmp;
 
-  tmp = (struct aChannelPtr *) MyMalloc(sizeof(struct aChannelPtr));
+  if (cptr == NULL)
+    return;
+
+  /* check for duplicates */
+  for (tmp = (*nptr)->FounderChannels; tmp != NULL; tmp = tmp->next)
+  {
+    if (tmp->cptr == cptr)
+      return;
+  }
+
+  tmp = MyMalloc(sizeof(struct aChannelPtr));
   memset(tmp, 0, sizeof(struct aChannelPtr));
 
   tmp->cptr = cptr;
@@ -852,6 +862,17 @@ struct AccessChannel *
 
   {
     struct AccessChannel *acptr;
+
+    for (acptr = nptr->AccessChannels; acptr != NULL; acptr = acptr->next)
+    {
+      if (acptr->cptr == chanptr)
+      {
+        if (acptr->accessptr->level < accessptr->level)
+          acptr->accessptr->level = accessptr->level;
+
+        return nptr->AccessChannels;
+      }
+    }
 
     acptr = (struct AccessChannel *) MyMalloc(sizeof(struct AccessChannel));
     acptr->cptr = chanptr;

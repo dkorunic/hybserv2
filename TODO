@@ -7,6 +7,7 @@ As long as the answer is right, who cares if the question is wrong?
 
 Pending bugs:
 -------------
+*) improve hashing
 *) remove MaxTrace
 *) fix absolutely ugly code formatting! [progress..]
 *) splint check
@@ -18,9 +19,7 @@ Pending bugs:
   - take IP bans into account
   - add /cs getkey (returns channel key), for same accesslvl as /cs invite
   - /cs info on private channel should require 1, not CMDINVITE
-*) does not want to unforbid sometimes (??)
 *) fix *LOCK functions (topic and mode lock)
-*) temp ignores rotate (possible overflow)
 *) > I plan on just setting the nickflood level higher in config.h, but
    could there be a configurable option via a operserv set command?
    Also, are there docs on what each operserv set variable is? Some of them
@@ -30,17 +29,11 @@ Pending bugs:
 *) channel modes don't always get synced on restart
 *) fix invalid gnote count
 *) check for OnAccessList() without master nick call - only when necessary
-*) remember to transfer access list in DeleteLink()
-*) seems it is possible that nickname stays ghosted more than necessary if
-   nick QUITs
 *) send all mlock modes on channel creation
 *) OperServ does not completely support hybrid7 modes yet, (for example
    .channel command or SECURE)
 *) sed helpfiles so that they have proper time values
    NOTE: this should be done via %v or %t.. something like it
-*) add flag for keeping other people's channel/nick status when
-   reconnecting - i find it annonying to look at forced synching
-*) on connect, services sometimes don't msg all the users [??]
 
 
 Features yet to come:
@@ -52,7 +45,6 @@ Features yet to come:
   PuNkSterQFeTus: Instead of just /kill chan
   PuNkSterQFeTus: how about adding /kline chan
 *) hide nick options..
-*) save auth users before restart/die with a small ts..
 *) blackbook for all operserv commands. searcheable, add, remove, list.
 *) adx wishlist:
   1)

@@ -870,11 +870,11 @@ struct AccessChannel *
         if (acptr->accessptr->level < accessptr->level)
           acptr->accessptr->level = accessptr->level;
 
-        return nptr->AccessChannels;
+        return NULL;
       }
     }
 
-    acptr = (struct AccessChannel *) MyMalloc(sizeof(struct AccessChannel));
+    acptr = MyMalloc(sizeof(struct AccessChannel));
     acptr->cptr = chanptr;
     acptr->accessptr = accessptr;
 

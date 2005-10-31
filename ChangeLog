@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed outstanding bug in InsertLink() where chan access lists where
+    shallow copied, instead of making new instance and deleting old
   - check for duplicates when adding founder or channel access
   * fixes for EMPOWERADMINMORE and AutoOPAdmin behaviour [from Brian
     Brazil]

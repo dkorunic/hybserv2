@@ -15,6 +15,10 @@ CONFDIR = $(PREFIX)/hybserv
 # (should match HelpPath in settings.conf)
 HELPDIR = $(PREFIX)/hybserv/help
 
+# Set this to the directory for logs repository
+# (should match LogPath in settings.conf)
+LOGDIR = $(PREFIX)/hybserv/logs
+
 ############ Don't change anything below here ############
 
 # Hybserv2 Version
@@ -94,6 +98,10 @@ install-binary:
 	@if test ! -d $(CONFDIR); then \
 		echo Creating $(CONFDIR); \
 		mkdir $(CONFDIR) 2>/dev/null; \
+	fi
+	@if test ! -d $(LOGDIR); then \
+		echo Creating $(LOGDIR); \
+		mkdir $(LOGDIR) 2>/dev/null; \
 	fi
 	@echo '** Installing Hybserv2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"

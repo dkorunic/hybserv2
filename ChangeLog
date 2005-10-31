@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * enforce usage of LogPath, for logs to be in a directory
   - fixed outstanding bug in InsertLink() where chan access lists where
     shallow copied, instead of making new instance and deleting old
   - check for duplicates when adding founder or channel access

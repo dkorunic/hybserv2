@@ -105,7 +105,8 @@ int main(int argc, char *argv[])
   if (LoadSettings(0) == 0)
     {
       fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
-              "Check logfile %s\n", SETPATH, LogFile ? LogFile : "*unknown*");
+              "Check logfile %s/%s\n", SETPATH, LogPath ? LogPath : "",
+              LogFile ?  LogFile : "*unknown*");
       return (0);
     }
 

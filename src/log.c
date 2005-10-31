@@ -21,6 +21,7 @@
 #include "sprintf_irc.h"
 #include "sprintf_irc.h"
 #include "mystring.h"
+#include "alloc.h"
 
 /*
 putlog()
@@ -36,6 +37,7 @@ putlog(int level, char *format, ...)
   FILE *fp;
   time_t CurrTime;
   char buf[MAXLINE + 1];
+  char LogFileName[MAXLINE + 1];
   va_list args;
 
   /*
@@ -46,10 +48,15 @@ putlog(int level, char *format, ...)
   if ((LogLevel == 0) || (LogLevel < level))
     return;
 
-  if (!LogFile)
-    return;
+  if (LogFile == NULL)
+    LogFile = MyStrdup("hybserv.log");
 
-  if ((fp = fopen(LogFile, "a+")) == NULL)
+  if (LogPath == NULL)
+    LogPath = MyStrdup(".");
+
+  ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
+
+  if ((fp = fopen(LogFileName, "a+")) == NULL)
     {
 #ifdef DEBUGMODE
       printf("Unable to open log file: %s\n", LogFile);
@@ -117,7 +124,7 @@ CheckLogs(time_t unixtime)
        * room for the current one.
        */
 
-      if (!(dp = opendir(HPath)))
+      if (!(dp = opendir(LogPath)))
         {
           putlog(LOG1, "Error reading log directory: %s",
                  strerror(errno));
@@ -162,7 +169,8 @@ CheckLogs(time_t unixtime)
            * There are too many log files in the directory,
            * delete the oldest one - it will be: LogFile.olddate
            */
-          ircsprintf(tmplog, "%s/%s.%s", HPath, LogFile, olddate);
+          ircsprintf(tmplog, "%s/%s.%s", LogPath, LogFile,
+              olddate);
           unlink(tmplog);
         }
 

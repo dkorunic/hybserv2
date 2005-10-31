@@ -49,6 +49,7 @@ extern  char      *DccMotdFile;
 extern  char      *GlineFile;
 extern  char      *HPath;
 extern  char      *HelpPath;
+extern  char      *LogPath;
 extern  char      *JupeFile;
 extern  char      *LogFile;
 extern  char      *LogonNews;

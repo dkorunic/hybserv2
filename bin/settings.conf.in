@@ -64,6 +64,7 @@
 # LogFile     - Log file
 # PidFile     - Pid file
 # HelpPath    - Directory in which to locate help files
+# LogPath     - Directory in which to locate log files
 # DccMotdFile - Message of the Day file for telnet/dcc clients
 # MotdFile    - Global Motd file (when client does /motd services.us)
 #
@@ -85,6 +86,7 @@ ConfigFile         "hybserv.conf"
 LogFile            "hybserv.log"
 PidFile            "hybserv.pid"
 HelpPath           "help"
+LogPath            "logs"
 DccMotdFile        "motd.dcc"
 MotdFile           "motd.global"
 

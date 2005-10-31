@@ -47,8 +47,6 @@ static int ChangeChanPass(struct ChanInfo *, char *);
 static void AddChan(struct ChanInfo *);
 static struct ChanInfo *MakeChan(void);
 static void AddFounder(struct Luser *, struct ChanInfo *);
-static int AddAccess(struct ChanInfo *, struct Luser *, char *,
-                     struct NickInfo *, int, time_t, time_t);
 static int DelAccess(struct ChanInfo *, struct Luser *, char *,
                      struct NickInfo *);
 static int AddAkick(struct ChanInfo *, struct Luser *, char *, char *, long);
@@ -2569,7 +2567,7 @@ DeleteChan(struct ChanInfo *chanptr)
  *
  * rewrote this to use master nicknames for access inheritance -kre
  */
-static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
+int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
     *mask, struct NickInfo *nptr, int level, time_t created, time_t
     last_used)
 {
@@ -2608,6 +2606,12 @@ static int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
        * channels it has access on, so if we ever delete the nick, we will
        * know where to remove it's access. */
       ptr->acptr = AddAccessChannel(master_nptr, chanptr, ptr);
+
+      if (ptr->acptr == NULL)
+      {
+        MyFree(ptr);
+        return 0;
+      }
     }
   else
     ptr->hostmask = MyStrdup(mask);

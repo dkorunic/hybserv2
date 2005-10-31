@@ -1756,9 +1756,6 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
    * leafmaster should no longer have a FounderChannels list - add all of
    * leafmaster's channels to master's channels. There's no point in
    * reallocating - just assign master's pointer to leafmaster's
-   *
-   * POSSIBLE BUG: Leaving the leafnick's access on channels and granting
-   * the master's founder access... This doesn't seem logical?
    */
   if (leafmaster->FounderChannels)
     {
@@ -1865,19 +1862,6 @@ static int DeleteLink(struct NickInfo *nptr, int copy)
       /* and make a master from nptr */
       nptr->master = nptr->nextlink = NULL;
 
-      if (copy)
-      {
-        struct AccessChannel *acptr = NULL;
-
-        /* hosts list */
-        for (hptr = master->hosts; hptr != NULL; hptr = hptr->next)
-          AddHostToNick(hptr->hostmask, nptr);
-
-        /* access list */
-        for (acptr = master->AccessChannels; acptr != NULL;
-            acptr = acptr->next)
-          AddAccessChannel(nptr, acptr->cptr, acptr->accessptr);
-      }
     }
   else /* nptr->master is NULL indicating this is master nick */
     {
@@ -1886,20 +1870,6 @@ static int DeleteLink(struct NickInfo *nptr, int copy)
       nptr->nextlink->numlinks = nptr->numlinks;
       for (tmp = nptr->nextlink->nextlink; tmp != NULL; tmp = tmp->nextlink)
         tmp->master = nptr->nextlink;
-
-      if (copy)
-      {
-        struct AccessChannel *acptr = NULL;
-
-        /* hosts list */
-        for (hptr = nptr->hosts; hptr != NULL; hptr = hptr->next)
-          AddHostToNick(hptr->hostmask, nptr->nextlink);
-
-        /* access list */
-        for (acptr = nptr->AccessChannels; acptr != NULL;
-            acptr = acptr->next)
-          AddAccessChannel(nptr->nextlink, acptr->cptr, acptr->accessptr);
-      }
 
       master = nptr->nextlink;
 
@@ -1916,6 +1886,21 @@ static int DeleteLink(struct NickInfo *nptr, int copy)
       master->numlinks = 0;
       master->master = NULL;
     }
+
+  if (copy)
+  {
+    struct AccessChannel *acptr = NULL;
+
+    /* hosts list */
+    for (hptr = master->hosts; hptr != NULL; hptr = hptr->next)
+      AddHostToNick(hptr->hostmask, nptr);
+
+    /* access list */
+    for (acptr = master->AccessChannels; acptr != NULL;
+        acptr = acptr->next)
+      AddAccess(acptr->cptr, NULL, NULL, nptr, acptr->accessptr->level,
+          current_ts, current_ts);
+  }
 
   return (1);
 } /* DeleteLink() */

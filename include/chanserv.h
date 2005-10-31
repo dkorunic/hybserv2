@@ -167,6 +167,8 @@ int HasAccess(struct ChanInfo *, struct Luser *, int);
 void SetDefaultALVL(struct ChanInfo *);
 void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 int IsFounder(struct Luser *, struct ChanInfo *);
+int AddAccess(struct ChanInfo *, struct Luser *, char *,
+                     struct NickInfo *, int, time_t, time_t);
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;

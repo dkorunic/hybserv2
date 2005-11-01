@@ -1,0 +1,18 @@
+--------------
+1.9.1 -> 1.9.2
+--------------
+* New LogPath directive in settings.conf. This must be manually added.
+  Example:
+Logpath  "logs"
+
+--------------
+1.8.0 -> 1.9.0
+--------------
+* New OperServIgnoreDB directive in settings.conf. This must be manually
+  added. Example:
+OperServIgnoreDB   "ignore.db"
+
+If this file doesn't exist, Hybserv will create it.
+
+-------------
+Upgrade instructions for versions prior to 1.8.0 do not exist.

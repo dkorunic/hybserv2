@@ -171,13 +171,23 @@ ServiceUmodes      "+io"
 
 # AutoOpAdmins [OPTIONAL]
 #
-#  Enable this to give channel operator status to administrators
-# who enter any ChanServ-monitored channel. This feature
-# will only work if EMPOWERADMINS is defined in config.h.
+# If EMPOWERADMINS is defined:
+#   * If AutoOpAdmins is enabled admins will have the same level of
+#    access as a channel founder, and will thus be autoopped on
+#    joining.
+#   * If AutoOpAdmins is disabled they'll have no special access to a
+#    channel, autoopping will be dependant on the access list.
 #
-# Note: This option does not apply to EMPOWERADMINS_MORE (config.h).
-#       EMPOWERADMINS_MORE gives founder access to every admin,
-#       and thus allowing them to have op in every channel.
+# If EMPOWERADMINS_MORE is defined:
+#   All admins have the power of founder in all registered channels.
+#   SET RESTRICTED does not apply to admins.
+#
+#   * If AutoOpAdmins is enabled admins will be opped on joining any
+#    channel registered with ChanServ.
+#   * If AutoOpAdmins is disabled admins will not have AUTOOP,
+#    AUTOVOICE or AUTOHALFOP on any channel granted to them by virtue
+#    of being an admin - the access list will decide if they'll be
+#    opped.
 
 AutoOpAdmins
 

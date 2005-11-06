@@ -430,7 +430,7 @@ ParseConf(char *filename, int rehash)
 
             MyFree(Me.info);
             Me.info = MyMalloc(REALLEN + 1);
-            strlcpy(Me.info, info, REALLEN - 1);
+            strlcpy(Me.info, info, REALLEN + 1);
 
             break;
           } /* case 'N' */

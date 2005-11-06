@@ -412,7 +412,7 @@ HostToMask (char *username, char *hostname)
            * copy the ip address (except the last .XXX) into the 
            * right spot in 'final'
            */
-          strlcpy(final + ii, host, temp - host);
+          strlcpy(final + ii, host, temp - host + 1);
 
           /* stick a .* on the end :-) */
           ii += (temp - host);

@@ -307,19 +307,19 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
       strchr(av[1], '@') || strchr(av[1], '!'))
     {
       if (match("*!*@*", av[1]))
-        strlcpy(seenstring, av[1], MAXLINE - 1);
+        strlcpy(seenstring, av[1], MAXLINE + 1);
       else if (match("*!*", av[1]))
       {
-        strlcpy(seenstring, av[1], MAXLINE - 3);
-        strlcat(seenstring, "@*", sizeof(seenstring));
+        strlcpy(seenstring, av[1], MAXLINE - 1);
+        strlcat(seenstring, "@*", MAXLINE + 1);
       }
       else if (match("*@*", av[1]))
       {
-        strlcpy(seenstring, "*!", sizeof(seenstring));
-        strncat(seenstring, av[1], MAXLINE - 3);
+        strlcpy(seenstring, "*!", MAXLINE - 1);
+        strncat(seenstring, av[1], MAXLINE + 1);
       }
       else
-        strlcpy(seenstring, av[1], MAXLINE);
+        strlcpy(seenstring, av[1], MAXLINE + 1);
 
       count = 0;
       for (seen = seenp; seen; seen = seen->prev)

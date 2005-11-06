@@ -247,10 +247,10 @@ struct Luser *
 
     memset(tempuser, 0, sizeof(struct Luser));
 
-    strlcpy(tempuser->nick, line[1], NICKLEN);
-    strlcpy(tempuser->username, line[5], USERLEN);
-    strlcpy(tempuser->hostname, line[6], HOSTLEN);
-    strlcpy(tempuser->realname, line[8] + 1, REALLEN);
+    strlcpy(tempuser->nick, line[1], NICKLEN + 1);
+    strlcpy(tempuser->username, line[5], USERLEN + 1);
+    strlcpy(tempuser->hostname, line[6], HOSTLEN + 1);
+    strlcpy(tempuser->realname, line[8] + 1, REALLEN + 1);
 
 #else
 

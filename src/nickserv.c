@@ -2885,7 +2885,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 
   if (strlen(host))
     {
-      strlcpy(user,mask,strlen(mask)-strlen(host));
+      strlcpy(user, mask, strlen(mask) - strlen(host) + 1);
     }
 
   if (!user || !host)

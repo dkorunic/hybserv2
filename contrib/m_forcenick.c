@@ -134,14 +134,15 @@ static void mo_forcenick(struct Client *client_p, struct Client *source_p,
   
   if (IsOper(source_p)) /* send it normally */
   {
-         sendto_realops_flags(FLAGS_ALL, L_ALL,
+         sendto_realops_flags(UMODE_ALL, L_ALL,
                          "Received FORCENICK message for '%s'->'%s'. From %s!%s@%s on %s",
                          target_p->name, parv[2], source_p->name,
-                         source_p->username,source_p->host, source_p->user->server);
+						 source_p->username, source_p->host,
+						 source_p->user->server->name);
   }
   else
   {
-         sendto_realops_flags(FLAGS_SKILL, L_ALL,
+         sendto_realops_flags(UMODE_SKILL, L_ALL,
                          "Received FORCENICK message for '%s'->'%s'. From %s",
                          target_p->name, parv[2], parv[0]);
   }

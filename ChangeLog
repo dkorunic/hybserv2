@@ -6,7 +6,8 @@ $Id$
   ^ = Other
 
 Hybserv-HEAD
-
+  
+  * fix m_forcenick.c to compile under Hybrid 7.1.3 [from sofit]
   * update AutoOpAdmins documentation [from Brian Brazil]
   * enforce usage of LogPath, for logs to be in a directory
   - fixed outstanding bug in InsertLink() where chan access lists where

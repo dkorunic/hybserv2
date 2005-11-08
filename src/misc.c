@@ -388,7 +388,7 @@ HostToMask (char *username, char *hostname)
        * domain; and if topsegment is NULL, the hostname must be
        * 2 parts (ie: blah.org), so don't strip off "blah"
        */
-      strlcpy(final + ii, host, MAXUSERLEN + 1);
+      strlcpy(final + ii, host, MAXUSERLEN + 1 - ii);
     }
   else
     {
@@ -412,11 +412,11 @@ HostToMask (char *username, char *hostname)
            * copy the ip address (except the last .XXX) into the 
            * right spot in 'final'
            */
-          strlcpy(final + ii, host, temp - host + 1);
+          strlcpy(final + ii, host, MAXUSERLEN + 1 - ii);
 
           /* stick a .* on the end :-) */
           ii += (temp - host);
-          strlcpy(final + ii, ".*", MAXUSERLEN + 1);
+          strlcpy(final + ii, ".*", MAXUSERLEN + 1 - ii);
         }
       else
         {

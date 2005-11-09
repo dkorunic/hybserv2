@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix GetLink() issue in HasAccess() which occuren when !AutoOpAdmins:
+    admins woudn't get +o on channels where they had normal access
   - fix several off-by-one errors
   * fix m_forcenick.c to compile under Hybrid 7.1.3 [from sofit]
   * update AutoOpAdmins documentation [from Brian Brazil]

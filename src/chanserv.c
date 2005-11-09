@@ -3046,8 +3046,8 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
       char nmask[MAXLINE];
 
       ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
-      lptr->hostname);
-      if ((ca = OnAccessList(cptr, nmask, FindNick(lptr->nick))))
+        lptr->hostname);
+      if ((ca = OnAccessList(cptr, nmask, GetLink(lptr->nick))))
         if (ca->level >= cptr->access_lvl[level])
           return 1;
       return 0;

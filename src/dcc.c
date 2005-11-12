@@ -367,6 +367,7 @@ void ConnectClient(struct PortInfo *portptr)
   }
 
   tempconn->username = NULL;
+  tempconn->nick = NULL;
   tempconn->idle = current_ts;
   tempconn->port = GetPort((struct sockaddr *)&addr);
 
@@ -1948,12 +1949,9 @@ ServReboot()
       close(connections->socket);
       connections->socket = NOSOCKET;
 
-      if (connections->nick)
-        MyFree(connections->nick);
-      if (connections->username)
-        MyFree(connections->username);
-      if (connections->hostname)
-        MyFree(connections->hostname);
+      MyFree(connections->nick);
+      MyFree(connections->username);
+      MyFree(connections->hostname);
       MyFree(connections);
 
       connections = tempconn;

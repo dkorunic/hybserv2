@@ -1417,9 +1417,9 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
   for (i = 0; i <= day; i++)
     {
       if (i == 0)
-        ircsprintf(grep_log_filename, "%s", LogFile );
+        ircsprintf(grep_log_filename, "%s/%s", LogPath, LogFile);
       else
-        ircsprintf(grep_log_filename, "%s.%8.8ld", LogFile,
+        ircsprintf(grep_log_filename, "%s/%s.%8.8ld", LogPath, LogFile,
             korectdat(atol(date), -i));
 
       if ((lf = fopen(grep_log_filename, "r")) == NULL)
@@ -1434,13 +1434,13 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
 
       while (fgets(buf, sizeof(buf), lf))
         {
-          if (ircncmp(buf + 25, av[1], strlen(av[1])) == 0)
-            if (match(av[2], buf + 25 + strlen(av[1]) + 2))
-              {
-                iCounter ++;
-                notice(n_StatServ, lptr->nick,
-                       "[%d] ... %s", iCounter, buf);
-              }
+          if ((ircncmp(buf + 25, av[1], strlen(av[1])) == 0)
+            && match(av[2], buf + 25 + strlen(av[1]) + 2))
+            {
+              iCounter ++;
+              notice(n_StatServ, lptr->nick,
+                     "[%d] ... %s", iCounter, buf);
+            }
         }
       fclose(lf);
     }

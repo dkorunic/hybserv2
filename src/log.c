@@ -107,6 +107,7 @@ CheckLogs(time_t unixtime)
 
 {
   char tmplog[MAXLINE + 1];
+  char LogFileName[MAXLINE + 1];
   char olddate[MAXLINE + 1];
   char *currdate;
   struct tm *log_tm;
@@ -131,7 +132,8 @@ CheckLogs(time_t unixtime)
           return;
         }
 
-      ircsprintf(tmplog, "%s.", LogFile);
+      ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
+      ircsprintf(tmplog, "%s.", LogFileName);
       len = strlen(tmplog);
 
       lmatches = 0;
@@ -188,7 +190,7 @@ CheckLogs(time_t unixtime)
   ircsprintf(tmplog, "%s.%d%02d%02d",
              LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
 
-  rename(LogFile, tmplog);
+  rename(LogFileName, tmplog);
 } /* CheckLogs() */
 
 /*

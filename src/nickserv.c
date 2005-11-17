@@ -1302,7 +1302,7 @@ CheckOper(char *nickname)
         notice(n_NickServ, nickname,
                "You have not set the NoExpire nickname flag for your nickname");
         notice(n_NickServ, nickname,
-               "Please type \002/MSG %s SET %s NOEXPIRE ON\002 so your nickname does not expire",
+               "Please type \002/MSG %s NOEXPIRE %s ON\002 so your nickname does not expire",
                n_NickServ, nickname);
       }
 } /* CheckOper() */

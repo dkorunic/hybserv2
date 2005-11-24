@@ -59,28 +59,28 @@ SendMotd(int sockfd)
   FILE *fp;
 
   if ((fp = fopen(DccMotdFile, "r")) == NULL)
-    {
-      writesocket(sockfd, "MOTD file missing\r\n");
-      return;
-    }
+	{
+	  writesocket(sockfd, "MOTD file missing\r\n");
+	  return;
+	}
 
   while (fgets(line, sizeof(line), fp))
-    {
-      if ((ch = strchr(buffer, '\n')) != NULL)
-        *ch = '\0';
+	{
+	  if ((ch = strchr(buffer, '\n')) != NULL)
+		*ch = '\0';
 
-      if (*line != '\0')
-      {
-        final = Substitute(NULL, line, sockfd);
-        if (final && (final != (char *) -1))
-          {
-            writesocket(sockfd, final);
-            MyFree(final);
-          }
-      }
+	  if (*line != '\0')
+	  {
+		final = Substitute(NULL, line, sockfd);
+		if (final && (final != (char *) -1))
+		  {
+			writesocket(sockfd, final);
+			MyFree(final);
+		  }
+	  }
 
-      writesocket(sockfd, "\r\n");
-    }
+	  writesocket(sockfd, "\r\n");
+	}
 
   fclose(fp);
 } /* SendMotd() */
@@ -91,7 +91,7 @@ IsAuth()
 Such checks include ident request, and correct nickname/password
 for telnet clients.
 Return: 1 if client is authorized
-        0 if not
+		0 if not
 */
 
 static int
@@ -99,12 +99,12 @@ IsAuth(struct DccUser *dccptr)
 
 {
   if (!dccptr)
-    return (0);
+	return (0);
 
   if ((dccptr->socket == NOSOCKET) ||
-      (dccptr->flags & SOCK_NEEDID) ||
-      IsDccPending(dccptr))
-    return (0);
+	  (dccptr->flags & SOCK_NEEDID) ||
+	  IsDccPending(dccptr))
+	return (0);
 
   return (1);
 } /* IsAuth() */
@@ -138,89 +138,89 @@ BroadcastDcc(int towho, char *format, ...)
    */
   tcmbuf[0] = '\0';
   if (towho == DCCALL)
-    {
-      /* Make the tcm buffer look like: (OperServ) Message */
-      ircsprintf(tcmbuf, "(%s) %s", n_OperServ, buffer);
-    }
+	{
+	  /* Make the tcm buffer look like: (OperServ) Message */
+	  ircsprintf(tcmbuf, "(%s) %s", n_OperServ, buffer);
+	}
 
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
-    {
-      /*
-       * Don't broadcast to a client who hasn't entered their
-       * password yet, or who hasn't responded to an ident
-       * request yet
-       */
-      if (!IsAuth(dccptr))
-        continue;
+	{
+	  /*
+	   * Don't broadcast to a client who hasn't entered their
+	   * password yet, or who hasn't responded to an ident
+	   * request yet
+	   */
+	  if (!IsAuth(dccptr))
+		continue;
 
-      switch (towho)
-        {
-        case DCCALL:
-          {
-            /* send it to everybody */
+	  switch (towho)
+		{
+		case DCCALL:
+		  {
+			/* send it to everybody */
 
-            if ((dccptr->flags & SOCK_TCMBOT) && (tcmbuf[0]))
-              {
-                /*
-                 * This client is a tcm bot, so send it tcmbuf[]
-                 */
+			if ((dccptr->flags & SOCK_TCMBOT) && (tcmbuf[0]))
+			  {
+				/*
+				 * This client is a tcm bot, so send it tcmbuf[]
+				 */
 
-                writesocket(dccptr->socket, tcmbuf);
-              }
-            else
-              {
-                /*
-                 * This is a user connection, send them buffer[]
-                 */
-                writesocket(dccptr->socket, buffer);
-              }
+				writesocket(dccptr->socket, tcmbuf);
+			  }
+			else
+			  {
+				/*
+				 * This is a user connection, send them buffer[]
+				 */
+				writesocket(dccptr->socket, buffer);
+			  }
 
-            break;
-          } /* case DCCALL */
+			break;
+		  } /* case DCCALL */
 
-        case DCCOPS:
-          {
-            struct Userlist *tempuser;
+		case DCCOPS:
+		  {
+			struct Userlist *tempuser;
 
-            /*
-             * send it only to operators (must have an "o" in their
-             * O: line)
-             */
+			/*
+			 * send it only to operators (must have an "o" in their
+			 * O: line)
+			 */
 
-            /*
-             * Assume dccptr has already been verified to come
-             * from the correct host etc, so allow GetUser()
-             * to match only nicknames if need be (they might
-             * be telnetting from an unknown host, or services
-             * might be squit'd from the network, and they're
-             * dcc chatting)
-             */
-            tempuser = DccGetUser(dccptr);
+			/*
+			 * Assume dccptr has already been verified to come
+			 * from the correct host etc, so allow GetUser()
+			 * to match only nicknames if need be (they might
+			 * be telnetting from an unknown host, or services
+			 * might be squit'd from the network, and they're
+			 * dcc chatting)
+			 */
+			tempuser = DccGetUser(dccptr);
 
-            if (!tempuser)
-              {
-                /*
-                 * One reason tempuser might be null here is if the user
-                 * connected to the partyline, but then his/her O: was
-                 * commented out of hybserv.conf and rehashed
-                 */
-                break;
-              }
+			if (!tempuser)
+			  {
+				/*
+				 * One reason tempuser might be null here is if the user
+				 * connected to the partyline, but then his/her O: was
+				 * commented out of hybserv.conf and rehashed
+				 */
+				break;
+			  }
 
-            if (dccptr->flags & SOCK_TCMBOT)
-              break;
+			if (dccptr->flags & SOCK_TCMBOT)
+			  break;
 
-            if (IsOper(tempuser) &&
-                IsRegistered(NULL, dccptr->socket))
-              writesocket(dccptr->socket, buffer);
+			if (IsOper(tempuser) &&
+				IsRegistered(NULL, dccptr->socket))
+			  writesocket(dccptr->socket, buffer);
 
-            break;
-          } /* case DCCOPS */
+			break;
+		  } /* case DCCOPS */
 
-        default:
-          break;
-        } /* switch (towho) */
-    } /* for (dccptr = connections; dccptr; dccptr = dccptr->next) */
+		default:
+		  break;
+		} /* switch (towho) */
+	} /* for (dccptr = connections; dccptr; dccptr = dccptr->next) */
 } /* BroadcastDcc() */
 
 /*
@@ -240,24 +240,24 @@ SendDccMessage(struct DccUser *from, char *message)
   struct DccUser *dccptr;
 
   if (!from || !message)
-    return;
+	return;
 
   ircsprintf(final, "<%s@%s> %s", from->nick, n_OperServ, message);
   strlcat(final, "\r\n", sizeof(final));
 
   /* now send the string to all clients */
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
-    {
-      /*
-       * Don't broadcast to a client who hasn't entered their
-       * password yet, or who hasn't responded to an ident
-       * request yet
-       */
-      if (!IsAuth(dccptr))
-        continue;
+	{
+	  /*
+	   * Don't broadcast to a client who hasn't entered their
+	   * password yet, or who hasn't responded to an ident
+	   * request yet
+	   */
+	  if (!IsAuth(dccptr))
+		continue;
 
-      writesocket(dccptr->socket, final);
-    }
+	  writesocket(dccptr->socket, final);
+	}
 } /* SendDccMessage() */
 
 /*
@@ -282,42 +282,42 @@ SendUmode(int umode, char *format, ...)
   char timestr[MAXLINE + 1];
 
   if (ActiveFlood)
-    return;
+	return;
 
   if (umode != OPERUMODE_D)
-    if (IsFlood())
-      ActiveFlood = current_ts;
+	if (IsFlood())
+	  ActiveFlood = current_ts;
 
   if (!ActiveFlood)
-    {
-      va_start(args, format);
+	{
+	  va_start(args, format);
 
-      vsprintf_irc(buffer, format, args);
+	  vsprintf_irc(buffer, format, args);
 
-      va_end(args);
-    } /* if (!ActiveFlood) */
+	  va_end(args);
+	} /* if (!ActiveFlood) */
 
   tmp_tm = localtime(&current_ts);
 
   ircsprintf(timestr, "[%02d:%02d:%02d]",
-             tmp_tm->tm_hour, tmp_tm->tm_min, tmp_tm->tm_sec);
+			 tmp_tm->tm_hour, tmp_tm->tm_min, tmp_tm->tm_sec);
 
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
-    {
-      if (!IsAuth(dccptr))
-        continue;
+	{
+	  if (!IsAuth(dccptr))
+		continue;
 
-      if ((tempuser = DccGetUser(dccptr)))
-        {
-          if (!IsOper(tempuser))
-            continue;
+	  if ((tempuser = DccGetUser(dccptr)))
+		{
+		  if (!IsOper(tempuser))
+			continue;
 
-          if (!ActiveFlood && tempuser->umodes & umode)
-            {
-              tosock(dccptr->socket, "%s %s\r\n", timestr, buffer);
-            }
-        }
-    }
+		  if (!ActiveFlood && tempuser->umodes & umode)
+			{
+			  tosock(dccptr->socket, "%s %s\r\n", timestr, buffer);
+			}
+		}
+	}
 } /* SendUmode() */
 
 /*
@@ -334,23 +334,23 @@ void ConnectClient(struct PortInfo *portptr)
   struct DccUser *tempconn;
 
   if (portptr == NULL)
-    return;
+	return;
 
   if ((fd = accept(portptr->socket, (struct sockaddr *)&addr,
-          &addrlen)) == -1)
-    {
-      putlog(LOG1, "Error in accept on socket %d: %s", portptr->socket,
-          strerror(errno));
-      return;
-    }
+		  &addrlen)) == -1)
+	{
+	  putlog(LOG1, "Error in accept on socket %d: %s", portptr->socket,
+		  strerror(errno));
+	  return;
+	}
 
   if (MaxConnections && (Network->TotalConns >= MaxConnections))
-    {
-      /* maximum users reached */
-      writesocket(fd, "Maximum connections reached, try again later\r\n");
-      close(fd);
-      return;
-    }
+	{
+	  /* maximum users reached */
+	  writesocket(fd, "Maximum connections reached, try again later\r\n");
+	  close(fd);
+	  return;
+	}
 
   resolved = LookupAddress((struct sockaddr *)&addr, addrlen);
 
@@ -359,11 +359,11 @@ void ConnectClient(struct PortInfo *portptr)
   tempconn->socket = fd;
 
   if (resolved != NULL)
-    tempconn->hostname = resolved;
+	tempconn->hostname = resolved;
   else
   {
-    tempconn->hostname = ConvertHostname((struct sockaddr *)&addr,
-        addrlen);
+	tempconn->hostname = ConvertHostname((struct sockaddr *)&addr,
+		addrlen);
   }
 
   tempconn->username = NULL;
@@ -375,87 +375,87 @@ void ConnectClient(struct PortInfo *portptr)
 
   switch (portptr->type)
   {
-    case PRT_TCM:
-    {
-      tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
+	case PRT_TCM:
+	{
+	  tempconn->flags = (SOCK_TCMBOT | SOCK_PENDING | SOCK_NEEDID);
 
-      putlog(LOG1, "Received tcm connection from [%s:%d] on port %d",
-                tempconn->hostname, tempconn->port, portptr->port);
-      SendUmode(OPERUMODE_B,
-                "*** Received tcm connection from [%s:%d] on port %d",
-                tempconn->hostname, tempconn->port, portptr->port);
+	  putlog(LOG1, "Received tcm connection from [%s:%d] on port %d",
+				tempconn->hostname, tempconn->port, portptr->port);
+	  SendUmode(OPERUMODE_B,
+				"*** Received tcm connection from [%s:%d] on port %d",
+				tempconn->hostname, tempconn->port, portptr->port);
 
-      sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
-      if (sock < 0)
-        goodid = 0;
+	  sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
+	  if (sock < 0)
+		goodid = 0;
 
-      break;
-    }
+	  break;
+	}
 
-    case PRT_USERS:
-    {
-      if (portptr->host)
-        {
-          /* Check if incoming connection has an authorized host */
-          if (match(portptr->host, tempconn->hostname) == 0)
-            {
-              putlog(LOG1,
-                "Illegal connection attempt on port %d from [%s:%d]",
-                portptr->port, tempconn->hostname, tempconn->port);
+	case PRT_USERS:
+	{
+	  if (portptr->host)
+		{
+		  /* Check if incoming connection has an authorized host */
+		  if (match(portptr->host, tempconn->hostname) == 0)
+			{
+			  putlog(LOG1,
+				"Illegal connection attempt on port %d from [%s:%d]",
+				portptr->port, tempconn->hostname, tempconn->port);
 
-              SendUmode(OPERUMODE_B,
-                "*** Unauthorized connection attempt from [%s:%d] on port %d",
-                tempconn->hostname, tempconn->port,
-                portptr->port);
+			  SendUmode(OPERUMODE_B,
+				"*** Unauthorized connection attempt from [%s:%d] on port %d",
+				tempconn->hostname, tempconn->port,
+				portptr->port);
 
-              close(tempconn->socket);
-              MyFree(tempconn->hostname);
-              MyFree(tempconn);
-              return;
-            }
-        }
+			  close(tempconn->socket);
+			  MyFree(tempconn->hostname);
+			  MyFree(tempconn);
+			  return;
+			}
+		}
 
-      tempconn->flags = SOCK_NEEDID;
+	  tempconn->flags = SOCK_NEEDID;
 
-      SendUmode(OPERUMODE_Y,
-        "*** Received connection from [%s:%d] on port %d",
-        tempconn->hostname, tempconn->port, portptr->port);
+	  SendUmode(OPERUMODE_Y,
+		"*** Received connection from [%s:%d] on port %d",
+		tempconn->hostname, tempconn->port, portptr->port);
 
-      sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
-      if (sock < 0)
-        goodid = 0;
+	  sock = RequestIdent(tempconn, (struct sockaddr *)&addr, addrlen);
+	  if (sock < 0)
+		goodid = 0;
 
-      break;
-    }
+	  break;
+	}
 
-    default:
-      {
-        /* something is really screwed */
-        putlog(LOG1,
-           "Invalid connection type specified on port [%d] (%s:%d)",
-           portptr->port, tempconn->hostname, tempconn->port);
+	default:
+	  {
+		/* something is really screwed */
+		putlog(LOG1,
+		   "Invalid connection type specified on port [%d] (%s:%d)",
+		   portptr->port, tempconn->hostname, tempconn->port);
 
-        close(tempconn->socket);
-        MyFree(tempconn->hostname);
-        MyFree(tempconn);
-        return;
-      }
-    }
+		close(tempconn->socket);
+		MyFree(tempconn->hostname);
+		MyFree(tempconn);
+		return;
+	  }
+	}
 
   if (!goodid)
-    {
-      /* something went wrong while connecting to their ident port */
+	{
+	  /* something went wrong while connecting to their ident port */
 
-      close(tempconn->authfd);
-      tempconn->authfd = NOSOCKET;
-      tempconn->flags &= ~SOCK_NEEDID;
-      tempconn->username = MyStrdup("unknown");
+	  close(tempconn->authfd);
+	  tempconn->authfd = NOSOCKET;
+	  tempconn->flags &= ~SOCK_NEEDID;
+	  tempconn->username = MyStrdup("unknown");
 
-      /* Their username will remain "unknown" from above */
+	  /* Their username will remain "unknown" from above */
 
-      if (!(tempconn->flags & SOCK_TCMBOT))
-        TelnetGreet(tempconn);
-    }
+	  if (!(tempconn->flags & SOCK_TCMBOT))
+		TelnetGreet(tempconn);
+	}
 
   LinkDccClient(tempconn);
 } /* ConnectClient() */
@@ -474,26 +474,26 @@ void readauth(struct DccUser *dccptr)
   length = recv(dccptr->authfd, buffer, sizeof(buffer), 0);
 
   if (length > 0)
-    {
-      unsigned short remport = 0, locport = 0;
-      int num;
+	{
+	  unsigned short remport = 0, locport = 0;
+	  int num;
 
-      num = sscanf(buffer, "%hu , %hu : USERID : %*[^:]: %10s",
-                   &remport, &locport, ident);
+	  num = sscanf(buffer, "%hu , %hu : USERID : %*[^:]: %10s",
+				   &remport, &locport, ident);
 
-      /*
-       * If num != 3, it's possible the remote identd returned
-       * <remoteport> , <localport> : ERROR : NO-USER
-       * so make the ident "unknown"
-       */
-      if (num != 3)
-        strlcpy(ident, "unknown", sizeof(ident));
-    }
+	  /*
+	   * If num != 3, it's possible the remote identd returned
+	   * <remoteport> , <localport> : ERROR : NO-USER
+	   * so make the ident "unknown"
+	   */
+	  if (num != 3)
+		strlcpy(ident, "unknown", sizeof(ident));
+	}
   else
-    {
-      /* connection was closed */
-      strlcpy(ident, "unknown", sizeof(ident));
-    }
+	{
+	  /* connection was closed */
+	  strlcpy(ident, "unknown", sizeof(ident));
+	}
 
   close(dccptr->authfd);
   dccptr->authfd = NOSOCKET;
@@ -504,7 +504,7 @@ void readauth(struct DccUser *dccptr)
   dccptr->username = MyStrdup(ident);
 
   if (!(dccptr->flags & SOCK_TCMBOT))
-    TelnetGreet(dccptr);
+	TelnetGreet(dccptr);
 } /* readauth() */
 
 /*
@@ -522,21 +522,21 @@ writeauth(struct DccUser *dccptr)
 
   len = sizeof(local);
   if ((getsockname(dccptr->socket, (struct sockaddr *)&local,
-          &len) == -1) ||
-      (getpeername(dccptr->socket,
-            (struct sockaddr *)&remote, &len) == -1))
-    {
-      /* something went wrong */
-      putlog(LOG1,
-             "FATAL: get{sock,peer}name error for %d: %s",
-             dccptr->socket, strerror(errno));
-      return;
-    }
+		  &len) == -1) ||
+	  (getpeername(dccptr->socket,
+			(struct sockaddr *)&remote, &len) == -1))
+	{
+	  /* something went wrong */
+	  putlog(LOG1,
+			 "FATAL: get{sock,peer}name error for %d: %s",
+			 dccptr->socket, strerror(errno));
+	  return;
+	}
 
   /* send ident request */
   ircsprintf(idstr, "%u , %u\r\n",
-             (unsigned int)ntohs(GetPort((struct sockaddr *)&remote)),
-             (unsigned int)ntohs(GetPort((struct sockaddr *)&local)));
+			 (unsigned int)ntohs(GetPort((struct sockaddr *)&remote)),
+			 (unsigned int)ntohs(GetPort((struct sockaddr *)&local)));
   writesocket(dccptr->authfd, idstr);
 
   dccptr->flags &= ~SOCK_WRID;
@@ -547,7 +547,7 @@ writeauth(struct DccUser *dccptr)
  * Connect to the ident port of dccptr
  */
 static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
-    socklen_t addrlen)
+	socklen_t addrlen)
 {
   int domain = PF_INET;
   struct sockaddr_storage laddr;
@@ -558,21 +558,21 @@ static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
   {
 #ifdef INET6
 	  case AF_INET6:
-      domain = PF_INET6;
+	  domain = PF_INET6;
 		  break;
 #endif
 	  case AF_INET:
-      domain = PF_INET;
+	  domain = PF_INET;
 		  break;
-    default:
-      putlog(LOG1, "FATAL: Unknown address family %d", addr->sa_family);
+	default:
+	  putlog(LOG1, "FATAL: Unknown address family %d", addr->sa_family);
 	}
 
   if ((dccptr->authfd = socket(domain, SOCK_STREAM, 6)) == -1)
   {
-    putlog(LOG1, "FATAL: Problem allocating socket: %s",
-           strerror(errno));
-    return -1;
+	putlog(LOG1, "FATAL: Problem allocating socket: %s",
+		   strerror(errno));
+	return -1;
   }
 
   SetSocketOptions(dccptr->authfd);
@@ -582,35 +582,35 @@ static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
   SetPort((struct sockaddr *)&laddr, 0);
 
   if (bind(dccptr->authfd, (struct sockaddr *)&laddr, laddrlen) == -1)
-    {
-      putlog(LOG1, "FATAL: Unable to bind port tcp/%d: %s",
-               0, strerror(errno));
-      close(dccptr->authfd);
-      return -1;
-    }
+	{
+	  putlog(LOG1, "FATAL: Unable to bind port tcp/%d: %s",
+			   0, strerror(errno));
+	  close(dccptr->authfd);
+	  return -1;
+	}
 
   memcpy(&remote, addr, sizeof(remote));
   SetPort((struct sockaddr *)&remote, 113);
 
   if ((connect(dccptr->authfd, (struct sockaddr *)&remote,
-               addrlen)) == -1)
-    {
-      if (IgnoreErrno(errno))
-      {
-        /* probably all alright */
-        dccptr->flags |= SOCK_WRID;
-        return(dccptr->authfd);
-      }
-      else
-      {
-        /* error, can't retry */
-        putlog(LOG1, "Error connecting to %s tcp/%d: %s",
-            dccptr->hostname, 113, strerror(errno));
+			   addrlen)) == -1)
+	{
+	  if (IgnoreErrno(errno))
+	  {
+		/* probably all alright */
+		dccptr->flags |= SOCK_WRID;
+		return(dccptr->authfd);
+	  }
+	  else
+	  {
+		/* error, can't retry */
+		putlog(LOG1, "Error connecting to %s tcp/%d: %s",
+			dccptr->hostname, 113, strerror(errno));
 
-        close(dccptr->authfd);
-        return -1;
-      }
-    }
+		close(dccptr->authfd);
+		return -1;
+	  }
+	}
 
   /* no problems at all */
   dccptr->flags |= SOCK_WRID;
@@ -629,10 +629,10 @@ TelnetGreet(struct DccUser *dccptr)
   char ver[MAXLINE + 1];
 
   if (!dccptr)
-    return;
+	return;
 
   if (dccptr->socket == NOSOCKET)
-    return;
+	return;
 
   SetDccPending(dccptr);
 
@@ -657,33 +657,33 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   struct DccUser *dccptr;
 
   if (!host || !lptr)
-    return 0;
+	return 0;
 
   if (MaxConnections && (Network->TotalConns >= MaxConnections))
-    {
-      /* maximum users reached */
-      notice(n_OperServ, lptr->nick,
-             "Maximum DCC connections have been reached, try again later");
-      return 0;
-    }
+	{
+	  /* maximum users reached */
+	  notice(n_OperServ, lptr->nick,
+			 "Maximum DCC connections have been reached, try again later");
+	  return 0;
+	}
 
   if (lptr->flags & L_OSREGISTERED)
-    tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
+	tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
   else
-    tempuser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
+	tempuser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
 
   if (!tempuser)
-    return 0;
+	return 0;
 
   dccptr = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
   memset(dccptr, 0, sizeof(struct DccUser));
 
   dccptr->socket = ConnectHost(host, port);
   if (dccptr->socket == -1)
-    {
-      MyFree(dccptr);
-      return 0;
-    }
+	{
+	  MyFree(dccptr);
+	  return 0;
+	}
 
   dccptr->flags = SOCK_DCC;
 
@@ -698,7 +698,7 @@ MakeConnection(char *host, int port, struct Luser *lptr)
   dccptr->hostname = MyStrdup(lptr->hostname);
 
   if (!(lptr->flags & L_OSREGISTERED))
-    SetDccPending(dccptr);
+	SetDccPending(dccptr);
 
   /* add them to list */
   LinkDccClient(dccptr);
@@ -712,7 +712,7 @@ GreetDccUser()
 the motd etc.
  
 Return: 1 if successful
-        0 if unsuccessful
+		0 if unsuccessful
 */
 
 int
@@ -734,59 +734,59 @@ GreetDccUser(struct DccUser *dccptr)
   errval = 0;
   errlen = sizeof(errval);
   if (getsockopt(dccptr->socket, SOL_SOCKET, SO_ERROR, (void *)&errval,
-        &errlen) < 0)
-    {
-      putlog(LOG1, "getsockopt(SO_ERROR) failed: %s", strerror(errno));
-      return 0;
-    }
+		&errlen) < 0)
+	{
+	  putlog(LOG1, "getsockopt(SO_ERROR) failed: %s", strerror(errno));
+	  return 0;
+	}
 
   if (errval > 0)
-    {
-      putlog(LOG1,
-             "Error connecting to %s@%s tcp/%d: %s",
-             dccptr->username, dccptr->hostname, dccptr->port,
-             strerror(errval));
+	{
+	  putlog(LOG1,
+			 "Error connecting to %s@%s tcp/%d: %s",
+			 dccptr->username, dccptr->hostname, dccptr->port,
+			 strerror(errval));
 
-      SendUmode(OPERUMODE_Y,
-                "*** Lost connection to [%s@%s:%d]: %s",
-                dccptr->username, dccptr->hostname, dccptr->port,
-                strerror(errval));
+	  SendUmode(OPERUMODE_Y,
+				"*** Lost connection to [%s@%s:%d]: %s",
+				dccptr->username, dccptr->hostname, dccptr->port,
+				strerror(errval));
 
-      return 0;
-    }
+	  return 0;
+	}
 
   motd_tm = localtime(&CurrTime);
   ircsprintf(sendstr, "Hybserv2 %s (%d/%d/%d %d:%02d)\r\n",
-             hVersion, 1900 + motd_tm->tm_year, motd_tm->tm_mon + 1,
-             motd_tm->tm_mday, motd_tm->tm_hour, motd_tm->tm_min);
+			 hVersion, 1900 + motd_tm->tm_year, motd_tm->tm_mon + 1,
+			 motd_tm->tm_mday, motd_tm->tm_hour, motd_tm->tm_min);
   writesocket(dccptr->socket, sendstr);
 
   /* give new user the motd */
   SendMotd(dccptr->socket);
 
   if (IsDccPending(dccptr))
-    {
-      writesocket(dccptr->socket,
-                  "You must .identify before you may use commands\r\n");
-      tempuser = GetUser(0, dccptr->nick, dccptr->username, dccptr->hostname);
-    }
+	{
+	  writesocket(dccptr->socket,
+				  "You must .identify before you may use commands\r\n");
+	  tempuser = GetUser(0, dccptr->nick, dccptr->username, dccptr->hostname);
+	}
   else
-    tempuser = GetUser(1, dccptr->nick, dccptr->username, dccptr->hostname);
+	tempuser = GetUser(1, dccptr->nick, dccptr->username, dccptr->hostname);
 
   assert(tempuser != 0);
 
   if (IsServicesAdmin(tempuser))
-    strlcpy(prefix, "Admin(%)", sizeof(prefix));
+	strlcpy(prefix, "Admin(%)", sizeof(prefix));
   else if (IsAdmin(tempuser))
-    strlcpy(prefix, "Admin", sizeof(prefix));
+	strlcpy(prefix, "Admin", sizeof(prefix));
   else if (IsOper(tempuser))
-    strlcpy(prefix, "Oper", sizeof(prefix));
+	strlcpy(prefix, "Oper", sizeof(prefix));
   else
-    strlcpy(prefix, "User", sizeof(prefix));
+	strlcpy(prefix, "User", sizeof(prefix));
 
   /* inform everyone of new user */
   BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\r\n",
-               prefix, dccptr->nick, dccptr->username, dccptr->hostname);
+			   prefix, dccptr->nick, dccptr->username, dccptr->hostname);
 
   return 1;
 } /* GreetDccUser() */
@@ -808,185 +808,185 @@ onctcp(char *nick, char *target, char *msg)
   struct Userlist *tempuser;
 
   if (!msg)
-    return;
+	return;
 
   if (!*++msg)
-    return;
+	return;
 
   lptr = FindClient(nick);
   if (!lptr)
-    return;
+	return;
 
   if (!ircncmp(msg, "ACTION", 6))
-    return; /* don't log ctcp actions */
+	return; /* don't log ctcp actions */
 
   if (ircncmp(msg, "PING", 4) == 0)
-    {
-      notice(target, nick, "%s", msg - 1);
-      SendUmode(OPERUMODE_Y,
-                "%s: CTCP PING received from %s!%s@%s",
-                target,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname);
-      return;
-    }
+	{
+	  notice(target, nick, "%s", msg - 1);
+	  SendUmode(OPERUMODE_Y,
+				"%s: CTCP PING received from %s!%s@%s",
+				target,
+				lptr->nick,
+				lptr->username,
+				lptr->hostname);
+	  return;
+	}
 
   if (ircncmp(msg, "VERSION", 7) == 0)
-    {
+	{
 #ifdef ADMININFO
-      struct Luser *ouser = NULL;
+	  struct Luser *ouser = NULL;
 #endif /* ADMININFO */
 
-      notice(target, nick,
-             "\001VERSION Hybserv2 TS Services version %s\001",
-             hVersion);
-      notice(target, nick,
-          "\001VERSION Compiled with NICKLEN=%d, "
-          "CHANNELLEN=%d, TOPICLEN=%d\001",
-          NICKLEN, CHANNELLEN, TOPICLEN);
-      notice(target, nick,
-             "\001VERSION Administrator: %s\001",
-             Me.admin);
+	  notice(target, nick,
+			 "\001VERSION Hybserv2 TS Services version %s\001",
+			 hVersion);
+	  notice(target, nick,
+		  "\001VERSION Compiled with NICKLEN=%d, "
+		  "CHANNELLEN=%d, TOPICLEN=%d\001",
+		  NICKLEN, CHANNELLEN, TOPICLEN);
+	  notice(target, nick,
+			 "\001VERSION Administrator: %s\001",
+			 Me.admin);
 
 #ifdef ADMININFO
-      /* Print active operators that have identified to OperServ. This could
-       * be a little performance hit, blah. -kre */
-      for (ouser = ClientList; ouser; ouser = ouser->next)
-        {
-          if (ouser->flags & L_OSREGISTERED)
-            notice(target, nick, "\001VERSION Active operators: %s"
-                   " (%s@%s)\001", ouser->nick, ouser->username,
-                   ouser->hostname);
-        }
+	  /* Print active operators that have identified to OperServ. This could
+	   * be a little performance hit, blah. -kre */
+	  for (ouser = ClientList; ouser; ouser = ouser->next)
+		{
+		  if (ouser->flags & L_OSREGISTERED)
+			notice(target, nick, "\001VERSION Active operators: %s"
+				   " (%s@%s)\001", ouser->nick, ouser->username,
+				   ouser->hostname);
+		}
 #endif /* ADMININFO */
 
-      SendUmode(OPERUMODE_Y,
-                "%s: CTCP VERSION received from %s!%s@%s",
-                target,
-                lptr->nick,
-                lptr->username,
-                lptr->hostname);
-      return;
-    }
+	  SendUmode(OPERUMODE_Y,
+				"%s: CTCP VERSION received from %s!%s@%s",
+				target,
+				lptr->nick,
+				lptr->username,
+				lptr->hostname);
+	  return;
+	}
 
   if (ircncmp(msg, "DCC CHAT", 8) == 0)
-    {
-      int acnt;
-      char **av;
-      char buff[MAXLINE + 1];
+	{
+	  int acnt;
+	  char **av;
+	  char buff[MAXLINE + 1];
 
-      if (irccmp(target, n_OperServ) != 0)
-        return; /* only let n_OperServ accept dcc chats */
+	  if (irccmp(target, n_OperServ) != 0)
+		return; /* only let n_OperServ accept dcc chats */
 
-      goodDCC = 1;
-      if (!lptr)
-        goodDCC = 0;
+	  goodDCC = 1;
+	  if (!lptr)
+		goodDCC = 0;
 
-      if (lptr->flags & L_OSREGISTERED)
-        {
-          /*
-           * If they have already registered through /msg, allow
-           * them to be from a different host, by passing 1 to
-           * GetUser() so it can only match nicknames and
-           * not hostnames if need be - if they are not registered,
-           * make sure hostnames match, otherwise anyone could just
-           * /nick <Oline-nickname> and gain dcc chat access
-           */
-          tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
-        }
-      else
-        tempuser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
+	  if (lptr->flags & L_OSREGISTERED)
+		{
+		  /*
+		   * If they have already registered through /msg, allow
+		   * them to be from a different host, by passing 1 to
+		   * GetUser() so it can only match nicknames and
+		   * not hostnames if need be - if they are not registered,
+		   * make sure hostnames match, otherwise anyone could just
+		   * /nick <Oline-nickname> and gain dcc chat access
+		   */
+		  tempuser = GetUser(1, lptr->nick, lptr->username, lptr->hostname);
+		}
+	  else
+		tempuser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
 
-      if (tempuser)
-        {
-          if (CanChat(tempuser))
-            {
-              goodDCC = 1;
+	  if (tempuser)
+		{
+		  if (CanChat(tempuser))
+			{
+			  goodDCC = 1;
 
-              if (OpersOnlyDcc && !IsOper(tempuser))
-                goodDCC = 0;
-            }
-          else
-            goodDCC = 0;
+			  if (OpersOnlyDcc && !IsOper(tempuser))
+				goodDCC = 0;
+			}
+		  else
+			goodDCC = 0;
 
-          if (IsAdmin(tempuser))
-            goodDCC = 1;
-        } /* if (tempuser) */
-      else
-        goodDCC = 0;
+		  if (IsAdmin(tempuser))
+			goodDCC = 1;
+		} /* if (tempuser) */
+	  else
+		goodDCC = 0;
 
-      if (goodDCC == 0)
-        {
-          notice(n_OperServ, nick,
-                 "You are not authorized to use this service");
+	  if (goodDCC == 0)
+		{
+		  notice(n_OperServ, nick,
+				 "You are not authorized to use this service");
 
-          SendUmode(OPERUMODE_Y,
-                    "*** Unauthorized Dcc Chat attempt from %s (%s@%s)",
-                    nick,
-                    lptr->username,
-                    lptr->hostname);
+		  SendUmode(OPERUMODE_Y,
+					"*** Unauthorized Dcc Chat attempt from %s (%s@%s)",
+					nick,
+					lptr->username,
+					lptr->hostname);
 
-          notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
+		  notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
 
-          putlog(LOG1, "Unauthorized Dcc Chat attempt from %s!%s@%s",
-                 nick,
-                 lptr->username,
-                 lptr->hostname);
+		  putlog(LOG1, "Unauthorized Dcc Chat attempt from %s!%s@%s",
+				 nick,
+				 lptr->username,
+				 lptr->hostname);
 
-          return;
-        }
+		  return;
+		}
 
-      strlcpy(temp, msg, sizeof(temp));
+	  strlcpy(temp, msg, sizeof(temp));
 
-      acnt = SplitBuf(temp, &av);
-      if (acnt < 5)
-        {
-          notice(n_OperServ, nick, "DCC CHAT connection failed");
-          notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
-          putlog(LOG1, "Invalid DCC string received from [%s]: %s",
-              nick, temp);
-          MyFree(av);
-          return;
-        }
+	  acnt = SplitBuf(temp, &av);
+	  if (acnt < 5)
+		{
+		  notice(n_OperServ, nick, "DCC CHAT connection failed");
+		  notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
+		  putlog(LOG1, "Invalid DCC string received from [%s]: %s",
+			  nick, temp);
+		  MyFree(av);
+		  return;
+		}
 
-      strlcpy(buff, av[3], sizeof(buff));
+	  strlcpy(buff, av[3], sizeof(buff));
 #ifdef HAVE_BROKEN_INT_GETADDRINFO
-      DCCNormalizeIP(buff, sizeof(buff));
+	  DCCNormalizeIP(buff, sizeof(buff));
 #endif
 
-      if (atoi(av[4]) < 1024)
-        {
-          notice(n_OperServ, nick,
-                 "Invalid DCC CHAT port specified.  Nice Try.");
-          notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
-          putlog(LOG1, "Bogus DCC CHAT port (%s) specified by %s!%s@%s",
-                 av[4],
-                 lptr->nick,
-                 lptr->username,
-                 lptr->hostname);
-        }
-      else if (!MakeConnection(buff, atoi(av[4]), lptr))
-        {
-          notice(n_OperServ, nick, "DCC CHAT connection failed");
-          notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
-        }
+	  if (atoi(av[4]) < 1024)
+		{
+		  notice(n_OperServ, nick,
+				 "Invalid DCC CHAT port specified.	Nice Try.");
+		  notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
+		  putlog(LOG1, "Bogus DCC CHAT port (%s) specified by %s!%s@%s",
+				 av[4],
+				 lptr->nick,
+				 lptr->username,
+				 lptr->hostname);
+		}
+	  else if (!MakeConnection(buff, atoi(av[4]), lptr))
+		{
+		  notice(n_OperServ, nick, "DCC CHAT connection failed");
+		  notice(n_OperServ, nick, "\001DCC REJECT chat chat\001");
+		}
 
-      MyFree(av);
-      return;
-    }
+	  MyFree(av);
+	  return;
+	}
   else
-    {
-      /*
-       * Chop off ending \001
-       */
+	{
+	  /*
+	   * Chop off ending \001
+	   */
 
-      strlcpy(temp, msg, sizeof(temp));
+	  strlcpy(temp, msg, sizeof(temp));
 
-      SendUmode(OPERUMODE_Y,
-        "%s: CTCP [%s] received from %s!%s@%s",
-        target, temp, lptr->nick, lptr->username, lptr->hostname);
-    }
+	  SendUmode(OPERUMODE_Y,
+		"%s: CTCP [%s] received from %s!%s@%s",
+		target, temp, lptr->nick, lptr->username, lptr->hostname);
+	}
 } /* onctcp() */
 
 /*
@@ -1005,45 +1005,45 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
   struct DccUser *dccptr, *nptr, *tmp;
 
   if (!nick)
-    {
-      /*
-       * nick will be null if we are trying to connect to all tcms
-       * at once (AutoLinkFreq)
-       */
-      nptr = NULL;
-    }
+	{
+	  /*
+	   * nick will be null if we are trying to connect to all tcms
+	   * at once (AutoLinkFreq)
+	   */
+	  nptr = NULL;
+	}
   else
-    if (!(nptr = IsOnDcc(nick)))
-      return 0;
+	if (!(nptr = IsOnDcc(nick)))
+	  return 0;
 
   dccptr = (struct DccUser *) MyMalloc(sizeof(struct DccUser));
   dccptr->socket = ConnectHost(bptr->hostname, bptr->port);
 
   if (dccptr->socket == -1)
-    {
-      SendUmode(OPERUMODE_B,
-                "*** Unable to connect to tcm %s [%s:%d]: %s",
-                bptr->name,
-                bptr->hostname,
-                bptr->port,
-                strerror(errno));
+	{
+	  SendUmode(OPERUMODE_B,
+				"*** Unable to connect to tcm %s [%s:%d]: %s",
+				bptr->name,
+				bptr->hostname,
+				bptr->port,
+				strerror(errno));
 
-      if (nptr)
-        {
-          ircsprintf(sendstr, "Unable to connect to port %d of %s: %s\r\n",
-                     bptr->port, bptr->hostname, strerror(errno));
-          writesocket(nptr->socket, sendstr);
-        }
-      MyFree(dccptr);
-      return (0);
-    }
+	  if (nptr)
+		{
+		  ircsprintf(sendstr, "Unable to connect to port %d of %s: %s\r\n",
+					 bptr->port, bptr->hostname, strerror(errno));
+		  writesocket(nptr->socket, sendstr);
+		}
+	  MyFree(dccptr);
+	  return (0);
+	}
 
   /*
-    The fields for linking to a tcm are in order:
-    <remote tcm's nick> <connecting bot's nick> <password>
+	The fields for linking to a tcm are in order:
+	<remote tcm's nick> <connecting bot's nick> <password>
   */
   ircsprintf(sendstr, "%s %s %s\r\n",
-             bptr->name, n_OperServ, bptr->password);
+			 bptr->name, n_OperServ, bptr->password);
   writesocket(dccptr->socket, sendstr);
 
   dccptr->flags = (SOCK_TCMBOT | SOCK_BOTHUB);
@@ -1052,43 +1052,43 @@ ConnectToTCM(char *nick, struct Botlist *bptr)
 
   lptr = FindClient(dccptr->nick); /* check if bot is on network */
   if (!lptr)
-    {
-      /* just make the bot's hostname ip:port */
-      dccptr->username = MyStrdup("unknown");
+	{
+	  /* just make the bot's hostname ip:port */
+	  dccptr->username = MyStrdup("unknown");
 
-      ircsprintf(sendstr, "%s:%d", bptr->hostname, bptr->port);
-      dccptr->hostname = MyStrdup(sendstr);
-    }
+	  ircsprintf(sendstr, "%s:%d", bptr->hostname, bptr->port);
+	  dccptr->hostname = MyStrdup(sendstr);
+	}
   else /* give the bot a user@host if possible */
-    {
-      dccptr->username = MyStrdup(lptr->username);
-      dccptr->hostname = MyStrdup(lptr->hostname);
-    }
+	{
+	  dccptr->username = MyStrdup(lptr->username);
+	  dccptr->hostname = MyStrdup(lptr->hostname);
+	}
 
   LinkDccClient(dccptr);
 
   /* inform everyone of new bot */
   for (tmp = connections; tmp; tmp = tmp->next)
-    {
-      if (!IsAuth(tmp))
-        continue;
+	{
+	  if (!IsAuth(tmp))
+		continue;
 
-      if (tmp == dccptr)
-        continue;
+	  if (tmp == dccptr)
+		continue;
 
-      if (tmp->flags & SOCK_TCMBOT)
-        {
-          ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
-                     n_OperServ, bptr->name, dccptr->username, dccptr->hostname);
-          writesocket(tmp->socket, sendstr);
-        }
-      else
-        {
-          ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
-                     bptr->name, dccptr->username, dccptr->hostname);
-          writesocket(tmp->socket, sendstr);
-        }
-    }
+	  if (tmp->flags & SOCK_TCMBOT)
+		{
+		  ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
+					 n_OperServ, bptr->name, dccptr->username, dccptr->hostname);
+		  writesocket(tmp->socket, sendstr);
+		}
+	  else
+		{
+		  ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
+					 bptr->name, dccptr->username, dccptr->hostname);
+		  writesocket(tmp->socket, sendstr);
+		}
+	}
 
   return (1);
 } /* ConnectToTCM */
@@ -1108,27 +1108,27 @@ LinkBots()
   int goodlink;
 
   if (BotList)
-    {
-      goodlink = 1;
-      for (bptr = BotList; bptr; bptr = bptr->next)
-        {
-          for (dccptr = connections; dccptr; dccptr = dccptr->next)
-            {
-              if ((dccptr->flags & SOCK_TCMBOT) &&
-                  (!irccmp(dccptr->nick, bptr->name)))
-                {
-                  /* bot is already linked */
-                  goodlink = 0;
-                  break;
-                }
-            }
+	{
+	  goodlink = 1;
+	  for (bptr = BotList; bptr; bptr = bptr->next)
+		{
+		  for (dccptr = connections; dccptr; dccptr = dccptr->next)
+			{
+			  if ((dccptr->flags & SOCK_TCMBOT) &&
+				  (!irccmp(dccptr->nick, bptr->name)))
+				{
+				  /* bot is already linked */
+				  goodlink = 0;
+				  break;
+				}
+			}
 
-          if (goodlink)
-            ConnectToTCM(NULL, bptr);
-          else
-            goodlink = 1;
-        }
-    } /* if (BotList) */
+		  if (goodlink)
+			ConnectToTCM(NULL, bptr);
+		  else
+			goodlink = 1;
+		}
+	} /* if (BotList) */
 } /* LinkBots() */
 
 /*
@@ -1146,45 +1146,45 @@ CloseConnection(struct DccUser *dccptr)
   struct Userlist *tempuser;
 
   if (!dccptr)
-    return;
+	return;
 
   if ((dccptr->flags & SOCK_DCC) || !IsDccPending(dccptr))
-    {
-      prefix[0] = '\0';
+	{
+	  prefix[0] = '\0';
 
-      if (dccptr->flags & SOCK_TCMBOT)
-        strlcpy(prefix, "Bot", sizeof(prefix));
-      else
-        {
-          tempuser = DccGetUser(dccptr);
+	  if (dccptr->flags & SOCK_TCMBOT)
+		strlcpy(prefix, "Bot", sizeof(prefix));
+	  else
+		{
+		  tempuser = DccGetUser(dccptr);
 
-          if (IsServicesAdmin(tempuser))
-            strlcpy(prefix, "Admin(%)", sizeof(prefix));
-          else if (IsAdmin(tempuser))
-            strlcpy(prefix, "Admin", sizeof(prefix));
-          else if (IsOper(tempuser))
-            strlcpy(prefix, "Oper", sizeof(prefix));
-          else
-            strlcpy(prefix, "User", sizeof(prefix));
-        }
+		  if (IsServicesAdmin(tempuser))
+			strlcpy(prefix, "Admin(%)", sizeof(prefix));
+		  else if (IsAdmin(tempuser))
+			strlcpy(prefix, "Admin", sizeof(prefix));
+		  else if (IsOper(tempuser))
+			strlcpy(prefix, "Oper", sizeof(prefix));
+		  else
+			strlcpy(prefix, "User", sizeof(prefix));
+		}
 
-      BroadcastDcc(DCCALL,
-                   "%s %s (%s@%s) has disconnected\r\n",
-                   prefix, dccptr->nick, dccptr->username,
-                   dccptr->hostname);
-    }
+	  BroadcastDcc(DCCALL,
+				   "%s %s (%s@%s) has disconnected\r\n",
+				   prefix, dccptr->nick, dccptr->username,
+				   dccptr->hostname);
+	}
   else
-    {
-      /*
-       * they connected through telnet, but closed the connection
-       * before sending their password
-       */
-      SendUmode(OPERUMODE_Y,
-                "*** Lost connection to [%s@%s:%d]",
-                dccptr->username,
-                dccptr->hostname,
-                dccptr->port);
-    }
+	{
+	  /*
+	   * they connected through telnet, but closed the connection
+	   * before sending their password
+	   */
+	  SendUmode(OPERUMODE_Y,
+				"*** Lost connection to [%s@%s:%d]",
+				dccptr->username,
+				dccptr->hostname,
+				dccptr->port);
+	}
 
   DeleteDccClient(dccptr);
 } /* CloseConnection() */
@@ -1199,7 +1199,7 @@ DeleteDccClient(struct DccUser *dccptr)
 
 {
   if (dccptr == dccnext)
-    dccnext = dccptr->next;
+	dccnext = dccptr->next;
 
   UnlinkDccClient(dccptr);
 
@@ -1207,11 +1207,11 @@ DeleteDccClient(struct DccUser *dccptr)
   dccptr->socket = NOSOCKET;
 
   if (dccptr->nick)
-    MyFree(dccptr->nick);
+	MyFree(dccptr->nick);
   if (dccptr->username)
-    MyFree(dccptr->username);
+	MyFree(dccptr->username);
   if (dccptr->hostname)
-    MyFree(dccptr->hostname);
+	MyFree(dccptr->hostname);
 
   MyFree(dccptr);
 } /* DeleteDccClient() */
@@ -1228,7 +1228,7 @@ LinkDccClient(struct DccUser *dccptr)
   dccptr->prev = NULL;
   dccptr->next = connections;
   if (dccptr->next)
-    dccptr->next->prev = dccptr;
+	dccptr->next->prev = dccptr;
   connections = dccptr;
 
   Network->TotalConns++;
@@ -1248,12 +1248,12 @@ UnlinkDccClient(struct DccUser *dccptr)
   Network->TotalConns--;
 
   if (dccptr->next)
-    dccptr->next->prev = dccptr->prev;
+	dccptr->next->prev = dccptr->prev;
 
   if (dccptr->prev)
-    dccptr->prev->next = dccptr->next;
+	dccptr->prev->next = dccptr->next;
   else
-    connections = dccptr->next;
+	connections = dccptr->next;
 } /* UnlinkDccClient() */
 
 /*
@@ -1269,28 +1269,28 @@ ExpireIdent(time_t unixtime)
   struct DccUser *dccptr;
 
   for (dccptr = connections; dccptr; dccptr = dccptr->next)
-    {
-      if ((dccptr->flags & SOCK_NEEDID) &&
-          (dccptr->authfd != NOSOCKET) &&
-          !(dccptr->flags & SOCK_DCC) &&
-          ((unixtime - dccptr->idle) >= IdentTimeout))
-        {
-          close (dccptr->authfd);
-          dccptr->authfd = NOSOCKET;
-          dccptr->flags &= ~SOCK_NEEDID;
+	{
+	  if ((dccptr->flags & SOCK_NEEDID) &&
+		  (dccptr->authfd != NOSOCKET) &&
+		  !(dccptr->flags & SOCK_DCC) &&
+		  ((unixtime - dccptr->idle) >= IdentTimeout))
+		{
+		  close (dccptr->authfd);
+		  dccptr->authfd = NOSOCKET;
+		  dccptr->flags &= ~SOCK_NEEDID;
 
-          if (dccptr->username)
-            MyFree(dccptr->username);
-          dccptr->username = MyStrdup("unknown");
+		  if (dccptr->username)
+			MyFree(dccptr->username);
+		  dccptr->username = MyStrdup("unknown");
 
-          /* reset idle time for TelnetTimeout */
-          dccptr->idle = current_ts;
+		  /* reset idle time for TelnetTimeout */
+		  dccptr->idle = current_ts;
 
-          writesocket(dccptr->socket, "\r\nIdent-request timed out\r\n");
-          if (!(dccptr->flags & SOCK_TCMBOT))
-            TelnetGreet(dccptr);
-        }
-    }
+		  writesocket(dccptr->socket, "\r\nIdent-request timed out\r\n");
+		  if (!(dccptr->flags & SOCK_TCMBOT))
+			TelnetGreet(dccptr);
+		}
+	}
 } /* ExpireIdent() */
 
 /*
@@ -1308,42 +1308,42 @@ ExpireTelnet(time_t unixtime)
 
   prev = NULL;
   for (dccptr = connections; dccptr; )
-    {
-      if (IsDccPending(dccptr) &&
-          !(dccptr->flags & SOCK_DCC) &&
-          ((unixtime - dccptr->idle) >= TelnetTimeout))
-        {
-          if (prev)
-            {
-              prev->next = dccptr->next;
-              CloseConnection(dccptr);
-              dccptr = prev;
-            }
-          else
-            {
-              /*
-               * We're deleting the first element in the list
-               */
-              connections = dccptr->next;
-              CloseConnection(dccptr);
-              dccptr = NULL;
-            }
-        }
+	{
+	  if (IsDccPending(dccptr) &&
+		  !(dccptr->flags & SOCK_DCC) &&
+		  ((unixtime - dccptr->idle) >= TelnetTimeout))
+		{
+		  if (prev)
+			{
+			  prev->next = dccptr->next;
+			  CloseConnection(dccptr);
+			  dccptr = prev;
+			}
+		  else
+			{
+			  /*
+			   * We're deleting the first element in the list
+			   */
+			  connections = dccptr->next;
+			  CloseConnection(dccptr);
+			  dccptr = NULL;
+			}
+		}
 
-      prev = dccptr;
+	  prev = dccptr;
 
-      /*
-       * If dccptr is NULL, we deleted the first element in
-       * the list, and connections was set to connections->next,
-       * so set dccptr to the new connections, to check what
-       * was previously the second element, but now is the first
-       */
+	  /*
+	   * If dccptr is NULL, we deleted the first element in
+	   * the list, and connections was set to connections->next,
+	   * so set dccptr to the new connections, to check what
+	   * was previously the second element, but now is the first
+	   */
 
-      if (dccptr)
-        dccptr = dccptr->next;
-      else
-        dccptr = connections;
-    }
+	  if (dccptr)
+		dccptr = dccptr->next;
+	  else
+		dccptr = connections;
+	}
 } /* ExpireTelnet() */
 
 /*
@@ -1360,30 +1360,30 @@ CheckEOF()
 
   prev = NULL;
   for (dccptr = connections; dccptr; )
-    {
-      if (dccptr->flags & SOCK_EOF)
-        {
-          if (prev)
-            {
-              prev->next = dccptr->next;
-              CloseConnection(dccptr);
-              dccptr = prev;
-            }
-          else
-            {
-              connections = dccptr->next;
-              CloseConnection(dccptr);
-              dccptr = NULL;
-            }
-        }
+	{
+	  if (dccptr->flags & SOCK_EOF)
+		{
+		  if (prev)
+			{
+			  prev->next = dccptr->next;
+			  CloseConnection(dccptr);
+			  dccptr = prev;
+			}
+		  else
+			{
+			  connections = dccptr->next;
+			  CloseConnection(dccptr);
+			  dccptr = NULL;
+			}
+		}
 
-      prev = dccptr;
+	  prev = dccptr;
 
-      if (dccptr)
-        dccptr = dccptr->next;
-      else
-        dccptr = connections;
-    }
+	  if (dccptr)
+		dccptr = dccptr->next;
+	  else
+		dccptr = connections;
+	}
 } /* CheckEOF() */
 
 /*
@@ -1394,48 +1394,48 @@ GoodTCM()
 */
 
 struct Botlist *
-      GoodTCM(struct DccUser *dccptr)
+	  GoodTCM(struct DccUser *dccptr)
 
   {
-    struct Botlist *tempbot;
-    char *user,
-    *host;
+	struct Botlist *tempbot;
+	char *user,
+	*host;
 
-    if (!dccptr)
-      return (NULL);
+	if (!dccptr)
+	  return (NULL);
 
-    if (dccptr->flags & SOCK_NEEDID)
-      user = NULL;
-    else
-      user = dccptr->username;
+	if (dccptr->flags & SOCK_NEEDID)
+	  user = NULL;
+	else
+	  user = dccptr->username;
 
-    host = dccptr->hostname;
+	host = dccptr->hostname;
 
-    for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
-      {
-        if (user && tempbot->username)
-          if (match(tempbot->username, user) == 0)
-            continue;
+	for (tempbot = RemoteBots; tempbot; tempbot = tempbot->next)
+	  {
+		if (user && tempbot->username)
+		  if (match(tempbot->username, user) == 0)
+			continue;
 
-        if (match(tempbot->hostname, host))
-          return (tempbot);
-      }
+		if (match(tempbot->hostname, host))
+		  return (tempbot);
+	  }
 
-    return (NULL);
+	return (NULL);
   } /* GoodTCM() */
 
 struct DccUser *
-      GetBot(char *bname)
+	  GetBot(char *bname)
 
   {
-    struct DccUser *botptr;
+	struct DccUser *botptr;
 
-    for (botptr = connections; botptr; botptr = botptr->next)
-      if ((botptr->flags & SOCK_TCMBOT) &&
-          (!irccmp(botptr->nick, bname)))
-        return(botptr);
+	for (botptr = connections; botptr; botptr = botptr->next)
+	  if ((botptr->flags & SOCK_TCMBOT) &&
+		  (!irccmp(botptr->nick, bname)))
+		return(botptr);
 
-    return (NULL);
+	return (NULL);
   } /* GetBot() */
 
 /*
@@ -1446,16 +1446,16 @@ IsDccSock()
 */
 
 struct DccUser *
-      IsDccSock(int sockfd)
+	  IsDccSock(int sockfd)
 
   {
-    struct DccUser *tmp;
+	struct DccUser *tmp;
 
-    for (tmp = connections; tmp; tmp = tmp->next)
-      if (tmp->socket == sockfd)
-        return (tmp);
+	for (tmp = connections; tmp; tmp = tmp->next)
+	  if (tmp->socket == sockfd)
+		return (tmp);
 
-    return (NULL);
+	return (NULL);
   } /* IsDccSock() */
 
 /*
@@ -1466,25 +1466,25 @@ IsOnDcc()
 */
 
 struct DccUser *
-      IsOnDcc(char *nick)
+	  IsOnDcc(char *nick)
 
   {
-    struct DccUser *tmp;
+	struct DccUser *tmp;
 
-    if (!nick)
-      return (NULL);
+	if (!nick)
+	  return (NULL);
 
-    for (tmp = connections; tmp; tmp = tmp->next)
-      {
-        if ((IsDccPending(tmp) && !(tmp->flags & SOCK_DCC)) ||
-            (tmp->flags & SOCK_NEEDID))
-          continue;
+	for (tmp = connections; tmp; tmp = tmp->next)
+	  {
+		if ((IsDccPending(tmp) && !(tmp->flags & SOCK_DCC)) ||
+			(tmp->flags & SOCK_NEEDID))
+		  continue;
 
-        if (!irccmp(tmp->nick, nick))
-          return (tmp);
-      }
+		if (!irccmp(tmp->nick, nick))
+		  return (tmp);
+	  }
 
-    return (NULL);
+	return (NULL);
   } /* IsOnDcc() */
 
 /*
@@ -1493,50 +1493,50 @@ DccGetUser()
 */
 
 struct Userlist *
-      DccGetUser(struct DccUser *dccptr)
+	  DccGetUser(struct DccUser *dccptr)
 
   {
-    struct Userlist *userptr;
+	struct Userlist *userptr;
 
-    if (!dccptr)
-      return (NULL);
+	if (!dccptr)
+	  return (NULL);
 
-    /*
-     * Give the arguement 1 to match nicknames if it can't
-     * find a hostname match, because the client may be
-     * a telnet client from a different host, but they
-     * still entered the correct username/password
-     */
-    userptr = GetUser(1, dccptr->nick, dccptr->username, dccptr->hostname);
+	/*
+	 * Give the arguement 1 to match nicknames if it can't
+	 * find a hostname match, because the client may be
+	 * a telnet client from a different host, but they
+	 * still entered the correct username/password
+	 */
+	userptr = GetUser(1, dccptr->nick, dccptr->username, dccptr->hostname);
 
-    if (userptr && !(dccptr->flags & SOCK_DCC))
-      {
-        /*
-         * dccptr is a telnet client, not dcc
-         */
+	if (userptr && !(dccptr->flags & SOCK_DCC))
+	  {
+		/*
+		 * dccptr is a telnet client, not dcc
+		 */
 
-        /*
-         * Check if dccptr->nick matches userptr->nick. If it does
-         * not, the problem is most likely the following scenario:
-         * There are two O: lines:
-         *        UserA *@a.com
-         *        UserB *@b.com
-         * Now, UserA connects to Hybserv (telnet) from *@b.com,
-         * so the above call to GetUser() would have returned
-         * UserB's structure, since hostnames are a higher
-         * priority than nicknames. However, since this is a
-         * telnet connection, the nicknames must also match since
-         * the user is forced to enter their nickname when
-         * they connect. Thus, call GetUser() again, telling
-         * it to match only nicknames, since matching hostnames
-         * has already failed. Otherwise UserA would incorrectly
-         * get UserB's privileges.
-         */
-        if (irccmp(dccptr->nick, userptr->nick) != 0)
-          userptr = GetUser(1, dccptr->nick, NULL, NULL);
-      }
+		/*
+		 * Check if dccptr->nick matches userptr->nick. If it does
+		 * not, the problem is most likely the following scenario:
+		 * There are two O: lines:
+		 *		  UserA *@a.com
+		 *		  UserB *@b.com
+		 * Now, UserA connects to Hybserv (telnet) from *@b.com,
+		 * so the above call to GetUser() would have returned
+		 * UserB's structure, since hostnames are a higher
+		 * priority than nicknames. However, since this is a
+		 * telnet connection, the nicknames must also match since
+		 * the user is forced to enter their nickname when
+		 * they connect. Thus, call GetUser() again, telling
+		 * it to match only nicknames, since matching hostnames
+		 * has already failed. Otherwise UserA would incorrectly
+		 * get UserB's privileges.
+		 */
+		if (irccmp(dccptr->nick, userptr->nick) != 0)
+		  userptr = GetUser(1, dccptr->nick, NULL, NULL);
+	  }
 
-    return (userptr);
+	return (userptr);
   } /* DccGetUser() */
 
 /*
@@ -1547,10 +1547,10 @@ accordingly.  Return 1 if telnet codes found, 0 if not
  Telnet Codes
  Type  Decimal Octal
  
- IAC:  255     377
- WILL: 251     373     
- DO:   253     375
- AYT:  246     366
+ IAC:  255	   377
+ WILL: 251	   373	   
+ DO:   253	   375
+ AYT:  246	   366
 */
 
 int
@@ -1558,27 +1558,27 @@ telnet_check(int socket, char *buf)
 
 {
   unsigned int ii;
-  int    ret = 0;
+  int	 ret = 0;
 
   if (!buf)
-    return 0;
+	return 0;
 
   for (ii = 0; ii < strlen(buf); ii++)
-    {
-      if ((buf[ii] == '\377') ||
-          (buf[ii] == '\373') ||
-          (buf[ii] == '\375'))
-        {
-          ret = 1;
-        }
-      if (buf[ii] == '\366')
-        {
-          /* Are you there? */
-          writesocket(socket, "\r\nAYT Received\r\n");
-          ret = 1;
-          break;
-        }
-    }
+	{
+	  if ((buf[ii] == '\377') ||
+		  (buf[ii] == '\373') ||
+		  (buf[ii] == '\375'))
+		{
+		  ret = 1;
+		}
+	  if (buf[ii] == '\366')
+		{
+		  /* Are you there? */
+		  writesocket(socket, "\r\nAYT Received\r\n");
+		  ret = 1;
+		  break;
+		}
+	}
 
   return (ret);
 } /* telnet_check() */
@@ -1595,7 +1595,7 @@ DccProcess(struct DccUser *dccptr, char *command)
 
 {
   if (!dccptr || !command)
-    return;
+	return;
 
   Network->RecvB += (command ? strlen(command) : 0);
 
@@ -1603,165 +1603,165 @@ DccProcess(struct DccUser *dccptr, char *command)
   dccptr->idle = current_ts;
 
   if (!(dccptr->flags & SOCK_DCC) && IsDccPending(dccptr))
-    {
-      struct Userlist *tempuser;
-      char prefix[MAXLINE + 1];
-      int goodconn; /* are they allowed to connect? */
+	{
+	  struct Userlist *tempuser;
+	  char prefix[MAXLINE + 1];
+	  int goodconn; /* are they allowed to connect? */
 
-      /*
-       * dccptr is an incoming telnet connection - they should
-       * either be entering their nickname or password right now
-       */
+	  /*
+	   * dccptr is an incoming telnet connection - they should
+	   * either be entering their nickname or password right now
+	   */
 
-      if (!dccptr->nick)
-        {
-          /*
-           * they should be entering their nickname now
-           */
-          dccptr->nick = MyStrdup(command);
+	  if (!dccptr->nick)
+		{
+		  /*
+		   * they should be entering their nickname now
+		   */
+		  dccptr->nick = MyStrdup(command);
 
-          /*
-           * \377\373\001 (IAC WILL ECHO) - turn off remote telnet echo
-           * for them to enter their password
-           */
-          writesocket(dccptr->socket, "Enter password\377\373\001\r\n");
+		  /*
+		   * \377\373\001 (IAC WILL ECHO) - turn off remote telnet echo
+		   * for them to enter their password
+		   */
+		  writesocket(dccptr->socket, "Enter password\377\373\001\r\n");
 
-          return;
-        }
+		  return;
+		}
 
-      if (telnet_check(dccptr->socket, command))
-        return;
+	  if (telnet_check(dccptr->socket, command))
+		return;
 
-      /* Check if they have an O: line */
-      if (!(tempuser = DccGetUser(dccptr)))
-        {
-          writesocket(dccptr->socket, "Invalid password\r\n");
+	  /* Check if they have an O: line */
+	  if (!(tempuser = DccGetUser(dccptr)))
+		{
+		  writesocket(dccptr->socket, "Invalid password\r\n");
 
-          SendUmode(OPERUMODE_Y,
-                    "*** Unauthorized connection attempt from %s@%s:%d [%s]",
-                    dccptr->username, dccptr->hostname, dccptr->port,
-                    dccptr->nick);
-          CloseConnection(dccptr);
-          return;
-        }
+		  SendUmode(OPERUMODE_Y,
+					"*** Unauthorized connection attempt from %s@%s:%d [%s]",
+					dccptr->username, dccptr->hostname, dccptr->port,
+					dccptr->nick);
+		  CloseConnection(dccptr);
+		  return;
+		}
 
-      if (CanChat(tempuser))
-        {
-          goodconn = 1;
+	  if (CanChat(tempuser))
+		{
+		  goodconn = 1;
 
-          if (OpersOnlyDcc && !IsOper(tempuser))
-            goodconn = 0;
-        }
-      else
-        goodconn = 0;
+		  if (OpersOnlyDcc && !IsOper(tempuser))
+			goodconn = 0;
+		}
+	  else
+		goodconn = 0;
 
-      if (goodconn == 0)
-        {
-          writesocket(dccptr->socket,
-                      "You are not authorized to use this service\r\n");
+	  if (goodconn == 0)
+		{
+		  writesocket(dccptr->socket,
+					  "You are not authorized to use this service\r\n");
 
-          SendUmode(OPERUMODE_Y,
-                    "Unauthorized connection attempt from %s@%s:%d [%s]",
-                    dccptr->username, dccptr->hostname, dccptr->port,
-                    tempuser->nick);
-          CloseConnection(dccptr);
-          return;
-        }
+		  SendUmode(OPERUMODE_Y,
+					"Unauthorized connection attempt from %s@%s:%d [%s]",
+					dccptr->username, dccptr->hostname, dccptr->port,
+					tempuser->nick);
+		  CloseConnection(dccptr);
+		  return;
+		}
 
-      /* check if 'command' matches their password */
+	  /* check if 'command' matches their password */
 
-      if (!operpwmatch(tempuser->password, command))
-        {
-          writesocket(dccptr->socket, "Invalid password\r\n");
-          SendUmode(OPERUMODE_Y,
-                    "*** Invalid password on connection from %s@%s:%d [%s]",
-                    dccptr->username,
-                    dccptr->hostname,
-                    dccptr->port,
-                    tempuser->nick);
-          CloseConnection(dccptr);
-          return;
-        }
-      else
-        {
-          MyFree(dccptr->nick);
-          dccptr->nick = MyStrdup(tempuser->nick);
+	  if (!operpwmatch(tempuser->password, command))
+		{
+		  writesocket(dccptr->socket, "Invalid password\r\n");
+		  SendUmode(OPERUMODE_Y,
+					"*** Invalid password on connection from %s@%s:%d [%s]",
+					dccptr->username,
+					dccptr->hostname,
+					dccptr->port,
+					tempuser->nick);
+		  CloseConnection(dccptr);
+		  return;
+		}
+	  else
+		{
+		  MyFree(dccptr->nick);
+		  dccptr->nick = MyStrdup(tempuser->nick);
 
-          ClearDccPending(dccptr);
+		  ClearDccPending(dccptr);
 
-          if (IsServicesAdmin(tempuser))
-            strlcpy(prefix, "Admin(%)", sizeof(prefix));
-          else if (IsAdmin(tempuser))
-            strlcpy(prefix, "Admin", sizeof(prefix));
-          else if (IsOper(tempuser))
-            strlcpy(prefix, "Oper", sizeof(prefix));
-          else
-            strlcpy(prefix, "User", sizeof(prefix));
+		  if (IsServicesAdmin(tempuser))
+			strlcpy(prefix, "Admin(%)", sizeof(prefix));
+		  else if (IsAdmin(tempuser))
+			strlcpy(prefix, "Admin", sizeof(prefix));
+		  else if (IsOper(tempuser))
+			strlcpy(prefix, "Oper", sizeof(prefix));
+		  else
+			strlcpy(prefix, "User", sizeof(prefix));
 
-          /* turn ECHO back on */
-          writesocket(dccptr->socket, "\377\374\001\r\n");
+		  /* turn ECHO back on */
+		  writesocket(dccptr->socket, "\377\374\001\r\n");
 
-          /* send them the motd */
-          SendMotd(dccptr->socket);
+		  /* send them the motd */
+		  SendMotd(dccptr->socket);
 
-          /* inform everyone of new user */
-          BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\r\n",
-                       prefix, dccptr->nick, dccptr->username,
-                       dccptr->hostname);
-        }
+		  /* inform everyone of new user */
+		  BroadcastDcc(DCCALL, "%s %s (%s@%s) has connected\r\n",
+					   prefix, dccptr->nick, dccptr->username,
+					   dccptr->hostname);
+		}
 
-      return;
-    }
+	  return;
+	}
 
   if (!(dccptr->flags & SOCK_DCC))
-    if (telnet_check(dccptr->socket, command))
-      return;
+	if (telnet_check(dccptr->socket, command))
+	  return;
 
   if (*command == '.')
-    {
-      int clength;
-      char *tmp;
+	{
+	  int clength;
+	  char *tmp;
 
-      /* its a command, not a message to the partyline */
+	  /* its a command, not a message to the partyline */
 
-      ++command;
-      if (IsRegistered(NULL, dccptr->socket))
-        {
-          os_process(dccptr->nick, command, dccptr->socket);
-          return;
-        }
+	  ++command;
+	  if (IsRegistered(NULL, dccptr->socket))
+		{
+		  os_process(dccptr->nick, command, dccptr->socket);
+		  return;
+		}
 
-      clength = 0;
-      for (tmp = command; *tmp; tmp++)
-        {
-          if (*tmp == ' ')
-            break;
-          clength++;
-        }
+	  clength = 0;
+	  for (tmp = command; *tmp; tmp++)
+		{
+		  if (*tmp == ' ')
+			break;
+		  clength++;
+		}
 
-      if ((!ircncmp(command, "REGISTER", clength)) ||
-          (!ircncmp(command, "IDENTIFY", clength)) ||
-          (!ircncmp(command, "HELP", clength)))
-        os_process(dccptr->nick, command, dccptr->socket);
-      else
-        writesocket(dccptr->socket, "You must identify first\r\n");
+	  if ((!ircncmp(command, "REGISTER", clength)) ||
+		  (!ircncmp(command, "IDENTIFY", clength)) ||
+		  (!ircncmp(command, "HELP", clength)))
+		os_process(dccptr->nick, command, dccptr->socket);
+	  else
+		writesocket(dccptr->socket, "You must identify first\r\n");
 
-    }
+	}
   else
-    {
-      /* it was not a command, broadcast it to dcc users */
-      if (strlen(command))
-        SendDccMessage(dccptr, command);
-    }
+	{
+	  /* it was not a command, broadcast it to dcc users */
+	  if (strlen(command))
+		SendDccMessage(dccptr, command);
+	}
 } /* DccProcess() */
 
 /*
 BotProcess()
   args: int bindex, char *line
   purpose: send 'line' to all other bots/users on botnet coming from
-           botptr
+		   botptr
   return: 1 -> failure (forced close, forget about spill)
-          0 -> success
+		  0 -> success
 */
 
 int BotProcess(struct DccUser *botptr, char *line)
@@ -1770,165 +1770,165 @@ int BotProcess(struct DccUser *botptr, char *line)
   char buf[MAXLINE + 1];
 
   if (!line)
-    return 0;
+	return 0;
 
   Network->RecvB += (line ? strlen(line) : 0);
 
   if (IsDccPending(botptr))
-    {
-      char *mynick;
-      char *tcmnick;
-      char *password;
-      struct Botlist *bptr;
-      int goodconn = 1;
-      char sendstr[MAXLINE + 1];
+	{
+	  char *mynick;
+	  char *tcmnick;
+	  char *password;
+	  struct Botlist *bptr;
+	  int goodconn = 1;
+	  char sendstr[MAXLINE + 1];
 
-      if (!(bptr = GoodTCM(botptr)))
-        {
-          goodconn = 0;
-          SendUmode(OPERUMODE_B,
-                    "*** Unauthorized tcm connection received from %s@%s:%d",
-                    botptr->username, botptr->hostname, botptr->port);
-          putlog(LOG1,
-                 "Unauthorized tcm connection received from %s@%s:%d",
-                 botptr->username, botptr->hostname, botptr->port);
-        }
+	  if (!(bptr = GoodTCM(botptr)))
+		{
+		  goodconn = 0;
+		  SendUmode(OPERUMODE_B,
+					"*** Unauthorized tcm connection received from %s@%s:%d",
+					botptr->username, botptr->hostname, botptr->port);
+		  putlog(LOG1,
+				 "Unauthorized tcm connection received from %s@%s:%d",
+				 botptr->username, botptr->hostname, botptr->port);
+		}
 
-      if (goodconn)
-        {
-          while (1)
-            {
-              /*
-               * this loop is needed so we can break if the tcm gives
-               * an incorrect pass/myname etc
-               */
+	  if (goodconn)
+		{
+		  while (1)
+			{
+			  /*
+			   * this loop is needed so we can break if the tcm gives
+			   * an incorrect pass/myname etc
+			   */
 
-              mynick = strtok(line, " ");
-              tcmnick = strtok(NULL, " ");
-              password = strtok(NULL, "\r\n");
+			  mynick = strtok(line, " ");
+			  tcmnick = strtok(NULL, " ");
+			  password = strtok(NULL, "\r\n");
 
-              if (!mynick || (irccmp(mynick, n_OperServ) != 0))
-                {
-                  SendUmode(OPERUMODE_B,
-                            "*** Invalid myname on tcm connection attempt from %s@%s:%d",
-                            botptr->username,
-                            botptr->hostname,
-                            botptr->port);
-                  goodconn = 0;
-                  break;
-                }
+			  if (!mynick || (irccmp(mynick, n_OperServ) != 0))
+				{
+				  SendUmode(OPERUMODE_B,
+							"*** Invalid myname on tcm connection attempt from %s@%s:%d",
+							botptr->username,
+							botptr->hostname,
+							botptr->port);
+				  goodconn = 0;
+				  break;
+				}
 
-              if (!tcmnick || (irccmp(tcmnick, bptr->name) != 0))
-                {
-                  SendUmode(OPERUMODE_B,
-                            "*** Invalid bot name specified on tcm connection attempt from %s@%s:%d",
-                            botptr->username,
-                            botptr->hostname,
-                            botptr->port);
-                  goodconn = 0;
-                  break;
-                }
+			  if (!tcmnick || (irccmp(tcmnick, bptr->name) != 0))
+				{
+				  SendUmode(OPERUMODE_B,
+							"*** Invalid bot name specified on tcm connection attempt from %s@%s:%d",
+							botptr->username,
+							botptr->hostname,
+							botptr->port);
+				  goodconn = 0;
+				  break;
+				}
 
-              if (!password || (irccmp(password, bptr->password) != 0))
-                {
-                  SendUmode(OPERUMODE_B,
-                            "*** Invalid password specified on tcm connection attempt from %s@%s:%d",
-                            botptr->username,
-                            botptr->hostname,
-                            botptr->port);
-                  goodconn = 0;
-                  break;
-                }
+			  if (!password || (irccmp(password, bptr->password) != 0))
+				{
+				  SendUmode(OPERUMODE_B,
+							"*** Invalid password specified on tcm connection attempt from %s@%s:%d",
+							botptr->username,
+							botptr->hostname,
+							botptr->port);
+				  goodconn = 0;
+				  break;
+				}
 
-              botptr->nick = MyStrdup(tcmnick);
+			  botptr->nick = MyStrdup(tcmnick);
 
-              ClearDccPending(botptr);
+			  ClearDccPending(botptr);
 
-              SendUmode(OPERUMODE_B,
-                        "*** Connection with %s [%s@%s] established",
-                        botptr->nick,
-                        botptr->username,
-                        botptr->hostname);
+			  SendUmode(OPERUMODE_B,
+						"*** Connection with %s [%s@%s] established",
+						botptr->nick,
+						botptr->username,
+						botptr->hostname);
 
-              for (tmp = connections; tmp; tmp = tmp->next)
-                {
-                  if (tmp == botptr)
-                    continue;
+			  for (tmp = connections; tmp; tmp = tmp->next)
+				{
+				  if (tmp == botptr)
+					continue;
 
-                  if (tmp->flags & SOCK_TCMBOT)
-                    {
-                      ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
-                                 n_OperServ, botptr->nick, botptr->username,
-                                 botptr->hostname);
-                      writesocket(tmp->socket, sendstr);
-                    }
-                  else
-                    {
-                      ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
-                                 botptr->nick, botptr->username, botptr->hostname);
-                      writesocket(tmp->socket, sendstr);
-                    }
-                }
-              break;
-            } /* while (1) */
-        } /* if (goodconn) */
+				  if (tmp->flags & SOCK_TCMBOT)
+					{
+					  ircsprintf(sendstr, "(%s) Linked to %s [%s@%s]\r\n",
+								 n_OperServ, botptr->nick, botptr->username,
+								 botptr->hostname);
+					  writesocket(tmp->socket, sendstr);
+					}
+				  else
+					{
+					  ircsprintf(sendstr, "*** Linked to %s [%s@%s]\r\n",
+								 botptr->nick, botptr->username, botptr->hostname);
+					  writesocket(tmp->socket, sendstr);
+					}
+				}
+			  break;
+			} /* while (1) */
+		} /* if (goodconn) */
 
-      if (!goodconn)
-        {
-          struct DccUser *prv;
+	  if (!goodconn)
+		{
+		  struct DccUser *prv;
 
-          close(botptr->socket);
-          botptr->socket = NOSOCKET;
-          MyFree(botptr->username);
-          MyFree(botptr->hostname);
+		  close(botptr->socket);
+		  botptr->socket = NOSOCKET;
+		  MyFree(botptr->username);
+		  MyFree(botptr->hostname);
 
-          if (connections)
-            {
-              if (connections == botptr)
-                {
-                  connections = connections->next;
-                  MyFree(botptr);
-                }
-              else
-                {
-                  prv = connections;
-                  for (tmp = connections->next; tmp; )
-                    {
-                      if (tmp == botptr)
-                        {
-                          prv->next = tmp->next;
-                          MyFree(tmp);
-                          break;
-                        }
-                      else
-                        {
-                          prv = tmp;
-                          tmp = tmp->next;
-                        }
-                    }
-                }
-            } /* if (connections) */
+		  if (connections)
+			{
+			  if (connections == botptr)
+				{
+				  connections = connections->next;
+				  MyFree(botptr);
+				}
+			  else
+				{
+				  prv = connections;
+				  for (tmp = connections->next; tmp; )
+					{
+					  if (tmp == botptr)
+						{
+						  prv->next = tmp->next;
+						  MyFree(tmp);
+						  break;
+						}
+					  else
+						{
+						  prv = tmp;
+						  tmp = tmp->next;
+						}
+					}
+				}
+			} /* if (connections) */
 
-          Network->TotalConns--;
-          return 1;
-        }
+		  Network->TotalConns--;
+		  return 1;
+		}
 
-      return 0;
-    }
+	  return 0;
+	}
 
   if (*line == '<')
-    {
-      /* <nick@bot> said something */
+	{
+	  /* <nick@bot> said something */
 
-      ircsprintf(buf, "%s\r\n", line);
-      for (tmp = connections; tmp; tmp = tmp->next)
-        {
-          if (botptr == tmp)
-            continue; /* don't send it back to the bot it came from */
+	  ircsprintf(buf, "%s\r\n", line);
+	  for (tmp = connections; tmp; tmp = tmp->next)
+		{
+		  if (botptr == tmp)
+			continue; /* don't send it back to the bot it came from */
 
-          writesocket(tmp->socket, buf);
-        }
-    }
+		  writesocket(tmp->socket, buf);
+		}
+	}
   return 0;
 } /* BotProcess() */
 
@@ -1944,18 +1944,18 @@ ServReboot()
   struct DccUser *tempconn;
 
   while (connections)
-    {
-      tempconn = connections->next;
-      close(connections->socket);
-      connections->socket = NOSOCKET;
+	{
+	  tempconn = connections->next;
+	  close(connections->socket);
+	  connections->socket = NOSOCKET;
 
-      MyFree(connections->nick);
-      MyFree(connections->username);
-      MyFree(connections->hostname);
-      MyFree(connections);
+	  MyFree(connections->nick);
+	  MyFree(connections->username);
+	  MyFree(connections->hostname);
+	  MyFree(connections);
 
-      connections = tempconn;
-    }
+	  connections = tempconn;
+	}
   connections = NULL;
 
   /* Instead of SQUIT -kre */
@@ -1993,13 +1993,13 @@ void DCCNormalizeIP(char *name, int len)
 {
   if (strchr(name, ':') == NULL)
   {
-    unsigned long int addr;
-    struct in_addr ipaddr;
+	unsigned long int addr;
+	struct in_addr ipaddr;
 
-    /* normal IPv4 address in 32bit number form */
-    addr = strtoul(name, NULL, 10);
-    ipaddr.s_addr = htonl(addr);
-    strlcpy(name, inet_ntoa(ipaddr), len);
+	/* normal IPv4 address in 32bit number form */
+	addr = strtoul(name, NULL, 10);
+	ipaddr.s_addr = htonl(addr);
+	strlcpy(name, inet_ntoa(ipaddr), len);
   }
 }
 #endif

@@ -168,12 +168,12 @@ struct sockaddr_storage {
 
 #if !defined HAVE_GETADDRINFO
 int getaddrinfo(const char *, const char *, const struct addrinfo *,
-    struct addrinfo **);
+	struct addrinfo **);
 #endif
 
 #if !defined HAVE_GETNAMEINFO
 int getnameinfo(const struct sockaddr *, socklen_t, char *,
-    size_t, char *, size_t, int);
+	size_t, char *, size_t, int);
 #endif
 
 #if !defined HAVE_INET_NTOA

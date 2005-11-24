@@ -31,10 +31,10 @@ char *StrToupper(char *str)
   static char retstr[MAXLINE + 1];
 
   if (str == NULL)
-    return NULL;
+	return NULL;
 
   for (; ii < strlen(str); ++ii)
-    retstr[ii] = ToUpper(str[ii]);
+	retstr[ii] = ToUpper(str[ii]);
 
   retstr[ii] = '\0';
 
@@ -54,10 +54,10 @@ char *StrTolower(char *str)
   static char retstr[MAXLINE + 1];
 
   if (str == NULL)
-    return NULL;
+	return NULL;
 
   for (; ii < strlen(str); ++ii)
-    retstr[ii] = ToLower(str[ii]);
+	retstr[ii] = ToLower(str[ii]);
 
   retstr[ii] = '\0';
 
@@ -80,11 +80,11 @@ char *GetString(int ac, char **av)
 
   for (; ii < ac; ++ii)
   {
-    strlcat(final, av[ii], MAXLINE + 1);
-    bw = strlcat(final, " ", MAXLINE + 1);
+	strlcat(final, av[ii], MAXLINE + 1);
+	bw = strlcat(final, " ", MAXLINE + 1);
   }
   if (bw)
-    final[bw - 1] = '\0';
+	final[bw - 1] = '\0';
 
   return final;
 } /* GetString() */
@@ -105,48 +105,48 @@ int SplitBuf(char *string, char ***array)
   *array = NULL;
 
   if ((buf == NULL) || (*buf == '\0'))
-    return 0;
+	return 0;
 
   *array = MyMalloc(sizeof(char *) * (MAXPARAM + 1));
 
   len = strlen(string);
   if (IsEOL(string[len - 1]))
-    string[len - 1] = '\0';
+	string[len - 1] = '\0';
 
   (*array)[x] = NULL;
 
   /* contained only spaces */
   while (IsSpace(*buf))
-    ++buf;
+	++buf;
 
   if (*buf == '\0')
-    return x;
+	return x;
 
   do
   {
-    (*array)[x++] = buf;
-    (*array)[x] = NULL;
-    if ((p = strchr(buf, ' ')) != NULL)
-    {
-      if (*(p + 1) == ':')
-      {
-        *p = '\0';
-        (*array)[x++] = p + 1;
-        (*array)[x] = NULL;
-        return x;
-      }
+	(*array)[x++] = buf;
+	(*array)[x] = NULL;
+	if ((p = strchr(buf, ' ')) != NULL)
+	{
+	  if (*(p + 1) == ':')
+	  {
+		*p = '\0';
+		(*array)[x++] = p + 1;
+		(*array)[x] = NULL;
+		return x;
+	  }
 
-      *p++ = '\0';
-      buf = p;
-    }
-    else
-      return x;
+	  *p++ = '\0';
+	  buf = p;
+	}
+	else
+	  return x;
 
-    while (*buf == ' ')
-      ++buf;
+	while (*buf == ' ')
+	  ++buf;
 
-    if (*buf == '\0')
-      return x;
+	if (*buf == '\0')
+	  return x;
   } while (x < MAXPARAM - 1);
 
   (*array)[x++] = p;

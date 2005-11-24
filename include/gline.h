@@ -18,11 +18,11 @@ struct Luser;
 struct Gline
 {
   struct Gline *next, *prev;
-  char *username;      /* username of gline */
-  char *hostname;      /* hostname of gline */
-  char *reason;        /* reason for Gline */
-  char *who;           /* who made the gline */
-  time_t expires;      /* 0 if its not a temp gline */
+  char *username;	   /* username of gline */
+  char *hostname;	   /* hostname of gline */
+  char *reason;		   /* reason for Gline */
+  char *who;		   /* who made the gline */
+  time_t expires;	   /* 0 if its not a temp gline */
 };
 
 void AddGline(char *, char *, char *, long);

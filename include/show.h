@@ -11,10 +11,10 @@
 #include "stdinc.h"
 #include "config.h"
 
-#define  SHOW_HELP        0x000001 /* -h/-? */
+#define  SHOW_HELP		  0x000001 /* -h/-? */
 #define  SHOW_TOTALCOUNT  0x000002 /* -n */
-#define  SHOW_FILE        0x000004 /* -f file */
-#define  SHOW_DETAIL      0x000008 /* display specific nickname(s) */
+#define  SHOW_FILE		  0x000004 /* -f file */
+#define  SHOW_DETAIL	  0x000008 /* display specific nickname(s) */
 
 extern char *Filename;
 extern int ncidx;

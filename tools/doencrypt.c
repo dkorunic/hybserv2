@@ -45,7 +45,7 @@ doencrypt_md5()
  MD5 encryption of plaintext string. Returns a pointer to 
  encrypted string.
 
- Taken from Hybrid7 mkpasswd tool.  -bane
+ Taken from Hybrid7 mkpasswd tool.	-bane
 */
 
 char *
@@ -59,7 +59,7 @@ doencrypt_md5(char *plaintext)
   salt[1] = '1';
   salt[2] = '$';
   for (i = 3; i <= 10; i++)
-    salt[i] = saltChars[random() % 64];
+	salt[i] = saltChars[random() % 64];
   salt[11] = '$';
   salt[12] = '\0';
 

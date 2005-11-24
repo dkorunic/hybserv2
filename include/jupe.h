@@ -17,20 +17,20 @@
 struct JupeVote
 {
   struct JupeVote *next, *prev;
-  char *name;            /* name of juped server */
+  char *name;			 /* name of juped server */
   char *who[JUPEVOTES];  /* array of people who've voted */
-  int count;             /* how many times it's been voted */
-  time_t lasttime;       /* unixtime that it was last voted for */
+  int count;			 /* how many times it's been voted */
+  time_t lasttime;		 /* unixtime that it was last voted for */
 };
 #endif /* JUPEVOTES */
 
 struct Jupe
 {
   struct Jupe *next, *prev;
-  char *name;        /* name of juped server/nick */
-  char *reason;      /* reason it's juped (if server) */
-  char *who;         /* who made the jupe */
-  int isnick;        /* 1 if juped nick, 0 if server */
+  char *name;		 /* name of juped server/nick */
+  char *reason;		 /* reason it's juped (if server) */
+  char *who;		 /* who made the jupe */
+  int isnick;		 /* 1 if juped nick, 0 if server */
 };
 
 void AddJupe(char *, char *, char *);

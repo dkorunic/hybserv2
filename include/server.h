@@ -12,7 +12,7 @@
 #include "config.h"
 
 /* Server structure flags */
-#define SERV_MYHUB      0x0001 /* services' current hub server */
+#define SERV_MYHUB		0x0001 /* services' current hub server */
 
 /* Stores info for servers on network */
 struct Server
@@ -25,37 +25,37 @@ struct Server
   char *name;
 #endif /* BLOCK_ALLOCATION */
 
-  long numusers;       /* number of users on server */
-  long numopers;       /* number of operators on server */
+  long numusers;	   /* number of users on server */
+  long numopers;	   /* number of operators on server */
   long numoperkills;   /* number of operator kills */
   long numservkills;   /* number of server kills */
-  long numservs;       /* current servers linked */
+  long numservs;	   /* current servers linked */
   struct Server *uplink; /* hub for this server */
   time_t connect_ts;   /* time server has been connected to its hub */
   long flags;
 
 #ifdef STATSERVICES
-  long maxusers;        /* max users seen on this server */
-  time_t maxusers_ts;   /* when max users were seen */
-  long maxopers;        /* max opers seen on this server */
-  time_t maxopers_ts;   /* when max opers were seen */
-  long maxservs;        /* max servers seen from this server */
-  time_t maxservs_ts;   /* when max servs were seen */
-  long numidentd;       /* number of identd clients on server */
-  long numreshosts;     /* number of clients with resolving hosts */
-  float maxping;        /* maximum ping received from this server */
-  time_t maxping_ts;    /* when max ping was received */
-  float minping;        /* minimum ping received from this server */
-  time_t minping_ts;    /* when min ping was received */
-  float ping;           /* current ping time received from this server */
-  long lastping_sec;    /* TS of last time we pinged them */
-  long lastping_usec;   /* microseconds corresponding to lastping_sec */
+  long maxusers;		/* max users seen on this server */
+  time_t maxusers_ts;	/* when max users were seen */
+  long maxopers;		/* max opers seen on this server */
+  time_t maxopers_ts;	/* when max opers were seen */
+  long maxservs;		/* max servers seen from this server */
+  time_t maxservs_ts;	/* when max servs were seen */
+  long numidentd;		/* number of identd clients on server */
+  long numreshosts;		/* number of clients with resolving hosts */
+  float maxping;		/* maximum ping received from this server */
+  time_t maxping_ts;	/* when max ping was received */
+  float minping;		/* minimum ping received from this server */
+  time_t minping_ts;	/* when min ping was received */
+  float ping;			/* current ping time received from this server */
+  long lastping_sec;	/* TS of last time we pinged them */
+  long lastping_usec;	/* microseconds corresponding to lastping_sec */
 #endif /* STATSERVICES */
 
 #ifdef SPLIT_INFO
   /* This could depend on STATSERVICES, but it can actually function for
    * itself by SendUmode(). -kre */
-  time_t split_ts;      /* TS of last known SERVER introducing */
+  time_t split_ts;		/* TS of last known SERVER introducing */
 #endif
 };
 

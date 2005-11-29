@@ -14,7 +14,7 @@
  * This will automagically transform into correct SETPATH. Don't change
  * it.
  */
-#define   SETPATH	"@prefix@/hybserv/settings.conf"
+#define   SETPATH   "@prefix@/hybserv/settings.conf"
 
 /*
  * Define this to enable NickServ (Nickname Services)
@@ -24,8 +24,8 @@
 /*
  * Define this to enable ChanServ (Channel Services)
  * NOTE: ChanServ requires NICKSERVICES, so if NickServ is disabled,
- *		 ChanServ will be disabled as well (NickServ can function
- *		 perfectly without ChanServ however)
+ *       ChanServ will be disabled as well (NickServ can function
+ *       perfectly without ChanServ however)
  * At this moment we require CHANNELSERVICES too.
  */
 #define   CHANNELSERVICES
@@ -33,16 +33,16 @@
 /*
  * Define this to enable MemoServ (Memo Services)
  * NOTE: MemoServ requires NICKSERVICES, so if NickServ is disabled,
- *		 MemoServ will be disabled as well (NickServ can function
- *		 perfectly without MemoServ however)
+ *       MemoServ will be disabled as well (NickServ can function
+ *       perfectly without MemoServ however)
  */
 #define   MEMOSERVICES
 
 /*
  * Define this to enable StatServ (Statistic Services)
  * NOTE: StatServ requires NICKSERVICES, so if NickServ is disabled,
- *		 StatServ will be disabled as well (NickServ can function
- *		 perfectly without StatServ however)
+ *       StatServ will be disabled as well (NickServ can function
+ *       perfectly without StatServ however)
  */
 #define   STATSERVICES
 
@@ -101,7 +101,7 @@
  * are correct.(Security reasons). You also must define OPERNICKIDENT for
  * this to work -ddb
  */
-#undef	 IDENTIFOPER
+#undef   IDENTIFOPER
 
 /*
  * Define this if you want NickServ to record the TS of users who split so
@@ -144,13 +144,13 @@
  * +f modes for channels, as well as +e umode for users.
  * (this will go into ./configure script)
  */
-#undef	  DANCER
+#undef    DANCER
 
 /*
  * If this is defined, commands that involve Hybserv setting modes, such
  * as .secure and .omode, will not break channel TS.  Instead, the program
  * will have OPERSERV_NICK join the channel to set the modes instead of
- * having the actual server set the modes.	A significant problem with
+ * having the actual server set the modes.  A significant problem with
  * this, is if OPERSERV_NICK gets kicked before it has a chance to
  * complete its job, where if the server set the modes, that is not a
  * concern.  Thus, there's a tradeoff between efficiency and saving TS.
@@ -167,11 +167,11 @@
  * Define this to allocate memory for clients/channels/servers in large
  * chunks rather than doing it individually
  * Advantages:
- *	 CPU load will be minimized during netsplits/netjoins because instead
- *	 of malloc()/free()'ing every client or channel, we will already have
- *	 the space allocated ahead of time
+ *   CPU load will be minimized during netsplits/netjoins because instead
+ *   of malloc()/free()'ing every client or channel, we will already have
+ *   the space allocated ahead of time
  * Disadvantages:
- *	  Slightly more memory is used if a portion of the heap is unused.
+ *    Slightly more memory is used if a portion of the heap is unused.
  *
  * Undefining this can be very dangerous, since bound checking is not
  * performed on new clients' usernames and hostnames. It relies on ircd to
@@ -184,17 +184,17 @@
  * Set this to the number of client structures to allocate at one time -
  * on really small nets, you may want to make this even lower
  */
-#define   CLIENT_ALLOCATE	256
+#define   CLIENT_ALLOCATE   256
 
 /*
  * Set this to the number of channel structures to allocate at one time
  */
-#define   CHANNEL_ALLOCATE	  256
+#define   CHANNEL_ALLOCATE    256
 
 /*
  * Set this to the number of server structures to allocate at one time
  */
-#define   SERVER_ALLOCATE	5
+#define   SERVER_ALLOCATE   5
 
 /*
  * Define this to switch to high-traffic mode if the traffic load exceeds
@@ -207,7 +207,7 @@
  * Set this to the minimum number of Kilobytes/second we need from our hub
  * to switch to high-traffic mode.
  */
-#define   RECVLOAD	  25
+#define   RECVLOAD    25
 
 /*
  * Set this to the number of seconds to stay in high-traffic mode once
@@ -215,11 +215,11 @@
  * still greater than RECVLOAD, high-traffic mode will continue for
  * another HTM_TIMEOUT seconds.
  */
-#define   HTM_TIMEOUT	30
+#define   HTM_TIMEOUT   30
 
 /*
  * Set this to the time interval (in seconds) to measure bytes received,
- * in order to calculate if high-traffic mode should be activated.	If the
+ * in order to calculate if high-traffic mode should be activated.  If the
  * current bytes received minus the bytes received HTM_INTERVAL seconds
  * ago exceeds RECVLOAD K/s, high-traffic mode will be activated The lower
  * this is, the more accurate it can detect the current load.
@@ -243,8 +243,8 @@
  * << STRONGLY RECOMMENDED >> Define this to use encrypted
  * nickname/channel passwords for your databases
  * NOTE: If you change from using encryption to not using it, or vice
- *		 versa, your database files will not work (you'll have to create
- *		 new ones)
+ *       versa, your database files will not work (you'll have to create
+ *       new ones)
  */
 #define   CRYPT_PASSWORDS
 
@@ -259,7 +259,7 @@
  * manually erased from memory before free()-ing. This could affect
  * performance a bit, so it is undefined by default.
  */
-#undef	  BORKPASSWD
+#undef    BORKPASSWD
 
 /* Define this if you wish to allow admins to use the .die command */
 #define   ALLOW_DIE
@@ -267,8 +267,8 @@
 /* 
  * Define these if you wish to enable glines and/or jupes 
  * NOTE: In order for ALLOW_JUPES to work correctly, you must give
- *		 services an H: line in ircd.conf because it must create a fake
- *		 server to take the place of the juped one
+ *       services an H: line in ircd.conf because it must create a fake
+ *       server to take the place of the juped one
  */
 #define   ALLOW_GLINES
 #define   ALLOW_JUPES
@@ -297,7 +297,7 @@
  * were named services.eu
  * 
  * shared {
- *	   name="services.eu";
+ *     name="services.eu";
  * };
  */
 #define   HYBRID7_GLINES
@@ -315,7 +315,7 @@
  * servers.  If you don't want it, #undef JUPEVOTES.  If you do want it
  * #define JUPEVOTES <how many votes required> (usually 3).
  */
-#undef	  JUPEVOTES
+#undef    JUPEVOTES
 
 /*
  * Define these to the username and the hostname that you want juped
@@ -336,10 +336,10 @@
  * Define this if you wish to allow administrators the use of the "dump"
  * command for raw IRC messages (inter-server).
  * BIG FAT WARNING: This stuff is serious. It can core your ircd, cause
- *					desync, etc. This is not to be used in any kind of
- *					"normal" IRC network.
+ *                  desync, etc. This is not to be used in any kind of
+ *                  "normal" IRC network.
  */
-#undef	  ALLOW_DUMP
+#undef    ALLOW_DUMP
 
 /* 
  * Define this for debugging purposes. It will setup coresize
@@ -347,14 +347,14 @@
  * Also, you might want to enable GDB_DEBUG to have Hybserv wait for Gdb
  * to attach it - and then you can set GDBAttached=1 to have it continue.
  */
-#undef	  DEBUGMODE
-#undef	  GDB_DEBUG
+#undef    DEBUGMODE
+#undef    GDB_DEBUG
 
 /*
  * Use this option wisely, as last resort. It will dump very large amounts
  * of debug information, causing actual daemon to lag.
  */
-#undef	  EXTREMEDEBUG
+#undef    EXTREMEDEBUG
 
 /*
  * This is feature that should give some information on netsplits - what
@@ -368,7 +368,7 @@
  * Using this and M: lines can make your Hybserv send CONNECT commands
  * when split time expires for leaf/hub in M: line.
  */
-#undef	 AUTO_ROUTING
+#undef   AUTO_ROUTING
 
 
 /*
@@ -381,7 +381,7 @@
 /*
  * Turn this on to support gecos bans for Hybrid5/6.
  * NOTE: This _has_ to be turned off for Hybrid7, since it does not
- *		 support +d style modes.
+ *       support +d style modes.
  */
 #define   GECOSBANS
 
@@ -394,26 +394,26 @@
  * from the same user@host in less than ADVFLOOD_DELAY seconds, advanced
  * flood protection will fire off.
  * - If ADVFLOOD_NOTIFY is defined, +y opers on OperServ will be notified
- *	 of the flood. If ADVFLOOD_NOTIFY_ALL is defined, notices regarding
- *	 floods will be sent out to all opers that idented to OperServ.
+ *   of the flood. If ADVFLOOD_NOTIFY_ALL is defined, notices regarding
+ *   floods will be sent out to all opers that idented to OperServ.
  * - If ADVFLOOD_GLINE is defined, offenders will be auto-glined with
- *	 reason ADVFLOOD_GLINE_REASON with a GLINE expiring after
- *	 ADVFLOOD_GLINE_TIME.
+ *   reason ADVFLOOD_GLINE_REASON with a GLINE expiring after
+ *   ADVFLOOD_GLINE_TIME.
  * - It is possible to define both ADVFLOOD_NOTIFY and ADVFLOOD_GLINE, but
- *	 not both ADVFLOOD_NOTIFY and ADVFLOOD_NOTIFY_ALL.
+ *   not both ADVFLOOD_NOTIFY and ADVFLOOD_NOTIFY_ALL.
  * - If ADVFLOOD_NOIDENT_GLINEHOST is defined, if a flood is detected from
- *	 a non-idented user, the entire host will be glined, not just the user
- *	 (since it's probably a script randomly choosing idents).
+ *   a non-idented user, the entire host will be glined, not just the user
+ *   (since it's probably a script randomly choosing idents).
  */
-#undef	  ADVFLOOD
+#undef    ADVFLOOD
 #define   ADVFLOOD_TABLE  60 
 #define   ADVFLOOD_DELAY  10
 #define   ADVFLOOD_COUNT  10 
 #define   ADVFLOOD_NOTIFY
-#undef	  ADVFLOOD_NOTIFY_ALL
+#undef    ADVFLOOD_NOTIFY_ALL
 #define   ADVFLOOD_GLINE
 #define   ADVFLOOD_GLINE_REASON "Reconnect / NICK flooding."
-#define   ADVFLOOD_GLINE_TIME	"1h"
+#define   ADVFLOOD_GLINE_TIME   "1h"
 #define   ADVFLOOD_NOIDENT_GLINEHOST
 
 /*
@@ -443,10 +443,10 @@
  * undefined, it pads as much numbers as in can get to fill the nickname
  * length.
  */
-#undef	  FORCENICK
+#undef    FORCENICK
 #define   FORCENICK_LEN 4
 #define   FORCENICK_PREFIX "Guest"
-#undef	  SVSNICK
+#undef    SVSNICK
 #define   SVSNICK_LEN 4
 #define   SVSNICK_PREFIX "Guest"
 
@@ -481,7 +481,7 @@
  * so that all databases will be checked and fixed. If you know what are
  * you doing, you can disable it.
  */
-#undef	  STRICT_DATA_CHECK
+#undef    STRICT_DATA_CHECK
 
 /* -------------------------------------------------------------- */
 /* ------------------- End of configurable section -------------- */

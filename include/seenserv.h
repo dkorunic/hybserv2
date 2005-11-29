@@ -15,7 +15,7 @@
 struct Seen
 {
   struct Seen *prev, *next, *seen;
-  int type;				   /* 1 - QUIT, 2 - NICK */
+  int type;                /* 1 - QUIT, 2 - NICK */
   char nick[NICKLEN + 1];
   char *userhost, *msg;
   time_t time;

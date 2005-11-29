@@ -13,15 +13,15 @@
 #include "hybdefs.h"
 
 /* socket flags */
-#define NOSOCKET	 (-2) /* unused socket in portlist */
+#define NOSOCKET     (-2) /* unused socket in portlist */
 #define SOCK_UNUSED  (1 << 0) /* unused socket */
 #define SOCK_TCMBOT  (1 << 1) /* socket is a tcm bot connection */
 #define SOCK_BOTHUB  (1 << 2) /* tcm bot is the hub */
 #define SOCK_PENDING (1 << 3) /* has the tcm sent the password yet? */
-#define SOCK_DCC	 (1 << 4) /* socket being used for dcc connection */
-#define SOCK_EOF	 (1 << 5) /* socket EOF'd during write() */
+#define SOCK_DCC     (1 << 4) /* socket being used for dcc connection */
+#define SOCK_EOF     (1 << 5) /* socket EOF'd during write() */
 #define SOCK_NEEDID  (1 << 6) /* need ident reply */
-#define SOCK_WRID	 (1 << 7) /* need to request ident */
+#define SOCK_WRID    (1 << 7) /* need to request ident */
 #define SOCK_CONNECT (1 << 8) /* connection has been activated */
 
 /* DccUser flag macros */
@@ -39,13 +39,13 @@ struct Botlist;
 struct DccUser
 {
   struct DccUser *next, *prev;
-  int socket;		/* socket file descriptor */
-  int authfd;		/* ident file descriptor */
-  int port;			/* remote port */
-  char *nick;		/* nickname */
-  char *username;	/* username */
-  char *hostname;	/* hostname */
-  int flags;		/* socket flags */
+  int socket;       /* socket file descriptor */
+  int authfd;       /* ident file descriptor */
+  int port;         /* remote port */
+  char *nick;       /* nickname */
+  char *username;   /* username */
+  char *hostname;   /* hostname */
+  int flags;        /* socket flags */
   char spill[MAXLINE * 2];
   int offset;
 

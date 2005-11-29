@@ -16,8 +16,8 @@
 typedef struct sBlock
 {
   struct sBlock *next; /* next sub block in our heap */
-  void *first;		   /* pointer to first element in sub block */
-  void *last;		   /* pointer to last element in sub block */
+  void *first;         /* pointer to first element in sub block */
+  void *last;          /* pointer to last element in sub block */
   int FreeElements;    /* number of unused elements in sub block */
 
   /*
@@ -46,11 +46,11 @@ typedef struct sBlock
 
 typedef struct BlockHeap
 {
-  SubBlock *base;		/* first sub block in our heap */
-  int ElementSize;		/* size of each element */
+  SubBlock *base;       /* first sub block in our heap */
+  int ElementSize;      /* size of each element */
   int ElementsPerBlock; /* number of elements in each sub block */
-  int NumSubBlocks;		/* number of sub blocks we have allocated */
-  int FreeElements;		/* number of unused elements in all blocks */
+  int NumSubBlocks;     /* number of sub blocks we have allocated */
+  int FreeElements;     /* number of unused elements in all blocks */
 } Heap;
 
 Heap *HeapCreate(size_t, int);
@@ -66,12 +66,12 @@ void OutOfMem(void);
 
 /* MyFree - free an argument */
 #define MyFree(ptr) \
-{					\
-  if (ptr != NULL)	\
-  {					\
-	free(ptr);		\
-	ptr = NULL;		\
-  }					\
+{                   \
+  if (ptr != NULL)  \
+  {                 \
+    free(ptr);      \
+    ptr = NULL;     \
+  }                 \
 }
 
 #ifdef BLOCK_ALLOCATION

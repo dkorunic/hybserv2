@@ -11,15 +11,15 @@
 #include "stdinc.h"
 #include "config.h"
 
-#define   NODCC		(-1)
-#define   DCCALL	(-2)
-#define   DCCOPS	(-3)
+#define   NODCC     (-1)
+#define   DCCALL    (-2)
+#define   DCCOPS    (-3)
 
 struct Luser;
 
 struct Command
 {
-  char *cmd;	   /* holds command */
+  char *cmd;       /* holds command */
   void (*func)(); /* corresponding function */
 
   /* LVL_NONE if anyone can execute it
@@ -30,9 +30,9 @@ struct Command
 
 struct aService
 {
-  char **name;		   /* nickname of service bot */
-  char **ident;		   /* ident of service bot */
-  char **desc;		   /* description of service bot */
+  char **name;         /* nickname of service bot */
+  char **ident;        /* ident of service bot */
+  char **desc;         /* description of service bot */
   struct Luser **lptr; /* pointer to service bot */
 };
 

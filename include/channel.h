@@ -13,27 +13,27 @@
 #include "hybdefs.h"
 
 /* Channel flags */
-#define CH_VOICED		0x000001 /* user is voiced */
-#define CH_OPPED		0x000002 /* user is opped */
-#define MODE_O			0x000004 /* someone was +o'd */
-#define MODE_V			0x000008 /* someone was +v'd */
-#define MODE_L			0x000010 /* channel is +l */
-#define MODE_K			0x000020 /* channel is +k */
-#define MODE_S			0x000040 /* channel is +s */
-#define MODE_P			0x000080 /* channel is +p */
-#define MODE_N			0x000100 /* channel is +n */
-#define MODE_T			0x000200 /* channel is +t */
-#define MODE_M			0x000400 /* channel is +m */
-#define MODE_I			0x000800 /* channel is +i */
+#define CH_VOICED       0x000001 /* user is voiced */
+#define CH_OPPED        0x000002 /* user is opped */
+#define MODE_O          0x000004 /* someone was +o'd */
+#define MODE_V          0x000008 /* someone was +v'd */
+#define MODE_L          0x000010 /* channel is +l */
+#define MODE_K          0x000020 /* channel is +k */
+#define MODE_S          0x000040 /* channel is +s */
+#define MODE_P          0x000080 /* channel is +p */
+#define MODE_N          0x000100 /* channel is +n */
+#define MODE_T          0x000200 /* channel is +t */
+#define MODE_M          0x000400 /* channel is +m */
+#define MODE_I          0x000800 /* channel is +i */
 
 #ifdef DANCER
-# define MODE_C			0x001000 /* channel is +c */
-# define MODE_F			0x002000 /* channel is +f */
+# define MODE_C         0x001000 /* channel is +c */
+# define MODE_F         0x002000 /* channel is +f */
 #endif /* DANCER */
 
 #ifdef HYBRID7_HALFOPS
-# define CH_HOPPED		0x001000 /* user is halfopped - Janos */
-# define MODE_H			0x002000 /* someone was +h - Janos */
+# define CH_HOPPED      0x001000 /* user is halfopped - Janos */
+# define MODE_H         0x002000 /* someone was +h - Janos */
 #endif /* HYBRID7_HALFOPS */
 
 struct Luser;
@@ -42,43 +42,43 @@ struct Luser;
 struct ChannelGecosBan
 {
   struct ChannelGecosBan *next, *prev;
-  char *who;	 /* who set the ban */
-  time_t when;	 /* when the ban was made */
-  char *mask;	 /* hostmask of the ban */
+  char *who;     /* who set the ban */
+  time_t when;   /* when the ban was made */
+  char *mask;    /* hostmask of the ban */
 };
 #endif /* GECOSBANS */
 
 struct ChannelBan
 {
   struct ChannelBan *next, *prev;
-  char *who;	 /* who set the ban */
-  time_t when;	 /* when the ban was made */
-  char *mask;	 /* hostmask of the ban */
+  char *who;     /* who set the ban */
+  time_t when;   /* when the ban was made */
+  char *mask;    /* hostmask of the ban */
 };
 
 struct Exception
 {
   struct Exception *next, *prev;
-  char *who;	/* who set the exception */
-  time_t when;	/* when it was set */
-  char *mask;	/* exception hostmask */
+  char *who;    /* who set the exception */
+  time_t when;  /* when it was set */
+  char *mask;   /* exception hostmask */
 };
 
 #ifdef HYBRID7
 struct InviteException
 {
   struct InviteException *next, *prev;
-  char *who;	/* who set the invite exception */
-  time_t when;	/* when it was set */
-  char *mask;	/* invite exception hostmask */
+  char *who;    /* who set the invite exception */
+  time_t when;  /* when it was set */
+  char *mask;   /* invite exception hostmask */
 };
 #endif /* HYBRID7 */
 
 struct ChannelUser
 {
   struct ChannelUser *next;
-  struct Luser *lptr;	/* pointer to user structure */
-  unsigned flags;		/* flags such as opped/voiced */
+  struct Luser *lptr;   /* pointer to user structure */
+  unsigned flags;       /* flags such as opped/voiced */
 };
 
 /* Stores info for network channels */
@@ -93,18 +93,18 @@ struct Channel
   char forward[CHANNELLEN + 1];
 #endif /* DANCER */
 #else
-  char *name;			  /* channel name */
-  char *key;			  /* NULL if no key */
+  char *name;             /* channel name */
+  char *key;              /* NULL if no key */
 #ifdef DANCER
-  char *forward;		  /* NULL if no forwarding */
+  char *forward;          /* NULL if no forwarding */
 #endif /* DANCER */
 #endif /* BLOCK_ALLOCATION */
 
-  int numusers;			  /* number of users in the channel */
-  int modes;			  /* channel modes */
-  int limit;			  /* 0 if no limit */
+  int numusers;           /* number of users in the channel */
+  int modes;              /* channel modes */
+  int limit;              /* 0 if no limit */
   struct ChannelUser *firstuser; /* pointer to first user in channel */
-  time_t since;			  /* when the channel was created (TS) */
+  time_t since;           /* when the channel was created (TS) */
   struct ChannelBan *firstban; /* pointer to first ban */
 #ifdef GECOSBANS
   struct ChannelGecosBan *firstgecosban; /* pointer to first gecos field ban*/
@@ -112,7 +112,7 @@ struct Channel
   struct Exception *exceptlist; /* pointer to first ban exception */
 #ifdef HYBRID7
   struct InviteException *inviteexceptlist; /* ptr to first invite
-											   exception - Janos */
+                                               exception - Janos */
 #endif /* HYBRID7 */
 
   /*
@@ -120,7 +120,7 @@ struct Channel
    * flood_ts[1] is the TS of the last time
    */
   time_t flood_ts[2];
-  int floodcnt;			  /* how many times a *Serv was kicked/deoped */
+  int floodcnt;           /* how many times a *Serv was kicked/deoped */
 };
 
 #ifdef GECOSBANS

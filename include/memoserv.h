@@ -15,10 +15,10 @@
 #if defined NICKSERVICES && defined MEMOSERVICES
 
 /* MemoServ flags */
-#define MS_READ			0x00000001 /* memo has been read */
-#define MS_DELETE		0x00000002 /* marked for deletion */
-#define MS_RDELETE		0x00000004 /* delete after a RELOAD */
-#define MS_REPLIED		0x00000008 /* has been replied */
+#define MS_READ         0x00000001 /* memo has been read */
+#define MS_DELETE       0x00000002 /* marked for deletion */
+#define MS_RDELETE      0x00000004 /* delete after a RELOAD */
+#define MS_REPLIED      0x00000008 /* has been replied */
 
 struct Luser;
 struct NickInfo;
@@ -27,8 +27,8 @@ struct Memo
 {
   struct Memo *next, *prev;
   char *sender;
-  long index;	  /* index number */
-  time_t sent;	  /* time it was sent */
+  long index;     /* index number */
+  time_t sent;    /* time it was sent */
   char *text;
   long flags;
 };
@@ -36,10 +36,10 @@ struct Memo
 struct MemoInfo
 {
   struct MemoInfo *next, *prev;
-  char *name;			 /* who the memo was sent to */
-  long memocnt;			 /* number of memos */
-  long newmemos;		 /* number of unread memos */
-  struct Memo *memos;	 /* the actual memos */
+  char *name;            /* who the memo was sent to */
+  long memocnt;          /* number of memos */
+  long newmemos;         /* number of unread memos */
+  struct Memo *memos;    /* the actual memos */
   struct Memo *lastmemo; /* ptr to last memo in list */
   long flags;
 };

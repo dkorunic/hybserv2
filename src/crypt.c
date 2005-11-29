@@ -11,7 +11,7 @@
  * crypt.c
  *
  * This part of code is taken from Hybrid7 src/crypt.c and slightly modified.
- * It provides MD5 implementation for systems that do not support MD5.	-bane
+ * It provides MD5 implementation for systems that do not support MD5.  -bane
  *
  * ----------------------------------------------------------------------------
  * "THE BEER-WARE LICENSE" (Revision 42):
@@ -32,9 +32,9 @@ typedef unsigned int u_int32_t;
 
 /* MD5 context. */
 typedef struct MD5Context {
-  u_int32_t state[4];	/* state (ABCD) */
-  u_int32_t count[2];	/* number of bits, modulo 2^64 (lsb first) */
-  unsigned char buffer[64];		/* input buffer */
+  u_int32_t state[4];   /* state (ABCD) */
+  u_int32_t count[2];   /* number of bits, modulo 2^64 (lsb first) */
+  unsigned char buffer[64];     /* input buffer */
 } MD5_CTX;
 
 void   MD5Init (MD5_CTX *);
@@ -45,19 +45,19 @@ char * MD5End(MD5_CTX *, char *);
 char * MD5File(const char *, char *);
 char * MD5Data(const unsigned char *, unsigned int, char *);
 
-static unsigned char itoa64[] =			/* 0 ... 63 => ascii - 64 */
-		"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static unsigned char itoa64[] =         /* 0 ... 63 => ascii - 64 */
+        "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 void
 _crypt_to64(s, v, n)
-		char *s;
-		unsigned long v;
-		int n;
+        char *s;
+        unsigned long v;
+        int n;
 {
-		while (--n >= 0) {
-				*s++ = itoa64[v&0x3f];
-				v >>= 6;
-		}
+        while (--n >= 0) {
+                *s++ = itoa64[v&0x3f];
+                v >>= 6;
+        }
 }
 
 /*
@@ -69,11 +69,11 @@ crypt_md5(const char *pw, const char *salt)
 {
 	static char	*magic = "$1$";	/*
 					 * This string is magic for
-					 * this algorithm.	Having
+					 * this algorithm.  Having
 					 * it this way, we can get
 					 * get better later on
 					 */
-	static char		passwd[120], *p;
+	static char     passwd[120], *p;
 	static const char *sp,*ep;
 	unsigned char	final[MD5_SIZE];
 	int sl,pl,i;
@@ -120,9 +120,9 @@ crypt_md5(const char *pw, const char *salt)
 	/* Then something really weird... */
 	for (i = strlen(pw); i ; i >>= 1)
 		if(i&1)
-			MD5Update(&ctx, final, 1);
+		    MD5Update(&ctx, final, 1);
 		else
-			MD5Update(&ctx, (const unsigned char *)pw, 1);
+		    MD5Update(&ctx, (const unsigned char *)pw, 1);
 
 	/* Now make the output string */
 	strlcpy(passwd,magic,sizeof(passwd));
@@ -168,7 +168,7 @@ crypt_md5(const char *pw, const char *salt)
 	_crypt_to64(p,l,4); p += 4;
 	l = (final[ 4]<<16) | (final[10]<<8) | final[ 5];
 	_crypt_to64(p,l,4); p += 4;
-	l =					   final[11]				;
+	l =                    final[11]                ;
 	_crypt_to64(p,l,2); p += 2;
 	*p = '\0';
 
@@ -204,7 +204,7 @@ crypt_md5(const char *pw, const char *salt)
  *
  * $FreeBSD: src/lib/libmd/md5c.c,v 1.11 1999/12/29 05:04:20 peter Exp $
  *
- * This code is the same as the code published by RSA Inc.	It has been
+ * This code is the same as the code published by RSA Inc.  It has been
  * edited for clarity and style only.
  */
 
@@ -250,7 +250,7 @@ Decode (output, input, len)
 
 	for (i = 0, j = 0; j < len; i++, j += 4)
 		output[i] = ((u_int32_t)input[j]) | (((u_int32_t)input[j+1]) << 8) |
-			(((u_int32_t)input[j+2]) << 16) | (((u_int32_t)input[j+3]) << 24);
+		    (((u_int32_t)input[j+2]) << 16) | (((u_int32_t)input[j+3]) << 24);
 }
 
 static unsigned char PADDING[64] = {
@@ -328,7 +328,7 @@ MD5Update (context, input, inputLen)
 
 	/* Update number of bits */
 	if ((context->count[0] += ((u_int32_t)inputLen << 3))
-		< ((u_int32_t)inputLen << 3))
+	    < ((u_int32_t)inputLen << 3))
 		context->count[1]++;
 	context->count[1] += ((u_int32_t)inputLen >> 29);
 
@@ -337,7 +337,7 @@ MD5Update (context, input, inputLen)
 	/* Transform as many times as possible. */
 	if (inputLen >= partLen) {
 		memcpy((void *)&context->buffer[index], (const void *)input,
-			partLen);
+		    partLen);
 		MD5Transform (context->state, context->buffer);
 
 		for (i = partLen; i + 63 < inputLen; i += 64)
@@ -350,7 +350,7 @@ MD5Update (context, input, inputLen)
 
 	/* Buffer remaining input */
 	memcpy ((void *)&context->buffer[index], (const void *)&input[i],
-		inputLen-i);
+	    inputLen-i);
 }
 
 /*

@@ -33,22 +33,22 @@
 #endif
 
 /* unixtime of when services was started */
-time_t						 TimeStarted;
+time_t                       TimeStarted;
 
 /* offset from UTC time */
-long						 gmt_offset;
+long                         gmt_offset;
 
-struct NetworkInfo			 *Network;
+struct NetworkInfo           *Network;
 
 /* structure containing services' info */
-struct MyInfo				 Me;
+struct MyInfo                Me;
 
 /*
  * Set to 1 "ConnectBurst" seconds after a successful
  * hub connection, so we don't send bursts of client/clone
  * connections to +y users etc, during an initial connect.
  */
-int							 SafeConnect = 0;
+int                          SafeConnect = 0;
 
 /* Arguments list */
 char **myargv;
@@ -81,19 +81,19 @@ int main(int argc, char *argv[])
   umask(077);
 
   fprintf(stderr,
-		  "Hybserv2 TS services version %s by Hybserv2 team\n"
+          "Hybserv2 TS services version %s by Hybserv2 team\n"
 #if defined __DATE__ && defined __TIME__
-		  "Compiled at %s, %s\n",
+          "Compiled at %s, %s\n",
 #endif
-		  hVersion
+          hVersion
 #if defined __DATE__ && defined __TIME__
-		  , __DATE__, __TIME__
+          , __DATE__, __TIME__
 #endif
-		 );
+         );
 
 #ifdef GDB_DEBUG
   while (!GDBAttached)
-	sleep(1);
+    sleep(1);
 #endif /* GDB_DEBUG */
 
   /*
@@ -103,70 +103,70 @@ int main(int argc, char *argv[])
    * in settings.conf
    */
   if (LoadSettings(0) == 0)
-	{
-	  fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
-			  "Check logfile %s/%s\n", SETPATH, LogPath ? LogPath : "",
-			  LogFile ?  LogFile : "*unknown*");
-	  return (0);
-	}
+    {
+      fprintf(stderr, "Fatal errors encountered parsing %s, exiting\n"
+              "Check logfile %s/%s\n", SETPATH, LogPath ? LogPath : "",
+              LogFile ?  LogFile : "*unknown*");
+      return (0);
+    }
 
   /*
    * If they run ./shownicks or ./showchans rather than ./hybserv
    * display nicknames/channels
    */
   if (strstr(argv[0], "shownicks"))
-	{
+    {
 #ifdef NICKSERVICES
-	  ShowNicknames(argc, argv);
+      ShowNicknames(argc, argv);
 #endif /* NICKSERVICES */
 
-	  return (0);
-	}
+      return (0);
+    }
   else if (strstr(argv[0], "showchans"))
-	{
+    {
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
-	  ShowChannels(argc, argv);
+      ShowChannels(argc, argv);
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */
 
-	  return 0;
-	}
+      return 0;
+    }
 
   /* Check for running services -kre */
   if ((pidfile = fopen(PidFile, "r")) == NULL)
-	fprintf(stderr, "WARNING: Unable to read pid file %s\n",
-		PidFile);
+    fprintf(stderr, "WARNING: Unable to read pid file %s\n",
+        PidFile);
   else
   {
-	pid_t mypid;
-	char line[MAXLINE + 1];
+    pid_t mypid;
+    char line[MAXLINE + 1];
 
-	fgets(line, sizeof(line), pidfile);
-	fclose(pidfile);
-	mypid = atoi(line);
-	if (mypid && !kill(mypid, 0))
-	{
-	  fprintf(stderr, "FATAL: Services are already running!\n");
-	  exit(EXIT_FAILURE);
-	}
+    fgets(line, sizeof(line), pidfile);
+    fclose(pidfile);
+    mypid = atoi(line);
+    if (mypid && !kill(mypid, 0))
+    {
+      fprintf(stderr, "FATAL: Services are already running!\n");
+      exit(EXIT_FAILURE);
+    }
   }
 
   uid = getuid(); /* the user id of the user who ran the process */
   euid = geteuid(); /* the effective id (different if setuid) */
 
   if (!uid || !euid)
-	{
-	  fprintf(stderr,
-		  "FATAL: Please don't run services as root. Now exiting.\n");
-	  exit(EXIT_FAILURE);
-	}
+    {
+      fprintf(stderr,
+          "FATAL: Please don't run services as root. Now exiting.\n");
+      exit(EXIT_FAILURE);
+    }
 
   if (chdir(HPath) != 0)
-	{
-	  fprintf(stderr,
-			  "HPath is an invalid directory, please check %s\n",
-			  SETPATH);
-	  exit(EXIT_FAILURE);
-	}
+    {
+      fprintf(stderr,
+              "HPath is an invalid directory, please check %s\n",
+              SETPATH);
+      exit(EXIT_FAILURE);
+    }
 
   putlog(LOG1, "Hybserv2 TS services version %s started", hVersion);
 
@@ -188,15 +188,15 @@ int main(int argc, char *argv[])
 #ifdef GLOBALSERVICES
 
   if (LogonNews)
-	{
-	  Network->LogonNewsFile.filename = LogonNews;
-	  ReadMessageFile(&Network->LogonNewsFile);
-	}
+    {
+      Network->LogonNewsFile.filename = LogonNews;
+      ReadMessageFile(&Network->LogonNewsFile);
+    }
 
 #endif /* GLOBALSERVICES */
 
   if (LocalHostName)
-	SetupVirtualHost();
+    SetupVirtualHost();
 
 #if !defined DEBUGMODE && !defined GDB_DEBUG
 
@@ -205,13 +205,13 @@ int main(int argc, char *argv[])
   pid = fork();
   if (pid == -1)
   {
-	printf("Unable to fork(), exiting.\n");
-	exit(EXIT_FAILURE);
+    printf("Unable to fork(), exiting.\n");
+    exit(EXIT_FAILURE);
   }
   if (pid != 0)
   {
-	printf("Running in background (pid: %d)\n", (int)pid);
-	exit(EXIT_SUCCESS);
+    printf("Running in background (pid: %d)\n", (int)pid);
+    exit(EXIT_SUCCESS);
   }
 
   close(STDIN_FILENO);
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
   /* Make current process session leader -kre */
   if (setsid() == -1)
   {
-	exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE);
   }
 #else
 
@@ -249,15 +249,15 @@ int main(int argc, char *argv[])
 
   /* Write our pid to a file */
   if ((pidfile = fopen(PidFile, "w")) == NULL)
-	putlog(LOG1, "Unable to open %s", PidFile);
+    putlog(LOG1, "Unable to open %s", PidFile);
   else
-	{
-	  char line[MAXLINE + 1];
+    {
+      char line[MAXLINE + 1];
 
-	  ircsprintf(line, "%d\n", getpid());
-	  fputs(line, pidfile);
-	  fclose(pidfile);
-	}
+      ircsprintf(line, "%d\n", getpid());
+      fputs(line, pidfile);
+      fclose(pidfile);
+    }
 
   /* initialize tcm/user listening ports */
   InitListenPorts();
@@ -273,43 +273,43 @@ int main(int argc, char *argv[])
   CycleServers();
 
   while (1)
-	{
-	  /* enter loop waiting for server info */
-	  ReadSocketInfo();
+    {
+      /* enter loop waiting for server info */
+      ReadSocketInfo();
 
-	  if (Me.hub)
-		SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
-	  else
-		SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
+      if (Me.hub)
+        SendUmode(OPERUMODE_Y, "*** Disconnected from %s", Me.hub->name);
+      else
+        SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
 
-	  if (currenthub)
-		if (currenthub->realname)
-		  {
-			MyFree(currenthub->realname);
-			currenthub->realname = NULL;
-		  }
+      if (currenthub)
+        if (currenthub->realname)
+          {
+            MyFree(currenthub->realname);
+            currenthub->realname = NULL;
+          }
 
-	  close(HubSock); /* There was an error */
-	  HubSock = NOSOCKET;
-	  currenthub->connect_ts = 0;
+      close(HubSock); /* There was an error */
+      HubSock = NOSOCKET;
+      currenthub->connect_ts = 0;
 
-	  /*
-	   * whenever Hybserv connects/reconnects to a server, clear
-	   * users, servers, and chans
-	   */
-	  ClearUsers();
-	  ClearChans();
-	  ClearServs();
-	  /*
-	   * ClearHashes() must be called AFTER ClearUsers(),
-	   * or StatServ's unique client counts will be off since
-	   * cloneTable[] would be NULL while it was trying to find
-	   * clones
-	   */
-	  ClearHashes(0);
+      /*
+       * whenever Hybserv connects/reconnects to a server, clear
+       * users, servers, and chans
+       */
+      ClearUsers();
+      ClearChans();
+      ClearServs();
+      /*
+       * ClearHashes() must be called AFTER ClearUsers(),
+       * or StatServ's unique client counts will be off since
+       * cloneTable[] would be NULL while it was trying to find
+       * clones
+       */
+      ClearHashes(0);
 
-	  PostCleanup();
-	} /* while (1) */
+      PostCleanup();
+    } /* while (1) */
 
   return 0;
 } /* main() */

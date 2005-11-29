@@ -24,8 +24,9 @@ struct Server;
 
 typedef struct hashentry
 {
-  void *list; /* pointer to first element in the bucket */
-} aHashEntry;
+	void *list; /* pointer to first element in the bucket */
+}
+aHashEntry;
 
 struct Luser *FindClient(const char *);
 void ClearHashes(int);

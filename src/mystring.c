@@ -27,18 +27,18 @@
 */
 char *StrToupper(char *str)
 {
-  int ii = 0;
-  static char retstr[MAXLINE + 1];
+	int ii = 0;
+	static char retstr[MAXLINE + 1];
 
-  if (str == NULL)
-    return NULL;
+	if (str == NULL)
+		return NULL;
 
-  for (; ii < strlen(str); ++ii)
-    retstr[ii] = ToUpper(str[ii]);
+	for (; ii < strlen(str); ++ii)
+		retstr[ii] = ToUpper(str[ii]);
 
-  retstr[ii] = '\0';
+	retstr[ii] = '\0';
 
-  return retstr;
+	return retstr;
 } /* StrToupper() */
 
 /*
@@ -50,18 +50,18 @@ char *StrToupper(char *str)
  */
 char *StrTolower(char *str)
 {
-  int ii = 0;
-  static char retstr[MAXLINE + 1];
+	int ii = 0;
+	static char retstr[MAXLINE + 1];
 
-  if (str == NULL)
-    return NULL;
+	if (str == NULL)
+		return NULL;
 
-  for (; ii < strlen(str); ++ii)
-    retstr[ii] = ToLower(str[ii]);
+	for (; ii < strlen(str); ++ii)
+		retstr[ii] = ToLower(str[ii]);
 
-  retstr[ii] = '\0';
+	retstr[ii] = '\0';
 
-  return retstr;
+	return retstr;
 } /* StrTolower() */
 
 /*
@@ -72,21 +72,21 @@ char *StrTolower(char *str)
  */
 char *GetString(int ac, char **av)
 {
-  char *final;
-  int ii = 0, bw = 0;
+	char *final;
+	int ii = 0, bw = 0;
 
-  final = MyMalloc(MAXLINE + 1);
-  final[0] = '\0';
+	final = MyMalloc(MAXLINE + 1);
+	final[0] = '\0';
 
-  for (; ii < ac; ++ii)
-  {
-    strlcat(final, av[ii], MAXLINE + 1);
-    bw = strlcat(final, " ", MAXLINE + 1);
-  }
-  if (bw)
-    final[bw - 1] = '\0';
+	for (; ii < ac; ++ii)
+	{
+		strlcat(final, av[ii], MAXLINE + 1);
+		bw = strlcat(final, " ", MAXLINE + 1);
+	}
+	if (bw)
+		final[bw - 1] = '\0';
 
-  return final;
+	return final;
 } /* GetString() */
 
 /*
@@ -98,59 +98,60 @@ char *GetString(int ac, char **av)
  */
 int SplitBuf(char *string, char ***array)
 {
-  int x = 0;
-  int len;
-  char *p, *buf = string;
+	int x = 0;
+	int len;
+	char *p, *buf = string;
 
-  *array = NULL;
+	*array = NULL;
 
-  if ((buf == NULL) || (*buf == '\0'))
-    return 0;
+	if ((buf == NULL) || (*buf == '\0'))
+		return 0;
 
-  *array = MyMalloc(sizeof(char *) * (MAXPARAM + 1));
+	*array = MyMalloc(sizeof(char *) * (MAXPARAM + 1));
 
-  len = strlen(string);
-  if (IsEOL(string[len - 1]))
-    string[len - 1] = '\0';
+	len = strlen(string);
+	if (IsEOL(string[len - 1]))
+		string[len - 1] = '\0';
 
-  (*array)[x] = NULL;
+	(*array)[x] = NULL;
 
-  /* contained only spaces */
-  while (IsSpace(*buf))
-    ++buf;
+	/* contained only spaces */
+	while (IsSpace(*buf))
+		++buf;
 
-  if (*buf == '\0')
-    return x;
+	if (*buf == '\0')
+		return x;
 
-  do
-  {
-    (*array)[x++] = buf;
-    (*array)[x] = NULL;
-    if ((p = strchr(buf, ' ')) != NULL)
-    {
-      if (*(p + 1) == ':')
-      {
-        *p = '\0';
-        (*array)[x++] = p + 1;
-        (*array)[x] = NULL;
-        return x;
-      }
+	do
+	{
+		(*array)[x++] = buf;
+		(*array)[x] = NULL;
+		if ((p = strchr(buf, ' ')) != NULL)
+		{
+			if (*(p + 1) == ':')
+			{
+				*p = '\0';
+				(*array)[x++] = p + 1;
+				(*array)[x] = NULL;
+				return x;
+			}
 
-      *p++ = '\0';
-      buf = p;
-    }
-    else
-      return x;
+			*p++ = '\0';
+			buf = p;
+		}
+		else
+			return x;
 
-    while (*buf == ' ')
-      ++buf;
+		while (*buf == ' ')
+			++buf;
 
-    if (*buf == '\0')
-      return x;
-  } while (x < MAXPARAM - 1);
+		if (*buf == '\0')
+			return x;
+	}
+	while (x < MAXPARAM - 1);
 
-  (*array)[x++] = p;
-  (*array)[x] = NULL;
-  
-  return x;
+	(*array)[x++] = p;
+	(*array)[x] = NULL;
+
+	return x;
 } /* SplitBuf() */

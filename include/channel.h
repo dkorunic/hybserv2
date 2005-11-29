@@ -41,86 +41,93 @@ struct Luser;
 #ifdef GECOSBANS
 struct ChannelGecosBan
 {
-  struct ChannelGecosBan *next, *prev;
-  char *who;     /* who set the ban */
-  time_t when;   /* when the ban was made */
-  char *mask;    /* hostmask of the ban */
+	struct ChannelGecosBan *next, *prev;
+	char *who;     /* who set the ban */
+	time_t when;   /* when the ban was made */
+	char *mask;    /* hostmask of the ban */
 };
 #endif /* GECOSBANS */
 
 struct ChannelBan
 {
-  struct ChannelBan *next, *prev;
-  char *who;     /* who set the ban */
-  time_t when;   /* when the ban was made */
-  char *mask;    /* hostmask of the ban */
+	struct ChannelBan *next, *prev;
+	char *who;     /* who set the ban */
+	time_t when;   /* when the ban was made */
+	char *mask;    /* hostmask of the ban */
 };
 
 struct Exception
 {
-  struct Exception *next, *prev;
-  char *who;    /* who set the exception */
-  time_t when;  /* when it was set */
-  char *mask;   /* exception hostmask */
+	struct Exception *next, *prev;
+	char *who;    /* who set the exception */
+	time_t when;  /* when it was set */
+	char *mask;   /* exception hostmask */
 };
 
 #ifdef HYBRID7
 struct InviteException
 {
-  struct InviteException *next, *prev;
-  char *who;    /* who set the invite exception */
-  time_t when;  /* when it was set */
-  char *mask;   /* invite exception hostmask */
+	struct InviteException *next, *prev;
+	char *who;    /* who set the invite exception */
+	time_t when;  /* when it was set */
+	char *mask;   /* invite exception hostmask */
 };
 #endif /* HYBRID7 */
 
 struct ChannelUser
 {
-  struct ChannelUser *next;
-  struct Luser *lptr;   /* pointer to user structure */
-  unsigned flags;       /* flags such as opped/voiced */
+	struct ChannelUser *next;
+	struct Luser *lptr;   /* pointer to user structure */
+	unsigned flags;       /* flags such as opped/voiced */
 };
 
 /* Stores info for network channels */
 struct Channel
 {
-  struct Channel *next, *prev, *hnext;
+	struct Channel *next, *prev, *hnext;
 
 #ifdef BLOCK_ALLOCATION
-  char name[CHANNELLEN + 1]; /* channel name */
-  char key[KEYLEN + 1];
+
+	char name[CHANNELLEN + 1]; /* channel name */
+	char key[KEYLEN + 1];
 #ifdef DANCER
-  char forward[CHANNELLEN + 1];
+
+	char forward[CHANNELLEN + 1];
 #endif /* DANCER */
 #else
-  char *name;             /* channel name */
-  char *key;              /* NULL if no key */
+
+	char *name;             /* channel name */
+	char *key;              /* NULL if no key */
 #ifdef DANCER
-  char *forward;          /* NULL if no forwarding */
+
+	char *forward;          /* NULL if no forwarding */
 #endif /* DANCER */
 #endif /* BLOCK_ALLOCATION */
 
-  int numusers;           /* number of users in the channel */
-  int modes;              /* channel modes */
-  int limit;              /* 0 if no limit */
-  struct ChannelUser *firstuser; /* pointer to first user in channel */
-  time_t since;           /* when the channel was created (TS) */
-  struct ChannelBan *firstban; /* pointer to first ban */
+	int numusers;           /* number of users in the channel */
+	int modes;              /* channel modes */
+	int limit;              /* 0 if no limit */
+	struct ChannelUser *firstuser; /* pointer to first user in channel */
+	time_t since;           /* when the channel was created (TS) */
+	struct ChannelBan *firstban; /* pointer to first ban */
 #ifdef GECOSBANS
-  struct ChannelGecosBan *firstgecosban; /* pointer to first gecos field ban*/
+
+	struct ChannelGecosBan *firstgecosban; /* pointer to first gecos field ban*/
 #endif /* GECOSBANS */
-  struct Exception *exceptlist; /* pointer to first ban exception */
+
+	struct Exception *exceptlist; /* pointer to first ban exception */
 #ifdef HYBRID7
-  struct InviteException *inviteexceptlist; /* ptr to first invite
-                                               exception - Janos */
+
+	struct InviteException *inviteexceptlist; /* ptr to first invite
+		                                               exception - Janos */
 #endif /* HYBRID7 */
 
-  /*
-   * flood_ts[0] is the TS of the first time a *Serv was kicked;
-   * flood_ts[1] is the TS of the last time
-   */
-  time_t flood_ts[2];
-  int floodcnt;           /* how many times a *Serv was kicked/deoped */
+	/*
+	 * flood_ts[0] is the TS of the first time a *Serv was kicked;
+	 * flood_ts[1] is the TS of the last time
+	 */
+	time_t flood_ts[2];
+	int floodcnt;           /* how many times a *Serv was kicked/deoped */
 };
 
 #ifdef GECOSBANS

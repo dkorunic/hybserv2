@@ -14,9 +14,9 @@
 
 #define   MAXLINE    512  /* don't change this */
 #define   BUFSIZE  16364  /* don't change this - number of bytes to read
-                             from sockets */
+from sockets */
 #define   MAXPARAM    20  /* don't change this - max parameters the hub
-                             can send us */
+can send us */
 #define   REALLEN     50  /* ircd value for max server info length */
 #define   USERLEN     10  /* username length */
 #define   HOSTLEN     63  /* hostname length */
@@ -42,72 +42,77 @@ struct Server;
 
 struct NetworkInfo
 {
-  float TotalUsers;     /* current user count */
-  float TotalServers;   /* current server count */
-  float TotalOperators; /* current operator count */
-  float TotalChannels;  /* current channel count */
-  float TotalOperKills; /* operator kills seen since startup */
-  float TotalServKills; /* server kills seen since startup */
+	float TotalUsers;     /* current user count */
+	float TotalServers;   /* current server count */
+	float TotalOperators; /* current operator count */
+	float TotalChannels;  /* current channel count */
+	float TotalOperKills; /* operator kills seen since startup */
+	float TotalServKills; /* server kills seen since startup */
 
-  int TotalJupes;   /* number of jupes */
-  int TotalGlines;  /* number of glines */
-  int TotalConns;   /* number of dcc connections */
-  int MyChans;      /* number of monitored channels */
-  int flags;
+	int TotalJupes;   /* number of jupes */
+	int TotalGlines;  /* number of glines */
+	int TotalConns;   /* number of dcc connections */
+	int MyChans;      /* number of monitored channels */
+	int flags;
 
 #ifdef GLOBALSERVICES
-  struct MessageFile LogonNewsFile;
+
+	struct MessageFile LogonNewsFile;
 #endif /* GLOBALSERVICES */
 
-  long RecvB; /* total bytes received */
+	long RecvB; /* total bytes received */
 
-  /* total bytes received 10 seconds ago - so we can check if we should
-   * enter high-traffic mode */
-  long CheckRecvB;
+	/* total bytes received 10 seconds ago - so we can check if we should
+	 * enter high-traffic mode */
+	long CheckRecvB;
 
-  /* This is set to the current RecvB, so 10 seconds from now we can set
-   * CheckRecvB to LastRecvB, and update LastRecvB to the current RecvB
-   * again */
-  long LastRecvB;
+	/* This is set to the current RecvB, so 10 seconds from now we can set
+	 * CheckRecvB to LastRecvB, and update LastRecvB to the current RecvB
+	 * again */
+	long LastRecvB;
 
-  long SendB;                   /* total bytes sent */
-  struct Server *firstserv;     /* ptr to first server in list */
+	long SendB;                   /* total bytes sent */
+	struct Server *firstserv;     /* ptr to first server in list */
 
 #ifdef NICKSERVICES
-  int TotalNicks; /* number of registered nicknames */
+
+	int TotalNicks; /* number of registered nicknames */
 
 #ifdef CHANNELSERVICES
-  int TotalChans; /* number of registered channels */
+
+	int TotalChans; /* number of registered channels */
 #endif
 
 #ifdef MEMOSERVICES
-  int TotalMemos; /* number of memos */
+
+	int TotalMemos; /* number of memos */
 #endif
 
 #endif /* NICKSERVICES */
 
 #ifdef STATSERVICES
-  long MaxUsers;           /* max users seen */
-  time_t MaxUsers_ts;
-  long MaxServers;         /* max servers seen */
-  time_t MaxServers_ts;
-  long MaxOperators;       /* max operators seen */
-  time_t MaxOperators_ts;
-  long MaxChannels;        /* max channels seen */
-  time_t MaxChannels_ts;
-  long Identd;             /* number of clients running identd */
-  long NonIdentd;          /* number of clients not running identd */
-  long ResHosts;           /* number of clients with resolving hosts */
-  long MaxUsersT;          /* max users seen today */
-  time_t MaxUsersT_ts;
-  long MaxServersT;        /* max servers seen today */
-  time_t MaxServersT_ts;
-  long MaxOperatorsT;      /* max operators seen today */
-  time_t MaxOperatorsT_ts;
-  long MaxChannelsT;       /* max channels seen today */
-  time_t MaxChannelsT_ts;
-  long OperKillsT;         /* oper kills seen today */
-  long ServKillsT;         /* server kills seen today */
+
+	long MaxUsers;           /* max users seen */
+	time_t MaxUsers_ts;
+	long MaxServers;         /* max servers seen */
+	time_t MaxServers_ts;
+	long MaxOperators;       /* max operators seen */
+	time_t MaxOperators_ts;
+	long MaxChannels;        /* max channels seen */
+	time_t MaxChannels_ts;
+	long Identd;             /* number of clients running identd */
+	long NonIdentd;          /* number of clients not running identd */
+	long ResHosts;           /* number of clients with resolving hosts */
+	long MaxUsersT;          /* max users seen today */
+	time_t MaxUsersT_ts;
+	long MaxServersT;        /* max servers seen today */
+	time_t MaxServersT_ts;
+	long MaxOperatorsT;      /* max operators seen today */
+	time_t MaxOperatorsT_ts;
+	long MaxChannelsT;       /* max channels seen today */
+	time_t MaxChannelsT_ts;
+	long OperKillsT;         /* oper kills seen today */
+	long ServKillsT;         /* server kills seen today */
 #endif /* STATSERVICES */
 };
 

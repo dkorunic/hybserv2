@@ -39,43 +39,43 @@ void
 AddGline(char *host, char *reason, char *who, long when)
 
 {
-  struct Gline *tempgline;
-  char *tmp;
+	struct Gline *tempgline;
+	char *tmp;
 
-  tempgline = (struct Gline *) MyMalloc(sizeof(struct Gline));
+	tempgline = (struct Gline *) MyMalloc(sizeof(struct Gline));
 
-  if ((tmp = strchr(host, '@')))
-    {
-      *tmp++ = '\0';
-      tempgline->username = MyStrdup(host);
-      tempgline->hostname = MyStrdup(tmp);
-    }
-  else
-    {
-      tempgline->username = MyStrdup("*");
-      tempgline->hostname = MyStrdup(host);
-    }
+	if ((tmp = strchr(host, '@')))
+	{
+		*tmp++ = '\0';
+		tempgline->username = MyStrdup(host);
+		tempgline->hostname = MyStrdup(tmp);
+	}
+	else
+	{
+		tempgline->username = MyStrdup("*");
+		tempgline->hostname = MyStrdup(host);
+	}
 
-  if (reason)
-    tempgline->reason = MyStrdup(reason);
-  else
-    tempgline->reason = MyStrdup("");
+	if (reason)
+		tempgline->reason = MyStrdup(reason);
+	else
+		tempgline->reason = MyStrdup("");
 
-  tempgline->who = MyStrdup(who);
+	tempgline->who = MyStrdup(who);
 
-  /* assume when to be in seconds */
-  if (!when)
-    tempgline->expires = 0;
-  else
-    tempgline->expires = current_ts + when;
+	/* assume when to be in seconds */
+	if (!when)
+		tempgline->expires = 0;
+	else
+		tempgline->expires = current_ts + when;
 
-  tempgline->next = GlineList;
-  tempgline->prev = NULL;
-  if (tempgline->next)
-    tempgline->next->prev = tempgline;
-  GlineList = tempgline;
+	tempgline->next = GlineList;
+	tempgline->prev = NULL;
+	if (tempgline->next)
+		tempgline->next->prev = tempgline;
+	GlineList = tempgline;
 
-  Network->TotalGlines++;
+	Network->TotalGlines++;
 } /* AddGline() */
 
 /*
@@ -87,25 +87,25 @@ void
 DeleteGline(struct Gline *gptr)
 
 {
-  if (!gptr)
-    return;
+	if (!gptr)
+		return;
 
-  MyFree(gptr->username);
-  MyFree(gptr->hostname);
-  MyFree(gptr->reason);
-  MyFree(gptr->who);
+	MyFree(gptr->username);
+	MyFree(gptr->hostname);
+	MyFree(gptr->reason);
+	MyFree(gptr->who);
 
-  if (gptr->prev)
-    gptr->prev->next = gptr->next;
-  else
-    GlineList = gptr->next;
+	if (gptr->prev)
+		gptr->prev->next = gptr->next;
+	else
+		GlineList = gptr->next;
 
-  if (gptr->next)
-    gptr->next->prev = gptr->prev;
+	if (gptr->next)
+		gptr->next->prev = gptr->prev;
 
-  MyFree(gptr);
+	MyFree(gptr);
 
-  Network->TotalGlines--;
+	Network->TotalGlines--;
 } /* DeleteGline() */
 
 /*
@@ -115,23 +115,23 @@ username and hostname, if any
 */
 
 struct Gline *
-      IsGline(char *username, char *hostname)
+			IsGline(char *username, char *hostname)
 
-  {
-    struct Gline *temp;
+{
+	struct Gline *temp;
 
-    if (!username || !hostname)
-      return (NULL);
+	if (!username || !hostname)
+		return (NULL);
 
-    for (temp = GlineList; temp; temp = temp->next)
-      {
-        if (match(temp->username, username) &&
-            match(temp->hostname, hostname))
-          return (temp);
-      }
+	for (temp = GlineList; temp; temp = temp->next)
+	{
+		if (match(temp->username, username) &&
+		        match(temp->hostname, hostname))
+			return (temp);
+	}
 
-    return (NULL);
-  } /* IsGline() */
+	return (NULL);
+} /* IsGline() */
 
 /*
 CheckGlined()
@@ -146,49 +146,49 @@ void
 CheckGlined(struct Luser *lptr)
 
 {
-  struct Gline *tempgline;
+	struct Gline *tempgline;
 
-  if (!lptr)
-    return;
+	if (!lptr)
+		return;
 
-  /*
-   * Make sure we don't kill one of ours
-   */
-  if (lptr->server == Me.sptr)
-    return;
+	/*
+	 * Make sure we don't kill one of ours
+	 */
+	if (lptr->server == Me.sptr)
+		return;
 
-  if ((tempgline = IsGline(lptr->username, lptr->hostname)))
-    {
-      toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
-             n_OperServ, lptr->nick, Me.name, n_OperServ,
-             tempgline->reason, tempgline->who);
+	if ((tempgline = IsGline(lptr->username, lptr->hostname)))
+	{
+		toserv(":%s KILL %s :%s!%s (Glined: %s (%s))\r\n",
+		       n_OperServ, lptr->nick, Me.name, n_OperServ,
+		       tempgline->reason, tempgline->who);
 
-      DeleteClient(lptr);
+		DeleteClient(lptr);
 
-      if (Me.sptr)
-        Me.sptr->numoperkills++;
-      Network->TotalOperKills++;
+		if (Me.sptr)
+			Me.sptr->numoperkills++;
+		Network->TotalOperKills++;
 
 #ifdef STATSERVICES
 
-      if (Network->TotalOperKills > Network->OperKillsT)
-        Network->OperKillsT = Network->TotalOperKills;
+		if (Network->TotalOperKills > Network->OperKillsT)
+			Network->OperKillsT = Network->TotalOperKills;
 #endif
 
 #ifdef HYBRID_GLINES
 
-      ExecuteGline(tempgline->username, tempgline->hostname,
-          tempgline->reason);
+		ExecuteGline(tempgline->username, tempgline->hostname,
+		             tempgline->reason);
 #endif /* HYBRID_GLINES */
 
 #ifdef HYBRID7_GLINES
 
-      Execute7Gline(tempgline->username, tempgline->hostname,
-          tempgline->reason,
-          tempgline->expires ? (tempgline->expires - current_ts) : 0);
+		Execute7Gline(tempgline->username, tempgline->hostname,
+		              tempgline->reason,
+		              tempgline->expires ? (tempgline->expires - current_ts) : 0);
 #endif /* HYBRID7_GLINES */
 
-    }
+	}
 } /* CheckGlined */
 
 #ifdef HYBRID_GLINES
@@ -209,14 +209,14 @@ void
 ExecuteGline(char *username, char *hostname, char *reason)
 
 {
-  toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\r\n",
-         Me.name, username ? username : "*", hostname, reason);
+	toserv(":%s GLINE Gliner1 gliner1 gliner1.com pseudo1.org %s %s :%s\r\n",
+	       Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\r\n",
-         Me.name, username ? username : "*", hostname, reason);
+	toserv(":%s GLINE Gliner2 gliner2 gliner2.com pseudo2.org %s %s :%s\r\n",
+	       Me.name, username ? username : "*", hostname, reason);
 
-  toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\r\n",
-         Me.name, username ? username : "*", hostname, reason);
+	toserv(":%s GLINE Gliner3 gliner3 gliner3.com pseudo3.org %s %s :%s\r\n",
+	       Me.name, username ? username : "*", hostname, reason);
 } /* ExecuteGline() */
 
 #endif /* HYBRID_GLINES */
@@ -229,11 +229,11 @@ ExecuteGline(char *username, char *hostname, char *reason)
  * :SERVER kline OPERNICK TARGET_SERVER DURATION USER HOST REASON
  */
 void Execute7Gline(char *username, char *hostname, char *reason, time_t
-    time)
+                   time)
 {
-  toserv(":%s KLINE %s %lu %s %s :%s\r\n",
-         n_OperServ, "*", time, username ? username : "*", hostname,
-         reason);
+	toserv(":%s KLINE %s %lu %s %s :%s\r\n",
+	       n_OperServ, "*", time, username ? username : "*", hostname,
+	       reason);
 } /* Execute7Gline() */
 
 #endif /* HYBRID7_GLINES */
@@ -247,40 +247,40 @@ void
 ExpireGlines(time_t unixtime)
 
 {
-  struct Gline *tempgline, *prev;
+	struct Gline *tempgline, *prev;
 
-  prev = NULL;
-  for (tempgline = GlineList; tempgline; )
-    {
-      if ((tempgline->expires) && (tempgline->expires <= unixtime))
-        {
-          SendUmode(OPERUMODE_Y,
-                    "*** Expired gline %s@%s [%s]",
-                    tempgline->username,
-                    tempgline->hostname,
-                    tempgline->reason);
+	prev = NULL;
+	for (tempgline = GlineList; tempgline; )
+	{
+		if ((tempgline->expires) && (tempgline->expires <= unixtime))
+		{
+			SendUmode(OPERUMODE_Y,
+			          "*** Expired gline %s@%s [%s]",
+			          tempgline->username,
+			          tempgline->hostname,
+			          tempgline->reason);
 
-          if (prev)
-            {
-              prev->next = tempgline->next;
-              DeleteGline(tempgline);
-              tempgline = prev;
-            }
-          else
-            {
-              GlineList = tempgline->next;
-              DeleteGline(tempgline);
-              tempgline = NULL;
-            }
-        }
+			if (prev)
+			{
+				prev->next = tempgline->next;
+				DeleteGline(tempgline);
+				tempgline = prev;
+			}
+			else
+			{
+				GlineList = tempgline->next;
+				DeleteGline(tempgline);
+				tempgline = NULL;
+			}
+		}
 
-      prev = tempgline;
+		prev = tempgline;
 
-      if (tempgline)
-        tempgline = tempgline->next;
-      else
-        tempgline = GlineList;
-    }
+		if (tempgline)
+			tempgline = tempgline->next;
+		else
+			tempgline = GlineList;
+	}
 } /* ExpireGlines() */
 
 #endif /* ALLOW_GLINES */

@@ -25,23 +25,23 @@ struct NickInfo;
 
 struct Memo
 {
-  struct Memo *next, *prev;
-  char *sender;
-  long index;     /* index number */
-  time_t sent;    /* time it was sent */
-  char *text;
-  long flags;
+	struct Memo *next, *prev;
+	char *sender;
+	long index;     /* index number */
+	time_t sent;    /* time it was sent */
+	char *text;
+	long flags;
 };
 
 struct MemoInfo
 {
-  struct MemoInfo *next, *prev;
-  char *name;            /* who the memo was sent to */
-  long memocnt;          /* number of memos */
-  long newmemos;         /* number of unread memos */
-  struct Memo *memos;    /* the actual memos */
-  struct Memo *lastmemo; /* ptr to last memo in list */
-  long flags;
+	struct MemoInfo *next, *prev;
+	char *name;            /* who the memo was sent to */
+	long memocnt;          /* number of memos */
+	long newmemos;         /* number of unread memos */
+	struct Memo *memos;    /* the actual memos */
+	struct Memo *lastmemo; /* ptr to last memo in list */
+	long flags;
 };
 
 void ms_process(char *, char *);

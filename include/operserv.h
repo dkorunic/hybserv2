@@ -55,26 +55,26 @@ struct Luser;
 
 struct OperCommand
 {
-  char *cmd; /* holds command */
-  void (*func)(); /* function to call depending on 'cmd' */
-  int dcconly; /* dcc chat command only? 1 if yes, 0 if not */
-  char flag; /* flag needed to use the command */
+	char *cmd; /* holds command */
+	void (*func)(); /* function to call depending on 'cmd' */
+	int dcconly; /* dcc chat command only? 1 if yes, 0 if not */
+	char flag; /* flag needed to use the command */
 };
 
 struct Ignore
 {
-  struct Ignore *next, *prev;
-  time_t expire;   /* 0 if permanent ignore */
-  char *hostmask;  /* hostmask to ignore */
+	struct Ignore *next, *prev;
+	time_t expire;   /* 0 if permanent ignore */
+	char *hostmask;  /* hostmask to ignore */
 };
 
 /* Information for fuckover processes */
 struct Process
 {
-  struct Process *next;
-  pid_t pid;      /* process-id */
-  char *who;      /* who started it */
-  char *target;   /* target of fuckover */
+	struct Process *next;
+	pid_t pid;      /* process-id */
+	char *who;      /* who started it */
+	char *target;   /* target of fuckover */
 };
 
 void os_process(char *, char *, int);

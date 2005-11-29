@@ -70,71 +70,74 @@ struct Channel;
 
 struct ChanAccess
 {
-  struct ChanAccess *next, *prev;
-  int level;               /* privs mask has */
-  char *hostmask;          /* hostmask that has access */
-  struct NickInfo *nptr;   /* nickname */
+	struct ChanAccess *next, *prev;
+	int level;               /* privs mask has */
+	char *hostmask;          /* hostmask that has access */
+	struct NickInfo *nptr;   /* nickname */
 
-  /*
-   * pointer to corresponding AccessChannel structure on nptr's
-   * AccessChannels list - this way, when we delete a ChanAccess
-   * structure, we don't have to loop through all of nptr's access
-   * channels to find the corresponding pointer.
-   */
-  struct AccessChannel *acptr;
-  time_t created; /* time when this entry was added */
-  time_t last_used; /* last time the person joined the channel while
-                       identified */
+	/*
+	 * pointer to corresponding AccessChannel structure on nptr's
+	 * AccessChannels list - this way, when we delete a ChanAccess
+	 * structure, we don't have to loop through all of nptr's access
+	 * channels to find the corresponding pointer.
+	 */
+	struct AccessChannel *acptr;
+	time_t created; /* time when this entry was added */
+	time_t last_used; /* last time the person joined the channel while
+		                       identified */
 };
 
 struct AutoKick
 {
-  struct AutoKick *next;
-  char *hostmask; /* mask to autokick */
-  char *reason;   /* reason for autokick */
-  long expires; /* AKICK expiration */
+	struct AutoKick *next;
+	char *hostmask; /* mask to autokick */
+	char *reason;   /* reason for autokick */
+	long expires; /* AKICK expiration */
 };
 
 struct ChanInfo
 {
-  struct ChanInfo *next, *prev;
-  char *name;                   /* channel name */
-  char *founder;                /* founder nick (must be registered) */
-  time_t last_founder_active;   /* last time the founder joined/left */
-  char *successor;              /* successor nick (must be registered) */
-  time_t last_successor_active; /* last time the founder joined/left */
-  char *password;               /* founder password */
-  char *topic;                  /* NULL if no topic lock */
-  long limit;                   /* 0 if no limit */
-  char *key;                    /* NULL if no key */
+	struct ChanInfo *next, *prev;
+	char *name;                   /* channel name */
+	char *founder;                /* founder nick (must be registered) */
+	time_t last_founder_active;   /* last time the founder joined/left */
+	char *successor;              /* successor nick (must be registered) */
+	time_t last_successor_active; /* last time the founder joined/left */
+	char *password;               /* founder password */
+	char *topic;                  /* NULL if no topic lock */
+	long limit;                   /* 0 if no limit */
+	char *key;                    /* NULL if no key */
 #ifdef DANCER
-  char *forward;                /* NULL if no forward target */
+
+	char *forward;                /* NULL if no forward target */
 #endif /* DANCER */
-  int modes_on;                 /* modes to enforce */
-  int modes_off;                /* modes to enforce off */
-  struct ChanAccess *access;    /* access list */
-  int akickcnt;                 /* number of akicks */
-  struct AutoKick *akick;       /* autokick list */
 
-  char *entrymsg;               /* msg to send to users upon entry to channel */
-  char *email;                  /* email address of channel */
-  char *url;                    /* url of channel */
-  char *comment;                /* channel comment line */
+	int modes_on;                 /* modes to enforce */
+	int modes_off;                /* modes to enforce off */
+	struct ChanAccess *access;    /* access list */
+	int akickcnt;                 /* number of akicks */
+	struct AutoKick *akick;       /* autokick list */
 
-  char *forbidby;               /* who did a forbid on channel */
-  char *forbidreason;           /* and an optional reason */
+	char *entrymsg;               /* msg to send to users upon entry to channel */
+	char *email;                  /* email address of channel */
+	char *url;                    /* url of channel */
+	char *comment;                /* channel comment line */
 
-  /* list of users who have founder access */
-  struct f_users
-  {
-    struct f_users *next;
-    struct Luser *lptr;
-  } *founders;
+	char *forbidby;               /* who did a forbid on channel */
+	char *forbidreason;           /* and an optional reason */
 
-  time_t created;               /* timestamp when it was registered */
-  time_t lastused;              /* for expiration purposes */
-  int *access_lvl;              /* customized access levels for this channel */
-  long flags;                   /* channel flags */
+	/* list of users who have founder access */
+	struct f_users
+	{
+		struct f_users *next;
+		struct Luser *lptr;
+	}
+	*founders;
+
+	time_t created;               /* timestamp when it was registered */
+	time_t lastused;              /* for expiration purposes */
+	int *access_lvl;              /* customized access levels for this channel */
+	long flags;                   /* channel flags */
 };
 
 void cs_process(char *, char *);
@@ -144,9 +147,9 @@ void cs_part(struct Channel *);
 void cs_CheckOp(struct Channel *, struct ChanInfo *, char *);
 void cs_CheckJoin(struct Channel *, struct ChanInfo *, char *);
 void cs_CheckSjoin(struct Channel *, struct ChanInfo *, int, char **,
-    int);
+                   int);
 void cs_CheckModes(struct Luser *, struct ChanInfo *, int, int, struct
-    Luser *);
+                   Luser *);
 void cs_CheckTopic(char *, char *);
 int cs_ShouldBeOnChan(struct ChanInfo *);
 void cs_RejoinChannels(void);
@@ -168,7 +171,7 @@ void SetDefaultALVL(struct ChanInfo *);
 void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 int IsFounder(struct Luser *, struct ChanInfo *);
 int AddAccess(struct ChanInfo *, struct Luser *, char *,
-                     struct NickInfo *, int, time_t, time_t);
+              struct NickInfo *, int, time_t, time_t);
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;

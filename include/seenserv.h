@@ -14,11 +14,11 @@
 
 struct Seen
 {
-  struct Seen *prev, *next, *seen;
-  int type;                /* 1 - QUIT, 2 - NICK */
-  char nick[NICKLEN + 1];
-  char *userhost, *msg;
-  time_t time;
+	struct Seen *prev, *next, *seen;
+	int type;                /* 1 - QUIT, 2 - NICK */
+	char nick[NICKLEN + 1];
+	char *userhost, *msg;
+	time_t time;
 };
 
 typedef struct Seen aSeen;
@@ -27,7 +27,7 @@ void es_process(char *, char *);
 void es_add(char *, char *, char *, char *, time_t, int);
 
 extern int seenc;
-extern aSeen *seenp, *seenb; 
+extern aSeen *seenp, *seenb;
 
 #endif /* SEENSERVICES */
 

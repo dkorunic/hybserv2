@@ -31,11 +31,13 @@
 typedef unsigned int u_int32_t;
 
 /* MD5 context. */
-typedef struct MD5Context {
-  u_int32_t state[4];   /* state (ABCD) */
-  u_int32_t count[2];   /* number of bits, modulo 2^64 (lsb first) */
-  unsigned char buffer[64];     /* input buffer */
-} MD5_CTX;
+typedef struct MD5Context
+{
+	u_int32_t state[4];   /* state (ABCD) */
+	u_int32_t count[2];   /* number of bits, modulo 2^64 (lsb first) */
+	unsigned char buffer[64];     /* input buffer */
+}
+MD5_CTX;
 
 void   MD5Init (MD5_CTX *);
 void   MD5Update (MD5_CTX *, const unsigned char *, unsigned int);
@@ -46,18 +48,19 @@ char * MD5File(const char *, char *);
 char * MD5Data(const unsigned char *, unsigned int, char *);
 
 static unsigned char itoa64[] =         /* 0 ... 63 => ascii - 64 */
-        "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 void
 _crypt_to64(s, v, n)
-        char *s;
-        unsigned long v;
-        int n;
+char *s;
+unsigned long v;
+int n;
 {
-        while (--n >= 0) {
-                *s++ = itoa64[v&0x3f];
-                v >>= 6;
-        }
+	while (--n >= 0)
+	{
+		*s++ = itoa64[v&0x3f];
+		v >>= 6;
+	}
 }
 
 /*
@@ -68,11 +71,11 @@ char *
 crypt_md5(const char *pw, const char *salt)
 {
 	static char	*magic = "$1$";	/*
-					 * This string is magic for
-					 * this algorithm.  Having
-					 * it this way, we can get
-					 * get better later on
-					 */
+		        					 * This string is magic for
+		        					 * this algorithm.  Having
+		        					 * it this way, we can get
+		        					 * get better later on
+		        					 */
 	static char     passwd[120], *p;
 	static const char *sp,*ep;
 	unsigned char	final[MD5_SIZE];
@@ -120,9 +123,9 @@ crypt_md5(const char *pw, const char *salt)
 	/* Then something really weird... */
 	for (i = strlen(pw); i ; i >>= 1)
 		if(i&1)
-		    MD5Update(&ctx, final, 1);
+			MD5Update(&ctx, final, 1);
 		else
-		    MD5Update(&ctx, (const unsigned char *)pw, 1);
+			MD5Update(&ctx, (const unsigned char *)pw, 1);
 
 	/* Now make the output string */
 	strlcpy(passwd,magic,sizeof(passwd));
@@ -136,7 +139,8 @@ crypt_md5(const char *pw, const char *salt)
 	 * On a 60 Mhz Pentium this takes 34 msec, so you would
 	 * need 30 seconds to build a 1000 entry dictionary...
 	 */
-	for(i=0;i<1000;i++) {
+	for(i=0;i<1000;i++)
+	{
 		MD5Init(&ctx1);
 		if(i & 1)
 			MD5Update(&ctx1,(const unsigned char *)pw,strlen(pw));
@@ -159,17 +163,23 @@ crypt_md5(const char *pw, const char *salt)
 	p = passwd + strlen(passwd);
 
 	l = (final[ 0]<<16) | (final[ 6]<<8) | final[12];
-	_crypt_to64(p,l,4); p += 4;
+	_crypt_to64(p,l,4);
+	p += 4;
 	l = (final[ 1]<<16) | (final[ 7]<<8) | final[13];
-	_crypt_to64(p,l,4); p += 4;
+	_crypt_to64(p,l,4);
+	p += 4;
 	l = (final[ 2]<<16) | (final[ 8]<<8) | final[14];
-	_crypt_to64(p,l,4); p += 4;
+	_crypt_to64(p,l,4);
+	p += 4;
 	l = (final[ 3]<<16) | (final[ 9]<<8) | final[15];
-	_crypt_to64(p,l,4); p += 4;
+	_crypt_to64(p,l,4);
+	p += 4;
 	l = (final[ 4]<<16) | (final[10]<<8) | final[ 5];
-	_crypt_to64(p,l,4); p += 4;
+	_crypt_to64(p,l,4);
+	p += 4;
 	l =                    final[11]                ;
-	_crypt_to64(p,l,2); p += 2;
+	_crypt_to64(p,l,2);
+	p += 2;
 	*p = '\0';
 
 	/* Don't leave anything around in vm they could use. */
@@ -221,13 +231,14 @@ static void MD5Transform (u_int32_t [4], const unsigned char [64]);
 
 static void
 Encode (output, input, len)
-	unsigned char *output;
-	u_int32_t *input;
-	unsigned int len;
+unsigned char *output;
+u_int32_t *input;
+unsigned int len;
 {
 	unsigned int i, j;
 
-	for (i = 0, j = 0; j < len; i++, j += 4) {
+	for (i = 0, j = 0; j < len; i++, j += 4)
+	{
 		output[j] = (unsigned char)(input[i] & 0xff);
 		output[j+1] = (unsigned char)((input[i] >> 8) & 0xff);
 		output[j+2] = (unsigned char)((input[i] >> 16) & 0xff);
@@ -242,22 +253,22 @@ Encode (output, input, len)
 
 static void
 Decode (output, input, len)
-	u_int32_t *output;
-	const unsigned char *input;
-	unsigned int len;
+u_int32_t *output;
+const unsigned char *input;
+unsigned int len;
 {
 	unsigned int i, j;
 
 	for (i = 0, j = 0; j < len; i++, j += 4)
 		output[i] = ((u_int32_t)input[j]) | (((u_int32_t)input[j+1]) << 8) |
-		    (((u_int32_t)input[j+2]) << 16) | (((u_int32_t)input[j+3]) << 24);
+		            (((u_int32_t)input[j+2]) << 16) | (((u_int32_t)input[j+3]) << 24);
 }
 
 static unsigned char PADDING[64] = {
-  0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+                                       0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                   };
 
 /* F, G, H and I are basic MD5 functions. */
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
@@ -297,7 +308,7 @@ static unsigned char PADDING[64] = {
 
 void
 MD5Init (context)
-	MD5_CTX *context;
+MD5_CTX *context;
 {
 
 	context->count[0] = context->count[1] = 0;
@@ -309,7 +320,7 @@ MD5Init (context)
 	context->state[3] = 0x10325476;
 }
 
-/* 
+/*
  * MD5 block update operation. Continues an MD5 message-digest
  * operation, processing another message block, and updating the
  * context.
@@ -317,9 +328,9 @@ MD5Init (context)
 
 void
 MD5Update (context, input, inputLen)
-	MD5_CTX *context;
-	const unsigned char *input;
-	unsigned int inputLen;
+MD5_CTX *context;
+const unsigned char *input;
+unsigned int inputLen;
 {
 	unsigned int i, index, partLen;
 
@@ -328,16 +339,17 @@ MD5Update (context, input, inputLen)
 
 	/* Update number of bits */
 	if ((context->count[0] += ((u_int32_t)inputLen << 3))
-	    < ((u_int32_t)inputLen << 3))
+	        < ((u_int32_t)inputLen << 3))
 		context->count[1]++;
 	context->count[1] += ((u_int32_t)inputLen >> 29);
 
 	partLen = 64 - index;
 
 	/* Transform as many times as possible. */
-	if (inputLen >= partLen) {
+	if (inputLen >= partLen)
+	{
 		memcpy((void *)&context->buffer[index], (const void *)input,
-		    partLen);
+		       partLen);
 		MD5Transform (context->state, context->buffer);
 
 		for (i = partLen; i + 63 < inputLen; i += 64)
@@ -350,7 +362,7 @@ MD5Update (context, input, inputLen)
 
 	/* Buffer remaining input */
 	memcpy ((void *)&context->buffer[index], (const void *)&input[i],
-	    inputLen-i);
+	        inputLen-i);
 }
 
 /*
@@ -359,7 +371,7 @@ MD5Update (context, input, inputLen)
 
 void
 MD5Pad (context)
-	MD5_CTX *context;
+MD5_CTX *context;
 {
 	unsigned char bits[8];
 	unsigned int index, padLen;
@@ -383,8 +395,8 @@ MD5Pad (context)
 
 void
 MD5Final (digest, context)
-	unsigned char digest[16];
-	MD5_CTX *context;
+unsigned char digest[16];
+MD5_CTX *context;
 {
 	/* Do padding. */
 	MD5Pad (context);
@@ -400,8 +412,8 @@ MD5Final (digest, context)
 
 static void
 MD5Transform (state, block)
-	u_int32_t state[4];
-	const unsigned char block[64];
+u_int32_t state[4];
+const unsigned char block[64];
 {
 	u_int32_t a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
@@ -412,6 +424,7 @@ MD5Transform (state, block)
 #define S12 12
 #define S13 17
 #define S14 22
+
 	FF (a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
 	FF (d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
 	FF (c, d, a, b, x[ 2], S13, 0x242070db); /* 3 */
@@ -434,6 +447,7 @@ MD5Transform (state, block)
 #define S22 9
 #define S23 14
 #define S24 20
+
 	GG (a, b, c, d, x[ 1], S21, 0xf61e2562); /* 17 */
 	GG (d, a, b, c, x[ 6], S22, 0xc040b340); /* 18 */
 	GG (c, d, a, b, x[11], S23, 0x265e5a51); /* 19 */
@@ -456,6 +470,7 @@ MD5Transform (state, block)
 #define S32 11
 #define S33 16
 #define S34 23
+
 	HH (a, b, c, d, x[ 5], S31, 0xfffa3942); /* 33 */
 	HH (d, a, b, c, x[ 8], S32, 0x8771f681); /* 34 */
 	HH (c, d, a, b, x[11], S33, 0x6d9d6122); /* 35 */
@@ -478,6 +493,7 @@ MD5Transform (state, block)
 #define S42 10
 #define S43 15
 #define S44 21
+
 	II (a, b, c, d, x[ 0], S41, 0xf4292244); /* 49 */
 	II (d, a, b, c, x[ 7], S42, 0x432aff97); /* 50 */
 	II (c, d, a, b, x[14], S43, 0xab9423a7); /* 51 */

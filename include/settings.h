@@ -27,14 +27,15 @@
 
 struct Directive
 {
-  char *name; /* directive name */
-  int flag; /* directive flag - D_* */
+	char *name; /* directive name */
+	int flag; /* directive flag - D_* */
 
-  struct
-  {
-    int type; /* type of variable "ptr" is - PARAM_* */
-    void *ptr; /* where to store parameter */
-  } param[PARAM_MAX];
+	struct
+	{
+		int type; /* type of variable "ptr" is - PARAM_* */
+		void *ptr; /* where to store parameter */
+	}
+	param[PARAM_MAX];
 };
 
 struct Directive *FindDirective(char *);

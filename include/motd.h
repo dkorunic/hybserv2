@@ -18,15 +18,15 @@ struct Luser;
 
 struct MessageFileLine
 {
-  struct MessageFileLine *next;
-  char *line;
+	struct MessageFileLine *next;
+	char *line;
 };
 
 struct MessageFile
 {
-  char *filename;
-  struct MessageFileLine *Contents;
-  char DateLastChanged[MAX_DATESTRING + 1];
+	char *filename;
+	struct MessageFileLine *Contents;
+	char DateLastChanged[MAX_DATESTRING + 1];
 };
 
 void InitMessageFile(struct MessageFile *);

@@ -29,10 +29,10 @@ void
 InitMessageFile(struct MessageFile *mfile)
 
 {
-  assert(mfile != 0);
+	assert(mfile != 0);
 
-  mfile->Contents = NULL;
-  mfile->DateLastChanged[0] = '\0';
+	mfile->Contents = NULL;
+	mfile->DateLastChanged[0] = '\0';
 } /* InitMessageFile() */
 
 /*
@@ -49,81 +49,81 @@ int
 ReadMessageFile(struct MessageFile *fileptr)
 
 {
-  struct stat sb;
-  struct tm *localtm;
-  FILE *fptr;
-  char buffer[MESSAGELINELEN + 1];
-  char *ch;
-  char *final;
-  struct MessageFileLine *NewLine,
-        *CurrentLine;
+	struct stat sb;
+	struct tm *localtm;
+	FILE *fptr;
+	char buffer[MESSAGELINELEN + 1];
+	char *ch;
+	char *final;
+	struct MessageFileLine *NewLine,
+				*CurrentLine;
 
-  assert(fileptr != 0);
-  assert(fileptr->filename != 0);
+	assert(fileptr != 0);
+	assert(fileptr->filename != 0);
 
-  if (stat(fileptr->filename, &sb) < 0)
-    return 0; /* file doesn't exist */
+	if (stat(fileptr->filename, &sb) < 0)
+		return 0; /* file doesn't exist */
 
-  localtm = localtime(&sb.st_mtime);
+	localtm = localtime(&sb.st_mtime);
 
-  if (localtm)
-    ircsprintf(fileptr->DateLastChanged, "%d/%d/%d %02d:%02d",
-               localtm->tm_mday, localtm->tm_mon + 1, 1900 + localtm->tm_year,
-               localtm->tm_hour, localtm->tm_min);
+	if (localtm)
+		ircsprintf(fileptr->DateLastChanged, "%d/%d/%d %02d:%02d",
+		           localtm->tm_mday, localtm->tm_mon + 1, 1900 + localtm->tm_year,
+		           localtm->tm_hour, localtm->tm_min);
 
-  /*
-   * Clear out old data
-   */
-  while (fileptr->Contents != NULL)
-    {
-      CurrentLine = fileptr->Contents->next;
-      MyFree(fileptr->Contents->line);
-      MyFree(fileptr->Contents);
-      fileptr->Contents = CurrentLine;
-    }
+	/*
+	 * Clear out old data
+	 */
+	while (fileptr->Contents != NULL)
+{
+		CurrentLine = fileptr->Contents->next;
+		MyFree(fileptr->Contents->line);
+		MyFree(fileptr->Contents);
+		fileptr->Contents = CurrentLine;
+	}
 
-  if ((fptr = fopen(fileptr->filename, "r")) == NULL)
-    return 0;
+	if ((fptr = fopen(fileptr->filename, "r")) == NULL)
+		return 0;
 
-  CurrentLine = NULL;
+	CurrentLine = NULL;
 
-  while (fgets(buffer, sizeof(buffer), fptr))
-    {
-      if ((ch = strchr(buffer, '\n')) != NULL)
-        *ch = '\0';
+	while (fgets(buffer, sizeof(buffer), fptr))
+	{
+		if ((ch = strchr(buffer, '\n')) != NULL)
+			*ch = '\0';
 
-      NewLine = MyMalloc(sizeof(struct MessageFileLine));
-      
-      if (*buffer != '\0')
-      {
-        final = Substitute(NULL, buffer, NODCC);
-        if (final && (final != (char *) -1))
-          NewLine->line = final;
-        else
-          NewLine->line = MyStrdup(" ");
-      }
-      else
-        NewLine->line = MyStrdup(" ");
+		NewLine = MyMalloc(sizeof(struct MessageFileLine));
 
-      NewLine->next = NULL;
+		if (*buffer != '\0')
+		{
+			final = Substitute(NULL, buffer, NODCC);
+			if (final && (final != (char *) -1))
+				NewLine->line = final;
+			else
+				NewLine->line = MyStrdup(" ");
+		}
+		else
+			NewLine->line = MyStrdup(" ");
 
-      if (fileptr->Contents)
-        {
-          if (CurrentLine)
-            CurrentLine->next = NewLine;
+		NewLine->next = NULL;
 
-          CurrentLine = NewLine;
-        }
-      else
-        {
-          fileptr->Contents = NewLine;
-          CurrentLine = NewLine;
-        }
-    }
+		if (fileptr->Contents)
+		{
+			if (CurrentLine)
+				CurrentLine->next = NewLine;
 
-  fclose(fptr);
+			CurrentLine = NewLine;
+		}
+		else
+		{
+			fileptr->Contents = NewLine;
+			CurrentLine = NewLine;
+		}
+	}
 
-  return 1;
+	fclose(fptr);
+
+	return 1;
 } /* ReadMessageFile() */
 
 /*
@@ -132,14 +132,14 @@ ReadMessageFile(struct MessageFile *fileptr)
 */
 void SendMessageFile(struct Luser *lptr, struct MessageFile *motdptr)
 {
-  struct MessageFileLine *lineptr;
+	struct MessageFileLine *lineptr;
 
-  assert(lptr && motdptr);
+	assert(lptr && motdptr);
 
-  if (motdptr->Contents == NULL)
-    return;
+	if (motdptr->Contents == NULL)
+		return;
 
-  for (lineptr = motdptr->Contents; lineptr != NULL; lineptr =
-      lineptr->next)
-    notice(n_Global, lptr->nick, "%s", lineptr->line);
+	for (lineptr = motdptr->Contents; lineptr != NULL; lineptr =
+	            lineptr->next)
+		notice(n_Global, lptr->nick, "%s", lineptr->line);
 } /* SendMessageFile() */

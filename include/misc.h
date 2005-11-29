@@ -19,21 +19,21 @@ struct Luser;
 
 struct Command
 {
-  char *cmd;       /* holds command */
-  void (*func)(); /* corresponding function */
+	char *cmd;       /* holds command */
+	void (*func)(); /* corresponding function */
 
-  /* LVL_NONE if anyone can execute it
-   * LVL_IDENT if nick needs to have IDENTIFY'd before using 'cmd'
-   * LVL_ADMIN if nick needs to match an admin line */
-  int level;
+	/* LVL_NONE if anyone can execute it
+	 * LVL_IDENT if nick needs to have IDENTIFY'd before using 'cmd'
+	 * LVL_ADMIN if nick needs to match an admin line */
+	int level;
 };
 
 struct aService
 {
-  char **name;         /* nickname of service bot */
-  char **ident;        /* ident of service bot */
-  char **desc;         /* description of service bot */
-  struct Luser **lptr; /* pointer to service bot */
+	char **name;         /* nickname of service bot */
+	char **ident;        /* ident of service bot */
+	char **desc;         /* description of service bot */
+	struct Luser **lptr; /* pointer to service bot */
 };
 
 void debug(char *, ...);

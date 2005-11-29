@@ -55,8 +55,8 @@ struct ChanAccess;
 
 struct NickHost
 {
-  struct NickHost *next;
-  char *hostmask; /* hostmask for nickname */
+	struct NickHost *next;
+	char *hostmask; /* hostmask for nickname */
 };
 
 #ifdef CHANNELSERVICES
@@ -65,9 +65,9 @@ struct NickHost
  * access on */
 struct AccessChannel
 {
-  struct AccessChannel *next, *prev;
-  struct ChanInfo *cptr;        /* pointer to channel */
-  struct ChanAccess *accessptr; /* pointer to ChanAccess structure on cptr */
+	struct AccessChannel *next, *prev;
+	struct ChanInfo *cptr;        /* pointer to channel */
+	struct ChanAccess *accessptr; /* pointer to ChanAccess structure on cptr */
 };
 
 #endif /* CHANNELSERVICES */
@@ -75,61 +75,61 @@ struct AccessChannel
 /* structure for registered nicknames */
 struct NickInfo
 {
-  struct NickInfo *next, *prev;
-  char *nick;                /* registered nickname */
-  char *password;            /* password */
-  char *phrase;              /* password recovery phrase */
-  struct NickHost *hosts;    /* recognized hosts for this nick */
-  time_t created;            /* timestamp when it was registered */
-  time_t lastseen;           /* for expiration purposes */
-  long flags;                /* nick flags */
-  char *email;               /* email address */
-  char *url;                 /* url */
-  char *gsm;                 /* GSM number */
-  char *phone;               /* Phone */
-  char *UIN;                 /* ICQ UIN */
-  char *lastu;               /* last seen username */
-  char *lasth;               /* last seen hostname */
-  char *lastqmsg;            /* last quit message */
-  char *forbidby;            /* who forbidded the nickname */
-  char *forbidreason;        /* why was it forbidden [optional] */
-  time_t collide_ts;         /* TS of when to collide them */
+	struct NickInfo *next, *prev;
+	char *nick;                /* registered nickname */
+	char *password;            /* password */
+	char *phrase;              /* password recovery phrase */
+	struct NickHost *hosts;    /* recognized hosts for this nick */
+	time_t created;            /* timestamp when it was registered */
+	time_t lastseen;           /* for expiration purposes */
+	long flags;                /* nick flags */
+	char *email;               /* email address */
+	char *url;                 /* url */
+	char *gsm;                 /* GSM number */
+	char *phone;               /* Phone */
+	char *UIN;                 /* ICQ UIN */
+	char *lastu;               /* last seen username */
+	char *lasth;               /* last seen hostname */
+	char *lastqmsg;            /* last quit message */
+	char *forbidby;            /* who forbidded the nickname */
+	char *forbidreason;        /* why was it forbidden [optional] */
+	time_t collide_ts;         /* TS of when to collide them */
 
 #ifdef RECORD_SPLIT_TS
-  /* If they split, record their TS, so if they rejoin, we can
-   * check if their TS's match up and don't make them re-IDENTIFY */
-  time_t split_ts;
-  time_t whensplit;          /* for expiration purposes */
+	/* If they split, record their TS, so if they rejoin, we can
+	 * check if their TS's match up and don't make them re-IDENTIFY */
+	time_t split_ts;
+	time_t whensplit;          /* for expiration purposes */
 #endif /* RECORD_SPLIT_TS */
 
 #ifdef RECORD_RESTART_TS
-  /* Record TS of nicks so that when services are restarted
-   * they won't have to reidentify */
-  time_t nick_ts;
+	/* Record TS of nicks so that when services are restarted
+	 * they won't have to reidentify */
+	time_t nick_ts;
 #endif
 
 #ifdef LINKED_NICKNAMES
-  /* Pointer to next nick in the nickname link list */
-  struct NickInfo *nextlink;
+	/* Pointer to next nick in the nickname link list */
+	struct NickInfo *nextlink;
 
-  /* If this is the "hub" nickname for a list of linked nicknames,
-   * master will be NULL. If this nickname is a leaf, master will
-   * point to the "hub" nickname of this list */
-  struct NickInfo *master;
+	/* If this is the "hub" nickname for a list of linked nicknames,
+	 * master will be NULL. If this nickname is a leaf, master will
+	 * point to the "hub" nickname of this list */
+	struct NickInfo *master;
 
-  /* Number of links in the list this nickname is a part of.
-   * This is only non-zero if this nickname is a master */
-  int numlinks;
+	/* Number of links in the list this nickname is a part of.
+	 * This is only non-zero if this nickname is a master */
+	int numlinks;
 #endif /* LINKED_NICKNAMES */
 
 #ifdef CHANNELSERVICES
-  /* List of channels for which this nickname is a founder */
-  struct aChannelPtr *FounderChannels;
-  int fccnt; /* number of channels registered */
+	/* List of channels for which this nickname is a founder */
+	struct aChannelPtr *FounderChannels;
+	int fccnt; /* number of channels registered */
 
-  /* List of channels this nickname has access on */
-  struct AccessChannel *AccessChannels;
-  int accnt; /* number of channels they have access to */
+	/* List of channels this nickname has access on */
+	struct AccessChannel *AccessChannels;
+	int accnt; /* number of channels they have access to */
 #endif /* CHANNELSERVICES */
 };
 
@@ -140,7 +140,7 @@ void ExpireNicknames(time_t);
 void AddFounderChannelToNick(struct NickInfo **, struct ChanInfo *);
 void RemoveFounderChannelFromNick(struct NickInfo **, struct ChanInfo *);
 struct AccessChannel *AddAccessChannel(struct NickInfo *, struct ChanInfo
-    *, struct ChanAccess *);
+			                                       *, struct ChanAccess *);
 void DeleteAccessChannel(struct NickInfo *, struct AccessChannel *);
 struct NickInfo *FindNick(char *);
 struct NickInfo *GetLink(char *);

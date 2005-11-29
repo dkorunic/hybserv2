@@ -47,127 +47,135 @@ struct Server;
 
 struct MyInfo
 {
-  char *name;     /* services' server name */
-  char *info;     /* services' info line */
-  char *admin;    /* administrative info */
-  struct Server *sptr; /* pointer to services entry in server list */
-  struct Server *hub;  /* pointer to services' current hub server */
-  struct Luser *osptr;   /* pointer to OperServ client structure */
+	char *name;     /* services' server name */
+	char *info;     /* services' info line */
+	char *admin;    /* administrative info */
+	struct Server *sptr; /* pointer to services entry in server list */
+	struct Server *hub;  /* pointer to services' current hub server */
+	struct Luser *osptr;   /* pointer to OperServ client structure */
 
 #ifdef NICKSERVICES
-  struct Luser *nsptr;   /* pointer to NickServ */
+
+	struct Luser *nsptr;   /* pointer to NickServ */
 #ifdef CHANNELSERVICES
-  struct Luser *csptr;   /* pointer to ChanServ */
+
+	struct Luser *csptr;   /* pointer to ChanServ */
 #endif /* CHANNELSERVICES */
 #ifdef MEMOSERVICES
-  struct Luser *msptr;   /* pointer to MemoServ */
+
+	struct Luser *msptr;   /* pointer to MemoServ */
 #endif /* MEMOSERVICES */
 #endif /* NICKSERVICES */
 #ifdef STATSERVICES
-  struct Luser *ssptr;   /* pointer to StatServ */
+
+	struct Luser *ssptr;   /* pointer to StatServ */
 #endif /* STATSERVICES */
 #ifdef HELPSERVICES
-  struct Luser *hsptr;   /* pointer to HelpServ */
+
+	struct Luser *hsptr;   /* pointer to HelpServ */
 #endif /* HELPSERVICES */
 #ifdef GLOBALSERVICES
-  struct Luser *gsptr;   /* pointer to Global(Serv) */
+
+	struct Luser *gsptr;   /* pointer to Global(Serv) */
 #endif /* GLOBALSERVICES */
 #ifdef SEENSERVICES
-  struct Luser *esptr;   /* pointer to SeenServ */
+
+	struct Luser *esptr;   /* pointer to SeenServ */
 #endif /* SEENSERVICES */
 };
 
 /* Stores server S: lines from hybserv.conf */
 struct Servlist
 {
-  struct Servlist *next;
-  char *hostname;       /* hostname of hub server */
-  char *password;       /* password for connection */
-  char *realname;       /* network name of hub (if differnet from hostname) */
-  int port;             /* port for connection */
-  time_t connect_ts;    /* time we connected to it */
-  int sockfd;           /* socket fd (must match HubSock) */
-  unsigned int flags;
+	struct Servlist *next;
+	char *hostname;       /* hostname of hub server */
+	char *password;       /* password for connection */
+	char *realname;       /* network name of hub (if differnet from hostname) */
+	int port;             /* port for connection */
+	time_t connect_ts;    /* time we connected to it */
+	int sockfd;           /* socket fd (must match HubSock) */
+	unsigned int flags;
 };
 
 /* Stores O: lines from hybserv.conf */
 struct Userlist
 {
-  struct Userlist *next;
-  char *nick;        /* nickname */
-  char *username;    /* username of user */
-  char *hostname;    /* hostname of user */
-  char *password;    /* password user must .identify with */
-  int flags;         /* privileges user has */
-  long umodes;       /* user modes set */
+	struct Userlist *next;
+	char *nick;        /* nickname */
+	char *username;    /* username of user */
+	char *hostname;    /* hostname of user */
+	char *password;    /* password user must .identify with */
+	int flags;         /* privileges user has */
+	long umodes;       /* user modes set */
 
 #ifdef RECORD_SPLIT_TS
-  /*
-   * if they split, record their TS, so if they rejoin, we can
-   * check if their TS's match up and don't make them re-IDENTIFY
-   */
-  time_t split_ts;
-  time_t whensplit;  /* for expiration purposes */
+	/*
+	 * if they split, record their TS, so if they rejoin, we can
+	 * check if their TS's match up and don't make them re-IDENTIFY
+	 */
+	time_t split_ts;
+	time_t whensplit;  /* for expiration purposes */
 #endif
 
 #ifdef RECORD_RESTART_TS
-  /* Record TS of nicks so that when services are restarted
-   * they won't have to reidentify */
-  time_t nick_ts;
-  char *last_nick;
+	/* Record TS of nicks so that when services are restarted
+	 * they won't have to reidentify */
+	time_t nick_ts;
+	char *last_nick;
 #endif
 };
 
 /* Stores C: lines from hybserv.conf */
 struct Chanlist
 {
-  struct Chanlist *next;
-  char *name;  /* name of channel */
-  int flags;   /* to mark CHAN_DELETE during rehash */
+	struct Chanlist *next;
+	char *name;  /* name of channel */
+	int flags;   /* to mark CHAN_DELETE during rehash */
 };
 
 struct Botlist
 {
-  struct Botlist *next;
-  char *name;     /* nickname of tcm */
-  char *username; /* username of tcm */
-  char *hostname; /* hostname of tcm */
-  char *password; /* password for tcm */
-  int port;       /* port for connection */
+	struct Botlist *next;
+	char *name;     /* nickname of tcm */
+	char *username; /* username of tcm */
+	char *hostname; /* hostname of tcm */
+	char *password; /* password for tcm */
+	int port;       /* port for connection */
 };
 
 /* Stores I: line info from hybserv.conf */
 struct rHost
 {
-  struct rHost *next;
-  char *username; /* username of restricted hostmask */
-  char *hostname; /* hostname of restricted hostmask */
-  int hostnum;    /* number of connections allowed from hostmask */
+	struct rHost *next;
+	char *username; /* username of restricted hostmask */
+	char *hostname; /* hostname of restricted hostmask */
+	int hostnum;    /* number of connections allowed from hostmask */
 #ifdef ADVFLOOD
-  int banhost;
+
+	int banhost;
 #endif /* ADVFLOOD */
 };
 
 /* Stores P: line info from hybserv.conf */
 struct PortInfo
 {
-  struct PortInfo *next;
-  int port;      /* port to listen on */
-  char *host;    /* hostmask to allow */
-  int socket;    /* socket file descriptor */
-  int type;      /* type of connections to accept */
-  int tries;     /* how many times we've tried to bind the port */
+	struct PortInfo *next;
+	int port;      /* port to listen on */
+	char *host;    /* hostmask to allow */
+	int socket;    /* socket file descriptor */
+	int type;      /* type of connections to accept */
+	int tries;     /* how many times we've tried to bind the port */
 };
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO
 /* Stores M: lines from hybserv.conf */
 struct cHost
 {
-  struct cHost *next;
-  long re_time; /* reconnect activation time (max value of split_ts) */
-  char *hub,    /* hub that leaf should be connected to*/
-    *leaf;      /* leaf */
-  int port;     /* reconnect port */
+	struct cHost *next;
+	long re_time; /* reconnect activation time (max value of split_ts) */
+	char *hub,    /* hub that leaf should be connected to*/
+	*leaf;      /* leaf */
+	int port;     /* reconnect port */
 };
 #endif
 

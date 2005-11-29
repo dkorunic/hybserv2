@@ -38,20 +38,20 @@ struct Botlist;
 /* info for dcc/tcm connections */
 struct DccUser
 {
-  struct DccUser *next, *prev;
-  int socket;       /* socket file descriptor */
-  int authfd;       /* ident file descriptor */
-  int port;         /* remote port */
-  char *nick;       /* nickname */
-  char *username;   /* username */
-  char *hostname;   /* hostname */
-  int flags;        /* socket flags */
-  char spill[MAXLINE * 2];
-  int offset;
+	struct DccUser *next, *prev;
+	int socket;       /* socket file descriptor */
+	int authfd;       /* ident file descriptor */
+	int port;         /* remote port */
+	char *nick;       /* nickname */
+	char *username;   /* username */
+	char *hostname;   /* hostname */
+	int flags;        /* socket flags */
+	char spill[MAXLINE * 2];
+	int offset;
 
-  /* time of their last message - for telnet clients who haven't entered
-   * their password yet, time that they connected */
-  time_t idle;
+	/* time of their last message - for telnet clients who haven't entered
+	 * their password yet, time that they connected */
+	time_t idle;
 };
 
 void BroadcastDcc(int, char *, ...);

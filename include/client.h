@@ -27,17 +27,17 @@
 
 struct UserChannel
 {
-  struct UserChannel *next;
-  int flags; /* channel flags - opped/voiced etc */
-  struct Channel *chptr; /* pointer to channel */
+	struct UserChannel *next;
+	int flags; /* channel flags - opped/voiced etc */
+	struct Channel *chptr; /* pointer to channel */
 };
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
 
 struct aChannelPtr
 {
-  struct aChannelPtr *next;
-  struct ChanInfo *cptr;
+	struct aChannelPtr *next;
+	struct ChanInfo *cptr;
 };
 
 #endif /* NICKSERVICES && CHANNELSERVICES */
@@ -45,58 +45,61 @@ struct aChannelPtr
 /* User structure */
 struct Luser
 {
-  struct Luser *next, *prev, *hnext, *cnext;
+	struct Luser *next, *prev, *hnext, *cnext;
 
 #ifdef BLOCK_ALLOCATION
-  /*
-   * When BLOCK_ALLOCATION is enabled, we don't want to have to malloc()
-   * space for nick,userhost,realname etc, so have it preallocated
-   */
-  char nick[NICKLEN + 1];     /* nickname */
-  char username[USERLEN + 1]; /* username */
-  char hostname[HOSTLEN + 1]; /* hostname */
-  char realname[REALLEN + 1]; /* realname */
+	/*
+	 * When BLOCK_ALLOCATION is enabled, we don't want to have to malloc()
+	 * space for nick,userhost,realname etc, so have it preallocated
+	 */
+	char nick[NICKLEN + 1];     /* nickname */
+	char username[USERLEN + 1]; /* username */
+	char hostname[HOSTLEN + 1]; /* hostname */
+	char realname[REALLEN + 1]; /* realname */
 #else
-  char *nick;
-  char *username;
-  char *hostname;
-  char *realname;
+
+	char *nick;
+	char *username;
+	char *hostname;
+	char *realname;
 #endif /* BLOCK_ALLOCATION */
 
-  int umodes;                    /* global usermodes they have */
-  struct Server *server;         /* pointer to server they're on */
-  struct UserChannel *firstchan; /* pointer to list of channels */
-  time_t since;                  /* when they connected to the network */
+	int umodes;                    /* global usermodes they have */
+	struct Server *server;         /* pointer to server they're on */
+	struct UserChannel *firstchan; /* pointer to list of channels */
+	time_t since;                  /* when they connected to the network */
 
 #ifdef NICKSERVICES
-  time_t nick_ts;      /* time of their last nick change */
-  time_t nickreg_ts;   /* time they last registered a nickname */
+
+	time_t nick_ts;      /* time of their last nick change */
+	time_t nickreg_ts;   /* time they last registered a nickname */
 #ifdef CHANNELSERVICES
-  /* list of channels user has identified for */
-  struct aChannelPtr *founder_channels;
+	/* list of channels user has identified for */
+	struct aChannelPtr *founder_channels;
 #endif /* CHANNELSERVICES */
 #endif /* NICKSERVICES */
 
-  /*
-   * msgs_ts[0] is the timestamp of the first message they send services;
-   * msgs_ts[1] is the timestamp of the last message they send
-   */
-  time_t msgs_ts[2];
-  int messages;        /* number of messages they've sent */
-  int flood_trigger;   /* how many times they triggered flood protection */
+	/*
+	 * msgs_ts[0] is the timestamp of the first message they send services;
+	 * msgs_ts[1] is the timestamp of the last message they send
+	 */
+	time_t msgs_ts[2];
+	int messages;        /* number of messages they've sent */
+	int flood_trigger;   /* how many times they triggered flood protection */
 
-  int flags;
+	int flags;
 
 #ifdef STATSERVICES
-  long  numops;      /* how many times they +o'd someone */
-  long  numdops;     /* how many times they -o'd someone */
-  long  numvoices;   /* how many times they +v'd someone */
-  long  numdvoices;  /* how many times they -v'd someone */
-  long  numnicks;    /* how many times they've changed their nickname */
-  long  numkicks;    /* how many times they've kicked someone */
-  long  numkills;    /* how many times they've killed someone */
-  long  numhops;     /* how many times they +h'd someone */
-  long  numdhops;    /* how many times they -h'd someone */
+
+	long  numops;      /* how many times they +o'd someone */
+	long  numdops;     /* how many times they -o'd someone */
+	long  numvoices;   /* how many times they +v'd someone */
+	long  numdvoices;  /* how many times they -v'd someone */
+	long  numnicks;    /* how many times they've changed their nickname */
+	long  numkicks;    /* how many times they've kicked someone */
+	long  numkills;    /* how many times they've killed someone */
+	long  numhops;     /* how many times they +h'd someone */
+	long  numdhops;    /* how many times they -h'd someone */
 #endif /* STATSERVICES */
 };
 

@@ -54,24 +54,24 @@
 
 
 static void mo_forcenick(struct Client *client_p, struct Client *source_p,
-    int parc, char *parv[]);
-struct Message forcenick_msgtab = 
-{
-  "FORCENICK", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, mo_forcenick, m_ignore, mo_forcenick, m_ignore}
-};
+                         int parc, char *parv[]);
+struct Message forcenick_msgtab =
+    {
+	    "FORCENICK", 0, 0, 3, 0, MFLG_SLOW, 0,
+	    {m_unregistered, m_not_oper, mo_forcenick, m_ignore, mo_forcenick, m_ignore}
+    };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&forcenick_msgtab);
+	mod_add_cmd(&forcenick_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&forcenick_msgtab);
+	mod_del_cmd(&forcenick_msgtab);
 }
 
 char *_version = "$Revision: 1325$";
@@ -85,21 +85,21 @@ char *_version = "$Revision: 1325$";
  */
 static int is_nickname(char *nick)
 {
-  if (nick == NULL)
-    return 0;
+	if (nick == NULL)
+		return 0;
 
-  /* nicks cant start with a digit or - or be 0 length */
-  /* This closer duplicates behaviour of hybrid-6 */
-  if (*nick == '-' || IsDigit(*nick) || *nick == '\0')
-    return 0;
+	/* nicks cant start with a digit or - or be 0 length */
+	/* This closer duplicates behaviour of hybrid-6 */
+	if (*nick == '-' || IsDigit(*nick) || *nick == '\0')
+		return 0;
 
-  for (; *nick; nick++)
-  {
-    if (!IsNickChar(*nick))
-      return 0;
-  }
+	for (; *nick; nick++)
+	{
+		if (!IsNickChar(*nick))
+			return 0;
+	}
 
-  return 1;
+	return 1;
 }
 
 /*
@@ -109,59 +109,59 @@ static int is_nickname(char *nick)
  *      parv[2] = nick to force them to
  */
 static void mo_forcenick(struct Client *client_p, struct Client *source_p,
-    int parc, char *parv[])
+                         int parc, char *parv[])
 {
-  struct Client *target_p;
+	struct Client *target_p;
 
-  if (!is_nickname(parv[2]))
-  {
-    sendto_one(source_p,
-        ":%s NOTICE %s :*** Notice -- Invalid new nickname %s",
-        me.name, source_p->name, parv[2]);
-    return;
-  }
+	if (!is_nickname(parv[2]))
+	{
+		sendto_one(source_p,
+		           ":%s NOTICE %s :*** Notice -- Invalid new nickname %s",
+		           me.name, source_p->name, parv[2]);
+		return;
+	}
 
-  if (strlen(parv[2]) > NICKLEN - 1)
-    parv[2][NICKLEN - 1] = '\0';
+	if (strlen(parv[2]) > NICKLEN - 1)
+		parv[2][NICKLEN - 1] = '\0';
 
-  if ((target_p = find_client(parv[1])) == NULL)
-  {
-    sendto_one(source_p,
-        ":%s NOTICE %s :*** Notice -- No such nickname %s",
-        me.name, source_p->name, parv[1]);
-    return;
-  }
-  
-  if (IsOper(source_p)) /* send it normally */
-  {
-         sendto_realops_flags(UMODE_ALL, L_ALL,
-                         "Received FORCENICK message for '%s'->'%s'. From %s!%s@%s on %s",
-                         target_p->name, parv[2], source_p->name,
-						 source_p->username, source_p->host,
-						 source_p->user->server->name);
-  }
-  else
-  {
-         sendto_realops_flags(UMODE_SKILL, L_ALL,
-                         "Received FORCENICK message for '%s'->'%s'. From %s",
-                         target_p->name, parv[2], parv[0]);
-  }
+	if ((target_p = find_client(parv[1])) == NULL)
+	{
+		sendto_one(source_p,
+		           ":%s NOTICE %s :*** Notice -- No such nickname %s",
+		           me.name, source_p->name, parv[1]);
+		return;
+	}
 
-  /* Pass on the message to everyone */
-  sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, 
-		  LL_ICLIENT, ":%s FORCENICK %s %s", parv[0], parv[1], parv[2]);
+	if (IsOper(source_p)) /* send it normally */
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+		                     "Received FORCENICK message for '%s'->'%s'. From %s!%s@%s on %s",
+		                     target_p->name, parv[2], source_p->name,
+		                     source_p->username, source_p->host,
+		                     source_p->user->server->name);
+	}
+	else
+	{
+		sendto_realops_flags(UMODE_SKILL, L_ALL,
+		                     "Received FORCENICK message for '%s'->'%s'. From %s",
+		                     target_p->name, parv[2], parv[0]);
+	}
 
-  /* See if the user is ours */
-  if (!MyClient(target_p))
-    return;
+	/* Pass on the message to everyone */
+	sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS,
+	              LL_ICLIENT, ":%s FORCENICK %s %s", parv[0], parv[1], parv[2]);
 
-  if (find_client(parv[2]) != NULL)
-  {
-    sendto_one(source_p,
-        ":%s NOTICE %s :*** Notice -- Nickname %s is in use",
-        me.name, source_p->name, parv[2]);
-    return;
-  }
+	/* See if the user is ours */
+	if (!MyClient(target_p))
+		return;
 
-  change_local_nick(target_p, target_p, parv[2]);
+	if (find_client(parv[2]) != NULL)
+	{
+		sendto_one(source_p,
+		           ":%s NOTICE %s :*** Notice -- Nickname %s is in use",
+		           me.name, source_p->name, parv[2]);
+		return;
+	}
+
+	change_local_nick(target_p, target_p, parv[2]);
 }

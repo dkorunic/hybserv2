@@ -150,6 +150,7 @@ int       MaxAkicks;
 long      InhabitTimeout;
 int       AllowAccessIfSOp;
 int       RestrictRegister;
+int       NotifyOpers;
 int       GiveNotice;
 long      MaxTSDelta;
 
@@ -316,6 +317,7 @@ struct Directive directives[] =
 	    { "InhabitTimeout", D_OPTIONAL,   { { PARAM_TIME, &InhabitTimeout } } },
 	    { "AllowAccessIfSOp", D_OPTIONAL, { { PARAM_SET, &AllowAccessIfSOp } } },
 	    { "RestrictRegister", D_OPTIONAL, { { PARAM_SET, &RestrictRegister } } },
+		{ "NotifyOpers", D_OPTIONAL,      { { PARAM_SET, &NotifyOpers } } },
 	    { "GiveNotice", D_OPTIONAL,       { { PARAM_SET, &GiveNotice } } },
 	    { "AllowGuardChannel", D_OPTIONAL, { { PARAM_SET, &AllowGuardChannel } } },
 

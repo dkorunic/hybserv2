@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  + add ability to notify opers on INFO [from CoolCold]
   - fix log rotation and greplog issues with LogPath
   - fix GetLink() issue in HasAccess() which occuren when !AutoOpAdmins:
     admins woudn't get +o on channels where they had normal access

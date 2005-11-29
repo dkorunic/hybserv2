@@ -543,6 +543,14 @@ AllowAccessIfSOp
 
 #RestrictRegister
 
+# NotifyOpers [OPTIONAL]
+#
+#  Enabling this will cause NickServ to notify registered
+# Service operators to be notified when someone is doing
+# INFO on them. Normally not necessary.
+
+#NotifyOpers
+
 # GiveNotice [OPTIONAL]
 #
 #  Enabling this will cause ChanServ to send a notice to

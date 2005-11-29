@@ -100,6 +100,7 @@ extern  int       DefaultTcmPort;
 extern  int       DoWallops;
 extern  int       FloodCount;
 extern  int       FloodProtection;
+extern  int       NotifyOpers;
 extern  int       GiveNotice;
 extern  int       GlobalNotices;
 extern  int       IgnoreOffenses;

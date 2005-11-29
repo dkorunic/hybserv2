@@ -4146,6 +4146,18 @@ n_info(struct Luser *lptr, int ac, char **av)
 	if (!(nptr = GetMaster(realptr)))
 		return;
 
+#if defined EMPOWERADMINS || defined EMPOWERADMINS_MORE
+	if (NotifyOpers)
+	{
+		struct Luser *ptr= FindClient(realptr->nick);
+		if ((ptr != NULL) && (ptr->flags & L_OSREGISTERED))
+		{
+			notice(n_NickServ, realptr->nick,
+					"%s is doing INFO on you", lptr->nick);
+		}
+	}
+#endif
+
 	RecordCommand("%s: %s!%s@%s INFO %s",
 	              n_NickServ, lptr->nick, lptr->username, lptr->hostname,
 	              realptr->nick);

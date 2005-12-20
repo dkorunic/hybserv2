@@ -187,8 +187,9 @@ CheckLogs(time_t unixtime)
 
 	oldts = unixtime - 1;
 	log_tm = localtime(&oldts);
-	ircsprintf(tmplog, "%s.%d%02d%02d",
-	           LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon + 1, log_tm->tm_mday);
+	ircsprintf(tmplog, "%s/%s.%d%02d%02d",
+			   LogPath, LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon +
+			   1, log_tm->tm_mday);
 
 	rename(LogFileName, tmplog);
 } /* CheckLogs() */

@@ -1158,6 +1158,9 @@ CheckNick(char *nickname)
 	struct NickInfo *nptr, *realptr;
 	int knownhost;
 
+	/* Doh. Wrong usage of names - generally we use nptr for linked
+	 * nickname and realptr for master nicknames. Will fix this later on.
+	 * -kre */
 	realptr = FindNick(nickname);
 	nptr = GetMaster(realptr);
 
@@ -1178,14 +1181,14 @@ CheckNick(char *nickname)
 	/*
 	 * Check if the nick is forbidden
 	 */
-	if (nptr->flags & NS_FORBID)
+	if (realptr->flags & NS_FORBID)
 	{
 		notice(n_NickServ, lptr->nick,
 		       "This nickname may not be used.  Please choose another.");
 		notice(n_NickServ, lptr->nick,
 		       "If you do not change within one minute, you will be disconnected");
-		nptr->flags |= NS_COLLIDE;
-		nptr->collide_ts = current_ts + 60;
+		realptr->flags |= NS_COLLIDE;
+		realptr->collide_ts = current_ts + 60;
 		return 0;
 	}
 
@@ -1235,8 +1238,8 @@ CheckNick(char *nickname)
 					notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
 #endif
 
-					nptr->flags |= NS_COLLIDE;
-					nptr->collide_ts = current_ts + 60;
+					realptr->flags |= NS_COLLIDE;
+					realptr->collide_ts = current_ts + 60;
 				}
 				else
 				{
@@ -1253,7 +1256,7 @@ CheckNick(char *nickname)
 					          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
 					collide(lptr->nick);
-					nptr->collide_ts = 0;
+					realptr->collide_ts = 0;
 				}
 			}
 			else if (nptr->flags & NS_PROTECTED)
@@ -1269,8 +1272,8 @@ CheckNick(char *nickname)
 				notice(n_NickServ, lptr->nick, ERR_MUST_CHANGE);
 #endif
 
-				nptr->flags |= NS_COLLIDE;
-				nptr->collide_ts = current_ts + 60;
+				realptr->flags |= NS_COLLIDE;
+				realptr->collide_ts = current_ts + 60;
 			}
 		}
 		return 0;
@@ -2328,7 +2331,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
 	              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
 	realptr->flags |= NS_IDENTIFIED;
-	nptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
+	realptr->flags &= ~(NS_COLLIDE | NS_RELEASE);
 	notice(n_NickServ, lptr->nick,
 	       "Password accepted - you are now recognized");
 #ifdef DANCER
@@ -4409,9 +4412,7 @@ n_link(struct Luser *lptr, int ac, char **av)
 
 	if (!(nptr = FindNick(lptr->nick)))
 	{
-		notice(n_NickServ, lptr->nick,
-		       ERR_NOT_REGGED,
-		       lptr->nick);
+		notice(n_NickServ, lptr->nick, ERR_NOT_REGGED, lptr->nick);
 		badlink = 1;
 	}
 	else if (nptr->flags & NS_FORBID)

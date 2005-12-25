@@ -8,6 +8,8 @@ As long as the answer is right, who cares if the question is wrong?
 Pending bugs:
 -------------
 *) fix -> NS_IDENTIFIED - always master
+*) n_info -> use nick specific stuff, not master!
+
 *) improve hashing
 *) remove MaxTrace
 *) fix absolutely ugly code formatting! [progress..]

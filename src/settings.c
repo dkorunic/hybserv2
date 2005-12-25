@@ -74,6 +74,7 @@ char      *desc_HelpServ;
 char      *desc_Global;
 char      *ServiceUmodes;
 
+int       SecureMessaging;
 int       RestrictedAccess;
 int       AutoOpAdmins;
 int       OpersHaveAccess;
@@ -231,6 +232,7 @@ struct Directive directives[] =
 	    { "ServiceUmodes", D_NORUNTIME,   { { PARAM_STRING, &ServiceUmodes } } },
 
 	    /* Security Settings */
+		{ "SecureMessaging", D_OPTIONAL, { { PARAM_SET, &SecureMessaging} } } ,
 	    { "RestrictedAccess", D_OPTIONAL, { { PARAM_SET, &RestrictedAccess } } },
 	    { "AutoOpAdmins", D_OPTIONAL,     { { PARAM_SET, &AutoOpAdmins } } },
 	    { "OpersHaveAccess", D_OPTIONAL,  { { PARAM_SET, &OpersHaveAccess } } },

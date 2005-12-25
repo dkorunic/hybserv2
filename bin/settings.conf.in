@@ -161,6 +161,14 @@ ServiceUmodes      "+io"
 #
 ################################################################
 
+# SecureMessaging [OPTIONAL]
+#
+#  Enabling this will force users to message services via
+# theoretically more secure way - directly with hostmask.
+# For example: /msg Nickserv@services.com
+
+#SecureMessaging
+
 # RestrictedAccess [OPTIONAL]
 #
 #  Enabling this will prevent everyone from using services,

@@ -213,8 +213,7 @@ static struct Command accesscmds[] =
 /* sub-commands for ChanServ AKICK */
 static struct Command akickcmds[] =
     {
-	    { "ADD", c_akick_add, LVL_NONE
-	    },
+	    { "ADD", c_akick_add, LVL_NONE },
 	    { "DEL", c_akick_del, LVL_NONE },
 	    { "LIST", c_akick_list, LVL_NONE },
 	    { 0, 0, 0 }

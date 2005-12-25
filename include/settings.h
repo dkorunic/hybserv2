@@ -141,6 +141,7 @@ extern  int       OpersHaveAccess;
 extern  int       OpersOnlyDcc;
 extern  int       ReloadDbsOnHup;
 extern  int       RestrictRegister;
+extern  int       SecureMessaging;
 extern  int       RestrictedAccess;
 extern  int       SeenMaxRecs;
 extern  int       ServerNotices;

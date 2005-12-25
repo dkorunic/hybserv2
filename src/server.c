@@ -1105,6 +1105,7 @@ s_privmsg(int ac, char **av)
 	char *who, /* nick who gave privmsg */
 	*command, /* contains the /msg that 'who' gave */
 	*tmp;
+	int issecured = 0;
 	struct Luser *lptr,
 				/*
 				 * if it was sent to a service nick as opposed to a
@@ -1156,7 +1157,10 @@ s_privmsg(int ac, char **av)
 	{
 		if (!irccmp(tmp + 1, Me.name))
 			*tmp = '\0';
+		issecured = 1;
 	}
+	else
+		issecured = 0;
 
 	serviceptr = GetService(av[2]);
 
@@ -1272,6 +1276,14 @@ s_privmsg(int ac, char **av)
 	{
 		/* process ctcp request */
 		onctcp(who, serviceptr->nick, command);
+		return;
+	}
+
+	if (SecureMessaging && !issecured)
+	{
+		notice(serviceptr->nick, lptr->nick,
+				"Please use secure messaging (example: /msg %s@%s)",
+				serviceptr->nick, Me.info);
 		return;
 	}
 

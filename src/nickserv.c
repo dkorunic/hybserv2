@@ -213,7 +213,7 @@ void ns_process(const char *nick, char *command)
 		return;
 
 	lptr = FindClient(nick);
-	if (!lptr)
+	if (lptr == NULL)
 		return;
 
 	if (Network->flags & NET_OFF)
@@ -263,6 +263,8 @@ void ns_process(const char *nick, char *command)
 	 */
 
 	nptr = FindNick(lptr->nick);
+	if (nptr == NULL)
+		return;
 
 	if (nptr->flags & NS_FORBID)
 	{

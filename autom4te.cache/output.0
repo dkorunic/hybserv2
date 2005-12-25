@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1320 2005-09-30 20:15:29Z kreator $
+@%:@ $Id: configure.in 1325 2005-10-24 08:51:16Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -851,21 +851,21 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-largefile     omit support for large files
-  --disable-ipv6					 Disable IPv6 support [default=no]
-  --enable-efence				 Enable libefence support [default=no]
-  --enable-dmalloc				 Enable dmalloc support [default=no]
-  --enable-warnings			 Enable compiler warnings [default=no]
-  --enable-asserts				 Enable asserts in code [default=no]
-  --enable-gimmecore			 Enable core dumping [default=yes]
-  --enable-daemontools		 Enable daemontools support [default=no]
+  --disable-ipv6          Disable IPv6 support [default=no]
+  --enable-efence         Enable libefence support [default=no]
+  --enable-dmalloc        Enable dmalloc support [default=no]
+  --enable-warnings       Enable compiler warnings [default=no]
+  --enable-asserts        Enable asserts in code [default=no]
+  --enable-gimmecore      Enable core dumping [default=yes]
+  --enable-daemontools    Enable daemontools support [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-nicklen=LENGTH		 Sets nick length to LENGTH [default=18]
+  --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
   --with-channellen=LENGTH  Sets channel length to LENGTH [default=200]
-  --with-topiclen=LENGTH		 Sets topic length to LENGTH [default=160]
-  --with-network=TYPE			 Sets network type TYPE
+  --with-topiclen=LENGTH    Sets topic length to LENGTH [default=160]
+  --with-network=TYPE       Sets network type TYPE
 
 Some influential environment variables:
   CC          C compiler command
@@ -982,7 +982,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1320 2005-09-30 20:15:29Z kreator $
+$Id: configure.in 1325 2005-10-24 08:51:16Z kreator $
 _ACEOF
   exit 0
 fi
@@ -1339,9 +1339,9 @@ _ACEOF
 
 
 if test -f "$srcdir/.svn/entries"; then
-	ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+  ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
 else
-	ac_cv_revision="release"
+  ac_cv_revision="release"
 fi
 ac_cv_version="$PACKAGE_VERSION-$ac_cv_revision"
 
@@ -1442,14 +1442,14 @@ host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 MYHOST=$host_os
 case "$host_os" in
 *sunos*|*solaris*)
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_SOLARIS 
 _ACEOF
 
-	;;
+  ;;
 *cygwin)
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_CYGWIN 
 _ACEOF
@@ -3216,51 +3216,51 @@ esac
 
 
 if test "x$ac_cv_c_compiler_gnu" != "xyes"; then
-	echo "$as_me:$LINENO: checking $CC -version for TenDRA or MIPSpro cc" >&5
+  echo "$as_me:$LINENO: checking $CC -version for TenDRA or MIPSpro cc" >&5
 echo $ECHO_N "checking $CC -version for TenDRA or MIPSpro cc... $ECHO_C" >&6
-	case `$CC -version 2>&1` in
-		*TenDRA*)
-			echo "$as_me:$LINENO: result: TenDRA cc" >&5
+  case `$CC -version 2>&1` in
+    *TenDRA*)
+      echo "$as_me:$LINENO: result: TenDRA cc" >&5
 echo "${ECHO_T}TenDRA cc" >&6
-			CPPFLAGS="$CPPFLAGS -Ylonglong -Yansi -Ysystem"
-			ac_cv_c_compiler="TenDRA"
-			;;
-		*MIPSpro*)
-			echo "$as_me:$LINENO: result: MIPSpro cc" >&5
+      CPPFLAGS="$CPPFLAGS -Ylonglong -Yansi -Ysystem"
+      ac_cv_c_compiler="TenDRA"
+      ;;
+    *MIPSpro*)
+      echo "$as_me:$LINENO: result: MIPSpro cc" >&5
 echo "${ECHO_T}MIPSpro cc" >&6
-			ac_cv_c_compiler="MIPSpro"
-			;;
-		*)
-			echo "$as_me:$LINENO: result: no" >&5
+      ac_cv_c_compiler="MIPSpro"
+      ;;
+    *)
+      echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-			;;
-	esac
-	
-	echo "$as_me:$LINENO: checking $CC -V for Sun Workshop, Forte, HPUX or Tru64 cc" >&5
+      ;;
+  esac
+  
+  echo "$as_me:$LINENO: checking $CC -V for Sun Workshop, Forte, HPUX or Tru64 cc" >&5
 echo $ECHO_N "checking $CC -V for Sun Workshop, Forte, HPUX or Tru64 cc... $ECHO_C" >&6
-	case `$CC -V 2>&1` in
-		*Sun*WorkShop* | *Forte*Developer* | *Sun*C*)
-			echo "$as_me:$LINENO: result: Sun Workshop/Forte" >&5
+  case `$CC -V 2>&1` in
+    *Sun*WorkShop* | *Forte*Developer* | *Sun*C*)
+      echo "$as_me:$LINENO: result: Sun Workshop/Forte" >&5
 echo "${ECHO_T}Sun Workshop/Forte" >&6
-			ac_cv_c_compiler="SunWorkShop"
-			;;
-		*Tru64*)
-			echo "$as_me:$LINENO: result: Tru64 cc" >&5
+      ac_cv_c_compiler="SunWorkShop"
+      ;;
+    *Tru64*)
+      echo "$as_me:$LINENO: result: Tru64 cc" >&5
 echo "${ECHO_T}Tru64 cc" >&6
-			CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-			ac_cv_c_compiler="Tru64"
-			;;
-		*HP*ANSI*)
-			echo "$as_me:$LINENO: result: HPUX cc" >&5
+      CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+      ac_cv_c_compiler="Tru64"
+      ;;
+    *HP*ANSI*)
+      echo "$as_me:$LINENO: result: HPUX cc" >&5
 echo "${ECHO_T}HPUX cc" >&6
-			CFLAGS="$CFLAGS +e"
-			ac_cv_c_compiler="HPUX"
-			;;
-		*)
-			echo "$as_me:$LINENO: result: no" >&5
+      CFLAGS="$CFLAGS +e"
+      ac_cv_c_compiler="HPUX"
+      ;;
+    *)
+      echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-			;;
-	esac
+      ;;
+  esac
 fi
 
 echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \$(MAKE)" >&5
@@ -3808,24 +3808,24 @@ fi
 echo "$as_me:$LINENO: checking how to generate dependency info" >&5
 echo $ECHO_N "checking how to generate dependency info... $ECHO_C" >&6
 if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
-	echo "$as_me:$LINENO: result: $CC -MM" >&5
+  echo "$as_me:$LINENO: result: $CC -MM" >&5
 echo "${ECHO_T}$CC -MM" >&6
-	MKDEP="$CC -MM"
+  MKDEP="$CC -MM"
 elif test "x$ac_cv_c_compiler" = "xSunWorkShop"; then
-	echo "$as_me:$LINENO: result: $CC -xM" >&5
+  echo "$as_me:$LINENO: result: $CC -xM" >&5
 echo "${ECHO_T}$CC -xM" >&6
-	MKDEP="$CC -xM"
+  MKDEP="$CC -xM"
 elif test "x$MKDEP" != "x"; then
-	echo "$as_me:$LINENO: result: mkdep" >&5
+  echo "$as_me:$LINENO: result: mkdep" >&5
 echo "${ECHO_T}mkdep" >&6
 elif test "x$MAKEDEPEND" != "x"; then
-	echo "$as_me:$LINENO: result: makedepend" >&5
+  echo "$as_me:$LINENO: result: makedepend" >&5
 echo "${ECHO_T}makedepend" >&6
-	MKDEP="$MAKEDEPEND -f-"
+  MKDEP="$MAKEDEPEND -f-"
 else
-	echo "$as_me:$LINENO: result: nothing suitable" >&5
+  echo "$as_me:$LINENO: result: nothing suitable" >&5
 echo "${ECHO_T}nothing suitable" >&6
-	MKDEP=":"
+  MKDEP=":"
 fi
 
 
@@ -4845,8 +4845,8 @@ done
 
 
 for ac_header in errno.h assert.h netdb.h fcntl.h signal.h \
-	limits.h arpa/inet.h netinet/in.h netinet/tcp.h \
-	sys/socket.h sys/resource.h sys/signal.h
+  limits.h arpa/inet.h netinet/in.h netinet/tcp.h \
+  sys/socket.h sys/resource.h sys/signal.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -5216,7 +5216,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_SOCKADDR_STORAGE 1
 _ACEOF
@@ -5241,15 +5241,15 @@ else
   cf_enable_ipv6="yes"
 fi; 
 if test "x$cf_enable_ipv6" = "xyes"; then
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	echo "$as_me:$LINENO: checking ipv6 stack type" >&5
+  echo "$as_me:$LINENO: checking ipv6 stack type" >&5
 echo $ECHO_N "checking ipv6 stack type... $ECHO_C" >&6
-	for i in inria kame linux-glibc linux-inet6 toshiba v6d zeta; do
-		case "$i" in
-		inria)
-			# http://www.kame.net/
-			cat >conftest.$ac_ext <<_ACEOF
+  for i in inria kame linux-glibc linux-inet6 toshiba v6d zeta; do
+    case "$i" in
+    inria)
+      # http://www.kame.net/
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5290,22 +5290,22 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		kame)
-			# http://www.kame.net/
-			cat >conftest.$ac_ext <<_ACEOF
+      ;;
+    kame)
+      # http://www.kame.net/
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5346,22 +5346,22 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		linux-glibc)
-			# http://www.v6.linux.or.jp/
-			cat >conftest.$ac_ext <<_ACEOF
+      ;;
+    linux-glibc)
+      # http://www.v6.linux.or.jp/
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5402,35 +5402,35 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		linux-inet6)
-			# http://www.v6.linux.or.jp/
-			if test -d /usr/inet6 -o -f /usr/inet6/lib/libinet6.a; then
-				ac_cv_ipv6type="$i"
-				
+      ;;
+    linux-inet6)
+      # http://www.v6.linux.or.jp/
+      if test -d /usr/inet6 -o -f /usr/inet6/lib/libinet6.a; then
+        ac_cv_ipv6type="$i"
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				CFLAGS="$CFLAGS -I/usr/inet6/include"
-				LIBS="$LIBS -linet6"
-				LDFLAGS="$LDFLAGS -L/usr/inet6/lib"
-			fi
-			;;
-		toshiba)
-			cat >conftest.$ac_ext <<_ACEOF
+        CFLAGS="$CFLAGS -I/usr/inet6/include"
+        LIBS="$LIBS -linet6"
+        LDFLAGS="$LDFLAGS -L/usr/inet6/lib"
+      fi
+      ;;
+    toshiba)
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5471,24 +5471,24 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LIBS="$LIBS -linet6"
-				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
-				
+        CFLAGS="$CFLAGS -I/usr/local/v6/include"
+        LIBS="$LIBS -linet6"
+        LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		v6d)
-			cat >conftest.$ac_ext <<_ACEOF
+      ;;
+    v6d)
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5529,24 +5529,24 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LIBS="$LIBS -lv6"
-				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
-				
+        CFLAGS="$CFLAGS -I/usr/local/v6/include"
+        LIBS="$LIBS -lv6"
+        LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		zeta)
-			cat >conftest.$ac_ext <<_ACEOF
+      ;;
+    zeta)
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -5587,30 +5587,30 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_ipv6type="$i"
-				
+        
 cat >>confdefs.h <<\_ACEOF
 @%:@define INET6 1
 _ACEOF
 
-				CFLAGS="$CFLAGS -I/usr/local/v6/include"
-				LIBS="$LIBS -lv6"
-				LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
-				
+        CFLAGS="$CFLAGS -I/usr/local/v6/include"
+        LIBS="$LIBS -lv6"
+        LDFLAGS="$LDFLAGS -L/usr/local/v6/lib"
+        
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-			;;
-		esac
-		if test "x$ac_cv_ipv6type" != "xunknown"; then
-			break
-		fi
-	done
-	echo "$as_me:$LINENO: result: $ac_cv_ipv6type" >&5
+      ;;
+    esac
+    if test "x$ac_cv_ipv6type" != "xunknown"; then
+      break
+    fi
+  done
+  echo "$as_me:$LINENO: result: $ac_cv_ipv6type" >&5
 echo "${ECHO_T}$ac_cv_ipv6type" >&6
-	echo "$as_me:$LINENO: checking for library containing getaddrinfo" >&5
+  echo "$as_me:$LINENO: checking for library containing getaddrinfo" >&5
 echo $ECHO_N "checking for library containing getaddrinfo... $ECHO_C" >&6
 if test "${ac_cv_search_getaddrinfo+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -5735,7 +5735,7 @@ if test "$ac_cv_search_getaddrinfo" != no; then
 fi
 
 else
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -7811,7 +7811,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 ( exit $ac_status )
 echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_BROKEN_INT_GETADDRINFO 1
 _ACEOF
@@ -7863,7 +7863,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_SYS_ERRLIST 1
 _ACEOF
@@ -7920,7 +7920,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define HAVE_SYS_NERR 1
 _ACEOF
@@ -7945,9 +7945,9 @@ else
   cf_enable_efence="no"
 fi; 
 if test "x$cf_enable_efence" = "xyes"; then
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 echo "$as_me:$LINENO: checking for malloc in -lefence" >&5
 echo $ECHO_N "checking for malloc in -lefence... $ECHO_C" >&6
 if test "${ac_cv_lib_efence_malloc+set}" = set; then
@@ -8021,7 +8021,7 @@ _ACEOF
 fi
 
 else
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -8035,9 +8035,9 @@ else
   cf_enable_malloc="no"
 fi; 
 if test "x$cf_enable_malloc" = "xyes"; then
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 echo "$as_me:$LINENO: checking for malloc in -ldmalloc" >&5
 echo $ECHO_N "checking for malloc in -ldmalloc... $ECHO_C" >&6
 if test "${ac_cv_lib_dmalloc_malloc+set}" = set; then
@@ -8111,7 +8111,7 @@ _ACEOF
 fi
 
 else
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -8155,34 +8155,34 @@ else
   ac_cv_network="no"
 fi; 
 if test "x$ac_cv_network" = "xyes"; then
-	ac_cv_network="hybrid7"
+  ac_cv_network="hybrid7"
 fi
 echo "$as_me:$LINENO: result: checking network type... $ac_cv_network" >&5
 echo "${ECHO_T}checking network type... $ac_cv_network" >&6
 if test "x$ac_cv_network" = "xhybrid"; then
-	ac_cv_nicklen=9
-	ac_cv_channellen=200
-	ac_cv_topiclen=120
+  ac_cv_nicklen=9
+  ac_cv_channellen=200
+  ac_cv_topiclen=120
 elif test "x$ac_cv_network" = "xhybrid7"; then
-	ac_cv_nicklen=18
-	ac_cv_channellen=200
-	ac_cv_topiclen=160
+  ac_cv_nicklen=18
+  ac_cv_channellen=200
+  ac_cv_topiclen=160
 elif test "x$ac_cv_network" = "xidolnet"; then
-	ac_cv_nicklen=18
-	ac_cv_channellen=200
-	ac_cv_topiclen=240
+  ac_cv_nicklen=18
+  ac_cv_channellen=200
+  ac_cv_topiclen=240
 elif test "x$ac_cv_network" = "xbalcannet"; then
-	ac_cv_nicklen=24
-	ac_cv_channellen=200
-	ac_cv_topiclen=400
+  ac_cv_nicklen=24
+  ac_cv_channellen=200
+  ac_cv_topiclen=400
 elif test "x$ac_cv_network" = "xdancer"; then
-	ac_cv_nicklen=20
-	ac_cv_channellen=30
-	ac_cv_topiclen=450
+  ac_cv_nicklen=20
+  ac_cv_channellen=30
+  ac_cv_topiclen=450
 elif test "x$ac_cv_network" = "xratbox"; then
-	ac_cv_nicklen=9
-	ac_cv_channellen=200
-	ac_cv_topiclen=160
+  ac_cv_nicklen=9
+  ac_cv_channellen=200
+  ac_cv_topiclen=160
 fi
 
 cat >>confdefs.h <<_ACEOF
@@ -8210,11 +8210,11 @@ else
   cf_enable_warnings="no"
 fi; 
 if test "x$cf_enable_warnings" = "xyes"; then
-	CFLAGS="$CFLAGS -Wall"
-	echo "$as_me:$LINENO: result: yes" >&5
+  CFLAGS="$CFLAGS -Wall"
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -8228,28 +8228,28 @@ else
   cf_enable_asserts="no"
 fi; 
 if test "x$cf_enable_asserts" = "xno"; then
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define NDEBUG 1
 _ACEOF
 
 elif test "x$cf_enable_asserts" = "xsoft"; then
-	echo "$as_me:$LINENO: result: soft" >&5
+  echo "$as_me:$LINENO: result: soft" >&5
 echo "${ECHO_T}soft" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define SOFT_ASSERT 1
 _ACEOF
 
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define NDEBUG 1
 _ACEOF
 
 else
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 fi
 
@@ -8263,12 +8263,12 @@ else
   cf_enable_gimmecore="yes"
 fi; 
 if test "x$cf_enable_gimmecore" = "xno"; then
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 else
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define GIMMECORE 1
 _ACEOF
@@ -8285,15 +8285,15 @@ else
   cf_enable_daemontools="no"
 fi; 
 if test "x$cf_enable_daemontools" = "xyes"; then
-	echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	
+  
 cat >>confdefs.h <<\_ACEOF
 @%:@define DAEMONTOOLS 1
 _ACEOF
 
 else
-	echo "$as_me:$LINENO: result: no" >&5
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -9445,20 +9445,21 @@ fi
 
 echo "
 Configuration:
-	Source revision ...... ${ac_cv_revision}
-	Detected OS .......... ${host_os}
-	Install path ......... ${prefix}/hybserv
+  Source revision ...... ${ac_cv_revision}
+  Detected OS .......... ${host_os}
+  Install path ......... ${prefix}/hybserv
 
 Compile configuration:
-	Configured network ... ${ac_cv_network}
-	Nick length .......... ${ac_cv_nicklen}
-	Channel length ....... ${ac_cv_channellen}
-	Topic length ......... ${ac_cv_topiclen}
+  Configured network ... ${ac_cv_network}
+  Nick length .......... ${ac_cv_nicklen}
+  Channel length ....... ${ac_cv_channellen}
+  Topic length ......... ${ac_cv_topiclen}
 
 Extra configurations:
-	Asserts enabled ...... ${cf_enable_asserts}
-	Coredumps enabled .... ${cf_enable_gimmecore}
-	Daemontools enabled .. ${cf_enable_daemontools}
+  Warnings enabled ..... ${cf_enable_warnings}
+  Asserts enabled ...... ${cf_enable_asserts}
+  Coredumps enabled .... ${cf_enable_gimmecore}
+  Daemontools enabled .. ${cf_enable_daemontools}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

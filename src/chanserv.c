@@ -374,7 +374,7 @@ void cs_process(char *nick, char *command)
 
 	if (nptr)
 	{
-		if (realptr->flags & NS_FORBID)
+		if (nptr->flags & NS_FORBID)
 		{
 			notice(n_ChanServ, lptr->nick,
 			       "Cannot execute commands for forbidden nicknames");

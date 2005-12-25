@@ -166,8 +166,8 @@ m4trace:configure.in:124: -1- AC_DEFINE_TRACE_LITERAL([STAT_MACROS_BROKEN])
 m4trace:configure.in:124: -1- AH_OUTPUT([STAT_MACROS_BROKEN], [/* Define to 1 if the `S_IS*\' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN])
 m4trace:configure.in:127: -1- AC_CHECK_HEADERS([errno.h assert.h netdb.h fcntl.h signal.h \
-	limits.h arpa/inet.h netinet/in.h netinet/tcp.h \
-	sys/socket.h sys/resource.h sys/signal.h])
+  limits.h arpa/inet.h netinet/in.h netinet/tcp.h \
+  sys/socket.h sys/resource.h sys/signal.h])
 m4trace:configure.in:127: -1- AH_OUTPUT([HAVE_ERRNO_H], [/* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H])
 m4trace:configure.in:127: -1- AH_OUTPUT([HAVE_ASSERT_H], [/* Define to 1 if you have the <assert.h> header file. */
@@ -349,7 +349,7 @@ m4trace:configure.in:452: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
 m4trace:configure.in:452: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 #undef DAEMONTOOLS])
 m4trace:configure.in:458: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
-	bin/settings.conf bin/cleandb include/config.h])
+  bin/settings.conf bin/cleandb include/config.h])
 m4trace:configure.in:458: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
 m4trace:configure.in:458: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix inconsistencies with NS_FORBID, NS_COLLIDE and NS_RELEASE usage
   - fix log rotation bug
   + add ability to notify opers on INFO [from CoolCold]
   - fix log rotation and greplog issues with LogPath

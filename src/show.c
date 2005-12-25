@@ -288,7 +288,7 @@ DisplayNick(struct NickInfo *realptr, int detail)
 			strlcat(buf, "AutoMask, ", sizeof(buf));
 		if (nptr->flags & NS_PRIVATE)
 			strlcat(buf, "Private, ", sizeof(buf));
-		if (realptr->flags & NS_FORBID)
+		if (nptr->flags & NS_FORBID)
 			strlcat(buf, "Forbidden, ", sizeof(buf));
 		if (nptr->flags & NS_SECURE)
 			strlcat(buf, "Secure, ", sizeof(buf));

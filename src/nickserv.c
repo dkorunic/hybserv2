@@ -4621,6 +4621,7 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 	}
 	else
 	{
+#if 0
 		/* We should be backwards compatibile, so we'll check the master.
 		 * Although in the future this should fallback only to nptr -kre
 		 * */
@@ -4631,20 +4632,25 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 			       av[1]);
 			return;
 		}
+#endif
 
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
 		{
 			tmp->flags |= NS_FORBID;
 			tmp->flags &= ~NS_IDENTIFIED;
+
+			MyFree(tmp->forbidby);
+			MyFree(tmp->forbidreason);
+
 			tmp->forbidby = MyStrdup(sendstr);
 			if (ac < 3)
 				tmp->forbidreason = NULL;
 			else
 				tmp->forbidreason = GetString(ac - 2, av + 2);
+
 			notice(n_NickServ, lptr->nick,
 				   "The nickname [\002%s\002] is now forbidden",
 				   tmp->nick);
-			/* Check if av[1] is currently online, if so, give warning */
 			CheckNick(tmp->nick);
 		}
 	}
@@ -4698,8 +4704,10 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
 		{
 			tmp->flags &= ~NS_FORBID;
+
 			MyFree(tmp->forbidby);
 			MyFree(tmp->forbidreason);
+
 			notice(n_NickServ, lptr->nick,
 				   "Nickname [\002%s\002] is now unforbidden", tmp->nick);
 			CheckNick(tmp->nick);

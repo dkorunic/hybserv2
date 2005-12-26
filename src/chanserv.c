@@ -3044,6 +3044,9 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 			return 0;
 	}
 
+	if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
+		return 1;
+
 #if defined EMPOWERADMINS || defined EMPOWERADMINS_MORE
 	/*
 	 * If AutoOpAdmins is enabled admins will have the same level of
@@ -3052,9 +3055,6 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 	if (AutoOpAdmins && IsValidAdmin(lptr))
 		return 1;
 #endif /* EMPOWERADMINS || EMPOWERADMINS_MORE */
-
-	if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
-		return 1;
 
 	return 0;
 } /* HasAccess() */

@@ -401,8 +401,7 @@ HostToMask (char *username, char *hostname)
 		 */
 
 		/* advance to the end of topsegment */
-		for (temp = topsegment; *temp; temp++)
-			;
+		for (temp = topsegment; *temp; temp++);
 
 		--temp; /* point to the last letter (number) of the TLD */
 		if ((*temp >= '0') && (*temp <= '9'))
@@ -423,8 +422,8 @@ HostToMask (char *username, char *hostname)
 		}
 		else
 		{
-			/* its a regular hostname with >= 3 segments */
 
+			/* its a regular hostname with >= 3 segments */
 			if (SmartMasking)
 			{
 				/*
@@ -440,7 +439,7 @@ HostToMask (char *username, char *hostname)
 				 * is much better than *.xx.isp.com.au
 				 */
 				cnt = 0;
-				while (temp--)
+				while ((*temp != '@') && (temp--))
 				{
 					if (*temp == '.')
 						if (++cnt >= 3)

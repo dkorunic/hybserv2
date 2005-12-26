@@ -1209,7 +1209,8 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
 				if (jj * (NICKLEN + 1) >= sizeof(kbnicks))
 				{
-					KickBan(1, n_ChanServ, chptr, kbnicks, "Restricted Channel");
+					KickBan(1, n_ChanServ, chptr, kbnicks,
+							"Restricted Channel");
 					kbnicks[0] = '\0';
 					jj = 1;
 				}
@@ -3043,41 +3044,14 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 			return 0;
 	}
 
-#ifdef EMPOWERADMINS
+#if defined EMPOWERADMINS || defined EMPOWERADMINS_MORE
 	/*
 	 * If AutoOpAdmins is enabled admins will have the same level of
 	 * access as a channel founder.
 	 */
 	if (AutoOpAdmins && IsValidAdmin(lptr))
 		return 1;
-#endif /* EMPOWERADMINS */
-
-#ifdef EMPOWERADMINS_MORE
-	/*
-	 * If AutoOpAdmins is disabled, don't give admins AUTO{OP,VOICE,HALFOP}
-	 * access so that they won't be opped on joining a channel - unless 
-	 * they'd have access on the channel anyway. Note that RESTRICTED 
-	 * doen't apply to admins if EMPOWERADMINS_MORE is defined, irrelevent 
-	 * of the setting of AutoOpAdmins.
-	 */
-	if (!AutoOpAdmins && IsValidAdmin(lptr)
-	        && (level == CA_AUTOOP || level == CA_AUTOVOICE
-#ifdef HYBRID7_HALFOPS
-	            || level == CA_AUTOHALFOP
-#endif
-	           ))
-	{
-		struct ChanAccess *ca;
-		char nmask[MAXLINE];
-
-		ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
-		           lptr->hostname);
-		if ((ca = OnAccessList(cptr, nmask, GetLink(lptr->nick))))
-			if (ca->level >= cptr->access_lvl[level])
-				return 1;
-		return 0;
-	}
-#endif /* EMPOWERADMINS_MORE */
+#endif /* EMPOWERADMINS || EMPOWERADMINS_MORE */
 
 	if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
 		return 1;

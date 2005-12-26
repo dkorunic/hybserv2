@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix some of AutoOp issues
   - allow user to dehalfop himself, as well as halfop ALL [all channels he
     is on]
   + add secure messaging [from CoolCold, heavily edited]

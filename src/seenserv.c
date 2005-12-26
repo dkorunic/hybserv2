@@ -48,8 +48,7 @@ static void FreeSeen(void);
 
 static struct Command seencmds[] =
     {
-	    { "SEEN", es_seen, LVL_NONE
-	    },
+	    { "SEEN", es_seen, LVL_NONE },
 	    { "SEENNICK", es_seennick, LVL_NONE },
 	    { "HELP", es_help, LVL_NONE },
 	    { "SEENSTAT", es_seenstat, LVL_ADMIN },
@@ -323,7 +322,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 			strlcpy(seenstring, av[1], MAXLINE + 1);
 
 		count = 0;
-		for (seen = seenp; seen; seen = seen->prev)
+		for (seen = seenp; seen != NULL; seen = seen->prev)
 		{
 			memset(nuhost, 0, sizeof(nuhost));
 			strlcpy(nuhost, seen->nick, NICKLEN + 1);
@@ -347,7 +346,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 			return ;
 		}
 		else
-			if (count == 0)
+			if ((first == NULL) || (count == 0))
 			{
 				notice(n_SeenServ, lptr->nick,
 				       "I found no matching seen records to your query");
@@ -359,7 +358,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 				for (i = 0; (i < 5) && (i < count); ++i)
 				{
 					saved = first;
-					for (last = 0; saved; saved = saved->seen)
+					for (last = 0; saved != NULL; saved = saved->seen)
 					{
 						if ((saved->time <= mytime) && (saved->time > last))
 						{
@@ -388,7 +387,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 		count = i;
 		for (i = 0; i < count; i++)
 		{
-			strlcat(sendstr, " ", sizeof(sendstr));
+			strlcat(sendstr, ", ", sizeof(sendstr));
 			strlcat(sendstr, sorted[i]->nick, sizeof(sendstr));
 		}
 		strlcat(sendstr, ". ", sizeof(sendstr));

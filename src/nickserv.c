@@ -3195,7 +3195,7 @@ static void n_set(struct Luser *lptr, int ac, char **av)
 	   )
 	{
 		notice(n_NickServ, lptr->nick,
-		       "Nickname [\002%s\002] is not liked with [\002%s\002]",
+		       "Nickname [\002%s\002] is not linked with [\002%s\002]",
 		       nptr->nick, lptr->nick);
 		return;
 	}

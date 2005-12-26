@@ -6710,7 +6710,6 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 	{
 		int ii, jj1 = 1, jj2 = 1, arc;
 		char *tempnix, *tempptr, **arv;
-		struct Luser *currlptr;
 
 		/* they want to halfop other people */
 		tempnix = GetString(ac - 2, av + 2);

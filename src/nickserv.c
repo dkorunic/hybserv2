@@ -85,7 +85,7 @@ static void n_set_gsm(struct Luser *, struct NickInfo *, int, char **);
 static void n_set_phone(struct Luser *, struct NickInfo *, int, char **);
 #ifdef LINKED_NICKNAMES
 static void n_set_master(struct Luser *, struct NickInfo *, int, char **);
-#endif
+#endif /* LINKED_NICKNAMES */
 
 static void n_list(struct Luser *, int, char **);
 static void n_info(struct Luser *, int, char **);
@@ -3186,6 +3186,7 @@ static void n_set(struct Luser *lptr, int ac, char **av)
 
 	sender = FindNick(lptr->nick);
 
+#ifdef LINKED_NICKNAMES
 	/* allow administrators to modify users' flags and settings */
 	if (!IsLinked(nptr, sender)
 #ifdef EMPOWERADMINS_MORE
@@ -3198,6 +3199,7 @@ static void n_set(struct Luser *lptr, int ac, char **av)
 		       nptr->nick, lptr->nick);
 		return;
 	}
+#endif /* LINKED_NICKNAMES */
 
 	cptr = GetCommand(setcmds, av[2]);
 
@@ -3972,6 +3974,7 @@ static void n_set_master(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 		return;
 	}
 
+#ifdef LINKED_NICKNAMES
 	if (!IsLinked(newmaster, nptr))
 	{
 		notice(n_NickServ, lptr->nick,
@@ -3979,6 +3982,7 @@ static void n_set_master(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 		       newmaster->nick, nptr->nick);
 		return;
 	}
+#endif /* LINKED_NICKNAMES */
 
 	if ((nptr->master == newmaster) ||
 	        (!nptr->master && (nptr == newmaster)))
@@ -4632,7 +4636,11 @@ n_forbid(struct Luser *lptr, int ac, char **av)
 		}
 #endif
 
+#ifdef LINKED_NICKNAMES
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
+#else
+		tmp = realptr;
+#endif /* LINKED_NICKNAMES */
 		{
 			tmp->flags |= NS_FORBID;
 			tmp->flags &= ~NS_IDENTIFIED;
@@ -4699,7 +4707,11 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
 	}
 	else
 	{
+#ifdef LINKED_NICKNAMES
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
+#else
+		tmp = realptr;
+#endif /* LINKED_NICKNAMES */
 		{
 			tmp->flags &= ~NS_FORBID;
 

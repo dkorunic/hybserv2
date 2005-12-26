@@ -1283,7 +1283,7 @@ s_privmsg(int ac, char **av)
 	{
 		notice(serviceptr->nick, lptr->nick,
 				"Please use secure messaging (example: /msg %s@%s)",
-				serviceptr->nick, Me.info);
+				serviceptr->nick, Me.name);
 		return;
 	}
 

@@ -6566,7 +6566,6 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 				struct Luser *alptr = FindClient(arv[ii]);
 				if ((cptr->flags & CS_SECUREOPS) && (alptr != lptr) &&
 				        (!HasAccess(cptr, alptr, CA_AUTOOP)))
-
 					continue;
 
 				/*
@@ -6616,21 +6615,64 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 	struct ChanInfo *cptr;
 	struct Channel *chptr;
 	char hnicks[MAXLINE + 1], dnicks[MAXLINE + 1];
+	struct UserChannel *uchan;
+	struct ChannelUser *cuser;
+	struct Luser *currlptr;
 
 	if (ac < 2)
 	{
-		notice(n_ChanServ, lptr->nick, "Syntax: \002HALFOP <channel>\002");
+		notice(n_ChanServ, lptr->nick,
+				"Syntax: \002HALFOP <channel> [nicks]\002");
 		notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ, "HALFOP");
 		return;
 	}
 
-	if (!(cptr = FindChan(av[1])))
+	if (!irccmp(av[1], "ALL"))
+		cptr = NULL;
+	else if (!(cptr = FindChan(av[1])))
 	{
 		notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
 		return;
 	}
 
-	/* NOTE: only CMDOP people can +h other people */
+	/* We'll once get NS_NOHALFOPS... */
+	if (HasFlag(lptr->nick, NS_NOCHANOPS))
+		return;
+
+	if (!cptr)
+	{
+		/* They want to be opped in all channels they are currently in. */
+		for (uchan = lptr->firstchan; uchan; uchan = uchan->next)
+		{
+			if (HasAccess(FindChan(uchan->chptr->name), lptr, CA_CMDHALFOP))
+			{
+				if (!(uchan->flags & CH_HOPPED))
+				{
+					toserv(":%s MODE %s +h %s\r\n", n_ChanServ,
+					       uchan->chptr->name, lptr->nick);
+					uchan->flags |= CH_HOPPED;
+
+					if ((cuser = FindUserByChannel(uchan->chptr, lptr)))
+						cuser->flags |= CH_HOPPED;
+				}
+				else
+				{
+					notice(n_ChanServ, lptr->nick,
+					       "You are already halfopped on [\002%s\002]",
+					       uchan->chptr->name);
+				}
+			}
+		}
+
+		notice(n_ChanServ, lptr->nick,
+		       "You have been halfopped on all channels you have access to");
+
+		RecordCommand("%s: %s!%s@%s HALFOP ALL", n_ChanServ, lptr->nick,
+		              lptr->username, lptr->hostname);
+
+		return;
+	}
+
 	if (!HasAccess(cptr, lptr, CA_CMDHALFOP))
 	{
 		notice(n_ChanServ, lptr->nick, ERR_NEED_ACCESS,
@@ -6644,14 +6686,25 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 	chptr = FindChannel(av[1]);
 	if (ac < 3)
 	{
-		strlcpy(hnicks, lptr->nick, sizeof(hnicks));
-		dnicks[0] = '\0';
+		if (HasFlag(lptr->nick, NS_NOCHANOPS))
+			return;
+
 		if (!IsChannelMember(chptr, lptr))
 		{
 			notice(n_ChanServ, lptr->nick,
 			       "You are not on [\002%s\002]", cptr->name);
 			return;
 		}
+
+		if (IsChannelOp(chptr, lptr))
+		{
+			notice(n_ChanServ, lptr->nick,
+			       "You are already opped on [\002%s\002]", cptr->name);
+			return;
+		}
+
+		strlcpy(hnicks, lptr->nick, sizeof(hnicks));
+		dnicks[0] = '\0';
 	}
 	else
 	{
@@ -6661,7 +6714,6 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
 		/* they want to halfop other people */
 		tempnix = GetString(ac - 2, av + 2);
-
 		tempptr = tempnix;
 		arc = SplitBuf(tempnix, &arv);
 
@@ -6680,7 +6732,6 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 
 			if (arv[ii][0] == '-')
 			{
-
 				if (jj1 * (NICKLEN + 1) >= sizeof(dnicks))
 				{
 					SetModes(n_ChanServ, 0, 'h', chptr, dnicks);
@@ -6694,6 +6745,14 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 			}
 			else
 			{
+				struct Luser *alptr = FindClient(arv[ii]);
+				if ((cptr->flags & CS_SECUREOPS) && (alptr != lptr) &&
+				        (!HasAccess(cptr, alptr, CA_AUTOHALFOP)))
+					continue;
+
+				if (HasFlag(arv[ii], NS_NOCHANOPS))
+					continue;
+
 				if (jj2 * (NICKLEN + 1) >= sizeof(hnicks))
 				{
 					SetModes(n_ChanServ, 1, 'h', chptr, hnicks);
@@ -6720,7 +6779,6 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 	              strlen(hnicks) ? " [+] " : "", strlen(hnicks) ? hnicks : "",
 	              strlen(dnicks) ? " [-] " : "", strlen(dnicks) ? dnicks : "");
 
-	return;
 } /* c_hop() */
 #endif /* HYBRID7_HALFOPS */
 

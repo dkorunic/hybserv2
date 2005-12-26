@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - allow user to dehalfop himself, as well as halfop ALL [all channels he
+    is on]
   + add secure messaging [from CoolCold, heavily edited]
   - fix inconsistencies with NS_FORBID, NS_COLLIDE and NS_RELEASE usage
   - fix log rotation bug

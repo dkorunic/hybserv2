@@ -117,8 +117,7 @@ static void n_flag(struct Luser *, int, char **);
 /* main NickServ commands */
 static struct Command nickcmds[] =
     {
-	    { "HELP", n_help, LVL_NONE
-	    },
+	    { "HELP", n_help, LVL_NONE },
 	    { "REGISTER", n_register, LVL_NONE },
 	    { "DROP", n_drop, LVL_NONE },
 	    { "IDENTIFY", n_identify, LVL_NONE },
@@ -263,10 +262,8 @@ void ns_process(const char *nick, char *command)
 	 */
 
 	nptr = FindNick(lptr->nick);
-	if (nptr == NULL)
-		return;
 
-	if (nptr->flags & NS_FORBID)
+	if (nptr != NULL && (nptr->flags & NS_FORBID))
 	{
 		notice(n_NickServ, lptr->nick,
 			   "Cannot execute commands for forbidden nicknames");

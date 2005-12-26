@@ -1199,7 +1199,6 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 				continue;
 
 #ifdef EMPOWERADMINS_MORE
-
 			if (IsValidAdmin(tempu->lptr))
 				continue;
 #endif
@@ -2891,7 +2890,6 @@ IsFounder(struct Luser *lptr, struct ChanInfo *cptr)
 	struct f_users *temp;
 
 #ifdef EMPOWERADMINS_MORE
-
 	if (IsValidAdmin(lptr))
 		return 1;
 #endif
@@ -3025,6 +3023,10 @@ int
 HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 
 {
+	struct NickInfo *nptr;
+
+	nptr = FindNick(lptr->nick);
+
 	if (!cptr || !lptr)
 		return 0;
 
@@ -3033,9 +3035,7 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 
 	if (cptr->flags & CS_SECURE)
 	{
-		struct NickInfo *nptr;
-
-		if ((nptr = FindNick(lptr->nick)))
+		if (nptr != NULL)
 		{
 			if (!(nptr->flags & NS_IDENTIFIED))
 				return 0;
@@ -3044,17 +3044,41 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 			return 0;
 	}
 
-	if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
-		return 1;
-
 #if defined EMPOWERADMINS || defined EMPOWERADMINS_MORE
 	/*
-	 * If AutoOpAdmins is enabled admins will have the same level of
-	 * access as a channel founder.
+	 * If AutoOpAdmins is disabled, check if lptr is an admin and if level
+	 * is AUTOOP (or AUTOVOICE) - if so, check if they are on the
+	 * channel's access list for the appropriate level; if they are, they
+	 * are allowed to get opped/voiced (return 1), otherwise return 0.
+	 * This extra check is needed because GetAccess() will return true if
+	 * lptr is an admin, regardless of AutoOpAdmins being enabled.
 	 */
-	if (AutoOpAdmins && IsValidAdmin(lptr))
-		return 1;
+	if (!AutoOpAdmins && IsValidAdmin(lptr)
+		&& (level == CA_AUTOOP || level == CA_AUTOVOICE
+#ifdef HYBRID7_HALFOPS
+		|| level == CA_AUTOHALFOP
+#endif
+		))
+	{
+		struct ChanAccess *ca;
+		char nmask[MAXLINE];
+		struct NickInfo *master_nptr;
+
+		ircsprintf(nmask, "%s!%s@%s", lptr->nick, lptr->username,
+				lptr->hostname);
+
+		master_nptr = GetMaster(nptr);
+
+		if ((ca = OnAccessList(cptr, nmask, master_nptr)) &&
+				(ca->level >= cptr->access_lvl[level]))
+			return 1;
+
+		return 0;
+	}
 #endif /* EMPOWERADMINS || EMPOWERADMINS_MORE */
+
+	if (GetAccess(cptr, lptr) >= cptr->access_lvl[level])
+		return 1;
 
 	return 0;
 } /* HasAccess() */
@@ -3341,8 +3365,8 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	}
 	else if (!(IsFounder(lptr, cptr)
 #ifdef EMPOWERADMINS
-	           /* We want empowered (not empoweredmore) admins to be able to drop
-	            * forbidden and forgotten channels, too. -kre */
+			   /* We want empowered (not empoweredmore) admins to be able
+				* to drop forbidden and forgotten channels, too. -kre */
 	           || (IsValidAdmin(lptr) && cptr->flags & (CS_FORBID | CS_FORGET))
 #endif /* EMPOWERADMINS */
 	          ))

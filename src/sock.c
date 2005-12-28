@@ -601,8 +601,8 @@ ReadSocketInfo(void)
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 
-		TimeOut.tv_sec = 1;
-		TimeOut.tv_usec = 0L;
+		TimeOut.tv_sec = 0L;
+		TimeOut.tv_usec = 200L;
 
 		if (currenthub && (HubSock != NOSOCKET))
 		{

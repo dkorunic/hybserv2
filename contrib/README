@@ -1,7 +1,9 @@
 $Id$
 
 This directory contains different parts of code which may extend or even
-help basic Hybserv2 functionalities.
+help basic Hybserv2 functionalities. Please note that you should check if
+there is more recent version of this modules in your Hybrid7 contrib/
+directory.
 
   * hybrid_services.c - This module is written by Dragan Dosen. Its main
     functionality is to add aliases for /msg

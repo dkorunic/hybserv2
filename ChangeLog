@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix crash in set level, no check for index == 0
   - fix smartmasking if . is in username
   - fix some of AutoOp issues
   - allow user to dehalfop himself, as well as halfop ALL [all channels he

@@ -4480,35 +4480,14 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		}
 		else
 		{
-			if( strlen(av[3]) > 5 )
-			{
-				notice(n_ChanServ, lptr->nick,
-				       "Invalid entry, sorry, try again!");
-				return;
-			}
 			index = atoi(av[3]) - 1;
-			if (index < 0 )
-			{
-				notice(n_ChanServ, lptr->nick,
-				       "Invalid type specified [\002%s\002]",
-				       av[3]);
-				return;
-			}
-
-			if (index >= CA_FOUNDER)
+			if (!index || index >= CA_FOUNDER)
 			{
 				notice(n_ChanServ, lptr->nick,
 				       "The index [\002%s\002] is not valid",
 				       av[3]);
 				return;
 			}
-		}
-
-		if (strlen(av[4]) > 5 )
-		{
-			notice(n_ChanServ, lptr->nick,
-			       "Invalid level, sorry, try again!");
-			return;
 		}
 
 		if (!irccmp(av[4], "OFF"))
@@ -4613,7 +4592,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		else
 		{
 			index = atoi(av[3]) - 1;
-			if (index >= CA_FOUNDER)
+			if (!index || index >= CA_FOUNDER)
 			{
 				notice(n_ChanServ, lptr->nick,
 				       "The index [\002%s\002] is not valid",

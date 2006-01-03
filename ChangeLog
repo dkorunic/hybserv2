@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix the crash in HasAccess() caused by order of NULLptr checks [thanks
+    Todor Dimitrov]
   - fix crash in set level, no check for index == 0
   - fix smartmasking if . is in username
   - fix some of AutoOp issues

@@ -3025,10 +3025,10 @@ HasAccess(struct ChanInfo *cptr, struct Luser *lptr, int level)
 {
 	struct NickInfo *nptr;
 
-	nptr = FindNick(lptr->nick);
-
-	if (!cptr || !lptr)
+	if ((cptr == NULL) || (lptr == NULL))
 		return 0;
+
+	nptr = FindNick(lptr->nick);
 
 	if (cptr->flags & (CS_FORBID | CS_FORGET))
 		return 0;

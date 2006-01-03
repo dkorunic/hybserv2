@@ -7,6 +7,10 @@ $Id$
 
 Hybserv-HEAD
 
+  ^ release collide timer immediately after FORCENICK/SVSNICK; use
+    FALLBACK_TO_KILL to make sure that nickname gets collided for sure,
+    even on mixed networks [some servers without FORCENICK/SVSNICK
+    command]
   - fix the crash in HasAccess() caused by order of NULLptr checks [thanks
     Todor Dimitrov]
   - fix crash in set level, no check for index == 0

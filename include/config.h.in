@@ -451,9 +451,9 @@
 #define   SVSNICK_PREFIX "Guest"
 
 /*
- * If you've defined FORCENICK or SVSNICK above and some servers on your
- * network don't have support for them, setting FALLBACK_TO_KILL will
- * KILL them after the forced nick change fails.
+ * << STRONGLY RECOMMENDED >> If you've defined FORCENICK or SVSNICK above
+ * and some servers on your network don't have support for them, setting
+ * FALLBACK_TO_KILL will KILL them after the forced nick change fails.
  */
 #define   FALLBACK_TO_KILL
 

@@ -1534,7 +1534,8 @@ collide(char *nick)
 #ifdef DANCER
 
 	ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
-	           "enforced", Me.name, Me.name, 0xffffffffUL, "Nickname Enforcement");
+	           "enforced", Me.name, Me.name, 0xffffffffUL,
+			   "Nickname Enforcement");
 
 #else
 
@@ -1557,7 +1558,11 @@ collide(char *nick)
 	AddClient(av);
 
 	MyFree(av);
+#endif
 
+	/* Unfortunately, this makes no guarantees that FORCENICK succeeded.
+	 * Please define FALLBACK_TO_KILL if you want to make sure that nick
+	 * gets collided for sure */
 	if ((nptr = FindNick(nick)))
 	{
 		/*
@@ -1567,7 +1572,6 @@ collide(char *nick)
 		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
 		nptr->flags |= NS_RELEASE;
 	}
-#endif
 } /* collide() */
 
 /*

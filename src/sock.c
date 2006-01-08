@@ -1181,9 +1181,10 @@ void DoListen(struct PortInfo *portptr)
 
 	while (res != NULL)
 	{
-		if ((portptr->socket = socket(res->ai_family, SOCK_STREAM, 6)) < 0)
+		if ((portptr->socket = socket(res->ai_family, SOCK_STREAM, 6)) == -1)
 		{
 			res = res->ai_next;
+			portptr->socket = NOSOCKET;
 			continue;
 		}
 

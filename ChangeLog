@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix crash in port listener when got socket = -1 [socket() would fail
+    on one of interface's addresses]
   ^ release collide timer immediately after FORCENICK/SVSNICK; use
     FALLBACK_TO_KILL to make sure that nickname gets collided for sure,
     even on mixed networks [some servers without FORCENICK/SVSNICK

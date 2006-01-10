@@ -3241,7 +3241,11 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	chptr = FindChannel(av[1]);
 
 	if (chptr == NULL)
+	{
+		notice(n_ChanServ, lptr->nick, "No such channel [\002%s\002]",
+				av[1]);
 		return;
+	}
 
 	if (!IsValidAdmin(lptr) && MinChanUsers &&
 	        (chptr->numusers < MinChanUsers))
@@ -4481,7 +4485,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		else
 		{
 			index = atoi(av[3]) - 1;
-			if (!index || index >= CA_FOUNDER)
+			if ((index == -1) || (index >= CA_FOUNDER))
 			{
 				notice(n_ChanServ, lptr->nick,
 				       "The index [\002%s\002] is not valid",
@@ -4592,7 +4596,7 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		else
 		{
 			index = atoi(av[3]) - 1;
-			if (!index || index >= CA_FOUNDER)
+			if ((index == -1) || (index >= CA_FOUNDER))
 			{
 				notice(n_ChanServ, lptr->nick,
 				       "The index [\002%s\002] is not valid",

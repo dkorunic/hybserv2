@@ -135,7 +135,7 @@ struct NickInfo
 
 void ns_process(const char *, char *);
 int CheckNick(char *);
-void CheckOper(char *);
+void CheckOper(struct Luser *);
 void ExpireNicknames(time_t);
 void AddFounderChannelToNick(struct NickInfo **, struct ChanInfo *);
 void RemoveFounderChannelFromNick(struct NickInfo **, struct ChanInfo *);

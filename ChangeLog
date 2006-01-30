@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  ^ fixes for n_noexpire [from sofit]
   - fix crash in port listener when got socket = -1 [socket() would fail
     on one of interface's addresses]
   ^ release collide timer immediately after FORCENICK/SVSNICK; use

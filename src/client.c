@@ -113,7 +113,7 @@ UpdateUserModes(struct Luser *user, char *modes)
 
 #ifdef NICKSERVICES
 
-				CheckOper(user->nick);
+				CheckOper(user);
 #endif
 
 				Network->TotalOperators++;

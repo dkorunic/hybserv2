@@ -1294,26 +1294,35 @@ nickname - we know 'nickname' is already an operator
 */
 
 void
-CheckOper(char *nickname)
+CheckOper(struct Luser *lptr)
 
 {
 	struct NickInfo *nptr, *realptr;
 
-	if (!nickname)
+	if (!lptr)
 		return;
 
-	realptr = FindNick(nickname);
-	nptr = GetMaster(realptr);
+/* -- not needed actually
+	if (!IsOper(lptr))
+		return;
+*/
 
-	if (realptr && nptr)
-		if ((realptr->flags & NS_IDENTIFIED) && !(nptr->flags & NS_NOEXPIRE))
-		{
-			notice(n_NickServ, nickname,
-			       "You have not set the NoExpire nickname flag for your nickname");
-			notice(n_NickServ, nickname,
-			       "Please type \002/MSG %s NOEXPIRE %s ON\002 so your nickname does not expire",
-			       n_NickServ, nickname);
-		}
+	if (!(realptr = FindNick(lptr->nick)))
+		return;
+
+	if (!(nptr = GetMaster(realptr)))
+		return;
+
+	if (IsValidAdmin(lptr) &&
+	    (realptr->flags & NS_IDENTIFIED) &&
+	    !(nptr->flags & NS_NOEXPIRE))
+	{
+		notice(n_NickServ, lptr->nick,
+		       "You have not set the NoExpire nickname flag for your nickname");
+		notice(n_NickServ, lptr->nick,
+		       "Please type \002/MSG %s NOEXPIRE %s ON\002 so your nickname does not expire",
+		       n_NickServ, lptr->nick);
+	}
 } /* CheckOper() */
 
 /*
@@ -2352,8 +2361,7 @@ n_identify(struct Luser *lptr, int ac, char **av)
 		MyFree(mask);
 	}
 
-	if (IsOperator(lptr))
-		CheckOper(lptr->nick);
+	CheckOper(lptr);
 
 	if (LastSeenInfo)
 	{

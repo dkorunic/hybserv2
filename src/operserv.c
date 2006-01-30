@@ -1164,6 +1164,7 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 		uptr->last_nick = MyStrdup(lptr->nick);
 #endif
 
+		CheckOper(lptr);
 	}
 	else
 	{

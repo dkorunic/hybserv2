@@ -85,6 +85,7 @@ struct ChanAccess
 	time_t created; /* time when this entry was added */
 	time_t last_used; /* last time the person joined the channel while
 		                       identified */
+	char *added_by;          /* who added this entry */
 };
 
 struct AutoKick
@@ -171,7 +172,7 @@ void SetDefaultALVL(struct ChanInfo *);
 void c_clear_all(struct Luser *, struct NickInfo *, int, char **);
 int IsFounder(struct Luser *, struct ChanInfo *);
 int AddAccess(struct ChanInfo *, struct Luser *, char *,
-              struct NickInfo *, int, time_t, time_t);
+              struct NickInfo *, int, time_t, time_t, char *);
 
 extern struct ChanInfo *chanlist[CHANLIST_MAX];
 extern struct Channel *ChannelList;

@@ -1816,7 +1816,7 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 			/* Add this channel to masters channel access list -jared */
 			AddAccess(acptr->cptr, NULL, NULL, master,
 			          acptr->accessptr->level, acptr->accessptr->created,
-			          acptr->accessptr->last_used);
+			          acptr->accessptr->last_used, acptr->accessptr->added_by);
 
 			tcptr = acptr->next;
 			DeleteAccess(acptr->cptr, acptr->accessptr);
@@ -1931,7 +1931,8 @@ static int DeleteLink(struct NickInfo *nptr, int copy)
 		for (acptr = master->AccessChannels; acptr != NULL;
 		        acptr = acptr->next)
 			AddAccess(acptr->cptr, NULL, NULL, nptr, acptr->accessptr->level,
-			          acptr->accessptr->created, acptr->accessptr->last_used);
+			          acptr->accessptr->created, acptr->accessptr->last_used,
+			          acptr->accessptr->added_by);
 	}
 
 	return (1);

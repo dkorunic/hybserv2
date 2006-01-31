@@ -599,6 +599,7 @@ cs_loaddata(void)
 				{
 					struct NickInfo *nptr;
 					time_t created = 0, last_used = 0;
+
 					if (ac > 4)
 					{
 						created = atol(av[3]);
@@ -607,10 +608,10 @@ cs_loaddata(void)
 
 					if ((nptr = FindNick(av[1])))
 						AddAccess(cptr, NULL, NULL, nptr, atoi(av[2]),
-						          created, last_used);
+						          created, last_used, ((ac > 5) ? av[5]: "*Unknown*"));
 					else
 						AddAccess(cptr, NULL, av[1], NULL, atoi(av[2]),
-						          created, last_used);
+						          created, last_used, ((ac > 5) ? av[5]: "*Unknown*"));
 				}
 			}
 			else if (!ircncmp("AKICK", keyword, 5))
@@ -2539,6 +2540,7 @@ DeleteChan(struct ChanInfo *chanptr)
 			DeleteAccessChannel(chanptr->access->nptr, chanptr->access->acptr);
 
 		MyFree(chanptr->access->hostmask);
+		MyFree(chanptr->access->added_by);
 		MyFree(chanptr->access);
 		chanptr->access = ca;
 	}
@@ -2592,7 +2594,7 @@ DeleteChan(struct ChanInfo *chanptr)
  */
 int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
               *mask, struct NickInfo *nptr, int level, time_t created, time_t
-              last_used)
+              last_used, char *added_by)
 {
 	struct ChanAccess *ptr;
 	struct NickInfo *master_nptr;
@@ -2619,6 +2621,7 @@ int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
 
 	ptr->created = created;
 	ptr->last_used = last_used;
+	ptr->added_by = MyStrdup(added_by);
 
 	if (master_nptr)
 	{
@@ -2736,6 +2739,7 @@ void DeleteAccess(struct ChanInfo *cptr, struct ChanAccess *ptr)
 		cptr->access = ptr->next;
 
 	MyFree(ptr->hostmask);
+	MyFree(ptr->added_by);
 	MyFree(ptr);
 } /* DeleteAccess() */
 
@@ -3292,7 +3296,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	 * -ags
 	 */
 	AddAccess(cptr, 0, 0, nptr, cptr->access_lvl[CA_FOUNDER], current_ts,
-	          current_ts);
+	          current_ts, "*As Founder*");
 
 	/* add cptr to channel list */
 	AddChan(cptr);
@@ -3547,7 +3551,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	}
 
 	/* add hostmask (or nickptr) to the access list */
-	if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel, current_ts, 0))
+	if (AddAccess(cptr, lptr, hostmask, nickptr, newlevel, current_ts, 0, lptr->nick))
 	{
 		notice(n_ChanServ, lptr->nick,
 		       "[\002%s\002] has been added to the access list "
@@ -3810,9 +3814,9 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
 		       "-- Access List for [\002%s\002] --",
 		       cptr->name);
 		notice(n_ChanServ, lptr->nick,
-		       "Num Level Hostmask             Since last use");
+		       "Num Level Hostmask             Since last use Added by");
 		notice(n_ChanServ, lptr->nick,
-		       "--- ----- --------             --------------");
+		       "--- ----- --------             -------------- --------");
 		idx = 1;
 		for (ca = cptr->access; ca; ca = ca->next, idx++)
 		{
@@ -3820,9 +3824,10 @@ c_access_list(struct Luser *lptr, struct NickInfo *nptr,
 				if (match(mask, ca->hostmask ? ca->hostmask : ca->nptr->nick) == 0)
 					continue;
 			notice(n_ChanServ, lptr->nick,
-			       "%-3d %-5d %-20s %-10s", idx, ca->level,
+			       "%-3d %-5d %-20s %-14s %s", idx, ca->level,
 			       ca->hostmask ? ca->hostmask : (ca->nptr ? ca->nptr->nick : ""),
-			       ca->last_used ? timeago(ca->last_used, 0) : "");
+			       ca->last_used ? timeago(ca->last_used, 0) : "",
+			       ca->added_by);
 		}
 		notice(n_ChanServ, lptr->nick,
 		       "-- End of list --");
@@ -4708,7 +4713,7 @@ c_identify(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	if (!OnAccessList(cptr, nmask, GetMaster(nptr)))
 	{
 		AddAccess(cptr, (struct Luser *) NULL, NULL, nptr,
-		          cptr->access_lvl[CA_FOUNDER], current_ts, current_ts);
+		          cptr->access_lvl[CA_FOUNDER], current_ts, current_ts, "*As Founder*");
 		notice(n_ChanServ, lptr->nick,
 		       "You have been added to %s as a \002founder\002",
 		       cptr->name);

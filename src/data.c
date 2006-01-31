@@ -1037,9 +1037,10 @@ WriteChans()
 				fprintf(fp, "\n");
 
 				for (ca = cptr->access; ca; ca = ca->next)
-					fprintf(fp, "->ACCESS %s %d %ld %ld\n", ca->nptr ?
+					fprintf(fp, "->ACCESS %s %d %ld %ld %s\n", ca->nptr ?
 					        ca->nptr->nick : ca->hostmask,
-					        ca->level, (long)ca->created, (long)ca->last_used);
+					        ca->level, (long)ca->created, (long)ca->last_used,
+						ca->added_by);
 
 				for (ak = cptr->akick; ak; ak = ak->next)
 					fprintf(fp, "->AKICK %ld %s :%s\n",

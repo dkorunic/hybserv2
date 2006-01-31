@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  + keep track of who added a hostmask in the access list [from sofit]
   ^ fixes for n_noexpire [from sofit]
   - fix crash in port listener when got socket = -1 [socket() would fail
     on one of interface's addresses]

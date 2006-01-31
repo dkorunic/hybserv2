@@ -6756,6 +6756,8 @@ CalcMem(char *nick, int socket)
 				csm += sizeof(struct ChanAccess);
 				if (ca->hostmask)
 					csm += strlen(ca->hostmask);
+				if (ca->added_by)
+					csm += strlen(ca->added_by);
 			}
 		}
 	} /* for (ii = 0; ii < CHANLIST_MAX; ii++) */

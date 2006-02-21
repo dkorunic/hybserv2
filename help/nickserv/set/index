@@ -19,6 +19,7 @@ settings should be applied to %bmaster%b nickname.
     PRIVMSG    Services will either privmsg or notice you
     SECURE     Turn nickname security on or off
     SIGNON     Turn notification of memos on signon on/off
+    NEVEROP    Turn auto-opping on join on/off
     UIN        Set ICQ UIN for this user
     UNSECURE   Set nickname security very low
     URL        Associate a url with your nick

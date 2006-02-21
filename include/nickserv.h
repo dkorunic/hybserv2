@@ -50,6 +50,8 @@
 # define NS_NOLINK       0x08000000 /* can't link nicknames */
 #endif
 
+#define NS_NEVEROP     0x10000000 /* Never op/hop/voice user on join */
+
 struct ChanInfo;
 struct ChanAccess;
 

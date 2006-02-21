@@ -114,6 +114,9 @@ static void n_flag(struct Luser *, int, char **);
 
 #endif /* EMPOWERADMINS */
 
+/* adding NEVEROP support / CoolCold / */
+static void n_set_neverop(struct Luser *, struct NickInfo *, int, char **);
+
 /* main NickServ commands */
 static struct Command nickcmds[] =
     {
@@ -192,6 +195,7 @@ static struct Command setcmds[] =
 	    { "MASTER", n_set_master, LVL_NONE },
 #endif
 
+	    { "NEVEROP", n_set_neverop, LVL_NONE },
 	    { 0, 0, 0 }
     };
 
@@ -3340,6 +3344,48 @@ static void n_set_automask(struct Luser *lptr, struct NickInfo *nptr, int ac,
 	       "SET AUTOMASK");
 } /* n_set_automask() */
 
+static void n_set_neverop(struct Luser *lptr, struct NickInfo *nptr, int ac,
+                           char **av)
+{
+	if (ac < 4)
+	{
+		notice(n_NickServ, lptr->nick,
+		       "NeverOP for [\002%s\002] is [\002%s\002]",
+		       nptr->nick,
+		       (nptr->flags & NS_NEVEROP) ? "ON" : "OFF");
+		return;
+	}
+
+	RecordCommand("%s: %s!%s@%s SET %s NEVEROP %s", n_NickServ,
+	              lptr->nick, lptr->username, lptr->hostname, nptr->nick,
+	              StrToupper(av[3]));
+
+	if (!irccmp(av[3], "ON"))
+	{
+		nptr->flags |= NS_NEVEROP;
+		notice(n_NickServ, lptr->nick,
+		       "NeverOP for [\002%s\002] is now [\002ON\002]",
+		       nptr->nick);
+		return;
+	}
+
+	if (!irccmp(av[3], "OFF"))
+	{
+		nptr->flags &= ~NS_NEVEROP;
+		notice(n_NickServ, lptr->nick,
+		       "NeverOP for [\002%s\002] is now [\002OFF\002]",
+		       nptr->nick);
+		return;
+	}
+
+	/* user gave an unknown param */
+	notice(n_NickServ, lptr->nick,
+	       "Syntax: \002SET <nickname> NEVEROP {ON|OFF}\002");
+	notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+	       "SET NEVEROP");
+} /* n_set_neverop() */
+
+
 static void n_set_private(struct Luser *lptr, struct NickInfo *nptr, int ac, char
                           **av)
 {
@@ -4290,6 +4336,9 @@ n_info(struct Luser *lptr, int ac, char **av)
 			strlcat(buf, "NoRegister, ", sizeof(buf));
 		if (nptr->flags & NS_NOCHANOPS)
 			strlcat(buf, "NoChannelOps, ", sizeof(buf));
+		if (nptr->flags & NS_NEVEROP)
+			strlcat(buf, "NeverOP, ", sizeof(buf));
+
 
 		if (*buf)
 		{

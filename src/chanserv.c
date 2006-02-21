@@ -1716,7 +1716,9 @@ cs_CheckOp(struct Channel *chanptr, struct ChanInfo *cptr, char *nick)
 	 * If the user is flagged to be denied channel op
 	 * privileges, do nothing
 	 */
-	if (HasFlag(nick, NS_NOCHANOPS))
+	
+	/* If user has NEVEROP flag do nothing too / CoolCold / */
+	if (HasFlag(nick, NS_NOCHANOPS) || HasFlag(nick, NS_NEVEROP))
 		return;
 
 	/*

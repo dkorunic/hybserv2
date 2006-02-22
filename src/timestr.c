@@ -39,66 +39,78 @@ char *timeago(time_t timestamp, int flag)
 {
 	static char final[TIMELEN];
 	char temp[TIMELEN];
-	time_t delta;
+	int delta = 0;
 	long years, weeks, days, hours, minutes, seconds;
 	int longfmt;
 	int spaces;
+	struct tm *timestamp_ts;
+	struct tm *current_ts_ts;
 
 	/* put spaces in the string? */
 	spaces = 1;
 
 	switch (flag)
 	{
-	case 0:
+		case 0:
 		{
-			delta = current_ts - timestamp;
+			longfmt = 0;
+			delta = 1;
+			break;
+		}
+
+		case 1:
+		{
+			longfmt = 1;
+			delta = 1;
+			break;
+		}
+
+		case 2:
+		{
+			delta = 0;
 			longfmt = 0;
 			break;
 		}
 
-	case 1:
+		case 3:
 		{
-			delta = current_ts - timestamp;
+			delta = 0;
 			longfmt = 1;
 			break;
 		}
 
-	case 2:
+		case 4:
 		{
-			delta = timestamp;
-			longfmt = 0;
-			break;
-		}
-
-	case 3:
-		{
-			delta = timestamp;
-			longfmt = 1;
-			break;
-		}
-
-	case 4:
-		{
-			delta = timestamp;
+			delta = 0;
 			longfmt = 0;
 			spaces = 0;
 			break;
 		}
 
-	default:
+		default:
 		{
 			/* shouldn't happen */
 			return NULL;
 		}
 	} /* switch (flag) */
 
-	years = weeks = days = hours = minutes = seconds = 0;
-	years = (delta / 31536000);
-	weeks = (delta / 604800) % 52;
-	days = (delta / 86400) % 7;
-	hours = (delta / 3600) % 24;
-	minutes = (delta / 60) % 60;
-	seconds = (delta % 60);
+	timestamp_ts = localtime(&timestamp);
+	years = timestamp_ts->tm_year;
+	weeks = 0;
+	days = timestamp_ts->tm_mday;
+	hours = timestamp_ts->tm_hour;
+	minutes = timestamp_ts->tm_min;
+	seconds = timestamp_ts->tm_sec;
+
+	if (delta)
+	{
+		current_ts_ts = localtime(&timestamp);
+		years = current_ts_ts->tm_year - years;
+		days = current_ts_ts->tm_mday - days;
+		hours = current_ts_ts->tm_hour - hours;
+		minutes = current_ts_ts->tm_min - minutes;
+		seconds = current_ts_ts->tm_sec - seconds;
+	}
 
 	final[0] = '\0';
 	if (years)

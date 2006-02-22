@@ -53,15 +53,15 @@ char *timeago(time_t timestamp, int flag)
 	{
 		case 0:
 		{
-			longfmt = 0;
 			delta = 1;
+			longfmt = 0;
 			break;
 		}
 
 		case 1:
 		{
-			longfmt = 1;
 			delta = 1;
+			longfmt = 1;
 			break;
 		}
 
@@ -104,7 +104,7 @@ char *timeago(time_t timestamp, int flag)
 
 	if (delta)
 	{
-		current_ts_ts = localtime(&timestamp);
+		current_ts_ts = localtime(&current_ts);
 		years = current_ts_ts->tm_year - years;
 		days = current_ts_ts->tm_mday - days;
 		hours = current_ts_ts->tm_hour - hours;

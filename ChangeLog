@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * fix incompatibility with m_forcenick.c and Hybrid 7.2
   + add NeverOP patch [from CoolCold], user with such flag won't be opped
     when he/she joins any channel - and it is user-selectable
   + keep track of who added a hostmask in the access list [from sofit]

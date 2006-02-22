@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix leap years timeago() bug [reported by Todor Dimitrov]
   * fix incompatibility with m_forcenick.c and Hybrid 7.2
   + add NeverOP patch [from CoolCold], user with such flag won't be opped
     when he/she joins any channel - and it is user-selectable

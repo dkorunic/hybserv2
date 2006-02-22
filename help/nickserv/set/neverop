@@ -1,0 +1,5 @@
+Syntax: %bSET <nickname> NEVEROP {ON|OFF}%b
+
+This toggles auto-opping <nickname> on channel join ON/OFF.
+If %bNeverOP%b is OFF <nickname> will be opped by ChanServ
+if <nickname> is in channel access list, else it won't

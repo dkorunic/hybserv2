@@ -39,80 +39,86 @@ char *timeago(time_t timestamp, int flag)
 {
 	static char final[TIMELEN];
 	char temp[TIMELEN];
-	int delta = 0;
+	time_t delta;
 	long years, weeks, days, hours, minutes, seconds;
 	int longfmt;
 	int spaces;
-	struct tm *timestamp_ts;
-	struct tm *current_ts_ts;
 
 	/* put spaces in the string? */
 	spaces = 1;
 
 	switch (flag)
 	{
-		case 0:
+	case 0:
 		{
-			delta = 1;
+			delta = current_ts - timestamp;
 			longfmt = 0;
 			break;
 		}
 
-		case 1:
+	case 1:
 		{
-			delta = 1;
+			delta = current_ts - timestamp;
 			longfmt = 1;
 			break;
 		}
 
-		case 2:
+	case 2:
 		{
-			delta = 0;
+			delta = timestamp;
 			longfmt = 0;
 			break;
 		}
 
-		case 3:
+	case 3:
 		{
-			delta = 0;
+			delta = timestamp;
 			longfmt = 1;
 			break;
 		}
 
-		case 4:
+	case 4:
 		{
-			delta = 0;
+			delta = timestamp;
 			longfmt = 0;
 			spaces = 0;
 			break;
 		}
 
-		default:
+	default:
 		{
 			/* shouldn't happen */
 			return NULL;
 		}
 	} /* switch (flag) */
 
-	timestamp_ts = localtime(&timestamp);
-	years = timestamp_ts->tm_year;
-	weeks = 0;
-	days = timestamp_ts->tm_mday;
-	hours = timestamp_ts->tm_hour;
-	minutes = timestamp_ts->tm_min;
-	seconds = timestamp_ts->tm_sec;
+	years = weeks = days = hours = minutes = seconds = 0;
 
-	if (delta)
-	{
-		current_ts_ts = localtime(&current_ts);
-		years = current_ts_ts->tm_year - years;
-		days = current_ts_ts->tm_mday - days;
-		hours = current_ts_ts->tm_hour - hours;
-		minutes = current_ts_ts->tm_min - minutes;
-		seconds = current_ts_ts->tm_sec - seconds;
-	}
+	/* years */
+	years = delta / (365 * 86400);
+	delta %= (365 * 86400);
+
+	/* weeks */
+	weeks = delta / (7 * 86400);
+	delta %= (7 * 86400);
+
+	/* days */
+	days = delta / 86400;
+	delta %= 86400;
+
+	/* hours */
+	hours = delta / 3600;
+	delta %= 3600;
+
+	/* minutes */
+	minutes = delta / 60;
+	delta %= 60;
+
+	/* and finally seconds */
+	seconds = delta;
 
 	final[0] = '\0';
+
 	if (years)
 	{
 		if (longfmt)

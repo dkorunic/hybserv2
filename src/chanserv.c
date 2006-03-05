@@ -30,6 +30,7 @@
 #include "nickserv.h"
 #include "operserv.h"
 #include "server.h"
+#include "seenserv.h"
 #include "settings.h"
 #include "sock.h"
 #include "timestr.h"
@@ -1982,12 +1983,19 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 	 * mlock modes everytime someone joins.
 	 */
 	if (newchan)
+	{
 		cs_join(cptr);
+
+		if (cptr->flags & CS_SEENSERV)
+		ss_join(chptr);
+	}
 
 #else
 
 	cs_join(cptr);
 
+	if (cptr->flags & CS_SEENSERV)
+		ss_join(chptr);
 #endif /* HYBRID_ONLY */
 
 	/*
@@ -2218,6 +2226,7 @@ ExpireChannels(time_t unixtime)
 				       cptr->name);
 
 				chptr = FindChannel(cptr->name);
+				ss_part(chptr);
 				if (IsChannelMember(chptr, Me.csptr))
 					cs_part(chptr);
 
@@ -2247,13 +2256,17 @@ CheckEmptyChans()
 		for (tempc = Me.csptr->firstchan; tempc != NULL; )
 		{
 			if ((tempc->chptr->numusers == 1) ||
+				(tempc->chptr->numusers == 2 &&
+				 IsChannelMember(tempc->chptr, Me.esptr)) ||
 			        !cs_ShouldBeOnChan(FindChan(tempc->chptr->name)))
+              
 			{
 				/* ChanServ is the only client on the channel, part */
 				SendUmode(OPERUMODE_Y, "%s: Parting channel [%s]",
 				          n_ChanServ, tempc->chptr->name);
 
 				temp = tempc->next;
+				ss_part(tempc->chptr);
 				cs_part(tempc->chptr);
 				tempc = temp;
 			}
@@ -3392,6 +3405,8 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	              cptr->name);
 
 	chptr = FindChannel(cptr->name);
+
+	ss_part(chptr);
 
 	if (IsChannelMember(chptr, Me.csptr))
 		cs_part(chptr);

@@ -1,0 +1,5 @@
+Syntax: %bPART <channel>%b
+
+Will have %O remove <channel> from the list of channels being
+monitored.  Available for identified to %C founders only.
+

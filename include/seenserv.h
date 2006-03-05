@@ -25,6 +25,8 @@ typedef struct Seen aSeen;
 
 void es_process(char *, char *);
 void es_add(char *, char *, char *, char *, time_t, int);
+void ss_join(struct Channel *);
+void ss_part(struct Channel *);
 
 extern int seenc;
 extern aSeen *seenp, *seenb;

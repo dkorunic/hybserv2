@@ -44,6 +44,9 @@ char *timeago(time_t timestamp, int flag)
 	int longfmt;
 	int spaces;
 
+	/* reinit the time */
+	current_ts = time(NULL);
+
 	/* put spaces in the string? */
 	spaces = 1;
 

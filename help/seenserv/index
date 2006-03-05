@@ -6,8 +6,12 @@ For more information on a specific command, type:
 
     SEEN       Gives information on a nick/hostmask
     SEENNICK   Gives information on specific nick only
+    JOIN       Joins a specified channel (identified founders only)
+    PART       Parts a specified channel (identified founders only)
 
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b
 %+a    SEENSTAT  Gives general 'last seen' statistics
+%+a    JOIN      Joins a channel.
+%+a    PART      Parts a channel.

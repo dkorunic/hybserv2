@@ -62,6 +62,13 @@
 #define   SEENSERVICES
 
 /*
+ * Define this to enable public commands:
+ * - !seen <mask> / !seennick <nick>
+ * - !op [nick] / !deop [nick]
+ */
+#define PUBCOMMANDS
+
+/*
  * If EMPOWERADMINS is defined, admins will be able to use SETPASS,
  * FORBID, DROP etc.
  */

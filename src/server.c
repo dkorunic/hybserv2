@@ -1103,15 +1103,13 @@ s_privmsg(int ac, char **av)
 
 {
 	char *who, /* nick who gave privmsg */
-	*command, /* contains the /msg that 'who' gave */
-	*tmp;
+	  *command, /* contains the /msg that 'who' gave */
+	  *tmp;
 	int issecured = 0;
-	struct Luser *lptr,
-				/*
-				 * if it was sent to a service nick as opposed to a
-				 * juped nick etc
-				 */
-				*serviceptr;
+	struct Luser *lptr, *serviceptr = NULL;
+#ifdef PUBCOMMANDS
+	int proceedpub = 0;
+#endif
 
 	if (ac < 4)
 		return;
@@ -1129,7 +1127,7 @@ s_privmsg(int ac, char **av)
 	command = av[3] + 1;
 
 	if (RestrictedAccess)
-{
+  {
 		/*
 		 * Check if the user has an "o" flag - if not, don't allow
 		 * the command
@@ -1164,7 +1162,43 @@ s_privmsg(int ac, char **av)
 
 	serviceptr = GetService(av[2]);
 
-	if (FloodProtection && serviceptr)
+/* 
+ If PUBCOMMANDS is defined, we need to match this pub commands first and
+ if any command matched, check flood then process, so matching is here /
+ CoolCold /
+*/
+#ifdef PUBCOMMANDS
+        /* match, then flood check, then proceed */
+        	if (!serviceptr)
+        	{
+#ifdef CHANNELSERVICES
+        		if (match("!OP*", command))
+        		{
+        			proceedpub = CS_PUB_OP;
+        		}
+				else if (match("!DEOP*", command)) 
+        		{
+        			proceedpub = CS_PUB_DEOP;
+        		}
+				else
+#ifdef SEENSERVICES
+				if (match("!SEENNICK *", command))
+        		{
+        			proceedpub = SS_PUB_SEENNICK;
+        		}
+				else if (match("!SEEN *", command))
+        		{
+        			proceedpub = SS_PUB_SEEN;
+        		}
+#else
+				{}
+#endif
+        	}
+#endif
+
+#endif
+
+	if (FloodProtection && (serviceptr || proceedpub))
 	{
 		if (!IsValidAdmin(lptr))
 		{
@@ -1179,7 +1213,8 @@ s_privmsg(int ac, char **av)
 					lptr->messages = 0;
 					if ((lptr->msgs_ts[1] - lptr->msgs_ts[0]) <= FloodTime)
 					{
-						char *mask = HostToMask(lptr->username, lptr->hostname);
+						char *mask = HostToMask(lptr->username,
+								lptr->hostname);
 
 						/*
 						 * they sent too many messages in too little time
@@ -1239,8 +1274,8 @@ s_privmsg(int ac, char **av)
 					if ((lptr->msgs_ts[1] - lptr->msgs_ts[0]) > FloodTime)
 					{
 						/*
-						 * FloodTime seconds has passed since their last message,
-						 * reset everything
+						 * FloodTime seconds has passed since their last
+						 * message, reset everything
 						 */
 						lptr->messages = 1;
 						lptr->msgs_ts[0] = current_ts;
@@ -1279,6 +1314,59 @@ s_privmsg(int ac, char **av)
 		return;
 	}
 
+#ifdef PUBCOMMANDS 
+	if (proceedpub) /* let's check did we match some pub command or not /
+					   CoolCold / */
+	{
+    	/* now create common part of all public commands */
+       	struct Channel *chptr;
+		char **tmpargv = NULL;
+		char *pubcommand, *nicks = NULL;
+		int acnt;
+		char tmpcommand[MAXLINE + 1];
+
+		if (!(chptr = FindChannel(av[2])))
+			return;
+        		
+		pubcommand = command + 1;
+		acnt = SplitBuf(pubcommand, &tmpargv);
+		nicks = GetString(acnt - 1, tmpargv + 1);
+
+		switch (proceedpub)
+		{
+			case CS_PUB_OP:
+				if (acnt > 1)
+					ircsprintf(tmpcommand, "OP %s %s", chptr->name,
+						nicks);
+				else
+					ircsprintf(tmpcommand, "OP %s %s", chptr->name,
+						lptr->nick);
+				cs_process(who, tmpcommand);
+				break;
+
+			case CS_PUB_DEOP:
+				if (acnt > 1)
+					ircsprintf(tmpcommand, "OP %s -%s", chptr->name,
+						nicks);
+				else
+					ircsprintf(tmpcommand, "OP %s -%s", chptr->name,
+						lptr->nick);
+				cs_process(who, tmpcommand);
+				break;
+
+			case SS_PUB_SEEN:
+			case SS_PUB_SEENNICK:
+			   es_process(who, pubcommand);
+			   break;
+		}
+		
+		MyFree(tmpargv);
+		MyFree(nicks);
+
+		return;
+    }
+#endif
+	
 	if (SecureMessaging && !issecured)
 	{
 		notice(serviceptr->nick, lptr->nick,

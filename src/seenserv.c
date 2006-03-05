@@ -20,6 +20,7 @@
 #include "data.h"
 #include "hash.h"
 #include "helpserv.h"
+#include "chanserv.h"
 #include "seenserv.h"
 #include "hybdefs.h"
 #include "match.h"
@@ -45,6 +46,8 @@ static void es_seennick(struct Luser *, int, char **);
 static void es_help(struct Luser *, int, char **);
 static void es_seenstat(struct Luser *, int, char **);
 static void FreeSeen(void);
+static void es_join(struct Luser *, int, char **, int);
+static void es_part(struct Luser *, int, char **);
 
 static struct Command seencmds[] =
     {
@@ -52,6 +55,8 @@ static struct Command seencmds[] =
 	    { "SEENNICK", es_seennick, LVL_NONE },
 	    { "HELP", es_help, LVL_NONE },
 	    { "SEENSTAT", es_seenstat, LVL_ADMIN },
+	    { "JOIN", es_join, LVL_NONE },
+	    { "PART", es_part, LVL_NONE },
 	    { 0, 0, 0 }
     };
 
@@ -539,5 +544,110 @@ static void es_seenstat(struct Luser *lptr, int ac, char **av)
 	notice(n_SeenServ, lptr->nick, "...of these, NICK msgs: %d", nicks);
 
 } /* es_seenstat() */
+
+/*
+ * ss_join - joins channel whitout performing any check
+ */
+void ss_join(struct Channel *cptr)
+{
+  char sendstr[MAXLINE];
+  char **av;
+  
+  if (!cptr)
+    return;  
+
+  ircsprintf(sendstr,
+             ":%s SJOIN %ld %s + :+%s\r\n",
+             Me.name, (long) cptr->since, cptr->name, n_SeenServ);
+  toserv(sendstr);
+  SplitBuf(sendstr, &av);
+
+  AddChannel(av, 0, (char **) NULL);
+  
+  MyFree(av);
+} /* ss_join() */
+
+/* ss_part - removes SeenServ from channel */
+void ss_part(struct Channel *chptr)
+{
+  if (!chptr)
+    return;
+  if (IsChannelMember(chptr, Me.esptr))
+    toserv(":%s PART %s\r\n", n_SeenServ, chptr->name);
+  RemoveFromChannel(chptr, Me.esptr);
+} /* ss_part() */
+
+static void
+es_join(struct Luser *lptr, int ac, char **av, int sockfd)
+
+{
+  struct Channel *chptr;
+  struct ChanInfo *cptr;
+  
+  if (ac < 2)
+    return;
+
+  if (!(chptr = FindChannel(av[1])))
+    {  
+	  notice(n_SeenServ, lptr->nick, "No such channel [\002%s\002]",
+			  av[1]);
+      return;
+    }
+  
+  if (!(cptr = FindChan(chptr->name)))
+    {
+      notice(n_SeenServ, lptr->nick,
+		  "The channel [\002%s\002] is not registered", chptr->name);
+      return;
+    }
+  
+  if (IsFounder(lptr, cptr) || IsAdmin(lptr))
+    {
+      cptr->flags |= CS_SEENSERV;
+      ss_join(chptr);
+      return;
+    }
+
+  notice(n_SeenServ, lptr->nick,
+	  "You are not the FOUNDER of [\002%s\002]", cptr->name);
+} /* es_join() */
+
+/*
+es_part()
+  Have SeenServ part 'chptr'
+*/
+void
+es_part(struct Luser *lptr, int ac, char **av)
+
+{
+  struct Channel *chptr;
+  struct ChanInfo *cptr;
+  
+  if (ac < 2)
+    return;
+   
+  if (!(chptr = FindChannel(av[1])))
+    {  
+      notice (n_SeenServ, lptr->nick, "No such channel - %s", av[1]);
+      return;
+    }
+  
+  if (!(cptr = FindChan(chptr->name)))
+    {
+      notice(n_SeenServ, lptr->nick,
+		  "The channel [\002%s\002] is not registered", chptr->name);
+      return;
+    }
+      
+  if (IsFounder(lptr, cptr) || IsAdmin(lptr))
+    {
+      cptr->flags &= ~CS_SEENSERV;
+      ss_part(chptr);
+      return;
+    }
+  
+  notice(n_SeenServ, lptr->nick,
+    "You are not the FOUNDER of [\002%s\002]", cptr->name);
+} /* es_part() */
 
 #endif /* SEENSERVICES */

@@ -29,6 +29,7 @@
 #define CS_SPLITOPS     0x00000800 /* let people keep ops from splits */
 #define CS_VERBOSE      0x00001000 /* notify chanops for access changes */
 #define CS_EXPIREBANS   0x00002000 /* expire bans after EXPIRETIME */
+#define CS_SEENSERV     0x00004000 /* channel is served by SeenServ */
 
 /* access_lvl[] indices */
 #if defined HYBRID7 && defined HYBRID7_HALFOPS

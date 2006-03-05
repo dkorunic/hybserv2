@@ -14,6 +14,14 @@
 /* Server structure flags */
 #define SERV_MYHUB      0x0001 /* services' current hub server */
 
+/* Defining public commands for services */
+#ifdef PUBCOMMANDS
+# define CS_PUB_OP 1
+# define CS_PUB_DEOP 2
+# define SS_PUB_SEEN 3
+# define SS_PUB_SEENNICK 4
+#endif
+
 /* Stores info for servers on network */
 struct Server
 {

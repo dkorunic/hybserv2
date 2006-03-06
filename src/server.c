@@ -1321,8 +1321,8 @@ s_privmsg(int ac, char **av)
     	/* now create common part of all public commands */
        	struct Channel *chptr;
 		char **tmpargv = NULL;
-		char *pubcommand, *nicks = NULL;
-		int acnt;
+		char *pubcommand;
+		int acnt, i;
 		char tmpcommand[MAXLINE + 1];
 
 		if (!(chptr = FindChannel(av[2])))
@@ -1330,14 +1330,21 @@ s_privmsg(int ac, char **av)
         		
 		pubcommand = command + 1;
 		acnt = SplitBuf(pubcommand, &tmpargv);
-		nicks = GetString(acnt - 1, tmpargv + 1);
 
 		switch (proceedpub)
 		{
 			case CS_PUB_OP:
 				if (acnt > 1)
-					ircsprintf(tmpcommand, "OP %s %s", chptr->name,
-						nicks);
+				{
+					ircsprintf(tmpcommand, "OP %s", chptr->name);
+					for (i = 1; i < acnt; ++i)
+					{
+						strncat(tmpcommand, " ", sizeof(tmpcommand));
+						strncat(tmpcommand, tmpargv[i],
+								sizeof(tmpcommand));
+					}
+
+				}
 				else
 					ircsprintf(tmpcommand, "OP %s %s", chptr->name,
 						lptr->nick);
@@ -1346,8 +1353,16 @@ s_privmsg(int ac, char **av)
 
 			case CS_PUB_DEOP:
 				if (acnt > 1)
-					ircsprintf(tmpcommand, "OP %s -%s", chptr->name,
-						nicks);
+				{
+					ircsprintf(tmpcommand, "OP %s", chptr->name);
+					for (i = 1; i < acnt; ++i)
+					{
+						strncat(tmpcommand, " -", sizeof(tmpcommand));
+						strncat(tmpcommand, tmpargv[i],
+								sizeof(tmpcommand));
+					}
+
+				}
 				else
 					ircsprintf(tmpcommand, "OP %s -%s", chptr->name,
 						lptr->nick);
@@ -1361,7 +1376,6 @@ s_privmsg(int ac, char **av)
 		}
 		
 		MyFree(tmpargv);
-		MyFree(nicks);
 
 		return;
     }

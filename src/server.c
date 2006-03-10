@@ -1328,7 +1328,7 @@ s_privmsg(int ac, char **av)
 		if (!(chptr = FindChannel(av[2])))
 			return;
         		
-		pubcommand = command + 1;
+		pubcommand = MyStrdup(command + 1);
 		acnt = SplitBuf(pubcommand, &tmpargv);
 
 		switch (proceedpub)
@@ -1371,11 +1371,13 @@ s_privmsg(int ac, char **av)
 
 			case SS_PUB_SEEN:
 			case SS_PUB_SEENNICK:
-			   es_process(who, pubcommand);
-			   break;
+				strncpy(tmpcommand, command + 1, sizeof(tmpcommand));
+				es_process(who, tmpcommand);
+				break;
 		}
 		
 		MyFree(tmpargv);
+		MyFree(pubcommand);
 
 		return;
     }

@@ -103,6 +103,7 @@ static void n_forbid(struct Luser *, int, char **);
 static void n_unforbid(struct Luser *, int, char **);
 static void n_setpass(struct Luser *, int, char **);
 static void n_noexpire(struct Luser *, int, char **);
+static void n_clearnoexp(struct Luser *, int, char **);
 
 #ifdef LINKED_NICKNAMES
 static void n_showlink(struct Luser *, int, char **);
@@ -145,6 +146,7 @@ static struct Command nickcmds[] =
 	    { "SETPASS", n_setpass, LVL_ADMIN },
 	    { "CHPASS", n_setpass, LVL_ADMIN },
 	    { "NOEXPIRE", n_noexpire, LVL_ADMIN },
+	    { "CLEARNOEXP", n_clearnoexp, LVL_ADMIN },
 #ifdef LINKED_NICKNAMES
 	    { "SHOWLINK", n_showlink, LVL_ADMIN },
 	    { "DROPLINK", n_droplink, LVL_ADMIN },
@@ -4900,6 +4902,7 @@ static void n_noexpire(struct Luser *lptr, int ac, char **av)
 
 	if (!irccmp(av[2], "OFF"))
 	{
+		nptr->lastseen = current_ts;
 		nptr->flags &= ~NS_NOEXPIRE;
 		notice(n_NickServ, lptr->nick,
 		       "NoExpire for [\002%s\002] is now [\002OFF\002]",
@@ -4913,6 +4916,50 @@ static void n_noexpire(struct Luser *lptr, int ac, char **av)
 	notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
 	       "NOEXPIRE");
 } /* n_noexpire() */
+
+/*
+ * Clear all noexpire flags for all users. Code taken from IrcBg and
+ * modified. -kre
+ */
+void n_clearnoexp(struct Luser *lptr, int ac, char **av)
+{
+	int ii;
+	struct NickInfo *nptr;
+	time_t currtime;
+
+	if (ac < 2)
+	{
+		notice(n_NickServ, lptr->nick,
+			"Syntax: CLEARNOEXP");
+		notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
+			"CLEARNOEXP");
+		return;
+	}
+
+	if (!(lptr->flags & PRIV_SADMIN))
+	{
+		notice(n_NickServ, lptr->nick,
+			"You must IDENTIFY as a Services Administrator to use this command");
+		return;
+	}
+	
+	RecordCommand("%s: %s!%s@%s CLEARNOEXP",
+			n_NickServ, lptr->nick, lptr->username, lptr->hostname);
+
+	currtime = current_ts;
+	
+	for (ii = 0; ii < NICKLIST_MAX; ++ii)
+		for (nptr = nicklist[ii]; nptr; nptr = nptr->next)
+			if (nptr->flags & NS_NOEXPIRE)
+			{
+				nptr->lastseen = currtime;
+				nptr->flags &= ~NS_NOEXPIRE;
+			}
+
+	notice(n_NickServ, lptr->nick,
+		"All noexpire flags for nicknames have been cleared.");
+
+} /* n_clearnoexp() */
 
 #ifdef LINKED_NICKNAMES
 /*

@@ -22,6 +22,7 @@ For more information on a specific command, type
 %+a%b* * * *
 %+aAdministrator commands:
 %+a%b%b
+%+a    CLEARNOEXP Clear all noexpire flags for nicks
 %+a    COLLIDE    Manipulate nickname collision list
 %+a    DROPLINK   Drop an entire nickname link
 %+a    FLAG       Set flags to limit a user's privileges

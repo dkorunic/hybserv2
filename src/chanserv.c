@@ -156,7 +156,7 @@ static void c_setpass(struct Luser *, struct NickInfo *, int, char **);
 static void c_status(struct Luser *, struct NickInfo *, int, char **);
 static void c_forget(struct Luser *, struct NickInfo *, int, char **);
 static void c_noexpire(struct Luser *, struct NickInfo *, int, char **);
-static void c_clearnoexpire(struct Luser *, struct NickInfo *, int, char
+static void c_clearnoexp(struct Luser *, struct NickInfo *, int, char
                             **);
 static void c_fixts(struct Luser *, struct NickInfo *, int, char **);
 static void c_resetlevels(struct Luser *, struct NickInfo *, int, char
@@ -195,7 +195,7 @@ static struct Command chancmds[] =
 	    { "STATUS", c_status, LVL_ADMIN },
 	    { "FORGET", c_forget, LVL_ADMIN },
 	    { "NOEXPIRE", c_noexpire, LVL_ADMIN },
-	    { "CLEARNOEXP", c_clearnoexpire, LVL_ADMIN },
+	    { "CLEARNOEXP", c_clearnoexp, LVL_ADMIN },
 	    { "RESETLEVELS", c_resetlevels, LVL_ADMIN },
 #endif
 	    { 0, 0, 0 }
@@ -8052,6 +8052,7 @@ static void c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
 	if (!irccmp(av[2], "OFF"))
 	{
+		cptr->lastused = current_ts;
 		cptr->flags &= ~CS_NOEXPIRE;
 		notice(n_ChanServ, lptr->nick,
 		       "Toggled NoExpire for channel %s [\002OFF\002]",
@@ -8072,23 +8073,46 @@ static void c_noexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
  * Clears noexpire modes setup on channels. Code taken from IrcBg and
  * slightly modified. -kre
  */
-void c_clearnoexpire(struct Luser *lptr, struct NickInfo *nptr, int ac,
+void c_clearnoexp(struct Luser *lptr, struct NickInfo *nptr, int ac,
                      char **av)
 {
 	int ii;
 	struct ChanInfo *cptr;
+	time_t currtime;
+	
+	if (ac < 2)
+	{
+		notice(n_ChanServ, lptr->nick,
+			"Syntax: CLEARNOEXP");
+		notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+			"CLEARNOEXP");
+		return;
+	}
+
+	if (!(lptr->flags & PRIV_SADMIN))
+	{
+		notice(n_ChanServ, lptr->nick,
+			"You must IDENTIFY as a Services Administrator to use this command");
+		return;
+	}
 
 	RecordCommand("%s: %s!%s@%s CLEARNOEXP",
 	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
 
+	currtime = current_ts;
+
 	for (ii = 0; ii < CHANLIST_MAX; ii++)
 		for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
-			cptr->flags &= ~CS_NOEXPIRE;
+			if (cptr->flags & CS_NOEXPIRE)
+			{
+				cptr->lastused = currtime;
+				cptr->flags &= ~CS_NOEXPIRE;
+			}
 
 	notice(n_ChanServ, lptr->nick,
-	       "All noexpire flags are cleared." );
+	       "All noexpire flags for channels have been cleared." );
 
-} /* c_clearnoexpire() */
+} /* c_clearnoexp() */
 
 /*
  * c_fixts()
@@ -8156,6 +8180,13 @@ static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
 	RecordCommand("%s: %s!%s@%s RESETLEVELS",
 	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+
+	if (!(lptr->flags & PRIV_SADMIN)) 
+ 	{ 
+		notice(n_NickServ, lptr->nick, 
+			"You must IDENTIFY as a Services Administrator to use this command"); 
+        return; 
+ 	} 
 
 	for (ii = 0; ii < CHANLIST_MAX; ii++)
 		for (cptr = chanlist[ii]; cptr; cptr = cptr->next)

@@ -7,6 +7,9 @@ $Id$
 
 Hybserv-HEAD
 
+  + add NickServ clearnoexp
+  * update ChanServ clearnoexp behaviour - lastused flag should be updated
+    on clear expire [from Ilian Jovchev/ShakeIT
   + when adding already added entry in channel access list, update
     added_by nickname [from Ilian Jovchev/ShakeIT]
   - fix for long-standing linked nicknames circular bug [thank you Ilian

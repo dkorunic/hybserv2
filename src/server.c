@@ -49,10 +49,12 @@ aHashEntry hostTable[HASHCLIENTS];
  * Global - list of network servers
  */
 struct Server *ServerList = NULL;
-static int ServerCollides = 0;
-static time_t ServerCollidesTS = 0;
 int burst_complete = 0;
 time_t most_recent_sjoin=0;
+#ifdef SERVICES_FIGHT_FIX
+static int ServerCollides = 0;
+static time_t ServerCollidesTS = 0;
+#endif /* SERVICES_FIGHT_FIX */
 
 static void s_pass(int ac, char **av);
 static void s_ping(int ac, char **av);
@@ -71,7 +73,9 @@ static void s_trace(int ac, char **av);
 static void s_version(int ac, char **av);
 static void s_motd(int ac, char **av);
 
+#ifdef SERVICES_FIGHT_FIX
 static void CheckServCollide(struct Server *bad_server);
+#endif /* SERVICES_FIGHT_FIX */
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 static void s_topic(int ac, char **av);

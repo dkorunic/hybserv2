@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  + when adding already added entry in channel access list, update
+    added_by nickname [from Ilian Jovchev/ShakeIT]
   - fix for long-standing linked nicknames circular bug [thank you Ilian
     Jovchev and ShakeIT!]
   * changes for ss_part/ss_join/es_part/es_join [mostly by ShakeIT]

@@ -2627,6 +2627,10 @@ int AddAccess(struct ChanInfo *chanptr, struct Luser *lptr, char
 			if (GetAccess(chanptr, lptr) <= ptr->level)
 				return 0;
 
+		/* change added_by */
+		MyFree(ptr->added_by);
+		ptr->added_by = MyStrdup(added_by);
+
 		ptr->level = level;
 		return 1;
 	}

@@ -1761,9 +1761,8 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 
 	/* setup leaf master */
 	if (leaf->master)
-{
+    {
 		leafmaster = leaf->master;
-		leaf->master->master = master;
 	}
 	else
 		leafmaster = leaf;
@@ -1834,6 +1833,10 @@ static int InsertLink(struct NickInfo *hub, struct NickInfo *leaf)
 	leafmaster->fccnt = 0;
 
 #endif /* CHANNELSERVICES */
+
+    /* setup new master for leaf master */
+    leafmaster->numlinks = 0;
+    leafmaster->master = master;
 
 	/* setup masters in whole list */
 	for (tmp = leafmaster; tmp->nextlink != NULL; tmp = tmp->nextlink)

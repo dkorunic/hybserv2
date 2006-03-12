@@ -7,6 +7,9 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix for long-standing linked nicknames circular bug [thank you Ilian
+    Jovchev and ShakeIT!]
+  * changes for ss_part/ss_join/es_part/es_join [mostly by ShakeIT]
   + SeenServ on channels, pubcommands for SeenServ: !seen, !seennick, !op
     and !deop [from t0sh and CoolCold, heavily edited]
   - fix leap years timeago() bug [reported by Todor Dimitrov]

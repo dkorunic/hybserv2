@@ -39,26 +39,30 @@ kreator     Dinko Korunic        kreator|AT|srce|hr
 The following people have contributed to Hybserv2 in blood and sweat
 (nick alphabetical order):
 adx         Piotr Nizynski       adx|AT|crashnet|pl
+alex        Ales Tokic           ales|tokic|AT|gmail|com
 args        Antoniu-George Savu  antoniu-george|savu|AT|fr|tiscali|com
 asuffield   Andrew Suffield      asuffield|AT|users|sourceforge|net
 bane        Dragan Dosen         ddosen|AT|ffzg|hr
 bbrazil     Brian Brazil         bbrazil|AT|netsoc|tcd|ie
 Bruns       Brian Bruns          bruns|AT|magenet|net
-MOLI        Olivier Molinete     olivier|AT|molinete|org
+CoolCold	CoolCold [?]         coolcold|AT|coolcold|org
 cosine      Patrick Alken        wnder|AT|uwns|underworld|net
 ddb         Ivan Petrov          ddb|AT|xplovdiv|com
 decho       Nedelcho Stanev      decho|AT|iname|com
 fl_         Lee Hardy            lee|AT|leeh|co|uk
 harly       Tomislav Novak       harly|AT|bofhlet|net
-Sarisa      Wendy Campbell       wcampbel|AT|botbay|net
 ike         Ivan Krstic          ike|AT|gnjilux|srk|fer|hr 
+ilian       Ilian Jovchev        ilian|AT|david|bg
 Janos       John Binder          jbinder|AT|kgazd|bme|hu
 John-Work   F| John Rowan        john|AT|tdkt|org
 knight      Alan Levee           alan|levee|AT|prometheus-designs|net
 KrisDuv     Christophe Duverger  krisduv2000|AT|yahoo|fr
 mend0za     Vladimir Shahov      mend0za|AT|nsys|by
+MOLI        Olivier Molinete     olivier|AT|molinete|org
 rhodie      Julian Petrov        rhodie|AT|irchelp|unibg|org
+Sarisa      Wendy Campbell       wcampbel|AT|botbay|net
 sofit       Stanislav Zahariev   sofit|AT|proshe|bg
+t0sh        Todor Dimitrov       todor_p_dimitrov|AT|yahoo|com
 toot        Toby Verrall         to7|AT|antipope|fsnet|co|uk
 
 We are grateful to all these people, as well as all users that have been
@@ -82,8 +86,6 @@ DISTRIBUTION:
 
   4)  Mirrors:
       http://dkorunic.net/projects/tarballs/
-      http://hybserv.icsbg.net/ [thanks sofit!]
-      http://www.sosdg.org/hybserv2/ [thanks Bruns!]
       http://www.hybserv.net/downloads/
 
 NOTE: For each of these sites there is one in hybserv.net and one in

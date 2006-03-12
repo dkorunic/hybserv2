@@ -1987,7 +1987,7 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 		cs_join(cptr);
 
 		if (cptr->flags & CS_SEENSERV)
-		ss_join(chptr);
+			ss_join(chptr);
 	}
 
 #else
@@ -7783,6 +7783,8 @@ static void c_unforbid(struct Luser *lptr, struct NickInfo *nptr, int ac,
 		 * safe to delete it -kre */
 		chptr = FindChannel(cptr->name);
 
+		ss_part(chptr);
+
 		if (IsChannelMember(chptr, Me.csptr))
 			cs_part(chptr);
 
@@ -7963,6 +7965,9 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		}
 
 		chptr = FindChannel(cptr->name);
+
+		ss_part(chptr);
+		
 		if (IsChannelMember(chptr, Me.csptr))
 			cs_part(chptr);
 

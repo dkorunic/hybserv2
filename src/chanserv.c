@@ -2206,7 +2206,6 @@ ExpireChannels(time_t unixtime)
 {
 	int ii;
 	struct ChanInfo *cptr, *next;
-	struct Channel *chptr;
 
 	if (!ChannelExpire)
 		return;
@@ -2224,11 +2223,6 @@ ExpireChannels(time_t unixtime)
 				       "%s: Expired channel [%s]",
 				       n_ChanServ,
 				       cptr->name);
-
-				chptr = FindChannel(cptr->name);
-				ss_part(chptr);
-				if (IsChannelMember(chptr, Me.csptr))
-					cs_part(chptr);
 
 				DeleteChan(cptr);
 			}
@@ -2507,6 +2501,7 @@ DeleteChan(struct ChanInfo *chanptr)
 	struct NickInfo *nptr;
 	struct AutoKick *ak;
 	struct ChanAccess *ca;
+	struct Channel *chptr;
 	struct f_users *fdrs;
 	int hashv;
 
@@ -2533,6 +2528,15 @@ DeleteChan(struct ChanInfo *chanptr)
 
 	MyFree(chanptr->forward);
 #endif /* DANCER */
+
+	/* leave channel if needed */
+	chptr = FindChannel(chanptr->name);
+	if (chptr != NULL)
+	{
+		if (IsChannelMember(chptr, Me.csptr))
+			cs_part(chptr);
+		ss_part(chptr);
+	}
 
 	while (chanptr->akick)
 	{
@@ -3358,7 +3362,6 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
 	struct ChanInfo *cptr;
-	struct Channel *chptr;
 
 	if (ac < 2)
 	{
@@ -3407,13 +3410,6 @@ c_drop(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	RecordCommand("%s: %s!%s@%s DROP [%s]",
 	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname,
 	              cptr->name);
-
-	chptr = FindChannel(cptr->name);
-
-	ss_part(chptr);
-
-	if (IsChannelMember(chptr, Me.csptr))
-		cs_part(chptr);
 
 	/* everything checks out ok...delete the channel */
 	DeleteChan(cptr);
@@ -7780,18 +7776,9 @@ static void c_unforbid(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
 	if (!cptr->password)
 	{
-		struct Channel *chptr;
-
 		/* Well, it has empty fields - it was either from old forbid() code,
 		 * or AddChan() made nickname from new forbid() - either way it is
 		 * safe to delete it -kre */
-		chptr = FindChannel(cptr->name);
-
-		ss_part(chptr);
-
-		if (IsChannelMember(chptr, Me.csptr))
-			cs_part(chptr);
-
 		DeleteChan(cptr);
 
 		notice(n_ChanServ, lptr->nick,
@@ -7935,7 +7922,6 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
 	struct ChanInfo *cptr;
-	struct Channel *chptr;
 
 	if (ac < 2)
 	{
@@ -7967,13 +7953,6 @@ c_forget(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			       cptr->name);
 			return;
 		}
-
-		chptr = FindChannel(cptr->name);
-
-		ss_part(chptr);
-		
-		if (IsChannelMember(chptr, Me.csptr))
-			cs_part(chptr);
 
 		/*
 		 * delete channel to kill the access/akick/founder list etc

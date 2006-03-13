@@ -1322,7 +1322,7 @@ CheckChans()
   return: none
 */
 
-static void
+void
 CheckChans()
 
 {

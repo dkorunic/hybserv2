@@ -179,6 +179,8 @@ void DoTimer(time_t unixtime)
 		 * Check for expired nicknames, channels, and memos every hour
 		 */
 
+		CheckChans();
+
 #ifdef NICKSERVICES
 
 		ExpireNicknames(unixtime);

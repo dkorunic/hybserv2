@@ -188,6 +188,7 @@ struct PortInfo *IsListening(int);
 struct PortInfo *IsPort(int);
 struct Botlist *IsBot(char *);
 void AddMyChan(char *);
+void CheckChans(void);
 int IsProtectedHost(char *, char *);
 struct Userlist *GetUser(int, char *, char *, char *);
 int CheckAccess(struct Userlist *, char);

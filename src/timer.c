@@ -13,6 +13,7 @@
 #include "chanserv.h"
 #include "config.h"
 #include "data.h"
+#include "conf.h"
 #include "dcc.h"
 #include "flood.h"
 #include "gline.h"

@@ -41,7 +41,6 @@ static void AddRemoteBot(char *nick, char *host, char *pass);
 static void AddPort(int port, char *host, char *type);
 static void ClearConfLines(void);
 
-static void CheckChans(void);
 static void CheckServers(void);
 static void CheckListenPorts(void);
 

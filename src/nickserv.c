@@ -4927,7 +4927,7 @@ void n_clearnoexp(struct Luser *lptr, int ac, char **av)
 	struct NickInfo *nptr;
 	time_t currtime;
 
-	if (ac < 2)
+	if (ac > 1)
 	{
 		notice(n_NickServ, lptr->nick,
 			"Syntax: CLEARNOEXP");
@@ -4936,7 +4936,7 @@ void n_clearnoexp(struct Luser *lptr, int ac, char **av)
 		return;
 	}
 
-	if (!(lptr->flags & PRIV_SADMIN))
+	if (!IsValidServicesAdmin(lptr))
 	{
 		notice(n_NickServ, lptr->nick,
 			"You must IDENTIFY as a Services Administrator to use this command");

@@ -8059,7 +8059,7 @@ void c_clearnoexp(struct Luser *lptr, struct NickInfo *nptr, int ac,
 	struct ChanInfo *cptr;
 	time_t currtime;
 	
-	if (ac < 2)
+	if (ac > 1)
 	{
 		notice(n_ChanServ, lptr->nick,
 			"Syntax: CLEARNOEXP");
@@ -8068,7 +8068,7 @@ void c_clearnoexp(struct Luser *lptr, struct NickInfo *nptr, int ac,
 		return;
 	}
 
-	if (!(lptr->flags & PRIV_SADMIN))
+	if (!IsValidServicesAdmin(lptr))
 	{
 		notice(n_ChanServ, lptr->nick,
 			"You must IDENTIFY as a Services Administrator to use this command");
@@ -8157,16 +8157,25 @@ static void c_resetlevels(struct Luser *lptr, struct NickInfo *nptr, int ac,
 	int ii;
 	struct ChanInfo *cptr;
 
-	RecordCommand("%s: %s!%s@%s RESETLEVELS",
-	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
-
-	if (!(lptr->flags & PRIV_SADMIN)) 
+	if (ac > 1)
+	{
+		notice(n_ChanServ, lptr->nick,
+			"Syntax: RESETLEVELS");
+		notice(n_ChanServ, lptr->nick, ERR_MORE_INFO, n_ChanServ,
+			"RESETLEVELS");
+		return;
+	}
+	
+	if (!IsValidServicesAdmin(lptr))
  	{ 
 		notice(n_NickServ, lptr->nick, 
 			"You must IDENTIFY as a Services Administrator to use this command"); 
-        return; 
+		return;
  	} 
 
+	RecordCommand("%s: %s!%s@%s RESETLEVELS",
+	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname);
+	
 	for (ii = 0; ii < CHANLIST_MAX; ii++)
 		for (cptr = chanlist[ii]; cptr; cptr = cptr->next)
 			SetDefaultALVL(cptr);

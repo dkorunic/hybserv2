@@ -7,6 +7,9 @@ $Id$
 
 Hybserv-HEAD
 
+  * better services admin checks for sadmin-privilege commands [thanks
+    Ilian]
+  * rearrange cs/ss_part code into DeleteChan()
   * fix warnings when undef SERVICES_FIGHT_FIX
   + add NickServ clearnoexp
   * update ChanServ clearnoexp behaviour - lastused flag should be updated

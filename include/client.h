@@ -110,6 +110,7 @@ char *GetNick(char *);
 int IsRegistered(struct Luser *, int);
 int IsOperator(struct Luser *);
 int IsValidAdmin(struct Luser *);
+int IsValidServicesAdmin(struct Luser *lptr);
 int IsNickCollide(struct Luser *, char **);
 
 extern struct Luser *ClientList;

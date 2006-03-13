@@ -711,6 +711,24 @@ IsValidAdmin(struct Luser *lptr)
 } /* IsValidAdmin() */
 
 /*
+ * IsValidServicesAdmin()
+ * Returns 1 if lptr is an identified Services Administrator
+ */
+int IsValidServicesAdmin(struct Luser *lptr)
+{
+	if (!lptr)
+		return 0;
+	
+	if (!(lptr->flags & L_OSREGISTERED))
+		return 0;
+
+	if (IsServicesAdmin(GetUser(0, lptr->nick, lptr->username, lptr->hostname)))
+		return 1;
+
+	return 0;
+} /* IsValidServicesAdmin() */
+
+/*
 IsNickCollide()
  Determine if 'servptr' is being nick collided
 A nickname collision is successful if the following conditions

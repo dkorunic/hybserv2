@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix a bug with OperServ not joining channels on initial start
   - OperServ should join channels which are to be monitored
   * better services admin checks for sadmin-privilege commands [thanks
     Ilian]

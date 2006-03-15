@@ -385,7 +385,9 @@ ParseConf(char *filename, int rehash)
 				{
 					/* a new chan was added to the conf */
 					AddMyChan(cname);
+#if 0
 					os_join_name(cname);
+#endif
 				}
 
 				break;

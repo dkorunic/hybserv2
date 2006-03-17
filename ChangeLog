@@ -5,10 +5,12 @@ $Id$
   * = Changed something
   ^ = Other
 
-Hybserv-HEAD
 
-  - fix a bug with OperServ not joining channels on initial start
-  - OperServ should join channels which are to be monitored
+Hybserv-1.9.2
+
+  ^ stage to REL_1_9_2 [03/17/2006]
+  - OperServ should join channels which are to be monitored [partially
+    done]
   * better services admin checks for sadmin-privilege commands [thanks
     Ilian]
   * rearrange cs/ss_part code into DeleteChan()

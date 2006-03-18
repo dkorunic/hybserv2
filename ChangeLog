@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix compile problem with PUBCOMMAND in server.c
+
 Hybserv-1.9.2
 
   ^ stage to REL_1_9_2 [03/17/2006]

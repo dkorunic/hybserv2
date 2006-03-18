@@ -1202,7 +1202,11 @@ s_privmsg(int ac, char **av)
 
 #endif
 
+#ifdef PUBCOMMANDS
 	if (FloodProtection && (serviceptr || proceedpub))
+#else
+	if (FloodProtection && serviceptr)
+#endif
 	{
 		if (!IsValidAdmin(lptr))
 		{

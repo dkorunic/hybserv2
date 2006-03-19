@@ -997,34 +997,6 @@ os_join_ts_minus_1(struct Channel *cptr)
 } /* os_join_ts_minus_1() */
 
 /*
-  os_join_name()
-  Have OperServ join a channel with name only
-*/
-void os_join_name(char *name)
-{
-	char sendstr[MAXLINE + 1];
-	char **av;
-
-	if (!name)
-		return;
-
-	ircsprintf(sendstr,
-	           ":%s SJOIN %ld %s + :@%s\r\n",
-	           Me.name, (long) current_ts, name, n_OperServ);
-
-	toserv("%s", sendstr);
-
-#if 0
-	SplitBuf(sendstr, &av);
-
-	/* Add OperServ to channel nick list etc */
-	AddChannel(av, 0, (char **) NULL);
-
-	MyFree(av);
-#endif
-} /* os_join_name() */
-
-/*
 os_part()
  Have OperServ part a channel
 */

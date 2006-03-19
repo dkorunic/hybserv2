@@ -515,7 +515,7 @@ cs_loaddata(void)
 			}
 			else if (!ircncmp("FNDR", keyword, 4))
 			{
-				if (!cptr->founder)
+				if (!cptr->founder && !(cptr->flags & (CS_FORBID | CS_FORGET)))
 				{
 					struct NickInfo *ni = FindNick(av[1]);
 					struct NickInfo *master;

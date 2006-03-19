@@ -8,6 +8,8 @@ $Id$
 Hybserv-HEAD
 
   - fix compile problem with PUBCOMMAND in server.c
+  - fix issue with forbidden channels and expired founder/sucessor in
+    cs_loaddata()
 
 Hybserv-1.9.2
 

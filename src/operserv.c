@@ -1014,12 +1014,14 @@ void os_join_name(char *name)
 
 	toserv("%s", sendstr);
 
+#if 0
 	SplitBuf(sendstr, &av);
 
 	/* Add OperServ to channel nick list etc */
 	AddChannel(av, 0, (char **) NULL);
 
 	MyFree(av);
+#endif
 } /* os_join_name() */
 
 /*

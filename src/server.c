@@ -1721,16 +1721,7 @@ s_kill(int ac, char **av)
 		 */
 		if (!irccmp(av[2], n_OperServ))
 		{
-			struct Chanlist *tempchan;
-			struct Channel *chptr;
-
-			/*
-			 * have OperServ rejoin all its chans, if other
-			 * users are in them
-			 */
-			for (tempchan = ChanList; tempchan; tempchan = tempchan->next)
-				if ((chptr = FindChannel(tempchan->name)))
-					os_join(chptr);
+			CheckChans();
 		}
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -2027,8 +2018,8 @@ s_sjoin(int ac, char **av)
 	oldptr = FindChannel(av[3]);
 	oldnick = GetNick(nicks[0]);
 	assert(oldnick != NULL); /* We should always know at least _first_
-		                                        nickname from list, since there would be no
-		                                        sjoin otherwise -kre */
+								nickname from list, since there would be
+								no sjoin otherwise -kre */
 
 	if (SafeConnect)
 	{

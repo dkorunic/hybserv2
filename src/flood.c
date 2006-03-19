@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "sock.h"
 #include "sprintf_irc.h"
+#include "mystring.h"
 
 #ifdef ADVFLOOD
 #include "match.h"

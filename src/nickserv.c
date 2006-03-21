@@ -1462,7 +1462,6 @@ collide(char *nick)
 {
 	struct Luser *lptr = NULL;
 #if defined SVSNICK || defined FORCENICK
-
 	char newnick[NICKLEN + 1];
 	long nicknum;
 	int base;
@@ -1543,7 +1542,7 @@ collide(char *nick)
 #endif
 #endif /* defined SVSNICK || defined FORCENICK */
 
-#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
+#if !defined SVSNICK && !defined FORCENICK
 
 	/* normal ghosted nickname */
 #ifdef DANCER
@@ -1573,7 +1572,6 @@ collide(char *nick)
 	AddClient(av);
 
 	MyFree(av);
-#endif
 
 	/* Unfortunately, this makes no guarantees that FORCENICK succeeded.
 	 * Please define FALLBACK_TO_KILL if you want to make sure that nick
@@ -1587,6 +1585,7 @@ collide(char *nick)
 		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
 		nptr->flags |= NS_RELEASE;
 	}
+#endif
 } /* collide() */
 
 /*

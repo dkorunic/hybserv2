@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix possible bug with nickserv ghost/collide pseudo nick never leaving
+    [needs further testing]
   - fix compile problem with PUBCOMMAND in server.c
   - fix issue with forbidden channels and expired founder/sucessor in
     cs_loaddata()

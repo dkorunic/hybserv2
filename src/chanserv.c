@@ -6508,7 +6508,7 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	if (ac < 3)
 	{
 		if (HasFlag(lptr->nick, NS_NOCHANOPS))
-			return;
+			eturn;
 
 		if (!IsChannelMember(chptr, lptr))
 		{

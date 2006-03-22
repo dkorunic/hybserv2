@@ -1258,7 +1258,7 @@ CheckNick(char *nickname)
 					          "%s: immediately killing %s!%s@%s (Nickname Enforcement)",
 					          n_NickServ, lptr->nick, lptr->username, lptr->hostname);
 
-					collide(lptr->nick);
+					collide(lptr->nick, 1);
 					realptr->collide_ts = 0;
 				}
 			}
@@ -1457,7 +1457,7 @@ collide()
 */
 
 void
-collide(char *nick)
+collide(char *nick, int dopseudo)
 
 {
 	struct Luser *lptr = NULL;
@@ -1544,7 +1544,7 @@ collide(char *nick)
 
 #if !defined SVSNICK && !defined FORCENICK
 
-	/* normal ghosted nickname */
+	/* normal ghosted nickname, automatically after not identing */
 #ifdef DANCER
 
 	ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n", lptr->nick,
@@ -1563,6 +1563,10 @@ collide(char *nick)
 	 * kill since most clients are -k */
 	toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
 	       lptr->nick, Me.name, n_NickServ, sendstr);
+
+	/* don't add pseudo nickname after KILL */
+	if (!dopseudo)
+		return;
 
 	/* erase the old user */
 	DeleteClient(lptr);
@@ -1680,7 +1684,7 @@ CollisionCheck(time_t unixtime)
 						/*
 						 * kill the nick and replace with a pseudo nick
 						 */
-						collide(lptr->nick);
+						collide(lptr->nick, 1);
 						nptr->collide_ts = 0;
 
 					}
@@ -2557,7 +2561,7 @@ n_recover(struct Luser *lptr, int ac, char **av)
 			return;
 		}
 
-		collide(av[1]);
+		collide(av[1], 1);
 		notice(n_NickServ, lptr->nick,
 		       "The nickname [\002%s\002] has been recovered",
 		       av[1]);
@@ -2759,7 +2763,7 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 			return;
 		}
 
-		collide(gptr->nick);
+		collide(gptr->nick, 0);
 
 		notice(n_NickServ, lptr->nick, "[\002%s\002] has been collided",
 		       av[1]);
@@ -5220,7 +5224,7 @@ n_collide(struct Luser *lptr, int ac, char **av)
 		}
 		else /* setnow */
 		{
-			collide(nptr->nick);
+			collide(nptr->nick, 1);
 			notice(n_NickServ, lptr->nick,
 			       "The nickname [\002%s\002] has been collided",
 			       nptr->nick);
@@ -5446,7 +5450,7 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
 			putlog(LOG1, "%s: Bogus TS nickname: [%s] (TS=%d)",
 			       n_NickServ, ouser->nick, ouser->since);
 
-			collide(ouser->nick);
+			collide(ouser->nick, 0);
 			notice(n_NickServ, lptr->nick,
 			       "The nickname [\002%s\002] has been collided",
 			       ouser->nick);

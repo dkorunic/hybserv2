@@ -149,7 +149,7 @@ struct NickInfo *GetLink(char *);
 void DelNick(struct NickInfo *);
 void DeleteNick(struct NickInfo *);
 int HasFlag(char *, int);
-void collide(char *);
+void collide(char *, int);
 void release(char *);
 void CollisionCheck(time_t);
 

@@ -9,14 +9,20 @@ directory.
     functionality is to add aliases for /msg
     nickserv|chanserv|operserv|memoserv|statserv|seenserv|global as short
     commands (/ns, /cs, /ms etc.) for Hybrid7 IRCD.
+	Obsolete: In newer incarnations of Hybrid7 the replacement module is
+	m_services.c and it provides full functionality.
 
   * m_forcenick.c - This module is written by Dinko Korunic. Its primary
     and only duty is to provide FORCENICK capability within Hybrid7 IRCD,
     which gives both admins and Hybserv2 services power to arbitrary
     change users' nicknames.
+	Obsolete: In newer incarnations of Hybrid7 the replacement module is
+	m_services.c and it uses SVSNICK command.
 
   * m_svsnick.c - Same as before, but for IRCD's supporting SVSNICK
     command. Experimental, untested. Probably even obsolete.
+	Obsolete: In newer incarnations of Hybrid7 the replacement module is
+	m_services.c.
 
   * m_unkline.c - Module written by Dragan Dosen. A very helpful and
     recommended module which gives both services capability to remotely

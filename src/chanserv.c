@@ -1190,7 +1190,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 
 	if ((cptr->flags & CS_RESTRICTED))
 	{
-		/* channel is restricted - kickban all non-autoops */
+		/* channel is restricted - kickban all non-ops */
 		char kbnicks[MAXLINE + 1];
 		int jj = 1;
 		kbnicks[0] = '\0';
@@ -1205,7 +1205,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 				continue;
 #endif
 
-			if (!HasAccess(cptr, tempu->lptr, CA_AUTOOP))
+			if (!HasAccess(cptr, tempu->lptr, CA_CMDOP))
 			{
 
 				if (jj * (NICKLEN + 1) >= sizeof(kbnicks))

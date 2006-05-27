@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #94, when CS_RESTRICTED it is enough to have CA_CMDOP instead of
+    CS_AUTOOP
   - fix #91, RECORD_RESTART_TS supersedes RECORD_SPLIT_TS, remove all
     RECORD_SPLIT_TS code
   - fix #101, LEVEL LIST not logged

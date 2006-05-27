@@ -163,12 +163,6 @@ InitLists()
 	GenericOper->hostname = MyStrdup("");
 	GenericOper->password = MyStrdup("");
 	GenericOper->flags = (PRIV_OPER | PRIV_JUPE | PRIV_GLINE);
-
-#ifdef RECORD_SPLIT_TS
-
-	GenericOper->split_ts = GenericOper->whensplit = 0;
-#endif
-
 } /* InitLists() */
 
 /*

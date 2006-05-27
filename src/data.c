@@ -118,12 +118,6 @@ ReloadData()
 					{
 						newnick->flags |= (temp->flags & NS_IDENTIFIED);
 						newnick->collide_ts = temp->collide_ts;
-
-#ifdef RECORD_SPLIT_TS
-						newnick->split_ts = temp->split_ts;
-						newnick->whensplit = temp->whensplit;
-#endif /* RECORD_SPLIT_TS */
-
 					}
 
 					DeleteNick(temp);

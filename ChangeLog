@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #91, RECORD_RESTART_TS supersedes RECORD_SPLIT_TS, remove all
+    RECORD_SPLIT_TS code
   - fix #101, LEVEL LIST not logged
   + when recording TS, record a servername for the originating nickname
     too and do both servername and ts check for opers and plain users

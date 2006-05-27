@@ -97,13 +97,6 @@ struct NickInfo
 	char *forbidreason;        /* why was it forbidden [optional] */
 	time_t collide_ts;         /* TS of when to collide them */
 
-#ifdef RECORD_SPLIT_TS
-	/* If they split, record their TS, so if they rejoin, we can
-	 * check if their TS's match up and don't make them re-IDENTIFY */
-	time_t split_ts;
-	time_t whensplit;          /* for expiration purposes */
-#endif /* RECORD_SPLIT_TS */
-
 #ifdef RECORD_RESTART_TS
 	/* Record TS of nicks so that when services are restarted
 	 * they won't have to reidentify */

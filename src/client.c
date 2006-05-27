@@ -488,20 +488,6 @@ DeleteClient(struct Luser *user)
 	if (nptr && realptr)
 	{
 
-#ifdef RECORD_SPLIT_TS
-
-		/*
-		 * If they are identified with NickServ, record their TS, so we
-		 * can tell if they are authorized later, if this is a netsplit
-		 */
-		if (realptr->flags & NS_IDENTIFIED)
-		{
-			realptr->split_ts = user->since;
-			realptr->whensplit = current_ts;
-		}
-
-#endif /* RECORD_SPLIT_TS */
-
 		if (LastSeenInfo && (realptr->flags & NS_IDENTIFIED))
 		{
 			/*
@@ -532,26 +518,6 @@ DeleteClient(struct Luser *user)
 #endif
 
 #endif /* NICKSERVICES */
-
-#ifdef RECORD_SPLIT_TS
-
-	/*
-	 * If they are registered with OperServ, record their TS, so we
-	 * can tell if they are authorized later, if this is a netsplit
-	 */
-
-	if (user->flags & L_OSREGISTERED)
-	{
-		struct Userlist *uptr;
-
-		if ((uptr = GetUser(0, user->nick, user->username, user->hostname)))
-		{
-			uptr->split_ts = user->since;
-			uptr->whensplit = current_ts;
-		}
-	}
-
-#endif /* RECORD_SPLIT_TS */
 
 #ifdef ALLOW_FUCKOVER
 	/* check if user was a target of o_fuckover() */

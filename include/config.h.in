@@ -111,15 +111,6 @@
 #undef   IDENTIFOPER
 
 /*
- * Define this if you want NickServ to record the TS of users who split so
- * that when they rejoin they don't need to re-IDENTIFY if their TS
- * matches. Also, OperServ will record the TS of users who have identified
- * so they don't need to do it over again. TS for split users is expired 
- * after half an hour.
- */
-#define   RECORD_SPLIT_TS
-
-/*
  * Define this to save the TS of users when they identify to NickServ. If 
  * services are restarted this can be used to see if they identified 
  * before the shutdown, so that they don't need to re-IDENTIFY.

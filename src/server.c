@@ -1004,29 +1004,6 @@ s_nick(int ac, char **av)
 			nptr->flags |= NS_IDENTIFIED;
 #endif /* DANCER */
 
-#ifdef RECORD_SPLIT_TS
-		/*
-		 * If nptr->split_ts is not 0, then the user QUIT while
-		 * being identified, so if their current TS matches their
-		 * split_ts, then they must have been on a valid netsplit,
-		 * and we can allow them to continue being identified
-		 */
-		if (nptr->split_ts)
-			if (nptr->split_ts == atol(av[3]))
-			{
-				nptr->flags |= NS_IDENTIFIED;
-
-				/*
-				 * Only reset nptr->split_ts if a match was made, because
-				 * if services sees someone QUIT during a split, and another
-				 * client comes on services' side with the same nick, when
-				 * the nick collide occurs, the old nick should still be
-				 * able to be recognized with the same TS
-				 */
-				nptr->split_ts = nptr->whensplit = 0;
-			}
-#endif /* RECORD_SPLIT_TS */
-
 #ifdef RECORD_RESTART_TS
 		/*
 		 * If nick_ts is not 0 then it is the TS of the user when they

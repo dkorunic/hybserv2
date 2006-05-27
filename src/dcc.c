@@ -1972,10 +1972,6 @@ ServReboot()
 	ClearChans();
 	ClearServs();
 
-	/*
-	 * This has to come after ClearUsers(), or RECORD_SPLIT_TS
-	 * will not work correctly
-	 */
 	ClearHashes(0);
 
 	HubSock = NOSOCKET;

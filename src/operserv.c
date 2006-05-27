@@ -3931,10 +3931,6 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
 		ClearChans();
 		ClearServs();
 
-		/*
-		 * This has to come after ClearUsers(), or RECORD_SPLIT_TS
-		 * will not work correctly
-		 */
 		ClearHashes(0);
 
 		HubSock = tempsock;

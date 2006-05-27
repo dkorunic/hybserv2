@@ -108,15 +108,6 @@ struct Userlist
 	int flags;         /* privileges user has */
 	long umodes;       /* user modes set */
 
-#ifdef RECORD_SPLIT_TS
-	/*
-	 * if they split, record their TS, so if they rejoin, we can
-	 * check if their TS's match up and don't make them re-IDENTIFY
-	 */
-	time_t split_ts;
-	time_t whensplit;  /* for expiration purposes */
-#endif
-
 #ifdef RECORD_RESTART_TS
 	/* Record TS of nicks so that when services are restarted
 	 * they won't have to reidentify */

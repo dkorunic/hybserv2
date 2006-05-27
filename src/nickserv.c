@@ -1185,7 +1185,7 @@ CheckNick(char *nickname)
 		return 0; /* nickname is not registered */
 
 	/*
-	 * If RECORD_SPLIT_TS is defined, the user could possibly be
+	 * If RECORD_RESTART_TS is defined, the user could possibly be
 	 * identified already, if we are rejoining from a netsplit;
 	 * if that is the case, don't bother checking hostnames etc
 	 */
@@ -1363,20 +1363,6 @@ ExpireNicknames(time_t unixtime)
 		for (nptr = nicklist[ii]; nptr; nptr = next)
 		{
 			next = nptr->next;
-
-#ifdef RECORD_SPLIT_TS
-
-			if (nptr->split_ts)
-			{
-				/*
-				 * Reset nptr->split_ts every half hour, if we have not
-				 * seen them
-				 */
-				if ((unixtime - nptr->whensplit) >= 1800)
-					nptr->split_ts = nptr->whensplit = 0;
-			}
-
-#endif /* RECORD_SPLIT_TS */
 
 			if (NickNameExpire)
 			{

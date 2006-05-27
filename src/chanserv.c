@@ -2221,7 +2221,7 @@ ExpireChannels(time_t unixtime)
 
 			/* find if anyone is still idling in the channel */
 			chptr = FindChannel(cptr->name);
-			if (chptr->numusers)
+			if (chptr && chptr->numusers)
 			{
 				for (tempuser = chptr->firstuser; tempuser; tempuser =
 						tempuser->next)

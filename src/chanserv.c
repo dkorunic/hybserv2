@@ -2214,7 +2214,22 @@ ExpireChannels(time_t unixtime)
 	{
 		for (cptr = chanlist[ii]; cptr; cptr = next)
 		{
+			struct Channel *chptr;
+			struct ChannelUser *tempuser;
+
 			next = cptr->next;
+
+			/* find if anyone is still idling in the channel */
+			chptr = FindChannel(cptr->name);
+			if (chptr->numusers)
+			{
+				for (tempuser = chptr->firstuser; tempuser; tempuser =
+						tempuser->next)
+				{
+					if (GetAccess(cptr, tempuser->lptr))
+						break;
+				}
+			}
 
 			if ((!(cptr->flags & (CS_FORBID | CS_FORGET | CS_NOEXPIRE))) &&
 			        ((unixtime - cptr->lastused) >= ChannelExpire))
@@ -3017,8 +3032,8 @@ static int GetAccess(struct ChanInfo *cptr, struct Luser *lptr)
 			if (nptr)
 			{
 				chptr = FindChannel(cptr->name);
-				/* Only if the identified user is currently on the channel update
-				 * usage time for this access level */
+				/* Only if the identified user is currently on the channel
+				 * update usage time for this access level */
 				if (chptr && (nptr->flags & NS_IDENTIFIED) &&
 				        IsChannelMember(chptr, lptr))
 					cptr->lastused = ca->last_used = current_ts;

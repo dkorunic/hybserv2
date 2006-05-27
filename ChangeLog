@@ -7,11 +7,13 @@ $Id$
 
 Hybserv-HEAD
 
-  - fix #94, when CS_RESTRICTED it is enough to have CA_CMDOP instead of
-    CS_AUTOOP
-  - fix #91, RECORD_RESTART_TS supersedes RECORD_SPLIT_TS, remove all
+  - fix #93: when expiring channels check if any members idle there and
+    what is their access
+  - fix #94: when channel is CS_RESTRICTED it is enough to have CA_CMDOP
+    instead of CS_AUTOOP
+  - fix #91: RECORD_RESTART_TS supersedes RECORD_SPLIT_TS, remove all
     RECORD_SPLIT_TS code
-  - fix #101, LEVEL LIST not logged
+  - fix #101: LEVEL LIST is now logged
   + when recording TS, record a servername for the originating nickname
     too and do both servername and ts check for opers and plain users
   + be smarter in collide() - don't do pseudo nicknames when no need

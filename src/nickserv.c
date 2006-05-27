@@ -1484,7 +1484,6 @@ collide(char *nick, int dopseudo)
 #endif
 
 #if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
-
 	char **av;
 	char sendstr[MAXLINE + 1];
 	struct NickInfo *nptr = NULL;

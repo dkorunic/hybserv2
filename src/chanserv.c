@@ -4422,6 +4422,12 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		}
 		notice(n_ChanServ, lptr->nick,
 		       "-- End of list --");
+
+		RecordCommand("%s: %s!%s@%s LEVEL [%s] LIST %s %s",
+		              n_ChanServ, lptr->nick, lptr->username,
+		              lptr->hostname, cptr->name,
+		              (ac >= 4) ? av[3] : "",
+		              (ac >= 5) ? av[4] : "");
 		return;
 	}
 
@@ -4430,12 +4436,8 @@ c_level(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		notice(n_ChanServ, lptr->nick,
 		       "Founder access is required for [\002LEVEL\002]");
 		RecordCommand("%s: %s!%s@%s failed LEVEL [%s] %s %s %s",
-		              n_ChanServ,
-		              lptr->nick,
-		              lptr->username,
-		              lptr->hostname,
-		              cptr->name,
-		              av[2],
+					  n_ChanServ, lptr->nick, lptr->username,
+					  lptr->hostname, cptr->name, av[2],
 		              (ac >= 4) ? av[3] : "",
 		              (ac >= 5) ? av[4] : "");
 		return;

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #101, LEVEL LIST not logged
   + when recording TS, record a servername for the originating nickname
     too and do both servername and ts check for opers and plain users
   + be smarter in collide() - don't do pseudo nicknames when no need

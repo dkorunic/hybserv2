@@ -472,8 +472,8 @@ CompleteHubConnection(struct Servlist *hubptr)
 	signon();
 
 	hubptr->connect_ts = current_ts;
-#ifdef RECORD_RESTART_TS
 
+#ifdef RECORD_RESTART_TS
 	most_recent_sjoin = current_ts;
 #endif
 

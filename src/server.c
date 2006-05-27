@@ -89,40 +89,40 @@ static void s_pong(int ac, char **av);
  * Table of commands the hub will send us
  */
 static struct ServCommand servtab[] =
-    {
-	    { "PASS", s_pass
-	    },
-	    { "PING", s_ping },
-	    { "SERVER", s_server },
-	    { "NICK", s_nick },
-	    { "SQUIT", s_squit },
-	    { "PRIVMSG", s_privmsg },
-	    /*  { "NOTICE", s_privmsg }, */
-	    { "QUIT", s_quit },
-	    { "KILL", s_kill },
-	    { "KICK", s_kick },
-	    { "MODE", s_mode },
-	    { "SJOIN", s_sjoin },
-	    { "JOIN", s_sjoin },
-	    { "PART", s_part },
-	    { "ERROR", s_error },
-	    { "WHOIS", s_whois },
-	    { "TRACE", s_trace },
-	    { "VERSION", s_version },
-	    { "MOTD", s_motd },
+	{
+		{ "PASS", s_pass
+		},
+		{ "PING", s_ping },
+		{ "SERVER", s_server },
+		{ "NICK", s_nick },
+		{ "SQUIT", s_squit },
+		{ "PRIVMSG", s_privmsg },
+		/*	{ "NOTICE", s_privmsg }, */
+		{ "QUIT", s_quit },
+		{ "KILL", s_kill },
+		{ "KICK", s_kick },
+		{ "MODE", s_mode },
+		{ "SJOIN", s_sjoin },
+		{ "JOIN", s_sjoin },
+		{ "PART", s_part },
+		{ "ERROR", s_error },
+		{ "WHOIS", s_whois },
+		{ "TRACE", s_trace },
+		{ "VERSION", s_version },
+		{ "MOTD", s_motd },
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
-	    { "TOPIC", s_topic
-	    },
+		{ "TOPIC", s_topic
+		},
 #endif
 
 #ifdef STATSERVICES
-	    { "PONG", s_pong },
+		{ "PONG", s_pong },
 #endif
 
-	    { 0, 0 }
-    };
+		{ 0, 0 }
+	};
 
 /*
 ProcessInfo()
@@ -249,9 +249,9 @@ struct Server *
 
 		if (SafeConnect)
 			SendUmode(OPERUMODE_L,
-			          "*** New Server: %s (hub: %s)",
-			          tempserv->name,
-			          tempserv->uplink ? tempserv->uplink->name : "*unknown*");
+					  "*** New Server: %s (hub: %s)",
+					  tempserv->name,
+					  tempserv->uplink ? tempserv->uplink->name : "*unknown*");
 	}
 
 	tempserv->connect_ts = current_ts;
@@ -290,8 +290,8 @@ struct Server *
 		{
 			/* notify of new max server count */
 			SendUmode(OPERUMODE_Y,
-			          "*** New Max Server Count: %ld",
-			          Network->MaxServers);
+					  "*** New Max Server Count: %ld",
+					  Network->MaxServers);
 		}
 	}
 	if (Network->TotalServers > Network->MaxServersT)
@@ -324,9 +324,9 @@ DeleteServer(struct Server *sptr)
 	/* This could spawn too much messages, even flood on connects/reconnects
 	 * because of severe DoS -kre */
 	SendUmode(OPERUMODE_L,
-	          "*** Netsplit: %s (hub: %s)",
-	          sptr->name,
-	          sptr->uplink ? sptr->uplink->name : "*unknown*");
+			  "*** Netsplit: %s (hub: %s)",
+			  sptr->name,
+			  sptr->uplink ? sptr->uplink->name : "*unknown*");
 #endif
 
 	/*
@@ -389,7 +389,7 @@ do_squit(char *serv, char *reason)
 		if (match(serv, tempserv->name))
 		{
 			toserv("SQUIT %s :%s\r\n",
-			       tempserv->name, reason);
+				   tempserv->name, reason);
 
 			prev = tempserv->next;
 
@@ -557,18 +557,18 @@ s_server(int ac, char **av)
 	{
 		if ((ac == 5)
 #ifdef ALLOW_JUPES
-		        && !IsJupe(tempserv->name)
+				&& !IsJupe(tempserv->name)
 #endif /* ALLOW_JUPES */
 		   )
 		{
 			tempserv->uplink = FindServer(av[0] + 1);
 			SendUmode(OPERUMODE_Y, "Server %s has connected to %s "
-			          "after %s split time",
-			          av[2], av[0] + 1, timeago(tempserv->split_ts, 0));
+					  "after %s split time",
+					  av[2], av[0] + 1, timeago(tempserv->split_ts, 0));
 			tempserv->split_ts = 0;
 			tempserv->connect_ts = current_ts;
-#ifdef RECORD_RESTART_TS
 
+#ifdef RECORD_RESTART_TS
 			most_recent_sjoin = current_ts;
 #endif
 
@@ -578,8 +578,8 @@ s_server(int ac, char **av)
 #endif /* SPLIT_INFO */
 
 	tempserv = AddServer(ac, av);
-#ifdef RECORD_RESTART_TS
 
+#ifdef RECORD_RESTART_TS
 	most_recent_sjoin = current_ts;
 #endif
 
@@ -599,7 +599,7 @@ s_server(int ac, char **av)
 		 * add the services (our) server as well
 		 */
 		ircsprintf(sendstr, ":%s SERVER %s 1 :%s",
-		           av[1], Me.name, Me.info);
+				   av[1], Me.name, Me.info);
 
 		SplitBuf(sendstr, &line);
 
@@ -632,7 +632,7 @@ s_server(int ac, char **av)
 #ifdef DEBUGMODE
 
 		fprintf(stderr, "Introducing new server %s\n",
-		        av[2]);
+				av[2]);
 #endif /* DEBUGMODE */
 
 	}
@@ -666,17 +666,14 @@ s_nick(int ac, char **av)
 	struct Luser *lptr,
 				*serviceptr;
 #ifdef NICKSERVICES
-
 	struct NickInfo *nptr, *newptr;
 #endif
 
 #ifdef RECORD_RESTART_TS
-
 	struct Userlist *uptr;
 #endif
 
 #ifdef SEENSERVICES
-
 	char oldnick[NICKLEN + 1];
 #endif
 
@@ -705,9 +702,9 @@ s_nick(int ac, char **av)
 #endif
 
 		SendUmode(OPERUMODE_N,
-		          "*** Nick Change: %s -> %s",
-		          lptr->nick,
-		          av[2]);
+				  "*** Nick Change: %s -> %s",
+				  lptr->nick,
+				  av[2]);
 
 #ifdef NICKSERVICES
 
@@ -766,9 +763,10 @@ s_nick(int ac, char **av)
 #endif /* DANCER */
 
 #ifdef RECORD_RESTART_TS
-
 					nptr->nick_ts = 0;
 					newptr->nick_ts = atol(av[3] + 1); /* need to skip the :*/
+					MyFree(newptr->last_server);
+					newptr->last_server = MyStrdup(lptr->server->name);
 #endif /* RECORD_RESTART_TS */
 
 				}
@@ -798,17 +796,19 @@ s_nick(int ac, char **av)
 		 * registered with OperServ, while it was turned on (before a rehash
 		 * etc) and the operator could get administrator access that way.
 		 */
-		if (GetUser(1, lptr->nick, lptr->username, lptr->hostname) == GenericOper)
+		if (GetUser(1, lptr->nick, lptr->username, lptr->hostname) ==
+				GenericOper)
 			lptr->flags &= ~L_OSREGISTERED;
 
 #ifdef RECORD_RESTART_TS
-
-		if ((uptr = GetUser(0, lptr->nick, lptr->username, lptr->hostname)) &&
-		        lptr->flags & L_OSREGISTERED)
+		if ((uptr = GetUser(0, lptr->nick, lptr->username,
+				lptr->hostname)) && lptr->flags & L_OSREGISTERED)
 		{
 			MyFree(uptr->last_nick);
 			uptr->last_nick = MyStrdup(av[2]);
 			uptr->nick_ts = atol(av[3] + 1);
+			MyFree(uptr->last_server);
+			uptr->last_server = MyStrdup(lptr->server->name);
 		}
 #endif
 
@@ -902,7 +902,7 @@ s_nick(int ac, char **av)
 			struct Luser *bad_lptr;
 
 			toserv(":%s KILL %s :%s\r\n", Me.name, av[1],
-			       "Attempt to Nick Collide Services");
+				   "Attempt to Nick Collide Services");
 
 			bad_lptr = FindClient(av[1]);
 
@@ -948,8 +948,8 @@ s_nick(int ac, char **av)
 	 */
 	if (SafeConnect)
 		SendUmode(OPERUMODE_CAPC,
-		          "*** Client connection: %s!%s@%s [%s]",
-		          av[1], av[5], av[6], av[7]);
+				  "*** Client connection: %s!%s@%s [%s]",
+				  av[1], av[5], av[6], av[7]);
 
 	/* Add user to list */
 	lptr = AddClient(av);
@@ -1034,21 +1034,27 @@ s_nick(int ac, char **av)
 		 * been stopped and started. If the TS match then they're the 
 		 * same person
 		 */
-		if (nptr->nick_ts)
+		if (nptr->nick_ts && (nptr->nick_ts == atol(av[3])))
 		{
-			if (nptr->nick_ts == atol(av[3]))
+			if (nptr->last_server &&
+					irccmp(nptr->last_server, lptr->server->name))
 			{
-				if (most_recent_sjoin + ConnectBurst >= current_ts)
-				{
-					RecordCommand("%s: %s!%s@%s has been identified based on TS",
-					              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
-					nptr->flags |= NS_IDENTIFIED;
-				}
-				else
-				{
-					RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since SJOIN",
-					              n_NickServ, lptr->nick, lptr->username, lptr->hostname);
-				}
+				RecordCommand("%s: %s!%s@%s failed to identify based on TS - servername changed since SJOIN",
+					  n_NickServ, lptr->nick, lptr->username,
+					  lptr->hostname);
+			}
+			else if (most_recent_sjoin + ConnectBurst >= current_ts)
+			{
+				RecordCommand("%s: %s!%s@%s has been identified based on TS",
+							  n_NickServ, lptr->nick, lptr->username,
+							  lptr->hostname);
+				nptr->flags |= NS_IDENTIFIED;
+			}
+			else
+			{
+				RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since SJOIN",
+					  n_NickServ, lptr->nick, lptr->username,
+					  lptr->hostname);
 			}
 		}
 #endif /* RECORD_RESTART_TS */
@@ -1065,32 +1071,40 @@ s_nick(int ac, char **av)
 	 * if so, re-register them
 	 */
 	if ((uptr = GetUser(0, av[1], av[5], av[6])) && uptr->last_nick &&
-	        !irccmp(uptr->last_nick, av[1])
+			!irccmp(uptr->last_nick, av[1])
 #ifdef OPERNICKIDENT
-	        && (nptr) && (nptr->flags & NS_IDENTIFIED)
+			&& (nptr) && (nptr->flags & NS_IDENTIFIED)
 #ifdef IDENTIFOPER
-	        && (nptr->flags & NS_NOEXPIRE) && (lptr->umodes & UMODE_O)
+			&& (nptr->flags & NS_NOEXPIRE) && (lptr->umodes & UMODE_O)
 #endif
 #endif
 	   )
 	{
 		if (uptr->nick_ts && (uptr->nick_ts == atol(av[3])))
 		{
-			if (most_recent_sjoin + ConnectBurst >= current_ts)
+			if (uptr->last_server &&
+				irccmp(uptr->last_server, lptr->server->name))
+			{
+				RecordCommand("%s: %s!%s@%s failed to identify based on TS = servername changed since SJOIN",
+					  n_OperServ, lptr->nick, lptr->username,
+					  lptr->hostname);
+			}
+			else if (most_recent_sjoin + ConnectBurst >= current_ts)
 			{
 				RecordCommand("%s: %s!%s@%s has been identified based on TS",
-				              n_OperServ, lptr->nick, lptr->username, lptr->hostname);
+						  n_OperServ, lptr->nick, lptr->username,
+						  lptr->hostname);
 				lptr->flags |= L_OSREGISTERED;
 			}
 			else
 			{
-				RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since an SJOIN",
-				              n_OperServ, lptr->nick, lptr->username, lptr->hostname);
+				RecordCommand("%s: %s!%s@%s failed to identify based on TS - more than ConnectBurst time since SJOIN",
+					  n_OperServ, lptr->nick, lptr->username,
+					  lptr->hostname);
 			}
 		}
 	}
 #endif /* RECORD_RESTART_TS */
-
 } /* s_nick() */
 
 /*
@@ -1148,7 +1162,7 @@ s_privmsg(int ac, char **av)
 		if (lptr)
 		{
 			ircsprintf(chkstr, "%s!%s@%s", lptr->nick, lptr->username,
-			           lptr->hostname);
+					   lptr->hostname);
 			if (OnIgnoreList(chkstr))
 				return;
 		}
@@ -1172,32 +1186,32 @@ s_privmsg(int ac, char **av)
  CoolCold /
 */
 #ifdef PUBCOMMANDS
-        /* match, then flood check, then proceed */
-        	if (!serviceptr)
-        	{
+		/* match, then flood check, then proceed */
+			if (!serviceptr)
+			{
 #ifdef CHANNELSERVICES
-        		if (match("!OP*", command))
-        		{
-        			proceedpub = CS_PUB_OP;
-        		}
+				if (match("!OP*", command))
+				{
+					proceedpub = CS_PUB_OP;
+				}
 				else if (match("!DEOP*", command)) 
-        		{
-        			proceedpub = CS_PUB_DEOP;
-        		}
+				{
+					proceedpub = CS_PUB_DEOP;
+				}
 				else
 #ifdef SEENSERVICES
 				if (match("!SEENNICK *", command))
-        		{
-        			proceedpub = SS_PUB_SEENNICK;
-        		}
+				{
+					proceedpub = SS_PUB_SEENNICK;
+				}
 				else if (match("!SEEN *", command))
-        		{
-        			proceedpub = SS_PUB_SEEN;
-        		}
+				{
+					proceedpub = SS_PUB_SEEN;
+				}
 #else
 				{}
 #endif
-        	}
+			}
 #endif
 
 #endif
@@ -1232,40 +1246,40 @@ s_privmsg(int ac, char **av)
 						{
 							AddIgnore(mask, 0);
 							notice(n_OperServ, lptr->nick,
-							       "Maximum flood offenses reached, you are on permanent ignore");
+								   "Maximum flood offenses reached, you are on permanent ignore");
 							putlog(LOG2,
-							       "PRIVMSG flood from %s!%s@%s (permanent ignore)",
-							       lptr->nick,
-							       lptr->username,
-							       lptr->hostname);
+								   "PRIVMSG flood from %s!%s@%s (permanent ignore)",
+								   lptr->nick,
+								   lptr->username,
+								   lptr->hostname);
 
 							SendUmode(OPERUMODE_Y,
-							          "*** Detected flood from %s!%s@%s (permanent ignore)",
-							          lptr->nick,
-							          lptr->username,
-							          lptr->hostname);
+									  "*** Detected flood from %s!%s@%s (permanent ignore)",
+									  lptr->nick,
+									  lptr->username,
+									  lptr->hostname);
 						}
 						else
 						{
 							AddIgnore(mask, IgnoreTime);
 							notice(n_OperServ, lptr->nick,
-							       "Received %d+ messages in <= %d seconds, you are being ignored for %s",
-							       FloodCount,
-							       FloodTime,
-							       timeago(IgnoreTime, 3));
+								   "Received %d+ messages in <= %d seconds, you are being ignored for %s",
+								   FloodCount,
+								   FloodTime,
+								   timeago(IgnoreTime, 3));
 							putlog(LOG2,
-							       "PRIVMSG flood from %s!%s@%s (%s ignore)",
-							       lptr->nick,
-							       lptr->username,
-							       lptr->hostname,
-							       timeago(IgnoreTime, 2));
+								   "PRIVMSG flood from %s!%s@%s (%s ignore)",
+								   lptr->nick,
+								   lptr->username,
+								   lptr->hostname,
+								   timeago(IgnoreTime, 2));
 
 							SendUmode(OPERUMODE_Y,
-							          "*** Detected flood from %s!%s@%s (%s ignore)",
-							          lptr->nick,
-							          lptr->username,
-							          lptr->hostname,
-							          timeago(IgnoreTime, 2));
+									  "*** Detected flood from %s!%s@%s (%s ignore)",
+									  lptr->nick,
+									  lptr->username,
+									  lptr->hostname,
+									  timeago(IgnoreTime, 2));
 						}
 
 						MyFree(mask);
@@ -1326,8 +1340,8 @@ s_privmsg(int ac, char **av)
 	if (proceedpub) /* let's check did we match some pub command or not /
 					   CoolCold / */
 	{
-    	/* now create common part of all public commands */
-       	struct Channel *chptr;
+		/* now create common part of all public commands */
+		struct Channel *chptr;
 		char **tmpargv = NULL;
 		char *pubcommand;
 		int acnt, i;
@@ -1335,7 +1349,7 @@ s_privmsg(int ac, char **av)
 
 		if (!(chptr = FindChannel(av[2])))
 			return;
-        		
+				
 		pubcommand = MyStrdup(command + 1);
 		acnt = SplitBuf(pubcommand, &tmpargv);
 
@@ -1388,7 +1402,7 @@ s_privmsg(int ac, char **av)
 		MyFree(pubcommand);
 
 		return;
-    }
+	}
 #endif
 	
 	if (SecureMessaging && !issecured)
@@ -1501,8 +1515,8 @@ s_squit(int ac, char **av)
 #ifdef EXTRA_SPLIT_INFO
 			/* This could spawn too much messages -kre */
 			SendUmode(OPERUMODE_L,
-			          "*** Netsplit: %s (hub: %s)", tmpserv->name,
-			          tmpserv->uplink ? tmpserv->uplink->name : "*unknown*");
+					  "*** Netsplit: %s (hub: %s)", tmpserv->name,
+					  tmpserv->uplink ? tmpserv->uplink->name : "*unknown*");
 #endif
 
 			tmpserv->uplink = NULL;
@@ -1542,8 +1556,8 @@ s_quit(int ac, char **av)
 	if (!lptr)
 	{
 		putlog(LOG1,
-		       "DEBUG: s_quit(): Unable to locate client [%s]",
-		       av[0] + 1);
+			   "DEBUG: s_quit(): Unable to locate client [%s]",
+			   av[0] + 1);
 		return;
 	}
 
@@ -1564,7 +1578,7 @@ s_quit(int ac, char **av)
 
 #ifdef SEENSERVICES
 	es_add(lptr->nick, lptr->username, lptr->hostname, av[2] + 1,
-	       current_ts, 1);
+		   current_ts, 1);
 #endif /* SEENSERVICES */
 
 #ifdef ADVFLOOD
@@ -1617,20 +1631,20 @@ s_kill(int ac, char **av)
 	if (lptr)
 {
 		SendUmode(OPERUMODE_CAPO,
-		          "*** Operator Kill: [%s] by %s!%s@%s (%s)",
-		          av[2],
-		          lptr->nick,
-		          lptr->username,
-		          lptr->hostname,
-		          av[3] + 1);
+				  "*** Operator Kill: [%s] by %s!%s@%s (%s)",
+				  av[2],
+				  lptr->nick,
+				  lptr->username,
+				  lptr->hostname,
+				  av[3] + 1);
 	}
 	else
 	{
 		SendUmode(OPERUMODE_CAPS,
-		          "*** Server Kill: [%s] by %s (%s)",
-		          av[2],
-		          who,
-		          av[3] + 1);
+				  "*** Server Kill: [%s] by %s (%s)",
+				  av[2],
+				  who,
+				  av[3] + 1);
 	}
 
 	if (match("*.*", who))
@@ -1682,7 +1696,7 @@ s_kill(int ac, char **av)
 		if (lptr)
 		{
 			putlog(LOG1, "%s was killed by %s!%s@%s, re-initializing", av[2],
-			       lptr->nick, lptr->username, lptr->hostname);
+				   lptr->nick, lptr->username, lptr->hostname);
 
 #ifdef SERVICES_FIGHT_FIX
 
@@ -1693,11 +1707,11 @@ s_kill(int ac, char **av)
 		else
 		{
 			putlog(LOG1,
-			       "%s was killed by %s (nick collide), re-initializing",
-			       av[2], who);
+				   "%s was killed by %s (nick collide), re-initializing",
+				   av[2], who);
 
 			toserv(":%s KILL %s :%s\r\n", Me.name, av[2],
-			       "Attempt to Nick Collide Services");
+				   "Attempt to Nick Collide Services");
 
 			if (Me.sptr)
 				++Me.sptr->numservkills;
@@ -1786,36 +1800,36 @@ s_kick(int ac, char **av)
 	if (lptr)
 {
 		putlog(LOG3, "%s: %s!%s@%s kicked %s [%s]",
-		       av[2],
-		       lptr->nick,
-		       lptr->username,
-		       lptr->hostname,
-		       av[3],
-		       av[4] + 1);
+			   av[2],
+			   lptr->nick,
+			   lptr->username,
+			   lptr->hostname,
+			   av[3],
+			   av[4] + 1);
 
 		SendUmode(OPERUMODE_K,
-		          "*** %s: Kick [%s] by %s!%s@%s (%s)",
-		          av[2],
-		          av[3],
-		          lptr->nick,
-		          lptr->username,
-		          lptr->hostname,
-		          av[4] + 1);
+				  "*** %s: Kick [%s] by %s!%s@%s (%s)",
+				  av[2],
+				  av[3],
+				  lptr->nick,
+				  lptr->username,
+				  lptr->hostname,
+				  av[4] + 1);
 	}
 	else
 	{
 		putlog(LOG3, "%s: %s kicked %s [%s]",
-		       av[2],
-		       who,
-		       av[3],
-		       av[4] + 1);
+			   av[2],
+			   who,
+			   av[3],
+			   av[4] + 1);
 
 		SendUmode(OPERUMODE_K,
-		          "*** %s: Kick [%s] by %s (%s)",
-		          av[2],
-		          av[3],
-		          who,
-		          av[4] + 1);
+				  "*** %s: Kick [%s] by %s (%s)",
+				  av[2],
+				  av[3],
+				  who,
+				  av[4] + 1);
 	}
 } /* s_kick() */
 
@@ -1915,7 +1929,7 @@ s_sjoin(int ac, char **av)
 
 		/* kludge for older ircds that don't use SJOIN */
 		ircsprintf(sendstr, ":%s SJOIN %ld %s + :%s",
-		           currenthub->realname, (long) current_ts, chan, av[0]);
+				   currenthub->realname, (long) current_ts, chan, av[0]);
 
 		SplitBuf(sendstr, &line);
 		SplitBuf(av[0], &nicks);
@@ -1943,7 +1957,7 @@ s_sjoin(int ac, char **av)
 		if (cptr)
 		{
 			if ((ci = FindChan(chan)) && !IsChannelMember(cptr, Me.csptr) &&
-			        !(ci->flags & CS_FORGET))
+					!(ci->flags & CS_FORGET))
 				cs_join(ci);
 		}
 
@@ -2029,15 +2043,15 @@ s_sjoin(int ac, char **av)
 			 * It is a new channel - notify all +j users
 			 */
 			SendUmode(OPERUMODE_J,
-			          "*** New channel: %s (created by %s)",
-			          av[3],
-			          oldnick);
+					  "*** New channel: %s (created by %s)",
+					  av[3],
+					  oldnick);
 		} /* if (!oldptr) */
 		else
 			SendUmode(OPERUMODE_J,
-			          "*** Channel join: %s (%s)",
-			          oldnick,
-			          oldptr->name);
+					  "*** Channel join: %s (%s)",
+					  oldnick,
+					  oldptr->name);
 	}
 
 	cptr = AddChannel(av, ncnt, nicks);
@@ -2183,11 +2197,11 @@ s_sjoin(int ac, char **av)
 #else
 
 				toserv(":%s MODE %s +o %s\r\n",
-				       Me.name, cptr->name, n_OperServ);
+					   Me.name, cptr->name, n_OperServ);
 #endif
 
 				putlog(LOG2, "%s: %s attempted to deop %s", cptr->name,
-				       av[0] + 1, n_OperServ);
+					   av[0] + 1, n_OperServ);
 			}
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
@@ -2200,13 +2214,13 @@ s_sjoin(int ac, char **av)
 #else
 
 				toserv(":%s MODE %s +o %s\r\n",
-				       Me.name, cptr->name, n_ChanServ);
+					   Me.name, cptr->name, n_ChanServ);
 #endif
 
 				putlog(LOG2, "%s: %s attempted to deop %s",
-				       cptr->name,
-				       av[0] + 1,
-				       n_ChanServ);
+					   cptr->name,
+					   av[0] + 1,
+					   n_ChanServ);
 			}
 #endif
 
@@ -2341,30 +2355,30 @@ s_whois(int ac, char **av)
 		return;
 
 	SendUmode(OPERUMODE_Y,
-	          "*** Remote whois [%s] requested by %s",
-	          serviceptr->nick,
-	          who);
+			  "*** Remote whois [%s] requested by %s",
+			  serviceptr->nick,
+			  who);
 
 	isoper = strchr(ServiceUmodes, 'o');
 
 	toserv(":%s 311 %s %s %s %s * :%s\r\n",
-	       Me.name, who, serviceptr->nick, serviceptr->username, Me.name,
-	       serviceptr->realname);
+		   Me.name, who, serviceptr->nick, serviceptr->username, Me.name,
+		   serviceptr->realname);
 
 	toserv(":%s 312 %s %s %s :%s\r\n",
-	       Me.name, who, serviceptr->nick, Me.name, Me.info);
+		   Me.name, who, serviceptr->nick, Me.name, Me.info);
 
 	if (isoper)
 	{
 		toserv(":%s 313 %s %s :is Network Service daemon\r\n",
-		       Me.name, who, serviceptr->nick);
+			   Me.name, who, serviceptr->nick);
 	}
 
 	toserv(":%s 317 %s %s 0 %ld :seconds idle, signon time\r\n",
-	       Me.name, who, serviceptr->nick, TimeStarted);
+		   Me.name, who, serviceptr->nick, TimeStarted);
 
 	toserv(":%s 318 %s %s :End of /WHOIS list.\r\n",
-	       Me.name, who, serviceptr->nick);
+		   Me.name, who, serviceptr->nick);
 } /* s_whois() */
 
 /*
@@ -2397,34 +2411,34 @@ s_trace(int ac, char **av)
 		who = av[0];
 
 	SendUmode(OPERUMODE_Y,
-	          "*** Remote trace query requested by %s",
-	          who);
+			  "*** Remote trace query requested by %s",
+			  who);
 
 	for (sptr = ServiceBots; sptr->name; ++sptr)
 	{
 		toserv(":%s %d %s %s %d :%s[%s@%s]\r\n",
-		       Me.name,
-		       isoper ? 204 : 205,
-		       who,
-		       isoper ? "Oper" : "User",
-		       isoper ? 5 : 1,
-		       *(sptr->name),
-		       *(sptr->ident),
-		       Me.name);
+			   Me.name,
+			   isoper ? 204 : 205,
+			   who,
+			   isoper ? "Oper" : "User",
+			   isoper ? 5 : 1,
+			   *(sptr->name),
+			   *(sptr->ident),
+			   Me.name);
 	}
 
 	toserv(":%s 206 %s Serv 10 %1.0fS %1.0fC %s :AutoConn.!*@%s\r\n",
-	       Me.name,
-	       who,
-	       Network->TotalServers,
-	       Network->TotalUsers,
-	       currenthub->realname ? currenthub->realname : currenthub->hostname,
-	       Me.name);
+		   Me.name,
+		   who,
+		   Network->TotalServers,
+		   Network->TotalUsers,
+		   currenthub->realname ? currenthub->realname : currenthub->hostname,
+		   Me.name);
 
 	toserv(":%s 262 %s %s :End of TRACE\r\n",
-	       Me.name,
-	       who,
-	       Me.name);
+		   Me.name,
+		   who,
+		   Me.name);
 } /* s_trace() */
 
 /*
@@ -2454,11 +2468,11 @@ s_version(int ac, char **av)
 		who = av[0];
 
 	SendUmode(OPERUMODE_Y,
-	          "*** Remote version query requested by %s",
-	          who);
+			  "*** Remote version query requested by %s",
+			  who);
 
 	toserv(":%s 351 %s Hybserv2-%s. %s :TS3\r\n",
-	       Me.name, who, hVersion, Me.name);
+		   Me.name, who, hVersion, Me.name);
 } /* s_version() */
 
 /*
@@ -2491,21 +2505,21 @@ s_motd(int ac, char **av)
 		who = av[0];
 
 	SendUmode(OPERUMODE_Y,
-	          "*** Remote motd query requested by %s",
-	          who);
+			  "*** Remote motd query requested by %s",
+			  who);
 
 	if (!(fp = fopen(MotdFile, "r")))
 	{
 		toserv(":%s 422 %s :MOTD File is missing\r\n",
-		       Me.name,
-		       who);
+			   Me.name,
+			   who);
 		return;
 	}
 
 	toserv(":%s 375 %s :- %s Message of the Day -\r\n",
-	       Me.name,
-	       who,
-	       Me.name);
+		   Me.name,
+		   who,
+		   Me.name);
 
 	while (fgets(line, sizeof(line), fp))
 	{
@@ -2554,10 +2568,10 @@ s_topic(int ac, char **av)
 		return;
 
 	SendUmode(OPERUMODE_T,
-	          "*** %s: Topic by %s (%s)",
-	          av[2],
-	          av[0] + 1,
-	          av[3] + 1);
+			  "*** %s: Topic by %s (%s)",
+			  av[2],
+			  av[0] + 1,
+			  av[3] + 1);
 
 	cs_CheckTopic(av[0] + 1, av[2]);
 } /* s_topic() */
@@ -2660,12 +2674,12 @@ s_pong(int ac, char **av)
 			if (HubCount > 1)
 			{
 				SendUmode(OPERUMODE_Y,
-				          "*** Ping response time from hub (%s) has exceeded [%s], rerouting",
-				          servptr->name,
-				          timeago(MaxPing, 3));
+						  "*** Ping response time from hub (%s) has exceeded [%s], rerouting",
+						  servptr->name,
+						  timeago(MaxPing, 3));
 
 				toserv(":%s ERROR :Rerouting (lag: %5.4f seconds)\r\n",
-				       Me.name, servptr->ping);
+					   Me.name, servptr->ping);
 				toserv(":%s QUIT\r\n", Me.name);
 
 				close(HubSock);

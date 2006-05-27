@@ -120,7 +120,6 @@ ReloadData()
 						newnick->collide_ts = temp->collide_ts;
 
 #ifdef RECORD_SPLIT_TS
-
 						newnick->split_ts = temp->split_ts;
 						newnick->whensplit = temp->whensplit;
 #endif /* RECORD_SPLIT_TS */
@@ -537,12 +536,14 @@ WriteOpers()
 	for (tempuser = UserList; tempuser; tempuser = tempuser->next)
 	{
 		fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
-#ifdef RECORD_RESTART_TS
 
+#ifdef RECORD_RESTART_TS
 		if (tempuser->nick_ts)
 			fprintf(fp, "->TS %lu\n", tempuser->nick_ts);
 		if (tempuser->last_nick)
 			fprintf(fp, "->LASTNICK %s\n", tempuser->last_nick);
+		if (tempuser->last_server)
+			fprintf(fp, "->LASTSERVER %s\n", tempuser->last_server);
 #endif
 
 	}
@@ -746,9 +747,10 @@ WriteNicks()
 				fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
 #ifdef RECORD_RESTART_TS
-
 			if (nptr->nick_ts)
 				fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+			if (nptr->last_server)
+                fprintf(fp, "->LASTSERVER %s\n", nptr->last_server);
 #endif
 
 		} /* for (nptr = nicklist[ii]; nptr; nptr = nptr->next) */
@@ -842,6 +844,8 @@ WriteNicks()
 #ifdef RECORD_RESTART_TS
 			if (nptr->nick_ts)
 				fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+			if (nptr->last_server)
+				fprintf(fp, "->LASTSERVER %s\n", nptr->last_server);
 #endif
 
 #ifdef LINKED_NICKNAMES

@@ -29,6 +29,7 @@
 #include "nickserv.h"
 #include "operserv.h"
 #include "settings.h"
+#include "server.h"
 #include "sock.h"
 #include "timestr.h"
 #include "sprintf_irc.h"
@@ -612,6 +613,18 @@ ns_loaddata()
 						ret = -1;
 				}
 			}
+			else if (!ircncmp(keyword, "LASTSERVER", 10))
+			{
+				if (!nptr->last_server)
+					nptr->last_server = MyStrdup(av[1]);
+				else
+				{
+					fatal(1, "%s:%d NickServ entry for [%s] has multiple LASTSERVER lines (using first)",
+					      NickServDB, cnt, nptr->nick);
+					if (ret > 0)
+						ret = -1;
+				}
+			}
 #endif /* RECORD_RESTART_TS */
 
 		} /* if (!ircncmp("->", keyword, 2)) */
@@ -1059,6 +1072,7 @@ DeleteNick(struct NickInfo *nickptr)
 	MyFree(nickptr->nick);
 	MyFree(nickptr->password);
 	MyFree(nickptr->phrase);
+    MyFree(nickptr->last_server);
 
 	while (nickptr->hosts != NULL)
 	{
@@ -2418,6 +2432,8 @@ n_identify(struct Luser *lptr, int ac, char **av)
 #ifdef RECORD_RESTART_TS
 	/* identify only linked, not his master */
 	realptr->nick_ts = lptr->nick_ts;
+	MyFree(realptr->last_server);
+	realptr->last_server = MyStrdup(lptr->server->name);
 #endif
 
 } /* n_identify() */

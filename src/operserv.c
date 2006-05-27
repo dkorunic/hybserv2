@@ -1158,10 +1158,11 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 		                "IDENTIFY");
 
 #ifdef RECORD_RESTART_TS
-
 		uptr->nick_ts = lptr->nick_ts;
 		MyFree(uptr->last_nick);
 		uptr->last_nick = MyStrdup(lptr->nick);
+		MyFree(uptr->last_server);
+		uptr->last_server = MyStrdup(lptr->server->name);
 #endif
 
 		CheckOper(lptr);

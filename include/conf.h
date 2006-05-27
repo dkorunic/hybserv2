@@ -122,6 +122,7 @@ struct Userlist
 	 * they won't have to reidentify */
 	time_t nick_ts;
 	char *last_nick;
+    char *last_server;
 #endif
 };
 

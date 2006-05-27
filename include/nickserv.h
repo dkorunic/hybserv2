@@ -108,6 +108,7 @@ struct NickInfo
 	/* Record TS of nicks so that when services are restarted
 	 * they won't have to reidentify */
 	time_t nick_ts;
+    char *last_server;
 #endif
 
 #ifdef LINKED_NICKNAMES

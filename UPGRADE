@@ -2,10 +2,11 @@ $Id$
 
 These are upgrade facts on different Hybserv versions.
 
-1.9.2 ->
--------------
+1.9.2 -> 1.9.3
+--------------
 * New NotifyOpers directive in settings.conf
 * New SecureMessaging directive in settings.conf
+* Removed RECORD_SPLIT_TS from config.h. It is useless now.
 
 1.9.1 -> 1.9.2
 --------------

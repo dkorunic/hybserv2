@@ -26,7 +26,7 @@ extern char *crypt_md5(const char *, const char *);
 char *make_des_salt(void);
 char *make_md5_salt(int);
 char *make_md5_salt_para(char *);
-void usage();
+void usage(void);
 static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
 int main(int argc, char *argv[])

@@ -533,7 +533,7 @@ WriteOpers()
 
 #ifdef RECORD_RESTART_TS
 		if (tempuser->nick_ts)
-			fprintf(fp, "->TS %lu\n", tempuser->nick_ts);
+			fprintf(fp, "->TS %li\n", tempuser->nick_ts);
 		if (tempuser->last_nick)
 			fprintf(fp, "->LASTNICK %s\n", tempuser->last_nick);
 		if (tempuser->last_server)
@@ -742,7 +742,7 @@ WriteNicks()
 
 #ifdef RECORD_RESTART_TS
 			if (nptr->nick_ts)
-				fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+				fprintf(fp, "->TS %li\n", nptr->nick_ts);
 			if (nptr->last_server)
                 fprintf(fp, "->LASTSERVER %s\n", nptr->last_server);
 #endif
@@ -837,7 +837,7 @@ WriteNicks()
 
 #ifdef RECORD_RESTART_TS
 			if (nptr->nick_ts)
-				fprintf(fp, "->TS %lu\n", nptr->nick_ts);
+				fprintf(fp, "->TS %li\n", nptr->nick_ts);
 			if (nptr->last_server)
 				fprintf(fp, "->LASTSERVER %s\n", nptr->last_server);
 #endif

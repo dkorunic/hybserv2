@@ -7686,7 +7686,6 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 {
 	struct ChanInfo *cptr = NULL;
-	struct Channel *chptr = NULL;
 	char sendstr[MAXLINE + 1];
 
 	if (ac < 2)

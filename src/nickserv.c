@@ -4254,8 +4254,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 		return;
 	}
 
-	if ((userptr = FindClient(realptr->nick))
-	   )
+	if ((userptr = FindClient(realptr->nick)))
 		if (realptr->flags & NS_IDENTIFIED)
 			online = 1;
 

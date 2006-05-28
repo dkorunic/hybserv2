@@ -1467,9 +1467,11 @@ collide(char *nick, int dopseudo)
 	int j;
 #endif
 
-#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
+#if !(defined SVSNICK || defined FORCENICK)
 	char **av;
 	char sendstr[MAXLINE + 1];
+#endif
+#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
 	struct NickInfo *nptr = NULL;
 #endif
 
@@ -1482,7 +1484,6 @@ collide(char *nick, int dopseudo)
 #if defined SVSNICK || defined FORCENICK
 
 #if defined FALLBACK_TO_KILL
-
 	if (!(lptr->flags & UMODE_NOFORCENICK))
 	{
 		lptr->flags |= UMODE_NOFORCENICK;

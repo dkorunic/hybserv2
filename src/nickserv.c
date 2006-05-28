@@ -328,7 +328,7 @@ ns_loaddata()
 	char *keyword;
 	int ac, ret = 1, cnt;
 	int islink;
-	struct NickInfo *nptr = NULL, *realptr;
+	struct NickInfo *nptr = NULL;
 
 	if (!(fp = fopen(NickServDB, "r")))
 	{
@@ -728,8 +728,6 @@ ns_loaddata()
 	 */
 	if (nptr)
 	{
-		realptr = GetMaster(nptr);
-
 		if ((nptr->password) || (nptr->flags & NS_FORBID))
 		{
 			if (!nptr->hosts && !(nptr->flags & NS_FORBID) && !islink)
@@ -4192,7 +4190,6 @@ n_info(struct Luser *lptr, int ac, char **av)
 
 {
 	struct NickInfo *nptr, *realptr, *tmpnick;
-	struct Luser *userptr;
 	int online = 0, isadmin = 0, isowner = 0;
 
 	/* find about nick who issued the request */
@@ -4254,7 +4251,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 		return;
 	}
 
-	if ((userptr = FindClient(realptr->nick)))
+	if (FindClient(realptr->nick))
 		if (realptr->flags & NS_IDENTIFIED)
 			online = 1;
 
@@ -4457,8 +4454,7 @@ n_link(struct Luser *lptr, int ac, char **av)
 
 {
 	struct NickInfo *target, /* target nickname */
-				*nptr, /* lptr's nick structure */
-				*realptr;
+				*nptr; /* lptr's nick structure */
 	int badlink,
 	ret;
 
@@ -4471,7 +4467,6 @@ n_link(struct Luser *lptr, int ac, char **av)
 	}
 
 	target = FindNick(av[1]);
-	realptr = GetMaster(target);
 
 	if (target == NULL)
 	{

@@ -1462,11 +1462,10 @@ long korectdat( long dat1, int dni)
 	int g, m, d;
 	long olddays, newdays, days;
 	int *tg;
-	short lhwb, lhwz;
+	short lhwb;
 	int i, days_in_year;
 
-	lhwb=365;
-	lhwz=365;
+	lhwb = 365;
 	g = dat1 / 10000;
 	if ( g <= 99 )
 		g += 1900;

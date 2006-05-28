@@ -312,7 +312,7 @@ void cs_process(char *nick, char *command)
 	char **arv;
 	struct Command *cptr;
 	struct Luser *lptr;
-	struct NickInfo *nptr, *realptr;
+	struct NickInfo *nptr;
 	struct ChanInfo *chptr;
 
 	if (!command || !(lptr = FindClient(nick)))
@@ -345,7 +345,6 @@ void cs_process(char *nick, char *command)
 	}
 
 	nptr = FindNick(lptr->nick);
-	realptr = GetMaster(nptr);
 
 	if ((nptr == NULL) &&
 	        (cptr->level != LVL_NONE))
@@ -7750,7 +7749,7 @@ c_forbid(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		AddChan(cptr);
 	}
 
-	if ((chptr = FindChannel(av[1])))
+	if (FindChannel(av[1]))
 	{
 		/* There are people in the channel - must kick them out */
 		cs_join(cptr);

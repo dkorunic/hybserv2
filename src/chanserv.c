@@ -5833,6 +5833,14 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 #endif /* DANCER */
 	}
 
+	if (!strlen(modes))
+	{
+		notice(n_ChanServ, lptr->nick,
+			"No valid modes in [\002%s\002], sorry",
+			av[3]);
+		return;
+	}
+
 	if ((chptr = FindChannel(cptr->name)))
 	{
 		toserv(":%s MODE %s %s %s\r\n",

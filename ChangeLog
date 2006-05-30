@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #103: MLOCK + causes services to split
   - fix #93: when expiring channels check if any members idle there and
     what is their access
   - fix #94: when channel is CS_RESTRICTED it is enough to have CA_CMDOP

@@ -7,9 +7,10 @@ $Id$
 
 Hybserv-HEAD
 
+  * fix for #105, log the New Max *** counters [Brian, again :)]
   + fix for #106, don't open logfile for each entry - now we open and
-    close logs only when needed
-  - fix docs to close #94 again
+    close logs only when needed [thanks Brian Brazil]
+  - fix docs to close #94 again [thanks Brian Brazil]
   + be more paranoid on NICK, non-netsplit QUIT - mark old nicknames as
     unusable for RECORD_RESTART_TS [suggestion from Brian Brazil]
   - fix #103: MLOCK + causes services to split

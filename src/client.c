@@ -139,6 +139,8 @@ UpdateUserModes(struct Luser *user, char *modes)
 						SendUmode(OPERUMODE_Y,
 						          "*** New Max Operator Count: %ld",
 						          Network->MaxOperators);
+						putlog(LOG2, "New Max Operator Count: %ld",
+								Network->MaxOperators);
 					}
 				}
 				if (Network->TotalOperators > Network->MaxOperatorsT)
@@ -335,6 +337,8 @@ struct Luser *
 						SendUmode(OPERUMODE_Y,
 						          "*** New Max Operator Count: %ld",
 						          Network->MaxOperators);
+						putlog(LOG2, "New Max Operator Count: %ld",
+								Network->MaxOperators);
 					}
 				}
 				if (Network->TotalOperators > Network->MaxOperatorsT)
@@ -424,6 +428,8 @@ struct Luser *
 			SendUmode(OPERUMODE_Y,
 			          "*** New Max Client Count: %ld",
 			          Network->MaxUsers);
+			putlog(LOG2, "New Max Client Count: %ld",
+					Network->MaxUsers);
 		}
 	}
 	if (Network->TotalUsers > Network->MaxUsersT)

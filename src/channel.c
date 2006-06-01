@@ -411,6 +411,8 @@ struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
 				/* notify +y people about new max channel count */
 				SendUmode(OPERUMODE_Y, "*** New Max Channel Count: %ld",
 				          Network->MaxChannels);
+				putlog(LOG2, "New Max Channel Count: %ld",
+						Network->MaxChannels);
 			}
 		}
 		if (Network->TotalChannels > Network->MaxChannelsT)

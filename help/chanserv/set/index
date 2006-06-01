@@ -20,6 +20,7 @@ Available options:
     MLOCK       Lock channel modes on or off
     PASSWORD    Set the founder password (founder)
     PRIVATE     Hide channel from ChanServ lists
+    PUBCOMMANDS Allow public commands in channel
     RESTRICTED  Restricts access to channel
     SECURE      Activate ChanServ security features
     SECUREOPS   Stricter control of chanop status

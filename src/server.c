@@ -1164,34 +1164,34 @@ s_privmsg(int ac, char **av)
  CoolCold /
 */
 #ifdef PUBCOMMANDS
-		/* match, then flood check, then proceed */
-			if (!serviceptr)
-			{
+	/* match, then flood check, then proceed */
+	if (!serviceptr)
+	{
 #ifdef CHANNELSERVICES
-				if (match("!OP*", command))
-				{
-					proceedpub = CS_PUB_OP;
-				}
-				else if (match("!DEOP*", command)) 
-				{
-					proceedpub = CS_PUB_DEOP;
-				}
-				else
+		if (match("!OP*", command))
+		{
+			proceedpub = CS_PUB_OP;
+		}
+		else if (match("!DEOP*", command)) 
+		{
+			proceedpub = CS_PUB_DEOP;
+		}
+		else
 #ifdef SEENSERVICES
-				if (match("!SEENNICK *", command))
-				{
-					proceedpub = SS_PUB_SEENNICK;
-				}
-				else if (match("!SEEN *", command))
-				{
-					proceedpub = SS_PUB_SEEN;
-				}
+		if (match("!SEENNICK *", command))
+		{
+			proceedpub = SS_PUB_SEENNICK;
+		}
+		else if (match("!SEEN *", command))
+		{
+			proceedpub = SS_PUB_SEEN;
+		}
 #else
-				{}
+		{
+		}
 #endif
-			}
+	}
 #endif
-
 #endif
 
 #ifdef PUBCOMMANDS
@@ -1320,6 +1320,7 @@ s_privmsg(int ac, char **av)
 	{
 		/* now create common part of all public commands */
 		struct Channel *chptr;
+		struct ChanInfo *ci = NULL;
 		char **tmpargv = NULL;
 		char *pubcommand;
 		int acnt, i;
@@ -1327,13 +1328,19 @@ s_privmsg(int ac, char **av)
 
 		if (!(chptr = FindChannel(av[2])))
 			return;
-				
+
+		if (!((ci = FindChan(chptr->name)) && (ci->flags & CS_PUBCOMMANDS)))
+			return;
+
 		pubcommand = MyStrdup(command + 1);
 		acnt = SplitBuf(pubcommand, &tmpargv);
 
 		switch (proceedpub)
 		{
 			case CS_PUB_OP:
+				if (!IsChannelMember(chptr, Me.csptr))
+					return;
+				
 				if (acnt > 1)
 				{
 					ircsprintf(tmpcommand, "OP %s", chptr->name);
@@ -1352,6 +1359,9 @@ s_privmsg(int ac, char **av)
 				break;
 
 			case CS_PUB_DEOP:
+				if (!IsChannelMember(chptr, Me.csptr))
+					return;
+				
 				if (acnt > 1)
 				{
 					ircsprintf(tmpcommand, "OP %s", chptr->name);
@@ -1371,6 +1381,9 @@ s_privmsg(int ac, char **av)
 
 			case SS_PUB_SEEN:
 			case SS_PUB_SEENNICK:
+				if (!IsChannelMember(chptr, Me.esptr))
+					return;
+				
 				strncpy(tmpcommand, command + 1, sizeof(tmpcommand));
 				es_process(who, tmpcommand);
 				break;

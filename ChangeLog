@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  + add PUBCOMMANDS enhancements from Ilian Jovchev
   * fix for #105, log the New Max *** counters [Brian, again :)]
   + fix for #106, don't open logfile for each entry - now we open and
     close logs only when needed [thanks Brian Brazil]

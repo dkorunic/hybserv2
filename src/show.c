@@ -557,6 +557,10 @@ DisplayChan(struct ChanInfo *chanptr, int detail)
 		if ((chanptr->flags & CS_EXPIREBANS) && BanExpire)
 			strlcat(buf, "Expirebans, ", sizeof(buf));
 #endif
+#ifdef PUBCOMMANDS
+		if (chanptr->flags & CS_PUBCOMMANDS)
+			strlcat(buf, "PubCommands, ", sizeof(buf));
+#endif
 
 		if (*buf)
 		{

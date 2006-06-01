@@ -123,6 +123,9 @@ static void c_set_email(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_url(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_expirebans(struct Luser *, struct NickInfo *, int, char **);
 static void c_set_comment(struct Luser *, struct NickInfo *, int, char **);
+#ifdef PUBCOMMANDS
+static void c_set_pubcommands(struct Luser *, struct NickInfo *, int, char **);
+#endif
 
 static void c_modes(struct Luser *, struct NickInfo *, int, char **);
 static void c_cycle(struct Luser *, struct NickInfo *, int, char **);
@@ -248,6 +251,9 @@ static struct Command setcmds[] =
 	    { "URL", c_set_url, LVL_NONE },
 	    { "WEBSITE", c_set_url, LVL_NONE },
 	    { "EXPIREBANS", c_set_expirebans, LVL_NONE },
+#ifdef PUBCOMMANDS
+	    { "PUBCOMMANDS", c_set_pubcommands, LVL_NONE },
+#endif
 	    { "COMMENT", c_set_comment, LVL_NONE },
 	    { 0, 0, 0 }
     };
@@ -6151,6 +6157,61 @@ c_set_comment(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	       cptr->comment);
 } /* c_set_comment() */
 
+#ifdef PUBCOMMANDS
+static void
+c_set_pubcommands(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
+
+{
+	struct ChanInfo *cptr;
+
+	if (!(cptr = FindChan(av[1])))
+		return;
+
+	RecordCommand("%s: %s!%s@%s SET [%s] PUBCOMMANDS %s",
+	              n_ChanServ,
+	              lptr->nick,
+	              lptr->username,
+	              lptr->hostname,
+	              cptr->name,
+	              (ac < 4) ? "" : StrToupper(av[3]));
+
+	if (ac < 4)
+	{
+		notice(n_ChanServ, lptr->nick,
+		       "PubCommands for channel %s is [\002%s\002]",
+		       cptr->name,
+		       (cptr->flags & CS_PUBCOMMANDS) ? "ON" : "OFF");
+		return;
+	}
+
+	if (!irccmp(av[3], "ON"))
+	{
+		cptr->flags |= CS_PUBCOMMANDS;
+		notice(n_ChanServ, lptr->nick,
+		       "Toggled PubCommands for channel %s [\002ON\002]",
+		       cptr->name);
+		return;
+	}
+
+	if (!irccmp(av[3], "OFF"))
+	{
+		cptr->flags &= ~CS_PUBCOMMANDS;
+		notice(n_ChanServ, lptr->nick,
+		       "Toggled PubCommands for channel %s [\002OFF\002]",
+		       cptr->name);
+		return;
+	}
+
+	/* user gave an unknown param */
+	notice(n_ChanServ, lptr->nick,
+	       "Syntax: \002SET <channel> PUBCOMMANDS {ON|OFF}\002");
+	notice(n_ChanServ, lptr->nick,
+	       ERR_MORE_INFO,
+	       n_ChanServ,
+	       "SET PUBCOMMANDS");
+} /* c_set_pubcommands() */
+#endif
+
 /*
  * c_modes()
  * shows all modes for a chan, including the key. lvl needed cmd_invite
@@ -7176,6 +7237,10 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 		strlcat(buf, "Verbose, ", sizeof(buf));
 	if ((cptr->flags & CS_EXPIREBANS) && BanExpire)
 		strlcat(buf, "Expirebans, ", sizeof(buf));
+#ifdef PUBCOMMANDS
+	if (cptr->flags & CS_PUBCOMMANDS)
+		strlcat(buf, "PubCommands, ", sizeof(buf));
+#endif
 
 	if (*buf)
 	{

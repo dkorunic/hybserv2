@@ -1,0 +1,4 @@
+Syntax: %bSET <channel> PUBCOMMANDS {ON|OFF}%b
+
+When PUBCOMMANDS is enabled, users can execute
+public commands in the channel.

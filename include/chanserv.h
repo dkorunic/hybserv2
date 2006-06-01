@@ -30,6 +30,9 @@
 #define CS_VERBOSE      0x00001000 /* notify chanops for access changes */
 #define CS_EXPIREBANS   0x00002000 /* expire bans after EXPIRETIME */
 #define CS_SEENSERV     0x00004000 /* channel is served by SeenServ */
+#ifdef PUBCOMMANDS
+# define CS_PUBCOMMANDS 0x01000000 /* allow public commands in channel */
+#endif
 
 /* access_lvl[] indices */
 #if defined HYBRID7 && defined HYBRID7_HALFOPS

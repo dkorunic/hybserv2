@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix docs to close #94 again
   + be more paranoid on NICK, non-netsplit QUIT - mark old nicknames as
     unusable for RECORD_RESTART_TS [suggestion from Brian Brazil]
   - fix #103: MLOCK + causes services to split

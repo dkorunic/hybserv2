@@ -20,5 +20,7 @@
 void putlog(int, char *, ...);
 void RecordCommand(char *, ...);
 void CheckLogs(time_t);
+int OpenLogFile(void);
+void CloseLogFile(void);
 
 #endif /* INCLUDED_log_h */

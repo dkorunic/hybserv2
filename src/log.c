@@ -23,6 +23,55 @@
 #include "mystring.h"
 #include "alloc.h"
 
+FILE *logfp = NULL;
+
+int OpenLogFile(void)
+{
+	/* check if log is already open */
+	if (logfp == NULL)
+	{
+		char LogFileName[MAXLINE + 1];
+
+		/* generate a proper name */
+		if (LogFile == NULL)
+			LogFile = MyStrdup("hybserv.log");
+
+		if (LogPath == NULL)
+			LogPath = MyStrdup(".");
+
+		ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
+
+		if ((logfp = fopen(LogFileName, "a+")) == NULL)
+		{
+#ifdef DEBUGMODE
+			printf("Unable to open log file: %s\n", LogFile);
+#endif
+			return 0;
+		}
+		else
+		{
+			/* set line buffering */
+			setvbuf(logfp, NULL, _IOLBF, 0);
+
+			putlog(LOG1, "Opened log file successfully");
+		}
+	}
+
+	return 1;
+}
+
+void CloseLogFile(void)
+{
+	if (logfp != NULL)
+	{
+		putlog(LOG1, "Closing log file");
+		fclose(logfp);
+		logfp = NULL;
+	}
+
+	return;
+}
+
 /*
 putlog()
   args: int level, char *fmt, va_alist
@@ -34,10 +83,8 @@ void
 putlog(int level, char *format, ...)
 
 {
-	FILE *fp;
 	time_t CurrTime;
 	char buf[MAXLINE + 1];
-	char LogFileName[MAXLINE + 1];
 	va_list args;
 
 	/*
@@ -48,21 +95,10 @@ putlog(int level, char *format, ...)
 	if ((LogLevel == 0) || (LogLevel < level))
 		return;
 
-	if (LogFile == NULL)
-		LogFile = MyStrdup("hybserv.log");
-
-	if (LogPath == NULL)
-		LogPath = MyStrdup(".");
-
-	ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
-
-	if ((fp = fopen(LogFileName, "a+")) == NULL)
+	if (logfp == NULL)
 	{
-#ifdef DEBUGMODE
-		printf("Unable to open log file: %s\n", LogFile);
-#endif
-
-		return;
+		if (!OpenLogFile())
+			return;
 	}
 
 	CurrTime = current_ts;
@@ -74,22 +110,19 @@ putlog(int level, char *format, ...)
 	 */
 	buf[strlen(buf) - 1] = ' ';
 
-	fprintf(fp, "%s", buf);
+	fprintf(logfp, "%s", buf);
 
 	va_start(args, format);
 
 	/* write the string to the log file */
-	vfprintf(fp, format, args);
-	fprintf(fp, "\n");
+	vfprintf(logfp, format, args);
+	fprintf(logfp, "\n");
 
 #ifdef DEBUGMODE
-
 	fprintf(stderr, "Logged> ");
 	vfprintf(stderr, format, args);
 	fprintf(stderr, "\n");
 #endif
-
-	fclose(fp);
 
 	va_end(args);
 } /* putlog() */
@@ -183,6 +216,8 @@ CheckLogs(time_t unixtime)
 	 * Now rename the current log file. Use the TS of one
 	 * second ago since this log file is actually yesterday's,
 	 * because it just turned midnight.
+	 *
+	 * Woo. Ugly :-)
 	 */
 
 	oldts = unixtime - 1;
@@ -192,6 +227,9 @@ CheckLogs(time_t unixtime)
 			   1, log_tm->tm_mday);
 
 	rename(LogFileName, tmplog);
+
+	CloseLogFile();
+	OpenLogFile();
 } /* CheckLogs() */
 
 /*

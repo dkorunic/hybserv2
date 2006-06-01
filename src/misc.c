@@ -309,6 +309,8 @@ DoShutdown(char *who, char *reason)
 	ClearHashes(0);
 #endif
 
+	CloseLogFile();
+
 	exit(1);
 } /* DoShutdown() */
 

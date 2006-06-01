@@ -55,6 +55,10 @@ ReloadData()
 
 #endif /* NICKSERVICES */
 
+	/* reopen logs */
+	CloseLogFile();
+	OpenLogFile();
+
 #ifdef NICKSERVICES
 
 	for (ii = 0; ii < NICKLIST_MAX; ++ii)

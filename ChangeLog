@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  + be more paranoid on NICK, non-netsplit QUIT - mark old nicknames as
+    unusable for RECORD_RESTART_TS [suggestion from Brian Brazil]
   - fix #103: MLOCK + causes services to split
   - fix #93: when expiring channels check if any members idle there and
     what is their access

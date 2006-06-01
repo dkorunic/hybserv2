@@ -764,7 +764,8 @@ s_nick(int ac, char **av)
 
 #ifdef RECORD_RESTART_TS
 					nptr->nick_ts = 0;
-					newptr->nick_ts = atol(av[3] + 1); /* need to skip the :*/
+					MyFree(nptr->last_server);
+					newptr->nick_ts = atol(av[3] + 1);
 					MyFree(newptr->last_server);
 					newptr->last_server = MyStrdup(lptr->server->name);
 #endif /* RECORD_RESTART_TS */
@@ -1544,11 +1545,16 @@ s_quit(int ac, char **av)
 		if (nptr->flags & NS_IDENTIFIED)
 		{
 			struct NickInfo *tmp;
-			if (nptr->lastqmsg)
-				MyFree(nptr->lastqmsg);
+
+			MyFree(nptr->lastqmsg);
 			nptr->lastqmsg = MyStrdup(av[2] + 1);
 			tmp = GetMaster(nptr);
 			tmp->lastseen = nptr->lastseen = current_ts;
+
+#ifdef RECORD_RESTART_TS
+			nptr->nick_ts = 0;
+			MyFree(nptr->last_server);
+#endif /* RECORD_RESTART_TS */
 		}
 	}
 #endif /* NICKSERVICES */

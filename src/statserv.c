@@ -1383,7 +1383,7 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
 	struct tm *     tm;
 	int             iCounter;
 
-	if (ac < 3 )
+	if (ac < 3)
 	{
 		notice(n_StatServ,lptr->nick,
 		       "Syntax: \002GREPLOG <service> <pattern> [days]\002");
@@ -1409,8 +1409,10 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
 
 	iCounter = 0;
 	tm = localtime(&current_ts);
-	putlog(LOG1, "Log browsing started.");
-	putlog(LOG1, "av[1]:%s av[2]:%s Nick:%s", av[1], av[2], lptr->nick);
+
+	RecordCommand("%s: %s!%s@%s GREPLOG [%s %s] %s", n_StatServ, lptr->nick,
+			lptr->username, lptr->hostname,
+			av[1], av[2], (ac >= 4) ? av[3] : "");
 
 	ircsprintf(date, "%4.4d%2.2d%2.2d",
 	           tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
@@ -1446,10 +1448,8 @@ ss_greplog(struct Luser *lptr, int ac, char **av )
 		fclose(lf);
 	}
 	notice(n_StatServ, lptr->nick, "End of search." );
-	putlog(LOG1, "Log browsing ended.");
 
 	return;
-
 } /* o_greplog */
 
 /*

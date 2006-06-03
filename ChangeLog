@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * fix #112: update pubcommands help page
   * fix for #104, use more standard RecordCommand for GREPLOG
   + add PUBCOMMANDS enhancements from Ilian Jovchev
   * fix for #105, log the New Max *** counters [Brian, again :)]

@@ -2,3 +2,9 @@ Syntax: %bSET <channel> PUBCOMMANDS {ON|OFF}%b
 
 When PUBCOMMANDS is enabled, users can execute
 public commands in the channel.
+
+Valid commands:
+%b!OP [nicknames]%b - gives +o to one or more nicknames
+%b!DEOP [nicknames]%b - removes +o from one or more nicknames
+%b!SEEN <nickname|hostmask>%b - last seen info for a nick/hostname
+%b!SEENNICK <nickname>%b - last exact seen info for a nick

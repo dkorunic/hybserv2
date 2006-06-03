@@ -710,8 +710,7 @@ s_nick(int ac, char **av)
 
 		nptr = FindNick(lptr->nick);
 
-#if (defined SVSNICK || defined FORCENICK) && defined FALLBACK_TO_KILL
-
+#if defined SVSNICK || defined FORCENICK
 		lptr->flags &= ~(UMODE_NOFORCENICK);
 #endif
 

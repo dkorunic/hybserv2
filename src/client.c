@@ -273,10 +273,10 @@ struct Luser *
 
 	tempuser->nick_ts = tempuser->since;
 
-#if (defined SVSNICK || defined FORCENICK) && defined FALLBACK_TO_KILL
-
+#if defined SVSNICK || defined FORCENICK
 	tempuser->flags &= ~(UMODE_NOFORCENICK);
 #endif
+
 #endif /* NICKSERVICES */
 
 	if ((tempuser->server = FindServer(line[7])))

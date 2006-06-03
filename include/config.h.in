@@ -449,13 +449,6 @@
 #define   SVSNICK_PREFIX "Guest"
 
 /*
- * << STRONGLY RECOMMENDED >> If you've defined FORCENICK or SVSNICK above
- * and some servers on your network don't have support for them, setting
- * FALLBACK_TO_KILL will KILL them after the forced nick change fails.
- */
-#define   FALLBACK_TO_KILL
-
-/*
  * Schedule nick kill instead of immediate killing for user-triggered
  * ghost command. Turn this on on very large networks to have smoother
  * operation. Beware that nick kills resolution is only every 30 seconds.

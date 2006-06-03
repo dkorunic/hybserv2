@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  * fix #111: make FALLBACK_TO_KILL mandatory and integrated with rest of
+    collide()
   * fix #112: update pubcommands help page
   * fix for #104, use more standard RecordCommand for GREPLOG
   + add PUBCOMMANDS enhancements from Ilian Jovchev

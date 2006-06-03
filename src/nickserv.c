@@ -1459,6 +1459,8 @@ collide(char *nick, int dopseudo)
 
 {
 	struct Luser *lptr = NULL;
+	struct NickInfo *nptr = NULL;
+
 #if defined SVSNICK || defined FORCENICK
 	char newnick[NICKLEN + 1];
 	long nicknum;
@@ -1467,12 +1469,9 @@ collide(char *nick, int dopseudo)
 	int j;
 #endif
 
-#if !(defined SVSNICK || defined FORCENICK)
+#if !defined SVSNICK && !defined FORCENICK
 	char **av;
 	char sendstr[MAXLINE + 1];
-#endif
-#if !(defined SVSNICK || defined FORCENICK) || defined FALLBACK_TO_KILL
-	struct NickInfo *nptr = NULL;
 #endif
 
 	if (!SafeConnect)
@@ -1480,10 +1479,8 @@ collide(char *nick, int dopseudo)
 
 	if (!(lptr = FindClient(nick)))
 		return;
-	/* calculate how many chars do we need to pad */
-#if defined SVSNICK || defined FORCENICK
 
-#if defined FALLBACK_TO_KILL
+#if defined SVSNICK || defined FORCENICK
 	if (!(lptr->flags & UMODE_NOFORCENICK))
 	{
 		lptr->flags |= UMODE_NOFORCENICK;
@@ -1492,10 +1489,12 @@ collide(char *nick, int dopseudo)
 			nptr->flags |= NS_COLLIDE;
 			nptr->collide_ts = current_ts + 30;
 		}
-#endif
 
 		nicknum = random();
 
+	/* 
+	 * calculate how many chars do we need to pad
+	 */
 #if defined SVSNICK
 #if defined SVSNICK_LEN
 
@@ -1503,8 +1502,8 @@ collide(char *nick, int dopseudo)
 #else
 
 		base = NICKLEN - strlen(SVSNICK_PREFIX);
-#endif /* SVSNICK */
 #endif
+#endif /* SVSNICK */
 
 #if defined FORCENICK
 #if defined FORCENICK_LEN
@@ -1513,9 +1512,10 @@ collide(char *nick, int dopseudo)
 #else
 
 		base = NICKLEN - strlen(FORCENICK_PREFIX);
-#endif /* FORCENICK */
 #endif
+#endif /* FORCENICK */
 
+		/* do the padding */
 		j = 1;
 		for (i = 1; i <= base; ++i)
 			j *= 10;
@@ -1532,12 +1532,8 @@ collide(char *nick, int dopseudo)
 		toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #endif
-
 		return;
-#ifdef FALLBACK_TO_KILL
-
 	}
-#endif
 #endif /* defined SVSNICK || defined FORCENICK */
 
 #if !defined SVSNICK && !defined FORCENICK

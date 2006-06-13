@@ -1564,8 +1564,15 @@ s_quit(int ac, char **av)
 			tmp->lastseen = nptr->lastseen = current_ts;
 
 #ifdef RECORD_RESTART_TS
-			nptr->nick_ts = 0;
-			MyFree(nptr->last_server);
+			/* Invalidating nick_ts on a QUIT only if it was set within
+			 * the last 5 minutes (+10% slack), i.e. the maximum
+			 * inter-server TS differential that hybrid will allow
+			 * -Brian Brazil */
+			if (current_ts - 330 < nptr->nick_ts)
+			{
+				nptr->nick_ts = 0;
+				MyFree(nptr->last_server);
+			}
 #endif /* RECORD_RESTART_TS */
 		}
 	}

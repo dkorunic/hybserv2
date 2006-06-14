@@ -71,9 +71,12 @@ char *MyStrdup(const char *str)
 {
 	char *newstr = NULL;
 
-	newstr = strdup(str);
-	if (newstr == NULL)
-		OutOfMem();
+	if (str != NULL)
+	{
+		newstr = strdup(str);
+		if (newstr == NULL)
+			OutOfMem();
+	}
 
 	return(newstr);
 } /* MyStrdup() */

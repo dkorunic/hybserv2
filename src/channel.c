@@ -1498,7 +1498,7 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
 		return;
 
 	/* sanity check: empty list of targets, don't do anything */
-	if (*args = '\0')
+	if (*args == '\0')
 		return;
 
 	temp = MyStrdup(args);

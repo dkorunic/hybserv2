@@ -1497,6 +1497,10 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
 	if ((source == NULL) || (chptr == NULL) || (args == NULL))
 		return;
 
+	/* sanity check: empty list of targets, don't do anything */
+	if (*args = '\0')
+		return;
+
 	temp = MyStrdup(args);
 	acnt = SplitBuf(temp, &av);
 	done[0] = '\0';

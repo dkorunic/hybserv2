@@ -66,6 +66,9 @@ void *MyRealloc(void *oldptr, size_t newsize)
  * MyStrdup()
  *
  * duplicates the string 'str' and returns a pointer to the new string
+ *
+ * Yes, this is forceful reimplementation of strdup(). This way it is
+ * easier to use valgrind/boehm/etc.
  */
 char *MyStrdup(const char *str)
 {
@@ -73,12 +76,16 @@ char *MyStrdup(const char *str)
 
 	if (str != NULL)
 	{
-		newstr = strdup(str);
+		char *newstr = malloc(strlen(str) + 1);
+
 		if (newstr == NULL)
 			OutOfMem();
+
+		strcpy(newstr, str);
+		return newstr;
 	}
 
-	return(newstr);
+	return newstr;
 } /* MyStrdup() */
 
 /*

@@ -775,7 +775,7 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
-			oelse if (!ircncmp("MOFF", keyword, 4))
+			else if (!ircncmp("MOFF", keyword, 4))
 			{
 				if (!cptr->modes_off)
 					cptr->modes_off = atoi(av[1]);

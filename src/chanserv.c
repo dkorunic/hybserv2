@@ -775,7 +775,7 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
-			else if (!ircncmp("MOFF", keyword, 5))
+			oelse if (!ircncmp("MOFF", keyword, 4))
 			{
 				if (!cptr->modes_off)
 					cptr->modes_off = atoi(av[1]);
@@ -803,7 +803,7 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
-			else if (!ircncmp("EMAIL", keyword, 8))
+			else if (!ircncmp("EMAIL", keyword, 5))
 			{
 				if (!cptr->email)
 					cptr->email = MyStrdup(av[1]);
@@ -817,7 +817,7 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
-			else if (!ircncmp("URL", keyword, 8))
+			else if (!ircncmp("URL", keyword, 3))
 			{
 				if (!cptr->url)
 					cptr->url = MyStrdup(av[1]);
@@ -831,7 +831,7 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
-			else if (!ircncmp("COMMENT", keyword, 8))
+			else if (!ircncmp("COMMENT", keyword, 7))
 			{
 				if (!cptr->comment)
 					cptr->comment = MyStrdup(av[1] + 1);

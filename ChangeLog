@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed several ircncmp() uses with wrong length
+  - fix #115: missing read of LASTSERV from oper.db [Brian Brazil]
   + fix #116: don't write out nick_ts if identified within last 5 minutes
     [Brian Brazil]
   + fix #117: invalidate nick_ts when user is KILLed [Brian Brazil]

@@ -520,7 +520,7 @@ ns_loaddata()
 						ret = -1;
 				}
 			}
-			else if (LastSeenInfo && !ircncmp(keyword, "LASTQMSG", 6))
+			else if (LastSeenInfo && !ircncmp(keyword, "LASTQMSG", 8))
 			{
 				if (!nptr->lastqmsg)
 					nptr->lastqmsg = MyStrdup(av[1] + 1);

@@ -1062,7 +1062,7 @@ s_nick(int ac, char **av)
 			if (uptr->last_server &&
 				irccmp(uptr->last_server, lptr->server->name))
 			{
-				RecordCommand("%s: %s!%s@%s failed to identify based on TS = servername changed since SJOIN",
+				RecordCommand("%s: %s!%s@%s failed to identify based on TS - servername changed since SJOIN",
 					  n_OperServ, lptr->nick, lptr->username,
 					  lptr->hostname);
 			}

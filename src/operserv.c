@@ -733,13 +733,25 @@ os_loaddata()
 						ret = -1;
 				}
 			}
-			else if (!ircncmp(keyword, "LASTNICK", 2))
+			else if (!ircncmp(keyword, "LASTNICK", 8))
 			{
 				if (!uptr->last_nick)
 					uptr->last_nick = MyStrdup(av[1]);
 				else
 				{
 					fatal(1, "%s:%d OperServ entry for [%s] has multiple LASTNICK lines (using first)",
+					      OperServDB, cnt, uptr->nick);
+					if (ret > 0)
+						ret = -1;
+				}
+			}
+			else if (!ircncmp(keyword, "LASTSERVER", 10))
+			{
+				if (!uptr->last_server)
+					uptr->last_server = MyStrdup(av[1]);
+				else
+				{
+					fatal(1, "%s:%d OperServ entry for [%s] has multiple LASTSERVER lines (using first)",
 					      OperServDB, cnt, uptr->nick);
 					if (ret > 0)
 						ret = -1;

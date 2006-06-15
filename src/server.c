@@ -1613,6 +1613,7 @@ s_kill(int ac, char **av)
 				*serviceptr;
 	struct Server *sptr;
 	char *who;
+	struct NickInfo *nptr;
 
 	if (ac < 4)
 		return;
@@ -1631,7 +1632,7 @@ s_kill(int ac, char **av)
 	lptr = FindClient(who);
 
 	if (lptr)
-{
+	{
 		SendUmode(OPERUMODE_CAPO,
 				  "*** Operator Kill: [%s] by %s!%s@%s (%s)",
 				  av[2],
@@ -1648,6 +1649,14 @@ s_kill(int ac, char **av)
 				  who,
 				  av[3] + 1);
 	}
+
+#if defined NICKSERVICES && defined RECORD_RESTART_TS
+	if ((nptr = FindNick(av[2])))
+	{
+		nptr->nick_ts = 0;
+		MyFree(nptr->last_server);
+	}
+#endif /* NICKSERVICES && RECORD_RESTART_TS */
 
 	if (match("*.*", who))
 	{

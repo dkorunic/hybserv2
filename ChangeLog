@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #117: invalidate nick_ts when user is KILLed [Brian Brazil]
   * add support for Boehm GC
   - fix #114: get record_restart_ts working with netsplits again [Brian
     Brazil]

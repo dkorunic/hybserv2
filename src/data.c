@@ -745,7 +745,12 @@ WriteNicks()
 				fprintf(fp, "->HOST %s\n", hptr->hostmask);
 
 #ifdef RECORD_RESTART_TS
-			if (nptr->nick_ts)
+			/* 
+			 * Don't save if identified within the last 330 seconds (max
+			 * inter-server TS difference + 10% slack)
+			 * - Brian Brazil
+			 */
+			if (nptr->nick_ts && (nptr->nick_ts < current_ts - 330))
 				fprintf(fp, "->TS %li\n", nptr->nick_ts);
 			if (nptr->last_server)
                 fprintf(fp, "->LASTSERVER %s\n", nptr->last_server);

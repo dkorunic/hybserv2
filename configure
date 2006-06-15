@@ -852,7 +852,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-largefile     omit support for large files
   --disable-ipv6          Disable IPv6 support [default=no]
-  --enable-efence         Enable libefence support [default=no]
+  --enable-efence         Enable Electric Fence support [default=no]
   --enable-dmalloc        Enable dmalloc support [default=no]
   --enable-boehm-gc       Enable Boehm GC support [default=yes]
   --enable-warnings       Enable compiler warnings [default=no]
@@ -8118,7 +8118,7 @@ fi
 
 echo "$as_me:$LINENO: checking compile with Boehm Garbage Collector" >&5
 echo $ECHO_N "checking compile with Boehm Garbage Collector... $ECHO_C" >&6
-# Check whether --enable-boehm_gc or --disable-boehm_gc was given.
+# Check whether --enable-boehm-gc or --disable-boehm-gc was given.
 if test "${enable_boehm_gc+set}" = set; then
   enableval="$enable_boehm_gc"
   cf_enable_boehm_gc=$enableval

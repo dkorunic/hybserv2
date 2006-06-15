@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1435 2006-03-17 18:07:24Z kreator $
+@%:@ $Id: configure.in 1471 2006-06-15 11:51:12Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -852,7 +852,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-largefile     omit support for large files
   --disable-ipv6          Disable IPv6 support [default=no]
-  --enable-efence         Enable libefence support [default=no]
+  --enable-efence         Enable Electric Fence support [default=no]
   --enable-dmalloc        Enable dmalloc support [default=no]
   --enable-boehm-gc       Enable Boehm GC support [default=yes]
   --enable-warnings       Enable compiler warnings [default=no]
@@ -983,7 +983,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1435 2006-03-17 18:07:24Z kreator $
+$Id: configure.in 1471 2006-06-15 11:51:12Z kreator $
 _ACEOF
   exit 0
 fi
@@ -8118,7 +8118,7 @@ fi
 
 echo "$as_me:$LINENO: checking compile with Boehm Garbage Collector" >&5
 echo $ECHO_N "checking compile with Boehm Garbage Collector... $ECHO_C" >&6
-# Check whether --enable-boehm_gc or --disable-boehm_gc was given.
+# Check whether --enable-boehm-gc or --disable-boehm-gc was given.
 if test "${enable_boehm_gc+set}" = set; then
   enableval="$enable_boehm_gc"
   cf_enable_boehm_gc=$enableval

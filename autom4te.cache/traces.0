@@ -324,33 +324,44 @@ m4trace:configure.in:345: -1- AC_CHECK_LIB([dmalloc], [malloc])
 m4trace:configure.in:345: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
 #undef HAVE_LIBDMALLOC])
 m4trace:configure.in:345: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
-m4trace:configure.in:397: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
-m4trace:configure.in:397: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
+m4trace:configure.in:362: -1- AC_CHECK_LIB([gc], [GC_malloc], [AC_CHECK_HEADERS(gc/gc.h gc.h)
+        AC_DEFINE(HAVE_BOEHM_GC,, Define this to enable Boehm GC)
+        LIBS="$LIBS -lgc"], [cf_enable_boehm_gc="yes"])
+m4trace:configure.in:362: -1- AC_CHECK_HEADERS([gc/gc.h gc.h])
+m4trace:configure.in:362: -1- AH_OUTPUT([HAVE_GC_GC_H], [/* Define to 1 if you have the <gc/gc.h> header file. */
+#undef HAVE_GC_GC_H])
+m4trace:configure.in:362: -1- AH_OUTPUT([HAVE_GC_H], [/* Define to 1 if you have the <gc.h> header file. */
+#undef HAVE_GC_H])
+m4trace:configure.in:362: -1- AC_DEFINE_TRACE_LITERAL([HAVE_BOEHM_GC])
+m4trace:configure.in:362: -1- AH_OUTPUT([HAVE_BOEHM_GC], [/* Define this to enable Boehm GC */
+#undef HAVE_BOEHM_GC])
+m4trace:configure.in:414: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
+m4trace:configure.in:414: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
 #undef NICKLEN])
-m4trace:configure.in:398: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
-m4trace:configure.in:398: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
+m4trace:configure.in:415: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
+m4trace:configure.in:415: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
 #undef CHANNELLEN])
-m4trace:configure.in:399: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
-m4trace:configure.in:399: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
+m4trace:configure.in:416: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
+m4trace:configure.in:416: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
 #undef TOPICLEN])
-m4trace:configure.in:422: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:422: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:439: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:439: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:425: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
-m4trace:configure.in:425: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
+m4trace:configure.in:442: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
+m4trace:configure.in:442: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
 #undef SOFT_ASSERT])
-m4trace:configure.in:426: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:426: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:443: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:443: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 #undef NDEBUG])
-m4trace:configure.in:441: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
-m4trace:configure.in:441: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
+m4trace:configure.in:458: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
+m4trace:configure.in:458: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
 #undef GIMMECORE])
-m4trace:configure.in:452: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
-m4trace:configure.in:452: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
+m4trace:configure.in:469: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
+m4trace:configure.in:469: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 #undef DAEMONTOOLS])
-m4trace:configure.in:458: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:475: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
   bin/settings.conf bin/cleandb include/config.h])
-m4trace:configure.in:458: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:475: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:458: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:458: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:475: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:475: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])

@@ -15,6 +15,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #undef HAVE_ASSERT_H
 
+/* Define this to enable Boehm GC */
+#undef HAVE_BOEHM_GC
+
 /* Define to 1 if you have broken getaddrinfo for integer notation */
 #undef HAVE_BROKEN_INT_GETADDRINFO
 
@@ -30,6 +33,12 @@
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the <gc/gc.h> header file. */
+#undef HAVE_GC_GC_H
+
+/* Define to 1 if you have the <gc.h> header file. */
+#undef HAVE_GC_H
 
 /* Define to 1 if you have the `getaddrinfo' function. */
 #undef HAVE_GETADDRINFO

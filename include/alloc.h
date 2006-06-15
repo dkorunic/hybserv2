@@ -11,6 +11,21 @@
 #include "stdinc.h"
 #include "config.h"
 
+#if defined HAVE_GC_GC_H
+#  include <gc/gc.h>
+#elif defined HAVE_GC_H
+#  include <gc.h>
+#endif
+
+#if defined HAVE_BOEHM_GC
+# undef GC_DEBUG
+# define malloc(n) GC_MALLOC(n)
+# define calloc(m,n) GC_MALLOC((m)*(n))
+# define free(p) GC_FREE(p)
+# define realloc(p,n) GC_REALLOC((p),(n))
+# define CHECK_LEAKS() GC_gcollect()
+#endif /* HAVE_BOEHM_GC */
+
 #ifdef BLOCK_ALLOCATION
 /* structure definition for a sub block in a preallocated heap */
 typedef struct sBlock

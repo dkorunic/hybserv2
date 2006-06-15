@@ -347,6 +347,23 @@ else
   AC_MSG_RESULT(no)
 fi
 
+dnl Try Boehm GC support
+AC_MSG_CHECKING([compile with Boehm Garbage Collector])
+AC_ARG_ENABLE(boehm_gc,
+  [  --enable-boehm-gc       Enable Boehm GC support [[default=yes]]],
+  [cf_enable_boehm_gc=$enableval],
+  [cf_enable_boehm_gc="yes"])
+if test "x$cf_enable_boehm_gc" = "xyes"; then
+  AC_MSG_RESULT(yes)
+  AC_CHECK_LIB(gc, GC_malloc,
+    [AC_CHECK_HEADERS(gc/gc.h gc.h)
+        AC_DEFINE(HAVE_BOEHM_GC,, Define this to enable Boehm GC)
+        LIBS="$LIBS -lgc"],
+    [cf_enable_boehm_gc="yes"])
+else
+  AC_MSG_RESULT(no)
+fi
+
 dnl Get nick/chan/topic length
 AC_ARG_WITH(nicklen,
   [  --with-nicklen=LENGTH     Sets nick length to LENGTH [[default=18]]],
@@ -474,6 +491,7 @@ Extra configurations:
   Asserts enabled ...... ${cf_enable_asserts}
   Coredumps enabled .... ${cf_enable_gimmecore}
   Daemontools enabled .. ${cf_enable_daemontools}
+  Boehm GC enabled ..... ${cf_enable_boehm_gc}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

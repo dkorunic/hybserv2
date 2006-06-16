@@ -73,6 +73,10 @@ int main(int argc, char *argv[])
 	uid_t uid; /* real user id */
 	uid_t euid; /* effective user id */
 
+#if defined HAVE_BOEHM_GC
+	GC_INIT();
+#endif /* HAVE_BOEHM_GC */
+
 	myargv = argv;
 
 	/* Initialise current TS for services -kre */

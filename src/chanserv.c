@@ -4069,7 +4069,7 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		if (!expires)
 			notice(n_ChanServ, lptr->nick,
 			       "[\002%s\002] has been added to the autokick list for %s with"
-			       "reason [%s]", hostmask, cptr->name, reason ? reason : "");
+			       " reason [%s]", hostmask, cptr->name, reason ? reason : "");
 		else
 			notice(n_ChanServ, lptr->nick,
 			       "[\002%s\002] has been added to the temporary autokick list"

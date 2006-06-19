@@ -1199,9 +1199,9 @@ CheckNick(char *nickname)
 	if (realptr->flags & NS_FORBID)
 	{
 		notice(n_NickServ, lptr->nick,
-			   "This nickname may not be used.	Please choose another.");
+			"This nickname may not be used.  Please choose another.");
 		notice(n_NickServ, lptr->nick,
-			   "If you do not change within one minute, you will be disconnected");
+			"If you do not change within one minute, you will be disconnected");
 		realptr->flags |= NS_COLLIDE;
 		realptr->collide_ts = current_ts + 60;
 		return 0;
@@ -4253,20 +4253,18 @@ n_info(struct Luser *lptr, int ac, char **av)
 			online = 1;
 
 	notice(n_NickServ, lptr->nick,
-		   "		   Nickname: %s %s",
-		   realptr->nick,
-		   online ? "<< ONLINE >>" : "");
+			"           Nickname: %s %s",
+			realptr->nick,
+			online ? "<< ONLINE >>" : "");
 
 	notice(n_NickServ, lptr->nick,
-		   "		 Registered: %s ago",
-		   timeago(realptr->created, 1)
-		  );
+			"         Registered: %s ago",
+			timeago(realptr->created, 1));
 
 	if (realptr->lastseen && !online)
 		notice(n_NickServ, lptr->nick,
-			   "		  Last Seen: %s ago",
-			   timeago(realptr->lastseen, 1)
-			  );
+			"          Last Seen: %s ago",
+			timeago(realptr->lastseen, 1));
 
 	if (!(nptr->flags & NS_HIDEALL)
 			|| isadmin || isowner)
@@ -4291,24 +4289,24 @@ n_info(struct Luser *lptr, int ac, char **av)
 		if (!(nptr->flags & NS_HIDEEMAIL) || isadmin || isowner)
 			if (realptr->email)
 				notice(n_NickServ, lptr->nick,
-					   "	  Email Address: %s", realptr->email);
+					"      Email Address: %s", realptr->email);
 
 		if (!(nptr->flags & NS_HIDEURL) || isadmin || isowner)
 			if (realptr->url)
 				notice(n_NickServ, lptr->nick,
-					   "				URL: %s", realptr->url);
+					"                URL: %s", realptr->url);
 
 		if (nptr->UIN)
 			notice(n_NickServ, lptr->nick,
-				   "				UIN: %s", nptr->UIN);
+				"                UIN: %s", nptr->UIN);
 
 		if (nptr->gsm)
 			notice(n_NickServ, lptr->nick,
-				   "				GSM: %s", nptr->gsm);
+				"                GSM: %s", nptr->gsm);
 
 		if (nptr->phone)
 			notice(n_NickServ, lptr->nick,
-				   "			  Phone: %s", nptr->phone);
+				"              Phone: %s", nptr->phone);
 
 		buf[0] = '\0';
 		if (AllowKillProtection)
@@ -4356,10 +4354,10 @@ n_info(struct Luser *lptr, int ac, char **av)
 		if (nptr->flags & NS_FORBID)
 		{
 			if (nptr->forbidby)
-				notice(n_NickServ, lptr->nick, "		  Forbid by: %s",
+				notice(n_NickServ, lptr->nick, "          Forbid by: %s",
 					   nptr->forbidby);
 			if (nptr->forbidreason)
-				notice(n_NickServ, lptr->nick, "	  Forbid reason: %s",
+				notice(n_NickServ, lptr->nick, "      Forbid reason: %s",
 					   nptr->forbidreason);
 		}
 	}
@@ -4382,12 +4380,12 @@ n_info(struct Luser *lptr, int ac, char **av)
 			cnt = 0;
 
 			notice(n_NickServ, lptr->nick,
-				   "   Linked Nicknames (first is master):");
+				"   Linked Nicknames (first is master):");
 
 			for (tmp = GetMaster(nptr); tmp; tmp = tmp->nextlink)
 			{
 				notice(n_NickServ, lptr->nick,
-					   "					 %d) %s", ++cnt, tmp->nick);
+					"                     %d) %s", ++cnt, tmp->nick);
 			}
 		}
 
@@ -4410,7 +4408,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 			for (tmpchan = nptr->FounderChannels; tmpchan; tmpchan =
 						tmpchan->next)
 			{
-				notice(n_NickServ, lptr->nick, "					 %d) %s",
+				notice(n_NickServ, lptr->nick, "                     %d) %s",
 					   ++cnt, tmpchan->cptr->name);
 			}
 		}
@@ -4426,10 +4424,8 @@ n_info(struct Luser *lptr, int ac, char **av)
 			for (acptr = nptr->AccessChannels; acptr; acptr = acptr->next)
 			{
 				notice(n_NickServ, lptr->nick,
-					   "					 %d) (%-3d) %s",
-					   ++cnt,
-					   acptr->accessptr->level,
-					   acptr->cptr->name);
+					"                     %d) (%-3d) %s",
+					++cnt, acptr->accessptr->level, acptr->cptr->name);
 			}
 		}
 

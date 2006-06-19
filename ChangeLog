@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #119: tabs/spaces issues in nickserv.c
   - fix #118: minor typo in msg when adding an autokick [Brian]
   - fixed several ircncmp() uses with wrong length
   - fix #115: missing read of LASTSERV from oper.db [Brian Brazil]

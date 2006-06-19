@@ -70,7 +70,7 @@ int n;
 char *
 crypt_md5(const char *pw, const char *salt)
 {
-	static char	*magic = "$1$";	/*
+	static char	*magic = "$1$"; /*
 		        					 * This string is magic for
 		        					 * this algorithm.  Having
 		        					 * it this way, we can get

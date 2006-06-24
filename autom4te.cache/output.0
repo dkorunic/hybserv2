@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1471 2006-06-15 11:51:12Z kreator $
+@%:@ $Id: configure.in 1477 2006-06-15 22:51:03Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -983,7 +983,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1471 2006-06-15 11:51:12Z kreator $
+$Id: configure.in 1477 2006-06-15 22:51:03Z kreator $
 _ACEOF
   exit 0
 fi
@@ -1445,14 +1445,14 @@ case "$host_os" in
 *sunos*|*solaris*)
   
 cat >>confdefs.h <<\_ACEOF
-@%:@define HAVE_SOLARIS 
+@%:@define HAVE_SOLARIS 1
 _ACEOF
 
   ;;
 *cygwin)
   
 cat >>confdefs.h <<\_ACEOF
-@%:@define HAVE_CYGWIN 
+@%:@define HAVE_CYGWIN 1
 _ACEOF
 
 esac
@@ -8344,7 +8344,7 @@ done
 
         
 cat >>confdefs.h <<\_ACEOF
-@%:@define HAVE_BOEHM_GC 
+@%:@define HAVE_BOEHM_GC 1
 _ACEOF
 
         LIBS="$LIBS -lgc"

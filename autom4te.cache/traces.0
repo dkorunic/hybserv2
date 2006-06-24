@@ -325,7 +325,7 @@ m4trace:configure.in:345: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if yo
 #undef HAVE_LIBDMALLOC])
 m4trace:configure.in:345: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
 m4trace:configure.in:362: -1- AC_CHECK_LIB([gc], [GC_malloc], [AC_CHECK_HEADERS(gc/gc.h gc.h)
-        AC_DEFINE(HAVE_BOEHM_GC,, Define this to enable Boehm GC)
+        AC_DEFINE(HAVE_BOEHM_GC, 1, [Define this to enable Boehm GC])
         LIBS="$LIBS -lgc"], [cf_enable_boehm_gc="yes"])
 m4trace:configure.in:362: -1- AC_CHECK_HEADERS([gc/gc.h gc.h])
 m4trace:configure.in:362: -1- AH_OUTPUT([HAVE_GC_GC_H], [/* Define to 1 if you have the <gc/gc.h> header file. */

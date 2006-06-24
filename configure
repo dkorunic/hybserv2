@@ -1445,14 +1445,14 @@ case "$host_os" in
 *sunos*|*solaris*)
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_SOLARIS
+#define HAVE_SOLARIS 1
 _ACEOF
 
   ;;
 *cygwin)
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_CYGWIN
+#define HAVE_CYGWIN 1
 _ACEOF
 
 esac
@@ -8344,7 +8344,7 @@ done
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_BOEHM_GC
+#define HAVE_BOEHM_GC 1
 _ACEOF
 
         LIBS="$LIBS -lgc"

@@ -22,6 +22,7 @@
 #include "sock.h"
 #include "sprintf_irc.h"
 #include "mystring.h"
+#include "seenserv.h"
 
 #ifdef ADVFLOOD
 #include "match.h"
@@ -146,26 +147,53 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
 		struct ChanInfo *chanptr;
 
 		chanptr = FindChan(chptr->name);
-		if ((servptr == Me.csptr) && chanptr)
+
+		if (chanptr != NULL)
 		{
-			if (normal)
+			if (servptr == Me.csptr)
 			{
-				if (kick)
-					cs_join(chanptr);
+				if (normal)
+				{
+					if (kick)
+						cs_join(chanptr);
+				}
+				else
+				{
+					if (!kick)
+						cs_part(chptr);
+					cs_join_ts_minus_1(chanptr);
+					putlog(LOG2,
+						   "%s: %s flood from %s!%s@%s on %s",
+						   n_ChanServ,
+						   kick ? "kick" : "deop",
+						   lptr->nick,
+						   lptr->username,
+						   lptr->hostname,
+						   chptr->name);
+				}
 			}
 			else
+			if (servptr == Me.esptr)
 			{
-				if (!kick)
-					cs_part(chptr);
-				cs_join_ts_minus_1(chanptr);
-				putlog(LOG2,
-				       "%s: %s flood from %s!%s@%s on %s",
-				       n_ChanServ,
-				       kick ? "kick" : "deop",
-				       lptr->nick,
-				       lptr->username,
-				       lptr->hostname,
-				       chptr->name);
+				if (normal)
+				{
+					if (kick)
+						ss_join(chptr);
+				}
+				else
+				{
+					if (!kick)
+						ss_part(chptr);
+					ss_join(chptr);
+					putlog(LOG2,
+						   "%s: %s flood from %s!%s@%s on %s",
+						   n_SeenServ,
+						   kick ? "kick" : "deop",
+						   lptr->nick,
+						   lptr->username,
+						   lptr->hostname,
+						   chptr->name);
+				}
 			}
 		}
 	} /* else */

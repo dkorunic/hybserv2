@@ -277,7 +277,7 @@
  * implementation, so it will not work on other ircds.
  * NOTE: These are Hybrid5/6 only glines.
  */
-#define   HYBRID_GLINES
+#undef   HYBRID_GLINES
 
 /*
  * Define this if you want services to create a gline the Hybrid7 way by

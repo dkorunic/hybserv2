@@ -381,7 +381,7 @@
  * NOTE: This _has_ to be turned off for Hybrid7, since it does not
  *       support +d style modes.
  */
-#define   GECOSBANS
+#undef   GECOSBANS
 
 /*
  * Defining ADVFLOOD enables advanced flood protection. Every client
@@ -483,12 +483,9 @@
 #endif
 
 #if defined HYBRID7
-# undef GECOSBANS
-#endif
-
-#if defined HYBRID7
 # undef DANCER
 # undef HYBRID_GLINES
+# undef GECOSBANS
 #endif
 
 #if defined HYBRID7 && !defined HYBRID_ONLY 

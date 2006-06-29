@@ -7,7 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
-  * make HYBRID_GLINES undefined as a default [thanks Ales Tokic]
+  * undef GECOSBANS as default, undef HYBRID_GLINES as default for Hybrid7
+    [thanks Ales Tokic]
   + SeenServ will rejoin channel after kick
   * smaller fixes for autoconf
   - fix #119: tabs/spaces issues in nickserv.c

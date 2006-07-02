@@ -4213,8 +4213,9 @@ n_info(struct Luser *lptr, int ac, char **av)
 #if defined EMPOWERADMINS || defined EMPOWERADMINS_MORE
 	if (NotifyOpers)
 	{
-		struct Luser *ptr= FindClient(realptr->nick);
-		if ((ptr != NULL) && (ptr->flags & L_OSREGISTERED))
+		struct Luser *ptr = FindClient(realptr->nick);
+		if ((ptr != NULL) && (ptr->flags & L_OSREGISTERED) &&
+				(realptr->nick != lptr->nick))
 		{
 			notice(n_NickServ, realptr->nick,
 					"%s is doing INFO on you", lptr->nick);

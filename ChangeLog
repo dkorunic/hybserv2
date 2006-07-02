@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #120: don't show notice if person issuing NS INFO command is
+    yourself
   * undef GECOSBANS as default, undef HYBRID_GLINES as default for Hybrid7
     [thanks Ales Tokic]
   + SeenServ will rejoin channel after kick

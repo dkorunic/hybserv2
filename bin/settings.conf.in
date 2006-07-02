@@ -820,7 +820,7 @@ LogLevel           2
 # deleted to make room for the new one.
 #  You may comment this out to never delete log files.
 
-MaxLogs            5
+MaxLogs            30
 
 # MaxModes <value> [REQUIRED]
 #

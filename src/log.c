@@ -150,67 +150,68 @@ CheckLogs(time_t unixtime)
 	int lmatches,
 	len;
 
-	if (MaxLogs)
+	/* infinite logging means we won't rotate logs at all because of user
+	 * safety: think of gazillions of files in a single directory */
+	if (!MaxLogs)
+		return;
+
+	/*
+	 * We must now check if there are MaxLogs log files
+	 * in HPath/. If so, delete the oldest one to make
+	 * room for the current one.
+	 */
+	if (!(dp = opendir(LogPath)))
 	{
-		/*
-		 * We must now check if there are MaxLogs log files
-		 * in HPath/. If so, delete the oldest one to make
-		 * room for the current one.
-		 */
+		putlog(LOG1, "Error reading log directory: %s",
+			   strerror(errno));
+		return;
+	}
 
-		if (!(dp = opendir(LogPath)))
+	ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
+	ircsprintf(tmplog, "%s.", LogFileName);
+	len = strlen(tmplog);
+
+	lmatches = 0;
+	olddate[0] = '\0';
+	currdate = NULL;
+
+	/*
+	 * Go through all the files in the directory and
+	 * pick out the ones that match "LogFile."
+	 */
+	while ((dirp = readdir(dp)))
+	{
+		if (!ircncmp(dirp->d_name, tmplog, len))
 		{
-			putlog(LOG1, "Error reading log directory: %s",
-			       strerror(errno));
-			return;
-		}
+			++lmatches;
 
-		ircsprintf(LogFileName, "%s/%s", LogPath, LogFile);
-		ircsprintf(tmplog, "%s.", LogFileName);
-		len = strlen(tmplog);
-
-		lmatches = 0;
-		olddate[0] = '\0';
-		currdate = NULL;
-
-		/*
-		 * Go through all the files in the directory and
-		 * pick out the ones that match "LogFile."
-		 */
-		while ((dirp = readdir(dp)))
-		{
-			if (!ircncmp(dirp->d_name, tmplog, len))
+			/*
+			 * Now check the date on the log file to see
+			 * if its the oldest.
+			 */
+			if (!olddate[0])
+				strlcpy(olddate, dirp->d_name + len, sizeof(olddate));
+			else
 			{
-				++lmatches;
-
-				/*
-				 * Now check the date on the log file to see
-				 * if its the oldest.
-				 */
-				if (!olddate[0])
-					strlcpy(olddate, dirp->d_name + len, sizeof(olddate));
-				else
-				{
-					currdate = dirp->d_name + len;
-					if (atol(olddate) > atol(currdate))
-						strlcpy(olddate, currdate, sizeof(olddate));
-				}
+				currdate = dirp->d_name + len;
+				if (atol(olddate) > atol(currdate))
+					strlcpy(olddate, currdate, sizeof(olddate));
 			}
 		}
+	}
 
-		if ((lmatches >= MaxLogs) && *olddate)
-		{
-			/*
-			 * There are too many log files in the directory,
-			 * delete the oldest one - it will be: LogFile.olddate
-			 */
-			ircsprintf(tmplog, "%s/%s.%s", LogPath, LogFile,
-			           olddate);
-			unlink(tmplog);
-		}
+	if ((lmatches >= MaxLogs) && *olddate)
+	{
+		/*
+		 * There are too many log files in the directory,
+		 * delete the oldest one - it will be: LogFile.olddate
+		 */
+		ircsprintf(tmplog, "%s/%s.%s", LogPath, LogFile,
+				   olddate);
+		unlink(tmplog);
+	}
 
-		closedir(dp);
-	} /* if (MaxLogs) */
+	closedir(dp);
 
 	/*
 	 * Now rename the current log file. Use the TS of one

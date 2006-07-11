@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * update MaxLogs docs: upgrade, src, etc.
   - fix #120: don't show notice if person issuing NS INFO command is
     yourself
   * undef GECOSBANS as default, undef HYBRID_GLINES as default for Hybrid7

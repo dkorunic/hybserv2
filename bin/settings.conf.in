@@ -818,7 +818,9 @@ LogLevel           2
 # a new log file will be started. After the number of log
 # files has reached MaxLogs, the oldest log file will be
 # deleted to make room for the new one.
-#  You may comment this out to never delete log files.
+#  You may comment this out to never delete log files -- that
+# will cause logging in main log file without any rotation.
+#  Note that values bigger 1024 are a really bad idea.
 
 MaxLogs            30
 

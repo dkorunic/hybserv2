@@ -405,6 +405,6 @@ long GetGMTOffset(time_t unixtime)
 {
 	struct tm *tm_gmt;
 
-	tm_gmt = gmtime(&TimeStarted);
+	tm_gmt = localtime(&TimeStarted);
 	return (TimeStarted - mktime(tm_gmt));
 } /* GetGMTOffset() */

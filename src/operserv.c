@@ -1290,6 +1290,7 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 {
 	float mem;
 	struct rusage rus;
+	time_t internal_ts;
 
 	o_RecordCommand(sockfd, "STATUS");
 
@@ -1451,6 +1452,10 @@ o_status(struct Luser *lptr, int ac, char **av, int sockfd)
 	if (AutoLinkFreq)
 		os_notice(lptr, sockfd, "   Tcm Link Interval: \002%s\002",
 		          timeago(AutoLinkFreq, 3));
+
+	internal_ts = current_ts + gmt_offset;
+	os_notice(lptr, sockfd, "       Internal time: \002%s\002",
+			ctime(&internal_ts));
 
 #if defined __DATE__ && defined __TIME__
 	os_notice(lptr, sockfd,   "         Compiled at: \002%s\002, \002%s\002", __DATE__, __TIME__);

@@ -8,7 +8,7 @@ $Id$
 Hybserv-HEAD
 
   * localtime fixes -- instead of gmtime() use localtime() which
-    supposedly knows of DST
+    supposedly knows of DST; fix long-standing GMT bug
   * update MaxLogs docs: upgrade, src, etc.
   - fix #120: don't show notice if person issuing NS INFO command is
     yourself

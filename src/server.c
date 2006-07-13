@@ -1047,7 +1047,8 @@ s_nick(int ac, char **av)
 	 * Check if they were registered with OperServ during a restart,
 	 * if so, re-register them
 	 */
-	if ((uptr = GetUser(0, av[1], av[5], av[6])) && uptr->last_nick &&
+	uptr = GetUser(0, av[1], av[5], av[6]);
+	if ((uptr != NULL) && uptr->last_nick &&
 			!irccmp(uptr->last_nick, av[1])
 #ifdef OPERNICKIDENT
 			&& (nptr) && (nptr->flags & NS_IDENTIFIED)

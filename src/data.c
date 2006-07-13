@@ -537,16 +537,16 @@ WriteOpers()
 		if (!(luser->flags & L_OSREGISTERED))
 			continue;
 
-		tempuser = GetUser(1, luser->nick, luser->username,
+		tempuser = GetUser(0, luser->nick, luser->username,
 				luser->hostname);
 
-		if (tempuser == NULL)
+		if (tempuser == NULL || tempuser == GenericOper)
 			continue;
 
-		fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
+		fprintf(fp, "%s %ld\n", luser->nick, tempuser->umodes);
 
 #ifdef RECORD_RESTART_TS
-		if (tempuser->nick_ts)
+		if (tempuser->nick_ts && (tempuser->nick_ts < current_ts - 330))
 			fprintf(fp, "->TS %li\n", tempuser->nick_ts);
 		if (tempuser->last_nick)
 			fprintf(fp, "->LASTNICK %s\n", tempuser->last_nick);

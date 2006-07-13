@@ -418,8 +418,7 @@ os_process(char *nick, char *command, int sockfd)
 	 * have to do is come on with any hostname and just use
 	 * the oper's nickname - make sure that doesn't happen
 	 */
-	cmduser = GetUser(0, lptr->nick, lptr->username, lptr->hostname)
-		          ;
+	cmduser = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
 	}
 
 	if (cmduser || dccptr)

@@ -543,7 +543,7 @@ WriteOpers()
 		if (tempuser == NULL || tempuser == GenericOper)
 			continue;
 
-		fprintf(fp, "%s %ld\n", luser->nick, tempuser->umodes);
+		fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
 
 #ifdef RECORD_RESTART_TS
 		if (tempuser->nick_ts && (tempuser->nick_ts < current_ts - 330))

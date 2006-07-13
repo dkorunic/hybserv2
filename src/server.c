@@ -801,8 +801,8 @@ s_nick(int ac, char **av)
 			lptr->flags &= ~L_OSREGISTERED;
 
 #ifdef RECORD_RESTART_TS
-		if ((uptr = GetUser(0, lptr->nick, lptr->username,
-				lptr->hostname)) && lptr->flags & L_OSREGISTERED)
+		uptr = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
+		if ((uptr == NULL)) && ((lptr->flags & L_OSREGISTERED))
 		{
 			MyFree(uptr->last_nick);
 			uptr->last_nick = MyStrdup(av[2]);

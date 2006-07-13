@@ -410,7 +410,7 @@ os_process(char *nick, char *command, int sockfd)
 	dccptr = IsDccSock(sockfd);
 
 	if (!dccptr)
-{
+	{
 	/*
 	 * It is a /msg command - give argument 0 so it MUST
 	 * match hostnames, not just nicknames - otherwise if
@@ -422,7 +422,7 @@ os_process(char *nick, char *command, int sockfd)
 	}
 
 	if (cmduser || dccptr)
-{
+	{
 	onick = ouser = ohost = NULL;
 
 	if (!dccptr)

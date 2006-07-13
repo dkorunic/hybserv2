@@ -15,6 +15,6 @@
 char *timeago(time_t, int);
 long timestr(char *);
 struct timeval *GetTime(struct timeval *);
-long GetGMTOffset(time_t);
+long GetTZOffset(time_t);
 
 #endif /* INCLUDED_timestr_h */

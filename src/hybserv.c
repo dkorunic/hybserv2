@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 	putlog(LOG1, "Hybserv2 TS services version %s started", hVersion);
 
 	/* Get the offset from GMT (London time) */
-	gmt_offset = GetGMTOffset(TimeStarted);
+	gmt_offset = GetTZOffset(TimeStarted);
 
 	/*
 	 * the Network list must be initialized before the config

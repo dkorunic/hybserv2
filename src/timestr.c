@@ -398,15 +398,17 @@ struct timeval *GetTime(struct timeval *timer)
 } /* GetTime() */
 
 /*
- * GetGMTOffset()
- * Return the GMT offset from localtime (in seconds)
+ * GetTZOffset()
+ * Return the GMT offset from localtime (in seconds), calculating the DST
+ * offset too
  *
  * Ripped off from Tcpdump with trivial changes.
  */
-long GetGMTOffset(time_t unixtime)
+long GetTZOffset(time_t unixtime)
 {
 	struct tm *tm_gmt, *tm_loc;
 	struct tm s_tm_gmt; /* successive calls get overwriten */
+	int dstflag;
 	long dt, dy;
 
 	if (!unixtime)
@@ -421,6 +423,10 @@ long GetGMTOffset(time_t unixtime)
 		(tm_loc->tm_min - tm_gmt->tm_min) * 60 +
 		(tm_loc->tm_sec - tm_gmt->tm_sec);
 
+	/* calculate the DST offset */
+	dstflag = (tm_loc->tm_isdst > 0) ? 1 : 0;
+	dt += 3600 * dstflag;
+
 	/* is year or julian day different? */
 	dy = tm_loc->tm_year - tm_gmt->tm_year;
 
@@ -429,5 +435,6 @@ long GetGMTOffset(time_t unixtime)
 
 	dt += dy * 86400;
 
-	return dt;
-} /* GetGMTOffset() */
+	/* the total offset is negative to current_ts */
+	return -dt;
+} /* GetTZOffset() */

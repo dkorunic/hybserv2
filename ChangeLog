@@ -7,7 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
-  - write only registered opers in oper.db
+  - write only active & OperServ registered opers in oper.db with TS
   * localtime fixes -- instead of gmtime() use localtime() which
     supposedly knows of DST; fix long-standing GMT bug
   * update MaxLogs docs: upgrade, src, etc.

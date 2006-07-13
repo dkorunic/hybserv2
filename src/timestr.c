@@ -419,7 +419,7 @@ long GetGMTOffset(time_t unixtime)
 	/* calculate base seconds offset */
 	dt = (tm_loc->tm_hour - tm_gmt->tm_hour) * 3600 +
 		(tm_loc->tm_min - tm_gmt->tm_min) * 60 +
-		(tm_loc->tm_sec - tm_gmt->tm_sec)
+		(tm_loc->tm_sec - tm_gmt->tm_sec);
 
 	/* is year or julian day different? */
 	dy = tm_loc->tm_year - tm_gmt->tm_year;

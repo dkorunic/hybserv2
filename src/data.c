@@ -541,7 +541,7 @@ WriteOpers()
 				luser->hostname);
 
 		if (tempuser == NULL)
-			return;
+			continue;
 
 		fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
 

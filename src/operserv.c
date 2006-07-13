@@ -705,7 +705,7 @@ os_loaddata()
 
 			if (!found)
 			{
-				/* previous user line was invalid - ingore all the params */
+				/* previous user line was invalid - ignore all the params */
 				continue;
 			}
 

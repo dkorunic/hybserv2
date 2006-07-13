@@ -519,6 +519,7 @@ WriteOpers()
 	FILE *fp;
 	char tempname[MAXLINE + 1];
 	struct Userlist *tempuser;
+	struct Luser *lptr;
 
 	ircsprintf(tempname, "%s.tmp", OperServDB);
 	fp = CreateDatabase(tempname, "OperServ Database");
@@ -533,6 +534,15 @@ WriteOpers()
 	/* Some O: lines may be for the same * nickname...  */
 	for (tempuser = UserList; tempuser; tempuser = tempuser->next)
 	{
+		lptr = FindClient(tempuser->nick);
+
+		if (lptr == NULL)
+			continue;
+
+		/* only if active and registered */
+		if (!(lptr->flags & L_OSREGISTERED))
+			continue;
+
 		fprintf(fp, "%s %ld\n", tempuser->nick, tempuser->umodes);
 
 #ifdef RECORD_RESTART_TS

@@ -1593,106 +1593,91 @@ struct Userlist *
 			GetUser(int nickonly, char *nickname, char *user, char *host)
 
 {
-	struct Userlist *tempuser,
-				/* we found a hostname match, but not a nick match */
-				*hostmatch,
-				/* we found a nick match, but not a hostname match */
-				*nickmatch;
+	struct Userlist *tempuser = NULL, *last_nick_match = NULL,
+					*last_uh_match = NULL;
+	int hostmatch, usermatch, nickmatch;
 
-	if (!nickname)
-		return (NULL);
+	/* sanity check */
+	if (nickonly && (nickname == NULL))
+		return NULL;
 
-	hostmatch = nickmatch = NULL;
-
-	/*
-	 * First, attempt to match both nickname and hostname, if possible.
-	 * If we don't find a match, try to match just hostnames, because
-	 * it is possible the user is simply using another nickname
-	 */
-
+	/* we will do a three-cathegories matching: hostname, username and
+	 * nickname */
 	for (tempuser = UserList; tempuser; tempuser = tempuser->next)
-{
-		if (!irccmp(tempuser->nick, nickname))
-		{
-			if (nickonly && (!user && !host))
-			{
-				/*
-				 * We found a nickname match - nickonly is 1, and userhost
-				 * is not supplied, return the pointer
-				 */
-				return(tempuser);
-			}
-			else
-			{
-				/*
-				 * We have a nickname match, but nickonly is 0, so try
-				 * to match userhost's as well
-				 */
-				if (match(tempuser->username, user) &&
-				        match(tempuser->hostname, host))
-					return (tempuser);
-			}
-
-			/*
-			 * Either nickonly is 0, and the userhosts don't match, or
-			 * nickonly is 1, but a userhost was still given and does
-			 * not match tempuser's userhost.  In either case, we have
-			 * a nickname match, so store this user structure into
-			 * 'nickmatch', so if we don't find a match later on,
-			 * with a nickname and hostname, we will return 'nickmatch'
-			 * but only if nickonly is 1, meaning we are allowed to
-			 * match only nicknames
-			 */
-			if (!nickmatch)
-				nickmatch = tempuser;
-		}
-		else if (user && host)
-		{
-			if (match(tempuser->username, user) &&
-			        match(tempuser->hostname, host))
-			{
-				/*
-				 * The nicknames do not match, but the userhosts do.
-				 * Record this user structure as a hostname match; in
-				 * case we don't find an exact match with both
-				 * nickname and hostname, this is still a pretty good
-				 * match
-				 */
-				if (!hostmatch)
-					hostmatch = tempuser;
-			}
-		}
-	}
-
-	if (hostmatch)
 	{
-		/*
-		 * The given userhost matches an O: line, but the nickname
-		 * does not - it is still a good match since the user
-		 * may be using a different nickname than usual -
-		 * return the hostname pointer
-		 */
-		return (hostmatch);
+		/* reset flags */
+		hostmatch = usermatch = nickmatch = 0;
+
+		/* matches hostname */
+		if (host != NULL)
+		{
+			if (match(tempuser->hostname, host))
+				hostmatch = 1;
+		}
+		else
+			hostmatch = -1;
+
+		/* matches username */
+		if (user != NULL)
+		{
+			if (match(tempuser->username, user))
+				usermatch = 1;
+		}
+		else
+			usermatch = -1;
+
+		/* matches nickname */
+		if (nickname != NULL)
+		{
+			if (!irccmp(tempuser->nick, nickname))
+				nickmatch = 1;
+		}
+		else
+			nickmatch = -1;
+
+		/* we have host! */
+		if (hostmatch == 1)
+		{
+			/* we have username! */
+			if (usermatch == 1)
+			{
+				/* nickname or we don't do nickmatching */
+				if ((nickmatch == 1) || (nickmatch == -1))
+					return tempuser;
+				else
+					last_uh_match = tempuser;
+			}
+			else if (usermatch == -1)
+			{
+				/* nickname or we don't do nickmatching */
+				if ((nickmatch == 1) || (nickmatch == -1))
+					return tempuser;
+			}
+
+		}
+
+		/* we didn't got host/user cominations, so at least check if it is
+		 * nickname match and write it down */
+		if (nickmatch == 1)
+			last_nick_match = tempuser;
 	}
 
-	if (nickonly && nickmatch)
-	{
-		/*
-		 * the given userhost doesn't have an O: line, but we did
-		 * have a nickname match, and since nickonly is 1, we are
-		 * allowed to disregard hostnames, so return the nickname
-		 * match we found
-		 */
-		return (nickmatch);
-	}
+	/* we had a username and hostname match */
+	if (last_uh_match != NULL)
+		return last_uh_match;
 
+	/* we actually permit a sole nickname match */
+	if (nickonly && (last_nick_match != NULL))
+		return last_nick_match;
+
+	/* no good match, but we have generic opers anyway */
 	if (OpersHaveAccess)
 	{
 		if (IsOperator(FindClient(nickname)))
 			return (GenericOper);
 	}
 
-	return (NULL);
+	return NULL;
 } /* GetUser() */
 
 #if defined AUTO_ROUTING && defined SPLIT_INFO

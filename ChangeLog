@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * new GetUser logic
   * rip off CalcMem, it was reporting invalid memory usage anyways
   - write only active & OperServ registered opers in oper.db with TS
   * localtime fixes -- instead of gmtime() use localtime() which

@@ -588,11 +588,9 @@ os_loaddata()
 {
 	FILE *fp;
 	char line[MAXLINE + 1], **av, *keyword;
-	int ac,
-	ret = 1,
-	      cnt,
-	      found = 0;
-	struct Userlist *tempuser = NULL, *uptr = NULL;
+	int ac, ret = 1, cnt, found = 0, nickonly = 0;
+	struct Userlist *uptr = NULL;
+	char *nick, *user, *host, *tmp;
 
 	if (!(fp = fopen(OperServDB, "r")))
 	{
@@ -600,19 +598,22 @@ os_loaddata()
 		return (-1);
 	}
 
+	nick = user = host = tmp = NULL;
+
 	/*
 	 * If this is being called from ReloadData(), make sure
 	 * all users' umodes are zeroed, or OperServ will
 	 * log a warning about multiple entries
 	 */
-	for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+	for (uptr = UserList; uptr; uptr = uptr->next)
 	{
-		tempuser->umodes = 0;
+		uptr->umodes = 0;
+
 #ifdef RECORD_RESTART_TS
-
-		tempuser->nick_ts = 0;
+		uptr->nick_ts = 0;
+		MyFree(uptr->last_nick);
+		MyFree(uptr->last_server);
 #endif
-
 	}
 
 	cnt = 0;
@@ -637,7 +638,7 @@ os_loaddata()
 
 		/*
 		 * OperServDB format should be:
-		 * Nickname <umodes>
+		 * nick!user@host <umodes>
 		 * where <umodes> is an integer number corresponding to
 		 * the OPERUMODE_* flags
 		 */
@@ -658,35 +659,47 @@ os_loaddata()
 			 * Go through user list and try to find a matching nickname
 			 * with av[0]
 			 */
-			found = 0;
-			for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+			found = nickonly = 0;
+			if ((tmp = strchr(av[0], '!')))
 			{
-				if (!irccmp(av[0], tempuser->nick))
-				{
-					found = 1;
-					uptr = tempuser;
-					if (tempuser->umodes && (tempuser->umodes != OPERUMODE_INIT))
-						/* multiple umodes */
-						continue;
-					else
-						tempuser->umodes = atol(av[1]);
-				} /* if (!irccmp(av[0], tempuser->nick)) */
-			} /* for (tempuser = UserList; tempuser; tempuser = tempuser->next) */
+				*tmp++ = '\0';
+				nick = MyStrdup(av[0]);
 
-			if (!found)
+				char *tmp2;
+				if ((tmp2 = strchr(tmp, '@')))
+				{
+					*tmp2++ = '\0';
+					user = MyStrdup(tmp);
+					host = MyStrdup(tmp2);
+				}
+			}
+			else
+			{
+				nick = MyStrdup(av[0]);
+				nickonly = 1;
+				user = NULL;
+				host = NULL;
+			}
+
+			uptr = GetUser(nickonly, nick, user, host);
+
+			if (uptr != NULL)
+				found = 1;
+			else
 			{
 				/*
 				 * No O: line found matching the nickname
 				 */
-				fatal(1, "%s:%d No O: line entry for nickname [%s] (ignoring)",
-				      OperServDB,
-				      cnt,
-				      av[0]);
+				fatal(1, "%s:%d No O: line entry for [%s!%s@%s] (ignoring)",
+					  OperServDB, cnt, nick, user, host);
 				if (ret > 0)
 					ret = (-1);
 			}
 
 			MyFree(av);
+			MyFree(nick);
+			MyFree(user);
+			MyFree(host);
 		}
 		else
 		{    /* (ircncmp("->", av[0], 2)) */
@@ -703,17 +716,6 @@ os_loaddata()
 			if (!found)
 			{
 				/* previous user line was invalid - ingore all the params */
-				continue;
-			}
-
-			/* check if there is no nickname associated with the data */
-			if (!uptr)
-			{
-				fatal(1, "%s:%d No nickname associated with data",
-				      OperServDB,
-				      cnt);
-				if (ret > 0)
-					ret = -1;
 				continue;
 			}
 
@@ -767,10 +769,10 @@ os_loaddata()
 	 * an entry in oper.db - therefore give them
 	 * default usermodes (+cby)
 	 */
-	for (tempuser = UserList; tempuser; tempuser = tempuser->next)
+	for (uptr = UserList; uptr; uptr = uptr->next)
 	{
-		if (tempuser->umodes == OPERUMODE_INIT)
-			tempuser->umodes = (OPERUMODE_C | OPERUMODE_B | OPERUMODE_Y);
+		if (uptr->umodes == OPERUMODE_INIT)
+			uptr->umodes = (OPERUMODE_C | OPERUMODE_B | OPERUMODE_Y);
 	}
 
 	return (ret);

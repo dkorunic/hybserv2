@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  * when writing oper.db, enter write O-line info of each registered oper
+    so that we can easily match
   * new GetUser logic
   * rip off CalcMem, it was reporting invalid memory usage anyways
   - write only active & OperServ registered opers in oper.db with TS

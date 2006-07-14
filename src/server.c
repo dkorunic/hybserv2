@@ -802,7 +802,7 @@ s_nick(int ac, char **av)
 
 #ifdef RECORD_RESTART_TS
 		uptr = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
-		if ((uptr == NULL) && (lptr->flags & L_OSREGISTERED))
+		if ((uptr != NULL) && (lptr->flags & L_OSREGISTERED))
 		{
 			MyFree(uptr->last_nick);
 			uptr->last_nick = MyStrdup(av[2]);
@@ -883,7 +883,6 @@ s_nick(int ac, char **av)
 	} /* if (ac == 4) */
 
 	/* It is a new user */
-
 	if (ac < 9)
 		return;
 
@@ -1048,7 +1047,7 @@ s_nick(int ac, char **av)
 	 * if so, re-register them
 	 */
 	uptr = GetUser(0, av[1], av[5], av[6]);
-	if ((uptr != NULL) && uptr->last_nick &&
+	if ((uptr != NULL) && (uptr->last_nick != NULL) &&
 			!irccmp(uptr->last_nick, av[1])
 #ifdef OPERNICKIDENT
 			&& (nptr) && (nptr->flags & NS_IDENTIFIED)

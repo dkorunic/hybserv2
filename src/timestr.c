@@ -435,6 +435,5 @@ long GetTZOffset(time_t unixtime)
 
 	dt += dy * 86400;
 
-	/* the total offset is negative to current_ts */
-	return -dt;
+	return dt;
 } /* GetTZOffset() */

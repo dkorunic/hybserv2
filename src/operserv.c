@@ -684,7 +684,10 @@ os_loaddata()
 			uptr = GetUser(nickonly, nick, user, host);
 
 			if (uptr != NULL)
+			{
 				found = 1;
+				uptr->umodes = atoi(av[1]);
+			}
 			else
 			{
 				/*

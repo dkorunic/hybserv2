@@ -423,9 +423,12 @@ long GetTZOffset(time_t unixtime)
 		(tm_loc->tm_min - tm_gmt->tm_min) * 60 +
 		(tm_loc->tm_sec - tm_gmt->tm_sec);
 
+	/* not needed */
+#if 0
 	/* calculate the DST offset */
 	dstflag = (tm_loc->tm_isdst > 0) ? 1 : 0;
 	dt += 3600 * dstflag;
+#endif
 
 	/* is year or julian day different? */
 	dy = tm_loc->tm_year - tm_gmt->tm_year;

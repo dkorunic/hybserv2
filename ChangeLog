@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - finally confirm TZ offset calculation is proper [thanks Ilian]
   * when writing oper.db, enter write O-line info of each registered oper
     so that we can easily match
   * new GetUser logic

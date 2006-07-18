@@ -694,7 +694,10 @@ os_loaddata()
 				 * No O: line found matching the nickname
 				 */
 				fatal(1, "%s:%d No O: line entry for [%s!%s@%s] (ignoring)",
-					  OperServDB, cnt, nick, user, host);
+					  OperServDB, cnt,
+					  (nick != NULL) ? nick : "unknown",
+					  (user != NULL) ? user : "unknown",
+					  (host != NULL) ? host : "unknown");
 				if (ret > 0)
 					ret = (-1);
 			}

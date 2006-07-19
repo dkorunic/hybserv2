@@ -28,6 +28,7 @@
 #include "statserv.h"
 #include "timer.h"
 #include "jupe.h"
+#include "timestr.h"
 
 /* Global timer that will reduce local usage of time() -kre */
 time_t current_ts;

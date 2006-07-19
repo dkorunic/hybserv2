@@ -270,6 +270,9 @@ void DoTimer(time_t unixtime)
 		 * a new one.
 		 */
 		CheckLogs(unixtime);
+
+		/* recalculate DST/TZ offset again at midnight */
+		gmt_offset = GetTZOffset(unixtime);
 	} /* if (((unixtime + gmt_offset) % 86400) == 0) */
 
 	if (BackupFreq && (((unixtime + gmt_offset) % BackupFreq) == 0))

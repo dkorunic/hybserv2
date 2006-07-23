@@ -764,14 +764,23 @@ ReadHub()
 	/* read in a line */
 	length = recv(HubSock, buffer, BUFSIZE, 0);
 
-	if ((length == (-1)) && ((errno == EWOULDBLOCK) || (errno == EAGAIN)))
-		return 2; /* no error - there's just nothing to read */
+	/* there's just nothing to read */
+	if (length == 0)
+		return 2;
 
-	if (length <= 0)
+	/* error in read */
+	if (length == -1)
 	{
-		putlog(LOG1, "Read error from server: %s",
-		       strerror(errno));
-		return 0; /* the connection was closed */
+			if ((errno == EWOULDBLOCK) || (errno == EAGAIN))
+				/* there's just nothing to read */
+				return 2;
+			else
+			{
+				/* the connection was closed */
+				putlog(LOG1, "Read error from server: %s",
+			       strerror(errno));
+				return 0;
+			}
 	}
 
 	Network->RecvB += length;

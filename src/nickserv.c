@@ -4751,7 +4751,8 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
 	}
 
 	RecordCommand("%s: %s!%s@%s UNFORBID [%s]",
-				  n_NickServ, lptr->nick, lptr->username, lptr->hostname, av[1]);
+				  n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+				  av[1]);
 
 	o_Wallops("UNFORBID from %s for nick [%s]", lptr->nick, av[1]);
 
@@ -4766,6 +4767,9 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
 	}
 	else
 	{
+		/* extend collision timer for 30 seconds */
+		nptr->collide_ts = current_ts + 30;
+
 #ifdef LINKED_NICKNAMES
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
 #else

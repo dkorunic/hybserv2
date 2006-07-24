@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  * give grace period of 30secs for unforbidden nickname
+  * misc changes on sock code to better detect server disconnects
   + recalculate TZ/DST every full hour [thanks Ilian]
   - finally confirm TZ offset calculation is proper [thanks Ilian]
   * when writing oper.db, enter write O-line info of each registered oper

@@ -1039,6 +1039,9 @@ DeleteNick(struct NickInfo *nickptr)
 
 			putlog(LOG2, "%s: Deleting [%s] caused deletion of channel [%s]",
 				   n_NickServ, nickptr->nick, cptr->name);
+			SendUmode(OPERUMODE_S,
+					"%s: Deleting [%s] caused deletion of channel [%s]",
+					n_NickServ, nickptr->nick, cptr->name);
 
 			/* And delete channel finally */
 			MyFree(cptr->founder);
@@ -1534,7 +1537,14 @@ collide(char *nick, int dopseudo)
 	}
 #endif /* defined SVSNICK || defined FORCENICK */
 
-#if !defined SVSNICK && !defined FORCENICK
+	/* Sending a server kill will be quieter than an oper
+	 * kill since most clients are -k */
+	toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n",
+		   lptr->nick, Me.name, n_NickServ);
+
+	/* don't add pseudo nickname after KILL */
+	if (!dopseudo)
+		return;
 
 	/* normal ghosted nickname, automatically after not identing */
 #ifdef DANCER
@@ -1550,17 +1560,7 @@ collide(char *nick, int dopseudo)
 			   Me.name, "Nickname Enforcement");
 
 #endif /* DANCER */
-
-#endif
-
-	/* Sending a server kill will be quieter than an oper
-	 * kill since most clients are -k */
-	toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
-		   lptr->nick, Me.name, n_NickServ, sendstr);
-
-	/* don't add pseudo nickname after KILL */
-	if (!dopseudo)
-		return;
+	toserv("%s\r\n",sendstr);
 
 	/* erase the old user */
 	DeleteClient(lptr);

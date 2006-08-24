@@ -1039,6 +1039,9 @@ DeleteNick(struct NickInfo *nickptr)
 
 			putlog(LOG2, "%s: Deleting [%s] caused deletion of channel [%s]",
 				   n_NickServ, nickptr->nick, cptr->name);
+			SendUmode(OPERUMODE_S,
+					"%s: Deleting [%s] caused deletion of channel [%s]",
+					n_NickServ, nickptr->nick, cptr->name);
 
 			/* And delete channel finally */
 			MyFree(cptr->founder);

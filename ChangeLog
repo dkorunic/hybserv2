@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #127: NickServ: deleting [%s] caused deletion of channel [%s] not
+    shown on partyline [Brian Brazil]
   - fix #125: fix regression in FALLBACK_TO_KILL [Brian Brazil]
   * give grace period of 30secs for unforbidden nickname
   * misc changes on sock code to better detect server disconnects

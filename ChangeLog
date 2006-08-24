@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - re-fix #127...
   - fix #127: NickServ: deleting [%s] caused deletion of channel [%s] not
     shown on partyline [Brian Brazil]
   - fix #125: fix regression in FALLBACK_TO_KILL [Brian Brazil]

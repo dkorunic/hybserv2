@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix #125: fix regression in FALLBACK_TO_KILL [Brian Brazil]
   * give grace period of 30secs for unforbidden nickname
   * misc changes on sock code to better detect server disconnects
   + recalculate TZ/DST every full hour [thanks Ilian]

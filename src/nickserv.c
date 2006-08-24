@@ -1469,10 +1469,8 @@ collide(char *nick, int dopseudo)
 	int j;
 #endif
 
-#if !defined SVSNICK && !defined FORCENICK
 	char **av;
 	char sendstr[MAXLINE + 1];
-#endif
 
 	if (!SafeConnect)
 		return;
@@ -1553,6 +1551,8 @@ collide(char *nick, int dopseudo)
 
 #endif /* DANCER */
 
+#endif
+
 	/* Sending a server kill will be quieter than an oper
 	 * kill since most clients are -k */
 	toserv("KILL %s :%s!%s (Nickname Enforcement)\r\n%s",
@@ -1583,7 +1583,6 @@ collide(char *nick, int dopseudo)
 		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
 		nptr->flags |= NS_RELEASE;
 	}
-#endif
 } /* collide() */
 
 /*

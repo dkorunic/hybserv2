@@ -4766,16 +4766,14 @@ n_unforbid(struct Luser *lptr, int ac, char **av)
 	}
 	else
 	{
-		/* extend collision timer for 30 seconds */
-		nptr->collide_ts = current_ts + 30;
-
 #ifdef LINKED_NICKNAMES
 		for (tmp = realptr; tmp != NULL; tmp = tmp->nextlink)
 #else
 		tmp = realptr;
 #endif /* LINKED_NICKNAMES */
 		{
-			tmp->flags &= ~NS_FORBID;
+			/* other flags will be set from CheckNick() code */
+			tmp->flags &= ~(NS_FORBID | NS_IDENTIFIED | NS_COLLIDE);
 
 			MyFree(tmp->forbidby);
 			MyFree(tmp->forbidreason);

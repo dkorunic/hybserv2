@@ -7,6 +7,9 @@ $Id$
 
 Hybserv-HEAD
 
+  - initial import of Debian *.sgml sources for manpages [thanks to Joshua
+    Kwan and Aurélien GÉRÔME]
+  - check for mkdir command/path and fill $(MKDIR) in Makefiles
   - merge #127 back in and re-fix #125
   - fix #127: NickServ: deleting [%s] caused deletion of channel [%s] not
     shown on partyline [Brian Brazil]

@@ -94,6 +94,7 @@ AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(LN, ln)
 AC_PATH_PROG(TOUCH, touch)
+AC_PATH_PROG(MKDIR, mkdir)
 
 dnl Find what to use as dependancy generator
 AC_PATH_PROG(MKDEP, mkdep)

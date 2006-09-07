@@ -30,6 +30,7 @@ RMR = @RM@ -rf
 CP = @CP@
 CPR = @CP@ -R
 LN = @LN@ -sf
+MKDIR = @MKDIR@ -p
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_BIN = $(INSTALL) -m 755
@@ -93,15 +94,15 @@ install: all install-binary install-help
 install-binary:
 	@if test ! -d $(BINDIR); then \
 		echo Creating $(BINDIR); \
-		mkdir $(BINDIR) 2>/dev/null; \
+		$(MKDIR) $(BINDIR) 2>/dev/null; \
 	fi
 	@if test ! -d $(CONFDIR); then \
 		echo Creating $(CONFDIR); \
-		mkdir $(CONFDIR) 2>/dev/null; \
+		$(MKDIR) $(CONFDIR) 2>/dev/null; \
 	fi
 	@if test ! -d $(LOGDIR); then \
 		echo Creating $(LOGDIR); \
-		mkdir $(LOGDIR) 2>/dev/null; \
+		$(MKDIR) $(LOGDIR) 2>/dev/null; \
 	fi
 	@echo '** Installing Hybserv2 in $(BINDIR) **'
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
@@ -131,11 +132,11 @@ install-binary:
 install-help:
 	@if test ! -d $(HELPDIR); then \
 		echo Creating $(HELPDIR); \
-		mkdir $(HELPDIR) 2>/dev/null; \
+		$(MKDIR) $(HELPDIR) 2>/dev/null; \
 	else \
 		echo Removing old $(HELPDIR); \
 		$(RMR) $(HELPDIR); \
-		mkdir $(HELPDIR) 2>/dev/null; \
+		$(MKDIR) $(HELPDIR) 2>/dev/null; \
 	fi
 	@echo Installing help files in $(HELPDIR)
 	@$(CPR) help/* $(HELPDIR)
@@ -146,8 +147,8 @@ autoconf:
 	autoreconf
 
 # Tags
-etags:
-	etags include/*.h src/*.c
+tags:
+	ctags-exuberant include/*.h src/*.c
 
 # End of Makefile
 # vim: ts=4:noet

@@ -88,52 +88,87 @@
       below.
     </para>
 
-    <para>
-      NickServ allows users to register their nicknames. Every client can
-      become an owner for a nickname by simply defining his own password
-      and identifying each time on IRC network login. NickServ can enforce
-      this registration as mandatory, and it can kill or rename users
-      which do not successfully complete the process of identification in a
-      given period of time. The righteous owners of nicks can also reclaim
-      their nicknames with their registration password, in case of
-      necessity. Nickname registration allows usage of many other services
-      which are described in the following paragraphs.
-    </para>
+    <variablelist>
+      <varlistentry>
+        <term>NickServ</term>
 
-    <para>
-      ChanServ allows users with registered nicknames to register their
-      own channels. This registration is enforced with a simple access
-      list which defines the access of channel members. The owner (founder
-      of a channel) and his successor can specify for each user (or
-      nickname mask) what is his status in channel: for instance does an
-      op, voice, halfop flags. Those flags can be auto- type (nickname
-      gets a flag automatically when joining the channel) or cmd- type
-      (with a proper access, nickname has to manually enter a command to
-      get an action done). ChanServ can also maintain a blacklist of users
-      with either nicknames or masks which will be automatically kicked
-      and banned from the channel.
-    </para>
+        <listitem>
+          <para>
+            NickServ allows users to register their nicknames. Every
+            client can become an owner for a nickname by simply defining
+            his own password and identifying each time on IRC network
+            login. NickServ can enforce this registration as mandatory,
+            and it can kill or rename users which do not successfully
+            complete the process of identification in a given period of
+            time. The righteous owners of nicks can also reclaim their
+            nicknames with their registration password, in case of
+            necessity.  Nickname registration allows usage of many other
+            services which are described in the following paragraphs.
+          </para>
+        </listitem>
+      </varlistentry>
 
-    <para>
-      MemoServ is a message service for registered nicknames. As opposed
-      to typical IRC which is a real-time service, it has got off-line
-      capabilities. This means users are able to send messages to each
-      other for later reading, typically on login to an IRC network.
-    </para>
+      <varlistentry>
+        <term>ChanServ</term>
 
-    <para>
-      StatServ is a statistical service mainly to be used by admins, but
-      it has got some possibly useful information for users too. It shows
-      active services' admins as well as all active IRC operators (globals
-      and locals), number of registered nicknames and channels and
-      miscellaneous other statistics.
-    </para>
+        <listitem>
+          <para>
+            ChanServ allows users with registered nicknames to register
+            their own channels. This registration is enforced with a
+            simple access list which defines the access of channel
+            members. The owner (founder of a channel) and his successor
+            can specify for each user (or nickname mask) what is his
+            status in channel: for instance does an op, voice, halfop
+            flags. Those flags can be auto- type (nickname gets a flag
+            automatically when joining the channel) or cmd- type (with a
+            proper access, nickname has to manually enter a command to get
+            an action done). ChanServ can also maintain a blacklist of
+            users with either nicknames or masks which will be
+            automatically kicked and banned from the channel.
+          </para>
+        </listitem>
+      </varlistentry>
 
-    <para>
-      Global messages every user on connect with contents of logon.news
-      and allows operators to easily send global messages and
-      notifications to all users.
-    </para>
+      <varlistentry>
+        <term>MemoServ</term>
+
+        <listitem>
+          <para>
+            MemoServ is a message service for registered nicknames. As
+            opposed to typical IRC which is a real-time service, it has
+            got off-line capabilities. This means users are able to send
+            messages to each other for later reading, typically on login
+            to an IRC network.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>StatServ</term>
+
+        <listitem>
+          <para>
+            StatServ is a statistical service mainly to be used by admins,
+            but it has got some possibly useful information for users too.
+            It shows active services' admins as well as all active IRC
+            operators (globals and locals), number of registered nicknames
+            and channels and miscellaneous other statistics.
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Global</term>
+
+        <listitem>
+          <para>
+            Global usually messages every user on connect with contents of
+            logon.news and allows operators to easily send global messages
+            and notifications to all users.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </refsect1>
 
   <refsect1>
@@ -179,17 +214,21 @@
     <title>AUTHORS</title>
 
     <para>
-        <address>
-            <firstname>Dinko</firstname>
-            <surname>Korunic</surname>
-            <email>kreator@srce.hr</email>,
-        </address>
-
+        This manpage is was originally written by
         <address>
             <firstname>Joshua</firstname>
             <surname>Kwan</surname>
             <email>joshk@triplehelix.org</email>
         </address>
+        for <productname>Debian</productname> <acronym>GNU</acronym>
+        <productname>Linux</productname> distribution. It has been
+        rewritten and is now maintained by 
+        <address>
+            <firstname>Dinko</firstname>
+            <surname>Korunic</surname>
+            <email>kreator@srce.hr</email>
+        </address>
+
   </refsect1>
 </refentry>
 

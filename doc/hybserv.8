@@ -3,7 +3,7 @@
 .\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
 .\" Please send any bug reports, improvements, comments, patches, 
 .\" etc. to Steve Cheng <steve@ggi-project.org>.
-.TH "HYBSERV" "8" "15 September 2006" "" ""
+.TH "HYBSERV" "8" "16 September 2006" "" ""
 
 .SH NAME
 hybserv \- daemon which provides Hybrid-compatible IRC services
@@ -23,6 +23,14 @@ registration services, providing users the means to officially
 register their nicknames and channels and regain control of them
 whenever needed. The latter to is supposed to prevent the takeovers
 and notorious IRC wars, especially on a larger IRC network.
+.PP
+Hybserv2 is a new and improved version of the now unsupported Hybserv,
+sporting new features, bugfixes, and more. Hybserv was specifically
+designed to run with Hybrid6/7 IRCd, although it should work with Ratbox
+IRCd and any other Hybrid-based IRCd. These services (more or less same
+code) are currently used by several other networks such as idolNET,
+BalcanNET, BGNet, BGFree, UniBG, BCNet, GunNet, ShakeIT, FreeWorld,
+IRCBG, FreeNode/OPN.
 .PP
 When successfully configured and connected,
 \fBhybserv\fR appears like any other IRC server.
@@ -87,17 +95,37 @@ invoked as \fBshowchans\fR(8) or
 \fBshownicks\fR(8).
 .SH "SEE ALSO"
 .PP
-\fBshowchans\fR(8), \fBshownicks\fR(8),
+\fBshowchans\fR(8),
+\fBshownicks\fR(8),
 \fBircd-hybrid\fR(8)
 .PP
 http://www.hybserv.net <URL:http://www.hybserv.net>
+.PP
+http://www.ircd-hybrid.net <URL:http://www.ircd-hybrid.net>
 .SH "CAVEATS"
 .PP
 Do not use if you do not have permission from your IRC administrator
-or if you are not administrator yourself. May explode in fire!
+or if you are not administrator yourself. Caution, may explode in fire!
 .SH "BUGS"
 .PP
 A dozen. Lots of. Numerous. Many. Swarms.
+.SH "COPYRIGHT"
+.PP
+Copyright (C) 2006  Dinko Korunic and Hybserv coding team
+.PP
+Hybserv2 is part of the GNU project and is free software. You can
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation. See the
+file README in the Hybserv2 distribution for more details regarding
+redistribution. You should have received a copy of the GNU General
+Public License along with the source for Hybserv2; see the file
+COPYING. If not, write to the Free Software Foundation, 59 Temple
+Place, Suite 330, Boston, MA 02111-1307, USA. 
+.PP
+Hybserv2 is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
 .SH "AUTHORS"
 .PP
 This manpage is was originally written by
@@ -110,3 +138,22 @@ rewritten and is now maintained by
 Dinko
 Korunic
 <kreator@srce.hr>\&.
+.PP
+Send bug reports or comments to the above address or leave a bug ticket
+at http://www.hybserv.net <URL:http://www.hybserv.net>\&.
+.PP
+Per Sidewnder's (Cosine's) request, original Hybserv will no longer be
+supported. So if you have questions or some problems, please upgrade
+first to a recent stable or even to a development version.  The former
+Hybserv development team has decided to spin off and focus its energy
+towards the Hybserv2 project. Like the name implies, this new version is
+even better. If there is something you would like to see added to
+Hybserv2, please let us know as we are always looking for fresh ideas. 
+.PP
+Hybserv was first coded by
+Patrick
+Alken
+<wnder@underworld.net>
+and is now maintained by the Hybserv2 coding team, unless otherwise
+mentioned in the code. For more information see the README file in
+Hybserv2 distribution.

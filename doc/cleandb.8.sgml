@@ -6,7 +6,7 @@
  This file is licensed under the terms of the GNU General Public License,
  Version 2 or any later version published by the Free Software Foundation.
 
- Copyright (C) 2006 Dinko Korunic <kreator@srce.hr>
+ Copyright (C) 2006  Dinko Korunic and Hybserv2 coding team
 -->
 
 <!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.2//EN" [
@@ -46,7 +46,7 @@
   <refnamediv>
     <refname>&dhbinary;</refname>
     <refpurpose>
-        purges old Hybserv services database backups
+        purges old Hybserv2 services database backups
     </refpurpose>
   </refnamediv>
 
@@ -66,8 +66,9 @@
     </para>
 
     <para>
-      <command>&dhbinary;</command> is a script that purges all the old
-      backups in Hybserv backup directory that are not from the past month.
+      <command>&dhbinary;</command> is a simple program that purges all the
+      old backups in Hybserv backup directory that are not from the past
+      month.
     </para>
   </refsect1>
 
@@ -79,7 +80,9 @@
         <term><option>backupdir</option></term>
 
         <listitem>
-          <para>Path to your backups, relative or absolute.</para>
+          <para>
+            Path to your backups, relative or absolute.
+          </para>
         </listitem>
       </varlistentry>
     </variablelist>

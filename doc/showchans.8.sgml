@@ -1,127 +1,216 @@
-<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!-- $Id$ -->
 
-  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
-  <!ENTITY dhfirstname "<firstname>Joshua Kwan</firstname>">
-  <!ENTITY dhsurname   "<surname>Kwan</surname>">
-  <!-- Please adjust the date whenever revising the manpage. -->
-  <!ENTITY dhdate      "<date>4/1/03</date>">
-  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
-       allowed: see man(7), man(1). -->
-  <!ENTITY dhsection   "<manvolnum>8</manvolnum>">
-  <!ENTITY dhemail     "<email>joshk@triplehelix.org</email>">
-  <!ENTITY dhusername  "Joshua Kwan">
-  <!ENTITY dhucpackage "<refentrytitle>hybserv</refentrytitle>">
-  <!ENTITY dhpackage   "showchans">
+<!--
+ This is the manual page for the Hybserv2 IRC services.
 
-  <!ENTITY debian      "<productname>Debian</productname>">
-  <!ENTITY gnu         "<acronym>GNU</acronym>">
-  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+ This file is licensed under the terms of the GNU General Public License,
+ Version 2 or any later version published by the Free Software Foundation.
+
+ Copyright (C) 2006  Dinko Korunic and Hybserv2 coding team
+-->
+
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.2//EN" [
+  <!ENTITY dhdate      "September 16, 2006">
+  <!ENTITY dhbinary    "showchans">
 ]>
 
 <refentry>
   <refentryinfo>
     <address>
-      &dhemail;
+        <email>kreator@srce.hr</email>,
     </address>
+
+    <address>
+        <email>hybserv@hybserv.net</email>
+    </address>
+
     <author>
-      &dhfirstname;
-      &dhsurname;
+        <firstname>Dinko</firstname>
+        <surname>Korunic<surname>
+        <email>kreator@srce.hr</email>
     </author>
+
     <copyright>
-      <year>2003</year>
-      <holder>&dhusername;</holder>
+      <year>2006</year>
+      <holder>Dinko Korunic and Hybserv2 coding team</holder>
     </copyright>
-    &dhdate;
+
+    <date>&dhdate;</date>
   </refentryinfo>
+
   <refmeta>
-    &dhucpackage;
-
-    &dhsection;
+    <refentrytitle>&dhbinary;</refentrytitle>
+    <manvolnum>8</manvolnum>
   </refmeta>
-  <refnamediv>
-    <refname>&dhpackage;, shownicks</refname>
 
-    <refpurpose>show channels and nicks registered with IRC 
-services</refpurpose>
+  <refnamediv>
+    <refname>&dhbinary;</refname>
+    <refpurpose>
+        shows channels registered with Hybserv2 services
+    </refpurpose>
   </refnamediv>
+
   <refsynopsisdiv>
     <cmdsynopsis>
-      <command>&dhpackage;</command>
-
-      <arg><option>-f <replaceable>data</replaceable></option></arg>
-
+      <command>&dhbinary;</command>
+	    <arg><option>-h</option><option>-?</option></arg>
+      <arg><option>-f <replaceable>file</replaceable></option></arg>
       <arg><option>-n</option></arg>
-	<arg><option>-h</option><option>-?</option></arg>
-	<arg><replaceable>nick1</replaceable> / <replaceable>chan1</replaceable></arg>
+    	<arg><replaceable>chan1</replaceable> <replaceable>chan2</replaceable>
+        <replaceable>...</replaceable</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
+
   <refsect1>
     <title>DESCRIPTION</title>
 
-    <para>This manual page documents briefly the
-      <command>&dhpackage;</command> and <command>shownicks</command>
-      commands.</para>
+    <para>
+      This manual page documents briefly the <command>&dhbinary;</command>
+      command.
+    </para>
 
-    <para>This manual page was written for the &debian; distribution
-      because the original program does not have a manual page.</para>
-
-    <para><command>&dhpackage;</command> and 
-<command>shownicks</command> are symlinks to the hybserv binary. 
-Invoked without arguments, they read the default channel or nickname 
-databases and display all the registered channels or nicknames. 
-The optional arguments are described below.</para>
-
+    <para>
+      <command>&dhbinary;</command> is usually a symlink to a main Hybserv2
+      binary. It can read Hybserv2 channel database and display some of
+      channel information.
+    </para>
   </refsect1>
+
   <refsect1>
     <title>OPTIONS</title>
 
     <variablelist>
       <varlistentry>
-        <term><option>-h</option>
+        <term>
+          <option>-h</option>
           <option>-?</option>
         </term>
+
         <listitem>
-          <para>Shows the summary of options.</para>
+          <para>
+            Shows help summary page.
+          </para>
         </listitem>
       </varlistentry>
+
       <varlistentry>
-        <term><option>-f data</option></term>
-        <listitem><para>Specify data as the nick.db or chan.db to read from.</para>
+        <term><option>-f file</option></term>
+
+        <listitem>
+          <para>
+            Allows to specify alternative file "file" as channel database.
+          </para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
         <term><option>-n</option></term>
-        <listitem><para>Instead of displaying all the nicks, 
-display how many registered channels or nicks there are.</para></listitem>
+
+        <listitem>
+          <para>
+            Instead of showing statistics per every channel, this will cause
+            only cumulative number of registered channels to be shown.
+          </para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term><option>nick1, chan1</option></term>
-        <listitem><para>Show details on the specified nick or 
-channel.</para>
-</listitem>
+        <term>
+          <option>chan1</option>
+          <option>chan2</option>
+          <option>...</option>
+        </term>
+
+        <listitem>
+          <para>
+            Shows details on one or more specified channels.
+          </para>
+        </listitem>
       </varlistentry>
 
     </variablelist>
   </refsect1>
+
   <refsect1>
     <title>SEE ALSO</title>
 
-    <para>hybserv (8), ircd-hybrid (8).</para>
-
+    <para>
+      <command>hybserv</command>(8)
+    </para>
   </refsect1>
+
   <refsect1>
-    <title>AUTHOR</title>
+    <title>COPYRIGHT</title>
 
-    <para>This manual page was written by &dhusername; &lt;&dhemail;&gt; for
-      the &debian; system (but may be used by others).  Permission is
-      granted to copy, distribute and/or modify this document under
-      the terms of the &gnu; Free Documentation
-      License, Version 1.1 or any later version published by the Free
-      Software Foundation; with no Invariant Sections, no Front-Cover
-      Texts and no Back-Cover Texts.</para>
+    <para>
+       Copyright (C) 2006  Dinko Korunic and Hybserv coding team
+    </para>
 
+    <para>
+       Hybserv2 is part of the GNU project and is free software. You can
+       redistribute it and/or modify it under the terms of the GNU General
+       Public License as published by the Free Software Foundation. See the
+       file README in the Hybserv2 distribution for more details regarding
+       redistribution. You should have received a copy of the GNU General
+       Public License along with the source for Hybserv2; see the file
+       COPYING. If not, write to the Free Software Foundation, 59 Temple
+       Place, Suite 330, Boston, MA 02111-1307, USA. 
+     </para>
+
+    <para>
+       Hybserv2 is distributed in the hope that it will be useful, but WITHOUT
+       ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+       FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+       for more details.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>AUTHORS</title>
+
+    <para>
+      This manpage is was originally written by
+      <address>
+        <firstname>Joshua</firstname>
+        <surname>Kwan</surname>
+        <email>joshk@triplehelix.org</email>
+      </address>
+      for <productname>Debian</productname> <acronym>GNU</acronym>
+      <productname>Linux</productname> distribution. It has been
+      rewritten and is now maintained by 
+      <address>
+        <firstname>Dinko</firstname>
+        <surname>Korunic</surname>
+        <email>kreator@srce.hr</email>.
+      </address>
+    </para>
+
+    <para>
+      Send bug reports or comments to the above address or leave a bug ticket
+      at <ulink url="http://www.hybserv.net">http://www.hybserv.net</ulink>.
+    </para>
+
+    <para>
+      Per Sidewnder's (Cosine's) request, original Hybserv will no longer be
+      supported. So if you have questions or some problems, please upgrade
+      first to a recent stable or even to a development version.  The former
+      Hybserv development team has decided to spin off and focus its energy
+      towards the Hybserv2 project. Like the name implies, this new version is
+      even better. If there is something you would like to see added to
+      Hybserv2, please let us know as we are always looking for fresh ideas. 
+    </para>
+
+    <para>
+      Hybserv was first coded by
+      <address>
+        <firstname>Patrick</firstname>
+        <surname>Alken</surname>
+        <email>wnder@underworld.net</email>
+      </address>
+      and is now maintained by the Hybserv2 coding team, unless otherwise
+      mentioned in the code. For more information see the README file in
+      Hybserv2 distribution.
+    </para>
   </refsect1>
 </refentry>
 
@@ -140,6 +229,6 @@ sgml-exposed-tags:nil
 sgml-local-catalogs:nil
 sgml-local-ecat-files:nil
 End:
+vim: et tw=78 syn=sgml
+vi: ts=2 sw=2
 -->
-
-

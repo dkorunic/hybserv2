@@ -53,13 +53,14 @@
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>&dhbinary;</command>
-	    <arg><option>-h</option><option>-?</option></arg>
+	    <arg><option>-h</option>|<option>-?</option></arg>
       <arg><option>-f <replaceable>file</replaceable></option></arg>
       <arg><option>-n</option></arg>
     	<arg><replaceable>chan1</replaceable> <replaceable>chan2</replaceable>
-        <replaceable>...</replaceable</arg>
+        <replaceable>...</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
+
 
   <refsect1>
     <title>DESCRIPTION</title>
@@ -81,9 +82,7 @@
 
     <variablelist>
       <varlistentry>
-        <term>
-          <option>-h</option>
-          <option>-?</option>
+        <term><option>-h</option>|<option>-?</option>
         </term>
 
         <listitem>
@@ -115,11 +114,8 @@
       </varlistentry>
 
       <varlistentry>
-        <term>
-          <option>chan1</option>
-          <option>chan2</option>
-          <option>...</option>
-        </term>
+        <term><option>chan1</option> <option>chan2</option>
+          <option>...</option></term>
 
         <listitem>
           <para>

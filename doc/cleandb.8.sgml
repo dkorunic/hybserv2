@@ -46,7 +46,7 @@
   <refnamediv>
     <refname>&dhbinary;</refname>
     <refpurpose>
-        purges old Hybserv2 services database backups
+      purges old Hybserv2 services database backups
     </refpurpose>
   </refnamediv>
 

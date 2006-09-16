@@ -46,7 +46,7 @@
   <refnamediv>
     <refname>&dhbinary;</refname>
     <refpurpose>
-        daemon which provides Hybrid-compatible IRC services
+      daemon which provides Hybrid-compatible IRC services
     </refpurpose>
   </refnamediv>
 

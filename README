@@ -10,11 +10,11 @@ for Hybrid IRC servers, but may work with others as well. It includes
 OperServ, NickServ, ChanServ, MemoServ, StatServ, HelpServ, and Global.
 Each of the services can be enabled and disabled as necessary.
 
-Hybserv was specifically designed to run with Hybrid6/7 ircd, although it
-*should* work with Ratbox ircd and any other Hybrid-based ircd. You may
+Hybserv was specifically designed to run with Hybrid6/7 IRCd, although it
+*should* work with Ratbox IRCd and any other Hybrid-based IRCd. You may
 find the Hybrid IRC daemon at http://ircd-hybrid.com/. These services
 (more or less same code) are currently used by several other networks such
-as idolNET, BalcanNET, BGNet, BGFree, UniBG< BCNet, GunNet, ShakeIT,
+as idolNET, BalcanNET, BGNet, BGFree, UniBG, BCNet, GunNet, ShakeIT,
 FreeWorld, IRCBG, FreeNode/OPN.
 
 The former Hybserv development team has decided to spin off and focus its

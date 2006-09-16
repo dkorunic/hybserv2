@@ -15,6 +15,9 @@ CONFDIR = $(PREFIX)/hybserv
 # (should match HelpPath in settings.conf)
 HELPDIR = $(PREFIX)/hybserv/help
 
+# Set this to the directory to install document files 
+DOCDIR = $(PREFIX)/hybserv/doc
+
 # Set this to the directory for logs repository
 # (should match LogPath in settings.conf)
 LOGDIR = $(PREFIX)/hybserv/logs
@@ -35,6 +38,7 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_BIN = $(INSTALL) -m 755
 INSTALL_SECURE = $(INSTALL) -m 600
+INSTALL_DOC = $(INSTALL) -m 644
 
 # Executable programs
 BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
@@ -43,6 +47,10 @@ BINPROGS = cleandb encryptconf encryptdb mkpasswd servchk \
 SECUREFILES = hybserv.conf settings.conf jupes.conf glines.conf
 # General configuration files
 CONFFILES = motd.dcc motd.global
+# Docfiles, manpages, etc
+DOCFILES1 = README-FLAGS cleandb.8 hybserv.8 showchans.8 shownicks.8 \
+			TCM-LINKING
+DOCFILES2 = README UPGRADE INSTALL COPYING RELEASENOTES
 # File containing HPath variable
 HPATHFIX = settings.conf
 
@@ -62,7 +70,7 @@ all: depend src tools
 build: all
 
 clean:
-	@echo '** Begin cleaning and removing objects **'
+	@echo "** Begin cleaning and removing objects **"
 	@for i in $(SUBDIRS); do \
 		echo "*** Cleaning $$i ***"; \
 		cd $$i; \
@@ -72,7 +80,7 @@ clean:
 	done
 
 distclean: clean
-	@echo '*** Removing objects and misc files ***'
+	@echo "*** Removing objects and misc files ***"
 	$(RM) `find . -type f -name Makefile -print` include/defs.h \
 		include/config.h bin/settings.conf bin/cleandb \
 		config.status src/.depend config.cache config.log ~* core \
@@ -81,30 +89,31 @@ distclean: clean
 mrproper: distclean
 
 depend:
-	@echo '*** Making dependancies ***'
+	@echo "*** Making dependancies ***"
 	@if test ! -f src/.depend; then \
 		touch src/.depend; \
 		cd src; $(MAKE) depend; \
 	fi
 	@echo
 
-install: all install-binary install-help
+install: all install-binary install-help install-doc
 	@echo "*** Done installing Hybserv2 $(VERSION) ***"
 
 install-binary:
+	@echo "*** Installing binaries ***"
 	@if test ! -d $(BINDIR); then \
-		echo Creating $(BINDIR); \
+		echo "** Creating $(BINDIR) **"; \
 		$(MKDIR) $(BINDIR) 2>/dev/null; \
 	fi
 	@if test ! -d $(CONFDIR); then \
-		echo Creating $(CONFDIR); \
+		echo "** Creating $(CONFDIR) **"; \
 		$(MKDIR) $(CONFDIR) 2>/dev/null; \
 	fi
 	@if test ! -d $(LOGDIR); then \
-		echo Creating $(LOGDIR); \
+		echo "** Creating $(LOGDIR) **"; \
 		$(MKDIR) $(LOGDIR) 2>/dev/null; \
 	fi
-	@echo '** Installing Hybserv2 in $(BINDIR) **'
+	@echo "** Installing Hybserv2 in $(BINDIR) **"
 	@$(INSTALL_BIN) "bin/hybserv" "$(BINDIR)/hybserv"
 	@for file in $(BINPROGS); do \
 		echo "** Installing $$file in $(BINDIR) **"; \
@@ -123,23 +132,41 @@ install-binary:
 		fi \
 	done
 	@$(RM) $(BINDIR)/shownicks $(BINDIR)/showchans
-	@echo '** Creating $(BINDIR)/shownicks **'
+	@echo "** Creating $(BINDIR)/shownicks **"
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/shownicks
-	@echo '** Creating $(BINDIR)/showchans **'
+	@echo "** Creating $(BINDIR)/showchans **"
 	@$(LN) $(BINDIR)/hybserv $(BINDIR)/showchans
 	@echo
 
 install-help:
+	@echo "*** Installing help files ***"
 	@if test ! -d $(HELPDIR); then \
-		echo Creating $(HELPDIR); \
+		echo "** Creating $(HELPDIR) **"; \
 		$(MKDIR) $(HELPDIR) 2>/dev/null; \
 	else \
-		echo Removing old $(HELPDIR); \
+		echo "** Removing old $(HELPDIR) **"; \
 		$(RMR) $(HELPDIR); \
 		$(MKDIR) $(HELPDIR) 2>/dev/null; \
 	fi
-	@echo Installing help files in $(HELPDIR)
+	@echo "** Installing help files in $(HELPDIR) **"
 	@$(CPR) help/* $(HELPDIR)
+	@echo
+
+install-doc:
+	@echo "*** Installing document files ***"
+	@if test ! -d $(DOCDIR); then \
+		echo "** Creating $(DOCDIR) **"; \
+		$(MKDIR) $(DOCDIR) 2>/dev/null; \
+	fi
+	@echo "** Installing doc files in $(DOCDIR) **";
+	@for file in $(DOCFILES1); do \
+		echo "** Installing $$file in $(DOCDIR) **"; \
+		$(INSTALL_DOC) "doc/$$file" "$(DOCDIR)/$$file"; \
+	done
+	@for file in $(DOCFILES2); do \
+		echo "** Installing $$file in $(DOCDIR) **"; \
+		$(INSTALL_DOC) "$$file" "$(DOCDIR)/$$file"; \
+	done
 	@echo
 
 # Autoconf stuff

@@ -52,14 +52,18 @@ NOTE: ./configure script accepts several additional parameters which
       can be used to fine-tune your setup:
 
   --disable-largefile     omit support for large files
+  --disable-ipv6          Disable IPv6 support [default=no]
+  --enable-efence         Enable Electric Fence support [default=no]
   --enable-dmalloc        Enable dmalloc support [default=no]
+  --enable-boehm-gc       Enable Boehm GC support [default=yes]
   --enable-warnings       Enable compiler warnings [default=no]
   --enable-asserts        Enable asserts in code [default=no]
   --enable-gimmecore      Enable core dumping [default=yes]
   --enable-daemontools    Enable daemontools support [default=no]
+
   --with-nicklen=LENGTH     Sets nick length to LENGTH [default=18]
-  --with-chanellen=LENGTH   Sets channel length to LENGTH [default=200]
-  --with-topiclen=LENGTH    Sets topic length to LENGTH [default=90]
+  --with-channellen=LENGTH  Sets channel length to LENGTH [default=200]
+  --with-topiclen=LENGTH    Sets topic length to LENGTH [default=160]
   --with-network=TYPE       Sets network type TYPE
 
 Hybserv2 is known to compile cleanly on the following operating systems,

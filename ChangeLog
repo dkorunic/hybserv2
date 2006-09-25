@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - update INSTALL docs
   - updated SGML documentation/manpages; updated installation procedures
     to install various docs and manpages in $(PREFIX)/hybserv/doc
   - fix #128: Unforbid still forces nick change

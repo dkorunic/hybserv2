@@ -7317,7 +7317,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 #ifdef DANCER
 
 		if (cptr->modes_on & MODE_C)
-			strlcat(buf, "c", sizeof(modes));
+			strlcat(buf, "c", sizeof(buf));
 #endif /* DANCER */
 
 		if (cptr->modes_on & MODE_M)

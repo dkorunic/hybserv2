@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - import MinNickAge code from ShakeIT [Kamen 'Craig' Sabev]
   - update INSTALL docs
   - updated SGML documentation/manpages; updated installation procedures
     to install various docs and manpages in $(PREFIX)/hybserv/doc

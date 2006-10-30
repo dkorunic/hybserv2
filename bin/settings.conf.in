@@ -576,6 +576,14 @@ GiveNotice
 
 #AllowGuardChannel
 
+# MinNickAge <time> [OPTIONAL]
+#
+# Enabling this will cause that nicknames need to be at least
+# MinNickAge on network to be able to register channels or be
+# founders.
+
+#MinNickAge 8w
+
 ################################################################
 #
 # MemoServ Configuration

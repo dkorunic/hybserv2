@@ -3294,6 +3294,20 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
+	/* We should check the nickname's age if we require nicks to have
+	 * specified minimum age to be able to register channels. -Craig */
+	if (MinNickAge)
+	{
+		if (current_ts - master->created < MinNickAge &&
+				!IsValidAdmin(lptr))
+		{
+			notice(n_ChanServ, lptr->nick,
+					"Your nickname must be older than \002%s\002 in order to register channels",
+					timeago(MinNickAge, 3));
+			return;
+		}
+	}
+
 	if (!IsValidAdmin(lptr) && MinChanUsers &&
 	        (chptr->numusers < MinChanUsers))
 	{
@@ -5464,6 +5478,20 @@ c_set_founder(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		       ERR_NOT_REGGED,
 		       av[3]);
 		return;
+	}
+
+	/* We should check the nickname's age if we require nicks to have
+	 * specified minimum age to be able to become founders. -Craig */
+	if (MinNickAge)
+	{
+		if (current_ts - fptr->created < MinNickAge &&
+				!IsValidAdmin(lptr))
+		{
+			notice(n_ChanServ, lptr->nick,
+					"The nickname [\002%s\002] must be older than \002%s\002 in order to be a founder",
+					fptr->nick, timeago(MinNickAge, 3));
+			return;
+		}
 	}
 
 	RemoveFounderChannelFromNick(&fptr, cptr);

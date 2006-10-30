@@ -169,5 +169,6 @@ extern  long      NickNameExpire;
 extern  long      NickRegDelay;
 extern  long      StatExpire;
 extern  long      TelnetTimeout;
+extern  long      MinNickAge;
 
 #endif /* INCLUDED_settings_h */

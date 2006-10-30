@@ -9,6 +9,7 @@ These are upgrade facts on different Hybserv versions.
 * Removed RECORD_SPLIT_TS from config.h. It is useless now.
 * MaxLogs in settings.conf is required if you want to enable log rotation
   at all. Note that values bigger 1024 are a really bad idea.
+* MinNickAge in settings.conf
 
 1.9.1 -> 1.9.2
 --------------

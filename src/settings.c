@@ -144,7 +144,7 @@ int       MaxLinks;
 int       AllowKillProtection;
 int       AllowKillImmed;
 int	      AllowGuardChannel;
-
+long      MinNickAge;
 int       MaxChansPerUser;
 int       MinChanUsers;
 int       MaxAkicks;
@@ -322,6 +322,7 @@ struct Directive directives[] =
 		{ "NotifyOpers", D_OPTIONAL,      { { PARAM_SET, &NotifyOpers } } },
 	    { "GiveNotice", D_OPTIONAL,       { { PARAM_SET, &GiveNotice } } },
 	    { "AllowGuardChannel", D_OPTIONAL, { { PARAM_SET, &AllowGuardChannel } } },
+		{ "MinNickAge", D_OPTIONAL,       { { PARAM_TIME, &MinNickAge } } },
 
 	    /* MemoServ Configuration */
 	    { "MaxMemos", D_OPTIONAL,         { { PARAM_INT, &MaxMemos } } },

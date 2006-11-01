@@ -7,14 +7,18 @@ $Id$
 
 Hybserv-HEAD
 
-  - import MinNickAge code from ShakeIT [Kamen 'Craig' Sabev]
-  - update INSTALL docs
-  - updated SGML documentation/manpages; updated installation procedures
+  + import password required changes from ShakeIT [Kamen 'Craig' Sabev]:
+    + current password on drop is now required
+    + old password on set password is now required to sucessfully change
+    to new password
+  + import MinNickAge code from ShakeIT [Kamen 'Craig' Sabev]
+  ^ update INSTALL docs
+  ^ updated SGML documentation/manpages; updated installation procedures
     to install various docs and manpages in $(PREFIX)/hybserv/doc
   - fix #128: Unforbid still forces nick change
-  - initial import of Debian *.sgml sources for manpages [thanks to Joshua
+  ^ initial import of Debian *.sgml sources for manpages [thanks to Joshua
     Kwan and Aurélien GÉRÔME]
-  - check for mkdir command/path and fill $(MKDIR) in Makefiles
+  * check for mkdir command/path and fill $(MKDIR) in Makefiles
   - merge #127 back in and re-fix #125
   - fix #127: NickServ: deleting [%s] caused deletion of channel [%s] not
     shown on partyline [Brian Brazil]

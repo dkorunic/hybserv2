@@ -2191,31 +2191,29 @@ n_drop(struct Luser *lptr, int ac, char **av)
 		return;
 	}
 
+	if (ac < 2)
+	{
+		notice(n_NickServ, lptr->nick,
+		       "Syntax: \002DROP\002 <password>");
+		notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "DROP");
+		return;
+	}
+
 	/*
 	 * Set dnick to lptr->nick instead of ni->nick because
 	 * when ni is deleted, dnick will be garbage
 	 */
 	dnick = lptr->nick;
 
-	if (!(ni->flags & NS_IDENTIFIED))
+	/* We now require the password in order to avoid abuse or inattentive
+	 * drop, as experience shows. Thus, we also make UNSECURE more
+	 * secure... -Craig  */
+	if (!pwmatch(ni->password, av[1]) && !IsValidAdmin(lptr))
 	{
-		if (ac < 2)
-		{
-			notice(n_NickServ, lptr->nick, "Syntax: \002DROP\002 [password]");
-			notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
-				   "DROP");
-			return;
-		}
-		else
-		{
-			if (!pwmatch(ni->password, av[1]))
-			{
-				notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
-				RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ,
-							  lptr->nick, lptr->username, lptr->hostname);
-				return;
-			}
-		}
+		notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+		RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ, lptr->nick,
+				lptr->username, lptr->hostname);
+		return;
 	}
 
 	if (lptr->flags & L_OSREGISTERED)
@@ -3772,10 +3770,11 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 static void n_set_password(struct Luser *lptr, struct NickInfo *nptr, int ac,
 						   char **av)
 {
-	if (ac < 4)
+	/* The user must supply the current password! -Craig */
+	if (ac < 5)
 	{
 		notice(n_NickServ, lptr->nick,
-			   "Syntax: \002SET <nickname> PASSWORD <newpass>\002");
+				"Syntax: \002SET <nickname> PASSWORD <oldpass> <newpass>\002");
 		notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ,
 			   "SET PASSWORD");
 		return;
@@ -3785,7 +3784,13 @@ static void n_set_password(struct Luser *lptr, struct NickInfo *nptr, int ac,
 				  n_NickServ, lptr->nick, lptr->username, lptr->hostname,
 				  nptr->nick);
 
-	if (!ChangePass(nptr, av[3]))
+	if (!pwmatch(nptr->password, av[3]))
+	{
+		notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+		return;
+	}
+
+	if (!ChangePass(nptr, av[4]))
 	{
 		notice(n_NickServ, lptr->nick,
 			   "Password change for [\002%s\002] failed",
@@ -3795,7 +3800,7 @@ static void n_set_password(struct Luser *lptr, struct NickInfo *nptr, int ac,
 
 	notice(n_NickServ, lptr->nick,
 		   "Password for [\002%s\002] is now [\002%s\002]",
-		   nptr->nick, av[3]);
+		   nptr->nick, av[4]);
 } /* n_set_password() */
 
 /* n_set_phrase()  -bane */

@@ -10,6 +10,9 @@ These are upgrade facts on different Hybserv versions.
 * MaxLogs in settings.conf is required if you want to enable log rotation
   at all. Note that values bigger 1024 are a really bad idea.
 * MinNickAge in settings.conf
+* current password on drop is now required
+* old password on set password is now required to sucessfully change
+  to new password
 
 1.9.1 -> 1.9.2
 --------------

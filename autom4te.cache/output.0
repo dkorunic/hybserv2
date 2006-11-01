@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1481 2006-06-24 20:01:03Z kreator $
+@%:@ $Id: configure.in 1521 2006-09-07 19:38:38Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -983,7 +983,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1481 2006-06-24 20:01:03Z kreator $
+$Id: configure.in 1521 2006-09-07 19:38:38Z kreator $
 _ACEOF
   exit 0
 fi
@@ -9737,7 +9737,7 @@ Compile configuration:
   Channel length ....... ${ac_cv_channellen}
   Topic length ......... ${ac_cv_topiclen}
 
-Extra configurations:
+Extra configuration:
   Warnings enabled ..... ${cf_enable_warnings}
   Asserts enabled ...... ${cf_enable_asserts}
   Coredumps enabled .... ${cf_enable_gimmecore}

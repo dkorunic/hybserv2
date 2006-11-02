@@ -767,8 +767,8 @@ s_nick(int ac, char **av)
 #else
 				ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
 						lptr->nick, (long) (lptr->nick_ts - 1),
-						"enforced", Me.name, Me.name, "Nickname
-						Enforcement");
+						"enforced", Me.name, Me.name,
+						"Nickname Enforcement");
 #endif /* DANCER */
 				toserv("%s\r\n", sendstr);
 				SplitBuf(sendstr, &args);

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  + allow ExpireBans settings per channel [Kamen 'Craig' Sabev]
   + a dozen of enforce/svsnick/forcenick changes: don't collide pseudo
     nicknames or jupes, make difference between ghost and recover, when
     forcenicked/svsnicked do issue pseudo nickname [Kamen 'Craig' Sabev]

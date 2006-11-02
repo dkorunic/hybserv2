@@ -1017,6 +1017,9 @@ WriteChans()
 					fprintf(fp, "->KEY %s\n",
 					        cptr->key);
 
+				if (cptr->expirebans)
+					fprintf(fp, "->EXPIREBANS %ld\n",
+					        cptr->expirebans);
 #ifdef DANCER
 
 				if (cptr->forward)

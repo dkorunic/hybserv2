@@ -1,4 +1,12 @@
-Syntax: %bSET <channel> EXPIREBANS {ON|OFF}%b
+Syntax: %bSET <channel> EXPIREBANS {ON|OFF|<time>}%b
 
-When EXPIREBANS is enabled, channel bans
-will expire after predefined time.
+When EXPIREBANS is enabled, channel bans will expire either
+after predefined time or after selected time, if the later
+had been ever specified.
+Letter meanings:
+w - weeks, d - days, h - hours, m - minutes, s - seconds.
+Executed without any parameters, the command shows the
+current state.
+Examples:
+/msg %C SET #MyChan EXPIREBANS ON
+/msg %C SET #MyChan EXPIREBANS 1h30m

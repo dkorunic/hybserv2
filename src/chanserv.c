@@ -745,6 +745,20 @@ cs_loaddata(void)
 						ret = -1;
 				}
 			}
+			else if (!ircncmp("EXPIREBANS", keyword, 10))
+			{
+				if (!cptr->expirebans)
+					cptr->expirebans = atol(av[1]);
+				else
+				{
+					fatal(1, "%s:%d ChanServ entry for [%s] has multiple EXPIREBANS lines (using first)",
+					      ChanServDB,
+					      cnt,
+					      cptr->name);
+					if (ret > 0)
+						ret = -1;
+				}
+			}
 #ifdef DANCER
 			else if (!strncasecmp("FORWARD", keyword, 3))
 			{
@@ -7264,7 +7278,7 @@ static void c_info(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 	if (cptr->flags & CS_VERBOSE)
 		strlcat(buf, "Verbose, ", sizeof(buf));
 	if ((cptr->flags & CS_EXPIREBANS) && BanExpire)
-		strlcat(buf, "Expirebans, ", sizeof(buf));
+		strlcat(buf, "ExpireBans, ", sizeof(buf));
 #ifdef PUBCOMMANDS
 	if (cptr->flags & CS_PUBCOMMANDS)
 		strlcat(buf, "PubCommands, ", sizeof(buf));
@@ -8318,6 +8332,8 @@ void SetDefaultALVL(struct ChanInfo *cptr)
 /*
  * ExpireBans()
  * Remove any bans that have expired. -harly 
+ * Checks also whether the channel uses own time value and evaluates
+ * according to it.	-Craig
  */
 void ExpireBans(time_t unixtime)
 {
@@ -8345,7 +8361,8 @@ void ExpireBans(time_t unixtime)
 
 				for (bptr = chptr->firstban; bptr; bptr = bptr->next)
 				{
-					if ((unixtime - bptr->when) >= BanExpire)
+					if ((unixtime - bptr->when) >= (cptr->expirebans ?
+								cptr->expirebans : BanExpire))
 					{
 						/* Ban has expired. Remove it. */
 						putlog(LOG2, "%s: Removing ban %s on %s (expired)",
@@ -8433,10 +8450,12 @@ static void c_set_expirebans(struct Luser *lptr,
                              struct NickInfo *nptr, int ac, char **av)
 {
 	struct ChanInfo *cptr;
+	long bantime;
 
 	if (!BanExpire)
 	{
-		notice(n_ChanServ, lptr->nick, "EXPIREBANS is disabled.");
+		notice(n_ChanServ, lptr->nick,
+				"EXPIREBANS is currently \002disabled\002");
 		return;
 	}
 
@@ -8452,6 +8471,12 @@ static void c_set_expirebans(struct Luser *lptr,
 		notice(n_ChanServ, lptr->nick,
 		       "EXPIREBANS for channel %s is [\002%s\002]",
 		       cptr->name, (cptr->flags & CS_EXPIREBANS) ? "ON" : "OFF");
+
+		/* also give information about the expiration time -Craig */
+		notice(n_ChanServ, lptr->nick,
+				"Bans expiration time for channel %s is [\002%s\002]",
+				cptr->name, cptr->expirebans ? timeago(cptr->expirebans, 4)
+					: timeago(BanExpire, 4));
 		return;
 	}
 
@@ -8467,13 +8492,23 @@ static void c_set_expirebans(struct Luser *lptr,
 		{
 			cptr->flags &= ~CS_EXPIREBANS;
 			notice(n_ChanServ, lptr->nick,
-			       "Toggled EXPIREBANS of channel %s [\002OFF\002]",
+			       "Toggled EXPIREBANS for channel %s [\002OFF\002]",
 			       cptr->name);
 			return;
 		}
 
+	else
+		if ((bantime = timestr(av[3])))
+		{
+			cptr->expirebans = bantime;
+			notice(n_ChanServ, lptr->nick,
+				"Bans expiration time for channel %s is now set to [\002%s\002]",
+				cptr->name, timeago(bantime, 4));
+			return;
+		}
+	
 	notice(n_ChanServ, lptr->nick,
-	       "Syntax: \002SET <channel> EXPIREBANS {ON|OFF}\002");
+	       "Syntax: \002SET <channel> EXPIREBANS {ON|OFF|<time>}\002");
 	notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
 	       n_ChanServ, "SET EXPIREBANS");
 } /* c_set_expirebans() */

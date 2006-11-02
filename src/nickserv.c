@@ -999,6 +999,11 @@ DeleteNick(struct NickInfo *nickptr)
 	if (nickptr == NULL)
 		return;
 
+	/* There is little probability for this to happen, but remove the
+	 * pseudonick if nick is dropped before the release -Craig */
+	if (nickptr->flags & NS_RELEASE)
+		release(nickptr->nick);
+
 #ifdef LINKED_NICKNAMES
 
 	DeleteLink(nickptr, 0);
@@ -1465,6 +1470,7 @@ collide(char *nick, int dopseudo)
 	struct NickInfo *nptr = NULL;
 
 #if defined SVSNICK || defined FORCENICK
+	struct Luser *lsptr = NULL;
 	char newnick[NICKLEN + 1];
 	long nicknum;
 	int base;
@@ -1478,14 +1484,24 @@ collide(char *nick, int dopseudo)
 	if (!SafeConnect)
 		return;
 
-	if (!(lptr = FindClient(nick)))
+	if ((lptr = FindClient(nick)) == NULL)
 		return;
+
+	if ((nptr = FindNick(nick)) == NULL)
+		return;
+
+	/* Do nothing if it's a pseudo nick -Craig */
+	if ((nptr != NULL) && lptr->server == Me.sptr)
+	{
+		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
+		return;
+	}
 
 #if defined SVSNICK || defined FORCENICK
 	if (!(lptr->flags & UMODE_NOFORCENICK))
 	{
 		lptr->flags |= UMODE_NOFORCENICK;
-		if ((nptr = FindNick(nick)))
+		if (nptr != NULL)
 		{
 			nptr->flags |= NS_COLLIDE;
 			nptr->collide_ts = current_ts + 30;
@@ -1533,6 +1549,13 @@ collide(char *nick, int dopseudo)
 		toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 
 #endif
+		/* When using SVSNICK/FORCENICK, we shouldn't delete the existing
+		 * real client and allocate a new structure for the pseudo nick,
+		 * we'll do it when the server reply with NICK, otherwise we would
+		 * cut the bough on which we are sitting. -Craig */
+		if (dopseudo)
+			nptr->flags |= NS_RELEASE;
+
 		return;
 	}
 #endif /* defined SVSNICK || defined FORCENICK */
@@ -1543,8 +1566,13 @@ collide(char *nick, int dopseudo)
 		   lptr->nick, Me.name, n_NickServ);
 
 	/* don't add pseudo nickname after KILL */
+	/* delete the client and drop the flags -Craig */
 	if (!dopseudo)
+	{
+		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
+		DeleteClient(lptr);
 		return;
+	}
 
 	/* normal ghosted nickname, automatically after not identing */
 #ifdef DANCER
@@ -1567,22 +1595,25 @@ collide(char *nick, int dopseudo)
 
 	/* add the new one */
 	SplitBuf(sendstr, &av);
+
+#if defined SVSNICK || defined FORCENICK
+	/* compensation if svsnick/forcenick hasn't succeeded -Craig */
+	lsptr = AddClient(av);
+	if (lsptr)
+		lsptr->nick_ts += 30;
+#else
 	AddClient(av);
+#endif
 
 	MyFree(av);
 
 	/* Unfortunately, this makes no guarantees that FORCENICK succeeded.
 	 * Please define FALLBACK_TO_KILL if you want to make sure that nick
 	 * gets collided for sure */
-	if ((nptr = FindNick(nick)))
-	{
-		/*
-		 * remove the collide timer, but put a release timer so the
-		 * pseudo nick gets removed after NSReleaseTimeout
-		 */
-		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
-		nptr->flags |= NS_RELEASE;
-	}
+	/* remove the collide timer, but put a release timer so the pseudo
+	 * nick gets removed after NSReleaseTimeout */
+	nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
+	nptr->flags |= NS_RELEASE;
 } /* collide() */
 
 /*
@@ -1600,11 +1631,12 @@ release(char *nickname)
 	if (!(lptr = FindClient(nickname)) || !(nptr = FindNick(nickname)))
 		return;
 
-	if (!lptr->server)
+	if ((lptr->server == NULL) || (lptr->server != Me.sptr))
+	{
+		/* drop the release flag to avoid coming here again -Craig */
+		nptr->flags &= ~NS_RELEASE;
 		return;
-
-	if (lptr->server != Me.sptr)
-		return; /* lptr->nick isn't a pseudo-nick */
+	}
 
 	toserv(":%s QUIT :Released\r\n", lptr->nick);
 	DeleteClient(lptr);
@@ -1677,6 +1709,14 @@ CollisionCheck(time_t unixtime)
 						/*
 						 * kill the nick and replace with a pseudo nick
 						 */
+#if defined SVSNICK || defined FORCENICK        
+						/* make difference between GHOST and RECOVER if
+						 * unable to change the nick -Craig */
+						if (!(nptr->flags & NS_RELEASE) && (lptr->flags &
+									UMODE_NOFORCENICK))
+							collide(lptr->nick, 0);
+                        else
+#endif
 						collide(lptr->nick, 1);
 						nptr->collide_ts = 0;
 
@@ -1698,17 +1738,18 @@ CollisionCheck(time_t unixtime)
 
 				if ((lptr = FindClient(nptr->nick)))
 				{
-					if ((unixtime - lptr->nick_ts) >= NSReleaseTimeout)
+					/* since we lose 1 minute, let's be accurate and add
+					 * it now -Craig */
+					if ((unixtime - (lptr->nick_ts + 60)) >=
+							NSReleaseTimeout)
 					{
 						putlog(LOG1,
 							   "%s: Releasing enforcement pseudo-nick [%s]",
-							   n_NickServ,
-							   lptr->nick);
+							   n_NickServ, lptr->nick);
 
 						SendUmode(OPERUMODE_S,
 								  "%s: Releasing enforcement pseudo-nick [%s]",
-								  n_NickServ,
-								  lptr->nick);
+								  n_NickServ, lptr->nick);
 
 						/* release the nickname */
 						release(lptr->nick);
@@ -2538,6 +2579,8 @@ n_recover(struct Luser *lptr, int ac, char **av)
 
 	if (goodcoll)
 	{
+		struct Luser *lsptr = NULL;
+
 		if (ni->flags & NS_RELEASE)
 		{
 			notice(n_NickServ, lptr->nick,
@@ -2545,15 +2588,21 @@ n_recover(struct Luser *lptr, int ac, char **av)
 				   av[1]);
 			return;
 		}
-
-		if (!FindClient(av[1]))
+		if ((lsptr = FindClient(av[1])) == NULL)
 		{
 			notice(n_NickServ, lptr->nick,
 				   "[\002%s\002] is not currently online",
 				   av[1]);
 			return;
 		}
-
+		/* Don't allow to collide pseudo nicks, especially jupitered
+		 * -Craig */
+		if (lsptr->server == Me.sptr)
+		{
+			notice(n_NickServ, lptr->nick,
+				   "[\002%s\002] is a pseudo nickname", av[1]);
+			return;
+		}
 		collide(av[1], 1);
 		notice(n_NickServ, lptr->nick,
 			   "The nickname [\002%s\002] has been recovered",
@@ -2746,12 +2795,21 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 
 	if (goodcoll)
 	{
-		struct Luser	*gptr;
+		struct Luser *gptr = NULL;
 
-		if (!(gptr = FindClient(av[1])))
+		if ((gptr = FindClient(av[1])) == NULL)
 		{
 			notice(n_NickServ, lptr->nick,
 				   "[\002%s\002] is not currently online",
+				   av[1]);
+			return;
+		}
+
+		/* Don't allow to ghost pseudo nicknames -Craig */
+		if (gptr->server == Me.sptr)
+		{
+			notice(n_NickServ, lptr->nick,
+				   "[\002%s\002] is a pseudo nickname",
 				   av[1]);
 			return;
 		}

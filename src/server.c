@@ -696,6 +696,12 @@ s_nick(int ac, char **av)
 		if (!lptr)
 			return;
 
+#if defined SVSNICK || defined FORCENICK
+		/* in case of lag.. -Craig */
+		if (lptr->server == Me.sptr)
+			return;
+#endif
+
 #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
 
 		strlcpy(newnick, av[2], sizeof(newnick));
@@ -709,10 +715,6 @@ s_nick(int ac, char **av)
 #ifdef NICKSERVICES
 
 		nptr = FindNick(lptr->nick);
-
-#if defined SVSNICK || defined FORCENICK
-		lptr->flags &= ~(UMODE_NOFORCENICK);
-#endif
 
 		/* Update lastseen info for old nickname */
 		if (nptr && (nptr->flags & NS_IDENTIFIED))
@@ -739,8 +741,42 @@ s_nick(int ac, char **av)
 			newptr->flags &= ~NS_IDENTIFIED;
 		}
 
+#if defined SVSNICK || defined FORCENICK
+        lptr->flags &= ~(UMODE_NOFORCENICK);
+#endif
+
 		if (nptr)
 		{
+#if defined SVSNICK || defined FORCENICK
+		/* If a pseudo nick must be generated, we should do it here,
+		 * because the server's reply with NICK will delete the client's
+		 * structure. So we don't touch this in advance in collide(),
+		 * otherwise the new allocated structure for the pseudo will be
+		 * removed and we'll be unable to find and release the nickname.
+		 * Also, we wait for the server reply before creating the
+		 * pseudo-nick to avoid possible direct collision. Now, we can
+		 * allocate a new structure for our pseudo client. -Craig */
+			if (nptr->flags & NS_RELEASE)
+			{
+				char **args;
+				char sendstr[MAXLINE + 1];
+#ifdef DANCER
+				ircsprintf(sendstr, "NICK %s 1 1 +i %s %s %s %lu :%s\r\n",
+						lptr->nick, "enforced", Me.name, Me.name,
+						0xffffffffUL, "Nickname Enforcement");
+#else
+				ircsprintf(sendstr, "NICK %s 1 %ld +i %s %s %s :%s\r\n",
+						lptr->nick, (long) (lptr->nick_ts - 1),
+						"enforced", Me.name, Me.name, "Nickname
+						Enforcement");
+#endif /* DANCER */
+				toserv("%s\r\n", sendstr);
+				SplitBuf(sendstr, &args);
+				AddClient(args);
+				MyFree(args);
+				nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
+			}
+#endif /* defined SVSNICK || defined FORCENICK */
 
 #ifdef LINKED_NICKNAMES
 			/*

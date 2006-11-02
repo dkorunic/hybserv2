@@ -7,6 +7,10 @@ $Id$
 
 Hybserv-HEAD
 
+  + a dozen of enforce/svsnick/forcenick changes: don't collide pseudo
+    nicknames or jupes, make difference between ghost and recover, when
+    forcenicked/svsnicked do issue pseudo nickname [Kamen 'Craig' Sabev]
+  - fix several memory leaks [Kamen 'Craig' Sabev]
   + import password required changes from ShakeIT [Kamen 'Craig' Sabev]:
     + current password on drop is now required
     + old password on set password is now required to sucessfully change

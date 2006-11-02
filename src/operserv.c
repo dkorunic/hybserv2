@@ -1729,6 +1729,13 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 	{
 		if ((jptr = FindClient(av[1])))
 		{
+#ifdef NICKSERVICES
+			struct NickInfo *nptr = FindNick(av[1]);
+			/* drop that flag, don't release the juped nick -Craig */
+			if (nptr)
+				nptr->flags &= ~NS_RELEASE;
+#endif
+
 			/* kill the juped nick */
 			toserv(":%s KILL %s :%s!%s (%s)\r\n",
 			       n_OperServ, av[1], Me.name, n_OperServ, reason);
@@ -1762,6 +1769,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 		toserv("%s", sendstr);
 		SplitBuf(sendstr, &arv);
 		AddClient(arv);
+		MyFree(arv);
 	} /* else */
 
 	MyFree(reason);

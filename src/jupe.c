@@ -252,6 +252,7 @@ CheckJuped(char *name)
 
 				SplitBuf(sendstr, &arv);
 				AddClient(arv);
+				MyFree(arv);
 
 				if (Me.sptr)
 					Me.sptr->numoperkills++;
@@ -278,6 +279,7 @@ CheckJuped(char *name)
 				SplitBuf(sendstr, &arv);
 
 				AddServer(5, arv);
+				MyFree(arv);
 			}
 			return 1;
 		}
@@ -340,6 +342,7 @@ InitJupes()
 
 			SplitBuf(sendstr, &av);
 			AddClient(av);
+			MyFree(av);
 		}
 		else
 		{
@@ -355,6 +358,7 @@ InitJupes()
 
 			SplitBuf(sendstr, &av);
 			AddServer(5, av);
+			MyFree(av);
 		}
 	}
 } /* InitJupes() */

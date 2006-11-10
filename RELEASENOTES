@@ -1,15 +1,15 @@
-03/17/2006  -  Dinko Korunic <dinko|korunic|AT|gmail|com>
+11/10/2006  -  Dinko Korunic <dinko|korunic|AT|gmail|com>
 
-  Hybserv 1.9.2 is here!
+  Hybserv 1.9.3 has been released!
 
-  Diff against 1.9.1 shows around 85k changed lines which include
-  a dozen of fixes and mostly no new features.
+  A new major release is here with rougly 17 medium-significance
+  enhancements, 29 bugfixes and 16 minor enhacements.
 
 Releases are available from following sources:
 
-  http://www.hybserv.net/downloads/
+  URL: http://www.hybserv.net/downloads/
+  SVN: svn://svn.hybserv.net/tags/REL_1_9_3
 
-Hybserv has got a new homepage [still in the process of making, however]:
+Hybserv homepage / bugreport / wiki:
 
-  http://www.hybserv.net/
-  http://www.hybserv2.net/
+  http://www.hybserv.net

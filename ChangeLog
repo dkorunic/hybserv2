@@ -5,8 +5,9 @@ $Id$
   * = Changed something
   ^ = Other
 
-Hybserv-HEAD
+Hybserv-1.9.3
 
+  ^ stage to REL_1_9_3 [11/10/2006]
   + allow ExpireBans settings per channel [Kamen 'Craig' Sabev]
   + a dozen of enforce/svsnick/forcenick changes: don't collide pseudo
     nicknames or jupes, make difference between ghost and recover, when

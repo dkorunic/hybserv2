@@ -1,7 +1,7 @@
 dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(Hybserv2, 1.9.3, hybserv@hybserv.net)
+AC_INIT(Hybserv2, 1.9.4, hybserv@hybserv.net)
 AC_PREREQ(2.50)
 AC_COPYRIGHT([$Id$])
 AC_CONFIG_HEADER(include/defs.h)

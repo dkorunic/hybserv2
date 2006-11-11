@@ -6,7 +6,6 @@ Options:
    %bB%b           - Display TCM bot lines
    %bS%b           - Display server link lines
    %bU%b           - Display current uptime
-   %bM%b           - Display memory usage
    %bI%b           - Display restricted hostmasks
    %bG%b           - Display active glines
    %bJ%b           - Display active jupes

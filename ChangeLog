@@ -5,6 +5,10 @@ $Id$
   * = Changed something
   ^ = Other
 
+Hybserv-HEAD
+
+  - fix OperServ stats m documentation (memory stats have been removed)
+
 Hybserv-1.9.3
 
   ^ stage to REL_1_9_3 [11/10/2006]

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - improve svn version detection in configure script for newer Subversion
   - fix OperServ stats m documentation (memory stats have been removed)
 
 Hybserv-1.9.3

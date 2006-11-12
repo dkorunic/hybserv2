@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1545 2006-11-10 17:55:04Z kreator $
+@%:@ $Id: configure.in 1546 2006-11-11 08:37:47Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -983,7 +983,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1545 2006-11-10 17:55:04Z kreator $
+$Id: configure.in 1546 2006-11-11 08:37:47Z kreator $
 _ACEOF
   exit 0
 fi
@@ -1340,7 +1340,11 @@ _ACEOF
 
 
 if test -f "$srcdir/.svn/entries"; then
-  ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+  if svn help >/dev/null 2>&1; then
+    ac_cv_revision="svn-"`svn info 2>/dev/null | grep 'Last Changed Rev' | cut -d ' ' -f 4`
+  else
+    ac_cv_revision="svn-unknown"
+  fi
 else
   ac_cv_revision="release"
 fi

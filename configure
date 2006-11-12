@@ -1340,7 +1340,11 @@ _ACEOF
 
 
 if test -f "$srcdir/.svn/entries"; then
-  ac_cv_revision="svn-"`grep committed-rev $srcdir/.svn/entries | sort -ur | head -n 1 | cut -d '"' -f 2`
+  if svn help >/dev/null 2>&1; then
+    ac_cv_revision="svn-"`svn info 2>/dev/null | grep 'Last Changed Rev' | cut -d ' ' -f 4`
+  else
+    ac_cv_revision="svn-unknown"
+  fi
 else
   ac_cv_revision="release"
 fi

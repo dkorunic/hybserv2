@@ -1244,7 +1244,7 @@ CheckNick(char *nickname)
 
 		if (AllowKillProtection)
 		{
-			if (nptr->flags & NS_KILLIMMED)
+			if (AllowKillImmed && (nptr->flags & NS_KILLIMMED))
 			{
 				if (nptr->flags & NS_SECURE)
 				{
@@ -4220,6 +4220,8 @@ n_list(struct Luser *lptr, int ac, char **av)
 						strlcpy(str, "<< PRIVATE >>", sizeof(str));
 					else if (temp->flags & NS_PROTECTED)
 						strlcpy(str, "<< PROTECTED >>", sizeof(str));
+					else if (temp->flags & NS_KILLIMMED)
+						strlcpy(str, "<< IMMEDKILL >>", sizeof(str));
 					else if (temp->flags & NS_NOEXPIRE)
 						strlcpy(str, "<< NOEXPIRE >>", sizeof(str));
 					else
@@ -4373,8 +4375,13 @@ n_info(struct Luser *lptr, int ac, char **av)
 
 		buf[0] = '\0';
 		if (AllowKillProtection)
-			if (nptr->flags & NS_PROTECTED)
-				strlcat(buf, "Kill Protection, ", sizeof(buf));
+		{
+			if (AllowKillImmed && (nptr->flags & NS_KILLIMMED))
+				strlcat(buf, "Immediate Kill Protection, ", sizeof(buf));
+			else
+				if (nptr->flags & NS_PROTECTED)
+					strlcat(buf, "Kill Protection, ", sizeof(buf));
+		}
 		if (nptr->flags & NS_NOEXPIRE)
 			strlcat(buf, "NoExpire, ", sizeof(buf));
 		if (nptr->flags & NS_AUTOMASK)

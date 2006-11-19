@@ -8,7 +8,7 @@
 @%:@ This configure script is free software; the Free Software Foundation
 @%:@ gives unlimited permission to copy, distribute and modify it.
 @%:@ 
-@%:@ $Id: configure.in 1546 2006-11-11 08:37:47Z kreator $
+@%:@ $Id: configure.in 1547 2006-11-12 10:12:40Z kreator $
 ## --------------------- ##
 ## M4sh Initialization.  ##
 ## --------------------- ##
@@ -983,7 +983,7 @@ Copyright (C) 2003 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-$Id: configure.in 1546 2006-11-11 08:37:47Z kreator $
+$Id: configure.in 1547 2006-11-12 10:12:40Z kreator $
 _ACEOF
   exit 0
 fi

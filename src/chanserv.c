@@ -2005,16 +2005,20 @@ cs_CheckSjoin(struct Channel *chptr, struct ChanInfo *cptr,
 	{
 		cs_join(cptr);
 
+#ifdef SEENSERVICES
 		if (cptr->flags & CS_SEENSERV)
 			ss_join(chptr);
+#endif /* SEENSERVICES */
 	}
 
 #else
 
 	cs_join(cptr);
 
+#ifdef SEENSERVICES
 	if (cptr->flags & CS_SEENSERV)
 		ss_join(chptr);
+#endif /* SEENSERVICES */
 #endif /* HYBRID_ONLY */
 
 	/*
@@ -2294,7 +2298,9 @@ CheckEmptyChans()
 				          n_ChanServ, tempc->chptr->name);
 
 				temp = tempc->next;
+#ifdef SEENSERVICES
 				ss_part(tempc->chptr);
+#endif /* SEENSERVICES */
 				cs_part(tempc->chptr);
 				tempc = temp;
 			}
@@ -2569,7 +2575,9 @@ DeleteChan(struct ChanInfo *chanptr)
 	{
 		if (IsChannelMember(chptr, Me.csptr))
 			cs_part(chptr);
+#ifdef SEENSERVICES
 		ss_part(chptr);
+#endif /* SEENSERVICES */
 	}
 
 	while (chanptr->akick)

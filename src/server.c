@@ -675,7 +675,7 @@ s_nick(int ac, char **av)
 
 #ifdef SEENSERVICES
 	char oldnick[NICKLEN + 1];
-#endif
+#endif /* SEENSERVICES */
 
 	if (ac == 4)
 {
@@ -858,7 +858,6 @@ s_nick(int ac, char **av)
 		/* Erase old nick, and store new nick in it's position */
 
 #ifdef SEENSERVICES
-
 		strlcpy(oldnick, lptr->nick, sizeof(oldnick));
 #endif /* SEENSERVICES */
 
@@ -901,12 +900,10 @@ s_nick(int ac, char **av)
 #endif /* NICKSERVICES */
 
 #ifdef ALLOW_JUPES
-
 		CheckJuped(av[2]); /* check if new nick is juped */
 #endif
 
 #ifdef SEENSERVICES
-
 		es_add(oldnick, lptr->username, lptr->hostname, NULL, current_ts, 2);
 #endif /* SEENSERVICES */
 
@@ -1414,6 +1411,7 @@ s_privmsg(int ac, char **av)
 				cs_process(who, tmpcommand);
 				break;
 
+#ifdef SEENSERVICES
 			case SS_PUB_SEEN:
 			case SS_PUB_SEENNICK:
 				if (!IsChannelMember(chptr, Me.esptr))
@@ -1422,6 +1420,7 @@ s_privmsg(int ac, char **av)
 				strncpy(tmpcommand, command + 1, sizeof(tmpcommand));
 				es_process(who, tmpcommand);
 				break;
+#endif /* SEENSERVICES */
 		}
 		
 		MyFree(tmpargv);

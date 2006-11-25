@@ -172,6 +172,7 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
 						   chptr->name);
 				}
 			}
+#ifdef SEENSERVICES
 			else
 			if (servptr == Me.esptr)
 			{
@@ -195,6 +196,7 @@ FloodCheck(struct Channel *chptr, struct Luser *lptr,
 						   chptr->name);
 				}
 			}
+#endif
 		}
 	} /* else */
 

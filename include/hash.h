@@ -14,9 +14,9 @@
 #define HASHCLIENTS     8192  /* size of client hash table */
 #define HASHCHANNELS    4096  /* size of channel hash table */
 #define HASHSERVERS     16    /* size of server hash table */
-#define NICKLIST_MAX    256   /* size of NickServ hash table */
-#define CHANLIST_MAX    256   /* size of ChanServ hash table */
-#define MEMOLIST_MAX    256   /* size of MemoServ hash table */
+#define NICKLIST_MAX    1024  /* size of NickServ hash table */
+#define CHANLIST_MAX    1024  /* size of ChanServ hash table */
+#define MEMOLIST_MAX    1024  /* size of MemoServ hash table */
 
 struct Luser;
 struct Channel;

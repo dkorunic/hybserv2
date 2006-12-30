@@ -1396,10 +1396,21 @@ static void
 cs_SetTopic(struct Channel *chanptr, char *topic)
 
 {
+	struct ChanInfo *cptr = NULL;
+
 	if (!chanptr || !topic)
 		return;
 
-	if (cs_ShouldBeOnChan(FindChan(chanptr->name)))
+	cptr = FindChan(chanptr->name);
+
+	/* if no change in topic (case sensitive), do nothing */
+	if (cptr != NULL)
+	{
+		if (cptr->topic && !strcmp(cptr->topic, topic))
+			return;
+	}
+
+	if (cs_ShouldBeOnChan(cptr))
 	{
 		/*
 		 * ChanServ should already be on the channel - just set

@@ -306,6 +306,7 @@ DoShutdown(char *who, char *reason)
 	ClearUsers();
 	ClearChans();
 	ClearServs();
+	ClearDirectives(0);
 	ClearHashes(0);
 #endif
 

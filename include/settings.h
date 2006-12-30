@@ -41,6 +41,7 @@ struct Directive
 struct Directive *FindDirective(char *);
 int LoadSettings(int);
 int SaveSettings(void);
+void ClearDirectives(int);
 
 extern  struct Directive directives[];
 extern	int	      AllowGuardChannel;

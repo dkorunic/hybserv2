@@ -651,6 +651,7 @@ os_loaddata()
 				      OperServDB,
 				      cnt);
 				ret = -2;
+
 				MyFree(av);
 				continue;
 			}
@@ -702,10 +703,11 @@ os_loaddata()
 					ret = (-1);
 			}
 
-			MyFree(av);
 			MyFree(nick);
 			MyFree(user);
 			MyFree(host);
+			MyFree(av);
+			continue;
 		}
 		else
 		{    /* (ircncmp("->", av[0], 2)) */
@@ -716,12 +718,15 @@ os_loaddata()
 				      OperServDB,
 				      cnt);
 				ret = -2;
+
+				MyFree(av);
 				continue;
 			}
 
 			if (!found)
 			{
 				/* previous user line was invalid - ingore all the params */
+				MyFree(av);
 				continue;
 			}
 
@@ -765,6 +770,8 @@ os_loaddata()
 #endif
 
 		}
+		/* reached the end of parsing, free the buffer */
+		MyFree(av);
 	}
 
 	fclose(fp);
@@ -830,6 +837,7 @@ int ignore_loaddata()
 			fatal(1, "%s:%d Invalid database format (FATAL)",
 			      OperServIgnoreDB, cnt);
 			ret = -2;
+
 			MyFree(av);
 			continue;
 		}

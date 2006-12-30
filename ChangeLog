@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed memory leaks in os_loaddata(), LoadSettings() and
+    ClearDirectives()
   - enlarge default MAX hash values
   - fix compilation issues when #undef SEENSERVICES
   * be more descriptive on AllowKillImmed

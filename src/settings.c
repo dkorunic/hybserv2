@@ -169,7 +169,6 @@ int       UseMD5;
 int       MaxServerCollides;
 long      MinServerCollidesDelta;
 
-static void ClearDirectives(int);
 static int CheckDirectives(void);
 static int dparse(char *, int, int);
 
@@ -353,7 +352,7 @@ value and rehash, it will simply get set to the new value, so
 everything is fine.
 */
 
-static void
+void
 ClearDirectives(int rehash)
 
 {
@@ -375,6 +374,7 @@ ClearDirectives(int rehash)
 			{
 			case PARAM_STRING:
 				{
+					MyFree(*(char **) tmp->param[ii].ptr);
 					*(char **) tmp->param[ii].ptr = NULL;
 					break;
 				}

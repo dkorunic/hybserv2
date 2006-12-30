@@ -1265,6 +1265,10 @@ ClearConfLines()
 		MyFree(UserList->username);
 		MyFree(UserList->hostname);
 		MyFree(UserList->password);
+#ifdef RECORD_RESTART_TS
+		MyFree(UserList->last_nick);
+		MyFree(UserList->last_server);
+#endif
 		MyFree(UserList);
 		UserList = tempuser;
 	}

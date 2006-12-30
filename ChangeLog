@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed memory leak in ClearConfLines() with UserList
   - don't send motd if re-registered via TS
   - don't change topic when old topic and new topic are the same
   - fixed memory leaks in os_loaddata(), LoadSettings() and

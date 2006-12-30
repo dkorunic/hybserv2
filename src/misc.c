@@ -309,13 +309,7 @@ DoShutdown(char *who, char *reason)
 	ClearDirectives(0);
 	ClearHashes(0);
 
-	/* other stuff to clean */
-	MyFree(Network);
-	MyFree(GenericOper->nick);
-	MyFree(GenericOper->username);
-	MyFree(GenericOper->hostname);
-	MyFree(GenericOper->password);
-	MyFree(GenericOper);
+	/* We haven't free()d Network and GenericOper at least */
 #endif
 
 	CloseLogFile();

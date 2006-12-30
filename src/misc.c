@@ -308,6 +308,14 @@ DoShutdown(char *who, char *reason)
 	ClearServs();
 	ClearDirectives(0);
 	ClearHashes(0);
+
+	/* other stuff to clean */
+	MyFree(Network);
+	MyFree(GenericOper->nick);
+	MyFree(GenericOper->username);
+	MyFree(GenericOper->hostname);
+	MyFree(GenericOper->password);
+	MyFree(GenericOper);
 #endif
 
 	CloseLogFile();
@@ -727,6 +735,8 @@ pwmatch(char *password, char *chkpass)
 	assert(encr != 0);
 
 	cmpresult = strcmp(encr, password);
+
+	/* we can't just free *encr here, unfortunately... */
 
 #ifdef BORKPASSWD
 

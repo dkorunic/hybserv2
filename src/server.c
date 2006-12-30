@@ -1106,7 +1106,8 @@ s_nick(int ac, char **av)
 #ifdef GLOBALSERVICES
 
 #ifdef RECORD_RESTART_TS
-	if (!(nptr->flags & NS_IDENTIFIED) && !(lptr->flags & L_OSREGISTERED))
+	if (!(nptr && nptr->flags & NS_IDENTIFIED) &&
+			!(lptr->flags & L_OSREGISTERED))
 #endif
 	if (ircncmp(Me.name, lptr->server->name, strlen(lptr->server->name)))
 	{

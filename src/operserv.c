@@ -605,7 +605,7 @@ os_loaddata()
 	 * all users' umodes are zeroed, or OperServ will
 	 * log a warning about multiple entries
 	 */
-	for (uptr = UserList; uptr; uptr = uptr->next)
+	for (uptr = UserList; uptr != NULL; uptr = uptr->next)
 	{
 		uptr->umodes = 0;
 

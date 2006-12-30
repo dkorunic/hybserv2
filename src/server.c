@@ -1000,19 +1000,6 @@ s_nick(int ac, char **av)
 		return;
 	}
 
-#ifdef GLOBALSERVICES
-
-	if (ircncmp(Me.name, lptr->server->name, strlen(lptr->server->name)))
-	{
-		/*
-		 * Send the motd to the new user
-		 */
-		if (Network->LogonNewsFile.Contents)
-			SendMessageFile(lptr, &Network->LogonNewsFile);
-	}
-
-#endif /* GLOBALSERVICES */
-
 #ifdef ALLOW_JUPES
 	CheckJuped(av[1]);
 #endif
@@ -1115,6 +1102,23 @@ s_nick(int ac, char **av)
 		}
 	}
 #endif /* RECORD_RESTART_TS */
+
+#ifdef GLOBALSERVICES
+
+#ifdef RECORD_RESTART_TS
+	if (!(nptr->flags & NS_IDENTIFIED) && !(lptr->flags & L_OSREGISTERED))
+#endif
+	if (ircncmp(Me.name, lptr->server->name, strlen(lptr->server->name)))
+	{
+		/*
+		 * Send the motd to the new user
+		 */
+		if (Network->LogonNewsFile.Contents)
+			SendMessageFile(lptr, &Network->LogonNewsFile);
+	}
+
+#endif /* GLOBALSERVICES */
+
 } /* s_nick() */
 
 /*

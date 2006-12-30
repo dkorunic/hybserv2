@@ -593,6 +593,7 @@ s_server(int ac, char **av)
 		 * get the network server name of hub in case it
 		 * doesn't match it's hostname 
 		  */
+		MyFree(currenthub->realname);
 		currenthub->realname = MyStrdup(av[1]);
 
 		/*

@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fixed leak in Substitute(), triggered on help with unregistered or
+    unprivileged user
   - fixed leak on jump in s_server
   - fixed memory leak in ClearConfLines() with UserList
   - don't send motd if re-registered via TS

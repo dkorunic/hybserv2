@@ -617,19 +617,27 @@ char *Substitute(char *nick, char *str, int sockfd)
 					if ((CheckAccess(tempuser, flag)))
 					{
 						if (!IsRegistered(lptr, sockfd))
+						{
+							MyFree(finalstr);
 							return ((char *) -1);
+						}
 
 						tcnt += 2;
 						cptr = str + tcnt;
+
 						MyFree(finalstr);
+
 						finstr = Substitute(nick, cptr, sockfd);
 						if (finstr == NULL)
 							finstr = MyStrdup("\r\n");
-						return (finstr);
+						return finstr;
 					}
 					else
-						return ((char *) -1); /* user doesn't have privs to read
-										                                                                               line */
+					{
+						/* user doesn't have privs to read line */
+						MyFree(finalstr);
+						return ((char *) -1);
+					}
 					break;
 				}
 
@@ -649,7 +657,7 @@ char *Substitute(char *nick, char *str, int sockfd)
 	if (finalstr[0] != '\0')
 	{
 		finalstr[MAXLINE] = '\0';
-		return(finalstr);
+		return finalstr;
 	}
 
 	MyFree(finalstr);

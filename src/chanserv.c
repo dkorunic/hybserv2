@@ -1403,13 +1403,6 @@ cs_SetTopic(struct Channel *chanptr, char *topic)
 
 	cptr = FindChan(chanptr->name);
 
-	/* if no change in topic (case sensitive), do nothing */
-	if (cptr != NULL)
-	{
-		if (cptr->topic && !strcmp(cptr->topic, topic))
-			return;
-	}
-
 	if (cs_ShouldBeOnChan(cptr))
 	{
 		/*
@@ -5960,18 +5953,21 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
-	/* But hey we've already checked (ac < 4)! -kre */
-#if 0
-	if (ac < 4)
-		topic = NULL;
-	else
-#endif
-
-		topic = GetString(ac - 3, av + 3);
+	topic = GetString(ac - 3, av + 3);
 
 	/* Truncate topiclen. It can't be NULL, since ac would be < 4 -kre */
 	if (strlen(topic) > TOPICLEN)
-		topic[TOPICLEN]=0;
+		topic[TOPICLEN] = 0;
+
+	/* if no change in topic (case sensitive), do nothing */
+	if (!strcmp(cptr->topic, topic))
+	{
+		notice(n_ChanServ, lptr->nick,
+				"The channel %s already has that topic",
+				cptr->name);
+		MyFree(topic);
+		return;
+	}
 
 	RecordCommand("%s: %s!%s@%s SET [%s] TOPIC %s",
 	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,

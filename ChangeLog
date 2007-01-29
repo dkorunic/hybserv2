@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - update docs to reflect SourceForge migration
   - fixed leak in Substitute(), triggered on help with unregistered or
     unprivileged user
   - fixed leak on jump in s_server

@@ -74,25 +74,23 @@ would be meaningless.
 DISTRIBUTION:
   You can get Hybserv2 from:
 
+  1)  SourceForge Hybserv2 releases page:
+      http://sourceforge.net/projects/hybserv2/
+      http://sourceforge.net/project/showfiles.php?group_id=187614
+
   1)  Hybserv2 home:
-      http://www.hybserv.net/
-      http://www.hybserv.net/wiki/HybservReleases
+      http://hybserv2.sourceforge.net/HybservReleases
 
   2)  Anonymous Subversion access:
-      svn co svn://svn.hybserv.net/trunk hybserv
+      svn co https://hybserv2.svn.sourceforge.net/svnroot/hybserv2/trunk \
+        hybserv
 
   3)  Subversion Web access:
-      http://www.hybserv.net/browser
-
-  4)  Mirrors:
-      http://dkorunic.net/projects/tarballs/
-      http://www.hybserv.net/downloads/
-
-NOTE: For each of these sites there is one in hybserv.net and one in
-      hybserv2.net domain, for increased redundancy.
+      http://hybserv2.svn.sourceforge.net/
 
 NOTE: Subversion copy is always more current than the release, since it is
-      working/development version.
+      working/development version. It is possible to checkout any needed
+      release via appropriate tags (for example REL_1_9_0).
 
 #########################################################
 
@@ -203,7 +201,9 @@ lines:
 BUGS:
 Use the appropriate bug reporting and ticketing system:
 
-  #0:  http://www.hybserv.net/newticket
+  http://sourceforge.net/projects/hybserv2
+  (click on Tracker button, choose Bugs/Feature requests/Patches/Support
+  Requests)
 
 Alternative, subscribe to the mailing list (details follow) and post them
 there.  We can't fix bugs if no one reports them!
@@ -219,59 +219,19 @@ Here we can discuss anything we need and make sure problems get fixed.
 Please feel free to give out this address, and you may subscribe by
 sending email to:
 
-  hybserv-request|AT|hybserv|net
+  hybserv2-devel-subscribe|AT|lists|sourceforge|net
 
-NOTE: Please use a command from below in the body of the message and not
-      in the subject. E-mail should corrected that "|AT|" is translated
-      into "@" and rest of "|" characters are translated to ".", forming a
-      correct destination.
+Or by visiting the list web interface available at:
+
+  https://lists.sourceforge.net/lists/listinfo/hybserv2-devel
+
+NOTE: E-mail should corrected that "|AT|" is translated into "@" and rest
+      of "|" characters are translated to ".", forming a correct
+      destination.
 
 Once subscribed, you can send a public post to:
 
-  hybserv|AT|hybserv|net -- General mailing list
-
-List manager interface is available at:
-
-  ecartis|AT|hybserv|net -- List manager interface
-
-The following commands are available:
-
-  subscribe
-        Syntax: subscribe [<list>] [<user>]
-        Subscribe to a list                                                   
-
-  unsubscribe
-        Syntax: unsubscribe [<list>] [<user>]
-        Unsubscribe from a list      
-
-  which
-        Syntax: which
-        Display lists to which you are subscribed
-        
-  who
-        Syntax: who [<list>]
-        Display membership for a list
-
-  info
-        Syntax: info [<list>]
-        Retrieves the info for a list.
-
-  lists
-        Syntax: lists
-        Send list of mailing lists available on this site.
-
-  help
-        Syntax: help
-        Send user the helpfile
-
-  commands
-        Syntax: commands
-        Send list of available commands, providing a 'cheat sheet' for
-        users. This takes into account any local plugins. 
-
-  end
-        Syntax: end
-        Ends processing of list server commands       
+  hybserv2-devel|AT|lists|sourceforge|net
 
 ################################################################
 

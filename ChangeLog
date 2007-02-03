@@ -7,10 +7,10 @@ $Id$
 
 Hybserv-HEAD
 
+  * send need to identify message on n_drop() from user matching an admin
+    line (but not valid admin) instead of bad pass message
   * ADVFLOOD protection is now default; SVSNICK should be always preferred
     over FORCENICK
-  - fix bug with n_drop() where pwmatch() was done against nickname
-    instead of password
   - update docs to reflect SourceForge migration
   - fixed leak in Substitute(), triggered on help with unregistered or
     unprivileged user

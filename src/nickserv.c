@@ -2267,8 +2267,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
 #ifdef EMPOWERADMINS
 		if (!IsValidAdmin(lptr))
 		{
-			notice(n_NickServ, lptr->nick,
-				   ERR_BAD_PASS);
+			notice(n_NickServ, lptr->nick, ERR_NEED_IDENTIFY, n_OperServ);
 			RecordCommand("%s: (Unregistered) Administrator %s!%s@%s failed DROP [%s]",
 						  n_NickServ, lptr->nick, lptr->username,
 						  lptr->hostname, av[1]);

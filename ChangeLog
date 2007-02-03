@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  * ADVFLOOD protection is now default; SVSNICK should be always preferred
+    over FORCENICK
   - fix bug with n_drop() where pwmatch() was done against nickname
     instead of password
   - update docs to reflect SourceForge migration

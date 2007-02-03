@@ -403,8 +403,8 @@
  *   a non-idented user, the entire host will be glined, not just the user
  *   (since it's probably a script randomly choosing idents).
  */
-#undef    ADVFLOOD
-#define   ADVFLOOD_TABLE  60 
+#define    ADVFLOOD
+#define   ADVFLOOD_TABLE  200 
 #define   ADVFLOOD_DELAY  10
 #define   ADVFLOOD_COUNT  10 
 #define   ADVFLOOD_NOTIFY
@@ -430,23 +430,24 @@
 
 /*
  * Alternative nick changing methods - SVSNICK and FORCENICK.
- * SVSNICK should be supported on recent Ratbox or Hybrid7. FORCENICK
- * should work on any recent Hybrid7 server, with module
+ * SVSNICK should be supported on any recent Ratbox or Hybrid7, and
+ * therefore is recommended over FORCENICK.
+ * FORCENICK should work on any recent Hybrid7 server, with module
  * contrib/m_forcenick.c compiled and installed (instead of using
  * SVSNICK).
  * I generally find either of those (they have same functionality) rather
- * useful instead of mass killing collided users.  Additionally, there is
+ * useful instead of mass killing collided users. Additionally, there is
  * FORCENICK_LEN/SVSNICK_LEN which can be used to specify how many
  * additional characters you want to fill in as random numbers. When
  * undefined, it pads as much numbers as in can get to fill the nickname
  * length.
  */
-#undef    FORCENICK
-#define   FORCENICK_LEN 4
-#define   FORCENICK_PREFIX "Guest"
 #undef    SVSNICK
 #define   SVSNICK_LEN 4
 #define   SVSNICK_PREFIX "Guest"
+#undef    FORCENICK
+#define   FORCENICK_LEN 4
+#define   FORCENICK_PREFIX "Guest"
 
 /*
  * Schedule nick kill instead of immediate killing for user-triggered

@@ -2249,7 +2249,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
 	/* We now require the password in order to avoid abuse or inattentive
 	 * drop, as experience shows. Thus, we also make UNSECURE more
 	 * secure... -Craig  */
-	if (!pwmatch(ni->password, av[2]) && !IsValidAdmin(lptr))
+	if (!pwmatch(ni->password, av[1]) && !IsValidAdmin(lptr))
 	{
 		notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
 		RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ, lptr->nick,

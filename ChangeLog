@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - rewrite n_drop logic to behave correctly when given password is OK but
+    sender matches too wide O line (*@* for instance)
   * send need to identify message on n_drop() from user matching an admin
     line (but not valid admin) instead of bad pass message
   * ADVFLOOD protection is now default; SVSNICK should be always preferred

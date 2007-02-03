@@ -2225,6 +2225,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
 	struct NickInfo *ni;
 	char *dnick;
 	struct Userlist *utmp;
+	int dropnick = 0;
 
 	if (!(ni = FindNick(lptr->nick)))
 	{
@@ -2249,12 +2250,13 @@ n_drop(struct Luser *lptr, int ac, char **av)
 	/* We now require the password in order to avoid abuse or inattentive
 	 * drop, as experience shows. Thus, we also make UNSECURE more
 	 * secure... -Craig  */
-	if (!pwmatch(ni->password, av[1]) && !IsValidAdmin(lptr))
+	if (pwmatch(ni->password, av[1]))
 	{
-		notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
-		RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ, lptr->nick,
-				lptr->username, lptr->hostname);
-		return;
+		/* just a regular user dropping their nick */
+		RecordCommand("%s: %s!%s@%s DROP", n_NickServ, lptr->nick,
+			  lptr->username, lptr->hostname);
+
+		dropnick = 1;
 	}
 
 	if (lptr->flags & L_OSREGISTERED)
@@ -2262,12 +2264,13 @@ n_drop(struct Luser *lptr, int ac, char **av)
 	else
 		utmp = GetUser(0, lptr->nick, lptr->username, lptr->hostname);
 
-	if (IsAdmin(utmp) && (ni->flags & NS_IDENTIFIED) && ac >= 2)
+	if ((dropnick == 0) && IsAdmin(utmp))
 	{
 #ifdef EMPOWERADMINS
 		if (!IsValidAdmin(lptr))
 		{
-			notice(n_NickServ, lptr->nick, ERR_NEED_IDENTIFY, n_OperServ);
+			notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+			notice(n_OperServ, lptr->nick, ERR_NEED_IDENTIFY, n_OperServ);
 			RecordCommand("%s: (Unregistered) Administrator %s!%s@%s failed DROP [%s]",
 						  n_NickServ, lptr->nick, lptr->username,
 						  lptr->hostname, av[1]);
@@ -2287,19 +2290,26 @@ n_drop(struct Luser *lptr, int ac, char **av)
 
 		o_Wallops("DROP from %s!%s@%s for nick [%s]", lptr->nick,
 				  lptr->username, lptr->hostname, av[1] );
+
+		dropnick = 1;
 #endif
 
 	}
-	else
+
+	/* still want to drop, but with no privileges and without correct
+	 * password */
+	if (dropnick == 0)
 	{
-		/* just a regular user dropping their nick */
-		RecordCommand("%s: %s!%s@%s DROP", n_NickServ, lptr->nick,
-					  lptr->username, lptr->hostname);
+		notice(n_NickServ, lptr->nick, ERR_BAD_PASS);
+		RecordCommand("%s: %s!%s@%s failed DROP", n_NickServ, lptr->nick,
+				lptr->username, lptr->hostname);
+		return;
 	}
 
-	/* remove the nick from the nicklist table */
-
+	/* remove the nick from the nicklist table, cause channel drop
+	 * flagging, successor promotion, etc. */
 	DeleteNick(ni);
+
 #ifdef DANCER
 	/* De-identify the user, for ircds that have such mode -kre */
 	toserv(":%s MODE %s -e\r\n", Me.name, dnick);

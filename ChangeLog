@@ -7,6 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix bug with n_drop() where pwmatch() was done against nickname
+    instead of password
   - update docs to reflect SourceForge migration
   - fixed leak in Substitute(), triggered on help with unregistered or
     unprivileged user

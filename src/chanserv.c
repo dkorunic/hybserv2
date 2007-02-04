@@ -5960,7 +5960,7 @@ c_set_topic(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		topic[TOPICLEN] = 0;
 
 	/* if no change in topic (case sensitive), do nothing */
-	if (!strcmp(cptr->topic, topic))
+	if ((cptr->topic != NULL) && !strcmp(cptr->topic, topic))
 	{
 		notice(n_ChanServ, lptr->nick,
 				"The channel %s already has that topic",

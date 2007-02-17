@@ -43,7 +43,7 @@ struct Channel *ChannelList = NULL;
  * purpose: add 'ban' set by 'who' to channel 'cptr'
  * return: none
  */
-void AddBan(char *who, struct Channel *cptr, char *ban)
+void AddBan(const char *who, struct Channel *cptr, const char *ban)
 {
 	time_t CurrTime = current_ts;
 	struct ChannelBan *tempban = NULL;
@@ -70,7 +70,7 @@ void AddBan(char *who, struct Channel *cptr, char *ban)
  * purpose: remove 'ban' from channel 'cptr'
  * return: none
  */
-void DeleteBan(struct Channel *cptr, char *ban)
+void DeleteBan(struct Channel *cptr, const char *ban)
 {
 	struct ChannelBan *bptr = NULL;
 
@@ -101,7 +101,7 @@ void DeleteBan(struct Channel *cptr, char *ban)
  * AddException()
  * Add hostmask 'mask' set by 'who' to channel exception list
  */
-void AddException(char *who, struct Channel *cptr, char *mask)
+void AddException(const char *who, struct Channel *cptr, const char *mask)
 {
 	struct Exception *tempe = NULL;
 
@@ -132,7 +132,8 @@ void AddException(char *who, struct Channel *cptr, char *mask)
  * single function that has an additional argument which will differ
  * exceptions -kre 
  */
-void AddInviteException(char *who, struct Channel *cptr, char *mask)
+void AddInviteException(const char *who, struct Channel *cptr, const char
+		*mask)
 {
 	struct InviteException *tempinvex = NULL;
 
@@ -158,7 +159,7 @@ void AddInviteException(char *who, struct Channel *cptr, char *mask)
  * DeleteException()
  * Remove hostmask 'mask' from cptr's exception list
  */
-void DeleteException(struct Channel *cptr, char *mask)
+void DeleteException(struct Channel *cptr, const char *mask)
 {
 	struct Exception *tempe = NULL;
 
@@ -188,7 +189,7 @@ void DeleteException(struct Channel *cptr, char *mask)
  * XXX: Same as the above - they _have_ to go in _same_ function, this way
  * we accumulate useless repeating code. -kre
 */
-void DeleteInviteException(struct Channel *cptr, char *mask)
+void DeleteInviteException(struct Channel *cptr, const char *mask)
 {
 	struct InviteException *tempinvex = NULL;
 
@@ -215,7 +216,7 @@ void DeleteInviteException(struct Channel *cptr, char *mask)
  * Same as FindBan() but use match() to compare bans to allow
  * for wildcards
  */
-struct ChannelBan *MatchBan(struct Channel *cptr, char *ban)
+struct ChannelBan *MatchBan(const struct Channel *cptr, const char *ban)
 {
 	struct ChannelBan *tempban = NULL;
 
@@ -233,7 +234,7 @@ struct ChannelBan *MatchBan(struct Channel *cptr, char *ban)
  * purpose: determine if 'ban' is on 'cptr's ban list
  * return: pointer to ban
  */
-struct ChannelBan *FindBan(struct Channel *cptr, char *ban)
+struct ChannelBan *FindBan(const struct Channel *cptr, const char *ban)
 {
 	struct ChannelBan *tempban = NULL;
 
@@ -253,7 +254,8 @@ struct ChannelBan *FindBan(struct Channel *cptr, char *ban)
  * Same as FindException() but use match() to compare bans to allow
  * for wildcards
  */
-struct Exception *MatchException(struct Channel *cptr, char *ban)
+struct Exception *MatchException(const struct Channel *cptr, const char
+		*ban)
 {
 	struct Exception *tempe = NULL;
 
@@ -270,7 +272,7 @@ struct Exception *MatchException(struct Channel *cptr, char *ban)
  * Return a pointer to occurence of 'mask' on cptr's ban exception
  * list
  */
-struct Exception *FindException(struct Channel *cptr, char *mask)
+struct Exception *FindException(const struct Channel *cptr, const char *mask)
 {
 	struct Exception *tempe = NULL;
 
@@ -293,8 +295,8 @@ struct Exception *FindException(struct Channel *cptr, char *mask)
  *
  * XXX: merge into FindException() -kre
  */
-struct InviteException *FindInviteException(struct Channel *cptr, char
-			        *mask)
+struct InviteException *FindInviteException(const struct Channel *cptr,
+		const char *mask)
 {
 	struct InviteException *tempinvex = NULL;
 
@@ -324,7 +326,7 @@ struct InviteException *FindInviteException(struct Channel *cptr, char
  * nickcnt > 0, use the provided nick array, otherwise create one from the
  * nicks in 'line'
  */
-struct Channel *AddChannel(char **line, int nickcnt, char **nicks)
+struct Channel *AddChannel(char **line, const int nickcnt, char **nicks)
 {
 	char *names = NULL;
 	char **anames = NULL;
@@ -632,11 +634,11 @@ void DeleteChannel(struct Channel *cptr)
  * Similar to RemoveFromChannel(), except accept string
  * arguements for the nickname and channel
  */
-void RemoveNickFromChannel(char *channel, char *nickname)
+void RemoveNickFromChannel(const char *channel, char *nickname)
 {
 	struct Channel *cptr = NULL;
 	struct Luser *lptr = NULL;
-	char *tmp;
+	const char *tmp;
 
 	tmp = channel;
 
@@ -746,9 +748,8 @@ void RemoveFromChannel(struct Channel *cptr, struct Luser *lptr)
  * NOTE: This is currently used only for o/v/h modes since the others
  *      are simple enough to handle in UpdateChanModes()
  */
-void SetChannelMode(struct Channel *cptr, int add
-	                    , int type, struct Luser
-	                    *lptr)
+void SetChannelMode(struct Channel *cptr, const int add, const int type,
+		const struct Luser *lptr)
 {
 	struct UserChannel *tempc = NULL;
 	struct ChannelUser *tempu = NULL;
@@ -762,8 +763,7 @@ void SetChannelMode(struct Channel *cptr, int add
 	{
 		if ((tempu != NULL) && (tempc != NULL))
 		{
-			if (add
-			   )
+			if (add)
 			{
 				tempu->flags |= CH_OPPED;
 				tempc->flags |= CH_OPPED;
@@ -779,8 +779,7 @@ void SetChannelMode(struct Channel *cptr, int add
 	{
 		if ((tempu != NULL) && (tempc != NULL))
 		{
-			if (add
-			   )
+			if (add)
 			{
 				tempu->flags |= CH_VOICED;
 				tempc->flags |= CH_VOICED;
@@ -798,8 +797,7 @@ void SetChannelMode(struct Channel *cptr, int add
 	{
 		if ((tempu != NULL) && (tempc != NULL))
 		{
-			if (add
-			   )
+			if (add)
 			{
 				tempu->flags |= CH_HOPPED;
 				tempc->flags |= CH_HOPPED;
@@ -822,11 +820,10 @@ void SetChannelMode(struct Channel *cptr, int add
  *          a mode change on a channel
  * return: none
  */
-void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
-                     char *modes)
+void UpdateChanModes(struct Luser *lptr, const char *who, struct
+		Channel *cptr, char *modes)
 {
-	int add
-		;
+	int add;
 	char ch;
 	char *tmp = NULL;
 	struct Luser *userptr = NULL;
@@ -873,8 +870,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 	 * corresponding lists correctly updated - also make sure OperServ and
 	 * ChanServ remain opped */
 
-	add
-		= 0;
+	add = 0;
 	argidx = -1;
 
 	for (tmp = modes; *tmp; ++tmp)
@@ -893,14 +889,12 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
 		case '-':
 			{
-				add
-					= 0;
+				add = 0;
 				break;
 			}
 		case '+':
 			{
-				add
-					= 1;
+				add = 1;
 				break;
 			}
 
@@ -920,17 +914,13 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				/* never mark ChanServ/OperServ as deopped -adx */
 #if defined CHANNELSERVICES
 
-				if (add
-				        || (userptr != Me.csptr && userptr != Me.osptr))
+				if (add || (userptr != Me.csptr && userptr != Me.osptr))
 #else
-				if (add
-				        || userptr != Me.osptr)
+				if (add || userptr != Me.osptr)
 #endif /* CHANNELSERVICES */
-					SetChannelMode(cptr, add
-						               , MODE_O, userptr);
+					SetChannelMode(cptr, add, MODE_O, userptr);
 
-				if (add
-				   )
+				if (add)
 				{
 #ifdef STATSERVICES
 					if (lptr != NULL)
@@ -982,8 +972,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				} /* else if (!add) */
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_O,
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_O,
 				              userptr);
 #endif /* NICKSERVICES && CHANNELSERVICES */
 
@@ -1000,11 +989,9 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if ((userptr = FindClient(modeargs[argidx])) == NULL)
 					break;
 
-				SetChannelMode(cptr, add
-					               , MODE_V, userptr);
+				SetChannelMode(cptr, add, MODE_V, userptr);
 
-				if (add
-				   )
+				if (add)
 				{
 #ifdef STATSERVICES
 					if (lptr != NULL)
@@ -1022,8 +1009,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				} /* else if (!add) */
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_V,
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_V,
 				              userptr);
 #endif /* NICKSERVICES && CHANNELSERVICES */
 
@@ -1041,11 +1027,9 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if ((userptr = FindClient(modeargs[argidx])) == NULL)
 					break;
 
-				SetChannelMode(cptr, add
-					               , MODE_H, userptr);
+				SetChannelMode(cptr, add, MODE_H, userptr);
 
-				if (add
-				   )
+				if (add)
 				{
 #ifdef STATSERVICES
 					if (lptr != NULL)
@@ -1063,8 +1047,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				} /* else if (!add) */
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_H, userptr);
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_H, userptr);
 #endif /* NICKSERVICES && CHANNELSERVICES */
 
 				break;
@@ -1074,8 +1057,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 			/* Channel limit */
 		case 'l':
 			{
-				if (add
-				   )
+				if (add)
 				{
 					++argidx;
 					if (argidx >= argcnt)
@@ -1088,8 +1070,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
 
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_L, 0);
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_L, 0);
 #endif /* NICKSERVICES && CHANNELSERVICES */
 
 				break;
@@ -1107,8 +1088,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				MyFree(cptr->key);
 #endif /* BLOCK_ALLOCATION */
 
-				if (add
-				   )
+				if (add)
 				{
 #ifdef BLOCK_ALLOCATION
 					strlcpy(cptr->key, modeargs[argidx], KEYLEN + 1);
@@ -1130,8 +1110,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				}
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_K, 0);
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_K, 0);
 #endif
 
 				break;
@@ -1151,8 +1130,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				MyFree(cptr->forward);
 #endif
 
-				if (add
-				   )
+				if (add)
 				{
 #ifdef BLOCK_ALLOCATION
 					strlcpy(cptr->forward, modeargs[argidx], CHANNELLEN + 1);
@@ -1173,8 +1151,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
 				}
 #if defined NICKSERVICES && defined CHANNELSERVICES
-				cs_CheckModes(lptr, FindChan(cptr->name), !add
-				              , MODE_F, 0);
+				cs_CheckModes(lptr, FindChan(cptr->name), !add, MODE_F, 0);
 #endif
 
 				break;
@@ -1188,8 +1165,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if (argidx >= argcnt)
 					break;
 
-				if (add
-				   )
+				if (add)
 					AddBan(who, cptr, modeargs[argidx]);
 				else
 					DeleteBan(cptr, modeargs[argidx]);
@@ -1205,8 +1181,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if (argidx >= argcnt)
 					break;
 
-				if (add
-				   )
+				if (add)
 					AddGecosBan(who, cptr, modeargs[argidx]);
 				else
 					DeleteGecosBan(cptr, modeargs[argidx]);
@@ -1222,8 +1197,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if (argidx >= argcnt)
 					break;
 
-				if (add
-				   )
+				if (add)
 					AddException(who, cptr, modeargs[argidx]);
 				else
 					DeleteException(cptr, modeargs[argidx]);
@@ -1239,8 +1213,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 				if (argidx >= argcnt)
 					break;
 
-				if (add
-				   )
+				if (add)
 					AddInviteException(who, cptr, modeargs[argidx]);
 				else
 					DeleteInviteException(cptr, modeargs[argidx]);
@@ -1272,8 +1245,7 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
 				if (modeflag)
 				{
-					if (add
-					   )
+					if (add)
 						cptr->modes |= modeflag;
 					else
 						cptr->modes &= ~modeflag;
@@ -1281,8 +1253,8 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
 
 #if defined NICKSERVICES && defined CHANNELSERVICES
 				if (modeflag)
-					cs_CheckModes(lptr, FindChan(cptr->name), !add
-					              , modeflag, 0);
+					cs_CheckModes(lptr, FindChan(cptr->name), !add,
+							modeflag, 0);
 #endif
 
 				break;
@@ -1319,8 +1291,8 @@ void UpdateChanModes(struct Luser *lptr, char *who, struct Channel *cptr,
  * FindChannelByUser()
  * return a pointer to channel 'channel' in lptr's channel list
  */
-struct UserChannel *FindChannelByUser(struct Luser *lptr, struct Channel
-			                                      *chptr)
+struct UserChannel *FindChannelByUser(const struct Luser *lptr, const
+		struct Channel *chptr)
 {
 	struct UserChannel *tempchan = NULL;
 
@@ -1339,8 +1311,8 @@ struct UserChannel *FindChannelByUser(struct Luser *lptr, struct Channel
  * FindUserByChannel()
  * return pointer to client 'lptr' in channel chptr's nick list
 */
-struct ChannelUser *FindUserByChannel(struct Channel *chptr, struct Luser
-			                                      *lptr)
+struct ChannelUser *FindUserByChannel(const struct Channel *chptr, const
+		struct Luser *lptr)
 {
 	struct ChannelUser *tempuser = NULL;
 
@@ -1361,7 +1333,7 @@ struct ChannelUser *FindUserByChannel(struct Channel *chptr, struct Luser
  *  purpose: determine if 'lptr' is currently voiced on 'chptr'
  *  return: 1 if voiced, 0 if not
  */
-int IsChannelVoice(struct Channel *chptr, struct Luser *lptr)
+int IsChannelVoice(const struct Channel *chptr, const struct Luser *lptr)
 {
 	struct UserChannel *tempchan = NULL;
 
@@ -1382,7 +1354,7 @@ int IsChannelVoice(struct Channel *chptr, struct Luser *lptr)
  *  purpose: determine if 'nick' is currently oped on 'channel'
  *  return: 1 if oped, 0 if not
  */
-int IsChannelOp(struct Channel *chptr, struct Luser *lptr)
+int IsChannelOp(const struct Channel *chptr, const struct Luser *lptr)
 {
 	struct UserChannel *tempchan = NULL;
 
@@ -1407,7 +1379,7 @@ int IsChannelOp(struct Channel *chptr, struct Luser *lptr)
  *  XXX: possibly merge this into IsChannelOp() -kre
  */
 #ifdef HYBRID7_HALFOPS
-int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
+int IsChannelHOp(const struct Channel *chptr, const struct Luser *lptr)
 {
 	struct UserChannel *tempchan = NULL;
 
@@ -1429,7 +1401,7 @@ int IsChannelHOp(struct Channel *chptr, struct Luser *lptr)
  *  if 'joinpart' is != 1, do not join/part because the channel is being
  *  secured - so there might be more modes to come.
  */
-void DoMode(struct Channel *chptr, char *modes, int joinpart)
+void DoMode(struct Channel *chptr, char *modes, const int joinpart)
 {
 #ifdef SAVE_TS
 	struct Chanlist *chanptr = NULL;
@@ -1466,7 +1438,7 @@ void DoMode(struct Channel *chptr, char *modes, int joinpart)
  *  purpose: determine if 'lptr' is currently on channel 'cptr'
  *  return: 1 if nick is on the channel, 0 if not
  */
-int IsChannelMember(struct Channel *cptr, struct Luser *lptr)
+int IsChannelMember(const struct Channel *cptr, const struct Luser *lptr)
 {
 	struct ChannelUser *tempuser = NULL;
 
@@ -1487,8 +1459,8 @@ int IsChannelMember(struct Channel *cptr, struct Luser *lptr)
  * SetModes()
  *  Set mode +/-<mode> <args> on <channel> from <source>
  */
-void SetModes(char *source, int plus, char mode, struct Channel *chptr,
-              char *args)
+void SetModes(const char *source, const int plus, const char mode, struct
+		Channel *chptr, const char *args)
 {
 	int acnt, mcnt, ii;
 	char done[MAXLINE + 1], sendstr[MAXLINE + 1];
@@ -1539,8 +1511,8 @@ void SetModes(char *source, int plus, char mode, struct Channel *chptr,
  * KickBan()
  *  KickBan 'nicks' on 'channel'
  */
-void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
-             char *reason)
+void KickBan(const int ban, const char *source, struct Channel
+		*channel, const char *nicks, const char *reason)
 {
 	char *mask = NULL, *tempnix = NULL, **av;
 	char temp[MAXLINE + 1];
@@ -1600,7 +1572,7 @@ void KickBan(int ban, char *source, struct Channel *channel, char *nicks,
  *  purpose: add gecos 'ban' set by 'who' to channel 'cptr'
  *  return: none
  */
-void AddGecosBan(char *who, struct Channel *cptr, char *ban)
+void AddGecosBan(const char *who, struct Channel *cptr, const char *ban)
 {
 	time_t CurrTime = current_ts;
 	struct ChannelGecosBan *tempban = NULL;
@@ -1627,7 +1599,7 @@ void AddGecosBan(char *who, struct Channel *cptr, char *ban)
  *  purpose: remove gecos 'ban' from channel 'cptr'
  *  return: none
  */
-void DeleteGecosBan(struct Channel *cptr, char *ban)
+void DeleteGecosBan(struct Channel *cptr, const char *ban)
 {
 	struct ChannelGecosBan *bptr = NULL;
 
@@ -1657,7 +1629,8 @@ void DeleteGecosBan(struct Channel *cptr, char *ban)
  *  purpose: determine if 'ban' is on 'cptr's ban list
  *  return: pointer to ban
  */
-struct ChannelGecosBan * FindGecosBan(struct Channel *cptr, char *ban)
+struct ChannelGecosBan *FindGecosBan(const struct Channel *cptr, const
+		char *ban)
 {
 	struct ChannelGecosBan *tempban = NULL;
 
@@ -1676,7 +1649,8 @@ struct ChannelGecosBan * FindGecosBan(struct Channel *cptr, char *ban)
  * Same as FindBan() but use match() to compare bans to allow
  * for wildcards
  */
-struct ChannelGecosBan * MatchGecosBan(struct Channel *cptr, char *ban)
+struct ChannelGecosBan * MatchGecosBan(const struct Channel *cptr, const
+		char *ban)
 {
 	struct ChannelGecosBan *tempban = NULL;
 

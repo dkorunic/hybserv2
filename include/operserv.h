@@ -78,7 +78,7 @@ struct Process
 };
 
 void os_process(char *, char *, int);
-void os_join(struct Channel *);
+void os_join(const struct Channel *);
 void os_join_ts_minus_1(struct Channel *);
 void os_part(struct Channel *);
 void CheckFuckoverTarget(struct Luser *, char *);

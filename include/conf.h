@@ -172,19 +172,21 @@ struct cHost
 #endif
 
 int Rehash(void);
-void ParseConf(char *, int);
+void ParseConf(const char *, const int);
 void LoadConfig(void);
-struct Chanlist *IsChannel(char *);
-struct Servlist *IsServLine(char *, char *);
-struct PortInfo *IsListening(int);
-struct PortInfo *IsPort(int);
-struct Botlist *IsBot(char *);
-void AddMyChan(char *);
+struct Chanlist *IsChannel(const char *);
+struct Servlist *IsServLine(const char *, const char *);
+struct PortInfo *IsListening(const int);
+struct PortInfo *IsPort(const int);
+struct Botlist *IsBot(const char *);
+void AddMyChan(const char *);
 void CheckChans(void);
-int IsProtectedHost(char *, char *);
-struct Userlist *GetUser(int, char *, char *, char *);
-int CheckAccess(struct Userlist *, char);
-struct rHost *IsRestrictedHost(char *, char *);
+int IsProtectedHost(const char *, const char *);
+struct Userlist *GetUser(const int, const char *, const char *,
+		const char *);
+int CheckAccess(const struct Userlist *, const char);
+struct rHost *IsRestrictedHost(const char *, const char *);
+
 extern struct Userlist *UserList;
 extern struct Servlist *ServList;
 extern struct Chanlist *ChanList;

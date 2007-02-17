@@ -131,52 +131,60 @@ struct Channel
 };
 
 #ifdef GECOSBANS
-void AddGecosBan(char *, struct Channel *, char *);
-void DeleteGecosBan(struct Channel *, char *);
+void AddGecosBan(const char *, struct Channel *, const char *);
+void DeleteGecosBan(struct Channel *, const char *);
 #endif /* GECOSBANS */
 
-void AddBan(char *, struct Channel *, char *);
-void DeleteBan(struct Channel *, char *);
-void AddException(char *, struct Channel *, char *);
-void DeleteException(struct Channel *, char *);
+void AddBan(const char *, struct Channel *, const char *);
+void DeleteBan(struct Channel *, const char *);
+void AddException(const char *, struct Channel *, const char *);
+void DeleteException(struct Channel *, const char *);
 
 #ifdef HYBRID7
-void AddInviteException(char *, struct Channel *, char *);
-void DeleteInviteException(struct Channel *, char *);
+void AddInviteException(const char *, struct Channel *, const char *);
+void DeleteInviteException(struct Channel *, const char *);
 #endif /* HYBRID7 */
 
-struct Channel *AddChannel(char **, int, char **);
+struct Channel *AddChannel(char **, const int, char **);
 void DeleteChannel(struct Channel *);
 void AddToChannel(struct Channel *, char *);
-void RemoveNickFromChannel(char *, char *);
+void RemoveNickFromChannel(const char *, char *);
 void RemoveFromChannel(struct Channel *, struct Luser *);
-void SetChannelMode(struct Channel *, int, int, struct Luser *);
-void UpdateChanModes(struct Luser *, char *, struct Channel *, char *);
-struct UserChannel *FindChannelByUser(struct Luser *, struct Channel *);
-struct ChannelUser *FindUserByChannel(struct Channel *, struct Luser *);
-void DoMode(struct Channel *, char *, int);
-void SetModes(char *, int, char, struct Channel *, char *);
-void KickBan(int, char *, struct Channel *, char *, char *);
-struct Channel *IsChan(char *);
-int IsChannelMember(struct Channel *, struct Luser *);
-int IsChannelVoice(struct Channel *, struct Luser *);
-int IsChannelOp(struct Channel *, struct Luser *);
+void SetChannelMode(struct Channel *, const int, const int, const struct
+		Luser *);
+void UpdateChanModes(struct Luser *, const char *, struct Channel *,
+		char *);
+struct UserChannel *FindChannelByUser(const struct Luser *, const struct
+		Channel *);
+struct ChannelUser *FindUserByChannel(const struct Channel *, const struct
+		Luser *);
+void DoMode(struct Channel *, char *, const int);
+void SetModes(const char *, const int, const char, struct Channel *, const
+		char *);
+void KickBan(const int, const char *, struct Channel *, const char
+		*, const char *);
+struct Channel *IsChan(const char *);
+int IsChannelMember(const struct Channel *, const struct Luser *);
+int IsChannelVoice(const struct Channel *, const struct Luser *);
+int IsChannelOp(const struct Channel *, const struct Luser *);
 #ifdef HYBRID7
-int IsChannelHOp(struct Channel *chptr, struct Luser *lptr);
+int IsChannelHOp(const struct Channel *chptr, const struct Luser *lptr);
 #endif /* HYBRID7 */
 
-struct ChannelBan *MatchBan(struct Channel *, char *);
-struct ChannelBan *FindBan(struct Channel *, char *);
-struct Exception *MatchException(struct Channel *, char *);
-struct Exception *FindException(struct Channel *, char *);
+struct ChannelBan *MatchBan(const struct Channel *, const char *);
+struct ChannelBan *FindBan(const struct Channel *, const char *);
+struct Exception *MatchException(const struct Channel *, const char *);
+struct Exception *FindException(const struct Channel *, const char *);
 #ifdef HYBRID7
-struct InviteException *MatchInviteException(struct Channel *, char *);
-struct InviteException *FindInviteException(struct Channel *, char *);
+struct InviteException *MatchInviteException(const struct Channel *, const
+		char *);
+struct InviteException *FindInviteException(const struct Channel *, const
+		char *);
 #endif /* HYBRID7 */
 
 #ifdef GECOSBANS
-struct ChannelGecosBan *MatchGecosBan(struct Channel *, char *);
-struct ChannelGecosBan *FindGecosBan(struct Channel *, char *);
+struct ChannelGecosBan *MatchGecosBan(const struct Channel *, const char *);
+struct ChannelGecosBan *FindGecosBan(const struct Channel *, const char *);
 #endif /* GECOSBANS */
 
 extern struct Channel *ChannelList;

@@ -619,9 +619,7 @@ GetNick()
 or +nickname and return just "nickname"
 */
 
-char *
-GetNick(char *nickname)
-
+char *GetNick(char *nickname)
 {
 	char *final;
 

@@ -220,7 +220,7 @@ ParseConf()
 */
 
 void
-ParseConf(char *filename, int rehash)
+ParseConf(const char *filename, const int rehash)
 
 {
 	FILE *fileptr;
@@ -228,7 +228,7 @@ ParseConf(char *filename, int rehash)
 	char *key;
 	int scnt; /* S: line count */
 
-	if (!filename)
+	if (filename == NULL)
 		return;
 
 	if ((fileptr = fopen(filename, "r")) == NULL)
@@ -737,8 +737,7 @@ IsChannel()
   return: pointer to channel in monitored channel list
 */
 
-struct Chanlist *
-			IsChannel(char *chan)
+struct Chanlist *IsChannel(const char *chan)
 
 {
 	struct Chanlist *tempchan;
@@ -747,7 +746,7 @@ struct Chanlist *
 		if (!irccmp(tempchan->name, chan))
 			return(tempchan);
 
-	return (NULL);
+	return NULL;
 } /* IsChannel() */
 
 /*
@@ -757,17 +756,16 @@ IsServLine()
   return: pointer to server struct in server list
 */
 
-struct Servlist *
-			IsServLine(char *name, char *port)
+struct Servlist *IsServLine(const char *name, const char *port)
 
 {
 	struct Servlist *tempserv;
 	int portnum;
 
-	if (!name)
+	if (name == NULL)
 		return (NULL);
 
-	if (!port)
+	if (port == NULL)
 		portnum = DefaultHubPort;
 	else
 		portnum = atoi(port);
@@ -777,7 +775,7 @@ struct Servlist *
 		        (!irccmp(tempserv->hostname, name)))
 			return (tempserv);
 
-	return (NULL);
+	return NULL;
 } /* IsServLine() */
 
 /*
@@ -785,8 +783,7 @@ IsListening()
   Determine if we are currently accepting connections on 'portnum'
 */
 
-struct PortInfo *
-			IsListening(int portnum)
+struct PortInfo *IsListening(const int portnum)
 
 {
 	struct PortInfo *pptr;
@@ -796,7 +793,7 @@ struct PortInfo *
 		        (pptr->socket != NOSOCKET))
 			return (pptr);
 
-	return (NULL);
+	return NULL;
 } /* IsListening() */
 
 /*
@@ -804,9 +801,7 @@ IsPort()
   Determine if 'portnum' has a P: line in hybserv.conf
 */
 
-struct PortInfo *
-			IsPort(int portnum)
-
+struct PortInfo * IsPort(int portnum)
 {
 	struct PortInfo *pptr;
 
@@ -814,7 +809,7 @@ struct PortInfo *
 		if (pptr->port == portnum)
 			return (pptr);
 
-	return (NULL);
+	return NULL;
 } /* IsPort() */
 
 /*
@@ -823,9 +818,7 @@ DoBinds()
 unable to bind on startup
 */
 
-void
-DoBinds()
-
+void DoBinds()
 {
 	struct PortInfo *pptr;
 
@@ -856,13 +849,11 @@ IsBot()
   return: pointer to bot structure
 */
 
-struct Botlist *
-			IsBot(char *bname)
-
+struct Botlist * IsBot(const char *bname)
 {
 	struct Botlist *tempbot;
 
-	if (!bname)
+	if (bname == NULL)
 		return (NULL);
 
 	tempbot = BotList;
@@ -914,9 +905,7 @@ IsRestrictedHost()
   Return pointer to restricted host structure matching 'host'
 */
 
-struct rHost *
-			IsRestrictedHost(char *user, char *host)
-
+struct rHost *IsRestrictedHost(const char *user, const char *host)
 {
 	struct rHost *temphost;
 
@@ -1069,9 +1058,7 @@ AddMyChan()
   Add 'channel' to list of C: line channels
 */
 
-void
-AddMyChan(char *channel)
-
+void AddMyChan(const char *channel)
 {
 	struct Chanlist *ptr;
 
@@ -1516,11 +1503,9 @@ CheckAccess()
   return: >= 1 if the user has 'flag', 0 if not          
 */
 
-int
-CheckAccess(struct Userlist *user, char flag)
-
+int CheckAccess(const struct Userlist *user, const char flag)
 {
-	if (!user)
+	if (user == NULL)
 		return 0;
 
 	switch (flag)
@@ -1564,7 +1549,7 @@ returns 1 if so, 0 if not
 */
 
 int
-IsProtectedHost(char *username, char *hostname)
+IsProtectedHost(const char *username, const char *hostname)
 
 {
 	struct Userlist *tempuser;
@@ -1593,9 +1578,8 @@ same nickname; if hostname is given, but nickonly is 0, do not just
 match nicknames - make sure the user@host matches as well
 */
 
-struct Userlist *
-			GetUser(int nickonly, char *nickname, char *user, char *host)
-
+struct Userlist *GetUser(const int nickonly, const char *nickname, const
+		char *user, const char *host)
 {
 	struct Userlist *tempuser = NULL, *last_nick_match = NULL,
 					*last_uh_match = NULL;

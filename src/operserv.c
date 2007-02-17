@@ -971,7 +971,7 @@ os_join()
 */
 
 void
-os_join(struct Channel *cptr)
+os_join(const struct Channel *cptr)
 
 {
 	char sendstr[MAXLINE + 1];

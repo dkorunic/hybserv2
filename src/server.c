@@ -1528,6 +1528,26 @@ s_squit(int ac, char **av)
 	else
 		sptr = NULL;
 
+	/* if manual squitting a juped server, get it back in! */
+	/* XXX: refactor this back into jupe.c function -kre */
+	if ((sptr != NULL) && IsJupe(sptr->name))
+	{
+		char sendstr[MAXLINE + 1], **arv;
+		int acnt;
+
+		/* add a fake server to replace it */
+		ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n", Me.name,
+			sptr->name, "Auto-rejupe after manual squit");
+
+		toserv("%s", sendstr);
+
+		acnt = SplitBuf(sendstr, &arv);
+		AddServer(acnt, arv);
+
+		MyFree(arv);
+		return;
+	}
+
 	/* If we defined more info on split, we will not delete
 	 * non-intentionally splitted servers from hash -kre */
 

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  * release immediately after collide on user-ghost
   + don't allow manual squit of a juped server
   - fix crash when first time setting channel topic via ChanServ
   - rewrite n_drop logic to behave correctly when given password is OK but

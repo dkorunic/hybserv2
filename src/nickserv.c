@@ -2824,6 +2824,7 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 		}
 
 		collide(gptr->nick, 0);
+		release(gptr->nick);
 
 		notice(n_NickServ, lptr->nick, "[\002%s\002] has been collided",
 			   av[1]);

@@ -7,6 +7,7 @@ $Id$
 
 Hybserv-HEAD
 
+  - fix release cycle after ghost-ing self
   * release immediately after collide on user-ghost
   + don't allow manual squit of a juped server
   - fix crash when first time setting channel topic via ChanServ

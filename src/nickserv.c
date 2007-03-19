@@ -1554,7 +1554,10 @@ collide(char *nick, int dopseudo)
 		 * we'll do it when the server reply with NICK, otherwise we would
 		 * cut the bough on which we are sitting. -Craig */
 		if (dopseudo)
+		{
+			nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
 			nptr->flags |= NS_RELEASE;
+		}
 
 		return;
 	}
@@ -2824,7 +2827,7 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 		}
 
 		collide(gptr->nick, 0);
-		release(gptr->nick);
+		/* release(gptr->nick); */
 
 		notice(n_NickServ, lptr->nick, "[\002%s\002] has been collided",
 			   av[1]);

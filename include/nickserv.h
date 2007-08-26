@@ -47,8 +47,8 @@
 # define NS_NOHALFOPS    0x01000000 /* can't halfop */
 # define NS_NOVOICE      0x02000000 /* can't +v */
 # define NS_NOACCESS     0x04000000 /* can't get access to chans */
-# define NS_NOLINK       0x08000000 /* can't link nicknames */
 #endif
+#define NS_NOLINK       0x08000000 /* can't link nicknames */
 
 #define NS_NEVEROP     0x10000000 /* Never op/hop/voice user on join */
 

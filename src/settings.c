@@ -137,6 +137,7 @@ int       NSSetHide;
 int       NSSetHideEmail;
 int       NSSetHideUrl;
 int       NSSetHideQuit;
+int       NSSetNoLink;
 int       LastSeenInfo;
 int       NicknameWarn;
 long      NickRegDelay;
@@ -304,6 +305,7 @@ struct Directive directives[] =
 	    { "NSSetHideEmail", D_OPTIONAL,   { { PARAM_SET, &NSSetHideEmail } } },
 	    { "NSSetHideUrl", D_OPTIONAL,     { { PARAM_SET, &NSSetHideUrl } } },
 	    { "NSSetHideQuit", D_OPTIONAL,    { { PARAM_SET, &NSSetHideQuit } } },
+	    { "NSSetNoLink", D_OPTIONAL,      { { PARAM_SET, &NSSetNoLink } } },
 	    { "LastSeenInfo", D_OPTIONAL,     { { PARAM_SET, &LastSeenInfo } } },
 	    { "NicknameWarn", D_OPTIONAL,     { { PARAM_SET, &NicknameWarn } } },
 	    { "NickRegDelay", D_OPTIONAL,     { { PARAM_TIME, &NickRegDelay } } },

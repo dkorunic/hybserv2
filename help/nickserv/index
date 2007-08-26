@@ -28,6 +28,7 @@ For more information on a specific command, type
 %+a    FLAG       Set flags to limit a user's privileges
 %+a    FORBID     Prevent anyone from using a nickname
 %+a    NOEXPIRE   Prevent a nickname from expiring
+%+a    NOLINK     Prevent a nickname linking (for master)
 %+a    SETPASS    Change a nickname's password
 %+a    SHOWLINK   Display a certain nickname link list
 %+a    UNFORBID   Reverses effects of FORBID command

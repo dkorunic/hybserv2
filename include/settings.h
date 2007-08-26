@@ -136,6 +136,7 @@ extern  int       NSSetMemoSignon;
 extern  int       NSSetPrivate;
 extern  int       NSSetSecure;
 extern  int       NSSetUnSecure;
+extern  int       NSSetNoLink;
 extern  int       NicknameWarn;
 extern  int       NonStarChars;
 extern  int       OpersHaveAccess;

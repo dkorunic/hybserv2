@@ -119,6 +119,9 @@ static void n_flag(struct Luser *, int, char **);
 /* adding NEVEROP support / CoolCold / */
 static void n_set_neverop(struct Luser *, struct NickInfo *, int, char **);
 
+/* adding NOLINK support   -kamen */
+static void n_set_nolink(struct Luser *, struct NickInfo *, int, char **);
+
 /* main NickServ commands */
 static struct Command nickcmds[] =
 	{
@@ -199,6 +202,7 @@ static struct Command setcmds[] =
 #endif
 
 		{ "NEVEROP", n_set_neverop, LVL_NONE },
+		{ "NOLINK", n_set_nolink, LVL_NONE },
 		{ 0, 0, 0 }
 	};
 
@@ -2183,6 +2187,8 @@ n_register(struct Luser *lptr, int ac, char **av)
 		nptr->flags |= NS_HIDEURL;
 	if (NSSetHideQuit)
 		nptr->flags |= NS_HIDEQUIT;
+	if (NSSetNoLink)
+		nptr->flags |= NS_NOLINK;
 
 	mask = HostToMask(lptr->username, lptr->hostname);
 
@@ -4419,6 +4425,8 @@ n_info(struct Luser *lptr, int ac, char **av)
 			strlcat(buf, "NoRegister, ", sizeof(buf));
 		if (nptr->flags & NS_NOCHANOPS)
 			strlcat(buf, "NoChannelOps, ", sizeof(buf));
+		if (nptr->flags & NS_NOLINK)
+			strlcat(buf, "NoLink, ", sizeof(buf));
 		if (nptr->flags & NS_NEVEROP)
 			strlcat(buf, "NeverOP, ", sizeof(buf));
 
@@ -4530,7 +4538,8 @@ n_link(struct Luser *lptr, int ac, char **av)
 
 {
 	struct NickInfo *target, /* target nickname */
-				*nptr; /* lptr's nick structure */
+				*nptr, /* lptr's nick structure */
+				*mptr; /* nptr's master   -kamen */
 	int badlink,
 	ret;
 
@@ -4561,6 +4570,14 @@ n_link(struct Luser *lptr, int ac, char **av)
 	{
 		notice(n_NickServ, lptr->nick,
 			   "The nickname [\002%s\002] is forbidden",
+			   target->nick);
+		badlink = 1;
+	}
+	/* NoLink support   -kamen */
+	else if ((mptr = GetMaster(target)) && (mptr->flags & NS_NOLINK))
+	{
+		notice(n_NickServ, lptr->nick,
+			   "The nickname [\002%s\002] does not accept links",
 			   target->nick);
 		badlink = 1;
 	}
@@ -5530,5 +5547,48 @@ static void n_fixts(struct Luser *lptr, int ac, char **av)
 		}
 	}
 }
+
+/*
+ * Disables the LINK option for the nickname    -kamen
+ */
+static void n_set_nolink(struct Luser *lptr, struct NickInfo *nptr, int
+		ac, char **av)
+{
+	if (ac < 4)
+	{
+		notice(n_NickServ, lptr->nick,
+			   "Disable linking to [\002%s\002] is [\002%s\002]",
+			   nptr->nick,
+			   (nptr->flags & NS_NOLINK) ? "ON" : "OFF");
+		return;
+	}
+
+	RecordCommand("%s: %s!%s@%s SET %s NOLINK %s",
+				  n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+				  nptr->nick, StrToupper(av[3]));
+
+	if (!irccmp(av[3], "ON"))
+	{
+		nptr->flags |= NS_NOLINK;
+		notice(n_NickServ, lptr->nick,
+			   "Disable linking to [\002%s\002] is now [\002ON\002]",
+			   nptr->nick);
+		return;
+	}
+
+	if (!irccmp(av[3], "OFF"))
+	{
+		nptr->flags &= ~NS_NOLINK;
+		notice(n_NickServ, lptr->nick,
+			   "Disable linking to [\002%s\002] is now [\002OFF\002]",
+			   nptr->nick);
+		return;
+	}
+
+	/* user gave an unknown param */
+	notice(n_NickServ, lptr->nick,
+		   "Syntax: \002SET <nickname> NOLINK {ON|OFF}\002");
+	notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET NOLINK");
+} /* n_set_nolink() */
 
 #endif /* NICKSERVICES */

@@ -1307,7 +1307,13 @@ CheckNick(char *nickname)
 	} /* if (!knownhost) */
 
 	if ((knownhost) && (nptr->flags & NS_UNSECURE))
-	{
+	{	
+
+		MyFree(realptr->lastu);
+		realptr->lastu = MyStrdup(lptr->username);
+		MyFree(realptr->lasth);
+		realptr->lasth = MyStrdup(lptr->hostname);
+
 		/*
 		 * They're from a known host, and have UNSECURE set -
 		 * mark them as identified

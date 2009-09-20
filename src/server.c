@@ -793,6 +793,12 @@ s_nick(int ac, char **av)
 				if (newptr && IsLinked(nptr, newptr))
 				{
 					newptr->flags |= NS_IDENTIFIED;
+
+
+					MyFree(newptr->lastu);
+					newptr->lastu = MyStrdup(lptr->username);
+					MyFree(newptr->lasth);
+					newptr->lasth = MyStrdup(lptr->hostname);
 #ifdef DANCER
 
 					toserv(":%s MODE %s +e\r\n", Me.name, newptr->nick);

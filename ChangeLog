@@ -7,7 +7,8 @@ $Id$
 
 Hybserv-HEAD
 
-  + add NoLink command to NickServ [Kamen 'Craig' Sabev]
+  - update last seen address when UnSecure is on [Kamen Sabeff]
+  + add NoLink command to NickServ [Kamen Sabeff]
   - fix release cycle after ghost-ing self
   * release immediately after collide on user-ghost
   + don't allow manual squit of a juped server
@@ -36,16 +37,16 @@ Hybserv-HEAD
 Hybserv-1.9.3
 
   ^ stage to REL_1_9_3 [11/10/2006]
-  + allow ExpireBans settings per channel [Kamen 'Craig' Sabev]
+  + allow ExpireBans settings per channel [Kamen Sabeff]
   + a dozen of enforce/svsnick/forcenick changes: don't collide pseudo
     nicknames or jupes, make difference between ghost and recover, when
-    forcenicked/svsnicked do issue pseudo nickname [Kamen 'Craig' Sabev]
-  - fix several memory leaks [Kamen 'Craig' Sabev]
-  + import password required changes from ShakeIT [Kamen 'Craig' Sabev]:
+    forcenicked/svsnicked do issue pseudo nickname [Kamen Sabeff]
+  - fix several memory leaks [Kamen Sabeff]
+  + import password required changes from ShakeIT [Kamen Sabeff]:
     + current password on drop is now required
     + old password on set password is now required to sucessfully change
     to new password
-  + import MinNickAge code from ShakeIT [Kamen 'Craig' Sabev]
+  + import MinNickAge code from ShakeIT [Kamen Sabeff]
   ^ update INSTALL docs
   ^ updated SGML documentation/manpages; updated installation procedures
     to install various docs and manpages in $(PREFIX)/hybserv/doc

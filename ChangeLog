@@ -5,8 +5,9 @@ $Id$
   * = Changed something
   ^ = Other
 
-Hybserv-HEAD
+Hybserv-1.9.4
 
+  ^ stage to REL_1_9_4 [09/20/2009]
   - update last seen address when UnSecure is on [Kamen Sabeff]
   + add NoLink command to NickServ [Kamen Sabeff]
   - fix release cycle after ghost-ing self

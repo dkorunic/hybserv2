@@ -142,7 +142,7 @@ int SplitBuf(char *string, char ***array)
 		else
 			return x;
 
-		while (*buf == ' ')
+		while (IsSpace(*buf))
 			++buf;
 
 		if (*buf == '\0')

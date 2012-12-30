@@ -5,6 +5,26 @@ $Id$
   * = Changed something
   ^ = Other
 
+Hybserv-1.9.5-dev
+
+  - fix in SplitBuf(), mystring.c: when params include \t in a
+    command such as /msg nickserv help \t, a crash occurs [Kamen Sabeff]
+  - fixed crash when SecureMessaging is on and someone sends a message in
+    a channel where service nicks reside [Kamen Sabeff]
+  + fixed some issues with nickname enforcement + added changes [Kamen
+    Sabeff]:
+    - NS can use KILL if for some reason svsnick/forcenick can't succeed
+      OR if after maximum five tries the random generated nickname is in
+    - use (unlikely, but still possible)
+      the GHOST command now uses KILL immediately if the nickname to be
+      ghosted is NS identified 
+  * services cannot op/deop themselves when the command comes from
+    regular users [Kamen Sabeff]
+  - fix is for a rare occasion when two or more bots set identical
+    ban/exception/etc simultaneously, so if expirebans is on, chanserv
+    removes the same ban many times in a row [Kamen Sabeff]
+  + logout command for OpenServ [Kamen Sabeff]
+
 Hybserv-1.9.4
 
   ^ stage to REL_1_9_4 [09/20/2009]
@@ -261,7 +281,5 @@ Hybserv-1.9.1
   + add FORCENICK
   + add SVSNICK
   * update config.h defaults to Hybrid7 [yay, at last!]
-
- -- Dinko Korunic <dinko|korunic|AT|gmail|com>
 
 # vim: ft=changelog:ts=2:et

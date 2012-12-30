@@ -48,6 +48,9 @@ void AddBan(const char *who, struct Channel *cptr, const char *ban)
 	time_t CurrTime = current_ts;
 	struct ChannelBan *tempban = NULL;
 
+	if (FindBan(cptr, ban))
+		return;
+
 	tempban = MyMalloc(sizeof(struct ChannelBan));
 	memset(tempban, 0, sizeof(struct ChannelBan));
 
@@ -105,6 +108,9 @@ void AddException(const char *who, struct Channel *cptr, const char *mask)
 {
 	struct Exception *tempe = NULL;
 
+    if (FindException(cptr, mask))
+		return;
+
 	tempe = MyMalloc(sizeof(struct Exception));
 	memset(tempe, 0, sizeof(struct Exception));
 
@@ -136,6 +142,9 @@ void AddInviteException(const char *who, struct Channel *cptr, const char
 		*mask)
 {
 	struct InviteException *tempinvex = NULL;
+
+    if (FindInviteException(cptr, mask))
+		return;
 
 	tempinvex = MyMalloc(sizeof(struct InviteException));
 	memset(tempinvex, 0, sizeof(struct InviteException));
@@ -1576,6 +1585,9 @@ void AddGecosBan(const char *who, struct Channel *cptr, const char *ban)
 {
 	time_t CurrTime = current_ts;
 	struct ChannelGecosBan *tempban = NULL;
+
+    if (FindGecosBan(cptr, ban))
+		return;
 
 	tempban = MyMalloc(sizeof(struct ChannelGecosBan));
 	memset(tempban, 0, sizeof(struct ChannelGecosBan));

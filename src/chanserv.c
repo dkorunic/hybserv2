@@ -6690,7 +6690,8 @@ c_op(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			else
 				currlptr = FindClient(arv[ii]);
 
-			if (!IsChannelMember(chptr, currlptr))
+			if (!IsChannelMember(chptr, currlptr) || ((currlptr->server == Me.sptr)
+                            && !IsOperator(lptr) && !(lptr->flags & L_OSREGISTERED)))
 				continue;
 
 			if ((arv[ii][0] == '-') && (IsChannelOp(chptr, currlptr)))
@@ -6871,7 +6872,8 @@ static void c_hop(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 			else
 				currlptr = FindClient(arv[ii]);
 
-			if (!IsChannelMember(chptr, currlptr))
+			if (!IsChannelMember(chptr, currlptr) || ((currlptr->server == Me.sptr)
+                            && !IsOperator(lptr) && !(lptr->flags & L_OSREGISTERED)))
 				continue;
 
 			if (arv[ii][0] == '-')
@@ -7009,7 +7011,8 @@ c_voice(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			else
 				currlptr = FindClient(arv[ii]);
 
-			if (!IsChannelMember(chptr, currlptr))
+			if (!IsChannelMember(chptr, currlptr) || ((currlptr->server == Me.sptr)
+                            && !IsOperator(lptr) && !(lptr->flags & L_OSREGISTERED)))
 				continue;
 
 			if (arv[ii][0] == '-')

@@ -1480,12 +1480,11 @@ collide(char *nick, int dopseudo)
 	struct NickInfo *nptr = NULL;
 
 #if defined SVSNICK || defined FORCENICK
-	struct Luser *lsptr = NULL;
 	char newnick[NICKLEN + 1];
 	long nicknum;
 	int base;
-	int i;
-	int j;
+	int i, j, cnt = 0;
+    struct Luser *fptr = NULL;
 #endif
 
 	char **av;
@@ -1517,8 +1516,10 @@ collide(char *nick, int dopseudo)
 			nptr->collide_ts = current_ts + 30;
 		}
 
-		nicknum = random();
+    /* make a random nickname, give it five tries if already in use */
+	  do {
 
+		nicknum = random();
 	/* 
 	 * calculate how many chars do we need to pad
 	 */
@@ -1549,29 +1550,35 @@ collide(char *nick, int dopseudo)
 		nicknum %= j;
 
 #ifdef SVSNICK
-
 		ircsprintf(newnick, "%s%ld", SVSNICK_PREFIX, nicknum);
-		toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
-
 #else /* defined FORCENICK */
-
 		ircsprintf(newnick, "%s%ld", FORCENICK_PREFIX, nicknum);
-		toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
+#endif /* SVSNICK */
 
+        ++cnt;
+	  } while ((fptr = FindClient(newnick)) != NULL && (cnt < 5));
+
+      /* OK, we tried... if the random nickname is in use, KILL right away */
+        if (fptr) goto killnick;
+
+#ifdef SVSNICK
+		toserv(":%s SVSNICK %s %s\r\n", Me.name, lptr->nick, newnick);
+#else
+		toserv(":%s FORCENICK %s %s\r\n", Me.name, lptr->nick, newnick);
 #endif
+
 		/* When using SVSNICK/FORCENICK, we shouldn't delete the existing
 		 * real client and allocate a new structure for the pseudo nick,
 		 * we'll do it when the server reply with NICK, otherwise we would
 		 * cut the bough on which we are sitting. -Craig */
 		if (dopseudo)
-		{
-			nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
 			nptr->flags |= NS_RELEASE;
-		}
 
 		return;
 	}
 #endif /* defined SVSNICK || defined FORCENICK */
+
+killnick:
 
 	/* Sending a server kill will be quieter than an oper
 	 * kill since most clients are -k */
@@ -1608,16 +1615,7 @@ collide(char *nick, int dopseudo)
 
 	/* add the new one */
 	SplitBuf(sendstr, &av);
-
-#if defined SVSNICK || defined FORCENICK
-	/* compensation if svsnick/forcenick hasn't succeeded -Craig */
-	lsptr = AddClient(av);
-	if (lsptr)
-		lsptr->nick_ts += 30;
-#else
 	AddClient(av);
-#endif
-
 	MyFree(av);
 
 	/* Unfortunately, this makes no guarantees that FORCENICK succeeded.
@@ -1722,15 +1720,21 @@ CollisionCheck(time_t unixtime)
 						/*
 						 * kill the nick and replace with a pseudo nick
 						 */
-#if defined SVSNICK || defined FORCENICK        
-						/* make difference between GHOST and RECOVER if
-						 * unable to change the nick -Craig */
-						if (!(nptr->flags & NS_RELEASE) && (lptr->flags &
-									UMODE_NOFORCENICK))
-							collide(lptr->nick, 0);
+#if defined(SVSNICK) || defined(FORCENICK)
+						/* a user joined the network and the nick is registered:
+						   collide and do pseudo */
+			 if (!(lptr->flags & UMODE_NOFORCENICK))
+                           collide(lptr->nick, 1);
                         else
-#endif
+                           /* if we are here, then, for some reason, SVSNICK didn't succeed:
+                              this could be after not supplying the password or after RECOVER 
+                              _or_ after GHOST */
+                           if (nptr->flags & NS_RELEASE)
+                             collide(lptr->nick, 1);
+                           else collide (lptr->nick, 0);
+#else
 						collide(lptr->nick, 1);
+#endif /* SVSNICK || FORCENICK */
 						nptr->collide_ts = 0;
 
 					}
@@ -2619,14 +2623,20 @@ n_recover(struct Luser *lptr, int ac, char **av)
 				   av[1]);
 			return;
 		}
-		/* Don't allow to collide pseudo nicks, especially jupitered
-		 * -Craig */
+
+		/* Don't allow to collide pseudo nicks, especially jupitered */
 		if (lsptr->server == Me.sptr)
 		{
 			notice(n_NickServ, lptr->nick,
 				   "[\002%s\002] is a pseudo nickname", av[1]);
 			return;
 		}
+
+#if defined(SVSNICK) || defined(FORCENICK)
+		/* these two lines ensure KILL if SVSNICK/FORCENICK fails */
+        	ni->collide_ts = current_ts + 10;
+		ni->flags |= NS_COLLIDE;
+#endif
 		collide(av[1], 1);
 		notice(n_NickServ, lptr->nick,
 			   "The nickname [\002%s\002] has been recovered",
@@ -2729,7 +2739,17 @@ n_release(struct Luser *lptr, int ac, char **av)
 				   av[1]);
 			return;
 		}
-
+#if defined(SVSNICK) || defined(FORCENICK)
+		/* this is if SVSNICK/FORCENICK didn't succeed so the nick
+		   is waiting for KILL and making of a pseudo nick */
+		if (ni->flags & NS_COLLIDE)
+        	{
+			notice(n_NickServ, lptr->nick,
+				   "Still recovering nickname [\002%s\002], wait a minute...",
+				   av[1]);
+			return;
+        	}
+#endif
 		release(av[1]);
 		notice(n_NickServ, lptr->nick,
 			   "The nickname [\002%s\002] has been released",
@@ -2838,10 +2858,28 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 			return;
 		}
 
-		collide(gptr->nick, 0);
-		/* release(gptr->nick); */
+        /* Immediately use KILL for ghosts if issued by an admin, or if the target is identified
+           so we can assume the command is coming from the nick owner, otherwise behave like RECOVER,
+           but without introducing a pseudo nickname */
+#if defined(SVSNICK) || defined(FORCENICK)
+        if (IsValidAdmin(lptr) || (ni->flags & NS_IDENTIFIED))
+        {
+#endif
+          toserv("KILL %s :%s!%s (%s (%s!%s@%s))\r\n", gptr->nick, Me.name, n_NickServ,
+                (IsValidAdmin(lptr) ? "Administrative Ghost" : "Ghost"), lptr->nick, lptr->username, lptr->hostname);
 
-		notice(n_NickServ, lptr->nick, "[\002%s\002] has been collided",
+          DeleteClient(gptr);
+          ni->flags &= ~(NS_COLLIDE | NS_RELEASE | NS_NUMERIC);
+
+#if defined(SVSNICK) || defined(FORCENICK)
+        } else {
+          /* if SVSNICK/FORCENICK don't succeed shortly after the command, use KILL */
+          	ni->collide_ts = current_ts + 10;
+		ni->flags |= NS_COLLIDE;
+		collide(av[1], 0);
+        }
+#endif
+		notice(n_NickServ, lptr->nick, "[\002%s\002] has been killed",
 			   av[1]);
 
 		RecordCommand("%s: %s!%s@%s GHOST [%s]", n_NickServ, lptr->nick,

@@ -14,6 +14,7 @@ For more information on the commands, type
 %+j    JUPE       Prevent a server from connecting
 %+o    KILL       Disconnect a user from the network
 %+g    KLINE      Kline a user, if your ircd supports it
+%+o    LOGOUT     Log out of %O
 %+o    STATS      Display various statistics
 %+o    STATUS     Display current status
 %+o    UMODE      Set various usermodes for yourself

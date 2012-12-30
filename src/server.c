@@ -697,11 +697,10 @@ s_nick(int ac, char **av)
 		if (!lptr)
 			return;
 
-#if defined SVSNICK || defined FORCENICK
-		/* in case of lag.. -Craig */
+		/* Shouldn't happen, but if it's our nick (juped/enforced) and somehow 
+           it's unknown for the other side and they are changing nick, ignore. */
 		if (lptr->server == Me.sptr)
 			return;
-#endif
 
 #if defined(BLOCK_ALLOCATION) || defined(NICKSERVICES)
 
@@ -1442,11 +1441,11 @@ s_privmsg(int ac, char **av)
 	}
 #endif
 	
-	if (SecureMessaging && !issecured)
+	if (SecureMessaging && !issecured && serviceptr)
 	{
 		notice(serviceptr->nick, lptr->nick,
-				"Please use secure messaging (example: /msg %s@%s)",
-				serviceptr->nick, Me.name);
+				"Please use secure messaging (example: \002/%s <command>\002 or \002/msg %s@%s\002)",
+				serviceptr->nick, serviceptr->nick, Me.name);
 		return;
 	}
 

@@ -140,6 +140,7 @@ static void o_boot(struct Luser *, int, char **, int);
 static void o_quit(struct Luser *, int, char **, int);
 static void o_link(struct Luser *, int, char **, int);
 static void o_unlink(struct Luser *, int, char **, int);
+static void o_logout(struct Luser *, int, char **, int);
 
 static void DeleteIgnore(struct Ignore *iptr);
 
@@ -193,6 +194,7 @@ static struct OperCommand opercmds[] =
 	    { "STATUS", o_status, 0, 'o' },
 	    { "UMODE", o_umode, 0, 'o' },
 	    { "USERMODE", o_umode, 0, 'o' },
+	    { "LOGOUT", o_logout, 0, 'o' },
 
 	    /*
 	     * Administrator commands
@@ -1205,6 +1207,26 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 		                "failed IDENTIFY");
 	}
 } /* o_identify() */
+
+
+/* 
+o_logout()
+  Log out of OperServ 
+*/
+static void
+o_logout(struct Luser *lptr, int ac, char **av, int sockfd)
+{
+	if (lptr && (lptr->flags & L_OSREGISTERED))
+		lptr->flags &= ~L_OSREGISTERED;
+
+	os_notice(lptr, sockfd, "Logged out");
+
+	o_RecordCommand(sockfd, "LOGOUT");
+#ifdef SHAKEIT
+	toserv(":%s SVSID %s ao\r\n", Me.name, lptr->nick);
+#endif
+} /* o_logout() */
+	
 
 /*
 o_rehash()

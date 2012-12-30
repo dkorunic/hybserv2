@@ -1,7 +1,7 @@
 /*
  * m_forcenick.c
  * Hybrid7 FORCENICK module
- * Copyright (C) 2002 Dinko 'kreator' Korunic <kreator@srce.hr>
+ * Copyright (C) 2002 Dinko 'kreator' Korunic <dinko.korunic@gmail.com>
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are

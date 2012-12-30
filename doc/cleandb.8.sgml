@@ -17,7 +17,7 @@
 <refentry>
   <refentryinfo>
     <address>
-        <email>kreator@srce.hr</email>,
+        <email>dinko.korunic@gmail.com</email>,
     </address>
 
     <address>
@@ -27,7 +27,7 @@
     <author>
         <firstname>Dinko</firstname>
         <surname>Korunic<surname>
-        <email>kreator@srce.hr</email>
+        <email>dinko.korunic@gmail.com</email>
     </author>
 
     <copyright>
@@ -148,13 +148,13 @@
       <address>
         <firstname>Dinko</firstname>
         <surname>Korunic</surname>
-        <email>kreator@srce.hr</email>.
+        <email>dinko.korunic@gmail.com</email>.
       </address>
     </para>
 
     <para>
       Send bug reports or comments to the above address or leave a bug ticket
-      at <ulink url="http://www.hybserv.net">http://www.hybserv.net</ulink>.
+      at <ulink url="http://www.github.com/dkorunic/hybserv2">http://www.github.com/dkorunic/hybserv2</ulink>.
     </para>
 
     <para>

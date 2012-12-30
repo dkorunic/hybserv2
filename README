@@ -75,19 +75,20 @@ would be meaningless.
 DISTRIBUTION:
   You can get Hybserv2 from:
 
-  1)  SourceForge Hybserv2 releases page:
+  1)  SourceForge Hybserv2 releases page (being obsoleted):
       http://sourceforge.net/projects/hybserv2/
-      http://sourceforge.net/project/showfiles.php?group_id=187614
+      https://sourceforge.net/projects/hybserv2/files/hybserv2/
 
   1)  GitHub home:
       http://github.com/dkorunic/hybserv2
+      https://github.com/dkorunic/hybserv2/tags
 
 NOTE: GitHub copy is always more current than the release, since it is
       working/development version. It is possible to checkout any needed
       release via appropriate tags (for example REL_1_9_0).
 
-NOTE: I plan to move off SourceForge's SVN completely and stay on GitHub
-      in future.
+NOTE: I plan to move off SourceForge completely and stay on GitHub in
+      future.
 
 #########################################################
 

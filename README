@@ -79,19 +79,15 @@ DISTRIBUTION:
       http://sourceforge.net/projects/hybserv2/
       http://sourceforge.net/project/showfiles.php?group_id=187614
 
-  1)  Hybserv2 home:
-      http://hybserv2.sourceforge.net/HybservReleases
+  1)  GitHub home:
+      https://github.com/dkorunic/hybserv2
 
-  2)  Anonymous Subversion access:
-      svn co https://hybserv2.svn.sourceforge.net/svnroot/hybserv2/trunk \
-        hybserv
-
-  3)  Subversion Web access:
-      http://hybserv2.svn.sourceforge.net/
-
-NOTE: Subversion copy is always more current than the release, since it is
+NOTE: GitHub copy is always more current than the release, since it is
       working/development version. It is possible to checkout any needed
       release via appropriate tags (for example REL_1_9_0).
+
+NOTE: I plan to move off SourceForge's SVN completely and stay on GitHub
+      in future.
 
 #########################################################
 

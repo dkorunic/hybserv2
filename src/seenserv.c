@@ -255,7 +255,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
 	strlcpy(seen->nick, nick, NICKLEN + 1);
 	strlcpy(userhost, user, USERLEN + 1);
 	strlcat(userhost, "@", sizeof(userhost));
-	strncat(userhost, host, HOSTLEN);
+	strlcat(userhost, host, HOSTLEN);
 	seen->userhost = MyStrdup(userhost);
 	seen->msg = (type == 1) ? MyStrdup(msg) : NULL;
 	seen->time = time;
@@ -292,7 +292,8 @@ static void FreeSeen()
 static void es_seen(struct Luser *lptr, int ac, char **av)
 {
 	int i, count, j;
-	aSeen *seen, *first = NULL, *saved = NULL, *sorted[5];
+	aSeen *seen, *first = NULL, *saved = NULL; 
+	aSeen *sorted[5] = { NULL, NULL, NULL, NULL, NULL };
 	char nuhost[MAXUSERLEN + 1], sendstr[MAXLINE + 1];
 	time_t mytime, last;
 	char seenstring[MAXLINE + 1];
@@ -321,7 +322,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 		else if (match("*@*", av[1]))
 		{
 			strlcpy(seenstring, "*!", MAXLINE - 1);
-			strncat(seenstring, av[1], MAXLINE + 1);
+			strlcat(seenstring, av[1], MAXLINE + 1);
 		}
 		else
 			strlcpy(seenstring, av[1], MAXLINE + 1);
@@ -332,7 +333,7 @@ static void es_seen(struct Luser *lptr, int ac, char **av)
 			memset(nuhost, 0, sizeof(nuhost));
 			strlcpy(nuhost, seen->nick, NICKLEN + 1);
 			strlcat(nuhost, "!", sizeof(nuhost));
-			strncat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
+			strlcat(nuhost, seen->userhost, USERLEN + HOSTLEN + 1);
 			if (match(seenstring, nuhost))
 			{
 				seen->seen = saved;

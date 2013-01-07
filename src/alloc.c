@@ -80,8 +80,8 @@ char *MyStrdup(const char *str)
 
 		if (newstr == NULL)
 			OutOfMem();
-
-		strcpy(newstr, str);
+		else
+			strcpy(newstr, str);
 		return newstr;
 	}
 

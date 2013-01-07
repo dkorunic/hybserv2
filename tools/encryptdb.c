@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
 	for (; ii < argc; ii++)
 	{
-		sprintf(newpath, "%s.orig",
+		snprintf(newpath, sizeof(newpath), "%s.orig",
 		        argv[ii]);
 
 		if (rename(argv[ii], newpath) < 0)

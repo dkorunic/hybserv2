@@ -97,9 +97,10 @@ writesocket(int sockfd, char *writestr)
 	int ii;
 
 	if (sockfd == NOSOCKET)
-		return (0);
+		return 0;
 
-	/*send(sockfd, writestr, strlen(writestr), 0);*/
+	if (writestr == NULL)
+		return 0;
 
 #ifdef DEBUGMODE
 
@@ -109,7 +110,7 @@ writesocket(int sockfd, char *writestr)
 
 	ii = write(sockfd, writestr, strlen(writestr));
 
-	Network->SendB += (writestr ? strlen(writestr) : 0);
+	Network->SendB += strlen(writestr);
 
 	if ((ii < 0) && (errno != EAGAIN))
 	{

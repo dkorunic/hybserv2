@@ -3079,7 +3079,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 
 			while (cnt < ac)
 			{
-				strncat(msgbuf, av[cnt++], sizeof(msgbuf) - strlen(msgbuf) - 20);
+				strlcat(msgbuf, av[cnt++], sizeof(msgbuf) - strlen(msgbuf) - 20);
 				strlcat(msgbuf, " ", sizeof(msgbuf));
 			}
 			msgbuf[strlen(msgbuf) - 1] = '\0';
@@ -3125,43 +3125,43 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 	ircsprintf(argbuf, "[%s] ", target);
 
 	if (showlong)
-		strlcat(argbuf, "-long ", sizeof(argbuf));
+		strlcat(argbuf, "-long ", sizeof(*argbuf));
 
 	if (nolimit)
-		strlcat(argbuf, "-nolimit ", sizeof(argbuf));
+		strlcat(argbuf, "-nolimit ", sizeof(*argbuf));
 
 	if (ops == 1)
-		strlcat(argbuf, "-ops ", sizeof(argbuf));
+		strlcat(argbuf, "-ops ", sizeof(*argbuf));
 	else if (ops == 2)
-		strlcat(argbuf, "-nonops ", sizeof(argbuf));
+		strlcat(argbuf, "-nonops ", sizeof(*argbuf));
 
 	if (clones)
-		strlcat(argbuf, "-clones ", sizeof(argbuf));
+		strlcat(argbuf, "-clones ", sizeof(*argbuf));
 
 	if (showinfo)
-		strlcat(argbuf, "-info ", sizeof(argbuf));
+		strlcat(argbuf, "-info ", sizeof(*argbuf));
 
 	if (realname)
 	{
-		strlcat(argbuf, "-realname ", sizeof(argbuf));
-		strlcat(argbuf, realname, sizeof(argbuf));
-		strlcat(argbuf, " ", sizeof(argbuf));
+		strlcat(argbuf, "-realname ", sizeof(*argbuf));
+		strlcat(argbuf, realname, sizeof(*argbuf));
+		strlcat(argbuf, " ", sizeof(*argbuf));
 	}
 
 	if (servptr)
 	{
-		strlcat(argbuf, "-server ", sizeof(argbuf));
-		strlcat(argbuf, servptr->name, sizeof(argbuf));
-		strlcat(argbuf, " ", sizeof(argbuf));
+		strlcat(argbuf, "-server ", sizeof(*argbuf));
+		strlcat(argbuf, servptr->name, sizeof(*argbuf));
+		strlcat(argbuf, " ", sizeof(*argbuf));
 	}
 
 	if (kill)
-		strlcat(argbuf, "-kill ", sizeof(argbuf));
+		strlcat(argbuf, "-kill ", sizeof(*argbuf));
 
 	if (*msgbuf)
 	{
-		strlcat(argbuf, "-msg ", sizeof(argbuf));
-		strlcat(argbuf, msgbuf, sizeof(argbuf));
+		strlcat(argbuf, "-msg ", sizeof(*argbuf));
+		strlcat(argbuf, msgbuf, sizeof(*argbuf));
 	}
 
 	o_RecordCommand(sockfd,

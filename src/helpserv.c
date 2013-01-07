@@ -242,7 +242,7 @@ GiveHelp(char *Serv, char *helpnick, char *command, int sockfd)
 
 {
 	FILE *fp;
-	char sendstr[MAXLINE + 1];
+	char sendstr[MAXLINE + 1] = "";
 	char line[MAXLINE + 1];
 	char *final;
 	struct Luser *servptr;

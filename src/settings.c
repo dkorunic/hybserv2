@@ -549,6 +549,10 @@ dparse(char *line, int linenum, int rehash)
 	 */
 
 	larc = 0;
+
+	if (line == NULL)
+		return 0;
+
 	for (lineptr = line; *lineptr; lineptr++)
 	{
 		if (larc >= PARAM_MAX)
@@ -560,9 +564,6 @@ dparse(char *line, int linenum, int rehash)
 			ret = 0;
 			break;
 		}
-
-		if (!lineptr || !*lineptr)
-			break;
 
 		while (*lineptr && IsSpace(*lineptr))
 			lineptr++;

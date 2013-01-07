@@ -3045,7 +3045,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 		strlcpy(user, mask, strlen(mask) - strlen(host) + 1);
 	}
 
-	if (!user || !host)
+	if ((user == NULL) || (host == NULL))
 	{
 		notice(n_NickServ, lptr->nick,
 			   "The hostmask [\002%s\002] is invalid",

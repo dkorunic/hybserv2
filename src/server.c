@@ -1389,8 +1389,8 @@ s_privmsg(int ac, char **av)
 					ircsprintf(tmpcommand, "OP %s", chptr->name);
 					for (i = 1; i < acnt; ++i)
 					{
-						strncat(tmpcommand, " ", sizeof(tmpcommand));
-						strncat(tmpcommand, tmpargv[i],
+						strlcat(tmpcommand, " ", sizeof(tmpcommand));
+						strlcat(tmpcommand, tmpargv[i],
 								sizeof(tmpcommand));
 					}
 
@@ -1410,8 +1410,8 @@ s_privmsg(int ac, char **av)
 					ircsprintf(tmpcommand, "OP %s", chptr->name);
 					for (i = 1; i < acnt; ++i)
 					{
-						strncat(tmpcommand, " -", sizeof(tmpcommand));
-						strncat(tmpcommand, tmpargv[i],
+						strlcat(tmpcommand, " -", sizeof(tmpcommand));
+						strlcat(tmpcommand, tmpargv[i],
 								sizeof(tmpcommand));
 					}
 
@@ -1428,7 +1428,7 @@ s_privmsg(int ac, char **av)
 				if (!IsChannelMember(chptr, Me.esptr))
 					return;
 				
-				strncpy(tmpcommand, command + 1, sizeof(tmpcommand));
+				strlcpy(tmpcommand, command + 1, sizeof(tmpcommand));
 				es_process(who, tmpcommand);
 				break;
 #endif /* SEENSERVICES */

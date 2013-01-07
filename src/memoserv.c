@@ -1590,7 +1590,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			memoptr->index = target->memocnt;
 
 			strlcpy(buf, "[Fwd]: ", sizeof(buf));
-			strncat(buf, fromptr->text, MAXLINE - 8);
+			strlcat(buf, fromptr->text, MAXLINE - 8);
 			memoptr->text = MyStrdup(buf);
 
 			AddMemo(target, memoptr);
@@ -1610,7 +1610,7 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	       buf,
 	       target->name);
 
-	if (master && realptr)
+	if ((master != NULL) && (realptr != NULL) && (memoptr != NULL))
 	{
 		/*
 		 * It was sent to a nickname - check if they are online

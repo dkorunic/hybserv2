@@ -291,15 +291,17 @@ int main(int argc, char *argv[])
 			SendUmode(OPERUMODE_Y, "*** Disconnected from hub server");
 
 		if (currenthub)
+		{
 			if (currenthub->realname)
 			{
 				MyFree(currenthub->realname);
 				currenthub->realname = NULL;
 			}
+			currenthub->connect_ts = 0;
+		}
 
 		close(HubSock); /* There was an error */
 		HubSock = NOSOCKET;
-		currenthub->connect_ts = 0;
 
 		/*
 		 * whenever Hybserv connects/reconnects to a server, clear

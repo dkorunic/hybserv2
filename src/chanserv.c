@@ -3610,12 +3610,12 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	else if (match("*@*", av[3]))
 	{
 		strlcpy(hostmask, "*!", sizeof(hostmask));
-		strncat(hostmask, av[3], sizeof(hostmask));
+		strlcat(hostmask, av[3], sizeof(hostmask));
 	}
 	else if (match("*.*", av[3]))
 	{
 		strlcpy(hostmask, "*!*@", sizeof(hostmask));
-		strncat(hostmask, av[3], sizeof(hostmask));
+		strlcat(hostmask, av[3], sizeof(hostmask));
 	}
 	else
 	{
@@ -3637,7 +3637,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 		RecordCommand("%s: %s!%s@%s ACCESS [%s] ADD %s %d",
 		              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-		              nickptr ? nickptr->nick : hostmask ? hostmask : "unknown!",
+		              (nickptr != NULL) ? nickptr->nick : (hostmask != NULL) ? hostmask : "unknown!",
 		              newlevel);
 
 		if ((cptr->flags & CS_VERBOSE))
@@ -3645,7 +3645,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			char line[MAXLINE + 1];
 			ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %d", lptr->nick,
 			           lptr->username, lptr->hostname, cptr->name, nickptr ?
-			           nickptr->nick : hostmask ? hostmask : "unknown!", newlevel);
+			           nickptr->nick : (hostmask != NULL) ? hostmask : "unknown!", newlevel);
 			chanopsnotice(FindChannel(cptr->name), line);
 		}
 
@@ -4136,9 +4136,9 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			nuhost[0] = '\0';
 			strlcpy(nuhost, tempuser->lptr->nick, NICKLEN + 1);
 			strlcat(nuhost, "!", sizeof(nuhost));
-			strncat(nuhost, tempuser->lptr->username, USERLEN + 1);
+			strlcat(nuhost, tempuser->lptr->username, USERLEN + 1);
 			strlcat(nuhost, "@", sizeof(nuhost));
-			strncat(nuhost, tempuser->lptr->hostname, HOSTLEN + 1);
+			strlcat(nuhost, tempuser->lptr->hostname, HOSTLEN + 1);
 
 			if (!match(hostmask, nuhost))
 				continue;
@@ -4232,12 +4232,12 @@ c_akick_del(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		else if (match("*@*", av[3]))
 		{
 			strlcpy(hostmask, "*!", sizeof(hostmask));
-			strncat(hostmask, av[3], sizeof(hostmask));
+			strlcat(hostmask, av[3], sizeof(hostmask));
 		}
 		else if (match("*.*", av[3]))
 		{
 			strlcpy(hostmask, "*!*@", sizeof(hostmask));
-			strncat(hostmask, av[3], sizeof(hostmask));
+			strlcat(hostmask, av[3], sizeof(hostmask));
 		}
 		else
 		{
@@ -8399,7 +8399,7 @@ void ExpireBans(time_t unixtime)
 					}
 				}
 
-				if (bans)
+				if ((bans != NULL) && (bans[0] != '\0'))
 					SetModes(n_ChanServ, 0, 'b', chptr, bans);
 			} /* if (cptr->flags & CS_EXPIREBANS) */
 		} /* for (cptr = chanlist[ii]; cptr; cptr = cptr->next) */

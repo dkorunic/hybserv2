@@ -1296,7 +1296,10 @@ CopyFile(char *oldfile, char *newfile)
 
 	fstat(oldfd, &fst);
 	if (!(fst.st_mode & S_IFREG))
+	{
+		close(oldfd);
 		return (-3);
+	}
 
 	if ((newfd = creat(newfile, (int) (fst.st_mode & 0700))) < 0)
 	{

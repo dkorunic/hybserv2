@@ -1856,9 +1856,10 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
 	ircsprintf(tmpfile, "%s.tmp", configname);
 
-	if (!(fp = fopen(tmpfile, "w")))
+	if ((fp = fopen(tmpfile, "w")) == NULL)
 	{
 		os_notice(lptr, sockfd, "Unable to open temporary config file");
+		fclose(configfp);
 		return;
 	}
 
@@ -2362,9 +2363,10 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 
 	ircsprintf(tmpfile, "%s.tmp", configname);
 
-	if (!(fp = fopen(tmpfile, "w")))
+	if ((fp = fopen(tmpfile, "w")) == NULL)
 	{
 		os_notice(lptr, sockfd, "Unable to open temporary config file");
+		fclose(configfp);
 		return;
 	}
 
@@ -2572,9 +2574,11 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 	}
 
 	ircsprintf(tmpfile, "%s.tmp", ConfigFile);
-	if (!(fp = fopen(tmpfile, "w")))
+
+	if ((fp = fopen(tmpfile, "w")) == NULL)
 	{
 		os_notice(lptr, sockfd, "Unable to open temporary config file");
+		fclose(configfp);
 		return;
 	}
 

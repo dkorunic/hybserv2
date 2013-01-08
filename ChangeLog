@@ -7,6 +7,14 @@ $Id$
 
 Hybserv-1.9.5-dev
 
+  - huge amount of various fixes practically in all components (15
+    occurences of dead code blocks, 13 occurences of unchecked return
+    values, 2 occurences of uninitialized variables usage, 13 occurences
+    of resource leakage, 3 occurences of forward NULL references, 2
+    occurences of reverse NULL references, 11 occurences of code without
+    effect, 2 occurences of unused variables, 6 occurences of possible
+    negative returns used in unsigned environment, 1 sizeof mismatch, 1
+    buffer size overflow, 2 string size overflows, 3 overruns)
   - fix in SplitBuf(), mystring.c: when params include \t in a
     command such as /msg nickserv help \t, a crash occurs [Kamen Sabeff]
   - fixed crash when SecureMessaging is on and someone sends a message in

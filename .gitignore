@@ -21,3 +21,4 @@
 *.orig
 cov-int
 hybserv2.tgz
+coverity-check.sh

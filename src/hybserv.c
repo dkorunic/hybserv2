@@ -146,14 +146,17 @@ int main(int argc, char *argv[])
 		pid_t mypid;
 		char line[MAXLINE + 1];
 
-		fgets(line, sizeof(line), pidfile);
-		fclose(pidfile);
-		mypid = atoi(line);
-		if (mypid && !kill(mypid, 0))
+		if (fgets(line, sizeof(line), pidfile) != NULL)
 		{
-			fprintf(stderr, "FATAL: Services are already running!\n");
-			exit(EXIT_FAILURE);
+			mypid = atoi(line);
+			if (mypid && !kill(mypid, 0))
+			{
+				fprintf(stderr, "FATAL: Services are already running!\n");
+				fclose(pidfile);
+				exit(EXIT_FAILURE);
+			}
 		}
+		fclose(pidfile);
 	}
 
 	uid = getuid(); /* the user id of the user who ran the process */

@@ -19,3 +19,5 @@
 # Various other
 *~
 *.orig
+cov-int
+hybserv2.tgz

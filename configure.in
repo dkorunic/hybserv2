@@ -364,7 +364,7 @@ if test "x$cf_enable_boehm_gc" = "xyes"; then
     [AC_CHECK_HEADERS(gc/gc.h gc.h)
         AC_DEFINE(HAVE_BOEHM_GC, 1, [Define this to enable Boehm GC])
         LIBS="$LIBS -lgc"],
-    [cf_enable_boehm_gc="yes"])
+    [cf_enable_boehm_gc="no"])
 else
   AC_MSG_RESULT(no)
 fi

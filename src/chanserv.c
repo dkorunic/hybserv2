@@ -1306,7 +1306,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 		{
 			char temp[MAXLINE + 1];
 
-			if (chptr->key)
+			if (chptr->key[0] != '\0')
 			{
 				ircsprintf(temp, "-k %s", chptr->key);
 				toserv(":%s MODE %s %s\r\n", n_ChanServ, chptr->name, temp);
@@ -6346,7 +6346,7 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
 			ircsprintf(temp, "%s %d", modes, chptr->limit);
 			strlcpy(modes, temp, sizeof(modes));
 		}
-		if ((chptr->key) && (chptr->key[0] != '\0'))
+		if (chptr->key[0] != '\0')
 		{
 			char temp[MAXLINE + 1];
 			ircsprintf(temp, "%s %s", modes, chptr->key);

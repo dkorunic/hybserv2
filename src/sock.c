@@ -693,7 +693,7 @@ ReadSocketInfo(void)
 					continue;
 				}
 
-				if (dccptr->authfd != NOSOCKET)
+				if (dccptr->authfd >= 0)
 				{
 					if (FD_ISSET(dccptr->authfd, &writefds) &&
 					        (dccptr->flags & SOCK_WRID))

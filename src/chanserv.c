@@ -3303,7 +3303,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
-	if ((cptr = FindChan(av[1])))
+	if (FindChan(av[1]) != NULL)
 	{
 		notice(n_ChanServ, lptr->nick,
 		       "The channel [\002%s\002] is already registered",

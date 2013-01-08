@@ -315,7 +315,6 @@ void updateConnectTable(char *user, char *host)
 #ifdef ADVFLOOD_GLINE
 
 	char togline[UHOSTLEN + 2];
-	struct Gline *gptr;
 #endif /* ADVFLOOD_GLINE */
 
 #if defined ADVFLOOD_NOTIFY || defined ADVFLOOD_NOTIFY_ALL
@@ -362,7 +361,7 @@ void updateConnectTable(char *user, char *host)
 					if (IsProtectedHost((banhost == 1) ? "*" : user, host))
 						banhost = -1; /* Can't do that. */
 
-					if ((gptr = IsGline((banhost == 1) ? "*" : user, host)))
+					if (IsGline((banhost == 1) ? "*" : user, host))
 						banhost = -1; /* Can't do that either. */
 
 					putlog(LOG1, "Advanced flood detected from [%s@%s], %s",

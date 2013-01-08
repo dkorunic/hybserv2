@@ -2092,7 +2092,10 @@ s_sjoin(int ac, char **av)
 	/* Safety check - if we got no nicknames, that is non-valid blank SJOIN
 	 * and we should silently ignore it kre */
 	if (!ncnt)
+	{
+		MyFree(nicks);
 		return;
+	}
 
 	/*
 	 * when a user joins the channel "0", they get parted from all their
@@ -2117,7 +2120,6 @@ s_sjoin(int ac, char **av)
 		}
 
 		MyFree(nicks);
-
 		return;
 	} /* if (*av[3] == '0') */
 
@@ -2149,7 +2151,10 @@ s_sjoin(int ac, char **av)
 	cptr = AddChannel(av, ncnt, nicks);
 
 	if (!cptr)
+	{
+		MyFree(nicks);
 		return; /* should never happen */
+	}
 
 	/*
 	 * If oldptr is valid, it was an existing channel,

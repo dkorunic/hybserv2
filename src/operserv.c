@@ -5104,6 +5104,7 @@ static void o_motd_add(struct Luser *lptr, int ac, char **av, int
 		os_notice(lptr, sockfd,
 		          "Cannot open MOTD file %s!",
 		          Network->LogonNewsFile.filename);
+		MyFree(line);
 		return;
 	}
 
@@ -5118,6 +5119,7 @@ static void o_motd_add(struct Luser *lptr, int ac, char **av, int
 
 	os_notice(lptr, sockfd,
 	          "MOTD set to %s", line ? line : "a blank line");
+	MyFree(line);
 } /* o_motd_add() */
 
 /*

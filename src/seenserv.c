@@ -221,7 +221,6 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
 	aSeen *seen = MyMalloc(sizeof(aSeen));
 
 #ifdef NOSQUITSEEN
-
 	if (type == 1)
 	{
 		mymsg = MyStrdup(msg);
@@ -232,6 +231,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
 			{
 				MyFree(mymsg);
 				MyFree(av);
+				MyFree(seen);
 				return ;
 			}
 		}
@@ -239,6 +239,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
 		MyFree(av);
 	}
 #endif
+
 	if (++seenc > SeenMaxRecs)
 	{
 		aSeen *sp = seenb;
@@ -250,6 +251,7 @@ void es_add(char *nick, char *user, char *host, char *msg, time_t time,
 		MyFree(sp);
 		seenc--;
 	}
+
 	memset(userhost, 0, sizeof(userhost));
 	memset(seen, 0, sizeof(aSeen));
 	strlcpy(seen->nick, nick, NICKLEN + 1);

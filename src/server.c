@@ -1382,7 +1382,11 @@ s_privmsg(int ac, char **av)
 		{
 			case CS_PUB_OP:
 				if (!IsChannelMember(chptr, Me.csptr))
+				{
+					MyFree(tmpargv);
+					MyFree(pubcommand);
 					return;
+				}
 				
 				if (acnt > 1)
 				{
@@ -1403,7 +1407,11 @@ s_privmsg(int ac, char **av)
 
 			case CS_PUB_DEOP:
 				if (!IsChannelMember(chptr, Me.csptr))
+				{
+					MyFree(tmpargv);
+					MyFree(pubcommand);
 					return;
+				}
 				
 				if (acnt > 1)
 				{
@@ -1426,7 +1434,11 @@ s_privmsg(int ac, char **av)
 			case SS_PUB_SEEN:
 			case SS_PUB_SEENNICK:
 				if (!IsChannelMember(chptr, Me.esptr))
+				{
+					MyFree(tmpargv);
+					MyFree(pubcommand);
 					return;
+				}
 				
 				strlcpy(tmpcommand, command + 1, sizeof(tmpcommand));
 				es_process(who, tmpcommand);
@@ -2092,7 +2104,10 @@ s_sjoin(int ac, char **av)
 		struct UserChannel *tempc;
 
 		if (!(lptr = FindClient(nicks[0])))
+		{
+			MyFree(nicks);
 			return;
+		}
 
 		while (lptr->firstchan)
 		{

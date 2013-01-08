@@ -460,7 +460,7 @@ struct Channel *AddChannel(char **line, const int nickcnt, char **nicks)
 	UpdateChanModes(0, line[0] + 1, chname, modes);
 
 	/* Only free anames[] if there was no nick list given */
-	if (!nickcnt)
+	if (nickcnt <= 0)
 		MyFree(anames);
 
 	return (chname);

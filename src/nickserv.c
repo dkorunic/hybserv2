@@ -2979,9 +2979,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 {
 	struct NickInfo *nptr;
 	char user[USERLEN + 1];
-	char *mask,
-	*host,
-	*tmp;
+	char *mask, *host, *tmp;
 
 	user[0] = '\0';
 
@@ -3032,11 +3030,14 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 	if (host == NULL )
 	{
 		notice(n_NickServ, lptr->nick, "Invalid hostmask!");
+		MyFree(tmp);
 		return;
 	}
 	if (strlen(mask)-strlen(host) > USERLEN - 1)
 	{
 		notice(n_NickServ, lptr->nick, "Invalid hostmask! Username too long!");
+		MyFree(tmp);
+		MyFree(host);
 		return;
 	}
 
@@ -3058,6 +3059,9 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 			notice(n_NickServ, lptr->nick,
 				   "[\002%s\002] matches a hostmask already on your Access List",
 				   mask);
+
+		MyFree(tmp);
+		MyFree(host);
 		return;
 	}
 	else
@@ -3093,6 +3097,9 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 						  mask);
 		}
 	}
+
+	MyFree(tmp);
+	MyFree(host);
 } /* n_access_add() */
 
 static void

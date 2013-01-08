@@ -1971,6 +1971,7 @@ o_omode(struct Luser *lptr, int ac, char **av, int sockfd)
 	if (!(chptr = FindChannel(av[1])))
 	{
 		os_notice(lptr, sockfd, "No such channel: %s", av[1]);
+		MyFree(omodes);
 		return;
 	}
 
@@ -5137,6 +5138,7 @@ static void o_motd_append(struct Luser *lptr, int ac, char **av, int
 	{
 		os_notice(lptr, sockfd,
 		          "Cannot open MOTD file %s!", Network->LogonNewsFile.filename);
+		MyFree(line);
 		return;
 	}
 
@@ -5146,6 +5148,7 @@ static void o_motd_append(struct Luser *lptr, int ac, char **av, int
 	ReadMessageFile(&Network->LogonNewsFile);
 	os_notice(lptr, sockfd,
 	          "Line appended to the current MOTD");
+	MyFree(line);
 } /* o_motd_append() */
 
 /*

@@ -4122,7 +4122,10 @@ c_akick_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		sidx = 1;
 
 		if (!(chptr = FindChannel(cptr->name)))
+		{
+			MyFree(reason);
 			return;
+		}
 
 		for (tempuser = chptr->firstuser; tempuser; tempuser = tempuser->next)
 		{

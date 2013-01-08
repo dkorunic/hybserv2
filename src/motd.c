@@ -75,7 +75,7 @@ ReadMessageFile(struct MessageFile *fileptr)
 	 * Clear out old data
 	 */
 	while (fileptr->Contents != NULL)
-{
+	{
 		CurrentLine = fileptr->Contents->next;
 		MyFree(fileptr->Contents->line);
 		MyFree(fileptr->Contents);

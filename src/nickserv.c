@@ -862,11 +862,7 @@ void RemoveFounderChannelFromNick(struct NickInfo **nptr, struct ChanInfo
 		}
 
 		prev = tmp;
-
-		if (tmp)
-			tmp = tmp->next;
-		else
-			tmp = (*nptr)->FounderChannels;
+		tmp = tmp->next;
 	}
 } /* RemoveFounderChannelFromNick() */
 

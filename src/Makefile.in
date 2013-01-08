@@ -6,7 +6,7 @@
 AR = @AR@
 RANLIB = @RANLIB@
 CC = @CC@
-CFLAGS = @CFLAGS@
+CFLAGS = @CFLAGS@ -Wall
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 COMPATDIR = ../compat

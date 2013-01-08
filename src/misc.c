@@ -288,7 +288,7 @@ DoShutdown(char *who, char *reason)
 
 	/* close listening sockets */
 	for (pptr = PortList; pptr; pptr = pptr->next)
-		if (pptr->socket != NOSOCKET)
+		if (pptr->socket >= 0)
 			close(pptr->socket);
 
 	ircsprintf(sendstr, "DIE [%s] (authorized by %s)",

@@ -327,10 +327,22 @@ CreateDatabase(char *name, char *info)
 	time_t currtime;
 
 	if ((fptr = fopen(name, "w")) == NULL)
-		return (NULL);
+	{
+		putlog(LOG1,
+			   "Error creating database [%s]: %s",
+			   name, strerror(errno));
+		return NULL;
+	}
 
 	/* change the mode to -rw------- */
-	chmod(name, 0600);
+	if (chmod(name, 0600) == -1)
+	{
+		putlog(LOG1,
+			   "Error changing permissions for database [%s]: %s",
+			   name, strerror(errno));
+		fclose(fptr);
+		return NULL;
+	}
 
 	currtime = current_ts;
 	fprintf(fptr, "; Hybserv2 %s - %s - created %s",
@@ -365,7 +377,7 @@ BackupDatabases(time_t unixtime)
 	{
 		/* Proceed if errno is set. This usually should not be necessary, but
 		 * this code should help me find why Solaris complains -kre */
-		if (errno && errno!=EEXIST)
+		if (errno && (errno != EEXIST))
 		{
 			putlog(LOG1,
 			       "Error creating backup directory [%s]: %s",
@@ -520,6 +532,7 @@ WriteOpers()
 	char tempname[MAXLINE + 1];
 	struct Userlist *tempuser;
 	struct Luser *luser;
+	int ret;
 
 	ircsprintf(tempname, "%s.tmp", OperServDB);
 	fp = CreateDatabase(tempname, "OperServ Database");
@@ -559,7 +572,13 @@ WriteOpers()
 
 	fclose(fp);
 
-	rename(tempname, OperServDB);
+	ret = rename(tempname, OperServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming OperServ Database %s to %s: %s",
+			   tempname, OperServDB, strerror(errno));
+		return 0;
+	}
 
 	putlog(LOG3, "Wrote %s", OperServDB);
 
@@ -577,6 +596,7 @@ int WriteIgnores()
 	FILE *fp;
 	char tempname[MAXLINE + 1];
 	struct Ignore *temp;
+	int ret;
 
 	ircsprintf(tempname, "%s.tmp", OperServIgnoreDB);
 	fp = CreateDatabase(tempname, "OperServ Ignore Database");
@@ -597,8 +617,17 @@ int WriteIgnores()
 	}
 
 	fclose(fp);
-	rename(tempname, OperServIgnoreDB);
+
+	ret = rename(tempname, OperServIgnoreDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming OperServ Ignore Database %s to %s: %s",
+			   tempname, OperServIgnoreDB, strerror(errno));
+		return 0;
+	}
+
 	putlog(LOG3, "Wrote %s", OperServIgnoreDB);
+
 	return 1;
 } /* WriteIgnores() */
 
@@ -616,6 +645,7 @@ WriteStats()
 {
 	FILE *fp;
 	char tempname[MAXLINE + 1];
+	int ret;
 
 	ircsprintf(tempname, "%s.tmp", StatServDB);
 	fp = CreateDatabase(tempname, "StatServ Database");
@@ -645,10 +675,15 @@ WriteStats()
 
 	fclose(fp);
 
-	rename(tempname, StatServDB);
+	ret = rename(tempname, StatServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming StatServ Database %s to %s: %s",
+			   tempname, StatServDB, strerror(errno));
+		return 0;
+	}
 
-	putlog(LOG3, "Wrote %s",
-	       StatServDB);
+	putlog(LOG3, "Wrote %s", StatServDB);
 
 	return 1;
 } /* WriteStats() */
@@ -671,7 +706,7 @@ WriteNicks()
 	int ii, ncnt;
 	struct NickInfo *nptr;
 	struct NickHost *hptr;
-	int islinked;
+	int islinked, ret;
 
 	ircsprintf(tempname, "%s.tmp", NickServDB);
 	fp = CreateDatabase(tempname, "NickServ Database");
@@ -882,7 +917,13 @@ WriteNicks()
 
 	fclose(fp);
 
-	rename(tempname, NickServDB);
+	ret = rename(tempname, NickServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming NickServ Database %s to %s: %s",
+			   tempname, NickServDB, strerror(errno));
+		return 0;
+	}
 
 	putlog(LOG3, "Wrote %s (%d registered nicknames)",
 	       NickServDB, ncnt);
@@ -904,8 +945,7 @@ WriteChans()
 	FILE *fp;
 	char tempname[MAXLINE + 1];
 	struct ChanInfo *cptr, *cnext;
-	int ii,
-	ccnt;
+	int ii, ccnt, ret;
 
 	ircsprintf(tempname, "%s.tmp", ChanServDB);
 	fp = CreateDatabase(tempname, "ChanServ Database");
@@ -1073,7 +1113,13 @@ WriteChans()
 
 	fclose(fp);
 
-	rename(tempname, ChanServDB);
+	ret = rename(tempname, ChanServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming ChanServ Database %s to %s: %s",
+			   tempname, ChanServDB, strerror(errno));
+		return 0;
+	}
 
 	putlog(LOG3, "Wrote %s (%d registered channels)",
 	       ChanServDB,
@@ -1097,8 +1143,7 @@ WriteMemos()
 {
 	FILE *fp;
 	char tempname[MAXLINE + 1];
-	int ii,
-	mcnt;
+	int ii, mcnt, ret;
 	struct MemoInfo *mi;
 	struct Memo *memoptr;
 
@@ -1139,7 +1184,13 @@ WriteMemos()
 
 	fclose(fp);
 
-	rename(tempname, MemoServDB);
+	ret = rename(tempname, MemoServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming MemoServ Database %s to %s: %s",
+			   tempname, MemoServDB, strerror(errno));
+		return 0;
+	}
 
 	putlog(LOG3, "Wrote %s (%d memo entries)",
 	       MemoServDB,
@@ -1285,16 +1336,20 @@ static int
 CopyFile(char *oldfile, char *newfile)
 
 {
-	int oldfd,
-	newfd;
+	int oldfd, newfd, ret, bytes;
 	struct stat fst;
 	char buffer[MAXLINE + 1];
-	int bytes;
 
 	if ((oldfd = open(oldfile, O_RDONLY, 0)) < 0)
 		return (-1);
 
-	fstat(oldfd, &fst);
+	ret = fstat(oldfd, &fst);
+	if (ret == -1)
+	{
+		close(oldfd);
+		return -3;
+	}
+
 	if (!(fst.st_mode & S_IFREG))
 	{
 		close(oldfd);
@@ -1350,6 +1405,7 @@ WriteSeen()
 	FILE *fp;
 	char tempname[MAXLINE + 1];
 	aSeen *seen;
+	int ret;
 
 	ircsprintf(tempname, "%s.tmp", SeenServDB);
 	fp = CreateDatabase(tempname, "SeenServ Database");
@@ -1379,13 +1435,17 @@ WriteSeen()
 
 	fclose(fp);
 
-	rename(tempname, SeenServDB);
+	ret = rename(tempname, SeenServDB);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming SeenServ Database %s to %s: %s",
+			   tempname, SeenServDB, strerror(errno));
+		return 0;
+	}
 
-	putlog(LOG3, "Wrote %s",
-	       SeenServDB);
+	putlog(LOG3, "Wrote %s", SeenServDB);
 
 	return 1;
-
 } /* WriteSeen() */
 
 #endif /* SEENSERVICES */

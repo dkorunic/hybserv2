@@ -580,7 +580,13 @@ static int RequestIdent(struct DccUser *dccptr, struct sockaddr *addr,
 	SetSocketOptions(dccptr->authfd);
 	SetNonBlocking(dccptr->authfd);
 
-	getsockname(dccptr->socket, (struct sockaddr *)&laddr, &laddrlen);
+	if (getsockname(dccptr->socket, (struct sockaddr *)&laddr, &laddrlen) == -1)
+	{
+		putlog(LOG1, "FATAL: Unable to get current address: %s", strerror(errno));
+		close(dccptr->authfd);
+		return -1;
+	}
+
 	SetPort((struct sockaddr *)&laddr, 0);
 
 	if (bind(dccptr->authfd, (struct sockaddr *)&laddr, laddrlen) == -1)
@@ -1272,11 +1278,11 @@ ExpireIdent(time_t unixtime)
 	for (dccptr = connections; dccptr; dccptr = dccptr->next)
 	{
 		if ((dccptr->flags & SOCK_NEEDID) &&
-		        (dccptr->authfd != NOSOCKET) &&
+		        (dccptr->authfd >= 0) &&
 		        !(dccptr->flags & SOCK_DCC) &&
 		        ((unixtime - dccptr->idle) >= IdentTimeout))
 		{
-			close (dccptr->authfd);
+			close(dccptr->authfd);
 			dccptr->authfd = NOSOCKET;
 			dccptr->flags &= ~SOCK_NEEDID;
 

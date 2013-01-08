@@ -879,7 +879,7 @@ int SaveSettings()
 {
 	FILE *fp;
 	struct Directive *dptr;
-	int ii;
+	int ii, ret;
 	char buffer[MAXLINE + 1],
 	tmp[MAXLINE + 1],
 	tempname[MAXLINE + 1];
@@ -977,7 +977,7 @@ int SaveSettings()
 
 	fclose(fp);
 
-	rename(tempname, SETPATH);
+	ret = rename(tempname, SETPATH);
 
-	return 1;
+	return (ret == 0) ? 1 : 0;
 } /* SaveSettings() */

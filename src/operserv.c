@@ -1815,6 +1815,7 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
 	int jcnt; /* number of matching jupes found */
+	int ret;
 	char line[MAXLINE + 1], linetemp[MAXLINE + 1];
 	char tmpfile[MAXLINE + 1];
 	char *configname;
@@ -1879,10 +1880,17 @@ o_unjupe(struct Luser *lptr, int ac, char **av, int sockfd)
 		else
 			fputs(linetemp, fp);
 	} /* while () */
+
 	fclose(configfp);
 	fclose(fp);
 
-	rename(tmpfile, configname);
+	ret = rename(tmpfile, configname);
+	if (ret == -1)
+	{
+		os_notice(lptr, sockfd, "Unable to rename temporary config file %s to %s: %s",
+				tmpfile, configname, strerror(errno));
+		return;
+	}
 
 	if (jcnt == 0)
 	{
@@ -2264,7 +2272,7 @@ static void
 o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 
 {
-	int gcnt;
+	int gcnt, ret;
 	char line[MAXLINE + 1], linetemp[MAXLINE + 1];
 	char tmpfile[MAXLINE + 1];
 	char chkstr[MAXLINE + 1];
@@ -2387,7 +2395,13 @@ o_ungline(struct Luser *lptr, int ac, char **av, int sockfd)
 	fclose(configfp);
 	fclose(fp);
 
-	rename(tmpfile, configname);
+	ret = rename(tmpfile, configname);
+	if (ret == -1)
+	{
+		os_notice(lptr, sockfd, "Unable to rename temporary config file %s to %s: %s",
+				tmpfile, configname, strerror(errno));
+		return;
+	}
 
 	os_notice(lptr, sockfd,
 	          "Glines for %s removed [%d matches]",
@@ -2502,6 +2516,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 	char tmpfile[MAXLINE + 1];
 	struct Chanlist *chanptr, *tempchan, *prev;
 	struct Channel *chptr;
+	int ret;
 
 	if (ac < 2)
 	{
@@ -2596,10 +2611,16 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 			fputs(linetemp, fp);
 	} /* while () */
 
-	fclose(fp);
 	fclose(configfp);
+	fclose(fp);
 
-	rename(tmpfile, ConfigFile);
+	ret = rename(tmpfile, ConfigFile);
+	if (ret == -1)
+	{
+		os_notice(lptr, sockfd, "Unable to rename temporary config file %s to %s: %s",
+				tmpfile, ConfigFile, strerror(errno));
+		return;
+	}
 
 	os_notice(lptr, sockfd, "No longer monitoring %s",
 	          av[1]);
@@ -3997,7 +4018,6 @@ o_jump(struct Luser *lptr, int ac, char **av, int sockfd)
 	}
 	else
 	{
-		close(tempsock);
 		os_notice(lptr, sockfd,
 		          "Unable to connect to port \002%d\002 of \002%s\002: %s",
 		          port,

@@ -1459,7 +1459,7 @@ CheckListenPorts()
 			       tempport->host ? tempport->host : "",
 			       tempport->host ? "]" : "");
 
-			if (tempport->socket != NOSOCKET)
+			if (tempport->socket >= 0)
 				close(tempport->socket);
 
 			if (tempport->host)

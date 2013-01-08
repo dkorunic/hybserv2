@@ -147,8 +147,7 @@ CheckLogs(time_t unixtime)
 	time_t oldts;
 	DIR *dp;
 	struct dirent *dirp;
-	int lmatches,
-	len;
+	int lmatches, len, ret;
 
 	/* infinite logging means we won't rotate logs at all because of user
 	 * safety: think of gazillions of files in a single directory */
@@ -227,7 +226,14 @@ CheckLogs(time_t unixtime)
 			   LogPath, LogFile, 1900 + log_tm->tm_year, log_tm->tm_mon +
 			   1, log_tm->tm_mday);
 
-	rename(LogFileName, tmplog);
+	ret = rename(LogFileName, tmplog);
+	if (ret == -1)
+	{
+		putlog(LOG1, "Error renaming log file %s to %s: %s",
+			   LogFileName, tmplog, strerror(errno));
+		return;
+	}
+
 
 	CloseLogFile();
 	OpenLogFile();

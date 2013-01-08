@@ -2405,11 +2405,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
 		}
 
 		cprev = fcptr;
-
-		if (fcptr)
-			fcptr = fcptr->next;
-		else
-			fcptr = lptr->founder_channels;
+		fcptr = fcptr->next;
 	}
 
 	uprev = NULL;
@@ -2433,11 +2429,7 @@ RemFounder(struct Luser *lptr, struct ChanInfo *cptr)
 		}
 
 		uprev = fuptr;
-
-		if (fuptr)
-			fuptr = fuptr->next;
-		else
-			fuptr = cptr->founders;
+		fuptr = fuptr->next;
 	}
 } /* RemFounder() */
 

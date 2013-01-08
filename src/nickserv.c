@@ -3174,11 +3174,7 @@ n_access_del(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 		}
 
 		prev = hptr;
-
-		if (hptr)
-			hptr = hptr->next;
-		else
-			hptr = nptr->hosts;
+		hptr = hptr->next;
 	}
 
 	if (found)

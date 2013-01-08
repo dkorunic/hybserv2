@@ -61,6 +61,7 @@ ReadMessageFile(struct MessageFile *fileptr)
 	assert(fileptr != 0);
 	assert(fileptr->filename != 0);
 
+	/* XXX: TOCTOU bug ahoy */
 	if (stat(fileptr->filename, &sb) < 0)
 		return 0; /* file doesn't exist */
 

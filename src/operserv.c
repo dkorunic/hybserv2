@@ -2575,11 +2575,7 @@ o_part(struct Luser *lptr, int ac, char **av, int sockfd)
 		}
 
 		prev = tempchan;
-
-		if (tempchan)
-			tempchan = tempchan->next;
-		else
-			tempchan = ChanList;
+		tempchan = tempchan->next;
 	}
 
 	/* Remove channel from config file */

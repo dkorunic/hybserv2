@@ -3497,11 +3497,11 @@ $as_echo "$ac_cv_safe_to_define___extensions__" >&6; }
 
 
 
-if test -f "$srcdir/.svn/entries"; then
-  if svn help >/dev/null 2>&1; then
-    ac_cv_revision="svn-"`svn info 2>/dev/null | grep 'Last Changed Rev' | cut -d ' ' -f 4`
+if test -d "$srcdir/.git"; then
+  if git help >/dev/null 2>&1; then
+    ac_cv_revision="git-"`git rev-parse --short HEAD`
   else
-    ac_cv_revision="svn-unknown"
+    ac_cv_revision="git-unknown"
   fi
 else
   ac_cv_revision="release"

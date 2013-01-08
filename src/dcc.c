@@ -882,8 +882,6 @@ onctcp(char *nick, char *target, char *msg)
 			return; /* only let n_OperServ accept dcc chats */
 
 		goodDCC = 1;
-		if (!lptr)
-			goodDCC = 0;
 
 		if (lptr->flags & L_OSREGISTERED)
 		{
@@ -1600,7 +1598,7 @@ DccProcess(struct DccUser *dccptr, char *command)
 	if (!dccptr || !command)
 		return;
 
-	Network->RecvB += (command ? strlen(command) : 0);
+	Network->RecvB += strlen(command);
 
 	/* reset idle time */
 	dccptr->idle = current_ts;
@@ -1775,7 +1773,7 @@ int BotProcess(struct DccUser *botptr, char *line)
 	if (!line)
 		return 0;
 
-	Network->RecvB += (line ? strlen(line) : 0);
+	Network->RecvB += strlen(line);
 
 	if (IsDccPending(botptr))
 	{

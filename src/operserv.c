@@ -3207,7 +3207,7 @@ o_trace(struct Luser *lptr, int ac, char **av, int sockfd)
 			bad = 1; /* -server */
 		else if ((clones == 1) && !IsClone(tempuser))
 			bad = 1; /* -clones */
-		else if ((realname) && (tempuser->realname))
+		else if (realname)
 		{
 			if (match(realname, tempuser->realname) == 0)
 				bad = 1; /* -realname */
@@ -3749,7 +3749,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 		strlcat(modes, "i", sizeof(modes));
 	if (cptr->limit)
 		strlcat(modes, "l", sizeof(modes));
-	if (cptr->key && *cptr->key)
+	if (cptr->key[0] != '\0')
 		strlcat(modes, "k", sizeof(modes));
 #ifdef DANCER
 
@@ -3763,7 +3763,7 @@ show_channel(struct Luser *lptr, struct Channel *cptr, int sockfd)
 		strlcpy(modes, temp, sizeof(modes));
 	}
 
-	if (cptr->key && *cptr->key)
+	if (cptr->key[0] != '\0')
 	{
 		ircsprintf(temp, "%s %s", modes, cptr->key);
 		strlcpy(modes, temp, sizeof(modes));

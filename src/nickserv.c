@@ -3017,7 +3017,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 		mask = av[2];
 	}
 
-	if(strlen(mask) > UHOSTLEN )
+	if (strlen(mask) > UHOSTLEN )
 	{
 		notice(n_NickServ, lptr->nick, "Hostmask too long!");
 		return;
@@ -3029,12 +3029,12 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 	tmp = MyStrdup(mask);
 
 	host = strchr(tmp, '@');
-	if( host == NULL )
+	if (host == NULL )
 	{
 		notice(n_NickServ, lptr->nick, "Invalid hostmask!");
 		return;
 	}
-	if( strlen(mask)-strlen(host) > USERLEN - 1 )
+	if (strlen(mask)-strlen(host) > USERLEN - 1)
 	{
 		notice(n_NickServ, lptr->nick, "Invalid hostmask! Username too long!");
 		return;
@@ -3043,14 +3043,6 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 	if (strlen(host))
 	{
 		strlcpy(user, mask, strlen(mask) - strlen(host) + 1);
-	}
-
-	if ((user == NULL) || (host == NULL))
-	{
-		notice(n_NickServ, lptr->nick,
-			   "The hostmask [\002%s\002] is invalid",
-			   mask);
-		return;
 	}
 
 	++host;

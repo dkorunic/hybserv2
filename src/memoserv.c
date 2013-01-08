@@ -854,10 +854,7 @@ m_send(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	}
 
 	/* get the actual memo text now */
-	if (ac < 3)
-		memotext = MyStrdup("");
-	else
-		memotext = GetString(ac - 2, av + 2);
+	memotext = GetString(ac - 2, av + 2);
 
 	index = StoreMemo(to, memotext, lptr);
 
@@ -1659,6 +1656,9 @@ m_forward(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 						        !(tmpn->flags & NS_MEMONOTIFY))
 							continue;
 					}
+
+					if (memoptr == NULL)
+						continue;
 
 					notice(n_MemoServ, cu->lptr->nick,
 					       "%d new forwarded channel memo%s from \002%s\002",

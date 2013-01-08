@@ -1462,24 +1462,21 @@ long korectdat( long dat1, int dni)
 	int g, m, d;
 	long olddays, newdays, days;
 	int *tg;
-	short lhwb;
 	int i, days_in_year;
 
-	lhwb = 365;
 	g = dat1 / 10000;
 	if ( g <= 99 )
 		g += 1900;
 	m = ( dat1 % 10000 ) / 100;
 	d = dat1 % 100;
 
-	olddays = (long)(--g) * (long)lhwb;
-	if( lhwb == 365 )
-		olddays += ( g / 4 - g / 100 + g / 400 );
+	olddays = (long)(--g) * 365L;
+	olddays += ( g / 4 - g / 100 + g / 400 );
 
 	tg = get_tg( ++g, &days_in_year );
 	for( i = 0; i < m - 1; ++i )
 		olddays += tg[i];
-	olddays += ( lhwb == 360 && d > 30 )? 30: d;
+	olddays += d;
 
 	newdays = olddays + dni;
 
@@ -1495,8 +1492,6 @@ long korectdat( long dat1, int dni)
 		days += tg[m];
 
 	d = newdays - days;
-	if( lhwb == 360 && d > 30 )
-		d = 30;
 	return( (long)g * 10000L + (long)( m + 1 ) * 100 + d );
 }
 

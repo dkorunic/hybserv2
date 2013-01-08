@@ -1363,7 +1363,7 @@ cs_CheckChan(struct ChanInfo *cptr, struct Channel *chptr)
 		        (chptr->limit))
 			strlcat(modes, "l", sizeof(modes));
 		if ((cptr->modes_off & MODE_K) &&
-		        (chptr->key))
+		        (chptr->key[0] != '\0'))
 		{
 			strlcat(modes, "k ", sizeof(modes));
 			strlcat(modes, chptr->key, sizeof(modes));
@@ -1673,7 +1673,7 @@ cs_CheckModes(struct Luser *source, struct ChanInfo *cptr,
 		if ((mode == MODE_K) &&
 		        (cptr->modes_off & MODE_K))
 		{
-			if (chptr->key)
+			if (chptr->key[0] != '\0')
 				ircsprintf(modes, "-k %s", chptr->key);
 		}
 #ifdef DANCER
@@ -3565,8 +3565,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		       cptr->name);
 		RecordCommand("%s: %s!%s@%s failed ACCESS [%s] ADD %s %s",
 		              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-		              (ac >= 4) ? av[3] : "",
-		              (ac >= 5) ? av[4] : "");
+		              av[3], av[4]);
 		return;
 	}
 
@@ -3637,7 +3636,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 
 		RecordCommand("%s: %s!%s@%s ACCESS [%s] ADD %s %d",
 		              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-		              (nickptr != NULL) ? nickptr->nick : (hostmask != NULL) ? hostmask : "unknown!",
+		              (nickptr != NULL) ? nickptr->nick : (hostmask[0] != '\0') ? hostmask : "unknown!",
 		              newlevel);
 
 		if ((cptr->flags & CS_VERBOSE))
@@ -3645,7 +3644,7 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 			char line[MAXLINE + 1];
 			ircsprintf(line, "%s!%s@%s ACCESS [%s] ADD %s %d", lptr->nick,
 			           lptr->username, lptr->hostname, cptr->name, nickptr ?
-			           nickptr->nick : (hostmask != NULL) ? hostmask : "unknown!", newlevel);
+			           nickptr->nick : (hostmask[0] != '\0') ? hostmask : "unknown!", newlevel);
 			chanopsnotice(FindChannel(cptr->name), line);
 		}
 
@@ -3724,7 +3723,7 @@ c_access_del(struct Luser *lptr, struct NickInfo *nptr,
 		       cptr->name);
 		RecordCommand("%s: %s!%s@%s failed ACCESS [%s] DEL %s",
 		              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
-		              (ac >= 4) ? av[3] : "");
+		              av[3]);
 		return;
 	}
 
@@ -5905,7 +5904,7 @@ c_set_mlock(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	{
 		toserv(":%s MODE %s %s %s\r\n",
 		       n_ChanServ, cptr->name, modes,
-		       ((cptr->modes_off & MODE_K) && (chptr->key)) ? chptr->key : "");
+		       (cptr->modes_off & MODE_K) ? chptr->key : "");
 		UpdateChanModes(Me.csptr, n_ChanServ, chptr, modes);
 	}
 
@@ -6022,10 +6021,7 @@ c_set_entrymsg(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
-	if (ac < 4)
-		emsg = NULL;
-	else
-		emsg = GetString(ac - 3, av + 3);
+	emsg = GetString(ac - 3, av + 3);
 
 	RecordCommand("%s: %s!%s@%s SET [%s] ENTRYMSG %s",
 	              n_ChanServ, lptr->nick, lptr->username, lptr->hostname, cptr->name,
@@ -6190,10 +6186,7 @@ c_set_comment(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
-	if (ac < 4)
-		cmnt = NULL;
-	else
-		cmnt = GetString(ac - 3, av + 3);
+	cmnt = GetString(ac - 3, av + 3);
 
 	RecordCommand("%s: %s!%s@%s SET [%s] COMMENT %s",
 	              n_ChanServ,
@@ -6345,7 +6338,7 @@ static void c_modes(struct Luser *lptr, struct NickInfo *nptr, int ac,
 			strlcat(modes, "i", sizeof(modes));
 		if (chptr->limit)
 			strlcat(modes, "l", sizeof(modes));
-		if ((chptr->key) && (chptr->key[0] != '\0'))
+		if (chptr->key[0] != '\0')
 			strlcat(modes, "k", sizeof(modes));
 		if (chptr->limit)
 		{
@@ -6430,7 +6423,7 @@ static void c_cycle(struct Luser *lptr, struct NickInfo *nptr, int ac,
 			strlcat(modes, "i", sizeof(modes));
 		if ((chptr->limit) && (!cptr->limit))
 			strlcat(modes, "l", sizeof(modes));
-		if ((chptr->key) && (chptr->key[0] != '\0') && (!cptr->key))
+		if ((chptr->key[0] != '\0') && (!cptr->key))
 		{
 			strlcat(modes, "k ", sizeof(modes));
 			strlcat(modes, chptr->key, sizeof(modes));
@@ -7632,7 +7625,7 @@ c_clear_modes(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		strlcat(modes, "i", sizeof(modes));
 	if (chptr->limit)
 		strlcat(modes, "l", sizeof(modes));
-	if (chptr->key)
+	if (chptr->key[0] != '\0')
 	{
 		strlcat(modes, "k ", sizeof(modes));
 		strlcat(modes, chptr->key, sizeof(modes));
@@ -8399,7 +8392,7 @@ void ExpireBans(time_t unixtime)
 					}
 				}
 
-				if ((bans != NULL) && (bans[0] != '\0'))
+				if (bans[0] != '\0')
 					SetModes(n_ChanServ, 0, 'b', chptr, bans);
 			} /* if (cptr->flags & CS_EXPIREBANS) */
 		} /* for (cptr = chanlist[ii]; cptr; cptr = cptr->next) */

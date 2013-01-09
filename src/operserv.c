@@ -665,10 +665,11 @@ os_loaddata()
 			found = nickonly = 0;
 			if ((tmp = strchr(av[0], '!')))
 			{
+				char *tmp2;
+
 				*tmp++ = '\0';
 				nick = MyStrdup(av[0]);
 
-				char *tmp2;
 				if ((tmp2 = strchr(tmp, '@')))
 				{
 					*tmp2++ = '\0';

@@ -1,11 +1,14 @@
-dnl $Id$
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(Hybserv2, 1.9.5-dev, dinko.korunic@gmail.com)
-AC_PREREQ(2.50)
-AC_COPYRIGHT([$Id$])
+AC_INIT(Hybserv2, 1.9.5, dinko.korunic@gmail.com)
+AC_PREREQ(2.60)
+AC_COPYRIGHT([Copyright (c) 1999-2013 Hybserv2 team])
 AC_CONFIG_HEADER(include/defs.h)
-AC_GNU_SOURCE
+
+dnl We need to check for the compiler up here to avoid anything else
+dnl starting with a different one.
+AC_PROG_CC([clang llvm-gcc gcc cc])
+AC_PROG_CPP
 
 dnl Get version and revision number
 if test -d "$srcdir/.git"; then
@@ -41,12 +44,13 @@ dnl Standard installation path
 AC_PREFIX_DEFAULT(/usr/local)
 
 dnl Compiler environment
-AC_PROG_CC
+AC_GNU_SOURCE
 AC_ISC_POSIX
 AC_C_INLINE
 AC_C_CONST
 AC_SYS_LARGEFILE
 AC_C_BIGENDIAN
+AC_USE_SYSTEM_EXTENSIONS
 
 dnl Check for more detailed compiler info
 if test "x$ac_cv_c_compiler_gnu" != "xyes"; then
@@ -481,7 +485,11 @@ AC_OUTPUT(Makefile compat/Makefile src/Makefile tools/Makefile \
 
 echo "
 Configuration:
+  C Compiler ........... ${CC}
+  C Compiler flags...... ${CFLAGS}
+  Linker flags ......... ${LDFLAGS}
   Source revision ...... ${ac_cv_revision}
+  Package revision ..... ${ac_cv_version}
   Detected OS .......... ${host_os}
   Install path ......... ${prefix}/hybserv
 

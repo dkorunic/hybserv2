@@ -1176,8 +1176,7 @@ o_identify(struct Luser *lptr, int ac, char **av, int sockfd)
 		struct DccUser *dccptr;
 
 		os_notice(lptr, sockfd, "You are now identified");
-		if (lptr)
-			lptr->flags |= L_OSREGISTERED;
+		lptr->flags |= L_OSREGISTERED;
 
 		if ((dccptr = IsDccSock(sockfd)))
 			ClearDccPending(dccptr);

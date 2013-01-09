@@ -5,7 +5,6 @@
  * This code is originally from the ircd-hybrid project,
  * which is released under the Gnu Public License.
  *
- * $Id$
  */
 
 #ifndef INCLUDED_match_h

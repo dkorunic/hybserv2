@@ -2,7 +2,6 @@
  * sock.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_sock_h

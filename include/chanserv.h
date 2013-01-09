@@ -2,7 +2,6 @@
  * chanserv.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_chanserv_h

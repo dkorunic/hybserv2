@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id$
 
 echo
 echo "Starting configuration with default values"

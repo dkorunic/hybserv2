@@ -6,7 +6,6 @@
 ** Modernization, getopt, etc for the Hybrid IRCD team
 ** by W. Campbell
 **
-** $Id$
 */
 
 #include "stdinc.h"

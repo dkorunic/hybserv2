@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-# $Id$
 # Hybserv2 Services by Hybserv2 team
 #
 # This script will remove all backup directories created

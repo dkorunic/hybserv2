@@ -2,7 +2,6 @@
  * jupe.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_jupe_h

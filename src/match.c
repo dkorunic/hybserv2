@@ -19,7 +19,6 @@
  * Imported from Hybrid7 since original match.c was taken from Hybrid6
  * -kre
  *
- * $Id$
  */
 #include "stdinc.h"
 #include "config.h"

@@ -1,5 +1,3 @@
-$Id$
-
 Functions to pay extreme attention to
 - string format vulnerabilities if not careful:
   * BroadcastDcc towho format ...

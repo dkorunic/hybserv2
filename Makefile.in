@@ -1,5 +1,4 @@
 # Hybserv Makefile by Hybserv2 team
-# $Id$
 
 # This is installation prefix. It can be overrided by passing PREFIX
 # argument to make, as in making a fake tree for binary package.

@@ -2,7 +2,6 @@
  * conf.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_conf_h

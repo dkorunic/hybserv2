@@ -19,7 +19,6 @@
  *
  *   Imported from Hybrid7 instead of original libString -kre
  *
- *   $Id$
  */
 
 #include "stdinc.h"

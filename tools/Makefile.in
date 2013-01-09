@@ -1,5 +1,4 @@
 # Hybserv ./tools Makefile
-# $Id$
 
 AR = @AR@
 RANLIB = @RANLIB@

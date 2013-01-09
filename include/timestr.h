@@ -2,7 +2,6 @@
  * timestr.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_timestr_h

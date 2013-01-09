@@ -2,7 +2,6 @@
  * show.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_show_h

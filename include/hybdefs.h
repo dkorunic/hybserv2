@@ -2,7 +2,6 @@
  * hybdefs.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_hybdefs_h

@@ -1,5 +1,4 @@
 /*
- * $Id$ 
  */
 
 #ifndef INCLUDED_sprintf_irc_h

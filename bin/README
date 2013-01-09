@@ -1,5 +1,3 @@
-$Id$
-
 Files you can usually find in bin/ directory:
 
   * cleandb       - Script to delete old database backups

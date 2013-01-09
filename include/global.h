@@ -2,7 +2,6 @@
  * global.h
  * Hybserv2 Services by Hybserv2 team
  *
- * $Id$
  */
 
 #ifndef INCLUDED_global_h

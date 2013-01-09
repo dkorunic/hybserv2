@@ -1,4 +1,3 @@
-/* $Id$ */
 
 #include "stdinc.h"
 #include "handlers.h"

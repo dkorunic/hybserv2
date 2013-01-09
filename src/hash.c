@@ -6,7 +6,6 @@
  * do so under the terms of the GNU General Public License under which  
  * this program is distributed.
  *
- * $Id$
  */
 
 #include "stdinc.h"

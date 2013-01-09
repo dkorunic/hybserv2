@@ -534,7 +534,7 @@ dparse(char *line, int linenum, int rehash)
 {
 	struct Directive *dptr;
 	int larc; /* line arg count */
-	char *larv[PARAM_MAX]; /* holds line arguements */
+	char *larv[PARAM_MAX + 1]; /* holds line arguements */
 	char *lineptr,
 	*tmp;
 	int ret,

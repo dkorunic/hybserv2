@@ -338,7 +338,9 @@ AC_ARG_ENABLE(efence,
   [cf_enable_efence="no"])
 if test "x$cf_enable_efence" = "xyes"; then
   AC_MSG_RESULT(yes)
-  AC_CHECK_LIB(efence, malloc)
+  AC_CHECK_LIB(efence, malloc,
+    [LIBS="$LIBS -lefence"],
+    [cf_enable_efence="no"])
 else
   AC_MSG_RESULT(no)
 fi
@@ -347,11 +349,14 @@ dnl Try dmalloc support
 AC_MSG_CHECKING([compile with malloc debugging libs])
 AC_ARG_ENABLE(dmalloc,
   [  --enable-dmalloc        Enable dmalloc support [[default=no]]],
-  [cf_enable_malloc=$enableval],
-  [cf_enable_malloc="no"])
-if test "x$cf_enable_malloc" = "xyes"; then
+  [cf_enable_dmalloc=$enableval],
+  [cf_enable_dmalloc="no"])
+if test "x$cf_enable_dmalloc" = "xyes"; then
   AC_MSG_RESULT(yes)
-  AC_CHECK_LIB(dmalloc, malloc)
+  AC_CHECK_LIB(dmalloc, malloc,
+    [CFLAGS="$CFLAGS -U_GNU_SOURCE"
+        LIBS="$LIBS -ldmalloc"],
+    [cf_enable_dmalloc="no"])
 else
   AC_MSG_RESULT(no)
 fi
@@ -424,19 +429,6 @@ AC_DEFINE_UNQUOTED(NICKLEN, $ac_cv_nicklen, [Define to nick length])
 AC_DEFINE_UNQUOTED(CHANNELLEN, $ac_cv_channellen, [Define to channel length])
 AC_DEFINE_UNQUOTED(TOPICLEN, $ac_cv_topiclen, [Define to topic length])
 
-dnl Check if warnings are to be enabled
-AC_MSG_CHECKING([compile with warning flags])
-AC_ARG_ENABLE(warnings,
-  [  --enable-warnings       Enable compiler warnings [[default=no]]],
-  [cf_enable_warnings=$enableval],
-  [cf_enable_warnings="no"])
-if test "x$cf_enable_warnings" = "xyes"; then
-  CFLAGS="$CFLAGS -Wall"
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
-
 dnl Check if asserts are to be enabled
 AC_MSG_CHECKING([compile with asserts enabled])
 AC_ARG_ENABLE(asserts,
@@ -487,7 +479,7 @@ echo "
 Configuration:
   C Compiler ........... ${CC}
   C Compiler flags...... ${CFLAGS}
-  Linker flags ......... ${LDFLAGS}
+  Linker flags ......... ${LIBS} ${LDFLAGS}  
   Source revision ...... ${ac_cv_revision}
   Package revision ..... ${ac_cv_version}
   Detected OS .......... ${host_os}
@@ -500,11 +492,12 @@ Compile configuration:
   Topic length ......... ${ac_cv_topiclen}
 
 Extra configuration:
-  Warnings enabled ..... ${cf_enable_warnings}
+  LibEfence enabled .... ${cf_enable_efence}
+  Dmalloc enabled ...... ${cf_enable_dmalloc}
+  Boehm GC enabled ..... ${cf_enable_boehm_gc}
   Asserts enabled ...... ${cf_enable_asserts}
   Coredumps enabled .... ${cf_enable_gimmecore}
   Daemontools enabled .. ${cf_enable_daemontools}
-  Boehm GC enabled ..... ${cf_enable_boehm_gc}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

@@ -584,71 +584,63 @@ m4trace:configure.in:323: -1- AC_DEFINE_TRACE_LITERAL([HAVE_SYS_NERR])
 m4trace:configure.in:323: -1- m4_pattern_allow([^HAVE_SYS_NERR$])
 m4trace:configure.in:323: -1- AH_OUTPUT([HAVE_SYS_NERR], [/* Define to 1 if you have sys_nerr */
 @%:@undef HAVE_SYS_NERR])
-m4trace:configure.in:341: -1- AH_OUTPUT([HAVE_LIBEFENCE], [/* Define to 1 if you have the `efence\' library (-lefence). */
-@%:@undef HAVE_LIBEFENCE])
-m4trace:configure.in:341: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBEFENCE])
-m4trace:configure.in:341: -1- m4_pattern_allow([^HAVE_LIBEFENCE$])
-m4trace:configure.in:354: -1- AH_OUTPUT([HAVE_LIBDMALLOC], [/* Define to 1 if you have the `dmalloc\' library (-ldmalloc). */
-@%:@undef HAVE_LIBDMALLOC])
-m4trace:configure.in:354: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBDMALLOC])
-m4trace:configure.in:354: -1- m4_pattern_allow([^HAVE_LIBDMALLOC$])
-m4trace:configure.in:367: -1- AH_OUTPUT([HAVE_GC_GC_H], [/* Define to 1 if you have the <gc/gc.h> header file. */
+m4trace:configure.in:372: -1- AH_OUTPUT([HAVE_GC_GC_H], [/* Define to 1 if you have the <gc/gc.h> header file. */
 @%:@undef HAVE_GC_GC_H])
-m4trace:configure.in:367: -1- AH_OUTPUT([HAVE_GC_H], [/* Define to 1 if you have the <gc.h> header file. */
+m4trace:configure.in:372: -1- AH_OUTPUT([HAVE_GC_H], [/* Define to 1 if you have the <gc.h> header file. */
 @%:@undef HAVE_GC_H])
-m4trace:configure.in:367: -1- AC_DEFINE_TRACE_LITERAL([HAVE_BOEHM_GC])
-m4trace:configure.in:367: -1- m4_pattern_allow([^HAVE_BOEHM_GC$])
-m4trace:configure.in:367: -1- AH_OUTPUT([HAVE_BOEHM_GC], [/* Define this to enable Boehm GC */
+m4trace:configure.in:372: -1- AC_DEFINE_TRACE_LITERAL([HAVE_BOEHM_GC])
+m4trace:configure.in:372: -1- m4_pattern_allow([^HAVE_BOEHM_GC$])
+m4trace:configure.in:372: -1- AH_OUTPUT([HAVE_BOEHM_GC], [/* Define this to enable Boehm GC */
 @%:@undef HAVE_BOEHM_GC])
-m4trace:configure.in:423: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
-m4trace:configure.in:423: -1- m4_pattern_allow([^NICKLEN$])
-m4trace:configure.in:423: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
+m4trace:configure.in:428: -1- AC_DEFINE_TRACE_LITERAL([NICKLEN])
+m4trace:configure.in:428: -1- m4_pattern_allow([^NICKLEN$])
+m4trace:configure.in:428: -1- AH_OUTPUT([NICKLEN], [/* Define to nick length */
 @%:@undef NICKLEN])
-m4trace:configure.in:424: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
-m4trace:configure.in:424: -1- m4_pattern_allow([^CHANNELLEN$])
-m4trace:configure.in:424: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
+m4trace:configure.in:429: -1- AC_DEFINE_TRACE_LITERAL([CHANNELLEN])
+m4trace:configure.in:429: -1- m4_pattern_allow([^CHANNELLEN$])
+m4trace:configure.in:429: -1- AH_OUTPUT([CHANNELLEN], [/* Define to channel length */
 @%:@undef CHANNELLEN])
-m4trace:configure.in:425: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
-m4trace:configure.in:425: -1- m4_pattern_allow([^TOPICLEN$])
-m4trace:configure.in:425: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
+m4trace:configure.in:430: -1- AC_DEFINE_TRACE_LITERAL([TOPICLEN])
+m4trace:configure.in:430: -1- m4_pattern_allow([^TOPICLEN$])
+m4trace:configure.in:430: -1- AH_OUTPUT([TOPICLEN], [/* Define to topic length */
 @%:@undef TOPICLEN])
-m4trace:configure.in:448: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:448: -1- m4_pattern_allow([^NDEBUG$])
-m4trace:configure.in:448: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:440: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:440: -1- m4_pattern_allow([^NDEBUG$])
+m4trace:configure.in:440: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 @%:@undef NDEBUG])
-m4trace:configure.in:451: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
-m4trace:configure.in:451: -1- m4_pattern_allow([^SOFT_ASSERT$])
-m4trace:configure.in:451: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
+m4trace:configure.in:443: -1- AC_DEFINE_TRACE_LITERAL([SOFT_ASSERT])
+m4trace:configure.in:443: -1- m4_pattern_allow([^SOFT_ASSERT$])
+m4trace:configure.in:443: -1- AH_OUTPUT([SOFT_ASSERT], [/* Define this to enable soft asserts */
 @%:@undef SOFT_ASSERT])
-m4trace:configure.in:452: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
-m4trace:configure.in:452: -1- m4_pattern_allow([^NDEBUG$])
-m4trace:configure.in:452: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
+m4trace:configure.in:444: -1- AC_DEFINE_TRACE_LITERAL([NDEBUG])
+m4trace:configure.in:444: -1- m4_pattern_allow([^NDEBUG$])
+m4trace:configure.in:444: -1- AH_OUTPUT([NDEBUG], [/* Define this to disable debugging support */
 @%:@undef NDEBUG])
-m4trace:configure.in:467: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
-m4trace:configure.in:467: -1- m4_pattern_allow([^GIMMECORE$])
-m4trace:configure.in:467: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
+m4trace:configure.in:459: -1- AC_DEFINE_TRACE_LITERAL([GIMMECORE])
+m4trace:configure.in:459: -1- m4_pattern_allow([^GIMMECORE$])
+m4trace:configure.in:459: -1- AH_OUTPUT([GIMMECORE], [/* Define this to enable core dumping */
 @%:@undef GIMMECORE])
-m4trace:configure.in:478: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
-m4trace:configure.in:478: -1- m4_pattern_allow([^DAEMONTOOLS$])
-m4trace:configure.in:478: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
+m4trace:configure.in:470: -1- AC_DEFINE_TRACE_LITERAL([DAEMONTOOLS])
+m4trace:configure.in:470: -1- m4_pattern_allow([^DAEMONTOOLS$])
+m4trace:configure.in:470: -1- AH_OUTPUT([DAEMONTOOLS], [/* Define this to enable daemontools support */
 @%:@undef DAEMONTOOLS])
-m4trace:configure.in:483: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
+m4trace:configure.in:475: -1- AC_CONFIG_FILES([Makefile compat/Makefile src/Makefile tools/Makefile \
   bin/settings.conf bin/cleandb include/config.h])
-m4trace:configure.in:483: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.in:475: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.in:483: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
-m4trace:configure.in:483: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.in:483: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([LTLIBOBJS])
-m4trace:configure.in:483: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([top_builddir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([top_build_prefix])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([srcdir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([abs_srcdir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([top_srcdir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([abs_top_srcdir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([builddir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([abs_builddir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([abs_top_builddir])
-m4trace:configure.in:483: -1- AC_SUBST_TRACE([INSTALL])
+m4trace:configure.in:475: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
+m4trace:configure.in:475: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.in:475: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([LTLIBOBJS])
+m4trace:configure.in:475: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([top_builddir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([top_build_prefix])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([srcdir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([abs_srcdir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([top_srcdir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([abs_top_srcdir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([builddir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([abs_builddir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([abs_top_builddir])
+m4trace:configure.in:475: -1- AC_SUBST_TRACE([INSTALL])

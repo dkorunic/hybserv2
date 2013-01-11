@@ -689,7 +689,6 @@ with_nicklen
 with_channellen
 with_topiclen
 with_network
-enable_warnings
 enable_asserts
 enable_gimmecore
 enable_daemontools
@@ -1323,7 +1322,6 @@ Optional Features:
   --enable-efence         Enable Electric Fence support [default=no]
   --enable-dmalloc        Enable dmalloc support [default=no]
   --enable-boehm-gc       Enable Boehm GC support [default=yes]
-  --enable-warnings       Enable compiler warnings [default=no]
   --enable-asserts        Enable asserts in code [default=no]
   --enable-gimmecore      Enable core dumping [default=yes]
   --enable-daemontools    Enable daemontools support [default=no]
@@ -6158,12 +6156,9 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_efence_malloc" >&5
 $as_echo "$ac_cv_lib_efence_malloc" >&6; }
 if test "x$ac_cv_lib_efence_malloc" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_LIBEFENCE 1
-_ACEOF
-
-  LIBS="-lefence $LIBS"
-
+  LIBS="$LIBS -lefence"
+else
+  cf_enable_efence="no"
 fi
 
 else
@@ -6175,12 +6170,12 @@ fi
 $as_echo_n "checking compile with malloc debugging libs... " >&6; }
 @%:@ Check whether --enable-dmalloc was given.
 if test "${enable_dmalloc+set}" = set; then :
-  enableval=$enable_dmalloc; cf_enable_malloc=$enableval
+  enableval=$enable_dmalloc; cf_enable_dmalloc=$enableval
 else
-  cf_enable_malloc="no"
+  cf_enable_dmalloc="no"
 fi
 
-if test "x$cf_enable_malloc" = "xyes"; then
+if test "x$cf_enable_dmalloc" = "xyes"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for malloc in -ldmalloc" >&5
@@ -6220,12 +6215,10 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_dmalloc_malloc" >&5
 $as_echo "$ac_cv_lib_dmalloc_malloc" >&6; }
 if test "x$ac_cv_lib_dmalloc_malloc" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_LIBDMALLOC 1
-_ACEOF
-
-  LIBS="-ldmalloc $LIBS"
-
+  CFLAGS="$CFLAGS -U_GNU_SOURCE"
+        LIBS="$LIBS -ldmalloc"
+else
+  cf_enable_dmalloc="no"
 fi
 
 else
@@ -6392,24 +6385,6 @@ cat >>confdefs.h <<_ACEOF
 @%:@define TOPICLEN $ac_cv_topiclen
 _ACEOF
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking compile with warning flags" >&5
-$as_echo_n "checking compile with warning flags... " >&6; }
-@%:@ Check whether --enable-warnings was given.
-if test "${enable_warnings+set}" = set; then :
-  enableval=$enable_warnings; cf_enable_warnings=$enableval
-else
-  cf_enable_warnings="no"
-fi
-
-if test "x$cf_enable_warnings" = "xyes"; then
-  CFLAGS="$CFLAGS -Wall"
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking compile with asserts enabled" >&5
 $as_echo_n "checking compile with asserts enabled... " >&6; }
@@ -7784,7 +7759,7 @@ echo "
 Configuration:
   C Compiler ........... ${CC}
   C Compiler flags...... ${CFLAGS}
-  Linker flags ......... ${LDFLAGS}
+  Linker flags ......... ${LIBS} ${LDFLAGS}  
   Source revision ...... ${ac_cv_revision}
   Package revision ..... ${ac_cv_version}
   Detected OS .......... ${host_os}
@@ -7797,11 +7772,12 @@ Compile configuration:
   Topic length ......... ${ac_cv_topiclen}
 
 Extra configuration:
-  Warnings enabled ..... ${cf_enable_warnings}
+  LibEfence enabled .... ${cf_enable_efence}
+  Dmalloc enabled ...... ${cf_enable_dmalloc}
+  Boehm GC enabled ..... ${cf_enable_boehm_gc}
   Asserts enabled ...... ${cf_enable_asserts}
   Coredumps enabled .... ${cf_enable_gimmecore}
   Daemontools enabled .. ${cf_enable_daemontools}
-  Boehm GC enabled ..... ${cf_enable_boehm_gc}
 
 NOTE: Please edit include/config.h to change the settings
 to match your network before running make!"

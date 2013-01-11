@@ -64,12 +64,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `dmalloc' library (-ldmalloc). */
-#undef HAVE_LIBDMALLOC
-
-/* Define to 1 if you have the `efence' library (-lefence). */
-#undef HAVE_LIBEFENCE
-
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 

@@ -1,0 +1,6 @@
+Syntax: %bSET <nickname> NOLINK {ON|OFF}%b
+
+This causes <nickname> to refuse any attempts for link.
+If %bNoLink%b is ON, then other nicknames, when
+attempt to link to <nickname>, will receive that
+<nickname> does not accept links.

@@ -764,9 +764,9 @@ ReadHub()
 	/* read in a line */
 	length = recv(HubSock, buffer, BUFSIZE, 0);
 
-	/* there's just nothing to read */
+	/* hub closed connection */
 	if (length == 0)
-		return 2;
+		return 0;
 
 	/* error in read */
 	if (length == -1)

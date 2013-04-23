@@ -121,7 +121,7 @@ struct ChanInfo
 	struct ChanAccess *access;    /* access list */
 	int akickcnt;                 /* number of akicks */
 	struct AutoKick *akick;       /* autokick list */
-	long expirebans;              /* bans expiration time -Craig */
+	long expirebans;              /* bans expiration time */
 	char *entrymsg;               /* msg to send to users upon entry to
 									 channel */
 	char *email;                  /* email address of channel */

@@ -118,8 +118,9 @@ static void n_flag(struct Luser *, int, char **);
 /* adding NEVEROP support / CoolCold / */
 static void n_set_neverop(struct Luser *, struct NickInfo *, int, char **);
 
-/* adding NOLINK support   -kamen */
+/* adding NOLINK and NOADD support */
 static void n_set_nolink(struct Luser *, struct NickInfo *, int, char **);
+static void n_set_noadd(struct Luser *, struct NickInfo *, int, char **);
 
 /* main NickServ commands */
 static struct Command nickcmds[] =
@@ -202,6 +203,7 @@ static struct Command setcmds[] =
 
 		{ "NEVEROP", n_set_neverop, LVL_NONE },
 		{ "NOLINK", n_set_nolink, LVL_NONE },
+		{ "NOADD", n_set_noadd, LVL_NONE },
 		{ 0, 0, 0 }
 	};
 
@@ -999,7 +1001,7 @@ DeleteNick(struct NickInfo *nickptr)
 		return;
 
 	/* There is little probability for this to happen, but remove the
-	 * pseudonick if nick is dropped before the release -Craig */
+	 * pseudonick if nick is dropped before the release */
 	if (nickptr->flags & NS_RELEASE)
 		release(nickptr->nick);
 
@@ -1494,7 +1496,7 @@ collide(char *nick, int dopseudo)
 	if ((nptr = FindNick(nick)) == NULL)
 		return;
 
-	/* Do nothing if it's a pseudo nick -Craig */
+	/* Do nothing if it's a pseudo nick */
 	if ((nptr != NULL) && lptr->server == Me.sptr)
 	{
 		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
@@ -1565,7 +1567,7 @@ collide(char *nick, int dopseudo)
 		/* When using SVSNICK/FORCENICK, we shouldn't delete the existing
 		 * real client and allocate a new structure for the pseudo nick,
 		 * we'll do it when the server reply with NICK, otherwise we would
-		 * cut the bough on which we are sitting. -Craig */
+		 * cut the bough on which we are sitting. */
 		if (dopseudo)
 			nptr->flags |= NS_RELEASE;
 
@@ -1581,7 +1583,7 @@ killnick:
 		   lptr->nick, Me.name, n_NickServ);
 
 	/* don't add pseudo nickname after KILL */
-	/* delete the client and drop the flags -Craig */
+	/* delete the client and drop the flags */
 	if (!dopseudo)
 	{
 		nptr->flags &= ~(NS_COLLIDE | NS_NUMERIC);
@@ -1639,7 +1641,7 @@ release(char *nickname)
 
 	if ((lptr->server == NULL) || (lptr->server != Me.sptr))
 	{
-		/* drop the release flag to avoid coming here again -Craig */
+		/* drop the release flag to avoid coming here again */
 		nptr->flags &= ~NS_RELEASE;
 		return;
 	}
@@ -1751,7 +1753,7 @@ CollisionCheck(time_t unixtime)
 				if ((lptr = FindClient(nptr->nick)))
 				{
 					/* since we lose 1 minute, let's be accurate and add
-					 * it now -Craig */
+					 * it now */
 					if ((unixtime - (lptr->nick_ts + 60)) >=
 							NSReleaseTimeout)
 					{
@@ -2194,6 +2196,8 @@ n_register(struct Luser *lptr, int ac, char **av)
 		nptr->flags |= NS_HIDEQUIT;
 	if (NSSetNoLink)
 		nptr->flags |= NS_NOLINK;
+	if (NSSetNoAdd)
+		nptr->flags |= NS_NOADD;
 
 	mask = HostToMask(lptr->username, lptr->hostname);
 
@@ -2263,7 +2267,7 @@ n_drop(struct Luser *lptr, int ac, char **av)
 
 	/* We now require the password in order to avoid abuse or inattentive
 	 * drop, as experience shows. Thus, we also make UNSECURE more
-	 * secure... -Craig  */
+	 * secure... */
 	if (pwmatch(ni->password, av[1]))
 	{
 		/* just a regular user dropping their nick */
@@ -2844,7 +2848,7 @@ n_ghost(struct Luser *lptr, int ac, char **av)
 			return;
 		}
 
-		/* Don't allow to ghost pseudo nicknames -Craig */
+		/* Don't allow to ghost pseudo nicknames */
 		if (gptr->server == Me.sptr)
 		{
 			notice(n_NickServ, lptr->nick,
@@ -3881,7 +3885,7 @@ static void n_set_hide(struct Luser *lptr, struct NickInfo *nptr, int ac, char
 static void n_set_password(struct Luser *lptr, struct NickInfo *nptr, int ac,
 						   char **av)
 {
-	/* The user must supply the current password! -Craig */
+	/* The user must supply the current password! */
 	if (ac < 5)
 	{
 		notice(n_NickServ, lptr->nick,
@@ -4461,8 +4465,10 @@ n_info(struct Luser *lptr, int ac, char **av)
 			strlcat(buf, "NoChannelOps, ", sizeof(buf));
 		if (nptr->flags & NS_NOLINK)
 			strlcat(buf, "NoLink, ", sizeof(buf));
+       if (nptr->flags & NS_NOADD)
+           strlcat(buf, "NoAdd, ", sizeof(buf));
 		if (nptr->flags & NS_NEVEROP)
-			strlcat(buf, "NeverOP, ", sizeof(buf));
+			strlcat(buf, "NeverOp, ", sizeof(buf));
 
 
 		if (*buf)
@@ -5624,5 +5630,49 @@ static void n_set_nolink(struct Luser *lptr, struct NickInfo *nptr, int
 		   "Syntax: \002SET <nickname> NOLINK {ON|OFF}\002");
 	notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET NOLINK");
 } /* n_set_nolink() */
+
+
+/*
+ * Prevents a nickname from being added to channel access lists
+ */
+static void n_set_noadd(struct Luser *lptr, struct NickInfo *nptr, int
+                ac, char **av)
+{
+        if (ac < 4)
+        {
+                notice(n_NickServ, lptr->nick,
+                           "Disable adding to channel lists is [\002%s\002]",
+                           nptr->nick,
+                           (nptr->flags & NS_NOADD) ? "ON" : "OFF");
+                return;
+        }
+
+        RecordCommand("%s: %s!%s@%s SET %s NOADD %s",
+                                  n_NickServ, lptr->nick, lptr->username, lptr->hostname,
+                                  nptr->nick, StrToupper(av[3]));
+
+        if (!irccmp(av[3], "ON"))
+        {
+                nptr->flags |= NS_NOADD;
+                notice(n_NickServ, lptr->nick,
+                           "Disable adding to channel lists is now [\002ON\002]",
+                           nptr->nick);
+                return;
+        }
+
+        if (!irccmp(av[3], "OFF"))
+        {
+                nptr->flags &= ~NS_NOADD;
+                notice(n_NickServ, lptr->nick,
+                           "Disable adding to channel lists is now [\002OFF\002]",
+                           nptr->nick);
+                return;
+        }
+
+        /* user gave an unknown param */
+        notice(n_NickServ, lptr->nick,
+                   "Syntax: \002SET <nickname> NOADD {ON|OFF}\002");
+        notice(n_NickServ, lptr->nick, ERR_MORE_INFO, n_NickServ, "SET NOADD");
+} /* n_set_noadd() */
 
 #endif /* NICKSERVICES */

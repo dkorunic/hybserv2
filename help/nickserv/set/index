@@ -11,6 +11,8 @@ settings should be applied to %bmaster%b nickname.
     KILL       Turn kill protection on or off
     MASTER     Reset the master nickname for your link
     MEMOS      Allow memos sent to your nick
+    NOADD      Disable adding to channel access lists
+    NOLINK     Disable linking to your nick
     NOTIFY     Turn notification of new memos on/off
     PASSWORD   Reset your nickname password
     PHONE      Set the phone for this user

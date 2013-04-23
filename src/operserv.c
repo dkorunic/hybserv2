@@ -1760,7 +1760,7 @@ o_jupe(struct Luser *lptr, int ac, char **av, int sockfd)
 		{
 #ifdef NICKSERVICES
 			struct NickInfo *nptr = FindNick(av[1]);
-			/* drop that flag, don't release the juped nick -Craig */
+			/* drop that flag, don't release the juped nick */
 			if (nptr)
 				nptr->flags &= ~NS_RELEASE;
 #endif

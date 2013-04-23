@@ -1,0 +1,3 @@
+Syntax: %bDELME <channel>%b
+
+Removes you from the access list of <channel>.

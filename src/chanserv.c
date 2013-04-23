@@ -99,6 +99,8 @@ static void c_akick_add(struct Luser *, struct NickInfo *, int, char **);
 static void c_akick_del(struct Luser *, struct NickInfo *, int, char **);
 static void c_akick_list(struct Luser *, struct NickInfo *, int, char **);
 
+static void c_delme(struct Luser *lptr, struct NickInfo *, int ac, char **av);
+
 static void c_list(struct Luser *, struct NickInfo *, int, char **);
 static void c_level(struct Luser *, struct NickInfo *, int, char **);
 
@@ -190,6 +192,7 @@ static struct Command chancmds[] =
 	    { "INFO", c_info, LVL_NONE },
 	    { "CLEAR", c_clear, LVL_IDENT },
 	    { "FIXTS" , c_fixts, LVL_ADMIN },
+	    { "DELME", c_delme, LVL_IDENT },
 #ifdef EMPOWERADMINS
 	    { "FORBID", c_forbid, LVL_ADMIN },
 	    { "UNFORBID", c_unforbid, LVL_ADMIN },
@@ -3312,7 +3315,7 @@ c_register(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 	}
 
 	/* We should check the nickname's age if we require nicks to have
-	 * specified minimum age to be able to register channels. -Craig */
+	 * specified minimum age to be able to register channels. */
 	if (MinNickAge)
 	{
 		if (current_ts - master->created < MinNickAge &&
@@ -3613,6 +3616,12 @@ c_access_add(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		if (!(nickptr = FindNick(av[3])))
 		{
 			notice(n_ChanServ, lptr->nick, "Nickname [\002%s\002] is not registered. Please use either registered nickname or proper mask (nick!user@host, user@host or just host)", av[3]);
+			return;
+		}
+
+		if (nickptr->flags & NS_NOADD)
+		{
+			notice(n_ChanServ, lptr->nick, "Nickname [\002%s\002] cannot be added to channel access lists", av[3]);
 			return;
 		}
 	}
@@ -5499,8 +5508,15 @@ c_set_founder(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		return;
 	}
 
+    if (fptr->flags & NS_NOADD)
+    {
+        notice(n_ChanServ, lptr->nick,
+               "The nickname [\002%s\002] cannot be set founder", fptr->nick);
+        return;
+    }
+
 	/* We should check the nickname's age if we require nicks to have
-	 * specified minimum age to be able to become founders. -Craig */
+	 * specified minimum age to be able to become founders. */
 	if (MinNickAge)
 	{
 		if (current_ts - fptr->created < MinNickAge &&
@@ -5585,6 +5601,13 @@ c_set_successor(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
 		notice(n_ChanServ, lptr->nick, ERR_NOT_REGGED, av[3]);
 		return;
 	}
+
+    if (fptr->flags & NS_NOADD)
+    {
+        notice(n_ChanServ, lptr->nick,
+               "The nickname [\002%s\002] cannot be set successor", fptr->nick);
+        return;
+    }
 
 	MyFree(cptr->successor);
 
@@ -8338,7 +8361,7 @@ void SetDefaultALVL(struct ChanInfo *cptr)
  * ExpireBans()
  * Remove any bans that have expired. -harly 
  * Checks also whether the channel uses own time value and evaluates
- * according to it.	-Craig
+ * according to it.
  */
 void ExpireBans(time_t unixtime)
 {
@@ -8477,7 +8500,7 @@ static void c_set_expirebans(struct Luser *lptr,
 		       "EXPIREBANS for channel %s is [\002%s\002]",
 		       cptr->name, (cptr->flags & CS_EXPIREBANS) ? "ON" : "OFF");
 
-		/* also give information about the expiration time -Craig */
+		/* also give information about the expiration time */
 		notice(n_ChanServ, lptr->nick,
 				"Bans expiration time for channel %s is [\002%s\002]",
 				cptr->name, cptr->expirebans ? timeago(cptr->expirebans, 4)
@@ -8517,5 +8540,72 @@ static void c_set_expirebans(struct Luser *lptr,
 	notice(n_ChanServ, lptr->nick, ERR_MORE_INFO,
 	       n_ChanServ, "SET EXPIREBANS");
 } /* c_set_expirebans() */
+
+/*
+ * Users can delete themselves from channels
+ */
+static void c_delme(struct Luser *lptr, struct NickInfo *nptr, int ac, char **av)
+{
+
+	struct ChanInfo *cptr;
+	struct NickInfo *mptr;
+	struct AccessChannel *acptr = NULL;
+
+	if (ac < 2)
+	{
+		notice(n_ChanServ, lptr->nick,
+			   "Syntax: \002DELME <channel>\002");
+		notice(n_ChanServ, lptr->nick,
+			   ERR_MORE_INFO,
+			   n_ChanServ,
+			   "DELME");
+		return;
+	}
+
+	if (!(cptr = FindChan(av[1])))
+	{
+		notice(n_ChanServ, lptr->nick, ERR_CH_NOT_REGGED, av[1]);
+		return;
+	}
+
+	mptr = GetLink(nptr->nick);
+
+	if (mptr && mptr->AccessChannels)
+		for (acptr = mptr->AccessChannels; acptr; acptr = acptr->next)
+			if (acptr->cptr == cptr)
+				break;
+
+	if (acptr == NULL)
+	{
+		notice(n_ChanServ, lptr->nick,
+		       "You are not in the access list of [\002%s\002]",
+		       cptr->name);
+
+		return;
+	}
+
+	if (acptr->accessptr->level <= cptr->access_lvl[CA_AUTODEOP])
+	{
+		notice(n_ChanServ, lptr->nick,
+		       "You cannot do that because you have AUTODEOP access level on [\002%s\002]",
+		       cptr->name);
+
+		return;
+	}
+
+	notice(n_ChanServ, lptr->nick,
+	       "You have been removed from the access list of [\002%s\002]",
+	       cptr->name);
+
+	RecordCommand("%s: %s!%s@%s DELME [%s]",
+				  n_ChanServ,
+				  lptr->nick,
+				  lptr->username,
+				  lptr->hostname,
+				  cptr->name);
+
+	DeleteAccess(cptr, acptr->accessptr);
+	DeleteAccessChannel(mptr, acptr);
+};
 
 #endif /* defined(NICKSERVICES) && defined(CHANNELSERVICES) */

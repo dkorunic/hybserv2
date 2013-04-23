@@ -754,7 +754,7 @@ s_nick(int ac, char **av)
 		 * removed and we'll be unable to find and release the nickname.
 		 * Also, we wait for the server reply before creating the
 		 * pseudo-nick to avoid possible direct collision. Now, we can
-		 * allocate a new structure for our pseudo client. -Craig */
+		 * allocate a new structure for our pseudo client. */
 			if (nptr->flags & NS_RELEASE)
 			{
 				char **args;

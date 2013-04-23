@@ -30,6 +30,12 @@ Hybserv-1.9.5-dev
     ban/exception/etc simultaneously, so if expirebans is on, chanserv
     removes the same ban many times in a row [Kamen Sabeff]
   + logout command for OpenServ [Kamen Sabeff]
+  - ReadHub() fix for correct reconnect in case of conn close [Kamen
+    Sabeff]
+  + NoAdd nickname option for channels [Kamen Sabeff]
+  - fixing missing help files
+  + DELME command for users to delete themselves from channel lists [Kamen
+    Sabeff]
 
 Hybserv-1.9.4
 

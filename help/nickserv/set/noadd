@@ -1,0 +1,4 @@
+Syntax: %bSET <nickname> NOADD {ON|OFF}%b
+
+This causes <nickname> to refuse any attempts
+for add to channel access lists.

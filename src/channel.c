@@ -25,6 +25,7 @@
 #include "mystring.h"
 #include "nickserv.h"
 #include "operserv.h"
+#include "seenserv.h"
 #include "settings.h"
 #include "sock.h"
 #include "sprintf_irc.h"
@@ -840,6 +841,9 @@ void UpdateChanModes(struct Luser *lptr, const char *who, struct
 
 	int cs_deoped = 0; /* was chanserv deoped? */
 #endif /* NICKSERVICES && CHANNELSERVICES */
+#ifdef SEENSERVICES
+	int es_devoiced = 0;
+#endif
 
 	char **modeargs; /* arguements to +l/k/o/v modes */
 	char tempargs[MAXLINE + 1];
@@ -996,7 +1000,9 @@ void UpdateChanModes(struct Luser *lptr, const char *who, struct
 
 				if ((userptr = FindClient(modeargs[argidx])) == NULL)
 					break;
-
+#ifdef SEENSERVICES
+				if (add || (userptr != Me.esptr))
+#endif
 				SetChannelMode(cptr, add, MODE_V, userptr);
 
 				if (add)
@@ -1009,6 +1015,10 @@ void UpdateChanModes(struct Luser *lptr, const char *who, struct
 				}
 				else
 				{
+#ifdef SEENSERVICES
+					if (userptr == Me.esptr)
+						es_devoiced = 1;
+#endif
 #ifdef STATSERVICES
 					if (lptr != NULL)
 						++lptr->numdvoices;
@@ -1293,6 +1303,28 @@ void UpdateChanModes(struct Luser *lptr, const char *who, struct
 			       lptr->nick, lptr->username, lptr->hostname, n_ChanServ);
 	}
 #endif /* defined NICKSERVICES) && defined CHANNELSERVICES */
+
+#ifdef SEENSERVICES
+
+	if ((es_devoiced) && (!FloodCheck(cptr, lptr, Me.esptr, 0)))
+	{
+		/* revoice SeenServ */
+#ifdef SAVE_TS
+		ss_part(cptr);
+		ss_join(cptr);
+#else
+
+		toserv(":%s MODE %s +v %s\r\n", Me.name, cptr->name, n_SeenServ);
+#endif /* SAVE_TS */
+
+		if (lptr == NULL)
+			putlog(LOG1, "%s: %s attempted to devoice %s", cptr->name, who,
+			       n_SeenServ);
+		else
+			putlog(LOG1, "%s: %s!%s@%s attempted to devoice %s", cptr->name,
+			       lptr->nick, lptr->username, lptr->hostname, n_SeenServ);
+	}
+#endif /* SEENSERVICES */
 } /* UpdateChanModes() */
 
 /*

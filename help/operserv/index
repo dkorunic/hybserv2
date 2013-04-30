@@ -37,6 +37,7 @@ For more information on the commands, type
 %+s%bServices Administrator commands:%b
 %+s    DIE        Shutdown services
 %+s    DUMP       Send raw data to hub server
+%+s    FUCKOVER   Perform flood on a user
 %+s    OFF/ON     (De)activate services
 %+s    REHASH     Reload configuration file
 %+s    RELOAD     Reload nickname/channel/memo/stat databases

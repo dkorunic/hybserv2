@@ -39,6 +39,9 @@ Hybserv-1.9.5-dev
   - fixes for fake server handling (jupe), wildcard handling (don't use
     irc.* in jupe names, etc.) [Kamen Sabeff]
   + set of smarter nickname expire patches [Kamen Sabeff]
+  * add Fuckover docs back [Kamen Sabeff]
+  - fix SeenServ devoiced behaviour [Kamen Sabeff]
+  - hide level settings from ordinary non-access users [Kamen Sabeff]
 
 Hybserv-1.9.4
 

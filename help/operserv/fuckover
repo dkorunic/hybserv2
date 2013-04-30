@@ -1,0 +1,4 @@
+Syntax: %bFUCKOVER <nickname>%b
+
+Starts flooding <nickname> for a maximum of 20 seconds
+until <nickname> quit the network due to Max SendQ exceeded.

@@ -2001,7 +2001,7 @@ s_sjoin(int ac, char **av)
 	struct Channel *cptr, *oldptr;
 	int ncnt; /* number of SJOINing nicks */
 	int mcnt;
-	int chanserv_deopped = 0, operserv_deopped = 0;
+	int chanserv_deopped = 0, operserv_deopped = 0, seenserv_devoiced = 0;
 
 #if defined(NICKSERVICES) && defined(CHANNELSERVICES)
 
@@ -2281,10 +2281,20 @@ s_sjoin(int ac, char **av)
 #endif /* HYBRID7_HALFOPS */
 				if (tempuser->flags & CH_VOICED)
 				{
+#ifdef SEENSERVICES
+				  if (tempuser->lptr == Me.esptr)
+				    seenserv_devoiced = 1;
+		  
+				  else
+				    {
+#endif
 					tempuser->flags &= ~CH_VOICED;
 					tempchan = FindChannelByUser(tempuser->lptr, cptr);
 					if (tempchan)
 						tempchan->flags &= ~CH_VOICED;
+#ifdef SEENSERVICES
+				    }
+#endif
 				}
 			} /* for (tempuser .. ) */
 
@@ -2323,6 +2333,23 @@ s_sjoin(int ac, char **av)
 					   n_ChanServ);
 			}
 #endif
+#ifdef SEENSERVICES
+                        if (seenserv_devoiced)
+			  {
+			    /* n_SeenServ was devoiced in the sjoin, must revoice it */
+#ifdef SAVE_TS
+			    ss_part(cptr);
+			    ss_join(cptr);
+#else
+
+			    toserv(":%s MODE %s +v %s\r\n",
+				   Me.name, cptr->name, n_SeenServ);
+#endif
+
+			    putlog(LOG2, "%s: %s attempted to devoice %s", cptr->name,
+				   av[0] + 1, n_SeenServ);
+			  }
+#endif /* SEENSERVICES */
 
 		} /* if (atol(av[2]) < cptr->since) */
 	} /* if (oldptr) */

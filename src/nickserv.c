@@ -1379,8 +1379,19 @@ ExpireNicknames(time_t unixtime)
 
 			if (NickNameExpire)
 			{
-				if ((!(nptr->flags & (NS_FORBID | NS_NOEXPIRE | NS_IDENTIFIED)))
-						&& ((unixtime - nptr->lastseen) >= NickNameExpire))
+				long exptime;
+				struct NickInfo *mptr;
+				
+				/* Smart expire? */
+				if (NickNameExpireAddTime && NickNameExpireAddPeriod)
+					exptime = NickNameExpire + NickNameExpireAddTime * ((unixtime - nptr->created) / NickNameExpireAddPeriod);
+				else
+					exptime = NickNameExpire;
+
+				/* If the master has NoExpire, slave nicks won't expire, too */
+				mptr = GetMaster(nptr);
+				if ((!(nptr->flags & (NS_FORBID | NS_NOEXPIRE | NS_IDENTIFIED))) && (!(mptr->flags & NS_NOEXPIRE))
+					&& ((unixtime - nptr->lastseen) >= exptime))
 				{
 					putlog(LOG2,
 						   "%s: Expired nickname [%s]",
@@ -4383,6 +4394,19 @@ n_info(struct Luser *lptr, int ac, char **av)
 			"         Registered: %s ago",
 			timeago(realptr->created, 1));
 
+	if ((isadmin || isowner) && NickNameExpire)
+	{
+		long exptime;
+		if (NickNameExpireAddTime && NickNameExpireAddPeriod)
+			exptime = NickNameExpire + NickNameExpireAddTime * ((current_ts - realptr->created) / NickNameExpireAddPeriod);
+		else
+			exptime = NickNameExpire;
+
+		notice(n_NickServ, lptr->nick,
+			"        Expire Time: %s",
+			timeago(exptime, 3));
+	}
+
 	if (realptr->lastseen && !online)
 		notice(n_NickServ, lptr->nick,
 			"          Last Seen: %s ago",
@@ -4439,7 +4463,7 @@ n_info(struct Luser *lptr, int ac, char **av)
 				if (nptr->flags & NS_PROTECTED)
 					strlcat(buf, "Kill Protection, ", sizeof(buf));
 		}
-		if (nptr->flags & NS_NOEXPIRE)
+		if (realptr->flags & NS_NOEXPIRE)  /* show the specific flag, not the master's one */
 			strlcat(buf, "NoExpire, ", sizeof(buf));
 		if (nptr->flags & NS_AUTOMASK)
 			strlcat(buf, "AutoMask, ", sizeof(buf));

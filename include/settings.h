@@ -172,5 +172,7 @@ extern  long      NickRegDelay;
 extern  long      StatExpire;
 extern  long      TelnetTimeout;
 extern  long      MinNickAge;
+extern  long      NickNameExpireAddTime;
+extern  long      NickNameExpireAddPeriod;
 
 #endif /* INCLUDED_settings_h */

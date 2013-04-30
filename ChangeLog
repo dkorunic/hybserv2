@@ -38,6 +38,7 @@ Hybserv-1.9.5-dev
     Sabeff]
   - fixes for fake server handling (jupe), wildcard handling (don't use
     irc.* in jupe names, etc.) [Kamen Sabeff]
+  + set of smarter nickname expire patches [Kamen Sabeff]
 
 Hybserv-1.9.4
 

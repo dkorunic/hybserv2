@@ -146,6 +146,8 @@ int       AllowKillProtection;
 int       AllowKillImmed;
 int	      AllowGuardChannel;
 long      MinNickAge;
+long      NickNameExpireAddTime;   /* How much time to add to NickNameExpire, and ... */
+long      NickNameExpireAddPeriod; /* ... how often to increase that time             */
 int       MaxChansPerUser;
 int       MinChanUsers;
 int       MaxAkicks;
@@ -240,6 +242,8 @@ struct Directive directives[] =
 
 	    /* Expire Settings */
 	    { "NickNameExpire", D_OPTIONAL,   { { PARAM_TIME, &NickNameExpire } } },
+	    { "NickNameExpireAddPeriod", D_OPTIONAL,   { { PARAM_TIME, &NickNameExpireAddPeriod } } },
+	    { "NickNameExpireAddTime", D_OPTIONAL,   { { PARAM_TIME, &NickNameExpireAddTime } } },
 	    { "ChannelExpire", D_OPTIONAL,    { { PARAM_TIME, &ChannelExpire } } },
 	    { "MemoExpire", D_OPTIONAL,       { { PARAM_TIME, &MemoExpire } } },
 	    { "StatExpire", D_OPTIONAL,       { { PARAM_TIME, &StatExpire } } },

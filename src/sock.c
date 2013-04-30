@@ -603,7 +603,7 @@ ReadSocketInfo(void)
 		FD_ZERO(&writefds);
 
 		TimeOut.tv_sec = 0L;
-		TimeOut.tv_usec = 200L;
+		TimeOut.tv_usec = 20000L;
 
 		if (currenthub && (HubSock != NOSOCKET))
 		{

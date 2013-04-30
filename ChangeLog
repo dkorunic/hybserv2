@@ -36,6 +36,8 @@ Hybserv-1.9.5-dev
   - fixing missing help files
   + DELME command for users to delete themselves from channel lists [Kamen
     Sabeff]
+  - fixes for fake server handling (jupe), wildcard handling (don't use
+    irc.* in jupe names, etc.) [Kamen Sabeff]
 
 Hybserv-1.9.4
 

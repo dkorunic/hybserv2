@@ -1537,6 +1537,10 @@ s_squit(int ac, char **av)
 	struct Server *tmpserv;
 #endif
 
+#ifdef ALLOW_JUPES
+	struct Jupe *tmpjupe;
+#endif
+
 	if (ac == 3)
 		sptr = FindServer(av[1]);
 	else if (ac == 4)
@@ -1544,26 +1548,26 @@ s_squit(int ac, char **av)
 	else
 		sptr = NULL;
 
+#ifdef ALLOW_JUPES
 	/* if manual squitting a juped server, get it back in! */
 	/* XXX: refactor this back into jupe.c function -kre */
-	if ((sptr != NULL) && IsJupe(sptr->name))
+	if ((tmpjupe = IsJupe(av[ac-2])))
 	{
-		char sendstr[MAXLINE + 1], **arv;
-		int acnt;
+	    /* it's our fake server, just get it back in (already hash-added) 
+	     */
+	    if (sptr)
+	      toserv(":%s SERVER %s 2 :Juped: %s\r\n", Me.name,
+		     sptr->name, tmpjupe->reason);
 
-		/* add a fake server to replace it */
-		ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n", Me.name,
-			sptr->name, "Auto-rejupe after manual squit");
+	    /* it's a remote server quiting (most probably after SQUIT in jupe.c),
+	     * which is to be juped
+	     */
+	    else
+	      FakeServer(av[ac-2], tmpjupe->reason);
 
-		toserv("%s", sendstr);
-
-		acnt = SplitBuf(sendstr, &arv);
-		AddServer(acnt, arv);
-
-		MyFree(arv);
 		return;
 	}
-
+#endif
 	/* If we defined more info on split, we will not delete
 	 * non-intentionally splitted servers from hash -kre */
 

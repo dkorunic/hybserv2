@@ -36,6 +36,7 @@ void AddJupe(char *, char *, char *);
 void DeleteJupe(struct Jupe *);
 void CheckJupes(void);
 void DoJupeSquit(char *, char *, char *);
+void FakeServer(char *, char *);
 int CheckJuped(char *);
 struct Jupe *IsJupe(char *);
 void InitJupes(void);

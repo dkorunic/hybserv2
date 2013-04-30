@@ -159,8 +159,14 @@ DoJupeSquit(char *serv, char *reason, char *who)
 
 {
 	struct Server *tempserv, *prev;
-	char sendstr[MAXLINE + 1], **arv;
-	int acnt;
+	char *servptr;
+	int nowild;
+
+	/* check for wildcards */
+	for (servptr = serv; *servptr != '\0' && !IsMWildChar(*servptr); servptr++)
+	  ;
+
+	nowild = (*servptr == '\0');
 
 	for (tempserv = ServerList; tempserv; )
 	{
@@ -173,22 +179,46 @@ DoJupeSquit(char *serv, char *reason, char *who)
 			prev = tempserv->next;
 			DeleteServer(tempserv); /* remove server from list */
 			tempserv = prev;
+
+			/* If the fake server is introduced before the remote server has quited,
+			 * we get "server already exists" and services get SQUIT'ed,
+			 * so we'll introduce it in s_squit()
+			 */
+			if (nowild)
+			  return;
 		}
 		else
 			tempserv = tempserv->next;
 	}
 
-	/* add a fake server to replace it */
+	/* we don't want to introduce servers such as "irc.*"
+	 */
+	if (nowild)
+	  FakeServer(serv, reason);
+} /* DoJupeSquit() */
+
+/*
+FakeServer()
+  args: char *serv, char *reason
+  purpose: introduce a fake server to the network
+*/
+
+void
+FakeServer(char *serv, char *reason)
+{
+  char **arv, sendstr[MAXLINE + 1];
+  int arc;
+
 	ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n", Me.name, serv,
 	           reason);
 
 	toserv("%s", sendstr);
 
-	acnt = SplitBuf(sendstr, &arv);
-	AddServer(acnt, arv);
+  arc = SplitBuf(sendstr, &arv);
+  AddServer(arc, arv);
 
 	MyFree(arv);
-} /* DoJupeSquit() */
+}
 
 /*
 CheckJuped()
@@ -271,14 +301,12 @@ CheckJuped(char *name)
 				tempserv = FindServer(name);
 				DeleteServer(tempserv);
 
-				/* replace it with fake server */
-				ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s\r\n",
-				           Me.name, name, tempjupe->reason);
-				toserv("%s", sendstr);
-				SplitBuf(sendstr, &arv);
+			/* If the fake server is introduced before the remote server has quited,
+			 * we get "server already exists" and services get SQUIT'ed,
+			 * so we'll introduce it in s_squit()
+			 */
 
-				AddServer(5, arv);
-				MyFree(arv);
+
 			}
 			return 1;
 		}
@@ -345,6 +373,14 @@ InitJupes()
 		}
 		else
 		{
+		  char *tptr;
+
+		  /* check for wildcards */
+		  for (tptr = tmpjupe->name; *tptr != '\0' && !IsMWildChar(*tptr); tptr++)
+		    ;
+
+		  if (*tptr == '\0')
+		    {
 			ircsprintf(sendstr, ":%s SERVER %s 2 :Juped: %s", Me.name,
 			           tmpjupe->name, tmpjupe->reason);
 
@@ -359,6 +395,7 @@ InitJupes()
 			AddServer(5, av);
 			MyFree(av);
 		}
+	}
 	}
 } /* InitJupes() */
 

@@ -3047,7 +3047,6 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 	{
 		notice(n_NickServ, lptr->nick, "Invalid hostmask! Username too long!");
 		MyFree(tmp);
-		MyFree(host);
 		return;
 	}
 
@@ -3058,7 +3057,7 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 
 	++host;
 
-	if (OnAccessList(user, host+1, nptr))
+	if (OnAccessList(user, host, nptr))
 	{
 		if (target)
 			notice(n_NickServ, lptr->nick,
@@ -3071,7 +3070,6 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 				   mask);
 
 		MyFree(tmp);
-		MyFree(host);
 		return;
 	}
 	else
@@ -3109,7 +3107,6 @@ n_access_add(struct Luser *lptr, struct NickInfo *target, int ac, char **av)
 	}
 
 	MyFree(tmp);
-	MyFree(host);
 } /* n_access_add() */
 
 static void

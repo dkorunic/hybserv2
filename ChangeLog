@@ -42,6 +42,8 @@ Hybserv-1.9.5-dev
   * add Fuckover docs back [Kamen Sabeff]
   - fix SeenServ devoiced behaviour [Kamen Sabeff]
   - hide level settings from ordinary non-access users [Kamen Sabeff]
+  - fix for NickServer ns access add crash and not matching a hostmask
+    already in ns access list [Kamen Sabeff]
 
 Hybserv-1.9.4
 

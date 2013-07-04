@@ -1,18 +1,16 @@
-NOTE: releasenotes from old release -- 1.9.5 development is in progress
----
+04/07/2013  -  Dinko Korunic <dinko|korunic|AT|gmail|com>
 
-09/20/2009  -  Dinko Korunic <dinko|korunic|AT|gmail|com>
-
-  Hybserv 1.9.4 has been released!
+  Hybserv 1.9.5 has been released!
 
   A new major release is here with roughly 2 medium-significance
-  enhancements, 15 bugfixes and 4 minor enhancements.
+  enhancements, 85 bugfixes and 6 minor enhancements.
 
 Releases are available from following sources:
 
-  URL: http://downloads.sourceforge.net/hybserv2/hybserv-1.9.4.tar.gz
-  SVN: https://hybserv2.svn.sourceforge.net/svnroot/hybserv2/tags/REL_1_9_4/
+  https://github.com/dkorunic/hybserv2/releases
+  http://freecode.com/projects/hybserv2/releases
 
 Hybserv homepage / bugreport / wiki:
 
-  http://sourceforge.net/projects/hybserv2
+  https://github.com/dkorunic
+  http://hybserv2.sourceforge.net

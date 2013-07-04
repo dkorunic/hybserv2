@@ -3,8 +3,9 @@
   * = Changed something
   ^ = Other
 
-Hybserv-1.9.5-dev
+Hybserv-1.9.5
 
+  ^ stage to REL_1_9_4 [04/07/2013]
   - huge amount of various fixes practically in all components (15
     occurences of dead code blocks, 13 occurences of unchecked return
     values, 2 occurences of uninitialized variables usage, 13 occurences

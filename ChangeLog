@@ -44,6 +44,9 @@ Hybserv-1.9.5-dev
   - hide level settings from ordinary non-access users [Kamen Sabeff]
   - fix for NickServer ns access add crash and not matching a hostmask
     already in ns access list [Kamen Sabeff]
+  + people with access level for ACCESS can see the list [Kamen Sabeff]
+  - QUIT messages for all services which resolves splits on DIE and
+    RESTART [Kamen Sabeff]
 
 Hybserv-1.9.4
 

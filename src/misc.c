@@ -284,6 +284,10 @@ DoShutdown(char *who, char *reason)
 
 	toserv(":%s QUIT :%s\r\n", n_ChanServ, "Shutting Down");
 #endif
+#ifdef SEENSERVICES
+        toserv(":%s QUIT :%s\r\n", n_SeenServ, "Shutting Down");
+#endif
+	toserv(":%s QUIT :%s\r\n", n_OperServ, "Shutting Down");
 
 	/* close listening sockets */
 	for (pptr = PortList; pptr; pptr = pptr->next)

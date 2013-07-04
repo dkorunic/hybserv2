@@ -1964,6 +1964,15 @@ ServReboot()
 	}
 	connections = NULL;
 
+#if defined(NICKSERVICES) && defined(CHANNELSERVICES)
+
+        toserv(":%s QUIT :%s\r\n", n_ChanServ, "Restarting");
+#endif
+#ifdef SEENSERVICES
+        toserv(":%s QUIT :%s\r\n", n_SeenServ, "Restarting");
+#endif
+        toserv(":%s QUIT :%s\r\n", n_OperServ, "Restarting");
+
 	/* Instead of SQUIT -kre */
 	toserv(":%s ERROR :Restarting\r\n", Me.name);
 	toserv(":%s QUIT\r\n", Me.name);

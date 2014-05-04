@@ -301,8 +301,10 @@ int main(int argc, char *argv[])
 			}
 			currenthub->connect_ts = 0;
 		}
-
-		close(HubSock); /* There was an error */
+		
+		/* There was an error */
+		if (HubSock > 0)
+			close(HubSock);
 		HubSock = NOSOCKET;
 
 		/*

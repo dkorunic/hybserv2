@@ -1952,7 +1952,8 @@ ServReboot()
 	while (connections)
 	{
 		tempconn = connections->next;
-		close(connections->socket);
+		if (connections->socket > 0)
+			close(connections->socket);
 		connections->socket = NOSOCKET;
 
 		MyFree(connections->nick);

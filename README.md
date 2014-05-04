@@ -14,9 +14,10 @@ Each of the services can be enabled and disabled as necessary.
 
 Hybserv was specifically designed to run with Hybrid6/7 IRCd, although it
 *should* work with Ratbox IRCd and any other Hybrid-based IRCd. You may
-find the Hybrid IRC daemon at http://ircd-hybrid.com/. These services
-(more or less same code) are currently used by several other networks such
-as idolNET, BalcanNET, BGNet, BGFree, UniBG, BCNet, GunNet, ShakeIT,
+find the Hybrid IRC daemon at
+[http://ircd-hybrid.com/](http://ircd-hybrid.com/). These services (more
+or less same code) are currently used by several other networks such as
+idolNET, BalcanNET, BGNet, BGFree, UniBG, BCNet, GunNet, ShakeIT,
 FreeWorld, IRCBG, FreeNode/OPN.
 
 The former Hybserv development team has decided to spin off and focus its
@@ -83,8 +84,8 @@ DISTRIBUTION
 ------------
 You can get Hybserv2 from:
 
-1. [GitHub Hybserv2 home](http://github.com/dkorunic/hybserv2) and
-      [GitHub Hybserv2 releases](http://github.com/dkorunic/hybserv2/releases)
+1. [Hybserv2 home](http://github.com/dkorunic/hybserv2) and
+      [Hybserv2 releases](http://github.com/dkorunic/hybserv2/releases)
 
     NOTE: GitHub copy is always more current than the release, since it is
     working/development version. It is possible to checkout any needed
@@ -202,7 +203,8 @@ lines:
 
 BUGS
 ----
-Use the appropriate bug reporting and ticketing system: [GitHub Hybserv2 Issues](https://github.com/dkorunic/hybserv2/issues)
+Use the appropriate bug reporting and ticketing system: 
+[Hybserv2 Issues](https://github.com/dkorunic/hybserv2/issues)
 
 
 Alternative, subscribe to the mailing list (details follow) and post them

@@ -29,7 +29,7 @@ NOTE: Per Sidewnder's (Cosine's) request - original Hybserv will no longer
 be supported.  So if you have questions or some problems, please
 *upgrade* first to a recent stable or even to a development version.
 
-Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net) and is
+Hybserv was first coded by Patrick Alken <wnder@underworld.net> and is
 now maintained by the Hybserv2 Coding Team, unless otherwise mentioned in
 the code or the Credits.
 
@@ -229,7 +229,7 @@ Functions used from other GPL'd sources:
 * HashChannel() -- from ircd-hybrid source
 
 tools/mkpasswd.c is copyright (C) 1991 Nelson Minar
-<minar|AT|reed|edu>, W. Campbell, and Hybrid7 team.
+<minar@reed.edu>, Wendy Campbell <wcampbel@botbay.net>, and Hybrid7 team.
 
 Some help files were used from EsperNet's service package:
 [ftp://ftp.dragonfire.net/software/unix/irc](ftp://ftp.dragonfire.net/software/unix/irc)

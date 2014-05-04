@@ -1,5 +1,5 @@
-![](https://api.travis-ci.org/dkorunic/hybserv2.svg)
-![](https://scan.coverity.com/projects/263/badge.svg)
+[![Travis CI Build Status](https://travis-ci.org/dkorunic/hybserv2.svg?branch=master)](https://travis-ci.org/dkorunic/hybserv2)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/263/badge.svg)](https://scan.coverity.com/projects/263)
 
 README
 ======
@@ -25,8 +25,8 @@ version is even better. If there is something you would like to see added
 to Hybserv2, please let us know as we are always looking for fresh ideas.
 
 NOTE: Per Sidewnder's (Cosine's) request - original Hybserv will no longer
-      be supported.  So if you have questions or some problems, please
-      *upgrade* first to a recent stable or even to a development version.
+be supported.  So if you have questions or some problems, please
+*upgrade* first to a recent stable or even to a development version.
 
 Hybserv was first coded by Patrick Alken (wnder|AT|underworld|net) and is
 now maintained by the Hybserv2 Coding Team, unless otherwise mentioned in
@@ -234,4 +234,3 @@ Some help files were used from EsperNet's service package:
 
 The ideas for a settings.conf and the shownicks/showchans programs were
 inspired from this package as well. See also the beginning of this file.
-

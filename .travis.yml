@@ -3,3 +3,15 @@ compiler:
   - gcc
   - clang
 script: ./configure && make
+env:
+  global:
+   - secure: "iVcCIz+mYHBJS1y6keTuNl8NIo5c2KR+ryrAn8BsheFjFqL67XnV6DSFITGp/1QGlQZ5Jm8tS4tyAd12QzR5eiTX0pkDprczD44aCUYi6agCFN48CA/R2YWKmxkIeFlprPBP2ou+qkSzn4ErifpVBBz9DnpwiFGH/NDjix/Iqz0="
+addons:
+  coverity_scan:
+    project:
+      name: "dkorunic/hybserv2"
+      description: "Hybserv IRC services"
+    notification_email: dinko.korunic@gmail.com
+    build_command_prepend: ./configure
+    build_command: make
+    branch_pattern: coverity_scan

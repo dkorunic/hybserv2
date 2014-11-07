@@ -89,7 +89,7 @@ distclean: clean
 mrproper: distclean
 
 depend:
-	@echo "*** Making dependancies ***"
+	@echo "*** Making dependencies ***"
 	@if test ! -f src/.depend; then \
 		touch src/.depend; \
 		cd src; $(MAKE) depend; \

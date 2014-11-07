@@ -16,7 +16,7 @@ RUN chown -Rh hybserv: /usr/local/hybserv
 
 # clean cruft
 RUN rm -rf /root/src
-RUN apt-get -y purge build-essential git-core
+RUN apt-get -y purge build-essential git-core fakeroot libfakeroot patch cpp make binutils libc-dev-bin libc6-dev linux-libc-dev manpages
 RUN apt-get -y autoremove
 
 # add volumes

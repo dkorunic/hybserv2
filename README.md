@@ -1,5 +1,7 @@
 [![Travis CI Build Status](https://travis-ci.org/dkorunic/hybserv2.svg?branch=master)](https://travis-ci.org/dkorunic/hybserv2)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/263/badge.svg)](https://scan.coverity.com/projects/263)
+[![Issue Stats](http://issuestats.com/github/dkorunic/hybserv/badge/pr)](http://issuestats.com/github/dkorunic/hybserv)
+
 
 README
 ======

@@ -6,6 +6,14 @@
 README
 ======
 
+*Important note: as it currently stands, Hybserv2 is incompatible with
+IRCD Hybrid 8.x as they have decided to be TS3 incompatible. There is some
+grunt work needed to make it fully TS6 and I personally don't have any
+more time and interest to code for IRC and related to IRC. For me, IRC has
+long died, as well as NNTP and other things we Unix kids loved in the
+past.*
+
+
 INFO
 ----
 Hybserv2 is a new and improved version of the now unsupported Hybserv,

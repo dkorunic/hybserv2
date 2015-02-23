@@ -84,7 +84,7 @@ The following people have contributed to Hybserv2 in blood and sweat
 | sofit | Stanislav Zahariev | sofit@proshe.bg| 
 | t0sh | Todor Dimitrov | todor_p_dimitrov@yahoo.com| 
 | toot | Toby Verrall | to7@antipope.fsnet.co.uk| 
-| Craig | Kamen Sabeff | ksabeff@gmail.com| 
+| Craig | Kamen Sabeff | kamen@wpw.pw|
 
 We are grateful to all these people, as well as all users that have been
 reporting bugs last several years. Thank you, without you this project
